@@ -4,7 +4,7 @@ package recoder.java;
 
 /**
  * Statement container.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
@@ -12,7 +12,7 @@ public interface StatementContainer extends NonTerminalProgramElement {
 
     /**
      * Get the number of statements in this container.
-     * 
+     *
      * @return the number of statements.
      */
     int getStatementCount();

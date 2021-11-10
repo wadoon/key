@@ -7,18 +7,18 @@ import recoder.java.SourceVisitor;
 
 /**
  * Less or equals.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class LessOrEquals extends ComparativeOperator {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 2156040099278098771L;
+     * serialization id
+     */
+    private static final long serialVersionUID = 2156040099278098771L;
 
-	/**
+    /**
      * Less or equals.
      */
 
@@ -28,11 +28,9 @@ public class LessOrEquals extends ComparativeOperator {
 
     /**
      * Less or equals.
-     * 
-     * @param lhs
-     *            an expression.
-     * @param rhs
-     *            an expression.
+     *
+     * @param lhs an expression.
+     * @param rhs an expression.
      */
 
     public LessOrEquals(Expression lhs, Expression rhs) {
@@ -42,9 +40,8 @@ public class LessOrEquals extends ComparativeOperator {
 
     /**
      * Less or equals.
-     * 
-     * @param proto
-     *            a less or equals.
+     *
+     * @param proto a less or equals.
      */
 
     protected LessOrEquals(LessOrEquals proto) {
@@ -54,7 +51,7 @@ public class LessOrEquals extends ComparativeOperator {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -64,7 +61,7 @@ public class LessOrEquals extends ComparativeOperator {
 
     /**
      * Get precedence.
-     * 
+     *
      * @return the int value.
      */
 

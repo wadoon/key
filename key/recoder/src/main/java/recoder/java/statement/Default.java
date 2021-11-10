@@ -10,35 +10,34 @@ import recoder.list.generic.ASTList;
 
 /**
  * Default.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class Default extends Branch {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 7895466623038779294L;
-	/**
+     * serialization id
+     */
+    private static final long serialVersionUID = 7895466623038779294L;
+    /**
      * Body.
      */
 
-	private ASTList<Statement> body;
+    private ASTList<Statement> body;
 
     /**
      * Default.
      */
 
     public Default() {
-    	super();
+        super();
     }
 
     /**
      * Default.
-     * 
-     * @param body
-     *            a statement mutable list.
+     *
+     * @param body a statement mutable list.
      */
 
     public Default(ASTList<Statement> body) {
@@ -48,9 +47,8 @@ public class Default extends Branch {
 
     /**
      * Default.
-     * 
-     * @param proto
-     *            a default.
+     *
+     * @param proto a default.
      */
 
     protected Default(Default proto) {
@@ -63,7 +61,7 @@ public class Default extends Branch {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -73,9 +71,8 @@ public class Default extends Branch {
 
     /**
      * Set parent.
-     * 
-     * @param parent
-     *            a switch.
+     *
+     * @param parent a switch.
      */
 
     public void setParent(Switch parent) {
@@ -96,7 +93,7 @@ public class Default extends Branch {
 
     /**
      * Returns the number of children of this node.
-     * 
+     *
      * @return an int giving the number of children of this node
      */
 
@@ -110,12 +107,10 @@ public class Default extends Branch {
     /**
      * Returns the child at the specified index in this node's "virtual" child
      * array
-     * 
-     * @param index
-     *            an index into this node's "virtual" child array
+     *
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
@@ -147,14 +142,11 @@ public class Default extends Branch {
      * element can be null - in that case, the child is effectively removed. The
      * parent role of the new child is validated, while the parent link of the
      * replaced child is left untouched.
-     * 
-     * @param p
-     *            the old child.
-     * @param p
-     *            the new child.
+     *
+     * @param p the old child.
+     * @param p the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException
-     *                if the new child cannot take over the role of the old one.
+     * @throws ClassCastException if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
@@ -180,7 +172,7 @@ public class Default extends Branch {
 
     /**
      * Get the number of statements in this container.
-     * 
+     *
      * @return the number of statements.
      */
 
@@ -213,9 +205,8 @@ public class Default extends Branch {
 
     /**
      * Set body.
-     * 
-     * @param list
-     *            a statement mutable list.
+     *
+     * @param list a statement mutable list.
      */
 
     public void setBody(ASTList<Statement> list) {
@@ -225,9 +216,9 @@ public class Default extends Branch {
     public void accept(SourceVisitor v) {
         v.visitDefault(this);
     }
-    
+
     public SourceElement getLastElement() {
-    	if (body == null || body.size() == 0) return this;
-        return body.get(body.size()-1).getLastElement();
+        if (body == null || body.size() == 0) return this;
+        return body.get(body.size() - 1).getLastElement();
     }
 }

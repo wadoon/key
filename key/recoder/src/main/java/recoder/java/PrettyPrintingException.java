@@ -11,11 +11,11 @@ import java.io.IOException;
 public class PrettyPrintingException extends RuntimeException {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -4300469088231850754L;
-	
-	private IOException ioe;
+     * serialization id
+     */
+    private static final long serialVersionUID = -4300469088231850754L;
+
+    private final IOException ioe;
 
     public PrettyPrintingException(IOException ioe) {
         this.ioe = ioe;

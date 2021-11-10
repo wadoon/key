@@ -2,9 +2,9 @@
 
 package recoder.kit;
 
-import java.util.List;
-
 import recoder.abstraction.ClassType;
+
+import java.util.List;
 
 
 /**
@@ -14,10 +14,10 @@ import recoder.abstraction.ClassType;
 public class MissingTypeDeclarations extends MissingSources {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 6106584488830182556L;
-	private List<ClassType> nonTypeDeclarations;
+     * serialization id
+     */
+    private static final long serialVersionUID = 6106584488830182556L;
+    private final List<ClassType> nonTypeDeclarations;
 
     public MissingTypeDeclarations(List<ClassType> nonTypeDeclarations) {
         this.nonTypeDeclarations = nonTypeDeclarations;

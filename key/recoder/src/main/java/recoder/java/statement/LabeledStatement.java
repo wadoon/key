@@ -2,38 +2,32 @@
 
 package recoder.java.statement;
 
-import recoder.java.Identifier;
-import recoder.java.NamedProgramElement;
-import recoder.java.ProgramElement;
-import recoder.java.SourceElement;
-import recoder.java.SourceVisitor;
-import recoder.java.Statement;
-import recoder.java.StatementContainer;
+import recoder.java.*;
 
 /**
  * Labeled statement.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class LabeledStatement extends JavaStatement implements StatementContainer, NamedProgramElement {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -4621689270408033058L;
+     * serialization id
+     */
+    private static final long serialVersionUID = -4621689270408033058L;
 
-	/**
+    /**
      * Name.
      */
 
-	private Identifier name;
+    private Identifier name;
 
     /**
      * Body.
      */
 
-	private Statement body;
+    private Statement body;
 
     /**
      * Labeled statement.
@@ -45,11 +39,9 @@ public class LabeledStatement extends JavaStatement implements StatementContaine
 
     /**
      * Labeled statement.
-     * 
-     * @param id
-     *            an identifier.
-     * @param statement
-     *            a statement.
+     *
+     * @param id        an identifier.
+     * @param statement a statement.
      */
 
     public LabeledStatement(Identifier id, Statement statement) {
@@ -60,9 +52,8 @@ public class LabeledStatement extends JavaStatement implements StatementContaine
 
     /**
      * Labeled statement.
-     * 
-     * @param proto
-     *            a labeled statement.
+     *
+     * @param proto a labeled statement.
      */
 
     protected LabeledStatement(LabeledStatement proto) {
@@ -78,7 +69,7 @@ public class LabeledStatement extends JavaStatement implements StatementContaine
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -113,14 +104,11 @@ public class LabeledStatement extends JavaStatement implements StatementContaine
      * element can be null - in that case, the child is effectively removed. The
      * parent role of the new child is validated, while the parent link of the
      * replaced child is left untouched.
-     * 
-     * @param p
-     *            the old child.
-     * @param p
-     *            the new child.
+     *
+     * @param p the old child.
+     * @param p the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException
-     *                if the new child cannot take over the role of the old one.
+     * @throws ClassCastException if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
@@ -149,7 +137,7 @@ public class LabeledStatement extends JavaStatement implements StatementContaine
 
     /**
      * Get name.
-     * 
+     *
      * @return the string.
      */
 
@@ -159,7 +147,7 @@ public class LabeledStatement extends JavaStatement implements StatementContaine
 
     /**
      * Get identifier.
-     * 
+     *
      * @return the identifier.
      */
 
@@ -169,9 +157,8 @@ public class LabeledStatement extends JavaStatement implements StatementContaine
 
     /**
      * Set identifier.
-     * 
-     * @param id
-     *            an identifier.
+     *
+     * @param id an identifier.
      */
 
     public void setIdentifier(Identifier id) {
@@ -180,7 +167,7 @@ public class LabeledStatement extends JavaStatement implements StatementContaine
 
     /**
      * Get body.
-     * 
+     *
      * @return the statement.
      */
 
@@ -190,9 +177,8 @@ public class LabeledStatement extends JavaStatement implements StatementContaine
 
     /**
      * Set body.
-     * 
-     * @param s
-     *            a statement.
+     *
+     * @param s a statement.
      */
 
     public void setBody(Statement s) {
@@ -201,7 +187,7 @@ public class LabeledStatement extends JavaStatement implements StatementContaine
 
     /**
      * Returns the number of children of this node.
-     * 
+     *
      * @return an int giving the number of children of this node
      */
 
@@ -217,12 +203,10 @@ public class LabeledStatement extends JavaStatement implements StatementContaine
     /**
      * Returns the child at the specified index in this node's "virtual" child
      * array
-     * 
-     * @param index
-     *            an index into this node's "virtual" child array
+     *
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
@@ -253,7 +237,7 @@ public class LabeledStatement extends JavaStatement implements StatementContaine
 
     /**
      * Get the number of statements in this container.
-     * 
+     *
      * @return the number of statements.
      */
 
@@ -264,12 +248,10 @@ public class LabeledStatement extends JavaStatement implements StatementContaine
     /**
      * Return the statement at the specified index in this node's "virtual"
      * statement array.
-     * 
-     * @param index
-     *            an index for a statement.
+     *
+     * @param index an index for a statement.
      * @return the statement with the given index.
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds.
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
 
     public Statement getStatementAt(int index) {

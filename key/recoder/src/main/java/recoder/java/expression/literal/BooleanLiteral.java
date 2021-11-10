@@ -7,31 +7,30 @@ import recoder.java.expression.Literal;
 
 /**
  * Boolean literal.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class BooleanLiteral extends Literal {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 1135231084094020816L;
-	private boolean value;
+     * serialization id
+     */
+    private static final long serialVersionUID = 1135231084094020816L;
+    private boolean value;
 
     /**
      * Boolean literal.
      */
 
     public BooleanLiteral() {
-    	// nothing to do
+        // nothing to do
     }
 
     /**
      * Boolean literal.
-     * 
-     * @param value
-     *            a boolean value.
+     *
+     * @param value a boolean value.
      */
 
     public BooleanLiteral(boolean value) {
@@ -40,9 +39,8 @@ public class BooleanLiteral extends Literal {
 
     /**
      * Boolean literal.
-     * 
-     * @param value
-     *            a string.
+     *
+     * @param value a string.
      */
 
     protected BooleanLiteral(String value) {
@@ -57,9 +55,8 @@ public class BooleanLiteral extends Literal {
 
     /**
      * Boolean literal.
-     * 
-     * @param proto
-     *            a boolean literal.
+     *
+     * @param proto a boolean literal.
      */
 
     protected BooleanLiteral(BooleanLiteral proto) {
@@ -69,7 +66,7 @@ public class BooleanLiteral extends Literal {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -78,19 +75,8 @@ public class BooleanLiteral extends Literal {
     }
 
     /**
-     * Set value.
-     * 
-     * @param b
-     *            a boolean value.
-     */
-
-    public void setValue(boolean b) {
-        value = b;
-    }
-
-    /**
      * Get value.
-     * 
+     *
      * @return the string.
      */
 
@@ -98,11 +84,21 @@ public class BooleanLiteral extends Literal {
         return value;
     }
 
+    /**
+     * Set value.
+     *
+     * @param b a boolean value.
+     */
+
+    public void setValue(boolean b) {
+        value = b;
+    }
+
     public void accept(SourceVisitor v) {
         v.visitBooleanLiteral(this);
     }
 
-	public Object getEquivalentJavaType() {
-		return Boolean.valueOf(value);
-	}
+    public Object getEquivalentJavaType() {
+        return Boolean.valueOf(value);
+    }
 }

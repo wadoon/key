@@ -5,19 +5,19 @@
  */
 package recoder.bytecode;
 
-import java.util.List;
-
 import recoder.abstraction.AnnotationUse;
 import recoder.abstraction.ElementValuePair;
 
+import java.util.List;
+
 /**
  * @author gutzmann
- *
  */
 public class AnnotationUseInfo implements AnnotationUse {
-	protected List<ElementValuePairInfo> elementValuePairs;
+    protected List<ElementValuePairInfo> elementValuePairs;
 
-	protected String fullAnnotationTypeName;
+    protected String fullAnnotationTypeName;
+
     /**
      * @param accessFlags
      * @param name
@@ -28,34 +28,34 @@ public class AnnotationUseInfo implements AnnotationUse {
         this.fullAnnotationTypeName = fullName;
     }
 
-	public List<ElementValuePairInfo> getElementValuePairs() {
-		return elementValuePairs;
-	}
-	
-	private String getParamStr() {
-		if (elementValuePairs.size() == 0)
-			return "";
-		StringBuilder res = new StringBuilder("(");
-		boolean first = true;
-		for (ElementValuePair evp : elementValuePairs) {
-			if (!first)
-				res.append(",");
-			first = false;
-			res.append(evp.toString());
-		}
-		res.append(")");
-		return res.toString();
-	}
-	
-	public String toString() {
-		return "@" + getFullReferencedName() + getParamStr();
-	}
+    public List<ElementValuePairInfo> getElementValuePairs() {
+        return elementValuePairs;
+    }
+
+    private String getParamStr() {
+        if (elementValuePairs.size() == 0)
+            return "";
+        StringBuilder res = new StringBuilder("(");
+        boolean first = true;
+        for (ElementValuePair evp : elementValuePairs) {
+            if (!first)
+                res.append(",");
+            first = false;
+            res.append(evp.toString());
+        }
+        res.append(")");
+        return res.toString();
+    }
+
+    public String toString() {
+        return "@" + getFullReferencedName() + getParamStr();
+    }
 
     public String getFullReferencedName() {
-    	return fullAnnotationTypeName;
+        return fullAnnotationTypeName;
     }
-    
-	public String getReferencedName() {
-		return fullAnnotationTypeName.substring(fullAnnotationTypeName.lastIndexOf('.')+1); 
-	}
+
+    public String getReferencedName() {
+        return fullAnnotationTypeName.substring(fullAnnotationTypeName.lastIndexOf('.') + 1);
+    }
 }

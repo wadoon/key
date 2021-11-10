@@ -8,18 +8,18 @@ import recoder.java.expression.Operator;
 
 /**
  * Unsigned shift right.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class UnsignedShiftRight extends Operator {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 638313602392128439L;
+     * serialization id
+     */
+    private static final long serialVersionUID = 638313602392128439L;
 
-	/**
+    /**
      * Unsigned shift right.
      */
 
@@ -29,11 +29,9 @@ public class UnsignedShiftRight extends Operator {
 
     /**
      * Unsigned shift right.
-     * 
-     * @param lhs
-     *            an expression.
-     * @param rhs
-     *            an expression.
+     *
+     * @param lhs an expression.
+     * @param rhs an expression.
      */
 
     public UnsignedShiftRight(Expression lhs, Expression rhs) {
@@ -43,9 +41,8 @@ public class UnsignedShiftRight extends Operator {
 
     /**
      * Unsigned shift right.
-     * 
-     * @param proto
-     *            an unsigned shift right.
+     *
+     * @param proto an unsigned shift right.
      */
 
     protected UnsignedShiftRight(UnsignedShiftRight proto) {
@@ -55,7 +52,7 @@ public class UnsignedShiftRight extends Operator {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -65,7 +62,7 @@ public class UnsignedShiftRight extends Operator {
 
     /**
      * Get arity.
-     * 
+     *
      * @return the int value.
      */
 
@@ -75,7 +72,7 @@ public class UnsignedShiftRight extends Operator {
 
     /**
      * Get precedence.
-     * 
+     *
      * @return the int value.
      */
 
@@ -85,7 +82,7 @@ public class UnsignedShiftRight extends Operator {
 
     /**
      * Get notation.
-     * 
+     *
      * @return the int value.
      */
 

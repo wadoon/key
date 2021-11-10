@@ -7,18 +7,18 @@ import recoder.java.SourceVisitor;
 
 /**
  * Throw.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class Throw extends ExpressionJumpStatement {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -259489032726058910L;
+     * serialization id
+     */
+    private static final long serialVersionUID = -259489032726058910L;
 
-	/**
+    /**
      * Throw.
      */
 
@@ -28,9 +28,8 @@ public class Throw extends ExpressionJumpStatement {
 
     /**
      * Throw.
-     * 
-     * @param expr
-     *            an expression.
+     *
+     * @param expr an expression.
      */
 
     public Throw(Expression expr) {
@@ -43,9 +42,8 @@ public class Throw extends ExpressionJumpStatement {
 
     /**
      * Throw.
-     * 
-     * @param proto
-     *            a throw.
+     *
+     * @param proto a throw.
      */
 
     protected Throw(Throw proto) {
@@ -55,7 +53,7 @@ public class Throw extends ExpressionJumpStatement {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 

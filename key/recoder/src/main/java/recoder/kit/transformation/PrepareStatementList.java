@@ -32,30 +32,27 @@ import recoder.list.generic.ASTList;
  * <DT>Removed:
  * <DD>the original statement wrapped by a block, in case this is necessary.
  * </DL>
- * 
- * @see recoder.kit.StatementKit#getStatementMutableList
- * 
+ *
  * @author AL
+ * @see recoder.kit.StatementKit#getStatementMutableList
  */
 public class PrepareStatementList extends TwoPassTransformation {
 
-    private Statement statement;
+    private final Statement statement;
     private Statement statementRepl;
 
     private StatementBlock block;
 
     private ASTList<Statement> list;
 
-    private boolean isVisible;
+    private final boolean isVisible;
 
     /**
      * Creates a new transformation object that wraps a statement with a new
      * statement block if necessary.
-     * 
-     * @param sc
-     *            the service configuration to use.
-     * @param s
-     *            a statement to be wrapped by a new statement block.
+     *
+     * @param sc the service configuration to use.
+     * @param s  a statement to be wrapped by a new statement block.
      * @deprecated - there are currently open issues.
      */
     public PrepareStatementList(CrossReferenceServiceConfiguration sc, Statement s, boolean isVisible) {
@@ -72,33 +69,13 @@ public class PrepareStatementList extends TwoPassTransformation {
     }
 
     /**
-     * Problem report indicating that a parent is not suited for a given child.
-     */
-    public static class IllegalParentContext extends Conflict {
-
-        /**
-		 * serialization id
-		 */
-		private static final long serialVersionUID = -1995165154877949565L;
-		private NonTerminalProgramElement parent;
-
-        public IllegalParentContext(NonTerminalProgramElement parent) {
-            this.parent = parent;
-        }
-
-        public NonTerminalProgramElement getParent() {
-            return parent;
-        }
-    }
-
-    /**
      * Returns a new
      * {@link recoder.kit.transformation.PrepareStatementList.IllegalParentContext}
      * if the statement is not embedded in a statement container, otherwise
      * {@link #NO_PROBLEM}if the statement is a local variable declaration
      * (which might potentially change program semantics), otherwise
      * {@link #EQUIVALENCE}.
-     * 
+     *
      * @return the problem report.
      */
     public ProblemReport analyze() {
@@ -132,7 +109,7 @@ public class PrepareStatementList extends TwoPassTransformation {
     /**
      * Clones the statement and replaces it with a new statement block
      * containing the cloned tree.
-     * 
+     *
      * @see #analyze()
      */
     public void transform() {
@@ -147,9 +124,9 @@ public class PrepareStatementList extends TwoPassTransformation {
      * Returns the new statement block after the transformation, if there had
      * one to be inserted. The block will contain the statement or a clone of
      * the statement as sole child node.
-     * 
+     *
      * @return the new statement block replacing the given statement, or <CODE>
-     *         null</CODE> if there a new block was not necessary.
+     * null</CODE> if there a new block was not necessary.
      * @see #getStatement()
      */
     public StatementBlock getBlock() {
@@ -167,12 +144,32 @@ public class PrepareStatementList extends TwoPassTransformation {
      * Returns the statement that has been wrapped. If this is a visible
      * transformation and the statement had to be wrapped, a clone of the
      * initial argument is returned.
-     * 
+     *
      * @return the statement that has been wrapped, possibly a clone of the
-     *         original statement.
+     * original statement.
      */
     public Statement getStatement() {
         return statementRepl != null ? statementRepl : statement;
+    }
+
+    /**
+     * Problem report indicating that a parent is not suited for a given child.
+     */
+    public static class IllegalParentContext extends Conflict {
+
+        /**
+         * serialization id
+         */
+        private static final long serialVersionUID = -1995165154877949565L;
+        private final NonTerminalProgramElement parent;
+
+        public IllegalParentContext(NonTerminalProgramElement parent) {
+            this.parent = parent;
+        }
+
+        public NonTerminalProgramElement getParent() {
+            return parent;
+        }
     }
 
 }

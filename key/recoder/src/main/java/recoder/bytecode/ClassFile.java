@@ -2,75 +2,45 @@
 
 package recoder.bytecode;
 
-import java.util.List;
+import recoder.abstraction.Package;
+import recoder.abstraction.*;
 
 import java.util.Collections;
-
-import recoder.abstraction.ArrayType;
-import recoder.abstraction.ClassType;
-import recoder.abstraction.ClassTypeContainer;
-import recoder.abstraction.Constructor;
-import recoder.abstraction.ErasedType;
-import recoder.abstraction.Field;
-import recoder.abstraction.Method;
-import recoder.abstraction.Package;
+import java.util.List;
 
 public class ClassFile extends ByteCodeElement implements ClassType {
 
-	boolean isInner;
-	
-	private String location; 
-
-	private String fullName;
-
-	private String physicalName;
-    
-	private String superName;
-
-	private String[] interfaceNames;
-
-	private List<FieldInfo> fields;
-
-	private List<MethodInfo> methods;
-
-	private List<ConstructorInfo> constructors;
-
-	private List<AnnotationUseInfo> annotations;
-    
-	private List<TypeParameterInfo> typeParams;
-    
-	private String[] innerClasses;
-    
-	List<TypeArgumentInfo> superClassTypeArguments;
-    
-	List<TypeArgumentInfo>[] superInterfacesTypeArguments;
-
-    private ArrayType arrayType;
-    
+    boolean isInner;
+    List<TypeArgumentInfo> superClassTypeArguments;
+    List<TypeArgumentInfo>[] superInterfacesTypeArguments;
     String enclosingMethod = null;
-    
     int version;
-    
+    private String location;
+    private String fullName;
+    private String physicalName;
+    private String superName;
+    private String[] interfaceNames;
+    private List<FieldInfo> fields;
+    private List<MethodInfo> methods;
+    private List<ConstructorInfo> constructors;
+    private List<AnnotationUseInfo> annotations;
+    private List<TypeParameterInfo> typeParams;
+    private String[] innerClasses;
+    private ArrayType arrayType;
+    private ErasedType erasedType = null;
+
     ClassFile() {
-    	super();
-    }
-    
-    public ArrayType getArrayType() {
-    	return arrayType;
-    }
-    
-    public ArrayType createArrayType() {
-    	if (arrayType == null)
-    		arrayType = new ArrayType(this, service.getServiceConfiguration().getImplicitElementInfo());
-    	return arrayType;
-    }
-    
-    void setFullName(String fullName) {
-        this.fullName = fullName.intern();
+        super();
     }
 
-    void setPhysicalName(String phkName) {
-        this.physicalName = phkName;
+    public ArrayType getArrayType() {
+        return arrayType;
+    }
+
+    public ArrayType createArrayType() {
+        if (arrayType == null)
+            arrayType = new ArrayType(this, service.getServiceConfiguration().getImplicitElementInfo());
+        return arrayType;
     }
 
     void setSuperName(String superName) {
@@ -78,6 +48,22 @@ public class ClassFile extends ByteCodeElement implements ClassType {
         if (superName != null) {
             this.superName = superName.intern();
         }
+    }
+
+    public final String getTypeName() {
+        return fullName;
+    }
+
+    public final String getSuperClassName() {
+        return superName;
+    }
+
+    public final List<TypeArgumentInfo> getSuperClassTypeArguments() {
+        return superClassTypeArguments;
+    }
+
+    public final String[] getInterfaceNames() {
+        return interfaceNames;
     }
 
     void setInterfaceNames(String[] interfaceNames) {
@@ -89,49 +75,8 @@ public class ClassFile extends ByteCodeElement implements ClassType {
         }
     }
 
-    void setFields(List<FieldInfo> fields) {
-        this.fields = Collections.unmodifiableList(fields);
-    }
-
-    void setMethods(List<MethodInfo> methods) {
-        this.methods = Collections.unmodifiableList(methods);
-    }
-
-    void setConstructors(List<ConstructorInfo> constructors) {
-        this.constructors = Collections.unmodifiableList(constructors);
-    }
-
-    void setInnerClassNames(String[] innerClassNames) {
-        this.innerClasses = innerClassNames;
-        if (innerClasses != null) {
-            for (int i = 0; i < innerClassNames.length; i++) {
-                innerClassNames[i] = innerClassNames[i].intern();
-            }
-        }
-    }
-    
-    void setAnnotations(List<AnnotationUseInfo> annotations) {
-        this.annotations = Collections.unmodifiableList(annotations);
-    }
-
-    public final String getTypeName() {
-        return fullName;
-    }
-
-    public final String getSuperClassName() {
-        return superName;
-    }
-    
-    public final List<TypeArgumentInfo> getSuperClassTypeArguments() {
-    	return superClassTypeArguments;
-    }
-
-    public final String[] getInterfaceNames() {
-        return interfaceNames;
-    }
-    
     public final List<TypeArgumentInfo> getSuperInterfaceTypeArguments(int ifidx) {
-    	return superInterfacesTypeArguments == null ? null : superInterfacesTypeArguments[ifidx];
+        return superInterfacesTypeArguments == null ? null : superInterfacesTypeArguments[ifidx];
     }
 
     public final List<FieldInfo> getFieldInfos() {
@@ -150,23 +95,41 @@ public class ClassFile extends ByteCodeElement implements ClassType {
         return innerClasses;
     }
 
+    void setInnerClassNames(String[] innerClassNames) {
+        this.innerClasses = innerClassNames;
+        if (innerClasses != null) {
+            for (int i = 0; i < innerClassNames.length; i++) {
+                innerClassNames[i] = innerClassNames[i].intern();
+            }
+        }
+    }
+
     public final String getFullName() {
         return fullName;
     }
-    
-	public String getBinaryName() {
-		return physicalName;
-	}
 
-	/**
-	 * Deprecated as of 0.92. Use <code>getBinaryName()</code> instead.
-	 * @Deprecated. 
-	 * @return the physical (=binary) name of this ClassFile
-	 * @see getBinaryName
-	 */
-	@Deprecated
+    void setFullName(String fullName) {
+        this.fullName = fullName.intern();
+    }
+
+    public String getBinaryName() {
+        return physicalName;
+    }
+
+    /**
+     * Deprecated as of 0.92. Use <code>getBinaryName()</code> instead.
+     *
+     * @return the physical (=binary) name of this ClassFile
+     * @Deprecated.
+     * @see getBinaryName
+     */
+    @Deprecated
     public final String getPhysicalName() {
         return physicalName;
+    }
+
+    void setPhysicalName(String phkName) {
+        this.physicalName = phkName;
     }
 
     public final ClassTypeContainer getContainer() {
@@ -185,12 +148,12 @@ public class ClassFile extends ByteCodeElement implements ClassType {
     public final boolean isInterface() {
         return (accessFlags & AccessFlags.INTERFACE) != 0;
     }
-    
+
     public boolean isOrdinaryInterface() {
         return (accessFlags & AccessFlags.INTERFACE) != 0 &&
-               (accessFlags & AccessFlags.ANNOTATION) == 0;
+                (accessFlags & AccessFlags.ANNOTATION) == 0;
     }
-    
+
     public boolean isAnnotationType() {
         return (accessFlags & AccessFlags.ANNOTATION) != 0;
     }
@@ -201,7 +164,7 @@ public class ClassFile extends ByteCodeElement implements ClassType {
 
     public boolean isOrdinaryClass() {
         return (accessFlags & AccessFlags.INTERFACE) == 0 &&
-        	   (accessFlags & AccessFlags.ENUM) == 0;
+                (accessFlags & AccessFlags.ENUM) == 0;
     }
 
     public final List<ClassType> getSupertypes() {
@@ -213,8 +176,12 @@ public class ClassFile extends ByteCodeElement implements ClassType {
     }
 
     @SuppressWarnings("unchecked")
-	public final List<FieldInfo> getFields() {
-       return (List<FieldInfo>)service.getFields(this);
+    public final List<FieldInfo> getFields() {
+        return (List<FieldInfo>) service.getFields(this);
+    }
+
+    void setFields(List<FieldInfo> fields) {
+        this.fields = Collections.unmodifiableList(fields);
     }
 
     public final List<Field> getAllFields() {
@@ -225,6 +192,10 @@ public class ClassFile extends ByteCodeElement implements ClassType {
         return service.getMethods(this);
     }
 
+    void setMethods(List<MethodInfo> methods) {
+        this.methods = Collections.unmodifiableList(methods);
+    }
+
     public final List<Method> getAllMethods() {
         return service.getAllMethods(this);
     }
@@ -233,9 +204,13 @@ public class ClassFile extends ByteCodeElement implements ClassType {
         return service.getConstructors(this);
     }
 
+    void setConstructors(List<ConstructorInfo> constructors) {
+        this.constructors = Collections.unmodifiableList(constructors);
+    }
+
     @SuppressWarnings("unchecked")
-	public final List<ClassFile> getTypes() {
-        return (List<ClassFile>)service.getTypes(this);
+    public final List<ClassFile> getTypes() {
+        return (List<ClassFile>) service.getTypes(this);
     }
 
     public final List<ClassType> getAllTypes() {
@@ -249,71 +224,73 @@ public class ClassFile extends ByteCodeElement implements ClassType {
         return annotations;
     }
 
-	public List<TypeParameterInfo> getTypeParameters() {
-		return typeParams;
-	}
-	
-	public void setTypeParameters(List<TypeParameterInfo> typeParams)  {
-		this.typeParams = typeParams;
-	}
-	
-	void setLocation(String location) {
-		this.location = location;
-	}
-	
-	public String getLocation() {
-		return location;
-	}
-	
-	@Override
-	public String toString() {
-		return "ClassFile " + getFullName();
-	}
+    void setAnnotations(List<AnnotationUseInfo> annotations) {
+        this.annotations = Collections.unmodifiableList(annotations);
+    }
+
+    public List<TypeParameterInfo> getTypeParameters() {
+        return typeParams;
+    }
+
+    public void setTypeParameters(List<TypeParameterInfo> typeParams) {
+        this.typeParams = typeParams;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    void setLocation(String location) {
+        this.location = location;
+    }
+
+    @Override
+    public String toString() {
+        return "ClassFile " + getFullName();
+    }
 
     public String getFullSignature() {
-    	String res = getFullName();
-    	if (getTypeParameters() == null || getTypeParameters().size() == 0)
-    		return res;
-    	res += "<";
-    	String del = "";
-    	for (TypeParameterInfo ta : getTypeParameters()) {
-    		res = res + del + ta.getFullSignature();
-    		del = ",";
-    	}
-    	res = res + ">";
-    	return res;
+        String res = getFullName();
+        if (getTypeParameters() == null || getTypeParameters().size() == 0)
+            return res;
+        res += "<";
+        String del = "";
+        for (TypeParameterInfo ta : getTypeParameters()) {
+            res = res + del + ta.getFullSignature();
+            del = ",";
+        }
+        res = res + ">";
+        return res;
     }
-    
-	private ErasedType erasedType = null;
-	
-	public ErasedType getErasedType() {
-		if (erasedType == null)
-			erasedType = new ErasedType(this, service.getServiceConfiguration().getImplicitElementInfo());
-		return erasedType;
-	}
 
-	public boolean isInner() {
-		return isInner;
-	}
+    public ErasedType getErasedType() {
+        if (erasedType == null)
+            erasedType = new ErasedType(this, service.getServiceConfiguration().getImplicitElementInfo());
+        return erasedType;
+    }
 
-	public ClassType getBaseClassType() {
-		return this;
-	}
+    public boolean isInner() {
+        return isInner;
+    }
 
-	/**
-	 * NOT FOR PUBLIC USE, SUBJECT TO CHANGE / BE REMOVED !!
-	 */
-	public String getEnclosingMethod() {
-		return enclosingMethod;
-	}
+    public ClassType getBaseClassType() {
+        return this;
+    }
 
-	@Override
-	public ClassFile getGenericMember() {
-		return this;
-	}
+    /**
+     * NOT FOR PUBLIC USE, SUBJECT TO CHANGE / BE REMOVED !!
+     */
+    public String getEnclosingMethod() {
+        return enclosingMethod;
+    }
 
-	public int getVersion()  {
-		return version;
-	}
+    @Override
+    public ClassFile getGenericMember() {
+        return this;
+    }
+
+    public int getVersion() {
+        return version;
+    }
 }
 

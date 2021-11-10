@@ -2,43 +2,22 @@
 
 package recoder.io;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-
 import recoder.AbstractService;
 import recoder.ParserException;
 import recoder.ServiceConfiguration;
 import recoder.convenience.Naming;
-import recoder.java.CompilationUnit;
-import recoder.java.Identifier;
-import recoder.java.NonTerminalProgramElement;
-import recoder.java.PackageSpecification;
-import recoder.java.PrettyPrinter;
-import recoder.java.ProgramElement;
+import recoder.java.*;
 import recoder.java.declaration.TypeDeclaration;
 import recoder.java.reference.PackageReference;
-import recoder.service.AttachChange;
-import recoder.service.ChangeHistory;
-import recoder.service.ChangeHistoryEvent;
-import recoder.service.ChangeHistoryListener;
-import recoder.service.DetachChange;
-import recoder.service.TreeChange;
+import recoder.service.*;
 import recoder.util.Debug;
 import recoder.util.ProgressListener;
 import recoder.util.ProgressListenerManager;
+
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.*;
+import java.util.*;
 
 /**
  * @author RN
@@ -47,51 +26,47 @@ import recoder.util.ProgressListenerManager;
 public class DefaultSourceFileRepository extends AbstractService implements SourceFileRepository,
         ChangeHistoryListener, PropertyChangeListener {
 
+    public final static FilenameFilter JAVA_FILENAME_FILTER = new FilenameFilter() {
+        public boolean accept(File dir, String name) {
+            return name.endsWith(".java");
+        }
+    };
     private final static boolean DEBUG = false;
-
     /**
      * Cache: data location to compilation units.
      */
     private final Map<DataLocation, CompilationUnit> location2cu = new HashMap<DataLocation, CompilationUnit>();
-
     /**
      * Set of units that have been changed and have to be rewritten.
      */
     private final Set<CompilationUnit> changedUnits = new HashSet<CompilationUnit>();
-
     /**
      * Set of units that are obsolete and should be deleted.
      */
     private final Set<DataLocation> deleteUnits = new HashSet<DataLocation>();
-
-    /**
-     * The change history service.
-     */
-    private ChangeHistory changeHistory;
-
-    /**
-     * Cached search path list.
-     */
-    private PathList searchPathList;
-
-    /**
-     * Cached output path.
-     */
-    private File outputPath;
-
     /**
      * Progress listener management.
      */
     ProgressListenerManager listeners = new ProgressListenerManager(this);
-
+    /**
+     * The change history service.
+     */
+    private ChangeHistory changeHistory;
+    /**
+     * Cached search path list.
+     */
+    private PathList searchPathList;
+    /**
+     * Cached output path.
+     */
+    private File outputPath;
     /**
      * NAI
      */
     private Properties locationSpecificVersion;//=new Properties();
 
     /**
-     * @param config
-     *            the configuration this services becomes part of.
+     * @param config the configuration this services becomes part of.
      */
     public DefaultSourceFileRepository(ServiceConfiguration config) {
         super(config);
@@ -105,7 +80,7 @@ public class DefaultSourceFileRepository extends AbstractService implements Sour
         settings.addPropertyChangeListener(this);
         searchPathList = settings.getSearchPathList();
         outputPath = new File(settings.getProperty(PropertyNames.OUTPUT_PATH));
-        locationSpecificVersion=settings.getLocationSpecificVersionProperties();	//NAI
+        locationSpecificVersion = settings.getLocationSpecificVersionProperties();    //NAI
     }
 
     protected final PathList getSearchPathList() {
@@ -190,7 +165,7 @@ public class DefaultSourceFileRepository extends AbstractService implements Sour
 
     // possible optimization: react on replacements
     public void modelChanged(ChangeHistoryEvent changes) {
-    	List<TreeChange> changed = changes.getChanges();
+        List<TreeChange> changed = changes.getChanges();
         for (int i = changed.size() - 1; i >= 0; i -= 1) {
             TreeChange tc = changed.get(i);
             ProgramElement pe = tc.getChangeRoot();
@@ -222,10 +197,9 @@ public class DefaultSourceFileRepository extends AbstractService implements Sour
 
     /**
      * Searches for the location of the source file for the given class.
-     * 
-     * @param classname
-     *            the name of the class for which the source file should be
-     *            looked up.
+     *
+     * @param classname the name of the class for which the source file should be
+     *                  looked up.
      */
     public DataLocation findSourceFile(String classname) {
         // possible optimzation: cache it !!!
@@ -242,37 +216,37 @@ public class DefaultSourceFileRepository extends AbstractService implements Sour
         // ok - lets parse the sources
         try {
             //NAI - check if there is a configuration for the java version
-            String locationStr=loc.toString();
-            String version=null;
-            Iterator<Object> keys=locationSpecificVersion.keySet().iterator();            
-            while(keys.hasNext()){
-            	String location=(String)keys.next();
-            	if(locationStr.startsWith(location)){
-            		version=(String)locationSpecificVersion.get(location);
-            	}
+            String locationStr = loc.toString();
+            String version = null;
+            Iterator<Object> keys = locationSpecificVersion.keySet().iterator();
+            while (keys.hasNext()) {
+                String location = (String) keys.next();
+                if (locationStr.startsWith(location)) {
+                    version = (String) locationSpecificVersion.get(location);
+                }
             }
             // /NAI
-        	
+
             Reader in;
             if (!loc.hasReaderSupport() || (in = loc.getReader()) == null) {
                 Debug.error("Location of source file provides no reader");
                 return null;
             }
             if (version != null)
-            	result = serviceConfiguration.getProgramFactory().parseCompilationUnit(in, version);
+                result = serviceConfiguration.getProgramFactory().parseCompilationUnit(in, version);
             else
-            	result = serviceConfiguration.getProgramFactory().parseCompilationUnit(in);
+                result = serviceConfiguration.getProgramFactory().parseCompilationUnit(in);
             in.close();
             loc.readerClosed();
             result.setDataLocation(loc);
             location2cu.put(loc, result); //let this be done by the history
             changeHistory.attached(result);
         } catch (Throwable e) {
-        	getServiceConfiguration().getProjectSettings().
-        	getErrorHandler().reportError(new Exception(
-        			e.getClass().getSimpleName() + " occured while parsing " + loc + "\n"
-        			+ e.getMessage()));
-        } 
+            getServiceConfiguration().getProjectSettings().
+                    getErrorHandler().reportError(new Exception(
+                            e.getClass().getSimpleName() + " occured while parsing " + loc + "\n"
+                                    + e.getMessage()));
+        }
         return result;
     }
 
@@ -300,7 +274,7 @@ public class DefaultSourceFileRepository extends AbstractService implements Sour
         List<CompilationUnit> res = new ArrayList<CompilationUnit>();
         listeners.fireProgressEvent(0, filenames.length, "Importing Source Files");
         for (int i = 0; i < filenames.length; i += 1) {
-            listeners.fireProgressEvent(i, "Parsing " + filenames[i].toString());
+            listeners.fireProgressEvent(i, "Parsing " + filenames[i]);
             CompilationUnit cu = getCompilationUnitFromFile(filenames[i]);
             if (cu != null) {
                 res.add(cu);
@@ -332,19 +306,13 @@ public class DefaultSourceFileRepository extends AbstractService implements Sour
         return res;
     }
 
-    public final static FilenameFilter JAVA_FILENAME_FILTER = new FilenameFilter() {
-        public boolean accept(File dir, String name) {
-            return name.endsWith(".java");
-        }
-    };
-
     public List<CompilationUnit> getAllCompilationUnitsFromPath() throws ParserException {
         return getAllCompilationUnitsFromPath(JAVA_FILENAME_FILTER);
     }
 
     public List<CompilationUnit> getAllCompilationUnitsFromPath(FilenameFilter filter) {
         DataLocation[] locations = getSearchPathList()
-        	.findAll(filter, getServiceConfiguration().getProjectSettings().getErrorHandler());
+                .findAll(filter, getServiceConfiguration().getProjectSettings().getErrorHandler());
         List<CompilationUnit> res = new ArrayList<CompilationUnit>(locations.length);
         listeners.fireProgressEvent(0, res.size(), "Importing Source Files From Path");
         for (int i = 0; i < locations.length; i++) {
@@ -412,7 +380,7 @@ public class DefaultSourceFileRepository extends AbstractService implements Sour
         listeners.fireProgressEvent(0, size, "Exporting Source Files");
         CompilationUnit[] units = new CompilationUnit[size];
         int j = 0;
-        for(CompilationUnit cu : always ? location2cu.values() : changedUnits) { 
+        for (CompilationUnit cu : always ? location2cu.values() : changedUnits) {
             units[j++] = cu;
         }
         if (DEBUG) {

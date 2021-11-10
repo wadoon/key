@@ -10,28 +10,26 @@ import recoder.java.reference.ReferenceSuffix;
 
 /**
  * String literal.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class StringLiteral extends Literal implements ReferencePrefix {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 7368137274068211543L;
-
-	/**
-     * Reference parent.
+     * serialization id
      */
-
-	private ReferenceSuffix referenceParent;
-
+    private static final long serialVersionUID = 7368137274068211543L;
     /**
      * The value.
      */
 
     protected String value;
+    /**
+     * Reference parent.
+     */
+
+    private ReferenceSuffix referenceParent;
 
     /**
      * String literal.
@@ -43,9 +41,8 @@ public class StringLiteral extends Literal implements ReferencePrefix {
 
     /**
      * String literal.
-     * 
-     * @param value
-     *            a string.
+     *
+     * @param value a string.
      */
 
     public StringLiteral(String value) {
@@ -54,9 +51,8 @@ public class StringLiteral extends Literal implements ReferencePrefix {
 
     /**
      * String literal.
-     * 
-     * @param proto
-     *            a string literal.
+     *
+     * @param proto a string literal.
      */
 
     protected StringLiteral(StringLiteral proto) {
@@ -66,7 +62,7 @@ public class StringLiteral extends Literal implements ReferencePrefix {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -76,7 +72,7 @@ public class StringLiteral extends Literal implements ReferencePrefix {
 
     /**
      * Get AST parent.
-     * 
+     *
      * @return the non terminal program element.
      */
 
@@ -90,7 +86,7 @@ public class StringLiteral extends Literal implements ReferencePrefix {
 
     /**
      * Get reference suffix.
-     * 
+     *
      * @return the reference suffix.
      */
 
@@ -100,9 +96,8 @@ public class StringLiteral extends Literal implements ReferencePrefix {
 
     /**
      * Set reference suffix.
-     * 
-     * @param path
-     *            a reference suffix.
+     *
+     * @param path a reference suffix.
      */
 
     public void setReferenceSuffix(ReferenceSuffix path) {
@@ -110,10 +105,19 @@ public class StringLiteral extends Literal implements ReferencePrefix {
     }
 
     /**
+     * Get value.
+     *
+     * @return the string.
+     */
+
+    public String getValue() {
+        return value;
+    }
+
+    /**
      * Set value.
-     * 
-     * @param str
-     *            a string value.
+     *
+     * @param str a string value.
      */
 
     public void setValue(String str) {
@@ -123,21 +127,11 @@ public class StringLiteral extends Literal implements ReferencePrefix {
         this.value = str.intern();
     }
 
-    /**
-     * Get value.
-     * 
-     * @return the string.
-     */
-
-    public String getValue() {
-        return value;
-    }
-
     public void accept(SourceVisitor v) {
         v.visitStringLiteral(this);
     }
-    
-	public Object getEquivalentJavaType() {
-		return value;
-	}
+
+    public Object getEquivalentJavaType() {
+        return value;
+    }
 }

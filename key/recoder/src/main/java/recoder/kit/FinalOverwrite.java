@@ -11,10 +11,10 @@ import recoder.abstraction.Member;
 public class FinalOverwrite extends Conflict {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -4261490216982913161L;
-	private Member member;
+     * serialization id
+     */
+    private static final long serialVersionUID = -4261490216982913161L;
+    private final Member member;
 
     public FinalOverwrite(Member member) {
         this.member = member;

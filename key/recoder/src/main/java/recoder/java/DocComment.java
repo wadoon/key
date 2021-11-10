@@ -4,18 +4,18 @@ package recoder.java;
 
 /**
  * Contains tags with
- * 
+ *
  * @-prefix and corresponding entries.
  */
 
 public class DocComment extends Comment {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 621277739856803262L;
+     * serialization id
+     */
+    private static final long serialVersionUID = 621277739856803262L;
 
-	/**
+    /**
      * Doc comment.
      */
 
@@ -26,9 +26,8 @@ public class DocComment extends Comment {
 
     /**
      * Doc comment.
-     * 
-     * @param text
-     *            a string.
+     *
+     * @param text a string.
      */
 
     public DocComment(String text) {
@@ -37,9 +36,8 @@ public class DocComment extends Comment {
 
     /**
      * Doc comment.
-     * 
-     * @param proto
-     *            a doc comment.
+     *
+     * @param proto a doc comment.
      */
 
     protected DocComment(DocComment proto) {
@@ -48,7 +46,7 @@ public class DocComment extends Comment {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -59,7 +57,7 @@ public class DocComment extends Comment {
     /**
      * Factory method that creates a tag info object that can analyze this
      * comment.
-     * 
+     *
      * @return a tag info object describing the tags in this comment.
      * @see recoder.java.TagInfo
      */

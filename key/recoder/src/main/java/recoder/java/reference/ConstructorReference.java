@@ -8,7 +8,7 @@ import recoder.list.generic.ASTList;
 
 /**
  * Constructor reference.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
@@ -16,16 +16,15 @@ public interface ConstructorReference extends MemberReference, Statement {
 
     /**
      * Get arguments.
-     * 
+     *
      * @return the expression mutable list.
      */
-	ASTList<Expression> getArguments();
+    ASTList<Expression> getArguments();
 
     /**
      * Set arguments.
-     * 
-     * @param list
-     *            an expression mutable list.
+     *
+     * @param list an expression mutable list.
      */
     void setArguments(ASTList<Expression> list);
 }

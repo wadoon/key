@@ -7,18 +7,18 @@ import recoder.java.SourceVisitor;
 
 /**
  * Equals.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class Equals extends ComparativeOperator {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -2291841565483675639L;
+     * serialization id
+     */
+    private static final long serialVersionUID = -2291841565483675639L;
 
-	/**
+    /**
      * Equals.
      */
 
@@ -28,11 +28,9 @@ public class Equals extends ComparativeOperator {
 
     /**
      * Equals.
-     * 
-     * @param lhs
-     *            an expression.
-     * @param rhs
-     *            an expression.
+     *
+     * @param lhs an expression.
+     * @param rhs an expression.
      */
 
     public Equals(Expression lhs, Expression rhs) {
@@ -42,9 +40,8 @@ public class Equals extends ComparativeOperator {
 
     /**
      * Equals.
-     * 
-     * @param proto
-     *            an equals.
+     *
+     * @param proto an equals.
      */
 
     protected Equals(Equals proto) {
@@ -54,7 +51,7 @@ public class Equals extends ComparativeOperator {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -64,7 +61,7 @@ public class Equals extends ComparativeOperator {
 
     /**
      * Get precedence.
-     * 
+     *
      * @return the int value.
      */
 

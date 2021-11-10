@@ -2,44 +2,16 @@
 
 package recoder.kit;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
-import java.util.Set;
-
 import recoder.ProgramFactory;
-import recoder.abstraction.ClassType;
-import recoder.abstraction.Constructor;
-import recoder.abstraction.Method;
-import recoder.abstraction.PrimitiveType;
-import recoder.abstraction.Type;
+import recoder.abstraction.*;
 import recoder.convenience.Naming;
 import recoder.convenience.TreeWalker;
-import recoder.java.Comment;
-import recoder.java.DocComment;
-import recoder.java.Expression;
-import recoder.java.NonTerminalProgramElement;
-import recoder.java.ParameterContainer;
-import recoder.java.Statement;
-import recoder.java.StatementBlock;
-import recoder.java.declaration.ConstructorDeclaration;
-import recoder.java.declaration.DeclarationSpecifier;
-import recoder.java.declaration.FieldSpecification;
-import recoder.java.declaration.InterfaceDeclaration;
-import recoder.java.declaration.MemberDeclaration;
-import recoder.java.declaration.MethodDeclaration;
-import recoder.java.declaration.TypeDeclaration;
+import recoder.java.*;
+import recoder.java.declaration.*;
 import recoder.java.declaration.modifier.Abstract;
 import recoder.java.declaration.modifier.VisibilityModifier;
 import recoder.java.expression.operator.New;
-import recoder.java.reference.ConstructorReference;
-import recoder.java.reference.FieldReference;
-import recoder.java.reference.MemberReference;
-import recoder.java.reference.MethodReference;
-import recoder.java.reference.ReferencePrefix;
+import recoder.java.reference.*;
 import recoder.java.statement.Return;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
@@ -49,9 +21,11 @@ import recoder.service.ProgramModelInfo;
 import recoder.service.SourceInfo;
 import recoder.util.Debug;
 
+import java.util.*;
+
 /**
  * This class implements auxiliary method related operations.
- * 
+ *
  * @author UA
  * @author AL
  * @author RN
@@ -60,7 +34,7 @@ import recoder.util.Debug;
 public class MethodKit {
 
     private MethodKit() {
-    	super();
+        super();
     }
 
     /**
@@ -81,7 +55,7 @@ public class MethodKit {
      * Makes a method reference to the method declaration with the same actual
      * argument names as in the declaration. For constructing adapters. Don't
      * use a reference prefix.
-     * <P>
+     * <p>
      * The parent role of the result is valid.
      */
     public static MethodReference createMethodReference(MethodDeclaration decl) {
@@ -93,7 +67,7 @@ public class MethodKit {
      * makes a method reference to the method declaration with the same actual
      * argument names as in the declaration. For constructing adapters. Use a
      * reference prefix.
-     * <P>
+     * <p>
      * The parent role of the result is valid.
      */
     public static MethodReference createMethodReference(ReferencePrefix prefix, MethodDeclaration decl) {
@@ -115,7 +89,7 @@ public class MethodKit {
      * redundant abstract modifier is removed, otherwise its existence is
      * ensured; any visibility modifier is removed - this changes the visibility
      * to public.
-     * 
+     *
      * @deprecated not tested
      */
     public static MethodDeclaration createAbstractMethodDeclaration(MethodDeclaration decl, boolean forInterface) {
@@ -144,7 +118,7 @@ public class MethodKit {
             }
             // interfaces should not have a visibility modifier
             if (vismod != null) {
-                modList.remove(modList.indexOf(vismod));
+                modList.remove(vismod);
             }
         } else {
             if (abstractPos < 0) {
@@ -190,13 +164,11 @@ public class MethodKit {
      * return type wider than the type of the field (or matching if they are
      * primitive) and has a return statement as last top level statement of the
      * method body referring to the field.
-     * 
-     * @param si
-     *            the source info service to be used.
-     * @param f
-     *            the field to find a getter for.
+     *
+     * @param si the source info service to be used.
+     * @param f  the field to find a getter for.
      * @return the list of getters; may be empty if there are no getters that
-     *         match the criteria in the class.
+     * match the criteria in the class.
      */
     public static List<MethodDeclaration> getGetters(SourceInfo si, FieldSpecification f) {
         Debug.assertNonnull(si, f);
@@ -252,63 +224,60 @@ public class MethodKit {
 
     /**
      * Query that returns a list of methods that the given method <b>directly</b>
-     * overwrites or implements, i.e., only direct supertypes are checked. 
+     * overwrites or implements, i.e., only direct supertypes are checked.
      * A method that is multiply inherited (from
      * interfaces) occurs multiple times, accordingly.
      * The method is "un-generified" first via getGenericMember().
-     * 
-     * @param m
-     *            a method.
+     *
+     * @param m a method.
      * @return a list of methods that are overwritten or implemented by <CODE>m
-     *         </CODE>.
+     * </CODE>.
      */
     public static List<Method> getRedefinedMethods(Method m) {
-    	if (m==null)
-        	throw new NullPointerException();
-    	return internalGetRedefinedMethods(m, m.getContainingClassType().getSupertypes());
+        if (m == null)
+            throw new NullPointerException();
+        return internalGetRedefinedMethods(m, m.getContainingClassType().getSupertypes());
     }
 
-    
+
     /**
-     * Query that returns a list of methods that the given method 
+     * Query that returns a list of methods that the given method
      * overwrites or implements. A method that is multiply inherited (from
      * interfaces) occurs multiple times, accordingly.
      * The method is "un-generified" first via getGenericMember().
-     * 
-     * @param m
-     *            a method.
+     *
+     * @param m a method.
      * @return a list of methods that are overwritten or implemented by <CODE>m
-     *         </CODE>.
-     * 
+     * </CODE>.
      */
     public static List<Method> getAllRedefinedMethods(Method m) {
-    	if (m==null)
-        	throw new NullPointerException();
-    	List<? extends ClassType> supers = m.getContainingClassType().getAllSupertypes();
-    	// remove erased types:
-    	supers = m.getProgramModelInfo().removeErasedTypesFromList(supers);
-    	// remove type itself:
-    	supers.remove(0);
-    	return internalGetRedefinedMethods(m, supers);
+        if (m == null)
+            throw new NullPointerException();
+        List<? extends ClassType> supers = m.getContainingClassType().getAllSupertypes();
+        // remove erased types:
+        supers = m.getProgramModelInfo().removeErasedTypesFromList(supers);
+        // remove type itself:
+        supers.remove(0);
+        return internalGetRedefinedMethods(m, supers);
     }
-    
+
     private static List<Method> internalGetRedefinedMethods(Method m, List<? extends ClassType> supers) {
         if (m instanceof Constructor) {
             return Collections.emptyList();
         }
-        m = (Method)m.getGenericMember();
-        
+        m = (Method) m.getGenericMember();
+
         ProgramModelInfo pmi = m.getProgramModelInfo();
         String mname = m.getName();
         List<Type> msig = m.getSignature();
         List<Method> result = new ArrayList<Method>();
         for (int i = supers.size() - 1; i >= 0; i -= 1) {
-        	List<? extends Method> meths = supers.get(i).getMethods();
+            List<? extends Method> meths = supers.get(i).getMethods();
             for (int j = meths.size() - 1; j >= 0; j -= 1) {
                 Method m2 = meths.get(j);
-                if (m2.getName().equals(mname) 
-                		&& signatureMatches(pmi, msig, m2.getSignature(), true, m.isVarArgMethod(), m2.isVarArgMethod()))
-                	result.add(m2);
+                if (m2.getName().equals(mname)
+                        && signatureMatches(pmi, msig, m2.getSignature(), true, m.isVarArgMethod(), m2.isVarArgMethod()))
+                    result.add(m2);
             }
         }
         return result;
@@ -317,11 +286,9 @@ public class MethodKit {
     /**
      * Query that returns a list of methods that redefine or implement the given
      * method. The method is "un-generified" first via getGenericMember().
-     * 
-     * @param xr
-     *            the cross referencer service to use.
-     * @param m
-     *            a method.
+     *
+     * @param xr the cross referencer service to use.
+     * @param m  a method.
      * @return a list of methods that redefine or implement <CODE>m</CODE>.
      */
     public static List<Method> getRedefiningMethods(CrossReferenceSourceInfo xr, Method m) {
@@ -329,21 +296,21 @@ public class MethodKit {
         if (m instanceof Constructor) {
             return Collections.emptyList();
         }
-        m = (Method)m.getGenericMember();
-        	
+        m = (Method) m.getGenericMember();
+
         ClassType ct = m.getContainingClassType();
         String mname = m.getName();
         List<Type> msig = m.getSignature();
         List<Method> result = new ArrayList<Method>();
         List<? extends ClassType> subs = xr.getAllSubtypes(ct);
         for (int i = subs.size() - 1; i >= 0; i -= 1) {
-        	List<? extends Method> meths = subs.get(i).getMethods();
+            List<? extends Method> meths = subs.get(i).getMethods();
             for (int j = meths.size() - 1; j >= 0; j -= 1) {
                 Method m2 = meths.get(j);
-                if (m2.getName().equals(mname) 
-                		&& signatureMatches(xr, m2.getSignature(), msig, 
-                				xr.getServiceConfiguration().getProjectSettings().java5Allowed(),
-                				m2.isVarArgMethod(), m.isVarArgMethod())) {
+                if (m2.getName().equals(mname)
+                        && signatureMatches(xr, m2.getSignature(), msig,
+                        xr.getServiceConfiguration().getProjectSettings().java5Allowed(),
+                        m2.isVarArgMethod(), m.isVarArgMethod())) {
                     result.add(m2);
                 }
             }
@@ -353,13 +320,11 @@ public class MethodKit {
 
     /**
      * Updating query that checks if the given method is a main method.
-     * 
-     * @param ni
-     *            the NameInfo service to use.
-     * @param m
-     *            the method to check.
+     *
+     * @param ni the NameInfo service to use.
+     * @param m  the method to check.
      * @return <CODE>true</CODE> if the given method has the form "public
-     *         static void main(String[] ...)", <CODE>false</CODE> otherwise.
+     * static void main(String[] ...)", <CODE>false</CODE> otherwise.
      */
     public static boolean isMain(NameInfo ni, Method m) {
         if (!m.isPublic()) {
@@ -387,13 +352,11 @@ public class MethodKit {
      * Updating query that checks if the given method is one of the
      * serialization methods <CODE>writeObject</CODE>,<CODE>readObject
      * </CODE>,<CODE>writeReplace</CODE>,<CODE>readResolve</CODE>.
-     * 
-     * @param ni
-     *            the NameInfo service to use.
-     * @param m
-     *            the method to check.
+     *
+     * @param ni the NameInfo service to use.
+     * @param m  the method to check.
      * @return <CODE>true</CODE> if the given method is one of the
-     *         serialization methods, <CODE>false</CODE> otherwise.
+     * serialization methods, <CODE>false</CODE> otherwise.
      */
     public static boolean isSerializationMethod(NameInfo ni, Method m) {
         if (m.getName().equals("writeObject") && m.isPrivate() && m.getReturnType() == null
@@ -410,19 +373,15 @@ public class MethodKit {
                 && m.getSignature().isEmpty()) {
             return true;
         }
-        if (m.getName().equals("readResolve") && m.getReturnType() == ni.getJavaLangObject()
-                && m.getSignature().isEmpty()) {
-            return true;
-        }
-        return false;
+        return m.getName().equals("readResolve") && m.getReturnType() == ni.getJavaLangObject()
+                && m.getSignature().isEmpty();
     }
 
     /**
      * Returns a deep clone of the header of the given declaration; the body of
      * the result is <CODE>null</CODE>.
-     * 
-     * @param md
-     *            the method declaration to clone the header from.
+     *
+     * @param md the method declaration to clone the header from.
      * @return a new method declaration sharing the header with the given one.
      * @see recoder.java.SourceElement#deepClone()
      */
@@ -437,48 +396,41 @@ public class MethodKit {
     /**
      * Query returning a method locally defined in the given type with the given
      * name and signature.
-     * 
-     * @param type
-     *            the class type the method might be defined in.
-     * @param name
-     *            the name of the method.
-     * @param signature
-     *            the signature of the method.
-     * @param signatureIsVarArg
-     * 			  whether the signature declares a var-arg parameter
+     *
+     * @param type              the class type the method might be defined in.
+     * @param name              the name of the method.
+     * @param signature         the signature of the method.
+     * @param signatureIsVarArg whether the signature declares a var-arg parameter
      * @return the method as defined in the class type, or <CODE>null</CODE>
-     *         if there is no match.
+     * if there is no match.
      */
     public static Method getDefinedMethod(ClassType type, String name, List<Type> signature, boolean signatureIsVarArg) {
-    	List<? extends Method> methods = type.getMethods();
+        List<? extends Method> methods = type.getMethods();
         for (int j = methods.size() - 1; j >= 0; j -= 1) {
             Method m = methods.get(j);
-            if (name.equals(m.getName()) 
-            		&& signatureMatches(
-            				type.getProgramModelInfo(),
-            				signature, 
-            				m.getSignature(), 
-            				type.getProgramModelInfo().getServiceConfiguration().getProjectSettings().java5Allowed(),
-            				signatureIsVarArg,
-            				m.isVarArgMethod())) {
-            	return m;
+            if (name.equals(m.getName())
+                    && signatureMatches(
+                    type.getProgramModelInfo(),
+                    signature,
+                    m.getSignature(),
+                    type.getProgramModelInfo().getServiceConfiguration().getProjectSettings().java5Allowed(),
+                    signatureIsVarArg,
+                    m.isVarArgMethod())) {
+                return m;
             }
         }
         return null;
     }
 
     public static boolean signatureMatches(ProgramModelInfo pmi, List<Type> sig1, List<Type> sig2, boolean java5, boolean sig1vararg, boolean sig2vararg) {
-    	if (java5) {
-    		// redefining if compatible in both ways (this resolves a raw-type bug)
-    		if (pmi.isCompatibleSignature(sig1, sig2, false, sig2vararg)
-    				&& pmi.isCompatibleSignature(sig2, sig1, false, sig1vararg))
-    			return true;
-    	} else {
-    		// no java5 allowed
-    		if (sig1.equals(sig2))
-    			return true;
-    	}    
-    	return false;
+        if (java5) {
+            // redefining if compatible in both ways (this resolves a raw-type bug)
+            return pmi.isCompatibleSignature(sig1, sig2, false, sig2vararg)
+                    && pmi.isCompatibleSignature(sig2, sig1, false, sig1vararg);
+        } else {
+            // no java5 allowed
+            return sig1.equals(sig2);
+        }
     }
 
     /**
@@ -487,18 +439,14 @@ public class MethodKit {
      * from independent interfaces, the bottom-most ones are reported. If there
      * is a version defined in a super class, it will be the first entry in the
      * list (position 0).
-     * 
-     * @param ni
-     *            the name info service to use.
-     * @param base
-     *            the class type which would contain the redefining method.
-     * @param name
-     *            the name of the possibly redefining method.
-     * @param signature
-     *            the signature of the possibly redefining method.
+     *
+     * @param ni        the name info service to use.
+     * @param base      the class type which would contain the redefining method.
+     * @param name      the name of the possibly redefining method.
+     * @param signature the signature of the possibly redefining method.
      * @return a list of methods that are directly redefined by a method with
-     *         the given name and signature; the first entry is the method
-     *         inherited from a class, if any.
+     * the given name and signature; the first entry is the method
+     * inherited from a class, if any.
      */
     public static List<Method> getRedefinedMethods(NameInfo ni, ClassType base, String name, List<Type> signature, boolean signatureIsVarArg) {
         List<? extends ClassType> supers = base.getSupertypes();
@@ -537,27 +485,24 @@ public class MethodKit {
      * signatures of the methods will match and that both have the same class.
      * The query will not check any contents of the redefining method, e.g. to
      * see if private members of the super class are accessed.
-     * 
-     * @param pmi
-     *            a program model info to use.
-     * @param redefined
-     *            the method to be redefined.
-     * @param redefining
-     *            the method that is / would be redefining.
+     *
+     * @param pmi        a program model info to use.
+     * @param redefined  the method to be redefined.
+     * @param redefining the method that is / would be redefining.
      * @return a problem report, one of the following:
-     *         <UL>
-     *         <LI>FinalOverwrite, if the redefined method is final;
-     *         <LI>DifferentReturnTypeOverwrite, if the redefining method has a
-     *         different return type;
-     *         <LI>MorePrivateOverwrite, if the redefining method is more
-     *         private;
-     *         <LI>NonStaticOverwrite, if the redefined method is static but
-     *         the redefining is not (if both are static, no problem is
-     *         reported, even though no real redefinition is taking place);
-     *         <LI>UncoveredExceptionsOverwrite, if the redefined method is
-     *         less exceptional;
-     *         <LI><CODE>null</CODE>, otherwise.
-     *         </UL>
+     * <UL>
+     * <LI>FinalOverwrite, if the redefined method is final;
+     * <LI>DifferentReturnTypeOverwrite, if the redefining method has a
+     * different return type;
+     * <LI>MorePrivateOverwrite, if the redefining method is more
+     * private;
+     * <LI>NonStaticOverwrite, if the redefined method is static but
+     * the redefining is not (if both are static, no problem is
+     * reported, even though no real redefinition is taking place);
+     * <LI>UncoveredExceptionsOverwrite, if the redefined method is
+     * less exceptional;
+     * <LI><CODE>null</CODE>, otherwise.
+     * </UL>
      */
     public static Problem checkMethodRedefinition(ProgramModelInfo pmi, Method redefined, Method redefining) {
 
@@ -568,8 +513,8 @@ public class MethodKit {
             return new FinalOverwrite(redefined);
         }
         if (redefined.getReturnType() != redefining.getReturnType()) {
-        	// TODO add check for covariant return types...
-        	return new DifferentReturnTypeOverwrite(redefined);
+            // TODO add check for covariant return types...
+            return new DifferentReturnTypeOverwrite(redefined);
         }
         if (TypeKit.isLessVisible(redefining, redefined)) {
             return new MorePrivateOverwrite(redefined);
@@ -590,39 +535,35 @@ public class MethodKit {
 
     /**
      * Query that finds out problems before inserting a new method declaration.
-     * 
-     * @param ni
-     *            the name info to use.
-     * @param si
-     *            the source info to use.
-     * @param context
-     *            the future context of the method.
-     * @param candidate
-     *            the method declaration that might be inserted.
+     *
+     * @param ni        the name info to use.
+     * @param si        the source info to use.
+     * @param context   the future context of the method.
+     * @param candidate the method declaration that might be inserted.
      * @return a problem report, one of the following:
-     *         <UL>
-     *         <LI>IllegalInterfaceMember, if the context is an interface and
-     *         the candidate is not a valid member;
-     *         <LI>IllegalName, if the name is a keyword;
-     *         <LI>NameConflict, if the candidate is a constructor and its name
-     *         does not match the type name;
-     *         <LI>NameConflict, if there is a method in the context with the
-     *         same name and signature;
-     *         <LI>FinalOverwrite, if there is a redefined method that is
-     *         final;
-     *         <LI>DifferentReturnTypeOverwrite, if there is a redefined method
-     *         with different return type;
-     *         <LI>MorePrivateOverwrite, if there is a redefined method that is
-     *         more public;
-     *         <LI>NonStaticOverwrite, if there is a redefined method that is
-     *         static;
-     *         <LI>UncoveredExceptionsOverwrite, if there is a redefined method
-     *         that is less exceptional;
-     *         <LI><CODE>null</CODE>, otherwise.
-     *         </UL>
+     * <UL>
+     * <LI>IllegalInterfaceMember, if the context is an interface and
+     * the candidate is not a valid member;
+     * <LI>IllegalName, if the name is a keyword;
+     * <LI>NameConflict, if the candidate is a constructor and its name
+     * does not match the type name;
+     * <LI>NameConflict, if there is a method in the context with the
+     * same name and signature;
+     * <LI>FinalOverwrite, if there is a redefined method that is
+     * final;
+     * <LI>DifferentReturnTypeOverwrite, if there is a redefined method
+     * with different return type;
+     * <LI>MorePrivateOverwrite, if there is a redefined method that is
+     * more public;
+     * <LI>NonStaticOverwrite, if there is a redefined method that is
+     * static;
+     * <LI>UncoveredExceptionsOverwrite, if there is a redefined method
+     * that is less exceptional;
+     * <LI><CODE>null</CODE>, otherwise.
+     * </UL>
      */
     public static Problem checkMethodDeclaration(NameInfo ni, SourceInfo si, TypeDeclaration context,
-            MethodDeclaration candidate) {
+                                                 MethodDeclaration candidate) {
 
         if (context instanceof InterfaceDeclaration) {
             if (!TypeKit.isValidInterfaceMember(candidate)) {
@@ -646,10 +587,10 @@ public class MethodKit {
                 MemberDeclaration md = members.get(i);
                 if (md instanceof MethodDeclaration) {
                     MethodDeclaration m = (MethodDeclaration) md;
-                    if (m.getName().equals(name) && 
-                    		signatureMatches(si, m.getSignature(), signature, 
-                    				si.getServiceConfiguration().getProjectSettings().java5Allowed(),
-                    				m.isVarArgMethod(), candidate.isVarArgMethod())) {
+                    if (m.getName().equals(name) &&
+                            signatureMatches(si, m.getSignature(), signature,
+                                    si.getServiceConfiguration().getProjectSettings().java5Allowed(),
+                                    m.isVarArgMethod(), candidate.isVarArgMethod())) {
                         return new NameConflict(m);
                     }
                 }
@@ -676,23 +617,19 @@ public class MethodKit {
      * reference information is collected from the tree. The filtering mode is
      * faster if the tree contains more nodes than there are global references
      * to the given method.
-     * 
-     * @param xr
-     *            the cross referencer to use.
-     * @param m
-     *            a method.
-     * @param root
-     *            the root of an arbitrary syntax tree.
-     * @param scanTree
-     *            flag indicating the search strategy; if <CODE>true</CODE>,
-     *            local cross reference information is build, otherwise the
-     *            global cross reference information is filtered.
+     *
+     * @param xr       the cross referencer to use.
+     * @param m        a method.
+     * @param root     the root of an arbitrary syntax tree.
+     * @param scanTree flag indicating the search strategy; if <CODE>true</CODE>,
+     *                 local cross reference information is build, otherwise the
+     *                 global cross reference information is filtered.
      * @return the list of references to the given method in the given tree, can
-     *         be empty but not <CODE>null</CODE>.
+     * be empty but not <CODE>null</CODE>.
      * @since 0.63
      */
     public static List<MemberReference> getReferences(CrossReferenceSourceInfo xr, Method m,
-            NonTerminalProgramElement root, boolean scanTree) {
+                                                      NonTerminalProgramElement root, boolean scanTree) {
         Debug.assertNonnull(xr, m, root);
         List<MemberReference> result = new ArrayList<MemberReference>();
         if (scanTree) {
@@ -713,7 +650,7 @@ public class MethodKit {
                 }
             }
         } else {
-        	List<MemberReference> refs = xr.getReferences(m);
+            List<MemberReference> refs = xr.getReferences(m);
             for (int i = 0, s = refs.size(); i < s; i += 1) {
                 MemberReference mr = refs.get(i);
                 if (MiscKit.contains(root, mr)) {
@@ -725,27 +662,112 @@ public class MethodKit {
     }
 
     /**
+     * Query that returns a list of methods would redefine, implement or are
+     * overriden or implemented each other starting from method <CODE>
+     * methodName</CODE> in <CODE>type</CODE> with specified <CODE>signature
+     * </CODE>. The method does not have to actually exist in <CODE>type
+     * </CODE> the query just assumes it does.
+     *
+     * @param xrsi       the cross referencer service to use.
+     * @param type       the type which contain method.
+     * @param methodName name of the method.
+     * @param signature  method signature.
+     * @return a list of related methods.
+     * @since 0.72
+     */
+    public static List<Method> getAllRelatedMethods(CrossReferenceSourceInfo xrsi, ClassType type, String methodName,
+                                                    List<Type> signature, boolean signatureIsVarArg) {
+        Debug.assertNonnull(xrsi, type, methodName, signature);
+
+        RelatedMethodsHelper rmh = new RelatedMethodsHelper(xrsi, type, methodName, signature, signatureIsVarArg);
+        return rmh.findRelatedMethods();
+    }
+
+    /**
+     * Query that returns a list of methods that redefine, implement or are
+     * overriden or implemented each other starting from method <CODE>method
+     * </CODE>. There are some cases where related methods might be outside of
+     * descendants or ascendants of type containing <CODE>method</CODE>. For
+     * instance, <CODE>Collection.size()</CODE> is related to <CODE>
+     * Dictionary.size()</CODE>, because <CODE>Hashtable</CODE> extends
+     * <CODE>Dictionary</CODE> and indirectly implements <CODE>Collection
+     * </CODE>.
+     *
+     * @param xrsi   the cross referencer service to use.
+     * @param method a method.
+     * @return a list of related methods including <CODE>method</CODE>.
+     * @since 0.72
+     */
+    public static List<Method> getAllRelatedMethods(CrossReferenceSourceInfo xrsi, Method method) {
+        Debug.assertNonnull(method);
+        return getAllRelatedMethods(xrsi, method.getContainingClassType(), method.getName(), method.getSignature(), method.isVarArgMethod());
+    }
+
+    /**
+     * calls getAllRelatedMethods(NameInfo ni, CrossReferenceSourceInfo xrsi, ClassType type,
+     * String methodName, List<Type> signature, boolean signatureIsVarArg) and assumes that
+     * the signature is <b>not</b> a vararg signature.
+     */
+    public static List<Method> getAllRelatedMethods(NameInfo ni, CrossReferenceSourceInfo xrsi, ClassType type,
+                                                    String methodName, List<Type> signature) {
+        return getAllRelatedMethods(ni, xrsi, type, methodName, signature, false);
+    }
+
+    public static List<Method> getAllRelatedMethods(NameInfo ni, CrossReferenceSourceInfo xrsi, ClassType type,
+                                                    String methodName, List<Type> signature, boolean signatureIsVarArg) {
+        Set<ClassType> visited = new HashSet<ClassType>();
+        Queue<ClassType> q = new LinkedList<ClassType>();
+        q.add(type);
+        visited.add(type);
+        List<Method> result = new ArrayList<Method>();
+        while (!q.isEmpty()) {
+            type = q.remove();
+            Method m = getDefinedMethod(type, methodName, signature, signatureIsVarArg);
+            if (m != null) {
+                result.add(m);
+            }
+            List<Method> redefined = getRedefinedMethods(ni, type, methodName, signature, signatureIsVarArg);
+            for (int i = redefined.size() - 1; i >= 0; i--) {
+                ClassType ct = redefined.get(i).getContainingClassType();
+                if (visited.add(ct)) {
+                    q.add(ct);
+                }
+            }
+            if (m != null || !redefined.isEmpty()) {
+                List<? extends ClassType> types = xrsi.getSubtypes(type);
+                for (int i = types.size() - 1; i >= 0; i--) {
+                    ClassType ct = types.get(i);
+                    if (visited.add(ct)) {
+                        q.add(ct);
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
      * @author AM
      */
     private static class RelatedMethodsHelper {
 
-        private List<Method> methods = new ArrayList<Method>();
+        private final List<Method> methods = new ArrayList<Method>();
 
-        private Set<ClassType> searchedUp = new HashSet<ClassType>();
+        private final Set<ClassType> searchedUp = new HashSet<ClassType>();
 
-        private Set<ClassType> searchedDown = new HashSet<ClassType>();
+        private final Set<ClassType> searchedDown = new HashSet<ClassType>();
 
-        private CrossReferenceSourceInfo xrsi;
+        private final CrossReferenceSourceInfo xrsi;
 
-        private ClassType starting_type;
+        private final ClassType starting_type;
 
-        private String methodName;
+        private final String methodName;
 
-        private List<Type> signature;
-        private boolean signatureIsVarArg;
+        private final List<Type> signature;
+        private final boolean signatureIsVarArg;
 
-        public RelatedMethodsHelper(CrossReferenceSourceInfo xrsi, ClassType type, String methodName, List<Type> signature, 
-        		boolean signatureIsVarArg) {
+        public RelatedMethodsHelper(CrossReferenceSourceInfo xrsi, ClassType type, String methodName, List<Type> signature,
+                                    boolean signatureIsVarArg) {
             this.xrsi = xrsi;
             this.methodName = methodName;
             this.signature = signature;
@@ -789,98 +811,6 @@ public class MethodKit {
                 addMethodsFromSuperTypes(parent);
             }
         }
-    }
-
-    /**
-     * Query that returns a list of methods would redefine, implement or are
-     * overriden or implemented each other starting from method <CODE>
-     * methodName</CODE> in <CODE>type</CODE> with specified <CODE>signature
-     * </CODE>. The method does not have to actually exist in <CODE>type
-     * </CODE> the query just assumes it does.
-     * 
-     * @param xrsi
-     *            the cross referencer service to use.
-     * @param type
-     *            the type which contain method.
-     * @param methodName
-     *            name of the method.
-     * @param signature
-     *            method signature.
-     * @return a list of related methods.
-     * @since 0.72
-     */
-    public static List<Method> getAllRelatedMethods(CrossReferenceSourceInfo xrsi, ClassType type, String methodName,
-    		List<Type> signature, boolean signatureIsVarArg) {
-        Debug.assertNonnull(xrsi, type, methodName, signature);
-
-        RelatedMethodsHelper rmh = new RelatedMethodsHelper(xrsi, type, methodName, signature, signatureIsVarArg);
-        return rmh.findRelatedMethods();
-    }
-
-    /**
-     * Query that returns a list of methods that redefine, implement or are
-     * overriden or implemented each other starting from method <CODE>method
-     * </CODE>. There are some cases where related methods might be outside of
-     * descendants or ascendants of type containing <CODE>method</CODE>. For
-     * instance, <CODE>Collection.size()</CODE> is related to <CODE>
-     * Dictionary.size()</CODE>, because <CODE>Hashtable</CODE> extends
-     * <CODE>Dictionary</CODE> and indirectly implements <CODE>Collection
-     * </CODE>.
-     * 
-     * @param xrsi
-     *            the cross referencer service to use.
-     * @param method
-     *            a method.
-     * @return a list of related methods including <CODE>method</CODE>.
-     * @since 0.72
-     */
-    public static List<Method> getAllRelatedMethods(CrossReferenceSourceInfo xrsi, Method method) {
-        Debug.assertNonnull(method);
-        return getAllRelatedMethods(xrsi, method.getContainingClassType(), method.getName(), method.getSignature(), method.isVarArgMethod());
-    }
-
-    /**
-     * calls getAllRelatedMethods(NameInfo ni, CrossReferenceSourceInfo xrsi, ClassType type,
-     *       String methodName, List<Type> signature, boolean signatureIsVarArg) and assumes that
-     *       the signature is <b>not</b> a vararg signature.
-
-     */
-    public static List<Method> getAllRelatedMethods(NameInfo ni, CrossReferenceSourceInfo xrsi, ClassType type,
-            String methodName, List<Type> signature) {
-    	return getAllRelatedMethods(ni, xrsi, type, methodName, signature, false);
-    }
-    
-    public static List<Method> getAllRelatedMethods(NameInfo ni, CrossReferenceSourceInfo xrsi, ClassType type,
-            String methodName, List<Type> signature, boolean signatureIsVarArg) {
-        Set<ClassType> visited = new HashSet<ClassType>();
-        Queue<ClassType> q = new LinkedList<ClassType>();
-        q.add(type);
-        visited.add(type);
-        List<Method> result = new ArrayList<Method>();
-        while (!q.isEmpty()) {
-            type = q.remove();
-            Method m = getDefinedMethod(type, methodName, signature, signatureIsVarArg);
-            if (m != null) {
-                result.add(m);
-            }
-            List<Method> redefined = getRedefinedMethods(ni, type, methodName, signature, signatureIsVarArg);
-            for (int i = redefined.size() - 1; i >= 0; i--) {
-                ClassType ct = redefined.get(i).getContainingClassType();
-                if (visited.add(ct)) {
-                    q.add(ct);
-                }
-            }
-            if (m != null || !redefined.isEmpty()) {
-                List<? extends ClassType> types = xrsi.getSubtypes(type);
-                for (int i = types.size() - 1; i >= 0; i--) {
-                    ClassType ct = types.get(i);
-                    if (visited.add(ct)) {
-                        q.add(ct);
-                    }
-                }
-            }
-        }
-        return result;
     }
 
 }

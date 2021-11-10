@@ -2,51 +2,41 @@
 
 package recoder.java.statement;
 
-import recoder.java.Expression;
-import recoder.java.ExpressionContainer;
-import recoder.java.LoopInitializer;
-import recoder.java.ProgramElement;
-import recoder.java.Statement;
-import recoder.java.StatementContainer;
+import recoder.java.*;
 import recoder.java.expression.ExpressionStatement;
 import recoder.list.generic.ASTList;
 
 /**
  * Loop statement.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public abstract class LoopStatement extends JavaStatement implements StatementContainer, ExpressionContainer {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	
-
     /**
-     * Guard.
+     *
      */
-
-	private Expression guard;
-
+    private static final long serialVersionUID = 1L;
     /**
      * Inits.
      */
 
-	ASTList<LoopInitializer> inits;
-
-    /**
-     * Updates.
-     */
-
-	private ASTList<Expression> updates;
-
+    ASTList<LoopInitializer> inits;
     /**
      * Body.
      */
 
-	Statement body;
+    Statement body;
+    /**
+     * Guard.
+     */
+
+    private Expression guard;
+    /**
+     * Updates.
+     */
+
+    private ASTList<Expression> updates;
 
     /**
      * Loop statement.
@@ -58,9 +48,8 @@ public abstract class LoopStatement extends JavaStatement implements StatementCo
 
     /**
      * Loop statement.
-     * 
-     * @param body
-     *            a statement.
+     *
+     * @param body a statement.
      */
 
     public LoopStatement(Statement body) {
@@ -69,9 +58,8 @@ public abstract class LoopStatement extends JavaStatement implements StatementCo
 
     /**
      * Loop statement.
-     * 
-     * @param proto
-     *            a loop statement.
+     *
+     * @param proto a loop statement.
      */
 
     protected LoopStatement(LoopStatement proto) {
@@ -122,7 +110,7 @@ public abstract class LoopStatement extends JavaStatement implements StatementCo
 
     /**
      * Returns the number of children of this node.
-     * 
+     *
      * @return an int giving the number of children of this node
      */
 
@@ -142,12 +130,10 @@ public abstract class LoopStatement extends JavaStatement implements StatementCo
     /**
      * Returns the child at the specified index in this node's "virtual" child
      * array
-     * 
-     * @param index
-     *            an index into this node's "virtual" child array
+     *
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
@@ -220,14 +206,11 @@ public abstract class LoopStatement extends JavaStatement implements StatementCo
      * element can be null - in that case, the child is effectively removed. The
      * parent role of the new child is validated, while the parent link of the
      * replaced child is left untouched.
-     * 
-     * @param p
-     *            the old child.
-     * @param p
-     *            the new child.
+     *
+     * @param p the old child.
+     * @param p the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException
-     *                if the new child cannot take over the role of the old one.
+     * @throws ClassCastException if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
@@ -286,7 +269,7 @@ public abstract class LoopStatement extends JavaStatement implements StatementCo
 
     /**
      * Get the number of expressions in this container.
-     * 
+     *
      * @return the number of expressions.
      */
 
@@ -341,7 +324,7 @@ public abstract class LoopStatement extends JavaStatement implements StatementCo
 
     /**
      * Get guard.
-     * 
+     *
      * @return the expression.
      */
 
@@ -351,9 +334,8 @@ public abstract class LoopStatement extends JavaStatement implements StatementCo
 
     /**
      * Set guard.
-     * 
-     * @param expr
-     *            an expression.
+     *
+     * @param expr an expression.
      */
 
     public void setGuard(Expression expr) {
@@ -362,7 +344,7 @@ public abstract class LoopStatement extends JavaStatement implements StatementCo
 
     /**
      * Get body.
-     * 
+     *
      * @return the statement.
      */
 
@@ -372,9 +354,8 @@ public abstract class LoopStatement extends JavaStatement implements StatementCo
 
     /**
      * Set body.
-     * 
-     * @param statement
-     *            a statement.
+     *
+     * @param statement a statement.
      */
 
     public void setBody(Statement statement) {
@@ -383,7 +364,7 @@ public abstract class LoopStatement extends JavaStatement implements StatementCo
 
     /**
      * Get the number of statements in this container.
-     * 
+     *
      * @return the number of statements.
      */
 
@@ -407,7 +388,7 @@ public abstract class LoopStatement extends JavaStatement implements StatementCo
 
     /**
      * Get initializers.
-     * 
+     *
      * @return the loop initializer mutable list.
      */
 
@@ -416,8 +397,17 @@ public abstract class LoopStatement extends JavaStatement implements StatementCo
     }
 
     /**
+     * Set initializers.
+     *
+     * @param list a loop initializer mutable list.
+     */
+    public void setInitializers(ASTList<LoopInitializer> list) {
+        inits = list;
+    }
+
+    /**
      * Get updates.
-     * 
+     *
      * @return the expression mutable list.
      */
 
@@ -426,8 +416,17 @@ public abstract class LoopStatement extends JavaStatement implements StatementCo
     }
 
     /**
+     * Set updates.
+     *
+     * @param list an expression mutable list.
+     */
+    public void setUpdates(ASTList<Expression> list) {
+        updates = list;
+    }
+
+    /**
      * Is exit condition.
-     * 
+     *
      * @return the boolean value.
      */
 
@@ -435,31 +434,11 @@ public abstract class LoopStatement extends JavaStatement implements StatementCo
 
     /**
      * Is checked before iteration.
-     * 
+     *
      * @return the boolean value.
      */
 
     public abstract boolean isCheckedBeforeIteration();
 
-    /**
-     * Set initializers.
-     * 
-     * @param list
-     *            a loop initializer mutable list.
-     */
-    public void setInitializers(ASTList<LoopInitializer> list) {
-        inits = list;
-    }
-
-    /**
-     * Set updates.
-     * 
-     * @param list
-     *            an expression mutable list.
-     */
-    public void setUpdates(ASTList<Expression> list) {
-        updates = list;
-    }
-    
-    public abstract LoopStatement deepClone();  
+    public abstract LoopStatement deepClone();
 }

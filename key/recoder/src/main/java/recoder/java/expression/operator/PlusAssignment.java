@@ -13,11 +13,11 @@ import recoder.java.expression.Assignment;
 public class PlusAssignment extends Assignment {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 316506987506404732L;
+     * serialization id
+     */
+    private static final long serialVersionUID = 316506987506404732L;
 
-	/**
+    /**
      * Plus assignment.
      */
 
@@ -27,11 +27,9 @@ public class PlusAssignment extends Assignment {
 
     /**
      * Plus assignment.
-     * 
-     * @param lhs
-     *            an expression.
-     * @param rhs
-     *            an expression.
+     *
+     * @param lhs an expression.
+     * @param rhs an expression.
      */
 
     public PlusAssignment(Expression lhs, Expression rhs) {
@@ -41,9 +39,8 @@ public class PlusAssignment extends Assignment {
 
     /**
      * Plus assignment.
-     * 
-     * @param proto
-     *            a plus assignment.
+     *
+     * @param proto a plus assignment.
      */
 
     protected PlusAssignment(PlusAssignment proto) {
@@ -53,7 +50,7 @@ public class PlusAssignment extends Assignment {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -63,7 +60,7 @@ public class PlusAssignment extends Assignment {
 
     /**
      * Get arity.
-     * 
+     *
      * @return the int value.
      */
 
@@ -73,7 +70,7 @@ public class PlusAssignment extends Assignment {
 
     /**
      * Get precedence.
-     * 
+     *
      * @return the int value.
      */
 
@@ -83,7 +80,7 @@ public class PlusAssignment extends Assignment {
 
     /**
      * Get notation.
-     * 
+     *
      * @return the int value.
      */
 

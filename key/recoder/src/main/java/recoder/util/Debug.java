@@ -2,57 +2,43 @@
 
 package recoder.util;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.io.*;
 import java.util.Properties;
 
 /**
  * Routines to debug.
- * 
+ *
  * @author UA
  * @author AL
  */
 public class Debug {
 
     /**
+     * Strings that are regarded as having a somewhat negative touch. Options
+     * with these values (or uppercase versions thereof) are considered unset.
+     */
+    protected final static String[] NEGATIVE_VALUES = new String[]{"", "0", "false", "off", "no", "none"};
+    protected final static String DEBUGGING_OPTION_FILE = "debug.properties";
+    final static String ESC_PREFIX = "\033[3;31m";
+    final static String ESC_SUFFIX = "\033[0m";
+    /**
      * Information level. Lower levels are higher.
      */
     protected static int level = 1;
-
     /**
      * The print writer output stream.
      */
     // protected static PrintWriter output = new PrintWriter(System.err);
     protected static PrintStream output = System.err;
-
-    /**
-     * Strings that are regarded as having a somewhat negative touch. Options
-     * with these values (or uppercase versions thereof) are considered unset.
-     */
-    protected final static String[] NEGATIVE_VALUES = new String[] { "", "0", "false", "off", "no", "none" };
-
-    protected final static String DEBUGGING_OPTION_FILE = "debug.properties";
-
+    static String ERROR_MESSAGE = "Error: ";
+    static String RESTRICTION_MESSAGE = "Restriction: ";
+    static String INFO_MESSAGE = "Info: ";
+    static String ASSERTION_MESSAGE = "Assertion failed: ";
     /**
      * Debugging print functions. Maintains an option table to steer debug
      * printout.
      */
     private static Properties debuggingOptions = null;
-
-    final static String ESC_PREFIX = "\033[3;31m";
-
-    final static String ESC_SUFFIX = "\033[0m";
-
-    static String ERROR_MESSAGE = "Error: ";
-
-    static String RESTRICTION_MESSAGE = "Restriction: ";
-
-    static String INFO_MESSAGE = "Info: ";
-
-    static String ASSERTION_MESSAGE = "Assertion failed: ";
 
     protected static Properties getDebuggingOptions() {
         if (debuggingOptions == null) {
@@ -178,11 +164,9 @@ public class Debug {
 
     /**
      * Assertion method for general conditions.
-     * 
-     * @param expression
-     *            predicate that must hold.
-     * @exception IllegalStateException
-     *                if the expression evaluates to false.
+     *
+     * @param expression predicate that must hold.
+     * @throws IllegalStateException if the expression evaluates to false.
      */
     public final static void assertBoolean(boolean expression) {
         if (!expression) {
@@ -192,13 +176,10 @@ public class Debug {
 
     /**
      * Assertion method for general conditions.
-     * 
-     * @param expression
-     *            predicate that must hold.
-     * @param message
-     *            detail message.
-     * @exception IllegalStateException
-     *                if the expression evaluates to false.
+     *
+     * @param expression predicate that must hold.
+     * @param message    detail message.
+     * @throws IllegalStateException if the expression evaluates to false.
      */
     public final static void assertBoolean(boolean expression, String message) {
         if (!expression) {
@@ -208,11 +189,9 @@ public class Debug {
 
     /**
      * Special assertion method to test for invalid objects.
-     * 
-     * @param nonnull
-     *            object that may not be null.
-     * @exception NullPointerException
-     *                if the object is null.
+     *
+     * @param nonnull object that may not be null.
+     * @throws NullPointerException if the object is null.
      */
     public final static void assertNonnull(Object nonnull) {
         if (nonnull == null) {
@@ -222,13 +201,10 @@ public class Debug {
 
     /**
      * Special assertion method to test for invalid objects.
-     * 
-     * @param nonnull1
-     *            object that may not be null.
-     * @param nonnull2
-     *            object that may not be null.
-     * @exception NullPointerException
-     *                if the object is null.
+     *
+     * @param nonnull1 object that may not be null.
+     * @param nonnull2 object that may not be null.
+     * @throws NullPointerException if the object is null.
      */
     public final static void assertNonnull(Object nonnull1, Object nonnull2) {
         if (nonnull1 == null) {
@@ -241,15 +217,11 @@ public class Debug {
 
     /**
      * Special assertion method to test for invalid objects.
-     * 
-     * @param nonnull1
-     *            object that may not be null.
-     * @param nonnull2
-     *            object that may not be null.
-     * @param nonnull3
-     *            object that may not be null.
-     * @exception NullPointerException
-     *                if the object is null.
+     *
+     * @param nonnull1 object that may not be null.
+     * @param nonnull2 object that may not be null.
+     * @param nonnull3 object that may not be null.
+     * @throws NullPointerException if the object is null.
      */
     public final static void assertNonnull(Object nonnull1, Object nonnull2, Object nonnull3) {
         if (nonnull1 == null) {
@@ -265,17 +237,12 @@ public class Debug {
 
     /**
      * Special assertion method to test for invalid objects.
-     * 
-     * @param nonnull1
-     *            object that may not be null.
-     * @param nonnull2
-     *            object that may not be null.
-     * @param nonnull3
-     *            object that may not be null.
-     * @param nonnull4
-     *            object that may not be null.
-     * @exception NullPointerException
-     *                if the object is null.
+     *
+     * @param nonnull1 object that may not be null.
+     * @param nonnull2 object that may not be null.
+     * @param nonnull3 object that may not be null.
+     * @param nonnull4 object that may not be null.
+     * @throws NullPointerException if the object is null.
      */
     public final static void assertNonnull(Object nonnull1, Object nonnull2, Object nonnull3, Object nonnull4) {
         if (nonnull1 == null) {
@@ -294,13 +261,10 @@ public class Debug {
 
     /**
      * Special assertion method to test for invalid objects.
-     * 
-     * @param nonnull
-     *            object that may not be null.
-     * @param message
-     *            detail message.
-     * @exception NullPointerException
-     *                if the object is null.
+     *
+     * @param nonnull object that may not be null.
+     * @param message detail message.
+     * @throws NullPointerException if the object is null.
      */
     public final static void assertNonnull(Object nonnull, String message) {
         if (nonnull == null) {

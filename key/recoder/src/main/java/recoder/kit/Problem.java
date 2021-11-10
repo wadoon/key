@@ -7,16 +7,15 @@ package recoder.kit;
  * indicating that the planned transformation is not applicable. This is dual to
  * the {@link recoder.kit.NoProblem}report. This class is also an exception but
  * is usually not thrown, but passed on as ordinary return value.
- * 
- * @see recoder.kit.NoProblem
- * 
+ *
  * @author AL
+ * @see recoder.kit.NoProblem
  */
 public abstract class Problem extends RuntimeException implements ProblemReport {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+
 }
 

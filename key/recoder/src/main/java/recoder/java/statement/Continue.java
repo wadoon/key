@@ -7,18 +7,18 @@ import recoder.java.SourceVisitor;
 
 /**
  * Continue.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class Continue extends LabelJumpStatement {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 8896520115861515813L;
+     * serialization id
+     */
+    private static final long serialVersionUID = 8896520115861515813L;
 
-	/**
+    /**
      * Continue.
      */
 
@@ -28,9 +28,8 @@ public class Continue extends LabelJumpStatement {
 
     /**
      * Continue.
-     * 
-     * @param label
-     *            an identifier.
+     *
+     * @param label an identifier.
      */
 
     public Continue(Identifier label) {
@@ -40,9 +39,8 @@ public class Continue extends LabelJumpStatement {
 
     /**
      * Continue.
-     * 
-     * @param proto
-     *            a continue.
+     *
+     * @param proto a continue.
      */
 
     protected Continue(Continue proto) {
@@ -52,7 +50,7 @@ public class Continue extends LabelJumpStatement {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 

@@ -7,30 +7,29 @@ import recoder.java.declaration.Modifier;
 
 /**
  * Abstract.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class Abstract extends Modifier {
 
     /**
-	 * serialization id 
-	 */
-	private static final long serialVersionUID = -380790417611526476L;
+     * serialization id
+     */
+    private static final long serialVersionUID = -380790417611526476L;
 
-	/**
+    /**
      * Abstract.
      */
 
     public Abstract() {
-    	// nothing to do
+        // nothing to do
     }
 
     /**
      * Abstract.
-     * 
-     * @param proto
-     *            an abstract.
+     *
+     * @param proto an abstract.
      */
 
     protected Abstract(Abstract proto) {
@@ -39,7 +38,7 @@ public class Abstract extends Modifier {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 

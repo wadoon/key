@@ -2,19 +2,19 @@
 
 package recoder.convenience;
 
-import java.util.List;
-
 import recoder.java.NonTerminalProgramElement;
 import recoder.java.ProgramElement;
 
+import java.util.List;
+
 /**
  * Walks all syntax trees from a list of program elements in depth-first order.
- * 
+ *
  * @author AL
  */
 public class ForestWalker extends AbstractTreeWalker {
 
-    private List<? extends ProgramElement> rootList;
+    private final List<? extends ProgramElement> rootList;
 
     private int unitIndex;
 

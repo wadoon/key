@@ -7,18 +7,18 @@ import recoder.convenience.TreeWalker;
 
 /**
  * Top level implementation of a Java {@link NonTerminalProgramElement}.
- * 
+ *
  * @author AL
  */
 
 public abstract class JavaNonTerminalProgramElement extends JavaProgramElement implements NonTerminalProgramElement {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+     *
+     */
+    private static final long serialVersionUID = 1L;
 
-	/**
+    /**
      * Java program element.
      */
 
@@ -28,9 +28,8 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement i
 
     /**
      * Java program element.
-     * 
-     * @param proto
-     *            a java program element.
+     *
+     * @param proto a java program element.
      */
 
     protected JavaNonTerminalProgramElement(JavaProgramElement proto) {
@@ -43,7 +42,7 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement i
 
     public void makeParentRoleValid() {
         //TODO weigl something todo?
-    };
+    }
 
     /**
      * Defaults to attempt a depth-first traversal using a
@@ -59,9 +58,8 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement i
 
     /**
      * Extracts the role of a child from its position code.
-     * 
-     * @param positionCode
-     *            the position code.
+     *
+     * @param positionCode the position code.
      * @return the role code of the given position code.
      * @see NonTerminalProgramElement#getChildPositionCode(ProgramElement)
      */
@@ -73,9 +71,8 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement i
      * Returns the index of the given child, or <CODE>-1</CODE> if there is no
      * such child. The child is searched for by identity: <CODE>
      * getChildAt(getIndexOfChild(x)) == x</CODE>.
-     * 
-     * @param child
-     *            the exact child to look for.
+     *
+     * @param child the exact child to look for.
      * @return the index of the given child, or <CODE>-1</CODE>.
      */
     public int getIndexOfChild(ProgramElement child) {
@@ -85,11 +82,11 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement i
         }
         return i;
     }
-    
-    public final void validateAll() throws ModelException { 
+
+    public final void validateAll() throws ModelException {
         TreeWalker tw = new TreeWalker(this);
         while (tw.next()) {
             tw.getProgramElement().validate();
-        }    	
+        }
     }
 }

@@ -8,18 +8,18 @@ import recoder.java.expression.Operator;
 
 /**
  * Times.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class Times extends Operator {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 452019546318592957L;
+     * serialization id
+     */
+    private static final long serialVersionUID = 452019546318592957L;
 
-	/**
+    /**
      * Times.
      */
 
@@ -29,11 +29,9 @@ public class Times extends Operator {
 
     /**
      * Times.
-     * 
-     * @param lhs
-     *            an expression.
-     * @param rhs
-     *            an expression.
+     *
+     * @param lhs an expression.
+     * @param rhs an expression.
      */
 
     public Times(Expression lhs, Expression rhs) {
@@ -43,9 +41,8 @@ public class Times extends Operator {
 
     /**
      * Times.
-     * 
-     * @param proto
-     *            a times.
+     *
+     * @param proto a times.
      */
 
     protected Times(Times proto) {
@@ -55,7 +52,7 @@ public class Times extends Operator {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -65,7 +62,7 @@ public class Times extends Operator {
 
     /**
      * Get arity.
-     * 
+     *
      * @return the int value.
      */
 
@@ -75,7 +72,7 @@ public class Times extends Operator {
 
     /**
      * Get precedence.
-     * 
+     *
      * @return the int value.
      */
 
@@ -85,7 +82,7 @@ public class Times extends Operator {
 
     /**
      * Get notation.
-     * 
+     *
      * @return the int value.
      */
 

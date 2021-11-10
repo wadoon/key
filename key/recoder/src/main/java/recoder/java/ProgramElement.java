@@ -4,58 +4,62 @@ package recoder.java;
 
 import recoder.ModelElement;
 import recoder.java.expression.Literal;
-import recoder.java.expression.literal.BooleanLiteral;
-import recoder.java.expression.literal.CharLiteral;
-import recoder.java.expression.literal.DoubleLiteral;
-import recoder.java.expression.literal.FloatLiteral;
-import recoder.java.expression.literal.IntLiteral;
-import recoder.java.expression.literal.LongLiteral;
-import recoder.java.expression.literal.NullLiteral;
-import recoder.java.expression.literal.StringLiteral;
-import recoder.java.reference.FieldReference;
-import recoder.java.reference.PackageReference;
-import recoder.java.reference.TypeReference;
-import recoder.java.reference.UncollatedReferenceQualifier;
-import recoder.java.reference.VariableReference;
+import recoder.java.expression.literal.*;
+import recoder.java.reference.*;
 import recoder.list.generic.ASTList;
 import recoder.util.Equality;
 import recoder.util.HashCode;
 
 /**
  * A part of the program syntax that carries semantics in the model.
- * 
+ *
  * @author AL
  */
 
 public interface ProgramElement extends SourceElement, ModelElement {
-	/**
-	 * for debug support. each ProgramElement get's an id during assigned during
-	 * creation, which should be the same for repeated program runs on the
-	 * same computer. 
-	 * May be removed in later versions...
-	 * @return 
-	 */
-	int getID();
-	
+    /**
+     * Structural hash code object for program elements.
+     *
+     * @see ProgramElement.TreeStructure#hashCode
+     */
+
+    HashCode STRUCTURAL_HASH_CODE = new TreeStructure();
+    /**
+     * Structural equality object for syntax trees.
+     *
+     * @see ProgramElement.TreeStructure#equals
+     */
+
+    Equality STRUCTURAL_EQUALITY = STRUCTURAL_HASH_CODE;
+
+    /**
+     * for debug support. each ProgramElement get's an id during assigned during
+     * creation, which should be the same for repeated program runs on the
+     * same computer.
+     * May be removed in later versions...
+     *
+     * @return
+     */
+    int getID();
+
     /**
      * Yields the syntactical parent node.
-     * 
+     *
      * @return the parent node in the syntax tree.
      */
     NonTerminalProgramElement getASTParent();
 
     /**
      * Get comments.
-     * 
+     *
      * @return the comments.
      */
     ASTList<Comment> getComments();
 
     /**
      * Set comments.
-     * 
-     * @param c
-     *            a comment list.
+     *
+     * @param c a comment list.
      */
     void setComments(ASTList<Comment> list);
 
@@ -73,7 +77,7 @@ public interface ProgramElement extends SourceElement, ModelElement {
          * {@link recoder.java.NamedProgramElement}and the number of its
          * children. For reasons of efficiency, no further recursion is
          * performed.
-         * 
+         *
          * @return the hash code.
          */
 
@@ -117,13 +121,11 @@ public interface ProgramElement extends SourceElement, ModelElement {
          * The function does not compare comments or indentation information.
          * Instead, the toSource method can be used to perform a more stringent
          * comparison.
-         * 
-         * @param x
-         *            the root of the first syntax tree.
-         * @param y
-         *            the root of the second syntax tree.
+         *
+         * @param x the root of the first syntax tree.
+         * @param y the root of the second syntax tree.
          * @return true, iff both roots have the same class and equal children
-         *         (if any).
+         * (if any).
          */
 
         public boolean equals(Object x, Object y) {
@@ -203,20 +205,4 @@ public interface ProgramElement extends SourceElement, ModelElement {
             }
         }
     }
-
-    /**
-     * Structural hash code object for program elements.
-     * 
-     * @see ProgramElement.TreeStructure#hashCode
-     */
-
-    HashCode STRUCTURAL_HASH_CODE = new TreeStructure();
-
-    /**
-     * Structural equality object for syntax trees.
-     * 
-     * @see ProgramElement.TreeStructure#equals
-     */
-
-    Equality STRUCTURAL_EQUALITY = STRUCTURAL_HASH_CODE;
 }

@@ -8,18 +8,18 @@ import recoder.java.expression.Operator;
 
 /**
  * Shift right.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class ShiftRight extends Operator {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -3676799631907980532L;
+     * serialization id
+     */
+    private static final long serialVersionUID = -3676799631907980532L;
 
-	/**
+    /**
      * Shift right.
      */
 
@@ -29,11 +29,9 @@ public class ShiftRight extends Operator {
 
     /**
      * Shift right.
-     * 
-     * @param lhs
-     *            an expression.
-     * @param rhs
-     *            an expression.
+     *
+     * @param lhs an expression.
+     * @param rhs an expression.
      */
 
     public ShiftRight(Expression lhs, Expression rhs) {
@@ -43,9 +41,8 @@ public class ShiftRight extends Operator {
 
     /**
      * Shift right.
-     * 
-     * @param proto
-     *            a shift right.
+     *
+     * @param proto a shift right.
      */
 
     protected ShiftRight(ShiftRight proto) {
@@ -55,7 +52,7 @@ public class ShiftRight extends Operator {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -65,7 +62,7 @@ public class ShiftRight extends Operator {
 
     /**
      * Get arity.
-     * 
+     *
      * @return the int value.
      */
 
@@ -75,7 +72,7 @@ public class ShiftRight extends Operator {
 
     /**
      * Get precedence.
-     * 
+     *
      * @return the int value.
      */
 
@@ -85,7 +82,7 @@ public class ShiftRight extends Operator {
 
     /**
      * Get notation.
-     * 
+     *
      * @return the int value.
      */
 

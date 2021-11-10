@@ -8,18 +8,18 @@ import recoder.java.expression.Assignment;
 
 /**
  * Modulo assignment.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class ModuloAssignment extends Assignment {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 4380772781463528921L;
+     * serialization id
+     */
+    private static final long serialVersionUID = 4380772781463528921L;
 
-	/**
+    /**
      * Modulo assignment.
      */
 
@@ -29,11 +29,9 @@ public class ModuloAssignment extends Assignment {
 
     /**
      * Modulo assignment.
-     * 
-     * @param lhs
-     *            an expression.
-     * @param rhs
-     *            an expression.
+     *
+     * @param lhs an expression.
+     * @param rhs an expression.
      */
 
     public ModuloAssignment(Expression lhs, Expression rhs) {
@@ -43,9 +41,8 @@ public class ModuloAssignment extends Assignment {
 
     /**
      * Modulo assignment.
-     * 
-     * @param proto
-     *            a modulo assignment.
+     *
+     * @param proto a modulo assignment.
      */
 
     protected ModuloAssignment(ModuloAssignment proto) {
@@ -55,7 +52,7 @@ public class ModuloAssignment extends Assignment {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -65,7 +62,7 @@ public class ModuloAssignment extends Assignment {
 
     /**
      * Get arity.
-     * 
+     *
      * @return the int value.
      */
 
@@ -75,7 +72,7 @@ public class ModuloAssignment extends Assignment {
 
     /**
      * Get precedence.
-     * 
+     *
      * @return the int value.
      */
 
@@ -85,7 +82,7 @@ public class ModuloAssignment extends Assignment {
 
     /**
      * Get notation.
-     * 
+     *
      * @return the int value.
      */
 

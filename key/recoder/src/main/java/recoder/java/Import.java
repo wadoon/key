@@ -2,51 +2,46 @@
 
 package recoder.java;
 
-import recoder.java.reference.PackageReference;
-import recoder.java.reference.PackageReferenceContainer;
-import recoder.java.reference.TypeReference;
-import recoder.java.reference.TypeReferenceContainer;
-import recoder.java.reference.TypeReferenceInfix;
-import recoder.java.reference.UncollatedReferenceQualifier;
+import recoder.java.reference.*;
 
 /**
  * Import.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class Import extends JavaNonTerminalProgramElement implements TypeReferenceContainer, PackageReferenceContainer {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -722260309045817264L;
+     * serialization id
+     */
+    private static final long serialVersionUID = -722260309045817264L;
 
-	/**
+    /**
      * Multi import flag.
      */
-	private boolean isMultiImport;
+    private boolean isMultiImport;
 
     /**
      * Static import flag (Java 5).
      */
-	private boolean isStaticImport;
-    
+    private boolean isStaticImport;
+
     /**
      * Parent.
      */
-	private CompilationUnit parent;
+    private CompilationUnit parent;
 
     /**
      * Type reference infix.
      */
-	private TypeReferenceInfix reference;
+    private TypeReferenceInfix reference;
 
     /**
      * the identifier used if this is a static import.
      */
-	private Identifier staticIdentifier;
-    
+    private Identifier staticIdentifier;
+
     /**
      * Import.
      */
@@ -57,11 +52,9 @@ public class Import extends JavaNonTerminalProgramElement implements TypeReferen
     /**
      * Creates a non-static (default) Import.
      * Same as <code>new Import(t, multi, false)</code>
-     * 
-     * @param t
-     *            a type reference.
-     * @param multi
-     *            indicates the wildcard.
+     *
+     * @param t     a type reference.
+     * @param multi indicates the wildcard.
      */
 
     public Import(TypeReference t, boolean multi) {
@@ -69,10 +62,10 @@ public class Import extends JavaNonTerminalProgramElement implements TypeReferen
         setMultiImport(multi);
         makeParentRoleValid();
     }
-    
+
     /**
      * Creates a static Import.
-     * 
+     *
      * @param t
      * @param multi
      * @param isStatic
@@ -84,7 +77,7 @@ public class Import extends JavaNonTerminalProgramElement implements TypeReferen
         setStaticImport(true);
         makeParentRoleValid();
     }
-    
+
     public Import(TypeReference t, boolean multi, boolean isStatic) {
         setReference(t);
         setMultiImport(multi);
@@ -94,9 +87,8 @@ public class Import extends JavaNonTerminalProgramElement implements TypeReferen
 
     /**
      * Import.
-     * 
-     * @param t
-     *            a package reference.
+     *
+     * @param t a package reference.
      */
     public Import(PackageReference t) {
         setReference(t);
@@ -107,9 +99,8 @@ public class Import extends JavaNonTerminalProgramElement implements TypeReferen
 
     /**
      * Import.
-     * 
-     * @param proto
-     *            an import.
+     *
+     * @param proto an import.
      */
     protected Import(Import proto) {
         super(proto);
@@ -141,7 +132,7 @@ public class Import extends JavaNonTerminalProgramElement implements TypeReferen
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
     public Import deepClone() {
@@ -155,30 +146,19 @@ public class Import extends JavaNonTerminalProgramElement implements TypeReferen
     /**
      * Checks if this import is a multi type import, also known as
      * type-on-demand import.
-     * 
+     *
      * @return the kind of this import.
      */
     public boolean isMultiImport() {
         return isMultiImport;
     }
-    
-    /**
-     * Checks if this import is a static import (Java 5).
-     * 
-     * @return wether or not the import is a static import
-     */
-    public boolean isStaticImport() {
-        return isStaticImport;
-    }
 
     /**
      * Sets this import to be a multi type import.
-     * 
-     * @param multi
-     *            denotes the wildcard for this import.
-     * @exception IllegalArgumentException
-     *                if the reference is a package and multi is <CODE>false
-     *                </CODE>.
+     *
+     * @param multi denotes the wildcard for this import.
+     * @throws IllegalArgumentException if the reference is a package and multi is <CODE>false
+     *                                  </CODE>.
      */
     public void setMultiImport(boolean multi) {
         if (!multi && reference instanceof PackageReference) {
@@ -186,22 +166,31 @@ public class Import extends JavaNonTerminalProgramElement implements TypeReferen
         }
         isMultiImport = multi;
     }
-    
+
+    /**
+     * Checks if this import is a static import (Java 5).
+     *
+     * @return wether or not the import is a static import
+     */
+    public boolean isStaticImport() {
+        return isStaticImport;
+    }
+
     public void setStaticImport(boolean isStatic) {
         isStaticImport = isStatic;
     }
-    
-    public void setStaticIdentifier(Identifier id) {
-        staticIdentifier = id;
-    }
-    
+
     public Identifier getStaticIdentifier() {
         return staticIdentifier;
     }
 
+    public void setStaticIdentifier(Identifier id) {
+        staticIdentifier = id;
+    }
+
     /**
      * Get AST parent.
-     * 
+     *
      * @return the non terminal program element.
      */
     public NonTerminalProgramElement getASTParent() {
@@ -210,7 +199,7 @@ public class Import extends JavaNonTerminalProgramElement implements TypeReferen
 
     /**
      * Returns the number of children of this node.
-     * 
+     *
      * @return an int giving the number of children of this node
      */
     public int getChildCount() {
@@ -225,19 +214,17 @@ public class Import extends JavaNonTerminalProgramElement implements TypeReferen
     /**
      * Returns the child at the specified index in this node's "virtual" child
      * array
-     * 
-     * @param index
-     *            an index into this node's "virtual" child array
+     *
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
         if (reference != null) {
             if (index == 0)
                 return reference;
             index--;
-        } 
+        }
         if (index == 0 && staticIdentifier != null)
             return staticIdentifier;
         throw new ArrayIndexOutOfBoundsException();
@@ -245,7 +232,7 @@ public class Import extends JavaNonTerminalProgramElement implements TypeReferen
 
     public int getChildPositionCode(ProgramElement child) {
         // role 0: reference
-    	// role 1: static identifier (java 5 only)
+        // role 1: static identifier (java 5 only)
         if (child == reference) {
             return 0;
         }
@@ -257,7 +244,7 @@ public class Import extends JavaNonTerminalProgramElement implements TypeReferen
 
     /**
      * Get parent.
-     * 
+     *
      * @return the compilation unit.
      */
     public CompilationUnit getParent() {
@@ -266,9 +253,8 @@ public class Import extends JavaNonTerminalProgramElement implements TypeReferen
 
     /**
      * Set parent.
-     * 
-     * @param u
-     *            a compilation unit.
+     *
+     * @param u a compilation unit.
      */
     public void setParent(CompilationUnit u) {
         parent = u;
@@ -276,7 +262,7 @@ public class Import extends JavaNonTerminalProgramElement implements TypeReferen
 
     /**
      * Get the number of type references in this container.
-     * 
+     *
      * @return the number of type references.
      */
     public int getTypeReferenceCount() {
@@ -298,7 +284,7 @@ public class Import extends JavaNonTerminalProgramElement implements TypeReferen
 
     /**
      * Returns the type reference of this import, if there is one.
-     * 
+     *
      * @return the reference of this import statement.
      */
     public TypeReference getTypeReference() {
@@ -309,7 +295,7 @@ public class Import extends JavaNonTerminalProgramElement implements TypeReferen
      * Returns the package reference of this import, if there is one.
      * Note that if reference is a URQ, this method will return <code>null</code>,
      * although this URQ may denote a Package.
-     * 
+     *
      * @return the reference of this import statement.
      */
     public PackageReference getPackageReference() {
@@ -319,7 +305,7 @@ public class Import extends JavaNonTerminalProgramElement implements TypeReferen
     /**
      * Returns the reference of this import, either a type or a package
      * reference.
-     * 
+     *
      * @return the reference of this import statement.
      */
     public TypeReferenceInfix getReference() {
@@ -328,28 +314,24 @@ public class Import extends JavaNonTerminalProgramElement implements TypeReferen
 
     /**
      * Set reference.
-     * 
-     * @param t
-     *            a type reference infix.
+     *
+     * @param t a type reference infix.
      */
     public void setReference(TypeReferenceInfix t) {
         reference = t;
     }
-    
+
     /**
      * Replace a single child in the current node. The child to replace is
      * matched by identity and hence must be known exactly. The replacement
      * element can be null - in that case, the child is effectively removed. The
      * parent role of the new child is validated, while the parent link of the
      * replaced child is left untouched.
-     * 
-     * @param p
-     *            the old child.
-     * @param p
-     *            the new child.
+     *
+     * @param p the old child.
+     * @param p the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException
-     *                if the new child cannot take over the role of the old one.
+     * @throws ClassCastException if the new child cannot take over the role of the old one.
      */
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
         if (p == null) {
@@ -372,10 +354,10 @@ public class Import extends JavaNonTerminalProgramElement implements TypeReferen
     public void accept(SourceVisitor v) {
         v.visitImport(this);
     }
- 
+
     @Override
     public String toString() {
-    	return "<Import"+ (isStaticImport ? " static" : "") + "> " + reference.getName() + 
-    		(isMultiImport ? ".*" : "");
+        return "<Import" + (isStaticImport ? " static" : "") + "> " + reference.getName() +
+                (isMultiImport ? ".*" : "");
     }
 }

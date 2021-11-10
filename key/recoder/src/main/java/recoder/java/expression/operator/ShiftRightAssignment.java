@@ -8,18 +8,18 @@ import recoder.java.expression.Assignment;
 
 /**
  * Shift right assignment.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class ShiftRightAssignment extends Assignment {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 704056071320435092L;
+     * serialization id
+     */
+    private static final long serialVersionUID = 704056071320435092L;
 
-	/**
+    /**
      * Shift right assignment.
      */
 
@@ -29,11 +29,9 @@ public class ShiftRightAssignment extends Assignment {
 
     /**
      * Shift right assignment.
-     * 
-     * @param lhs
-     *            an expression.
-     * @param rhs
-     *            an expression.
+     *
+     * @param lhs an expression.
+     * @param rhs an expression.
      */
 
     public ShiftRightAssignment(Expression lhs, Expression rhs) {
@@ -43,9 +41,8 @@ public class ShiftRightAssignment extends Assignment {
 
     /**
      * Shift right assignment.
-     * 
-     * @param proto
-     *            a shift right assignment.
+     *
+     * @param proto a shift right assignment.
      */
 
     protected ShiftRightAssignment(ShiftRightAssignment proto) {
@@ -55,7 +52,7 @@ public class ShiftRightAssignment extends Assignment {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -65,7 +62,7 @@ public class ShiftRightAssignment extends Assignment {
 
     /**
      * Get arity.
-     * 
+     *
      * @return the int value.
      */
 
@@ -75,7 +72,7 @@ public class ShiftRightAssignment extends Assignment {
 
     /**
      * Get precedence.
-     * 
+     *
      * @return the int value.
      */
 
@@ -85,7 +82,7 @@ public class ShiftRightAssignment extends Assignment {
 
     /**
      * Get notation.
-     * 
+     *
      * @return the int value.
      */
 

@@ -2,46 +2,40 @@
 
 package recoder.java.statement;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import recoder.java.ProgramElement;
-import recoder.java.SourceElement;
-import recoder.java.SourceVisitor;
-import recoder.java.Statement;
-import recoder.java.StatementBlock;
-import recoder.java.StatementContainer;
-import recoder.java.VariableScope;
+import recoder.java.*;
 import recoder.java.declaration.LocalVariableDeclaration;
 import recoder.java.declaration.VariableSpecification;
 import recoder.list.generic.ASTList;
 import recoder.util.Debug;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * Try.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class Try extends BranchStatement implements StatementContainer, VariableScope {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -6939974882487466260L;
+     * serialization id
+     */
+    private static final long serialVersionUID = -6939974882487466260L;
 
-	/**
+    /**
      * Body.
      */
-	private StatementBlock body;
+    private StatementBlock body;
 
     /**
      * Branches.
      */
-	private ASTList<Branch> branches;
+    private ASTList<Branch> branches;
 
-	private ASTList<LocalVariableDeclaration> variableDeclarations;
+    private ASTList<LocalVariableDeclaration> variableDeclarations;
 
     /**
      * Try.
@@ -53,9 +47,8 @@ public class Try extends BranchStatement implements StatementContainer, Variable
 
     /**
      * Try.
-     * 
-     * @param body
-     *            a statement block.
+     *
+     * @param body a statement block.
      */
 
     public Try(StatementBlock body) {
@@ -65,11 +58,9 @@ public class Try extends BranchStatement implements StatementContainer, Variable
 
     /**
      * Try.
-     * 
-     * @param body
-     *            a statement block.
-     * @param branches
-     *            a branch mutable list.
+     *
+     * @param body     a statement block.
+     * @param branches a branch mutable list.
      */
 
     public Try(StatementBlock body, ASTList<Branch> branches) {
@@ -80,9 +71,8 @@ public class Try extends BranchStatement implements StatementContainer, Variable
 
     /**
      * Try.
-     * 
-     * @param proto
-     *            a try.
+     *
+     * @param proto a try.
      */
 
     protected Try(Try proto) {
@@ -93,14 +83,14 @@ public class Try extends BranchStatement implements StatementContainer, Variable
         if (proto.branches != null) {
             branches = proto.branches.deepClone();
         }
-		if (proto.variableDeclarations != null)
-			variableDeclarations = proto.variableDeclarations.deepClone();
+        if (proto.variableDeclarations != null)
+            variableDeclarations = proto.variableDeclarations.deepClone();
         makeParentRoleValid();
     }
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -113,11 +103,11 @@ public class Try extends BranchStatement implements StatementContainer, Variable
      */
 
     public void makeParentRoleValid() {
-		if (variableDeclarations != null) {
-			for (LocalVariableDeclaration vd: variableDeclarations) {
-				vd.setStatementContainer(this);
-			}
-		}
+        if (variableDeclarations != null) {
+            for (LocalVariableDeclaration vd : variableDeclarations) {
+                vd.setStatementContainer(this);
+            }
+        }
         if (body != null) {
             body.setStatementContainer(this);
         }
@@ -139,7 +129,7 @@ public class Try extends BranchStatement implements StatementContainer, Variable
 
     /**
      * Returns the number of children of this node.
-     * 
+     *
      * @return an int giving the number of children of this node
      */
 
@@ -149,28 +139,26 @@ public class Try extends BranchStatement implements StatementContainer, Variable
             result++;
         if (branches != null)
             result += branches.size();
-		result += variableDeclarations == null ? 0 : variableDeclarations.size();
+        result += variableDeclarations == null ? 0 : variableDeclarations.size();
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child
      * array
-     * 
-     * @param index
-     *            an index into this node's "virtual" child array
+     *
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
-		if (variableDeclarations != null) {
-			if  (index < variableDeclarations.size()) 
-				return variableDeclarations.get(index);
-			index -= variableDeclarations.size();
-		}
-    	if (body != null) {
+        if (variableDeclarations != null) {
+            if (index < variableDeclarations.size())
+                return variableDeclarations.get(index);
+            index -= variableDeclarations.size();
+        }
+        if (body != null) {
             if (index == 0)
                 return body;
             index--;
@@ -182,15 +170,15 @@ public class Try extends BranchStatement implements StatementContainer, Variable
     }
 
     public int getChildPositionCode(ProgramElement child) {
-    	// role 0: variable decls
+        // role 0: variable decls
         // role 1: body
         // role 2 (IDX): branch
-		if (variableDeclarations != null) {
-			int idx = variableDeclarations.indexOf(child);
-			if (idx >= 0) {
-				return (idx << 4);
-			}
-		}
+        if (variableDeclarations != null) {
+            int idx = variableDeclarations.indexOf(child);
+            if (idx >= 0) {
+                return (idx << 4);
+            }
+        }
         if (body == child) {
             return 1;
         }
@@ -209,14 +197,11 @@ public class Try extends BranchStatement implements StatementContainer, Variable
      * element can be null - in that case, the child is effectively removed. The
      * parent role of the new child is validated, while the parent link of the
      * replaced child is left untouched.
-     * 
-     * @param p
-     *            the old child.
-     * @param p
-     *            the new child.
+     *
+     * @param p the old child.
+     * @param p the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException
-     *                if the new child cannot take over the role of the old one.
+     * @throws ClassCastException if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
@@ -228,10 +213,10 @@ public class Try extends BranchStatement implements StatementContainer, Variable
         for (int i = 0; i < count; i++) {
             if (variableDeclarations.get(i) == p) {
                 if (q == null) {
-                	variableDeclarations.remove(i);
+                    variableDeclarations.remove(i);
                 } else {
-                	variableDeclarations.set(i, (LocalVariableDeclaration) q);
-                	((LocalVariableDeclaration) q).setStatementContainer(this);
+                    variableDeclarations.set(i, (LocalVariableDeclaration) q);
+                    ((LocalVariableDeclaration) q).setStatementContainer(this);
                 }
                 return true;
             }
@@ -266,7 +251,7 @@ public class Try extends BranchStatement implements StatementContainer, Variable
 
     /**
      * Get body.
-     * 
+     *
      * @return the statement block.
      */
 
@@ -276,9 +261,8 @@ public class Try extends BranchStatement implements StatementContainer, Variable
 
     /**
      * Set body.
-     * 
-     * @param body
-     *            a statement block.
+     *
+     * @param body a statement block.
      */
 
     public void setBody(StatementBlock body) {
@@ -287,7 +271,7 @@ public class Try extends BranchStatement implements StatementContainer, Variable
 
     /**
      * Get the number of statements in this container.
-     * 
+     *
      * @return the number of statements.
      */
 
@@ -311,7 +295,7 @@ public class Try extends BranchStatement implements StatementContainer, Variable
 
     /**
      * Get branch list.
-     * 
+     *
      * @return branches a branch mutable list.
      */
 
@@ -321,9 +305,8 @@ public class Try extends BranchStatement implements StatementContainer, Variable
 
     /**
      * Set branch list.
-     * 
-     * @param branches
-     *            a branch mutable list.
+     *
+     * @param branches a branch mutable list.
      */
 
     public void setBranchList(ASTList<Branch> branches) {
@@ -332,11 +315,11 @@ public class Try extends BranchStatement implements StatementContainer, Variable
 
     /**
      * Get the number of branches in this container.
-     * 
+     *
      * @return the number of branches.
      */
 
-	@Override
+    @Override
     public int getBranchCount() {
         return (branches != null) ? branches.size() : 0;
     }
@@ -348,7 +331,7 @@ public class Try extends BranchStatement implements StatementContainer, Variable
      * </tt> is out of bounds.
      */
 
-	@Override
+    @Override
     public Branch getBranchAt(int index) {
         if (branches != null) {
             return branches.get(index);
@@ -356,58 +339,58 @@ public class Try extends BranchStatement implements StatementContainer, Variable
         throw new ArrayIndexOutOfBoundsException();
     }
 
-	@Override
+    @Override
     public void accept(SourceVisitor v) {
         v.visitTry(this);
     }
- 
-	@Override
+
+    @Override
     public boolean isDefinedScope() {
         return true;
     }
 
-	@Override
+    @Override
     public void setDefinedScope(boolean defined) {
         // ignore.
     }
-    
+
     public ASTList<LocalVariableDeclaration> getVariableDeclarations() {
-    	return variableDeclarations;
-    }
-    
-    public void setVariableDeclarations(ASTList<LocalVariableDeclaration> variableDeclarations) {
-    	this.variableDeclarations = variableDeclarations;
+        return variableDeclarations;
     }
 
-	@Override
+    public void setVariableDeclarations(ASTList<LocalVariableDeclaration> variableDeclarations) {
+        this.variableDeclarations = variableDeclarations;
+    }
+
+    @Override
     public List<VariableSpecification> getVariablesInScope() {
         if (variableDeclarations != null) {
-        	List<VariableSpecification> res = new ArrayList<VariableSpecification>();
-        	for (LocalVariableDeclaration vd: variableDeclarations)
-        		res.addAll(vd.getVariables());
+            List<VariableSpecification> res = new ArrayList<VariableSpecification>();
+            for (LocalVariableDeclaration vd : variableDeclarations)
+                res.addAll(vd.getVariables());
             return res;
         }
         return Collections.emptyList();
     }
 
-	@Override
+    @Override
     public VariableSpecification getVariableInScope(String name) {
         Debug.assertNonnull(name);
-        for (VariableSpecification vs: getVariablesInScope()) {
-        	if (vs.getName().equals(name)) 
-        		return vs;
+        for (VariableSpecification vs : getVariablesInScope()) {
+            if (vs.getName().equals(name))
+                return vs;
         }
         return null;
     }
-	
-	@Override
-	public void addVariableToScope(VariableSpecification var) {
-        Debug.assertNonnull(var);
-	}
 
-	@Override
-	public void removeVariableFromScope(String name) {
+    @Override
+    public void addVariableToScope(VariableSpecification var) {
+        Debug.assertNonnull(var);
+    }
+
+    @Override
+    public void removeVariableFromScope(String name) {
         Debug.assertNonnull(name);
-	}
+    }
 
 }

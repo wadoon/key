@@ -2,10 +2,6 @@
 
 package recoder.convenience;
 
-import java.io.File;
-import java.util.HashSet;
-import java.util.Set;
-
 import recoder.abstraction.ClassType;
 import recoder.abstraction.ClassTypeContainer;
 import recoder.abstraction.Field;
@@ -14,37 +10,91 @@ import recoder.java.CompilationUnit;
 import recoder.java.Identifier;
 import recoder.java.PackageSpecification;
 import recoder.java.declaration.TypeDeclaration;
-import recoder.java.reference.NameReference;
-import recoder.java.reference.PackageReference;
-import recoder.java.reference.ReferencePrefix;
-import recoder.java.reference.ReferenceSuffix;
-import recoder.java.reference.TypeReference;
+import recoder.java.reference.*;
 import recoder.util.Debug;
+
+import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Utility class to obtain or transform Identifiers obeying a set of naming
  * conventions. There should be distinguishable Identifiers for features,
  * constants and classes for any given base name.
- * <P>
+ * <p>
  * The default Java naming scheme defines lower case first letters for features,
  * upper case first letters for classes, lower case for packages, and upper case
  * for constants (final attributes).
- * <P>
+ * <p>
  * Examples: <BR>
  * createFeatureName("HelloWorld").equals("helloWorld") <BR>
  * createClassName("helloWorld").equals("HelloWorld") <BR>
  * createPackageName("HelloWorld").equals("helloworld") <BR>
  * createConstantName("HelloWorld").equals("HELLOWORLD")
- * <P>
+ * <p>
  * All methods create new String or Identifier objects.
- * 
+ *
  * @author AL
  */
 
 public abstract class Naming {
 
+    private final static Set<String> KEYWORDS = new HashSet<String>();
+
+    static {
+        KEYWORDS.add("abstract");
+        KEYWORDS.add("default");
+        KEYWORDS.add("if");
+        KEYWORDS.add("private");
+        KEYWORDS.add("throw");
+        KEYWORDS.add("boolean");
+        KEYWORDS.add("do");
+        KEYWORDS.add("implements");
+        KEYWORDS.add("protected");
+        KEYWORDS.add("throws");
+        KEYWORDS.add("break");
+        KEYWORDS.add("double");
+        KEYWORDS.add("import");
+        KEYWORDS.add("public");
+        KEYWORDS.add("transient");
+        KEYWORDS.add("byte");
+        KEYWORDS.add("else");
+        KEYWORDS.add("instanceof");
+        KEYWORDS.add("return");
+        KEYWORDS.add("try");
+        KEYWORDS.add("case");
+        KEYWORDS.add("extends");
+        KEYWORDS.add("int");
+        KEYWORDS.add("short");
+        KEYWORDS.add("void");
+        KEYWORDS.add("catch");
+        KEYWORDS.add("final");
+        KEYWORDS.add("interface");
+        KEYWORDS.add("static");
+        KEYWORDS.add("volatile");
+        KEYWORDS.add("char");
+        KEYWORDS.add("finally");
+        KEYWORDS.add("long");
+        KEYWORDS.add("super");
+        KEYWORDS.add("while");
+        KEYWORDS.add("class");
+        KEYWORDS.add("float");
+        KEYWORDS.add("native");
+        KEYWORDS.add("switch");
+        KEYWORDS.add("const");
+        KEYWORDS.add("for");
+        KEYWORDS.add("new");
+        KEYWORDS.add("synchronized");
+        KEYWORDS.add("continue");
+        KEYWORDS.add("goto");
+        KEYWORDS.add("package");
+        KEYWORDS.add("this");
+        KEYWORDS.add("assert");
+        KEYWORDS.add("enum");
+    }
+
     public static boolean hasLowerCaseBegin(String str) {
-        return (str.length() == 0) ? false : Character.isLowerCase(str.charAt(0));
+        return str.length() != 0 && Character.isLowerCase(str.charAt(0));
     }
 
     public static String makeLowerCaseBegin(String str) {
@@ -52,7 +102,7 @@ public abstract class Naming {
     }
 
     public static boolean hasUpperCaseBegin(String str) {
-        return (str.length() == 0) ? false : Character.isUpperCase(str.charAt(0));
+        return str.length() != 0 && Character.isUpperCase(str.charAt(0));
     }
 
     public static String makeUpperCaseBegin(String str) {
@@ -65,7 +115,7 @@ public abstract class Naming {
 
     public static Identifier createMemberName(Identifier base) {
         String text = base.getText();
-        return hasLowerCaseBegin(text) ? (Identifier) base.deepClone() : base.getFactory().createIdentifier(
+        return hasLowerCaseBegin(text) ? base.deepClone() : base.getFactory().createIdentifier(
                 makeLowerCaseBegin(text));
     }
 
@@ -75,7 +125,7 @@ public abstract class Naming {
 
     public static Identifier createClassName(Identifier base) {
         String text = base.getText();
-        return hasUpperCaseBegin(text) ? (Identifier) base.deepClone() : base.getFactory().createIdentifier(
+        return hasUpperCaseBegin(text) ? base.deepClone() : base.getFactory().createIdentifier(
                 makeUpperCaseBegin(text));
     }
 
@@ -160,9 +210,8 @@ public abstract class Naming {
      * string if the prefix is not a
      * {@link recoder.java.reference.NameReference}. Appends array brackets if
      * the prefix is a type reference with a dimension > 0.
-     * 
-     * @param ref
-     *            a reference prefix.
+     *
+     * @param ref a reference prefix.
      * @return the dotted representation of the given reference.
      */
     public static String toPathName(ReferencePrefix ref) {
@@ -207,11 +256,9 @@ public abstract class Naming {
      * {@link recoder.java.reference.NameReference}. Ignores the suffix if it
      * is <CODE>null</CODE> or empty. Assumes that the prefix is not a type
      * reference with a dimension > 0.
-     * 
-     * @param ref
-     *            a reference prefix.
-     * @param suffix
-     *            a suffix string.
+     *
+     * @param ref    a reference prefix.
+     * @param suffix a suffix string.
      * @return the dotted representation of the given reference and the suffix.
      * @since 0.72
      */
@@ -275,11 +322,10 @@ public abstract class Naming {
     /**
      * Derives the canonical name for a compilation unit. Combines the name of
      * the package and the name of the primary type declaration. If the primary
-     * type declaration is not public, or no type is declared within the compilation unit, 
+     * type declaration is not public, or no type is declared within the compilation unit,
      * it's attempted to keep the old filename instead.
-     * 
-     * @param cu
-     *            a compilation unit.
+     *
+     * @param cu a compilation unit.
      * @return the canonical name of the unit.
      */
     public static String toCanonicalName(CompilationUnit cu) {
@@ -287,7 +333,7 @@ public abstract class Naming {
         TypeDeclaration m = cu.getPrimaryTypeDeclaration();
         String name;
         if (m == null && cu.getTypeDeclarationCount() == 0 && cu.getDataLocation() == null)
-        	name = "package-info"; // should be, at least...
+            name = "package-info"; // should be, at least...
         else if (m == null || (!m.isPublic() && cu.getDataLocation() != null)) {
             // keep original filename, if possible
             String dataLocStr = cu.getDataLocation().toString();
@@ -314,9 +360,8 @@ public abstract class Naming {
      * of the package and the name of the primary type declaration, transforms
      * it into a platform specific file name and appends the ".java" filename
      * suffix.
-     * 
-     * @param cu
-     *            a compilation unit.
+     *
+     * @param cu a compilation unit.
      * @return the canonical file name of the unit.
      */
     public static String toCanonicalFilename(CompilationUnit cu) {
@@ -324,7 +369,7 @@ public abstract class Naming {
     }
 
     public static String getFullName(ClassTypeContainer ct, String suffix) {
-    	StringBuilder buffer = new StringBuilder();
+        StringBuilder buffer = new StringBuilder();
         addName(buffer, ct);
         if (suffix != null && suffix.length() > 0) {
             if (buffer.length() > 0) {
@@ -336,13 +381,13 @@ public abstract class Naming {
     }
 
     public static String getFullName(ClassTypeContainer ct) {
-    	StringBuilder buffer = new StringBuilder();
+        StringBuilder buffer = new StringBuilder();
         addName(buffer, ct);
         return buffer.toString();
     }
 
     public static String getFullName(Field f) {
-    	StringBuilder buffer = new StringBuilder();
+        StringBuilder buffer = new StringBuilder();
         addName(buffer, f.getContainingClassType());
         buffer.append('.');
         buffer.append(f.getName());
@@ -376,70 +421,15 @@ public abstract class Naming {
         return false;
     }
 
-    private final static Set<String> KEYWORDS = new HashSet<String>();
-
-    static {
-        KEYWORDS.add("abstract");
-        KEYWORDS.add("default");
-        KEYWORDS.add("if");
-        KEYWORDS.add("private");
-        KEYWORDS.add("throw");
-        KEYWORDS.add("boolean");
-        KEYWORDS.add("do");
-        KEYWORDS.add("implements");
-        KEYWORDS.add("protected");
-        KEYWORDS.add("throws");
-        KEYWORDS.add("break");
-        KEYWORDS.add("double");
-        KEYWORDS.add("import");
-        KEYWORDS.add("public");
-        KEYWORDS.add("transient");
-        KEYWORDS.add("byte");
-        KEYWORDS.add("else");
-        KEYWORDS.add("instanceof");
-        KEYWORDS.add("return");
-        KEYWORDS.add("try");
-        KEYWORDS.add("case");
-        KEYWORDS.add("extends");
-        KEYWORDS.add("int");
-        KEYWORDS.add("short");
-        KEYWORDS.add("void");
-        KEYWORDS.add("catch");
-        KEYWORDS.add("final");
-        KEYWORDS.add("interface");
-        KEYWORDS.add("static");
-        KEYWORDS.add("volatile");
-        KEYWORDS.add("char");
-        KEYWORDS.add("finally");
-        KEYWORDS.add("long");
-        KEYWORDS.add("super");
-        KEYWORDS.add("while");
-        KEYWORDS.add("class");
-        KEYWORDS.add("float");
-        KEYWORDS.add("native");
-        KEYWORDS.add("switch");
-        KEYWORDS.add("const");
-        KEYWORDS.add("for");
-        KEYWORDS.add("new");
-        KEYWORDS.add("synchronized");
-        KEYWORDS.add("continue");
-        KEYWORDS.add("goto");
-        KEYWORDS.add("package");
-        KEYWORDS.add("this");
-        KEYWORDS.add("assert");
-        KEYWORDS.add("enum");
-    }
-
     /**
      * Checks if the given name is a Java keyword and hence an invalid
      * identifier. This always assumes the latest Java version, independent
      * of the current project. For example, <CODE>assert</CODE> is considered
-     * a keyword even for pre-Java 1.4 projects. 
-     * 
-     * @param name
-     *            the name to check.
+     * a keyword even for pre-Java 1.4 projects.
+     *
+     * @param name the name to check.
      * @return <CODE>true</CODE> if the given name is a keyword, <CODE>false
-     *         </CODE> otherwise.
+     * </CODE> otherwise.
      */
     public static boolean isKeyword(String name) {
         return KEYWORDS.contains(name);

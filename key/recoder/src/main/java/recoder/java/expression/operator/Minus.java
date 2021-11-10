@@ -8,18 +8,18 @@ import recoder.java.expression.Operator;
 
 /**
  * Minus.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class Minus extends Operator {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 6139443256879639859L;
+     * serialization id
+     */
+    private static final long serialVersionUID = 6139443256879639859L;
 
-	/**
+    /**
      * Minus.
      */
 
@@ -29,11 +29,9 @@ public class Minus extends Operator {
 
     /**
      * Minus.
-     * 
-     * @param lhs
-     *            an expression.
-     * @param rhs
-     *            an expression.
+     *
+     * @param lhs an expression.
+     * @param rhs an expression.
      */
 
     public Minus(Expression lhs, Expression rhs) {
@@ -43,9 +41,8 @@ public class Minus extends Operator {
 
     /**
      * Minus.
-     * 
-     * @param proto
-     *            a minus.
+     *
+     * @param proto a minus.
      */
 
     protected Minus(Minus proto) {
@@ -55,7 +52,7 @@ public class Minus extends Operator {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -65,7 +62,7 @@ public class Minus extends Operator {
 
     /**
      * Get arity.
-     * 
+     *
      * @return the int value.
      */
 
@@ -75,7 +72,7 @@ public class Minus extends Operator {
 
     /**
      * Get precedence.
-     * 
+     *
      * @return the int value.
      */
 
@@ -85,7 +82,7 @@ public class Minus extends Operator {
 
     /**
      * Get notation.
-     * 
+     *
      * @return the int value.
      */
 

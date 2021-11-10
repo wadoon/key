@@ -7,12 +7,12 @@ import recoder.ModelException;
 public class InconsistentPatternException extends ModelException {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 1L;
+     * serialization id
+     */
+    private static final long serialVersionUID = 1L;
 
-	public InconsistentPatternException() {
-		super();
+    public InconsistentPatternException() {
+        super();
     }
 
     public InconsistentPatternException(String s) {

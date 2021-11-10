@@ -6,7 +6,7 @@ import recoder.java.NonTerminalProgramElement;
 
 /**
  * Type declaration container.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
@@ -14,7 +14,7 @@ public interface TypeDeclarationContainer extends NonTerminalProgramElement {
 
     /**
      * Get the number of type declarations in this container.
-     * 
+     *
      * @return the number of type declarations.
      */
     int getTypeDeclarationCount();

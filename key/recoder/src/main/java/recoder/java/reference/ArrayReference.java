@@ -2,19 +2,12 @@
 
 package recoder.java.reference;
 
-import recoder.java.Expression;
-import recoder.java.ExpressionContainer;
-import recoder.java.JavaNonTerminalProgramElement;
-import recoder.java.NonTerminalProgramElement;
-import recoder.java.ProgramElement;
-import recoder.java.Reference;
-import recoder.java.SourceElement;
-import recoder.java.SourceVisitor;
+import recoder.java.*;
 import recoder.list.generic.ASTList;
 
 /**
  * Array reference.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
@@ -22,45 +15,43 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
         ReferenceSuffix, ExpressionContainer, TypeReferenceContainer {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 5264208667205795216L;
+     * serialization id
+     */
+    private static final long serialVersionUID = 5264208667205795216L;
 
-	/**
+    /**
      * Access parent when used as a reference prefix (e.g. <CODE>a[5].clone()
      * </CODE>).
      */
-	private ReferenceSuffix accessParent;
+    private ReferenceSuffix accessParent;
 
     /**
      * Parent.
      */
-	private ExpressionContainer parent;
+    private ExpressionContainer parent;
 
     /**
      * Access path.
      */
-	private ReferencePrefix accessPath;
+    private ReferencePrefix accessPath;
 
     /**
      * Inits.
      */
-	private ASTList<Expression> inits;
+    private ASTList<Expression> inits;
 
     /**
      * Array reference.
      */
     public ArrayReference() {
-    	// nothing to do
+        // nothing to do
     }
 
     /**
      * Array reference.
-     * 
-     * @param accessPath
-     *            a reference prefix.
-     * @param initializers
-     *            an expression mutable list.
+     *
+     * @param accessPath   a reference prefix.
+     * @param initializers an expression mutable list.
      */
 
     public ArrayReference(ReferencePrefix accessPath, ASTList<Expression> initializers) {
@@ -71,9 +62,8 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
 
     /**
      * Array reference.
-     * 
-     * @param proto
-     *            an array reference.
+     *
+     * @param proto an array reference.
      */
 
     protected ArrayReference(ArrayReference proto) {
@@ -89,7 +79,7 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -114,7 +104,7 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
 
     /**
      * Get AST parent.
-     * 
+     *
      * @return the non terminal program element.
      */
 
@@ -128,7 +118,7 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
 
     /**
      * Get the number of expressions in this container.
-     * 
+     *
      * @return the number of expressions.
      */
 
@@ -166,14 +156,11 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
      * element can be null - in that case, the child is effectively removed. The
      * parent role of the new child is validated, while the parent link of the
      * replaced child is left untouched.
-     * 
-     * @param p
-     *            the old child.
-     * @param p
-     *            the new child.
+     *
+     * @param p the old child.
+     * @param p the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException
-     *                if the new child cannot take over the role of the old one.
+     * @throws ClassCastException if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
@@ -207,7 +194,7 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
 
     /**
      * Get the number of type references in this container.
-     * 
+     *
      * @return the number of type references.
      */
 
@@ -231,7 +218,7 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
 
     /**
      * Get reference suffix.
-     * 
+     *
      * @return the reference suffix.
      */
 
@@ -241,9 +228,8 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
 
     /**
      * Set reference suffix.
-     * 
-     * @param path
-     *            a reference suffix.
+     *
+     * @param path a reference suffix.
      */
 
     public void setReferenceSuffix(ReferenceSuffix path) {
@@ -252,7 +238,7 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
 
     /**
      * Get reference prefix.
-     * 
+     *
      * @return the reference prefix.
      */
 
@@ -262,9 +248,8 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
 
     /**
      * Set reference prefix.
-     * 
-     * @param accessPath
-     *            a reference prefix.
+     *
+     * @param accessPath a reference prefix.
      */
 
     public void setReferencePrefix(ReferencePrefix accessPath) {
@@ -273,7 +258,7 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
 
     /**
      * Returns the number of children of this node.
-     * 
+     *
      * @return an int giving the number of children of this node
      */
 
@@ -289,12 +274,10 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
     /**
      * Returns the child at the specified index in this node's "virtual" child
      * array
-     * 
-     * @param index
-     *            an index into this node's "virtual" child array
+     *
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
@@ -326,7 +309,7 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
 
     /**
      * Get expression container.
-     * 
+     *
      * @return the expression container.
      */
 
@@ -336,9 +319,8 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
 
     /**
      * Set expression container.
-     * 
-     * @param c
-     *            an expression container.
+     *
+     * @param c an expression container.
      */
 
     public void setExpressionContainer(ExpressionContainer c) {
@@ -347,7 +329,7 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
 
     /**
      * Get dimension expressions.
-     * 
+     *
      * @return the expression mutable list.
      */
 
@@ -357,9 +339,8 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
 
     /**
      * Set dimension expressions.
-     * 
-     * @param list
-     *            an expression mutable list.
+     *
+     * @param list an expression mutable list.
      */
 
     public void setDimensionExpressions(ASTList<Expression> list) {
@@ -373,9 +354,9 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
     public void accept(SourceVisitor v) {
         v.visitArrayReference(this);
     }
-    
+
     @Override
     public String toString() {
-    	return "<ArrayReference>";
+        return "<ArrayReference>";
     }
 }

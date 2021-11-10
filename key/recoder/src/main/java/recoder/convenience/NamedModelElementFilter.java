@@ -8,20 +8,19 @@ import recoder.NamedModelElement;
 /**
  * Filter predicate for named model elements. Can search for certain names and
  * types (optionally).
- * 
+ *
  * @author AL
  */
 public class NamedModelElementFilter implements ModelElementFilter {
 
-    private Class<? extends NamedModelElement> type;
+    private final Class<? extends NamedModelElement> type;
 
-    private String name;
+    private final String name;
 
     /**
      * Create a filter that accepts any named model element with the given name.
-     * 
-     * @param name
-     *            the name that is accepted.
+     *
+     * @param name the name that is accepted.
      */
     public NamedModelElementFilter(String name) {
         this.type = NamedModelElement.class;
@@ -31,14 +30,11 @@ public class NamedModelElementFilter implements ModelElementFilter {
     /**
      * Create a filter that accepts any named model element with the given name
      * and type.
-     * 
-     * @param type
-     *            the most general type to accept.
-     * @param name
-     *            the name that is accepted.
-     * @exception IllegalArgumentException
-     *                if the type is not a subtype of
-     *                {@link recoder.NamedModelElement}.
+     *
+     * @param type the most general type to accept.
+     * @param name the name that is accepted.
+     * @throws IllegalArgumentException if the type is not a subtype of
+     *                                  {@link recoder.NamedModelElement}.
      */
     public NamedModelElementFilter(Class<? extends NamedModelElement> type, String name) {
         this.type = type;
@@ -47,9 +43,8 @@ public class NamedModelElementFilter implements ModelElementFilter {
 
     /**
      * Accepts or denies a given model element.
-     * 
-     * @param e
-     *            the model element to value.
+     *
+     * @param e the model element to value.
      * @return true iff the given element is accepted by the filter.
      */
     public boolean accept(ModelElement e) {

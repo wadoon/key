@@ -7,18 +7,18 @@ import recoder.java.SourceVisitor;
 
 /**
  * Not equals.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class NotEquals extends ComparativeOperator {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -4821815905384213846L;
+     * serialization id
+     */
+    private static final long serialVersionUID = -4821815905384213846L;
 
-	/**
+    /**
      * Not equals.
      */
 
@@ -28,11 +28,9 @@ public class NotEquals extends ComparativeOperator {
 
     /**
      * Not equals.
-     * 
-     * @param lhs
-     *            an expression.
-     * @param rhs
-     *            an expression.
+     *
+     * @param lhs an expression.
+     * @param rhs an expression.
      */
 
     public NotEquals(Expression lhs, Expression rhs) {
@@ -42,9 +40,8 @@ public class NotEquals extends ComparativeOperator {
 
     /**
      * Not equals.
-     * 
-     * @param proto
-     *            a not equals.
+     *
+     * @param proto a not equals.
      */
 
     protected NotEquals(NotEquals proto) {
@@ -54,7 +51,7 @@ public class NotEquals extends ComparativeOperator {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -64,7 +61,7 @@ public class NotEquals extends ComparativeOperator {
 
     /**
      * Get precedence.
-     * 
+     *
      * @return the int value.
      */
 

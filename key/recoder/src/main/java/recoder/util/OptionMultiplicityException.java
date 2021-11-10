@@ -8,11 +8,11 @@ package recoder.util;
 public class OptionMultiplicityException extends OptionException {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 1892377246432205468L;
+     * serialization id
+     */
+    private static final long serialVersionUID = 1892377246432205468L;
 
-	public OptionMultiplicityException(String opt) {
+    public OptionMultiplicityException(String opt) {
         super(opt);
     }
 

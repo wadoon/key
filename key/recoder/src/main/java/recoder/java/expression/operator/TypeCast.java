@@ -9,18 +9,18 @@ import recoder.java.reference.TypeReference;
 
 /**
  * Type cast.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class TypeCast extends TypeOperator {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 2209252813347809519L;
+     * serialization id
+     */
+    private static final long serialVersionUID = 2209252813347809519L;
 
-	/**
+    /**
      * Type cast.
      */
 
@@ -41,9 +41,8 @@ public class TypeCast extends TypeOperator {
 
     /**
      * Type cast.
-     * 
-     * @param proto
-     *            a type cast.
+     *
+     * @param proto a type cast.
      */
 
     protected TypeCast(TypeCast proto) {
@@ -53,7 +52,7 @@ public class TypeCast extends TypeOperator {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -63,7 +62,7 @@ public class TypeCast extends TypeOperator {
 
     /**
      * Returns the number of children of this node.
-     * 
+     *
      * @return an int giving the number of children of this node
      */
 
@@ -79,12 +78,10 @@ public class TypeCast extends TypeOperator {
     /**
      * Returns the child at the specified index in this node's "virtual" child
      * array
-     * 
-     * @param index
-     *            an index into this node's "virtual" child array
+     *
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
@@ -106,7 +103,7 @@ public class TypeCast extends TypeOperator {
 
     /**
      * Get arity.
-     * 
+     *
      * @return the int value.
      */
 
@@ -116,7 +113,7 @@ public class TypeCast extends TypeOperator {
 
     /**
      * Get precedence.
-     * 
+     *
      * @return the int value.
      */
 
@@ -126,7 +123,7 @@ public class TypeCast extends TypeOperator {
 
     /**
      * Get notation.
-     * 
+     *
      * @return the int value.
      */
 
@@ -137,9 +134,9 @@ public class TypeCast extends TypeOperator {
     /**
      * Checks if this operator is left or right associative. Type casts are
      * right associative.
-     * 
+     *
      * @return <CODE>true</CODE>, if the operator is left associative, <CODE>
-     *         false</CODE> otherwise.
+     * false</CODE> otherwise.
      */
 
     public boolean isLeftAssociative() {

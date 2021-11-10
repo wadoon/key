@@ -2,65 +2,27 @@
 
 package recoder.service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Stack;
-
 import recoder.ServiceConfiguration;
-import recoder.abstraction.AnnotationProperty;
-import recoder.abstraction.ArrayType;
-import recoder.abstraction.ClassType;
-import recoder.abstraction.Constructor;
-import recoder.abstraction.DummyGetClassMethod;
-import recoder.abstraction.ErasedConstructor;
-import recoder.abstraction.ErasedField;
-import recoder.abstraction.ErasedMethod;
-import recoder.abstraction.ErasedType;
-import recoder.abstraction.Field;
-import recoder.abstraction.Method;
 import recoder.abstraction.Package;
-import recoder.abstraction.ParameterizedConstructor;
-import recoder.abstraction.ParameterizedField;
-import recoder.abstraction.ParameterizedMethod;
-import recoder.abstraction.ParameterizedType;
-import recoder.abstraction.ProgramModelElement;
-import recoder.abstraction.ResolvedGenericMethod;
-import recoder.abstraction.Type;
-import recoder.abstraction.Variable;
+import recoder.abstraction.*;
 import recoder.convenience.Format;
 import recoder.convenience.TreeWalker;
 import recoder.io.SourceFileRepository;
-import recoder.java.CompilationUnit;
-import recoder.java.Import;
-import recoder.java.NonTerminalProgramElement;
-import recoder.java.ProgramElement;
-import recoder.java.Reference;
+import recoder.java.*;
 import recoder.java.declaration.AnnotationElementValuePair;
 import recoder.java.declaration.InheritanceSpecification;
 import recoder.java.declaration.TypeArgumentDeclaration;
 import recoder.java.declaration.VariableDeclaration;
 import recoder.java.expression.operator.New;
-import recoder.java.reference.AnnotationPropertyReference;
-import recoder.java.reference.ConstructorReference;
-import recoder.java.reference.FieldReference;
-import recoder.java.reference.MemberReference;
-import recoder.java.reference.MethodReference;
-import recoder.java.reference.PackageReference;
-import recoder.java.reference.TypeReference;
-import recoder.java.reference.TypeReferenceContainer;
-import recoder.java.reference.UncollatedReferenceQualifier;
-import recoder.java.reference.VariableReference;
+import recoder.java.reference.*;
 import recoder.util.Debug;
 import recoder.util.ProgressEvent;
 
+import java.util.*;
+
 /**
  * Implements queries for cross referencing.
- * 
+ *
  * @author AL
  */
 public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo implements CrossReferenceSourceInfo {
@@ -68,14 +30,15 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo implement
     /**
      * Cache mapping elements to known references.
      */
-	private final Map<ProgramModelElement, Set<Reference>>
-		element2references = new HashMap<ProgramModelElement, Set<Reference>>(256);
+    private final Map<ProgramModelElement, Set<Reference>>
+            element2references = new HashMap<ProgramModelElement, Set<Reference>>(256);
+    private final FastWorkList worklist = new FastWorkList();
+    private final Stack<NonTerminalProgramElement> NTEs = new Stack<NonTerminalProgramElement>();
 
     /**
      * Creates a new service.
-     * 
-     * @param config
-     *            the configuration this services becomes part of.
+     *
+     * @param config the configuration this services becomes part of.
      */
     public DefaultCrossReferenceSourceInfo(ServiceConfiguration config) {
         super(config);
@@ -83,9 +46,8 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo implement
 
     /**
      * Change notification callback method.
-     * 
-     * @param config
-     *            the configuration this services becomes part of.
+     *
+     * @param config the configuration this services becomes part of.
      */
     public void modelChanged(ChangeHistoryEvent changes) {
 
@@ -131,23 +93,23 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo implement
                 if (!tc.isMinor()) {
                     ProgramElement pe = tc.getChangeRoot();
                     if (pe instanceof TypeArgumentDeclaration) {
-                    	// this may invalidate the parent reference...
-                    	reset(true);
-                    	return;
+                        // this may invalidate the parent reference...
+                        reset(true);
+                        return;
                     } else if (pe instanceof Reference) {
-                    	// TODO we can most probably handle AnnotationUse more efficiently
-                    	
-                    	// We would have to remove this reference from
-                    	// the entity it belongs to and do this
-                    	// transitively for the outer reference.
-                    	// If this is a type reference in
-                    	// an inheritance specification, we have a problem.
-                    	reset(true);
-                    	return;
+                        // TODO we can most probably handle AnnotationUse more efficiently
+
+                        // We would have to remove this reference from
+                        // the entity it belongs to and do this
+                        // transitively for the outer reference.
+                        // If this is a type reference in
+                        // an inheritance specification, we have a problem.
+                        reset(true);
+                        return;
                     } else if (pe instanceof ProgramModelElement || pe instanceof VariableDeclaration) {
                         // We would have to revalidate all references to
                         // this element.
-                    	// TODO deleting a single constructor which takes no parameters can be improved! (regardless of visibility)
+                        // TODO deleting a single constructor which takes no parameters can be improved! (regardless of visibility)
                         reset(true);
                         return;
                     } else if (pe instanceof InheritanceSpecification) {
@@ -155,13 +117,13 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo implement
                         reset(true);
                         return;
                     } else if (pe instanceof AnnotationElementValuePair) {
-                    	// may invalidate the reference of an annotation use
-                    	reset(true);
-                    	return;
+                        // may invalidate the reference of an annotation use
+                        reset(true);
+                        return;
                     } else if (pe instanceof Import) {
-                    	// TODO update only the current CU
-                    	reset(true);
-                    	return;
+                        // TODO update only the current CU
+                        reset(true);
+                        return;
                     }
                     tw.reset(pe);
                     tw.next(); // skip pe
@@ -182,25 +144,25 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo implement
                     ProgramElement pe = tc.getChangeRoot();
 //                    NonTerminalProgramElement pa = tc.getChangeRootParent();
                     if (pe instanceof TypeArgumentDeclaration) {
-                    	// this may invalidate the parent reference...
-                    	reset(true);
-                    	return;
+                        // this may invalidate the parent reference...
+                        reset(true);
+                        return;
                     } else if (pe instanceof Reference) {
-                    	// TODO we can most probably handle AnnotationUse more efficiently
-                        
-                    	// We would have to handle type references in
-                    	// inheritance specifications. Hard work.
-                    	reset(true);
-                    	return;
+                        // TODO we can most probably handle AnnotationUse more efficiently
+
+                        // We would have to handle type references in
+                        // inheritance specifications. Hard work.
+                        reset(true);
+                        return;
                     } else if (pe instanceof ProgramModelElement || pe instanceof VariableDeclaration) {
                         // We would have to find out whether this element
                         // hides some other element that is already referred to.
                         // If so, we must revalidate those elements.
-                    	// Further, overloading must be considered.
+                        // Further, overloading must be considered.
                         // Program model elements in subtrees are not relevant
                         // as they must be in an inner scope (really?) and
                         // cannot have been referred to.
-                    	// TODO replacing a default constructor can be improved, if proper visibility
+                        // TODO replacing a default constructor can be improved, if proper visibility
                         reset(true);
                         return;
                     } else if (pe instanceof InheritanceSpecification) {
@@ -208,13 +170,13 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo implement
                         reset(true);
                         return;
                     } else if (pe instanceof AnnotationElementValuePair) {
-                    	// may invalidate the reference of an annotation use
-                    	reset(true);
-                    	return;
+                        // may invalidate the reference of an annotation use
+                        reset(true);
+                        return;
                     } else if (pe instanceof Import) {
-                    	// TODO update only the current CU
-                    	reset(true);
-                    	return;
+                        // TODO update only the current CU
+                        reset(true);
+                        return;
                     }
                 }
                 listeners.fireProgressEvent(++c);
@@ -235,18 +197,17 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo implement
     /**
      * Retrieves the list of references to a given method (or constructor). The
      * references stem from all known compilation units.
-     * 
-     * @param m
-     *            a method.
+     *
+     * @param m a method.
      * @return a possibly empty list of references to the given method.
      */
     public List<MemberReference> getReferences(Method m) {
         Debug.assertNonnull(m);
         updateModel();
-        
+
         m = getBaseMethod(m);
-        
-        Set<Reference> references =  element2references.get(m);
+
+        Set<Reference> references = element2references.get(m);
         if (references == null) {
             return Collections.emptyList();
         }
@@ -256,7 +217,7 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo implement
         }
         List<MemberReference> result = new ArrayList<MemberReference>(s);
         for (Reference o : references) {
-            result.add((MemberReference)o);
+            result.add((MemberReference) o);
         }
         return result;
     }
@@ -264,17 +225,16 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo implement
     /**
      * Retrieves the list of references to a given constructor. The references
      * stem from all known compilation units.
-     * 
-     * @param c
-     *            a constructor.
+     *
+     * @param c a constructor.
      * @return a possibly empty list of references to the given constructor.
      */
     public List<ConstructorReference> getReferences(Constructor c) {
         Debug.assertNonnull(c);
         updateModel();
-        
+
         c = getBaseConstructor(c);
-        
+
         Set<Reference> references = element2references.get(c);
         if (references == null) {
             return Collections.emptyList();
@@ -285,7 +245,7 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo implement
         }
         List<ConstructorReference> result = new ArrayList<ConstructorReference>(s);
         for (Reference o : references) {
-            result.add((ConstructorReference)o);
+            result.add((ConstructorReference) o);
         }
         return result;
     }
@@ -293,15 +253,14 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo implement
     /**
      * Retrieves the list of references to a given variable. The references stem
      * from all known compilation units.
-     * 
-     * @param v
-     *            a variable.
+     *
+     * @param v a variable.
      * @return a possibly empty list of references to the given variable.
      */
     public List<VariableReference> getReferences(Variable v) {
         Debug.assertNonnull(v);
         updateModel();
-        Set<Reference> references =  element2references.get(v);
+        Set<Reference> references = element2references.get(v);
         if (references == null) {
             return Collections.emptyList();
         }
@@ -319,17 +278,16 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo implement
     /**
      * Retrieves the list of references to a given field. The references stem
      * from all known compilation units.
-     * 
-     * @param f
-     *            a field.
+     *
+     * @param f a field.
      * @return a possibly empty list of references to the given field, but never <code>null</code>.
      */
     public List<FieldReference> getReferences(Field f) {
         Debug.assertNonnull(f);
         updateModel();
-        
-        f = (Field)getBaseField(f);
-        
+
+        f = (Field) getBaseField(f);
+
         Set<Reference> references = element2references.get(f);
         if (references == null) {
             return Collections.emptyList();
@@ -340,7 +298,7 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo implement
         }
         List<FieldReference> result = new ArrayList<FieldReference>(s);
         for (Reference r : references) {
-        	result.add((FieldReference)r);
+            result.add((FieldReference) r);
         }
         return result;
     }
@@ -348,18 +306,17 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo implement
     /**
      * Retrieves the list of references to a given type. The references stem
      * from all known compilation units.
-     * 
-     * @param t
-     *            a type.
+     *
+     * @param t a type.
      * @return a possibly empty list of references to the given type.
      */
     public List<TypeReference> getReferences(Type t) {
         Debug.assertNonnull(t);
         updateModel();
-        
+
         t = getBaseType(t);
-        
-        Set<Reference> references =  element2references.get(t);
+
+        Set<Reference> references = element2references.get(t);
         if (references == null) {
             return Collections.emptyList();
         }
@@ -369,45 +326,44 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo implement
         }
         List<TypeReference> result = new ArrayList<TypeReference>(s);
         for (Reference r : references) {
-            result.add((TypeReference)r);
+            result.add((TypeReference) r);
         }
         return result;
     }
-    
+
     public List<TypeReference> getReferences(Type t, boolean includeArrayTypes) {
-    	if (!includeArrayTypes) return getReferences(t);
-    	if (t == null) throw new NullPointerException();
-    	updateModel();
-    	
-    	ArrayList<TypeReference> result = new ArrayList<TypeReference>();
-    	
-    	t = getBaseType(t);
-    	
-    	do {
-    		Set<Reference> references = element2references.get(t);
-    		if (references != null) {
-    			for (Reference r : references) {
-    				result.add((TypeReference)r);
-    			}
-    		}
-    		t = t.getArrayType();
-    	} while (t != null);
-    	result.trimToSize();
-    	return result;
+        if (!includeArrayTypes) return getReferences(t);
+        if (t == null) throw new NullPointerException();
+        updateModel();
+
+        ArrayList<TypeReference> result = new ArrayList<TypeReference>();
+
+        t = getBaseType(t);
+
+        do {
+            Set<Reference> references = element2references.get(t);
+            if (references != null) {
+                for (Reference r : references) {
+                    result.add((TypeReference) r);
+                }
+            }
+            t = t.getArrayType();
+        } while (t != null);
+        result.trimToSize();
+        return result;
     }
 
     /**
      * Retrieves the list of references to a given package. The references stem
      * from all known compilation units.
-     * 
-     * @param p
-     *            a package.
+     *
+     * @param p a package.
      * @return a possibly empty list of references to the given package.
      */
     public List<PackageReference> getReferences(Package p) {
         Debug.assertNonnull(p);
         updateModel();
-        Set<Reference> references =  element2references.get(p);
+        Set<Reference> references = element2references.get(p);
         if (references == null) {
             return Collections.emptyList();
         }
@@ -417,96 +373,96 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo implement
         }
         List<PackageReference> result = new ArrayList<PackageReference>(s);
         for (Reference pr : references) {
-            result.add((PackageReference)pr);
+            result.add((PackageReference) pr);
         }
         return result;
     }
-    
+
     private void registerVariableReference(VariableReference ref, Variable v) {
-    	v = getBaseField(v);
-    	registerReference(ref, v);
+        v = getBaseField(v);
+        registerReference(ref, v);
     }
 
-	private Variable getBaseField(Variable v) {
-		if (v instanceof ErasedField)
-    		v = ((ErasedField)v).getGenericField();
-    	while (v instanceof ParameterizedField)
-    		v = ((ParameterizedField)v).getGenericField();
-		return v;
-	}
-    
+    private Variable getBaseField(Variable v) {
+        if (v instanceof ErasedField)
+            v = ((ErasedField) v).getGenericField();
+        while (v instanceof ParameterizedField)
+            v = ((ParameterizedField) v).getGenericField();
+        return v;
+    }
+
     private void registerMethodReference(MethodReference ref, Method m) {
-    	m = getBaseMethod(m);
-    	registerReference(ref, m);
+        m = getBaseMethod(m);
+        registerReference(ref, m);
     }
 
-	private Method getBaseMethod(Method m) {
-		if (m instanceof DummyGetClassMethod)
-    		m = findObjectGetClass();
-    	if (m instanceof ErasedMethod)
-    		m = ((ErasedMethod)m).getGenericMethod();
-    	while (m instanceof ParameterizedMethod)
-    		m = ((ParameterizedMethod)m).getGenericMethod();
-    	if (m instanceof ResolvedGenericMethod)
-    		m = ((ResolvedGenericMethod)m).getGenericMethod();
-    	while (m instanceof ParameterizedMethod) // TODO twice necessary?
-    		m = ((ParameterizedMethod)m).getGenericMethod();
-		return m;
-	}
-    
+    private Method getBaseMethod(Method m) {
+        if (m instanceof DummyGetClassMethod)
+            m = findObjectGetClass();
+        if (m instanceof ErasedMethod)
+            m = ((ErasedMethod) m).getGenericMethod();
+        while (m instanceof ParameterizedMethod)
+            m = ((ParameterizedMethod) m).getGenericMethod();
+        if (m instanceof ResolvedGenericMethod)
+            m = ((ResolvedGenericMethod) m).getGenericMethod();
+        while (m instanceof ParameterizedMethod) // TODO twice necessary?
+            m = ((ParameterizedMethod) m).getGenericMethod();
+        return m;
+    }
+
     private Method findObjectGetClass() {
-    	ClassType ct = getNameInfo().getJavaLangObject();
-    	for (Method m : ct.getMethods()) {
-    		if (m.getName() == GETCLASS_NAME)
-    			return m;
-    	}
-    	throw new Error(); // can't happen.
+        ClassType ct = getNameInfo().getJavaLangObject();
+        for (Method m : ct.getMethods()) {
+            if (m.getName() == GETCLASS_NAME)
+                return m;
+        }
+        throw new Error(); // can't happen.
     }
-    
+
     private void registerConstructorReference(ConstructorReference ref, Constructor c) {
-    	c = getBaseConstructor(c);
-    	registerReference(ref, c);
+        c = getBaseConstructor(c);
+        registerReference(ref, c);
     }
 
-	private Constructor getBaseConstructor(Constructor c) {
-		if (c instanceof ErasedConstructor)
-    		c = (Constructor)((ErasedConstructor)c).getGenericMethod();
-    	if (c instanceof ParameterizedConstructor)
-    		c = (Constructor)((ParameterizedConstructor)c).getGenericMethod();
-		return c;
-	}
-    
+    private Constructor getBaseConstructor(Constructor c) {
+        if (c instanceof ErasedConstructor)
+            c = (Constructor) ((ErasedConstructor) c).getGenericMethod();
+        if (c instanceof ParameterizedConstructor)
+            c = (Constructor) ((ParameterizedConstructor) c).getGenericMethod();
+        return c;
+    }
+
     private void registerAnnotationPropertyReference(AnnotationPropertyReference ref, AnnotationProperty pme) {
-    	registerReference(ref, pme);
-    }
-    
-    private void registerTypeReference(TypeReference ref, Type t) {
-    	// CapturedType ErasedType CapturedTypeArgument ParameterizedType
-    	t = getBaseType(t);
-    	registerReference(ref, t);
+        registerReference(ref, pme);
     }
 
-	private Type getBaseType(Type t) {
-		int dim = 0;
-		while (t instanceof ArrayType) {
-			t = ((ArrayType)t).getBaseType();
-			dim++;
-		}
-    	if (t instanceof ErasedType)
-    		t = ((ErasedType)t).getGenericType();
-    	// TODO CapturedTypeArgument ??
-    	while (t instanceof ParameterizedType)
-    		t = ((ParameterizedType)t).getGenericType();
-    	for (int i = 0; i < dim; i++) {
-    		t = t.createArrayType();
-    	}
-		return t;
-	}
-    
-    private void registerPackageReference(PackageReference ref, Package pme) {
-    	registerReference(ref, pme);
+    private void registerTypeReference(TypeReference ref, Type t) {
+        // CapturedType ErasedType CapturedTypeArgument ParameterizedType
+        t = getBaseType(t);
+        registerReference(ref, t);
     }
-    
+
+    private Type getBaseType(Type t) {
+        int dim = 0;
+        while (t instanceof ArrayType) {
+            t = ((ArrayType) t).getBaseType();
+            dim++;
+        }
+        if (t instanceof ErasedType)
+            t = ((ErasedType) t).getGenericType();
+        // TODO CapturedTypeArgument ??
+        while (t instanceof ParameterizedType)
+            t = ((ParameterizedType) t).getGenericType();
+        for (int i = 0; i < dim; i++) {
+            t = t.createArrayType();
+        }
+        return t;
+    }
+
+    private void registerPackageReference(PackageReference ref, Package pme) {
+        registerReference(ref, pme);
+    }
+
     private void registerReference(Reference ref, ProgramModelElement pme) {
         Set<Reference> set = element2references.get(pme);
         if (set == null) {
@@ -530,31 +486,29 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo implement
         }
     }
 
-    private FastWorkList worklist = new FastWorkList();
-    private Stack<NonTerminalProgramElement> NTEs = new Stack<NonTerminalProgramElement>();
     /**
      * Collects all Method-, Constructor-, Variable- and TypeReferences in the
      * subtree.
      */
     private void analyzeReferences(ProgramElement pe) {
-    	worklist.add(pe);
-    	NTEs.push(null); // dummy item
-    	while (!worklist.isEmpty()) {
-    		pe = worklist.peekLast();
-    		if (pe instanceof NonTerminalProgramElement) {
-    			NonTerminalProgramElement nt = (NonTerminalProgramElement)pe;
-    			if (NTEs.peek() != nt) {
-    				NTEs.push(nt);
-    				for (int i = nt.getChildCount()-1; i >= 0; i--)
-    					worklist.add(nt.getChildAt(i));
-    				continue; // continue in subtree.
-    			}
-    			worklist.removeLast(); // all children have been visited.
-    			NTEs.pop();
-    		} else {
-    			worklist.removeLast(); // terminal. skip and continue.
-    			continue;
-    		}
+        worklist.add(pe);
+        NTEs.push(null); // dummy item
+        while (!worklist.isEmpty()) {
+            pe = worklist.peekLast();
+            if (pe instanceof NonTerminalProgramElement) {
+                NonTerminalProgramElement nt = (NonTerminalProgramElement) pe;
+                if (NTEs.peek() != nt) {
+                    NTEs.push(nt);
+                    for (int i = nt.getChildCount() - 1; i >= 0; i--)
+                        worklist.add(nt.getChildAt(i));
+                    continue; // continue in subtree.
+                }
+                worklist.removeLast(); // all children have been visited.
+                NTEs.pop();
+            } else {
+                worklist.removeLast(); // terminal. skip and continue.
+                continue;
+            }
 //    	{
 //    		if (pe instanceof NonTerminalProgramElement) {
 //    			NonTerminalProgramElement nt = (NonTerminalProgramElement) pe;
@@ -564,81 +518,73 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo implement
 //    		} else {
 //    			return;
 //    		}
-    		if (pe instanceof Reference) {
-    			if (pe instanceof UncollatedReferenceQualifier) {
-    				try {
-    					pe = resolveURQ((UncollatedReferenceQualifier) pe);
-    				} catch (ClassCastException cce) {
-    					getErrorHandler().reportError(
-    							new UnresolvedReferenceException(Format.toString("Could not resolve " + ELEMENT_LONG + "(CR1)", pe),
-    									pe));
-    					// this might have been a field or class or package
-    					// we have to let this URQ remain alive
-    				}
-    			}
-    			// no else
-    			if (pe instanceof VariableReference) {
-    				VariableReference vr = (VariableReference) pe;
-    				Variable v = getVariable(vr);
-    				if (v == null) {
-    					getErrorHandler().reportError(
-    							new UnresolvedReferenceException(Format.toString("Could not resolve " + ELEMENT_LONG + "(CR2)", vr),
-    									vr));
-    					v = getNameInfo().getUnknownField();
-    				}
-    				registerVariableReference(vr, v);
-    			} else if (pe instanceof TypeReference) {
-    				TypeReference tr = (TypeReference) pe;
-    				Type t = getType(tr);
-    				if (t != null) { // void type otherwise
-    					if (!(t instanceof DefaultNameInfo.UnknownClassType)) {
-    						registerTypeReference(tr, t);
-    						if (t instanceof ClassType) {
-        						t = ((ClassType)t).getBaseClassType();
-    							ClassType subType = null;
-    							TypeReferenceContainer parent = tr.getParent();
-    							if (parent instanceof InheritanceSpecification) {
-    								subType = ((InheritanceSpecification) parent).getParent();
-    							} else if (parent instanceof New) {
-    								subType = ((New) parent).getClassDeclaration();
-    							}
-    							// TODO 0.90 adapt for enums !
-    							if (subType != null) {
-    								ClassType superType = (ClassType) t;
-    								ProgramModelInfo pmi = superType.getProgramModelInfo();
-    								((DefaultProgramModelInfo) pmi).registerSubtype(subType, superType);
-    							}
-    						}
-    					}
-    				}
-    			} else if (pe instanceof MethodReference) {
-    				MethodReference mr = (MethodReference) pe;
-    				Method m = (Method)getMethod(mr).getGenericMember();
-    				registerMethodReference(mr, m);
-    			} else if (pe instanceof ConstructorReference) {
-    				ConstructorReference cr = (ConstructorReference) pe;
-    				Constructor c = (Constructor)getConstructor(cr).getGenericMember();
-    				registerConstructorReference(cr, c);
-    			} else if (pe instanceof AnnotationPropertyReference) {
-    				AnnotationPropertyReference apr = (AnnotationPropertyReference)pe;
-    				AnnotationProperty ap = getAnnotationProperty(apr);
-    				registerAnnotationPropertyReference(apr, ap);
-    			} else if (pe instanceof PackageReference) {
-    				PackageReference pr = (PackageReference) pe;
-    				Package p = getPackage(pr);
-    				registerPackageReference(pr, p);
-    			}
-    		}
-    	}
-    }
-
-    class SubTypeTopSort extends ClassTypeTopSort {
-
-        protected final List<ClassType> getAdjacent(ClassType c) {
-            return getSubtypes(c);
+            if (pe instanceof Reference) {
+                if (pe instanceof UncollatedReferenceQualifier) {
+                    try {
+                        pe = resolveURQ((UncollatedReferenceQualifier) pe);
+                    } catch (ClassCastException cce) {
+                        getErrorHandler().reportError(
+                                new UnresolvedReferenceException(Format.toString("Could not resolve " + ELEMENT_LONG + "(CR1)", pe),
+                                        pe));
+                        // this might have been a field or class or package
+                        // we have to let this URQ remain alive
+                    }
+                }
+                // no else
+                if (pe instanceof VariableReference) {
+                    VariableReference vr = (VariableReference) pe;
+                    Variable v = getVariable(vr);
+                    if (v == null) {
+                        getErrorHandler().reportError(
+                                new UnresolvedReferenceException(Format.toString("Could not resolve " + ELEMENT_LONG + "(CR2)", vr),
+                                        vr));
+                        v = getNameInfo().getUnknownField();
+                    }
+                    registerVariableReference(vr, v);
+                } else if (pe instanceof TypeReference) {
+                    TypeReference tr = (TypeReference) pe;
+                    Type t = getType(tr);
+                    if (t != null) { // void type otherwise
+                        if (!(t instanceof DefaultNameInfo.UnknownClassType)) {
+                            registerTypeReference(tr, t);
+                            if (t instanceof ClassType) {
+                                t = ((ClassType) t).getBaseClassType();
+                                ClassType subType = null;
+                                TypeReferenceContainer parent = tr.getParent();
+                                if (parent instanceof InheritanceSpecification) {
+                                    subType = ((InheritanceSpecification) parent).getParent();
+                                } else if (parent instanceof New) {
+                                    subType = ((New) parent).getClassDeclaration();
+                                }
+                                // TODO 0.90 adapt for enums !
+                                if (subType != null) {
+                                    ClassType superType = (ClassType) t;
+                                    ProgramModelInfo pmi = superType.getProgramModelInfo();
+                                    ((DefaultProgramModelInfo) pmi).registerSubtype(subType, superType);
+                                }
+                            }
+                        }
+                    }
+                } else if (pe instanceof MethodReference) {
+                    MethodReference mr = (MethodReference) pe;
+                    Method m = (Method) getMethod(mr).getGenericMember();
+                    registerMethodReference(mr, m);
+                } else if (pe instanceof ConstructorReference) {
+                    ConstructorReference cr = (ConstructorReference) pe;
+                    Constructor c = (Constructor) getConstructor(cr).getGenericMember();
+                    registerConstructorReference(cr, c);
+                } else if (pe instanceof AnnotationPropertyReference) {
+                    AnnotationPropertyReference apr = (AnnotationPropertyReference) pe;
+                    AnnotationProperty ap = getAnnotationProperty(apr);
+                    registerAnnotationPropertyReference(apr, ap);
+                } else if (pe instanceof PackageReference) {
+                    PackageReference pr = (PackageReference) pe;
+                    Package p = getPackage(pr);
+                    registerPackageReference(pr, p);
+                }
+            }
         }
     }
-
 
     public String information() {
         updateModel();
@@ -696,6 +642,13 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo implement
      */
     public void reset() {
         reset(false);
+    }
+
+    class SubTypeTopSort extends ClassTypeTopSort {
+
+        protected final List<ClassType> getAdjacent(ClassType c) {
+            return getSubtypes(c);
+        }
     }
 }
 

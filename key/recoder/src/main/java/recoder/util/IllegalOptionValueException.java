@@ -8,10 +8,10 @@ package recoder.util;
 public class IllegalOptionValueException extends OptionException {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 3501805964861992020L;
-	String val;
+     * serialization id
+     */
+    private static final long serialVersionUID = 3501805964861992020L;
+    String val;
 
     public IllegalOptionValueException(String opt, String val) {
         super(opt);

@@ -2,70 +2,61 @@
 
 package recoder.io;
 
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-
 import recoder.service.ErrorHandler;
 import recoder.util.FileCollector;
 import recoder.util.StringUtils;
+
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 /**
  * This class describes a list of search paths. Search paths may contain a
  * mixture of directories, logical directories (e.g. "."), and archive files
  * (e.g. ".jar", ".zip").
- * 
+ *
  * @author RN
  * @author AL
  */
 public class PathList {
 
-    /**
-     * Caches directory content queries. Map <File, NaturalHashSet>.
-     */
-    private Map<File, Set<String>> dirContents = new HashMap<File, Set<String>>();
-
-    /**
-     * Caches known directories. Map <File, File>.
-     */
-    private Map<File, File> knownDirs = new HashMap<File, File>();
-
+    private final static File NO_FILE = new File("");
     /**
      * Caches names of types relative to the search path that are known to be
      * unknown. Set <String>.
      */
     private final Set<String> notFound = new HashSet<String>();
-
     /**
      * Maps filenames to data locations. Map <String, DataLocation>.
      */
     private final Map<String, DataLocation> locations = new HashMap<String, DataLocation>();
-
     /**
      * Stores path entries. List <File|ZipFile>.
      */
     private final List<Object> paths = new ArrayList<Object>();
+    /**
+     * Caches directory content queries. Map <File, NaturalHashSet>.
+     */
+    private final Map<File, Set<String>> dirContents = new HashMap<File, Set<String>>();
+    /**
+     * Caches known directories. Map <File, File>.
+     */
+    private final Map<File, File> knownDirs = new HashMap<File, File>();
 
-    /** creates a new empty path list */
+    /**
+     * creates a new empty path list
+     */
     public PathList() {
-    	super();
+        super();
     }
 
     /**
      * creates a path list from the given path string
-     * 
-     * @param pathStr
-     *            a single path string, e.g. the content of <tt>CLASSPATH</tt>
+     *
+     * @param pathStr a single path string, e.g. the content of <tt>CLASSPATH</tt>
      */
     public PathList(String pathStr) {
         add(pathStr);
@@ -74,11 +65,10 @@ public class PathList {
     /**
      * creates a path list from the given strings. The single strings are
      * interpreted as path strings.
-     * 
-     * @param paths
-     *            the array of path strings to be added
+     *
+     * @param paths the array of path strings to be added
      */
-    public PathList(String paths[]) {
+    public PathList(String[] paths) {
         for (int i = 0; i < paths.length; i++) {
             add(paths[i]);
         }
@@ -86,7 +76,7 @@ public class PathList {
 
     /**
      * Empties the caches of this service.
-     * 
+     *
      * @since 0.72
      */
     public void flushCaches() {
@@ -110,9 +100,8 @@ public class PathList {
 
     /**
      * adds the given paths to the list.
-     * 
-     * @param pathStr
-     *            the string containing the paths
+     *
+     * @param pathStr the string containing the paths
      * @return the number of paths added from the path string
      */
     public int add(String pathStr) {
@@ -146,8 +135,6 @@ public class PathList {
         }
         return result;
     }
-
-    private final static File NO_FILE = new File("");
 
     private File getDir(File parent, String name) {
         File attempt = new File(parent, name);
@@ -195,11 +182,10 @@ public class PathList {
      * Looks for the file with the given relative file name in the path list and
      * returns the according location object. If no such file can be found
      * within the paths, the method returns <tt>null</tt>.
-     * 
-     * @param relativeName
-     *            the relative name of the file
+     *
+     * @param relativeName the relative name of the file
      * @return the location object or <tt>null</tt> if the file could not be
-     *         found.
+     * found.
      */
     public DataLocation find(String relativeName) {
         DataLocation result = locations.get(relativeName);
@@ -221,9 +207,8 @@ public class PathList {
      * directory path prefix if the prefix occurs in this path list. If the
      * filename is a directory path that is already in this path list, a "." is
      * returned. In any other case, the absolute file name is passed through.
-     * 
-     * @param absoluteFilename
-     *            an absolute file name.
+     *
+     * @param absoluteFilename an absolute file name.
      * @return a name for this file, possibly relative to this search path.
      */
     public String getRelativeName(String absoluteFilename) {
@@ -253,9 +238,8 @@ public class PathList {
      * Looks for files with the given relative file name in the path list and
      * returns an array containing the full path names of each match. If no file
      * could be located, this method returns an empty array.
-     * 
-     * @param relativeName
-     *            the relative name of the file
+     *
+     * @param relativeName the relative name of the file
      * @return an array containing the full paths of all matching files
      */
     public DataLocation[] findAll(String relativeName) {
@@ -274,9 +258,9 @@ public class PathList {
     }
 
     public DataLocation[] findAll(FilenameFilter filter) {
-    	return findAll(filter, null);
+        return findAll(filter, null);
     }
-    
+
     // the filter must be able to accept null parent directories
     // (e.g. for ZipEntries)
     public DataLocation[] findAll(FilenameFilter filter, ErrorHandler eh) {
@@ -297,15 +281,15 @@ public class PathList {
                             locations.put(name, loc);
                         }
                         if (!res.add(loc) && !reportedDublettes) {
-                        	if (eh != null) {
-                        		eh.reportError(new DuplicatePathWarning
-                        				("Found a data location twice in search path: " +
-                        					loc +	
-                        					"\nPlease check the configuration " +
-                        					"of the input path. (This " +
-                        					"warning is reported only once)"));
-                        	}
-                        	reportedDublettes = true;
+                            if (eh != null) {
+                                eh.reportError(new DuplicatePathWarning
+                                        ("Found a data location twice in search path: " +
+                                                loc +
+                                                "\nPlease check the configuration " +
+                                                "of the input path. (This " +
+                                                "warning is reported only once)"));
+                            }
+                            reportedDublettes = true;
                         }
                     }
                 }
@@ -323,18 +307,18 @@ public class PathList {
                                 locations.put(name, loc);
                             }
                             if (!res.add(loc) && !reportedDublettes) {
-                            	if (eh != null) {
-                            		eh.reportError(new DuplicatePathWarning
-                        				("Found a data location twice in search path: " +
-                        					loc +	
-                        					"\nPlease check the configuration" +
-                        					"of the input path. (This" +
-                        					"warning is reported only once"));
-                            	}
-                            	reportedDublettes = true;
+                                if (eh != null) {
+                                    eh.reportError(new DuplicatePathWarning
+                                            ("Found a data location twice in search path: " +
+                                                    loc +
+                                                    "\nPlease check the configuration" +
+                                                    "of the input path. (This" +
+                                                    "warning is reported only once"));
+                                }
+                                reportedDublettes = true;
                             }
                         } catch (IOException ioe) {
-                        	// TODO really ignore ??
+                            // TODO really ignore ??
                         }
                     }
                 }
@@ -347,7 +331,7 @@ public class PathList {
 
     /**
      * Returns the string representation of the path list.
-     * 
+     *
      * @return the concatenated pathstring.
      */
     public String toString() {
@@ -365,7 +349,7 @@ public class PathList {
                     sb.append(((File) f).getPath());
                 }
             }
-            result = sb.toString().substring(1);
+            result = sb.substring(1);
         }
         return result;
     }

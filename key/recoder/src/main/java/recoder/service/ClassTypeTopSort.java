@@ -2,17 +2,17 @@
 
 package recoder.service;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import recoder.abstraction.ClassType;
 import recoder.convenience.Format;
 import recoder.convenience.Formats;
 import recoder.util.Debug;
 
+import java.util.ArrayList;
+import java.util.List;
+
 abstract class ClassTypeTopSort implements Formats {
 
-    private List<ClassType> classesDFS = new ArrayList<ClassType>(32);
+    private final List<ClassType> classesDFS = new ArrayList<ClassType>(32);
 
     private int[] indeg = new int[32];
 

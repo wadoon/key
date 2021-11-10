@@ -2,22 +2,12 @@
 
 package recoder.java.declaration;
 
-import java.util.Collections;
-import java.util.List;
-
 import recoder.abstraction.ClassType;
 import recoder.abstraction.ClassTypeContainer;
 import recoder.abstraction.Member;
 import recoder.abstraction.Package;
 import recoder.convenience.Naming;
-import recoder.java.NonTerminalProgramElement;
-import recoder.java.ProgramElement;
-import recoder.java.ScopeDefiningElement;
-import recoder.java.SourceElement;
-import recoder.java.SourceVisitor;
-import recoder.java.Statement;
-import recoder.java.StatementBlock;
-import recoder.java.StatementContainer;
+import recoder.java.*;
 import recoder.java.declaration.modifier.Static;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
@@ -25,24 +15,27 @@ import recoder.service.ProgramModelInfo;
 import recoder.service.SourceInfo;
 import recoder.util.Debug;
 
+import java.util.Collections;
+import java.util.List;
+
 /**
  * Class initializer.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class ClassInitializer extends JavaDeclaration implements Member, MemberDeclaration, StatementContainer, ClassTypeContainer, ScopeDefiningElement {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 7172264701196251395L;
+     * serialization id
+     */
+    private static final long serialVersionUID = 7172264701196251395L;
 
-	/**
+    /**
      * Parent.
      */
 
-	private TypeDeclaration parent;
+    private TypeDeclaration parent;
 
     /**
      * Body.
@@ -51,7 +44,7 @@ public class ClassInitializer extends JavaDeclaration implements Member, MemberD
     private StatementBlock body;
 
     private SourceInfo service;
-    
+
     /**
      * Class initializer.
      */
@@ -62,9 +55,8 @@ public class ClassInitializer extends JavaDeclaration implements Member, MemberD
 
     /**
      * Class initializer.
-     * 
-     * @param body
-     *            a statement block.
+     *
+     * @param body a statement block.
      */
 
     public ClassInitializer(StatementBlock body) {
@@ -74,16 +66,14 @@ public class ClassInitializer extends JavaDeclaration implements Member, MemberD
 
     /**
      * Class initializer.
-     * 
-     * @param modifier
-     *            a static.
-     * @param body
-     *            a statement block.
+     *
+     * @param modifier a static.
+     * @param body     a statement block.
      */
 
     public ClassInitializer(Static modifier, StatementBlock body) {
         if (modifier != null) {
-        	ASTList<DeclarationSpecifier> mods = new ASTArrayList<DeclarationSpecifier>(1);
+            ASTList<DeclarationSpecifier> mods = new ASTArrayList<DeclarationSpecifier>(1);
             mods.add(modifier);
             setDeclarationSpecifiers(mods);
         }
@@ -93,9 +83,8 @@ public class ClassInitializer extends JavaDeclaration implements Member, MemberD
 
     /**
      * Class initializer.
-     * 
-     * @param proto
-     *            a class initializer.
+     *
+     * @param proto a class initializer.
      */
 
     protected ClassInitializer(ClassInitializer proto) {
@@ -108,7 +97,7 @@ public class ClassInitializer extends JavaDeclaration implements Member, MemberD
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -137,7 +126,7 @@ public class ClassInitializer extends JavaDeclaration implements Member, MemberD
 
     /**
      * Get AST parent.
-     * 
+     *
      * @return the non terminal program element.
      */
 
@@ -147,7 +136,7 @@ public class ClassInitializer extends JavaDeclaration implements Member, MemberD
 
     /**
      * Get body.
-     * 
+     *
      * @return the statement block.
      */
 
@@ -157,9 +146,8 @@ public class ClassInitializer extends JavaDeclaration implements Member, MemberD
 
     /**
      * Set body.
-     * 
-     * @param body
-     *            a statement block.
+     *
+     * @param body a statement block.
      */
 
     public void setBody(StatementBlock body) {
@@ -168,7 +156,7 @@ public class ClassInitializer extends JavaDeclaration implements Member, MemberD
 
     /**
      * Get the number of statements in this container.
-     * 
+     *
      * @return the number of statements.
      */
 
@@ -192,7 +180,7 @@ public class ClassInitializer extends JavaDeclaration implements Member, MemberD
 
     /**
      * Returns the number of children of this node.
-     * 
+     *
      * @return an int giving the number of children of this node
      */
 
@@ -208,12 +196,10 @@ public class ClassInitializer extends JavaDeclaration implements Member, MemberD
     /**
      * Returns the child at the specified index in this node's "virtual" child
      * array
-     * 
-     * @param index
-     *            an index into this node's "virtual" child array
+     *
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
@@ -253,14 +239,11 @@ public class ClassInitializer extends JavaDeclaration implements Member, MemberD
      * element can be null - in that case, the child is effectively removed. The
      * parent role of the new child is validated, while the parent link of the
      * replaced child is left untouched.
-     * 
-     * @param p
-     *            the old child.
-     * @param p
-     *            the new child.
+     *
+     * @param p the old child.
+     * @param p the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException
-     *                if the new child cannot take over the role of the old one.
+     * @throws ClassCastException if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
@@ -294,7 +277,7 @@ public class ClassInitializer extends JavaDeclaration implements Member, MemberD
 
     /**
      * Get member parent.
-     * 
+     *
      * @return the type declaration.
      */
 
@@ -304,16 +287,17 @@ public class ClassInitializer extends JavaDeclaration implements Member, MemberD
 
     /**
      * Set member parent.
-     * 
-     * @param t
-     *            a type declaration.
+     *
+     * @param t a type declaration.
      */
 
     public void setMemberParent(TypeDeclaration t) {
         parent = t;
     }
 
-    /** A binary class initializer does not occur. */
+    /**
+     * A binary class initializer does not occur.
+     */
 
     public boolean isBinary() {
         return false;
@@ -371,12 +355,12 @@ public class ClassInitializer extends JavaDeclaration implements Member, MemberD
     public String getFullName() {
         return Naming.getFullName(this);
     }
-    
 
-	@Override
-	public String getBinaryName() {
-		return null;
-	}
+
+    @Override
+    public String getBinaryName() {
+        return null;
+    }
 
     @Override
     public SourceInfo getProgramModelInfo() {
@@ -389,33 +373,32 @@ public class ClassInitializer extends JavaDeclaration implements Member, MemberD
 
     @Override
     public void setProgramModelInfo(ProgramModelInfo service) {
-    	if (!(service instanceof SourceInfo))
-    		throw new IllegalArgumentException("service for MethodDeclaration must be of type SourceInfo.");
-        this.service = (SourceInfo)service;
+        if (!(service instanceof SourceInfo))
+            throw new IllegalArgumentException("service for MethodDeclaration must be of type SourceInfo.");
+        this.service = (SourceInfo) service;
     }
 
     private void updateModel() {
         getFactory().getServiceConfiguration().getChangeHistory().updateModel();
     }
 
-	@Override
-	public String getName() {
-		return null;
-	}
+    @Override
+    public String getName() {
+        return null;
+    }
 
     /**
      * returns the types declared in the corresponding StatementBlock, if there
      * is any (i.e. method is not abstract). Returns
      * <code>RecoderList<ClassType>.EMPTY_LIST</code> otherwise.
-     * 
      */
-	@Override
+    @Override
     public List<TypeDeclaration> getTypes() {
         if (service == null) {
             Debug.log("Zero service while " + Debug.makeStackTrace());
             updateModel();
         }
-        return getBody() == null ? Collections.<TypeDeclaration>emptyList() : getBody().getTypesInScope();
+        return getBody() == null ? Collections.emptyList() : getBody().getTypesInScope();
     }
 
     @Override
@@ -432,32 +415,33 @@ public class ClassInitializer extends JavaDeclaration implements Member, MemberD
         return getContainingClassType();
     }
 
-	@Override
+    @Override
     public ClassType getContainingClassType() {
         if (service == null) {
             Debug.log("Zero service while " + Debug.makeStackTrace());
             updateModel();
         }
-        return service.getContainingClassType((ProgramElement)this);
+        return service.getContainingClassType((ProgramElement) this);
     }
 
-	@Override
-	public Member getGenericMember() {
-		return this;
-	}
-	
-	@Override
-	public boolean isFinal() {
-		return true;
-	}
+    @Override
+    public Member getGenericMember() {
+        return this;
+    }
 
-	@Override
+    @Override
+    public boolean isFinal() {
+        return true;
+    }
+
+    @Override
     public boolean isDefinedScope() {
         return true;
     }
 
-	@Override
-    @SuppressWarnings("all") public void setDefinedScope(boolean defined) {
+    @Override
+    @SuppressWarnings("all")
+    public void setDefinedScope(boolean defined) {
         // ignore
     }
 

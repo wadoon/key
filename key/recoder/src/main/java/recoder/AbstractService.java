@@ -10,7 +10,7 @@ public abstract class AbstractService implements Service {
      * Constructs a service without configuration. Be cautious when doing so.
      */
     protected AbstractService() {
-    	super();
+        super();
     }
 
     protected AbstractService(ServiceConfiguration config) {
@@ -26,11 +26,11 @@ public abstract class AbstractService implements Service {
      * configuration partners. The service configuration can be memorized if it
      * has not been passed in by a constructor already. The default
      * implementation does nothing.
-     * 
-     * @param cfg
-     *            the service configuration this services has been assigned to.
+     *
+     * @param cfg the service configuration this services has been assigned to.
      */
-    @SuppressWarnings("all") public void initialize(ServiceConfiguration cfg) {
+    @SuppressWarnings("all")
+    public void initialize(ServiceConfiguration cfg) {
     }
 
     public ServiceConfiguration getServiceConfiguration() {

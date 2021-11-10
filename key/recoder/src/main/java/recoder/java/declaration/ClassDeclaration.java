@@ -2,12 +2,7 @@
 
 package recoder.java.declaration;
 
-import recoder.java.Identifier;
-import recoder.java.ProgramElement;
-import recoder.java.SourceVisitor;
-import recoder.java.Statement;
-import recoder.java.StatementBlock;
-import recoder.java.StatementContainer;
+import recoder.java.*;
 import recoder.list.generic.ASTList;
 
 /**
@@ -39,7 +34,7 @@ import recoder.list.generic.ASTList;
  * </ul>
  * <li>anonymous classes
  * <ul>
- * <li>getContainer() != null (but further unspecified; 
+ * <li>getContainer() != null (but further unspecified;
  * 								could be Method, ClassInitializer, but also Package in case
  * 								it appears in )
  * <li>getStatementContainer() == null
@@ -52,24 +47,24 @@ import recoder.list.generic.ASTList;
 public class ClassDeclaration extends TypeDeclaration implements Statement {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -1520369925548201696L;
+     * serialization id
+     */
+    private static final long serialVersionUID = -1520369925548201696L;
 
-	/**
+    /**
      * Extending.
      */
-	private Extends extending;
-    
+    private Extends extending;
+
     /**
      * Type Parameters (Java 5)
      */
-	private ASTList<TypeParameterDeclaration> typeParameters;
+    private ASTList<TypeParameterDeclaration> typeParameters;
 
     /**
      * Implementing.
      */
-	private Implements implementing;
+    private Implements implementing;
 
     /**
      * Class declaration.
@@ -78,9 +73,11 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
         // nothing to do here
     }
 
-    /** Construct a non-anonymous class. */
+    /**
+     * Construct a non-anonymous class.
+     */
     public ClassDeclaration(ASTList<DeclarationSpecifier> declSpecs, Identifier name, Extends extended, Implements implemented,
-    		ASTList<MemberDeclaration> members, ASTList<TypeParameterDeclaration> typeParameters) {
+                            ASTList<MemberDeclaration> members, ASTList<TypeParameterDeclaration> typeParameters) {
         super(declSpecs, name);
         setExtendedTypes(extended);
         setImplementedTypes(implemented);
@@ -88,17 +85,16 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
         setTypeParameters(typeParameters);
         makeParentRoleValid();
     }
-    
+
     public ClassDeclaration(ASTList<DeclarationSpecifier> declSpecs, Identifier name, Extends extended, Implements implemented,
-    		ASTList<MemberDeclaration> members) {
-    	this (declSpecs, name, extended, implemented, members, null);
+                            ASTList<MemberDeclaration> members) {
+        this(declSpecs, name, extended, implemented, members, null);
     }
 
     /**
      * Class declaration.
-     * 
-     * @param members
-     *            a member declaration mutable list.
+     *
+     * @param members a member declaration mutable list.
      */
     public ClassDeclaration(ASTList<MemberDeclaration> members) {
         setMembers(members);
@@ -107,9 +103,8 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
 
     /**
      * Class declaration.
-     * 
-     * @param proto
-     *            a class declaration.
+     *
+     * @param proto a class declaration.
      */
     protected ClassDeclaration(ClassDeclaration proto) {
         super(proto);
@@ -120,14 +115,14 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
             implementing = proto.implementing.deepClone();
         }
         if (proto.typeParameters != null) {
-        	typeParameters = proto.typeParameters.deepClone();
+            typeParameters = proto.typeParameters.deepClone();
         }
         makeParentRoleValid();
     }
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
     public ClassDeclaration deepClone() {
@@ -146,15 +141,15 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
             implementing.setParent(this);
         }
         if (typeParameters != null) {
-        	for (TypeParameterDeclaration tp : typeParameters) {
-        		tp.setParent(this);
-        	}
+            for (TypeParameterDeclaration tp : typeParameters) {
+                tp.setParent(this);
+            }
         }
     }
 
     /**
      * Returns the number of children of this node.
-     * 
+     *
      * @return an int giving the number of children of this node
      */
     public int getChildCount() {
@@ -170,19 +165,17 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
         if (members != null)
             result += members.size();
         if (typeParameters != null)
-        	result += typeParameters.size();
+            result += typeParameters.size();
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child
      * array
-     * 
-     * @param index
-     *            an index into this node's "virtual" child array
+     *
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
         int len;
@@ -199,10 +192,10 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
             index--;
         }
         if (typeParameters != null) {
-        	len = typeParameters.size();
-        	if (len > index)
-        		return typeParameters.get(index);
-        	index -= len;
+            len = typeParameters.size();
+            if (len > index)
+                return typeParameters.get(index);
+            index -= len;
         }
         if (extending != null) {
             if (index == 0)
@@ -215,9 +208,9 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
             index--;
         }
         if (members != null) {
-        	if (index < members.size())
-        		return members.get(index);
-        	index -= members.size();
+            if (index < members.size())
+                return members.get(index);
+            index -= members.size();
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -228,7 +221,7 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
         // role 2: extends
         // role 3: implements (no occurrence in interfaces)
         // role 4 (IDX): members
-    	// role 5 (IDX): type parameters
+        // role 5 (IDX): type parameters
         if (declarationSpecifiers != null) {
             int index = declarationSpecifiers.indexOf(child);
             if (index >= 0) {
@@ -248,10 +241,10 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
             }
         }
         if (typeParameters != null) {
-        	int index = typeParameters.size();
-        	if (index >= 0) {
-        		return (index << 4) | 5;
-        	}
+            int index = typeParameters.size();
+            if (index >= 0) {
+                return (index << 4) | 5;
+            }
         }
         return -1;
     }
@@ -262,14 +255,11 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
      * element can be null - in that case, the child is effectively removed. The
      * parent role of the new child is validated, while the parent link of the
      * replaced child is left untouched.
-     * 
-     * @param p
-     *            the old child.
-     * @param p
-     *            the new child.
+     *
+     * @param p the old child.
+     * @param p the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException
-     *                if the new child cannot take over the role of the old one.
+     * @throws ClassCastException if the new child cannot take over the role of the old one.
      */
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
         if (p == null) {
@@ -327,24 +317,24 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
             }
         }
         if (typeParameters != null) {
-        	int idx = typeParameters.indexOf(p);
-        	if (idx != -1) {
-        		if (q == null) {
-        			typeParameters.remove(idx);
-        		} else {
-        			TypeParameterDeclaration r = (TypeParameterDeclaration)q;
-        			typeParameters.set(idx, r);
-        			r.setParent(this);
-        		}
-        		return true;
-        	}
+            int idx = typeParameters.indexOf(p);
+            if (idx != -1) {
+                if (q == null) {
+                    typeParameters.remove(idx);
+                } else {
+                    TypeParameterDeclaration r = (TypeParameterDeclaration) q;
+                    typeParameters.set(idx, r);
+                    r.setParent(this);
+                }
+                return true;
+            }
         }
         return false;
     }
 
     /**
      * Get statement container.
-     * 
+     *
      * @return null, if the type is not declared locally.
      */
     public StatementContainer getStatementContainer() {
@@ -353,9 +343,8 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
 
     /**
      * Set statement container. Must be a {@link recoder.java.StatementBlock}.
-     * 
-     * @param p
-     *            a statement container.
+     *
+     * @param p a statement container.
      */
     public void setStatementContainer(StatementContainer p) {
         parent = (StatementBlock) p;
@@ -363,7 +352,7 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
 
     /**
      * Get extended types.
-     * 
+     *
      * @return the extends.
      */
     public Extends getExtendedTypes() {
@@ -372,9 +361,8 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
 
     /**
      * Set extended types.
-     * 
-     * @param spec
-     *            an extends.
+     *
+     * @param spec an extends.
      */
     public void setExtendedTypes(Extends spec) {
         extending = spec;
@@ -382,7 +370,7 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
 
     /**
      * Get implemented types.
-     * 
+     *
      * @return the implements.
      */
     public Implements getImplementedTypes() {
@@ -391,9 +379,8 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
 
     /**
      * Set implemented types.
-     * 
-     * @param spec
-     *            an implements.
+     *
+     * @param spec an implements.
      */
     public void setImplementedTypes(Implements spec) {
         implementing = spec;
@@ -423,11 +410,11 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
     public boolean isInterface() {
         return false;
     }
-    
+
     public boolean isOrdinaryInterface() {
         return false;
     }
-    
+
     public boolean isAnnotationType() {
         return false;
     }
@@ -443,20 +430,18 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
     public void accept(SourceVisitor v) {
         v.visitClassDeclaration(this);
     }
-    
-    public void setTypeParameters(ASTList<TypeParameterDeclaration> typeParameters) {
-    	this.typeParameters = typeParameters;
-    }
-    
+
     public ASTList<TypeParameterDeclaration> getTypeParameters() {
-    	return typeParameters;
+        return typeParameters;
     }
 
-	public boolean isInner() {
-		if (isStatic()) 
-			return false;
-		if (!(getContainingClassType() instanceof ClassDeclaration))
-			return false;
-		return true;
-	}
+    public void setTypeParameters(ASTList<TypeParameterDeclaration> typeParameters) {
+        this.typeParameters = typeParameters;
+    }
+
+    public boolean isInner() {
+        if (isStatic())
+            return false;
+        return getContainingClassType() instanceof ClassDeclaration;
+    }
 }

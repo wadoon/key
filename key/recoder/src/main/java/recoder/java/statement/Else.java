@@ -9,35 +9,34 @@ import recoder.java.Statement;
 
 /**
  * Else.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class Else extends Branch {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 5468467558759778758L;
-	/**
+     * serialization id
+     */
+    private static final long serialVersionUID = 5468467558759778758L;
+    /**
      * Body.
      */
 
-	private Statement body;
+    private Statement body;
 
     /**
      * Else.
      */
 
     public Else() {
-    	super();
+        super();
     }
 
     /**
      * Else.
-     * 
-     * @param body
-     *            a statement.
+     *
+     * @param body a statement.
      */
 
     public Else(Statement body) {
@@ -47,9 +46,8 @@ public class Else extends Branch {
 
     /**
      * Else.
-     * 
-     * @param proto
-     *            an else.
+     *
+     * @param proto an else.
      */
 
     protected Else(Else proto) {
@@ -62,7 +60,7 @@ public class Else extends Branch {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -86,7 +84,7 @@ public class Else extends Branch {
 
     /**
      * Returns the number of children of this node.
-     * 
+     *
      * @return an int giving the number of children of this node
      */
 
@@ -97,12 +95,10 @@ public class Else extends Branch {
     /**
      * Returns the child at the specified index in this node's "virtual" child
      * array
-     * 
-     * @param index
-     *            an index into this node's "virtual" child array
+     *
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
@@ -127,14 +123,11 @@ public class Else extends Branch {
      * element can be null - in that case, the child is effectively removed. The
      * parent role of the new child is validated, while the parent link of the
      * replaced child is left untouched.
-     * 
-     * @param p
-     *            the old child.
-     * @param p
-     *            the new child.
+     *
+     * @param p the old child.
+     * @param p the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException
-     *                if the new child cannot take over the role of the old one.
+     * @throws ClassCastException if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
@@ -154,7 +147,7 @@ public class Else extends Branch {
 
     /**
      * Get the number of statements in this container.
-     * 
+     *
      * @return the number of statements.
      */
 
@@ -187,9 +180,8 @@ public class Else extends Branch {
 
     /**
      * Set body.
-     * 
-     * @param statement
-     *            a statement.
+     *
+     * @param statement a statement.
      */
 
     public void setBody(Statement statement) {
@@ -198,9 +190,8 @@ public class Else extends Branch {
 
     /**
      * Set parent.
-     * 
-     * @param parent
-     *            an if.
+     *
+     * @param parent an if.
      */
 
     public void setParent(If parent) {

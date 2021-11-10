@@ -2,12 +2,6 @@
 
 package recoder.java;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import recoder.abstraction.ClassType;
 import recoder.io.DataLocation;
 import recoder.java.declaration.TypeDeclaration;
@@ -15,12 +9,14 @@ import recoder.java.declaration.TypeDeclarationContainer;
 import recoder.list.generic.ASTList;
 import recoder.util.Debug;
 
+import java.util.*;
+
 /**
  * A node representing a single source file containing {@link TypeDeclaration}s
  * and an optional {@link PackageSpecification}and an optional set of
  * {@link Import}s. In Java, any source file may contain at most one public
  * class type definition.
- * 
+ *
  * @author AL
  * @author <TT>AutoDoc</TT>
  */
@@ -28,51 +24,44 @@ import recoder.util.Debug;
 public class CompilationUnit extends JavaNonTerminalProgramElement implements TypeDeclarationContainer, TypeScope {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = -1511486506045179278L;
-
-	/**
-     * Current data location.
+     *
      */
-
-	private DataLocation location;
-
-    /**
-     * Original data location.
-     */
-
-    private DataLocation originalLocation;
-
-    /**
-     * Package spec.
-     */
-
-    private PackageSpecification packageSpec;
-
-    /**
-     * Imports.
-     */
-
-    private ASTList<Import> imports;
-
-    /**
-     * Type declarations.
-     */
-
-    private ASTList<TypeDeclaration> typeDeclarations;
-
+    private static final long serialVersionUID = -1511486506045179278L;
     /**
      * Undefined scope tag.
      */
 
     private final static Map<String, ClassType> UNDEFINED_SCOPE = Collections.emptyMap();
+    /**
+     * Current data location.
+     */
 
+    private DataLocation location;
+    /**
+     * Original data location.
+     */
+
+    private DataLocation originalLocation;
+    /**
+     * Package spec.
+     */
+
+    private PackageSpecification packageSpec;
+    /**
+     * Imports.
+     */
+
+    private ASTList<Import> imports;
+    /**
+     * Type declarations.
+     */
+
+    private ASTList<TypeDeclaration> typeDeclarations;
     /**
      * Scope table.
      */
 
-	private Map<String, ClassType> name2type = UNDEFINED_SCOPE;
+    private Map<String, ClassType> name2type = UNDEFINED_SCOPE;
 
     /**
      * Compilation unit.
@@ -84,17 +73,14 @@ public class CompilationUnit extends JavaNonTerminalProgramElement implements Ty
 
     /**
      * Compilation unit.
-     * 
-     * @param pkg
-     *            a package specification.
-     * @param imports
-     *            an import mutable list.
-     * @param typeDeclarations
-     *            a type declaration mutable list.
+     *
+     * @param pkg              a package specification.
+     * @param imports          an import mutable list.
+     * @param typeDeclarations a type declaration mutable list.
      */
 
     public CompilationUnit(PackageSpecification pkg, ASTList<Import> imports,
-    		ASTList<TypeDeclaration> typeDeclarations) {
+                           ASTList<TypeDeclaration> typeDeclarations) {
         setPackageSpecification(pkg);
         setImports(imports);
         setDeclarations(typeDeclarations);
@@ -103,9 +89,8 @@ public class CompilationUnit extends JavaNonTerminalProgramElement implements Ty
 
     /**
      * Compilation unit. Does not copy the data location.
-     * 
-     * @param proto
-     *            a compilation unit.
+     *
+     * @param proto a compilation unit.
      */
 
     protected CompilationUnit(CompilationUnit proto) {
@@ -124,7 +109,7 @@ public class CompilationUnit extends JavaNonTerminalProgramElement implements Ty
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -158,14 +143,11 @@ public class CompilationUnit extends JavaNonTerminalProgramElement implements Ty
      * element can be null - in that case, the child is effectively removed. The
      * parent role of the new child is validated, while the parent link of the
      * replaced child is left untouched.
-     * 
-     * @param p
-     *            the old child.
-     * @param p
-     *            the new child.
+     *
+     * @param p the old child.
+     * @param p the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException
-     *                if the new child cannot take over the role of the old one.
+     * @throws ClassCastException if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
@@ -222,7 +204,7 @@ public class CompilationUnit extends JavaNonTerminalProgramElement implements Ty
     /**
      * Get name of the unit. The name is empty if no data location is set;
      * otherwise, the name of the current data location is returned.
-     * 
+     *
      * @return the name of this compilation unit.
      * @see #getDataLocation()
      */
@@ -231,7 +213,9 @@ public class CompilationUnit extends JavaNonTerminalProgramElement implements Ty
         return (location == null) ? "" : location.toString();
     }
 
-    /** A compilation unit has no syntactical parent */
+    /**
+     * A compilation unit has no syntactical parent
+     */
 
     public NonTerminalProgramElement getASTParent() {
         return null;
@@ -239,7 +223,7 @@ public class CompilationUnit extends JavaNonTerminalProgramElement implements Ty
 
     /**
      * Returns the number of children of this node.
-     * 
+     *
      * @return an int giving the number of children of this node
      */
 
@@ -257,12 +241,10 @@ public class CompilationUnit extends JavaNonTerminalProgramElement implements Ty
     /**
      * Returns the child at the specified index in this node's "virtual" child
      * array
-     * 
-     * @param index
-     *            an index into this node's "virtual" child array
+     *
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
@@ -309,7 +291,7 @@ public class CompilationUnit extends JavaNonTerminalProgramElement implements Ty
 
     /**
      * Gets the current data location.
-     * 
+     *
      * @return the data location.
      */
 
@@ -320,9 +302,8 @@ public class CompilationUnit extends JavaNonTerminalProgramElement implements Ty
     /**
      * Sets the current data location. If the data location has been <CODE>null
      * </CODE>, the location also becomes the new original location.
-     * 
-     * @param location
-     *            a data location.
+     *
+     * @param location a data location.
      */
 
     public void setDataLocation(DataLocation location) {
@@ -334,7 +315,7 @@ public class CompilationUnit extends JavaNonTerminalProgramElement implements Ty
 
     /**
      * Gets the original data location.
-     * 
+     *
      * @return the original data location.
      */
 
@@ -344,7 +325,7 @@ public class CompilationUnit extends JavaNonTerminalProgramElement implements Ty
 
     /**
      * Get imports.
-     * 
+     *
      * @return the import mutable list.
      */
 
@@ -354,9 +335,8 @@ public class CompilationUnit extends JavaNonTerminalProgramElement implements Ty
 
     /**
      * Set imports.
-     * 
-     * @param list
-     *            an import mutable list.
+     *
+     * @param list an import mutable list.
      */
 
     public void setImports(ASTList<Import> list) {
@@ -365,7 +345,7 @@ public class CompilationUnit extends JavaNonTerminalProgramElement implements Ty
 
     /**
      * Get package specification.
-     * 
+     *
      * @return the package specification.
      */
 
@@ -375,9 +355,8 @@ public class CompilationUnit extends JavaNonTerminalProgramElement implements Ty
 
     /**
      * Set package specification.
-     * 
-     * @param p
-     *            a package specification.
+     *
+     * @param p a package specification.
      */
 
     public void setPackageSpecification(PackageSpecification p) {
@@ -386,7 +365,7 @@ public class CompilationUnit extends JavaNonTerminalProgramElement implements Ty
 
     /**
      * Get the number of type declarations in this container.
-     * 
+     *
      * @return the number of type declarations.
      */
 
@@ -411,7 +390,7 @@ public class CompilationUnit extends JavaNonTerminalProgramElement implements Ty
 
     /**
      * Get declarations.
-     * 
+     *
      * @return the type declaration mutable list.
      */
 
@@ -421,9 +400,8 @@ public class CompilationUnit extends JavaNonTerminalProgramElement implements Ty
 
     /**
      * Set declarations.
-     * 
-     * @param list
-     *            a type declaration mutable list.
+     *
+     * @param list a type declaration mutable list.
      */
 
     public void setDeclarations(ASTList<TypeDeclaration> list) {
@@ -475,7 +453,7 @@ public class CompilationUnit extends JavaNonTerminalProgramElement implements Ty
             return Collections.emptyList();
         }
         List<ClassType> res = new ArrayList<ClassType>(name2type.size());
-        for(ClassType ct : name2type.values()) {
+        for (ClassType ct : name2type.values()) {
             res.add(ct);
         }
         return res;
@@ -508,9 +486,9 @@ public class CompilationUnit extends JavaNonTerminalProgramElement implements Ty
     public void accept(SourceVisitor v) {
         v.visitCompilationUnit(this);
     }
-    
+
     @Override
     public String toString() {
-    	return "<CompilationUnit> " + getName();
+        return "<CompilationUnit> " + getName();
     }
 }

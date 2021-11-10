@@ -4,7 +4,7 @@ package recoder.java;
 
 /**
  * Expression container.
- * 
+ *
  * @author AL
  * @author <TT>AutoDoc</TT>
  */
@@ -13,7 +13,7 @@ public interface ExpressionContainer extends NonTerminalProgramElement {
 
     /**
      * Get the number of expressions in this container.
-     * 
+     *
      * @return the number of expressions.
      */
     int getExpressionCount();

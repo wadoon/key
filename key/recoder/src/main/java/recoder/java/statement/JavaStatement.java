@@ -9,22 +9,22 @@ import recoder.java.StatementContainer;
 
 /**
  * Default implementation for non-terminal Java statements.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public abstract class JavaStatement extends JavaNonTerminalProgramElement implements Statement {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * Parent.
      */
 
-	private StatementContainer parent;
+    private StatementContainer parent;
 
     /**
      * Java statement.
@@ -36,9 +36,8 @@ public abstract class JavaStatement extends JavaNonTerminalProgramElement implem
 
     /**
      * Java statement.
-     * 
-     * @param proto
-     *            a java statement.
+     *
+     * @param proto a java statement.
      */
 
     protected JavaStatement(JavaStatement proto) {
@@ -47,7 +46,7 @@ public abstract class JavaStatement extends JavaNonTerminalProgramElement implem
 
     /**
      * Get AST parent.
-     * 
+     *
      * @return the non terminal program element.
      */
 
@@ -57,7 +56,7 @@ public abstract class JavaStatement extends JavaNonTerminalProgramElement implem
 
     /**
      * Get statement container.
-     * 
+     *
      * @return the statement container.
      */
 
@@ -67,9 +66,8 @@ public abstract class JavaStatement extends JavaNonTerminalProgramElement implem
 
     /**
      * Set statement container.
-     * 
-     * @param c
-     *            a statement container.
+     *
+     * @param c a statement container.
      */
 
     public void setStatementContainer(StatementContainer c) {

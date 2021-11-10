@@ -4,8 +4,6 @@
  */
 package recoder.java.statement;
 
-import java.util.List;
-
 import recoder.java.LoopInitializer;
 import recoder.java.SourceVisitor;
 import recoder.java.Statement;
@@ -14,20 +12,22 @@ import recoder.java.declaration.LocalVariableDeclaration;
 import recoder.java.declaration.VariableSpecification;
 import recoder.util.Debug;
 
+import java.util.List;
+
 /**
  * @author gutzmann
- *
+ * <p>
  * This file is part of the RECODER library and protected by the LGPL.
  */
 public class EnhancedFor extends LoopStatement implements VariableScope {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -4531341585909005502L;
+     * serialization id
+     */
+    private static final long serialVersionUID = -4531341585909005502L;
 
-	/**
-     * 
+    /**
+     *
      */
     public EnhancedFor() {
         super();
@@ -40,8 +40,8 @@ public class EnhancedFor extends LoopStatement implements VariableScope {
         super(body);
         makeParentRoleValid();
     }
-    
-    
+
+
     protected EnhancedFor(EnhancedFor proto) {
         super(proto);
         makeParentRoleValid();
@@ -77,7 +77,8 @@ public class EnhancedFor extends LoopStatement implements VariableScope {
     public VariableSpecification getVariableInScope(String name) {
         VariableSpecification var = getVariablesInScope().get(0);
         if (var.getName().equals(name)) return var;
-        /*else*/ return null;
+        /*else*/
+        return null;
     }
 
     /* (non-Javadoc)

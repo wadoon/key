@@ -7,30 +7,29 @@ import recoder.java.declaration.Modifier;
 
 /**
  * Strict fp.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class StrictFp extends Modifier {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 6903473464189070008L;
+     * serialization id
+     */
+    private static final long serialVersionUID = 6903473464189070008L;
 
-	/**
+    /**
      * Strict fp.
      */
 
     public StrictFp() {
-    	// nothing to do
+        // nothing to do
     }
 
     /**
      * Strict fp.
-     * 
-     * @param proto
-     *            a strict fp.
+     *
+     * @param proto a strict fp.
      */
 
     protected StrictFp(StrictFp proto) {
@@ -39,7 +38,7 @@ public class StrictFp extends Modifier {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 

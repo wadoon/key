@@ -6,30 +6,29 @@ import recoder.java.SourceVisitor;
 
 /**
  * Private.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class Private extends VisibilityModifier {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -7858559458205603231L;
+     * serialization id
+     */
+    private static final long serialVersionUID = -7858559458205603231L;
 
-	/**
+    /**
      * Private.
      */
 
     public Private() {
-    	// nothing to do
+        // nothing to do
     }
 
     /**
      * Private.
-     * 
-     * @param proto
-     *            a private.
+     *
+     * @param proto a private.
      */
 
     protected Private(Private proto) {
@@ -38,7 +37,7 @@ public class Private extends VisibilityModifier {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 

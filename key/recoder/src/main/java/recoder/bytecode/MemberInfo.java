@@ -2,17 +2,17 @@
 
 package recoder.bytecode;
 
-import java.util.List;
-
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Member;
+
+import java.util.List;
 
 public abstract class MemberInfo extends ByteCodeElement implements Member {
 
     protected ClassFile parent;
 
     List<AnnotationUseInfo> annotations;
-    
+
     boolean isTypeVariable;
 
     public MemberInfo(int accessFlags, String name, ClassFile parent, boolean isTypeVariable) {
@@ -20,32 +20,32 @@ public abstract class MemberInfo extends ByteCodeElement implements Member {
         setParent(parent);
         this.isTypeVariable = isTypeVariable;
     }
-    
-    public boolean isTypeVariable() {
-    	return isTypeVariable;
-    }
-    
-    void setAnnotations(List<AnnotationUseInfo> annotations) {
-        this.annotations = annotations;
-    }
 
-    public void setParent(ClassFile parent) {
-        this.parent = parent;
+    public boolean isTypeVariable() {
+        return isTypeVariable;
     }
 
     public ClassFile getParent() {
         return parent;
     }
 
+    public void setParent(ClassFile parent) {
+        this.parent = parent;
+    }
+
     public ClassType getContainingClassType() {
         return service.getContainingClassType(this);
     }
-    
+
     /**
      * @return a list of annotations
      */
     public List<AnnotationUseInfo> getAnnotations() {
         return annotations;
+    }
+
+    void setAnnotations(List<AnnotationUseInfo> annotations) {
+        this.annotations = annotations;
     }
 }
 

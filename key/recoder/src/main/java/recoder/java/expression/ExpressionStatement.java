@@ -15,5 +15,5 @@ import recoder.java.LoopInitializer;
  */
 
 public interface ExpressionStatement extends Expression, LoopInitializer {
-	ExpressionStatement deepClone();
+    ExpressionStatement deepClone();
 }

@@ -6,14 +6,7 @@
 package recoder.java.declaration;
 
 import recoder.abstraction.AnnotationUse;
-import recoder.java.Declaration;
-import recoder.java.Expression;
-import recoder.java.ExpressionContainer;
-import recoder.java.JavaNonTerminalProgramElement;
-import recoder.java.NonTerminalProgramElement;
-import recoder.java.PackageSpecification;
-import recoder.java.ProgramElement;
-import recoder.java.SourceVisitor;
+import recoder.java.*;
 import recoder.java.reference.TypeReference;
 import recoder.java.reference.TypeReferenceContainer;
 import recoder.list.generic.ASTList;
@@ -21,33 +14,32 @@ import recoder.list.generic.ASTList;
 /**
  * Use of an annotation, usually within a declaration. However, it may occur
  * as part as an ElementValuePair, so the interface Expression is implemented as well.
- * 
- * @author gutzmann
  *
+ * @author gutzmann
  */
 public class AnnotationUseSpecification extends JavaNonTerminalProgramElement implements AnnotationUse, DeclarationSpecifier, TypeReferenceContainer, Expression {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 6354411799881814722L;
+     * serialization id
+     */
+    private static final long serialVersionUID = 6354411799881814722L;
 
-	/**
+    /**
      * Parent. Either an expression container, a declaration, or a PackageSpecification
      */
-	private NonTerminalProgramElement parent;
-    
-	private TypeReference reference;
-    
-	private ASTList<AnnotationElementValuePair> elementValuePairs;
-    
+    private NonTerminalProgramElement parent;
+
+    private TypeReference reference;
+
+    private ASTList<AnnotationElementValuePair> elementValuePairs;
+
     /**
-     * 
+     *
      */
     public AnnotationUseSpecification() {
         super();
     }
-    
+
     public AnnotationUseSpecification(TypeReference reference) {
         this.reference = reference;
         makeParentRoleValid();
@@ -59,9 +51,9 @@ public class AnnotationUseSpecification extends JavaNonTerminalProgramElement im
     protected AnnotationUseSpecification(AnnotationUseSpecification proto) {
         super(proto);
         if (proto.reference != null)
-        	this.reference = proto.reference.deepClone();
+            this.reference = proto.reference.deepClone();
         if (proto.elementValuePairs != null)
-        	this.elementValuePairs = proto.elementValuePairs.deepClone();
+            this.elementValuePairs = proto.elementValuePairs.deepClone();
         makeParentRoleValid();
     }
 
@@ -136,10 +128,10 @@ public class AnnotationUseSpecification extends JavaNonTerminalProgramElement im
             throw new NullPointerException();
         }
         if (p == reference) {
-            TypeReference tr = (TypeReference)q; 
+            TypeReference tr = (TypeReference) q;
             reference = tr;
             if (tr != null)
-            	tr.setParent(this);
+                tr.setParent(this);
             return true;
         }
         for (int i = 0; i < elementValuePairs.size(); i++) {
@@ -151,15 +143,15 @@ public class AnnotationUseSpecification extends JavaNonTerminalProgramElement im
                     AnnotationElementValuePair r = (AnnotationElementValuePair) q;
                     elementValuePairs.set(i, r);
                     r.setParent(this);
-                }            
+                }
             }
         }
         return false;
     }
-    
+
     /**
      * Get AST parent.
-     * 
+     *
      * @return the non terminal program element.
      */
 
@@ -169,33 +161,32 @@ public class AnnotationUseSpecification extends JavaNonTerminalProgramElement im
 
     /**
      * Get parent iff it is a declaration.
-     * 
+     *
      * @return the declaration.
      */
 
     public Declaration getParentDeclaration() {
-        return parent instanceof Declaration ? (Declaration)parent : null;
+        return parent instanceof Declaration ? (Declaration) parent : null;
     }
 
     /**
      * Set parent.
-     * 
-     * @param parent
-     *            a declaration.
+     *
+     * @param parent a declaration.
      */
 
     public void setParent(Declaration parent) {
         this.parent = parent;
     }
-    
+
     public void setParent(PackageSpecification parent) {
-    	this.parent = parent;
+        this.parent = parent;
     }
-    
+
     public TypeReference getTypeReference() {
         return reference;
     }
-    
+
     public void setTypeReference(TypeReference tr) {
         this.reference = tr;
     }
@@ -215,20 +206,20 @@ public class AnnotationUseSpecification extends JavaNonTerminalProgramElement im
             return reference;
         throw new ArrayIndexOutOfBoundsException(index);
     }
-    
-    public void setElementValuePairs(ASTList<AnnotationElementValuePair> elementValuePairs) {
-        this.elementValuePairs = elementValuePairs;
-    }
-    
+
     public ASTList<AnnotationElementValuePair> getElementValuePairs() {
         return elementValuePairs;
+    }
+
+    public void setElementValuePairs(ASTList<AnnotationElementValuePair> elementValuePairs) {
+        this.elementValuePairs = elementValuePairs;
     }
 
     /* (non-Javadoc)
      * @see recoder.java.Expression#getExpressionContainer()
      */
     public ExpressionContainer getExpressionContainer() {
-        return parent instanceof ExpressionContainer ? (ExpressionContainer)parent : null; 
+        return parent instanceof ExpressionContainer ? (ExpressionContainer) parent : null;
     }
 
     /* (non-Javadoc)

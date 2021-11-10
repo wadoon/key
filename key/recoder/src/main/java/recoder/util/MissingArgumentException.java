@@ -8,11 +8,11 @@ package recoder.util;
 public class MissingArgumentException extends OptionException {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -202835350467537194L;
+     * serialization id
+     */
+    private static final long serialVersionUID = -202835350467537194L;
 
-	public MissingArgumentException(String opt) {
+    public MissingArgumentException(String opt) {
         super(opt);
     }
 

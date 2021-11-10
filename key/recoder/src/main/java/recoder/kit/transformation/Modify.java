@@ -2,8 +2,6 @@
 
 package recoder.kit.transformation;
 
-import java.util.List;
-
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.bytecode.AccessFlags;
 import recoder.java.Declaration;
@@ -17,6 +15,8 @@ import recoder.kit.ModifierKit;
 import recoder.kit.ProblemReport;
 import recoder.kit.TwoPassTransformation;
 
+import java.util.List;
+
 /**
  * Syntactic transformation that modifies a declaration by adding/removing
  * single modifiers. This transformation replaces an existing visibility
@@ -26,16 +26,16 @@ import recoder.kit.TwoPassTransformation;
  * obeys the standard JavaDOC modifier order convention: Visibility modifiers go
  * first, then abstract or static and then final. All others are simply
  * appended.
- * 
+ *
  * @author AL
  */
 public class Modify extends TwoPassTransformation {
 
-    private boolean isVisible;
+    private final boolean isVisible;
 
-    private int modifier;
+    private final int modifier;
 
-    private Declaration decl;
+    private final Declaration decl;
 
     private int insertPosition = -1;
 
@@ -45,17 +45,13 @@ public class Modify extends TwoPassTransformation {
 
     /**
      * Creates a new transformation object that modifies a declaration.
-     * 
-     * @param sc
-     *            the service configuration to use.
-     * @param isVisible
-     *            flag indicating if this transformation shall be visible.
-     * @param decl
-     *            the declaration to modify. may not be <CODE>null</CODE> and
-     *            must denote a valid identifier name.
-     * @param code
-     *            the modifier to create, using the codes from
-     *            {@link recoder.kit.ModifierKit}.
+     *
+     * @param sc        the service configuration to use.
+     * @param isVisible flag indicating if this transformation shall be visible.
+     * @param decl      the declaration to modify. may not be <CODE>null</CODE> and
+     *                  must denote a valid identifier name.
+     * @param code      the modifier to create, using the codes from
+     *                  {@link recoder.kit.ModifierKit}.
      */
     public Modify(CrossReferenceServiceConfiguration sc, boolean isVisible, Declaration decl, int code) {
         super(sc);
@@ -67,20 +63,8 @@ public class Modify extends TwoPassTransformation {
         this.modifier = code;
     }
 
-    public boolean isVisible() {
-        return isVisible;
-    }
-
-    private int getLastModifierPosition() {
-    	List<DeclarationSpecifier> mods = decl.getDeclarationSpecifiers();
-        if (mods == null) {
-            return 0;
-        }
-        return mods.size();
-    }
-
     private static boolean containsModifier(Declaration decl, Class<? extends Modifier> mod) {
-    	List<DeclarationSpecifier> mods = decl.getDeclarationSpecifiers();
+        List<DeclarationSpecifier> mods = decl.getDeclarationSpecifiers();
         if (mods == null) {
             return false;
         }
@@ -93,10 +77,22 @@ public class Modify extends TwoPassTransformation {
         return false;
     }
 
+    public boolean isVisible() {
+        return isVisible;
+    }
+
+    private int getLastModifierPosition() {
+        List<DeclarationSpecifier> mods = decl.getDeclarationSpecifiers();
+        if (mods == null) {
+            return 0;
+        }
+        return mods.size();
+    }
+
     /**
      * Finds out which modifier to remove and which to add, if any. This
      * transformation is syntactic.
-     * 
+     *
      * @return the problem report.
      * @deprecated Does not check vadility of modification.
      */
@@ -107,82 +103,81 @@ public class Modify extends TwoPassTransformation {
             return setProblemReport(IDENTITY);
         }
         switch (modifier) {
-        case ModifierKit.PACKAGE:
-            remove = ModifierKit.getVisibilityModifier(decl);
-            break;
-        case AccessFlags.PUBLIC:
-            remove = ModifierKit.getVisibilityModifier(decl);
-            if (remove instanceof Public) {
+            case ModifierKit.PACKAGE:
+                remove = ModifierKit.getVisibilityModifier(decl);
                 break;
-            }
-            insert = getProgramFactory().createPublic();
-            break;
-        case AccessFlags.PROTECTED:
-            remove = ModifierKit.getVisibilityModifier(decl);
-            if (remove instanceof Protected) {
+            case AccessFlags.PUBLIC:
+                remove = ModifierKit.getVisibilityModifier(decl);
+                if (remove instanceof Public) {
+                    break;
+                }
+                insert = getProgramFactory().createPublic();
                 break;
-            }
-            insert = getProgramFactory().createProtected();
-            break;
-        case AccessFlags.PRIVATE:
-            remove = ModifierKit.getVisibilityModifier(decl);
-            if (remove instanceof Private) {
+            case AccessFlags.PROTECTED:
+                remove = ModifierKit.getVisibilityModifier(decl);
+                if (remove instanceof Protected) {
+                    break;
+                }
+                insert = getProgramFactory().createProtected();
                 break;
-            }
-            insert = getProgramFactory().createPrivate();
-            break;
-        case AccessFlags.STATIC:
-            if (ModifierKit.getVisibilityModifier(decl) != null) {
-                insertPosition += 1;
-            }
-            insert = getProgramFactory().createStatic();
-            break;
-        case AccessFlags.FINAL:
-            if (ModifierKit.getVisibilityModifier(decl) != null) {
-                insertPosition += 1;
-            }
-            if (containsModifier(decl, Static.class)) {
-                insertPosition += 1;
-            }
-            insert = getProgramFactory().createFinal();
-            break;
-        case AccessFlags.ABSTRACT:
-            if (ModifierKit.getVisibilityModifier(decl) != null) {
-                insertPosition += 1;
-            }
-            insert = getProgramFactory().createAbstract();
-            break;
-        case AccessFlags.SYNCHRONIZED:
-            insertPosition = getLastModifierPosition();
-            insert = getProgramFactory().createSynchronized();
-            break;
-        case AccessFlags.TRANSIENT:
-            insertPosition = getLastModifierPosition();
-            insert = getProgramFactory().createTransient();
-            break;
-        case AccessFlags.STRICT:
-            insertPosition = getLastModifierPosition();
-            insert = getProgramFactory().createStrictFp();
-            break;
-        case AccessFlags.VOLATILE:
-            insertPosition = getLastModifierPosition();
-            insert = getProgramFactory().createVolatile();
-            break;
-        case AccessFlags.NATIVE:
-            insertPosition = getLastModifierPosition();
-            insert = getProgramFactory().createNative();
-            break;
-        default:
-            throw new IllegalArgumentException("Unsupported modifier code " + modifier);
+            case AccessFlags.PRIVATE:
+                remove = ModifierKit.getVisibilityModifier(decl);
+                if (remove instanceof Private) {
+                    break;
+                }
+                insert = getProgramFactory().createPrivate();
+                break;
+            case AccessFlags.STATIC:
+                if (ModifierKit.getVisibilityModifier(decl) != null) {
+                    insertPosition += 1;
+                }
+                insert = getProgramFactory().createStatic();
+                break;
+            case AccessFlags.FINAL:
+                if (ModifierKit.getVisibilityModifier(decl) != null) {
+                    insertPosition += 1;
+                }
+                if (containsModifier(decl, Static.class)) {
+                    insertPosition += 1;
+                }
+                insert = getProgramFactory().createFinal();
+                break;
+            case AccessFlags.ABSTRACT:
+                if (ModifierKit.getVisibilityModifier(decl) != null) {
+                    insertPosition += 1;
+                }
+                insert = getProgramFactory().createAbstract();
+                break;
+            case AccessFlags.SYNCHRONIZED:
+                insertPosition = getLastModifierPosition();
+                insert = getProgramFactory().createSynchronized();
+                break;
+            case AccessFlags.TRANSIENT:
+                insertPosition = getLastModifierPosition();
+                insert = getProgramFactory().createTransient();
+                break;
+            case AccessFlags.STRICT:
+                insertPosition = getLastModifierPosition();
+                insert = getProgramFactory().createStrictFp();
+                break;
+            case AccessFlags.VOLATILE:
+                insertPosition = getLastModifierPosition();
+                insert = getProgramFactory().createVolatile();
+                break;
+            case AccessFlags.NATIVE:
+                insertPosition = getLastModifierPosition();
+                insert = getProgramFactory().createNative();
+                break;
+            default:
+                throw new IllegalArgumentException("Unsupported modifier code " + modifier);
         }
         return setProblemReport(NO_PROBLEM);
     }
 
     /**
      * Attaches or detaches modifiers when necessary.
-     * 
-     * @exception IllegalStateException
-     *                if the analyzation has not been called.
+     *
+     * @throws IllegalStateException if the analyzation has not been called.
      * @see #analyze()
      */
     public void transform() {
@@ -197,7 +192,7 @@ public class Modify extends TwoPassTransformation {
 
     /**
      * Returns the modifier that is detached, or is to be detached.
-     * 
+     *
      * @return the modifier that is / will be detached.
      */
     public Modifier getDetached() {
@@ -206,7 +201,7 @@ public class Modify extends TwoPassTransformation {
 
     /**
      * Returns the modifier that is attached, or is to be attached.
-     * 
+     *
      * @return the modifier that is / will be attached.
      */
     public Modifier getAttached() {

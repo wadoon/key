@@ -4,34 +4,33 @@ package recoder.java;
 
 /**
  * A comment, possibly with multiple lines.
- * 
+ *
  * @author AL
  */
 
 public class Comment extends JavaSourceElement {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 5919865992017191460L;
+     * serialization id
+     */
+    private static final long serialVersionUID = 5919865992017191460L;
 
-	/**
+    /**
      * The text string.
      */
 
-	private String text;
+    private String text;
 
     /**
      * Mark if the comment stands before its associated element.
      */
 
-	private boolean prefixed;
+    private boolean prefixed;
 
     /**
      * Mark if the comment is the comment to a container; parser uses this only
      * for empty containers (i.e. StatementBlock, ArrayInitializer,
      * ClassDeclaration)
-     *  
      */
     private boolean isContainerComment;
 
@@ -53,9 +52,8 @@ public class Comment extends JavaSourceElement {
     /**
      * Create a new comment with the given content. No extra comment markers are
      * created.
-     * 
-     * @param text
-     *            the text of the comment.
+     *
+     * @param text the text of the comment.
      */
 
     public Comment(String text) {
@@ -65,9 +63,8 @@ public class Comment extends JavaSourceElement {
     /**
      * Create a new comment with the given content. No extra comment markers are
      * created.
-     * 
-     * @param text
-     *            the text of the comment.
+     *
+     * @param text the text of the comment.
      */
 
     public Comment(String text, boolean prefixed) {
@@ -77,20 +74,19 @@ public class Comment extends JavaSourceElement {
 
     /**
      * Comment.
-     * 
-     * @param proto
-     *            a comment.
+     *
+     * @param proto a comment.
      */
 
     protected Comment(Comment proto) {
         super(proto);
-        text = new String(proto.text);
+        text = proto.text;
         prefixed = proto.prefixed;
     }
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -101,7 +97,7 @@ public class Comment extends JavaSourceElement {
     /**
      * Check if this comment should be prefixed in front of the parent element,
      * or if it should follow it.
-     * 
+     *
      * @return the boolean value.
      */
 
@@ -109,16 +105,11 @@ public class Comment extends JavaSourceElement {
         return prefixed;
     }
 
-    public boolean isContainerComment() {
-        return isContainerComment;
-    }
-
     /**
      * Define if this comment should be prefixed in front of the parent element,
      * or if it should follow it. Implicitly sets isContainerComment to false.
-     * 
-     * @param prefixed
-     *            the boolean value.
+     *
+     * @param prefixed the boolean value.
      */
 
     public void setPrefixed(boolean prefixed) {
@@ -126,10 +117,14 @@ public class Comment extends JavaSourceElement {
         this.isContainerComment = false;
     }
 
+    public boolean isContainerComment() {
+        return isContainerComment;
+    }
+
     /**
      * Define if this comment should be a container comment. Implicitly sets
      * isPrefixed to false.
-     * 
+     *
      * @param isContainerComment
      */
     public void setContainerComment(boolean isContainerComment) {
@@ -138,19 +133,8 @@ public class Comment extends JavaSourceElement {
     }
 
     /**
-     * Set parent of the comment.
-     * 
-     * @param p
-     *            a program element.
-     */
-
-    public void setParent(ProgramElement p) {
-        parent = p;
-    }
-
-    /**
      * Get parent of the comment.
-     * 
+     *
      * @return the parent element.
      */
 
@@ -159,8 +143,18 @@ public class Comment extends JavaSourceElement {
     }
 
     /**
+     * Set parent of the comment.
+     *
+     * @param p a program element.
+     */
+
+    public void setParent(ProgramElement p) {
+        parent = p;
+    }
+
+    /**
      * Get the comment text.
-     * 
+     *
      * @return the string with the complete content.
      */
 
@@ -171,9 +165,8 @@ public class Comment extends JavaSourceElement {
     /**
      * Set text, including all markers. The text must contain all necessary
      * leading and closing tokens.
-     * 
-     * @param text
-     *            a string.
+     *
+     * @param text a string.
      */
 
     public void setText(String text) {
@@ -183,13 +176,13 @@ public class Comment extends JavaSourceElement {
     public void accept(SourceVisitor v) {
         v.visitComment(this);
     }
-    
+
     @Override
     public String toString() {
-    	int min = Math.min(text.length(), text.indexOf('\n'));
-    	if (min > 10) min = 10;
-    	if (min == -1) min = text.length();
-    	return "<Comment> " + text.substring(0, min);
+        int min = Math.min(text.length(), text.indexOf('\n'));
+        if (min > 10) min = 10;
+        if (min == -1) min = text.length();
+        return "<Comment> " + text.substring(0, min);
     }
 
 }

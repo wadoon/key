@@ -10,9 +10,9 @@ import recoder.java.ProgramElement;
 
 /**
  * @author gutzmann
- *
  */
 public interface DeclarationSpecifier extends ProgramElement {
-    public void setParent(Declaration parent);
-    public Declaration getParentDeclaration();
+    void setParent(Declaration parent);
+
+    Declaration getParentDeclaration();
 }

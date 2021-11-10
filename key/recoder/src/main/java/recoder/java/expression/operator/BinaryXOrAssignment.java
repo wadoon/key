@@ -8,18 +8,18 @@ import recoder.java.expression.Assignment;
 
 /**
  * Binary X or assignment.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class BinaryXOrAssignment extends Assignment {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 2881071324012163593L;
+     * serialization id
+     */
+    private static final long serialVersionUID = 2881071324012163593L;
 
-	/**
+    /**
      * Binary X or assignment.
      */
 
@@ -29,11 +29,9 @@ public class BinaryXOrAssignment extends Assignment {
 
     /**
      * Binary X or assignment.
-     * 
-     * @param lhs
-     *            an expression.
-     * @param rhs
-     *            an expression.
+     *
+     * @param lhs an expression.
+     * @param rhs an expression.
      */
 
     public BinaryXOrAssignment(Expression lhs, Expression rhs) {
@@ -43,9 +41,8 @@ public class BinaryXOrAssignment extends Assignment {
 
     /**
      * Binary X or assignment.
-     * 
-     * @param proto
-     *            a binary X or assignment.
+     *
+     * @param proto a binary X or assignment.
      */
 
     protected BinaryXOrAssignment(BinaryXOrAssignment proto) {
@@ -55,7 +52,7 @@ public class BinaryXOrAssignment extends Assignment {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -65,7 +62,7 @@ public class BinaryXOrAssignment extends Assignment {
 
     /**
      * Get arity.
-     * 
+     *
      * @return the int value.
      */
 
@@ -75,7 +72,7 @@ public class BinaryXOrAssignment extends Assignment {
 
     /**
      * Get precedence.
-     * 
+     *
      * @return the int value.
      */
 
@@ -85,7 +82,7 @@ public class BinaryXOrAssignment extends Assignment {
 
     /**
      * Get notation.
-     * 
+     *
      * @return the int value.
      */
 

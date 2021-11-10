@@ -8,10 +8,10 @@ package recoder.kit;
  * about the missing parts.
  */
 public abstract class MissingSources extends Problem {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+
 }
 

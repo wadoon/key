@@ -4,7 +4,7 @@ package recoder.java;
 
 /**
  * Loop initializer.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 

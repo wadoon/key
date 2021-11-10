@@ -3,43 +3,39 @@
 package recoder.java.statement;
 
 import recoder.ModelException;
-import recoder.java.Expression;
-import recoder.java.ExpressionContainer;
-import recoder.java.ProgramElement;
-import recoder.java.SourceElement;
-import recoder.java.SourceVisitor;
+import recoder.java.*;
 import recoder.service.SyntaxException;
 
 /**
  * If.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class If extends BranchStatement implements ExpressionContainer {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -6352480723638689470L;
+     * serialization id
+     */
+    private static final long serialVersionUID = -6352480723638689470L;
 
-	/**
+    /**
      * Then branch.
      */
 
-	private Then thenBranch;
+    private Then thenBranch;
 
     /**
      * Else branch.
      */
 
-	private Else elseBranch;
+    private Else elseBranch;
 
     /**
      * Expression.
      */
 
-	private Expression expression;
+    private Expression expression;
 
     /**
      * If.
@@ -51,11 +47,9 @@ public class If extends BranchStatement implements ExpressionContainer {
 
     /**
      * If.
-     * 
-     * @param e
-     *            an expression.
-     * @param thenBranch
-     *            a then.
+     *
+     * @param e          an expression.
+     * @param thenBranch a then.
      */
 
     public If(Expression e, Then thenBranch) {
@@ -64,13 +58,10 @@ public class If extends BranchStatement implements ExpressionContainer {
 
     /**
      * If.
-     * 
-     * @param e
-     *            an expression.
-     * @param thenBranch
-     *            a then.
-     * @param elseBranch
-     *            an else.
+     *
+     * @param e          an expression.
+     * @param thenBranch a then.
+     * @param elseBranch an else.
      */
 
     public If(Expression e, Then thenBranch, Else elseBranch) {
@@ -85,9 +76,8 @@ public class If extends BranchStatement implements ExpressionContainer {
 
     /**
      * If.
-     * 
-     * @param proto
-     *            an if.
+     *
+     * @param proto an if.
      */
 
     protected If(If proto) {
@@ -106,7 +96,7 @@ public class If extends BranchStatement implements ExpressionContainer {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -120,7 +110,7 @@ public class If extends BranchStatement implements ExpressionContainer {
 
     /**
      * Returns the number of children of this node.
-     * 
+     *
      * @return an int giving the number of children of this node
      */
 
@@ -138,12 +128,10 @@ public class If extends BranchStatement implements ExpressionContainer {
     /**
      * Returns the child at the specified index in this node's "virtual" child
      * array
-     * 
-     * @param index
-     *            an index into this node's "virtual" child array
+     *
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
@@ -202,14 +190,11 @@ public class If extends BranchStatement implements ExpressionContainer {
      * element can be null - in that case, the child is effectively removed. The
      * parent role of the new child is validated, while the parent link of the
      * replaced child is left untouched.
-     * 
-     * @param p
-     *            the old child.
-     * @param p
-     *            the new child.
+     *
+     * @param p the old child.
+     * @param p the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException
-     *                if the new child cannot take over the role of the old one.
+     * @throws ClassCastException if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
@@ -245,7 +230,7 @@ public class If extends BranchStatement implements ExpressionContainer {
 
     /**
      * Get the number of expressions in this container.
-     * 
+     *
      * @return the number of expressions.
      */
 
@@ -269,7 +254,7 @@ public class If extends BranchStatement implements ExpressionContainer {
 
     /**
      * Get expression.
-     * 
+     *
      * @return the expression.
      */
 
@@ -279,9 +264,8 @@ public class If extends BranchStatement implements ExpressionContainer {
 
     /**
      * Set expression.
-     * 
-     * @param expr
-     *            an expression.
+     *
+     * @param expr an expression.
      */
 
     public void setExpression(Expression expr) {
@@ -290,7 +274,7 @@ public class If extends BranchStatement implements ExpressionContainer {
 
     /**
      * Get then.
-     * 
+     *
      * @return the then.
      */
 
@@ -299,8 +283,18 @@ public class If extends BranchStatement implements ExpressionContainer {
     }
 
     /**
+     * Set then.
+     *
+     * @param thenBranch a then.
+     */
+
+    public void setThen(Then thenBranch) {
+        this.thenBranch = thenBranch;
+    }
+
+    /**
      * Get else.
-     * 
+     *
      * @return the else.
      */
 
@@ -309,21 +303,9 @@ public class If extends BranchStatement implements ExpressionContainer {
     }
 
     /**
-     * Set then.
-     * 
-     * @param thenBranch
-     *            a then.
-     */
-
-    public void setThen(Then thenBranch) {
-        this.thenBranch = thenBranch;
-    }
-
-    /**
      * Set else.
-     * 
-     * @param elseBranch
-     *            an else.
+     *
+     * @param elseBranch an else.
      */
 
     public void setElse(Else elseBranch) {
@@ -332,7 +314,7 @@ public class If extends BranchStatement implements ExpressionContainer {
 
     /**
      * Get the number of branches in this container.
-     * 
+     *
      * @return the number of branches.
      */
 
@@ -370,13 +352,13 @@ public class If extends BranchStatement implements ExpressionContainer {
     public void accept(SourceVisitor v) {
         v.visitIf(this);
     }
-    
+
     @Override
     public void validate() throws ModelException {
-    	super.validate();
-    	if (getExpression() == null)
-    		throw new SyntaxException(this, "No expression");
-    	if (getThen() == null)
-    		throw new SyntaxException(this, "No then-block");
+        super.validate();
+        if (getExpression() == null)
+            throw new SyntaxException(this, "No expression");
+        if (getThen() == null)
+            throw new SyntaxException(this, "No then-block");
     }
 }

@@ -13,28 +13,28 @@ import recoder.list.generic.ASTList;
 
 /**
  * Inheritance specification.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public abstract class InheritanceSpecification extends JavaNonTerminalProgramElement implements TypeReferenceContainer {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+     *
+     */
+    private static final long serialVersionUID = 1L;
 
-	/**
+    /**
      * Parent.
      */
 
-	private TypeDeclaration parent;
+    private TypeDeclaration parent;
 
     /**
      * Supertypes.
      */
 
-	private ASTList<TypeReference> supertypes;
+    private ASTList<TypeReference> supertypes;
 
     /**
      * Inheritance specification.
@@ -46,9 +46,8 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
 
     /**
      * Inheritance specification.
-     * 
-     * @param supertype
-     *            a type reference.
+     *
+     * @param supertype a type reference.
      */
 
     public InheritanceSpecification(TypeReference supertype) {
@@ -59,9 +58,8 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
 
     /**
      * Inheritance specification.
-     * 
-     * @param supertypes
-     *            a type reference mutable list.
+     *
+     * @param supertypes a type reference mutable list.
      */
 
     public InheritanceSpecification(ASTList<TypeReference> supertypes) {
@@ -71,9 +69,8 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
 
     /**
      * Inheritance specification.
-     * 
-     * @param proto
-     *            an inheritance specification.
+     *
+     * @param proto an inheritance specification.
      */
 
     protected InheritanceSpecification(InheritanceSpecification proto) {
@@ -86,7 +83,7 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
 
     /**
      * Get AST parent.
-     * 
+     *
      * @return the non terminal program element.
      */
 
@@ -115,7 +112,7 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
 
     /**
      * Returns the number of children of this node.
-     * 
+     *
      * @return an int giving the number of children of this node
      */
 
@@ -129,12 +126,10 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
     /**
      * Returns the child at the specified index in this node's "virtual" child
      * array
-     * 
-     * @param index
-     *            an index into this node's "virtual" child array
+     *
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
@@ -161,14 +156,11 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
      * element can be null - in that case, the child is effectively removed. The
      * parent role of the new child is validated, while the parent link of the
      * replaced child is left untouched.
-     * 
-     * @param p
-     *            the old child.
-     * @param p
-     *            the new child.
+     *
+     * @param p the old child.
+     * @param p the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException
-     *                if the new child cannot take over the role of the old one.
+     * @throws ClassCastException if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
@@ -194,7 +186,7 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
 
     /**
      * Get parent.
-     * 
+     *
      * @return the type declaration.
      */
 
@@ -204,9 +196,8 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
 
     /**
      * Set parent.
-     * 
-     * @param decl
-     *            a type declaration.
+     *
+     * @param decl a type declaration.
      */
 
     public void setParent(TypeDeclaration decl) {
@@ -215,7 +206,7 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
 
     /**
      * Get supertypes.
-     * 
+     *
      * @return the type reference mutable list.
      */
 
@@ -225,9 +216,8 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
 
     /**
      * Set supertypes.
-     * 
-     * @param list
-     *            a type reference mutable list.
+     *
+     * @param list a type reference mutable list.
      */
 
     public void setSupertypes(ASTList<TypeReference> list) {
@@ -236,7 +226,7 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
 
     /**
      * Get the number of type references in this container.
-     * 
+     *
      * @return the number of type references.
      */
 

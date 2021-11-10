@@ -2,16 +2,10 @@
 
 package recoder.service;
 
-import java.util.Stack;
-
 import recoder.AbstractService;
 import recoder.ModelException;
 import recoder.ServiceConfiguration;
-import recoder.abstraction.EnumConstant;
-import recoder.abstraction.Field;
-import recoder.abstraction.PrimitiveType;
-import recoder.abstraction.Type;
-import recoder.abstraction.Variable;
+import recoder.abstraction.*;
 import recoder.java.Expression;
 import recoder.java.JavaProgramFactory;
 import recoder.java.ProgramElement;
@@ -19,71 +13,677 @@ import recoder.java.expression.Assignment;
 import recoder.java.expression.Literal;
 import recoder.java.expression.Operator;
 import recoder.java.expression.ParenthesizedExpression;
-import recoder.java.expression.literal.BooleanLiteral;
-import recoder.java.expression.literal.CharLiteral;
-import recoder.java.expression.literal.DoubleLiteral;
-import recoder.java.expression.literal.FloatLiteral;
-import recoder.java.expression.literal.IntLiteral;
-import recoder.java.expression.literal.LongLiteral;
-import recoder.java.expression.literal.NullLiteral;
-import recoder.java.expression.literal.StringLiteral;
-import recoder.java.expression.operator.BinaryAnd;
-import recoder.java.expression.operator.BinaryNot;
-import recoder.java.expression.operator.BinaryOr;
-import recoder.java.expression.operator.BinaryXOr;
-import recoder.java.expression.operator.ComparativeOperator;
-import recoder.java.expression.operator.Divide;
-import recoder.java.expression.operator.Equals;
-import recoder.java.expression.operator.GreaterOrEquals;
-import recoder.java.expression.operator.GreaterThan;
-import recoder.java.expression.operator.LessOrEquals;
-import recoder.java.expression.operator.LessThan;
-import recoder.java.expression.operator.LogicalAnd;
-import recoder.java.expression.operator.LogicalNot;
-import recoder.java.expression.operator.LogicalOr;
-import recoder.java.expression.operator.Minus;
-import recoder.java.expression.operator.Modulo;
-import recoder.java.expression.operator.Negative;
-import recoder.java.expression.operator.NotEquals;
-import recoder.java.expression.operator.Plus;
-import recoder.java.expression.operator.Positive;
-import recoder.java.expression.operator.ShiftLeft;
-import recoder.java.expression.operator.ShiftRight;
-import recoder.java.expression.operator.Times;
-import recoder.java.expression.operator.TypeCast;
-import recoder.java.expression.operator.TypeOperator;
-import recoder.java.expression.operator.UnsignedShiftRight;
-import recoder.java.reference.FieldReference;
-import recoder.java.reference.PackageReference;
-import recoder.java.reference.ReferencePrefix;
-import recoder.java.reference.ReferenceSuffix;
-import recoder.java.reference.TypeReference;
-import recoder.java.reference.UncollatedReferenceQualifier;
-import recoder.java.reference.VariableReference;
+import recoder.java.expression.literal.*;
+import recoder.java.expression.operator.*;
+import recoder.java.reference.*;
+
+import java.util.Stack;
 
 /**
  * Easy constant folder to evaluate Java compile-time constants.
- * 
+ *
  * @author AL
  */
 public class DefaultConstantEvaluator extends AbstractService implements ConstantEvaluator {
 
+    final static BinaryNumericOperation PLUS = new BinaryNumericOperation() {
+        public boolean eval(boolean a, boolean b) {
+            fail();
+            return false;
+        }
+
+        public int eval(int a, int b) {
+            return a + b;
+        }
+
+        public long eval(long a, long b) {
+            return a + b;
+        }
+
+        public float eval(float a, float b) {
+            return a + b;
+        }
+
+        public double eval(double a, double b) {
+            return a + b;
+        }
+
+        public String eval(String a, String b) {
+            if (a == null) {
+                fail();
+                return null;
+            }
+            return a + b;
+        }
+    };
+    final static BinaryNumericOperation MINUS = new BinaryNumericOperation() {
+        public boolean eval(boolean a, boolean b) {
+            fail();
+            return false;
+        }
+
+        public int eval(int a, int b) {
+            return a - b;
+        }
+
+        public long eval(long a, long b) {
+            return a - b;
+        }
+
+        public float eval(float a, float b) {
+            return a - b;
+        }
+
+        public double eval(double a, double b) {
+            return a - b;
+        }
+
+        public String eval(String a, String b) {
+            fail();
+            return null;
+        }
+    };
+    final static BinaryNumericOperation DIVIDE = new BinaryNumericOperation() {
+        public boolean eval(boolean a, boolean b) {
+            fail();
+            return false;
+        }
+
+        public int eval(int a, int b) {
+            return a / b;
+        }
+
+        public long eval(long a, long b) {
+            return a / b;
+        }
+
+        public float eval(float a, float b) {
+            return a / b;
+        }
+
+        public double eval(double a, double b) {
+            return a / b;
+        }
+
+        public String eval(String a, String b) {
+            fail();
+            return null;
+        }
+        // should catch the div-by-zero exception and re-throw a more
+        // meaningful error message
+    };
+    final static BinaryNumericOperation MODULO = new BinaryNumericOperation() {
+        public boolean eval(boolean a, boolean b) {
+            fail();
+            return false;
+        }
+
+        public int eval(int a, int b) {
+            return a % b;
+        }
+
+        public long eval(long a, long b) {
+            return a % b;
+        }
+
+        public float eval(float a, float b) {
+            return a % b;
+        }
+
+        public double eval(double a, double b) {
+            return a % b;
+        }
+
+        public String eval(String a, String b) {
+            fail();
+            return null;
+        }
+        // should catch the div-by-zero exception and re-throw a more
+        // meaningful error message
+    };
+    final static BinaryNumericOperation TIMES = new BinaryNumericOperation() {
+        public boolean eval(boolean a, boolean b) {
+            fail();
+            return false;
+        }
+
+        public int eval(int a, int b) {
+            return a * b;
+        }
+
+        public long eval(long a, long b) {
+            return a * b;
+        }
+
+        public float eval(float a, float b) {
+            return a * b;
+        }
+
+        public double eval(double a, double b) {
+            return a * b;
+        }
+
+        public String eval(String a, String b) {
+            fail();
+            return null;
+        }
+    };
+    final static BinaryNumericOperation SHIFT_LEFT = new BinaryNumericOperation() {
+        public boolean eval(boolean a, boolean b) {
+            fail();
+            return false;
+        }
+
+        public int eval(int a, int b) {
+            return a << b;
+        }
+
+        public long eval(long a, long b) {
+            return a << b;
+        }
+
+        public float eval(float a, float b) {
+            fail();
+            return 0;
+        }
+
+        public double eval(double a, double b) {
+            fail();
+            return 0;
+        }
+
+        public String eval(String a, String b) {
+            fail();
+            return null;
+        }
+    };
+    final static BinaryNumericOperation SHIFT_RIGHT = new BinaryNumericOperation() {
+        public boolean eval(boolean a, boolean b) {
+            fail();
+            return false;
+        }
+
+        public int eval(int a, int b) {
+            return a >> b;
+        }
+
+        public long eval(long a, long b) {
+            return a >> b;
+        }
+
+        public float eval(float a, float b) {
+            fail();
+            return 0;
+        }
+
+        public double eval(double a, double b) {
+            fail();
+            return 0;
+        }
+
+        public String eval(String a, String b) {
+            fail();
+            return null;
+        }
+    };
+    final static BinaryNumericOperation UNSIGNED_SHIFT_RIGHT = new BinaryNumericOperation() {
+        public boolean eval(boolean a, boolean b) {
+            fail();
+            return false;
+        }
+
+        public int eval(int a, int b) {
+            return a >>> b;
+        }
+
+        public long eval(long a, long b) {
+            return a >>> b;
+        }
+
+        public float eval(float a, float b) {
+            fail();
+            return 0;
+        }
+
+        public double eval(double a, double b) {
+            fail();
+            return 0;
+        }
+
+        public String eval(String a, String b) {
+            fail();
+            return null;
+        }
+    };
+    final static BinaryNumericOperation BINARY_AND = new BinaryNumericOperation() {
+        public boolean eval(boolean a, boolean b) {
+            return a & b;
+        }
+
+        public int eval(int a, int b) {
+            return a & b;
+        }
+
+        public long eval(long a, long b) {
+            return a & b;
+        }
+
+        public float eval(float a, float b) {
+            fail();
+            return 0;
+        }
+
+        public double eval(double a, double b) {
+            fail();
+            return 0;
+        }
+
+        public String eval(String a, String b) {
+            fail();
+            return null;
+        }
+    };
+    final static BinaryNumericOperation BINARY_OR = new BinaryNumericOperation() {
+        public boolean eval(boolean a, boolean b) {
+            return a | b;
+        }
+
+        public int eval(int a, int b) {
+            return a | b;
+        }
+
+        public long eval(long a, long b) {
+            return a | b;
+        }
+
+        public float eval(float a, float b) {
+            fail();
+            return 0;
+        }
+
+        public double eval(double a, double b) {
+            fail();
+            return 0;
+        }
+
+        public String eval(String a, String b) {
+            fail();
+            return null;
+        }
+    };
+    final static BinaryNumericOperation BINARY_XOR = new BinaryNumericOperation() {
+        public boolean eval(boolean a, boolean b) {
+            return a ^ b;
+        }
+
+        public int eval(int a, int b) {
+            return a ^ b;
+        }
+
+        public long eval(long a, long b) {
+            return a ^ b;
+        }
+
+        public float eval(float a, float b) {
+            fail();
+            return 0;
+        }
+
+        public double eval(double a, double b) {
+            fail();
+            return 0;
+        }
+
+        public String eval(String a, String b) {
+            fail();
+            return null;
+        }
+    };
+    final static BinaryBooleanOperation EQUALS = new BinaryBooleanOperation() {
+        public boolean eval(boolean a, boolean b) {
+            return a == b;
+        }
+
+        public boolean eval(int a, int b) {
+            return a == b;
+        }
+
+        public boolean eval(long a, long b) {
+            return a == b;
+        }
+
+        public boolean eval(float a, float b) {
+            return a == b;
+        }
+
+        public boolean eval(double a, double b) {
+            return a == b;
+        }
+
+        public boolean eval(String a, String b) {
+            return a == b;
+        }
+        // the String equals relies on the internalization in EvaluationResult
+    };
+    final static BinaryBooleanOperation NOT_EQUALS = new BinaryBooleanOperation() {
+        public boolean eval(boolean a, boolean b) {
+            return a != b;
+        }
+
+        public boolean eval(int a, int b) {
+            return a != b;
+        }
+
+        public boolean eval(long a, long b) {
+            return a != b;
+        }
+
+        public boolean eval(float a, float b) {
+            return a != b;
+        }
+
+        public boolean eval(double a, double b) {
+            return a != b;
+        }
+
+        public boolean eval(String a, String b) {
+            return a != b;
+        }
+    };
+    final static BinaryBooleanOperation LESS_THAN = new BinaryBooleanOperation() {
+        public boolean eval(boolean a, boolean b) {
+            fail();
+            return false;
+        }
+
+        public boolean eval(int a, int b) {
+            return a < b;
+        }
+
+        public boolean eval(long a, long b) {
+            return a < b;
+        }
+
+        public boolean eval(float a, float b) {
+            return a < b;
+        }
+
+        public boolean eval(double a, double b) {
+            return a < b;
+        }
+
+        public boolean eval(String a, String b) {
+            fail();
+            return false;
+        }
+    };
+    final static BinaryBooleanOperation GREATER_THAN = new BinaryBooleanOperation() {
+        public boolean eval(boolean a, boolean b) {
+            fail();
+            return false;
+        }
+
+        public boolean eval(int a, int b) {
+            return a > b;
+        }
+
+        public boolean eval(long a, long b) {
+            return a > b;
+        }
+
+        public boolean eval(float a, float b) {
+            return a > b;
+        }
+
+        public boolean eval(double a, double b) {
+            return a > b;
+        }
+
+        public boolean eval(String a, String b) {
+            fail();
+            return false;
+        }
+    };
+    final static BinaryBooleanOperation LESS_OR_EQUALS = new BinaryBooleanOperation() {
+        public boolean eval(boolean a, boolean b) {
+            fail();
+            return false;
+        }
+
+        public boolean eval(int a, int b) {
+            return a <= b;
+        }
+
+        public boolean eval(long a, long b) {
+            return a <= b;
+        }
+
+        public boolean eval(float a, float b) {
+            return a <= b;
+        }
+
+        public boolean eval(double a, double b) {
+            return a <= b;
+        }
+
+        public boolean eval(String a, String b) {
+            fail();
+            return false;
+        }
+    };
+    final static BinaryBooleanOperation GREATER_OR_EQUALS = new BinaryBooleanOperation() {
+        public boolean eval(boolean a, boolean b) {
+            fail();
+            return false;
+        }
+
+        public boolean eval(int a, int b) {
+            return a >= b;
+        }
+
+        public boolean eval(long a, long b) {
+            return a >= b;
+        }
+
+        public boolean eval(float a, float b) {
+            return a >= b;
+        }
+
+        public boolean eval(double a, double b) {
+            return a >= b;
+        }
+
+        public boolean eval(String a, String b) {
+            fail();
+            return false;
+        }
+    };
+    final static BinaryBooleanOperation LOGICAL_AND = new BinaryBooleanOperation() {
+        public boolean eval(boolean a, boolean b) {
+            return a && b;
+        }
+
+        public boolean eval(int a, int b) {
+            fail();
+            return false;
+        }
+
+        public boolean eval(long a, long b) {
+            fail();
+            return false;
+        }
+
+        public boolean eval(float a, float b) {
+            fail();
+            return false;
+        }
+
+        public boolean eval(double a, double b) {
+            fail();
+            return false;
+        }
+
+        public boolean eval(String a, String b) {
+            fail();
+            return false;
+        }
+    };
+    final static BinaryBooleanOperation LOGICAL_OR = new BinaryBooleanOperation() {
+        public boolean eval(boolean a, boolean b) {
+            return a || b;
+        }
+
+        public boolean eval(int a, int b) {
+            fail();
+            return false;
+        }
+
+        public boolean eval(long a, long b) {
+            fail();
+            return false;
+        }
+
+        public boolean eval(float a, float b) {
+            fail();
+            return false;
+        }
+
+        public boolean eval(double a, double b) {
+            fail();
+            return false;
+        }
+
+        public boolean eval(String a, String b) {
+            fail();
+            return false;
+        }
+    };
+    final static UnaryBooleanOperation LOGICAL_NOT = new UnaryBooleanOperation() {
+        public boolean eval(boolean a) {
+            return !a;
+        }
+
+        public boolean eval(int a) {
+            fail();
+            return false;
+        }
+
+        public boolean eval(long a) {
+            fail();
+            return false;
+        }
+
+        public boolean eval(float a) {
+            fail();
+            return false;
+        }
+
+        public boolean eval(double a) {
+            fail();
+            return false;
+        }
+
+        public boolean eval(String a) {
+            fail();
+            return false;
+        }
+    };
+    final static UnaryNumericOperation POSITIVE = new UnaryNumericOperation() {
+        public boolean eval(boolean a) {
+            fail();
+            return false;
+        }
+
+        public int eval(int a) {
+            return +a;
+        }
+
+        public long eval(long a) {
+            return +a;
+        }
+
+        public float eval(float a) {
+            return +a;
+        }
+
+        public double eval(double a) {
+            return +a;
+        }
+
+        public String eval(String a) {
+            fail();
+            return null;
+        }
+    };
+    final static UnaryNumericOperation NEGATIVE = new UnaryNumericOperation() {
+        public boolean eval(boolean a) {
+            fail();
+            return false;
+        }
+
+        public int eval(int a) {
+            return -a;
+        }
+
+        public long eval(long a) {
+            return -a;
+        }
+
+        public float eval(float a) {
+            return -a;
+        }
+
+        public double eval(double a) {
+            return -a;
+        }
+
+        public String eval(String a) {
+            fail();
+            return null;
+        }
+    };
+    final static UnaryNumericOperation BINARY_NOT = new UnaryNumericOperation() {
+        public boolean eval(boolean a) {
+            fail();
+            return false;
+        }
+
+        public int eval(int a) {
+            return ~a;
+        }
+
+        public long eval(long a) {
+            return ~a;
+        }
+
+        public float eval(float a) {
+            fail();
+            return 0;
+        }
+
+        public double eval(double a) {
+            fail();
+            return 0;
+        }
+
+        public String eval(String a) {
+            fail();
+            return null;
+        }
+    };
+    /*
+     * Stack holding all variable references that have already been followed.
+     * This is used to detect cycles
+     */
+    private final Stack<Expression> visitedVariableReferences = new Stack<Expression>();
+
     /**
      * Create a new constant evaluator.
-     * 
-     * @param config
-     *            the configuration this services becomes part of.
+     *
+     * @param config the configuration this services becomes part of.
      */
     public DefaultConstantEvaluator(ServiceConfiguration config) {
         super(config);
-    }
-
-    NameInfo getNameInfo() {
-        return serviceConfiguration.getNameInfo();
-    }
-
-    SourceInfo getSourceInfo() {
-        return serviceConfiguration.getSourceInfo();
     }
 
     /**
@@ -111,24 +711,24 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
 
     static PrimitiveType translateType(int t, NameInfo ni) {
         switch (t) {
-        case INT_TYPE:
-            return ni.getIntType();
-        case BOOLEAN_TYPE:
-            return ni.getBooleanType();
-        case LONG_TYPE:
-            return ni.getLongType();
-        case FLOAT_TYPE:
-            return ni.getFloatType();
-        case DOUBLE_TYPE:
-            return ni.getDoubleType();
-        case BYTE_TYPE:
-            return ni.getByteType();
-        case CHAR_TYPE:
-            return ni.getCharType();
-        case SHORT_TYPE:
-            return ni.getShortType();
-        default:
-            return null;
+            case INT_TYPE:
+                return ni.getIntType();
+            case BOOLEAN_TYPE:
+                return ni.getBooleanType();
+            case LONG_TYPE:
+                return ni.getLongType();
+            case FLOAT_TYPE:
+                return ni.getFloatType();
+            case DOUBLE_TYPE:
+                return ni.getDoubleType();
+            case BYTE_TYPE:
+                return ni.getByteType();
+            case CHAR_TYPE:
+                return ni.getCharType();
+            case SHORT_TYPE:
+                return ni.getShortType();
+            default:
+                return null;
         }
     }
 
@@ -138,15 +738,15 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
      */
     static void promoteNumericTypeToInt(ConstantEvaluator.EvaluationResult res) {
         switch (res.getTypeCode()) {
-        case BYTE_TYPE:
-            res.setInt(res.getByte());
-            break;
-        case CHAR_TYPE:
-            res.setInt(res.getChar());
-            break;
-        case SHORT_TYPE:
-            res.setInt(res.getShort());
-            break;
+            case BYTE_TYPE:
+                res.setInt(res.getByte());
+                break;
+            case CHAR_TYPE:
+                res.setInt(res.getChar());
+                break;
+            case SHORT_TYPE:
+                res.setInt(res.getShort());
+                break;
         }
     }
 
@@ -158,74 +758,74 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
      */
     static void matchTypes(ConstantEvaluator.EvaluationResult lhs, ConstantEvaluator.EvaluationResult rhs) {
         switch (lhs.getTypeCode()) {
-        case INT_TYPE:
-            switch (rhs.getTypeCode()) {
-            case LONG_TYPE:
-                lhs.setLong(lhs.getInt());
-                break;
-            case FLOAT_TYPE:
-                lhs.setFloat(lhs.getInt());
-                break;
-            case DOUBLE_TYPE:
-                lhs.setDouble(lhs.getInt());
-                break;
-            }
-            break;
-        case LONG_TYPE:
-            switch (rhs.getTypeCode()) {
             case INT_TYPE:
-                rhs.setLong(rhs.getInt());
-                break;
-            case FLOAT_TYPE:
-                lhs.setFloat(lhs.getLong());
-                break;
-            case DOUBLE_TYPE:
-                lhs.setDouble(lhs.getLong());
-                break;
-            }
-            break;
-        case FLOAT_TYPE:
-            switch (rhs.getTypeCode()) {
-            case INT_TYPE:
-                rhs.setFloat(rhs.getInt());
+                switch (rhs.getTypeCode()) {
+                    case LONG_TYPE:
+                        lhs.setLong(lhs.getInt());
+                        break;
+                    case FLOAT_TYPE:
+                        lhs.setFloat(lhs.getInt());
+                        break;
+                    case DOUBLE_TYPE:
+                        lhs.setDouble(lhs.getInt());
+                        break;
+                }
                 break;
             case LONG_TYPE:
-                rhs.setFloat(rhs.getLong());
-                break;
-            case DOUBLE_TYPE:
-                lhs.setDouble(lhs.getFloat());
-                break;
-            }
-            break;
-        case DOUBLE_TYPE:
-            switch (rhs.getTypeCode()) {
-            case INT_TYPE:
-                rhs.setDouble(rhs.getInt());
-                break;
-            case LONG_TYPE:
-                rhs.setDouble(rhs.getLong());
+                switch (rhs.getTypeCode()) {
+                    case INT_TYPE:
+                        rhs.setLong(rhs.getInt());
+                        break;
+                    case FLOAT_TYPE:
+                        lhs.setFloat(lhs.getLong());
+                        break;
+                    case DOUBLE_TYPE:
+                        lhs.setDouble(lhs.getLong());
+                        break;
+                }
                 break;
             case FLOAT_TYPE:
-                rhs.setDouble(rhs.getFloat());
-                break;
-            }
-            break;
-        case STRING_TYPE:
-            switch (rhs.getTypeCode()) {
-            case INT_TYPE:
-                rhs.setString(String.valueOf(rhs.getInt()));
-                break;
-            case LONG_TYPE:
-                rhs.setString(String.valueOf(rhs.getLong()));
-                break;
-            case FLOAT_TYPE:
-                rhs.setString(String.valueOf(rhs.getFloat()));
+                switch (rhs.getTypeCode()) {
+                    case INT_TYPE:
+                        rhs.setFloat(rhs.getInt());
+                        break;
+                    case LONG_TYPE:
+                        rhs.setFloat(rhs.getLong());
+                        break;
+                    case DOUBLE_TYPE:
+                        lhs.setDouble(lhs.getFloat());
+                        break;
+                }
                 break;
             case DOUBLE_TYPE:
-                rhs.setString(String.valueOf(rhs.getDouble()));
+                switch (rhs.getTypeCode()) {
+                    case INT_TYPE:
+                        rhs.setDouble(rhs.getInt());
+                        break;
+                    case LONG_TYPE:
+                        rhs.setDouble(rhs.getLong());
+                        break;
+                    case FLOAT_TYPE:
+                        rhs.setDouble(rhs.getFloat());
+                        break;
+                }
                 break;
-            }
-            break;
+            case STRING_TYPE:
+                switch (rhs.getTypeCode()) {
+                    case INT_TYPE:
+                        rhs.setString(String.valueOf(rhs.getInt()));
+                        break;
+                    case LONG_TYPE:
+                        rhs.setString(String.valueOf(rhs.getLong()));
+                        break;
+                    case FLOAT_TYPE:
+                        rhs.setString(String.valueOf(rhs.getFloat()));
+                        break;
+                    case DOUBLE_TYPE:
+                        rhs.setString(String.valueOf(rhs.getDouble()));
+                        break;
+                }
+                break;
         }
         // if the rules above did not produce equal types,
         // something is wrong, e.g. boolean + non-boolean,
@@ -243,67 +843,67 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
     static void matchAssignmentTypes(ConstantEvaluator.EvaluationResult lhs, ConstantEvaluator.EvaluationResult rhs) {
         int value;
         switch (lhs.getTypeCode()) {
-        case INT_TYPE:
-            switch (rhs.getTypeCode()) {
+            case INT_TYPE:
+                switch (rhs.getTypeCode()) {
+                    case BYTE_TYPE:
+                        value = lhs.getInt();
+                        if (Byte.MIN_VALUE <= value && value <= Byte.MAX_VALUE) {
+                            lhs.setByte((byte) value);
+                        } else {
+                            rhs.setInt(rhs.getByte());
+                        }
+                        return;
+                    case CHAR_TYPE:
+                        value = lhs.getInt();
+                        if (Character.MIN_VALUE <= value && value <= Character.MAX_VALUE) {
+                            lhs.setChar((char) value);
+                        } else {
+                            rhs.setInt(rhs.getChar());
+                        }
+                        return;
+                    case SHORT_TYPE:
+                        value = lhs.getInt();
+                        if (Short.MIN_VALUE <= value && value <= Short.MAX_VALUE) {
+                            lhs.setShort((short) value);
+                        } else {
+                            rhs.setInt(rhs.getShort());
+                        }
+                        return;
+                }
+                break;
             case BYTE_TYPE:
-                value = lhs.getInt();
-                if (Byte.MIN_VALUE <= value && value <= Byte.MAX_VALUE) {
-                    lhs.setByte((byte) value);
-                } else {
-                    rhs.setInt(rhs.getByte());
+                if (rhs.getTypeCode() == INT_TYPE) {
+                    value = rhs.getInt();
+                    if (Byte.MIN_VALUE <= value && value <= Byte.MAX_VALUE) {
+                        rhs.setByte((byte) value);
+                    } else {
+                        lhs.setInt(lhs.getByte());
+                    }
+                    return;
                 }
-                return;
-            case CHAR_TYPE:
-                value = lhs.getInt();
-                if (Character.MIN_VALUE <= value && value <= Character.MAX_VALUE) {
-                    lhs.setChar((char) value);
-                } else {
-                    rhs.setInt(rhs.getChar());
-                }
-                return;
+                break;
             case SHORT_TYPE:
-                value = lhs.getInt();
-                if (Short.MIN_VALUE <= value && value <= Short.MAX_VALUE) {
-                    lhs.setShort((short) value);
-                } else {
-                    rhs.setInt(rhs.getShort());
+                if (rhs.getTypeCode() == INT_TYPE) {
+                    value = rhs.getInt();
+                    if (Short.MIN_VALUE <= value && value <= Short.MAX_VALUE) {
+                        rhs.setShort((short) value);
+                    } else {
+                        lhs.setInt(lhs.getShort());
+                    }
+                    return;
                 }
-                return;
-            }
-            break;
-        case BYTE_TYPE:
-            if (rhs.getTypeCode() == INT_TYPE) {
-                value = rhs.getInt();
-                if (Byte.MIN_VALUE <= value && value <= Byte.MAX_VALUE) {
-                    rhs.setByte((byte) value);
-                } else {
-                    lhs.setInt(lhs.getByte());
+                break;
+            case CHAR_TYPE:
+                if (rhs.getTypeCode() == INT_TYPE) {
+                    value = rhs.getInt();
+                    if (Character.MIN_VALUE <= value && value <= Character.MAX_VALUE) {
+                        rhs.setChar((char) value);
+                    } else {
+                        lhs.setInt(lhs.getChar());
+                    }
+                    return;
                 }
-                return;
-            }
-            break;
-        case SHORT_TYPE:
-            if (rhs.getTypeCode() == INT_TYPE) {
-                value = rhs.getInt();
-                if (Short.MIN_VALUE <= value && value <= Short.MAX_VALUE) {
-                    rhs.setShort((short) value);
-                } else {
-                    lhs.setInt(lhs.getShort());
-                }
-                return;
-            }
-            break;
-        case CHAR_TYPE:
-            if (rhs.getTypeCode() == INT_TYPE) {
-                value = rhs.getInt();
-                if (Character.MIN_VALUE <= value && value <= Character.MAX_VALUE) {
-                    rhs.setChar((char) value);
-                } else {
-                    lhs.setInt(lhs.getChar());
-                }
-                return;
-            }
-            break;
+                break;
         }
         matchTypes(lhs, rhs);
     }
@@ -315,37 +915,37 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
      */
     static void matchConditionalTypes(ConstantEvaluator.EvaluationResult lhs, ConstantEvaluator.EvaluationResult rhs) {
         switch (lhs.getTypeCode()) {
-        case BYTE_TYPE:
-            switch (rhs.getTypeCode()) {
-            case SHORT_TYPE: // byte x short -> short x short
-                lhs.setShort(lhs.getByte());
-                return;
-            case CHAR_TYPE: // byte x char -> int x int
-                promoteNumericTypeToInt(lhs);
-                promoteNumericTypeToInt(rhs);
-                return;
-            }
-            break;
-        case CHAR_TYPE:
-            switch (rhs.getTypeCode()) {
-            case BYTE_TYPE: // char x byte, char x short -> int x int
+            case BYTE_TYPE:
+                switch (rhs.getTypeCode()) {
+                    case SHORT_TYPE: // byte x short -> short x short
+                        lhs.setShort(lhs.getByte());
+                        return;
+                    case CHAR_TYPE: // byte x char -> int x int
+                        promoteNumericTypeToInt(lhs);
+                        promoteNumericTypeToInt(rhs);
+                        return;
+                }
+                break;
+            case CHAR_TYPE:
+                switch (rhs.getTypeCode()) {
+                    case BYTE_TYPE: // char x byte, char x short -> int x int
+                    case SHORT_TYPE:
+                        promoteNumericTypeToInt(lhs);
+                        promoteNumericTypeToInt(rhs);
+                        return;
+                }
+                break;
             case SHORT_TYPE:
-                promoteNumericTypeToInt(lhs);
-                promoteNumericTypeToInt(rhs);
-                return;
-            }
-            break;
-        case SHORT_TYPE:
-            switch (rhs.getTypeCode()) {
-            case BYTE_TYPE: // short x byte -> short x short
-                rhs.setShort(rhs.getByte());
-                return;
-            case CHAR_TYPE: // short x char -> int x int
-                promoteNumericTypeToInt(lhs);
-                promoteNumericTypeToInt(rhs);
-                return;
-            }
-            break;
+                switch (rhs.getTypeCode()) {
+                    case BYTE_TYPE: // short x byte -> short x short
+                        rhs.setShort(rhs.getByte());
+                        return;
+                    case CHAR_TYPE: // short x char -> int x int
+                        promoteNumericTypeToInt(lhs);
+                        promoteNumericTypeToInt(rhs);
+                        return;
+                }
+                break;
         }
         matchAssignmentTypes(lhs, rhs);
     }
@@ -360,57 +960,57 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
             } else {
                 i += 1;
                 switch (text.charAt(i)) {
-                case 'b':
-                    buf.append('\b');
-                    break;
-                case 't':
-                    buf.append('\t');
-                    break;
-                case 'n':
-                    buf.append('\n');
-                    break;
-                case 'f':
-                    buf.append('\f');
-                    break;
-                case 'r':
-                    buf.append('\r');
-                    break;
-                case '\"':
-                    buf.append('\"');
-                    break;
-                case '\'':
-                    buf.append('\'');
-                    break;
-                case '\\':
-                    buf.append('\\');
-                    break;
-                case 'u':
-                    // skip an arbitrary number of u's
-                    i += 1;
-                    while (text.charAt(i) == 'u') {
+                    case 'b':
+                        buf.append('\b');
+                        break;
+                    case 't':
+                        buf.append('\t');
+                        break;
+                    case 'n':
+                        buf.append('\n');
+                        break;
+                    case 'f':
+                        buf.append('\f');
+                        break;
+                    case 'r':
+                        buf.append('\r');
+                        break;
+                    case '\"':
+                        buf.append('\"');
+                        break;
+                    case '\'':
+                        buf.append('\'');
+                        break;
+                    case '\\':
+                        buf.append('\\');
+                        break;
+                    case 'u':
+                        // skip an arbitrary number of u's
                         i += 1;
-                    }
-                    // the following must be a 4-digit hex value
-                    buf.append((char) Integer.parseInt(text.substring(i, i + 4), 16));
-                    i += 4;
-                    break;
-                case '0':
-                case '1':
-                case '2':
-                case '3':
-                case '4':
-                case '5':
-                case '6':
-                case '7':
-                    int j = i + 1;
-                    while (j < len && text.charAt(j) >= '0' && text.charAt(j) <= '7') {
-                        j += 1;
-                    }
-                    buf.append((char) Integer.parseInt(text.substring(i, j), 8));
-                    i = j;
-                    break;
-                default:
-                    throw new ModelException("Bad character representation: " + text);
+                        while (text.charAt(i) == 'u') {
+                            i += 1;
+                        }
+                        // the following must be a 4-digit hex value
+                        buf.append((char) Integer.parseInt(text.substring(i, i + 4), 16));
+                        i += 4;
+                        break;
+                    case '0':
+                    case '1':
+                    case '2':
+                    case '3':
+                    case '4':
+                    case '5':
+                    case '6':
+                    case '7':
+                        int j = i + 1;
+                        while (j < len && text.charAt(j) >= '0' && text.charAt(j) <= '7') {
+                            j += 1;
+                        }
+                        buf.append((char) Integer.parseInt(text.substring(i, j), 8));
+                        i = j;
+                        break;
+                    default:
+                        throw new ModelException("Bad character representation: " + text);
                 }
             }
         }
@@ -425,178 +1025,179 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
             throw new ModelException("Cast not allowed");
         }
         switch (oldType) {
-        case BYTE_TYPE:
-            switch (newType) {
-            case SHORT_TYPE:
-                res.setShort(res.getByte());
-                return;
-            case CHAR_TYPE:
-                res.setChar((char) res.getByte());
-                return;
-            case INT_TYPE:
-                res.setInt(res.getByte());
-                return;
-            case LONG_TYPE:
-                res.setLong(res.getByte());
-                return;
-            case FLOAT_TYPE:
-                res.setFloat(res.getByte());
-                return;
-            case DOUBLE_TYPE:
-                res.setDouble(res.getByte());
-                return;
-            }
-            break;
-        case SHORT_TYPE:
-            switch (newType) {
             case BYTE_TYPE:
-                res.setByte((byte) res.getShort());
-                return;
-            case CHAR_TYPE:
-                res.setChar((char) res.getShort());
-                return;
-            case INT_TYPE:
-                res.setInt(res.getShort());
-                return;
-            case LONG_TYPE:
-                res.setLong(res.getShort());
-                return;
-            case FLOAT_TYPE:
-                res.setFloat(res.getShort());
-                return;
-            case DOUBLE_TYPE:
-                res.setDouble(res.getShort());
-                return;
-            }
-            break;
-        case CHAR_TYPE:
-            switch (newType) {
-            case BYTE_TYPE:
-                res.setByte((byte) res.getChar());
-                return;
+                switch (newType) {
+                    case SHORT_TYPE:
+                        res.setShort(res.getByte());
+                        return;
+                    case CHAR_TYPE:
+                        res.setChar((char) res.getByte());
+                        return;
+                    case INT_TYPE:
+                        res.setInt(res.getByte());
+                        return;
+                    case LONG_TYPE:
+                        res.setLong(res.getByte());
+                        return;
+                    case FLOAT_TYPE:
+                        res.setFloat(res.getByte());
+                        return;
+                    case DOUBLE_TYPE:
+                        res.setDouble(res.getByte());
+                        return;
+                }
+                break;
             case SHORT_TYPE:
-                res.setShort((short) res.getChar());
-                return;
-            case INT_TYPE:
-                res.setInt(res.getChar());
-                return;
-            case LONG_TYPE:
-                res.setLong(res.getChar());
-                return;
-            case FLOAT_TYPE:
-                res.setFloat(res.getChar());
-                return;
-            case DOUBLE_TYPE:
-                res.setDouble(res.getChar());
-                return;
-            }
-            break;
-        case INT_TYPE:
-            switch (newType) {
-            case BYTE_TYPE:
-                res.setByte((byte) res.getInt());
-                return;
-            case SHORT_TYPE:
-                res.setShort((short) res.getInt());
-                return;
+                switch (newType) {
+                    case BYTE_TYPE:
+                        res.setByte((byte) res.getShort());
+                        return;
+                    case CHAR_TYPE:
+                        res.setChar((char) res.getShort());
+                        return;
+                    case INT_TYPE:
+                        res.setInt(res.getShort());
+                        return;
+                    case LONG_TYPE:
+                        res.setLong(res.getShort());
+                        return;
+                    case FLOAT_TYPE:
+                        res.setFloat(res.getShort());
+                        return;
+                    case DOUBLE_TYPE:
+                        res.setDouble(res.getShort());
+                        return;
+                }
+                break;
             case CHAR_TYPE:
-                res.setChar((char) res.getInt());
-                return;
-            case LONG_TYPE:
-                res.setLong(res.getInt());
-                return;
-            case FLOAT_TYPE:
-                res.setFloat(res.getInt());
-                return;
-            case DOUBLE_TYPE:
-                res.setDouble(res.getInt());
-                return;
-            }
-            break;
-        case LONG_TYPE:
-            switch (newType) {
-            case BYTE_TYPE:
-                res.setByte((byte) res.getLong());
-                return;
-            case SHORT_TYPE:
-                res.setShort((short) res.getLong());
-                return;
-            case CHAR_TYPE:
-                res.setChar((char) res.getLong());
-                return;
+                switch (newType) {
+                    case BYTE_TYPE:
+                        res.setByte((byte) res.getChar());
+                        return;
+                    case SHORT_TYPE:
+                        res.setShort((short) res.getChar());
+                        return;
+                    case INT_TYPE:
+                        res.setInt(res.getChar());
+                        return;
+                    case LONG_TYPE:
+                        res.setLong(res.getChar());
+                        return;
+                    case FLOAT_TYPE:
+                        res.setFloat(res.getChar());
+                        return;
+                    case DOUBLE_TYPE:
+                        res.setDouble(res.getChar());
+                        return;
+                }
+                break;
             case INT_TYPE:
-                res.setInt((int) res.getLong());
-                return;
-            case FLOAT_TYPE:
-                res.setFloat(res.getLong());
-                return;
-            case DOUBLE_TYPE:
-                res.setDouble(res.getLong());
-                return;
-            }
-            break;
-        case FLOAT_TYPE:
-            switch (newType) {
-            case BYTE_TYPE:
-                res.setByte((byte) res.getFloat());
-                return;
-            case SHORT_TYPE:
-                res.setShort((short) res.getFloat());
-                return;
-            case CHAR_TYPE:
-                res.setChar((char) res.getFloat());
-                return;
-            case INT_TYPE:
-                res.setInt((int) res.getFloat());
-                return;
+                switch (newType) {
+                    case BYTE_TYPE:
+                        res.setByte((byte) res.getInt());
+                        return;
+                    case SHORT_TYPE:
+                        res.setShort((short) res.getInt());
+                        return;
+                    case CHAR_TYPE:
+                        res.setChar((char) res.getInt());
+                        return;
+                    case LONG_TYPE:
+                        res.setLong(res.getInt());
+                        return;
+                    case FLOAT_TYPE:
+                        res.setFloat(res.getInt());
+                        return;
+                    case DOUBLE_TYPE:
+                        res.setDouble(res.getInt());
+                        return;
+                }
+                break;
             case LONG_TYPE:
-                res.setLong((long) res.getFloat());
-                return;
-            case DOUBLE_TYPE:
-                res.setDouble(res.getFloat());
-                return;
-            }
-            break;
-        case DOUBLE_TYPE:
-            switch (newType) {
-            case BYTE_TYPE:
-                res.setByte((byte) res.getDouble());
-                return;
-            case SHORT_TYPE:
-                res.setShort((short) res.getDouble());
-                return;
-            case CHAR_TYPE:
-                res.setChar((char) res.getDouble());
-                return;
-            case INT_TYPE:
-                res.setInt((int) res.getDouble());
-                return;
-            case LONG_TYPE:
-                res.setLong((long) res.getDouble());
-                return;
+                switch (newType) {
+                    case BYTE_TYPE:
+                        res.setByte((byte) res.getLong());
+                        return;
+                    case SHORT_TYPE:
+                        res.setShort((short) res.getLong());
+                        return;
+                    case CHAR_TYPE:
+                        res.setChar((char) res.getLong());
+                        return;
+                    case INT_TYPE:
+                        res.setInt((int) res.getLong());
+                        return;
+                    case FLOAT_TYPE:
+                        res.setFloat(res.getLong());
+                        return;
+                    case DOUBLE_TYPE:
+                        res.setDouble(res.getLong());
+                        return;
+                }
+                break;
             case FLOAT_TYPE:
-                res.setFloat((float) res.getDouble());
-                return;
-            }
-            break;
+                switch (newType) {
+                    case BYTE_TYPE:
+                        res.setByte((byte) res.getFloat());
+                        return;
+                    case SHORT_TYPE:
+                        res.setShort((short) res.getFloat());
+                        return;
+                    case CHAR_TYPE:
+                        res.setChar((char) res.getFloat());
+                        return;
+                    case INT_TYPE:
+                        res.setInt((int) res.getFloat());
+                        return;
+                    case LONG_TYPE:
+                        res.setLong((long) res.getFloat());
+                        return;
+                    case DOUBLE_TYPE:
+                        res.setDouble(res.getFloat());
+                        return;
+                }
+                break;
+            case DOUBLE_TYPE:
+                switch (newType) {
+                    case BYTE_TYPE:
+                        res.setByte((byte) res.getDouble());
+                        return;
+                    case SHORT_TYPE:
+                        res.setShort((short) res.getDouble());
+                        return;
+                    case CHAR_TYPE:
+                        res.setChar((char) res.getDouble());
+                        return;
+                    case INT_TYPE:
+                        res.setInt((int) res.getDouble());
+                        return;
+                    case LONG_TYPE:
+                        res.setLong((long) res.getDouble());
+                        return;
+                    case FLOAT_TYPE:
+                        res.setFloat((float) res.getDouble());
+                        return;
+                }
+                break;
         }
     }
 
-    /*
-     * Stack holding all variable references that have already been followed.
-     * This is used to detect cycles
-     */
-    private Stack<Expression> visitedVariableReferences = new Stack<Expression>();
+    NameInfo getNameInfo() {
+        return serviceConfiguration.getNameInfo();
+    }
+
+    SourceInfo getSourceInfo() {
+        return serviceConfiguration.getSourceInfo();
+    }
 
     /**
      * Returns the type of a constant expression if it is a compile-time
      * constant as defined in the Java language specification, or <CODE>null
      * </CODE> if it is not.
-     * 
-     * @param expr
-     *            the expression to evaluate.
+     *
+     * @param expr the expression to evaluate.
      * @return the type of the expression, or <CODE>null</CODE> if the
-     *         expression is not constant.
+     * expression is not constant.
      */
     public Type getCompileTimeConstantType(Expression expr) {
         ConstantEvaluator.EvaluationResult res = new ConstantEvaluator.EvaluationResult();
@@ -609,11 +1210,10 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
     /**
      * Checks if the given expression is a compile-time constant as defined in
      * the Java language specification.
-     * 
-     * @param expr
-     *            the expression to evaluate.
+     *
+     * @param expr the expression to evaluate.
      * @return <CODE>true</CODE>, if the expression is a compile-time
-     *         constant, <CODE>false</CODE> otherwise.
+     * constant, <CODE>false</CODE> otherwise.
      */
     public boolean isCompileTimeConstant(Expression expr) {
         return isCompileTimeConstant(expr, new ConstantEvaluator.EvaluationResult());
@@ -622,14 +1222,12 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
     /**
      * Checks if the given expression is a compile-time constant as defined in
      * the Java language specification, and derives the result.
-     * 
-     * @param expr
-     *            the expression to evaluate.
-     * @param res
-     *            the result of the evaluation; contains the type encoding and
-     *            the result value.
+     *
+     * @param expr the expression to evaluate.
+     * @param res  the result of the evaluation; contains the type encoding and
+     *             the result value.
      * @return <CODE>true</CODE>, if the expression is a compile-time
-     *         constant, <CODE>false</CODE> otherwise.
+     * constant, <CODE>false</CODE> otherwise.
      */
     public boolean isCompileTimeConstant(Expression expr, ConstantEvaluator.EvaluationResult res) {
         if (expr instanceof Literal) {
@@ -683,12 +1281,9 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
                         newType = translateType((PrimitiveType) to, getNameInfo());
                     } else if (to == getNameInfo().getJavaLangString()) {
                         newType = STRING_TYPE;
-                        if (res.getTypeCode() != STRING_TYPE) {
-                            // reject casts from anything else than Strings.
-                            // note that we considered nulls as Strings.
-                            return false;
-                        }
-                        return true;
+                        // reject casts from anything else than Strings.
+                        // note that we considered nulls as Strings.
+                        return res.getTypeCode() == STRING_TYPE;
                     } else {
                         // other non-primitive types are not seen as constants
                         return false;
@@ -719,236 +1314,236 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
             BinaryBooleanOperation bbo = null;
 
             switch (op.getArity()) {
-            case 1: // unary operations
+                case 1: // unary operations
 
-                if (!isCompileTimeConstant(op.getExpressionAt(0), res)) {
-                    return false;
-                }
+                    if (!isCompileTimeConstant(op.getExpressionAt(0), res)) {
+                        return false;
+                    }
 
-                if (op instanceof Positive) {
-                    uno = POSITIVE;
-                } else if (op instanceof Negative) {
-                    uno = NEGATIVE;
-                } else if (op instanceof BinaryNot) {
-                    uno = BINARY_NOT;
-                } else if (op instanceof LogicalNot) {
-                    ubo = LOGICAL_NOT;
-                }
-                break;
-            case 2: // binary operations
-                if (!isCompileTimeConstant(op.getExpressionAt(0), res)) {
-                    return false;
-                }
-                lhs = res;
-                promoteNumericTypeToInt(lhs);
-                /*
-                 * The allocation could be optimized away if the contents of the
-                 * res/lhs object would be stored locally and res would be
-                 * reused for the rhs call. However, performance is not critical
-                 * here.
-                 */
-                rhs = new ConstantEvaluator.EvaluationResult();
-                // evaluate right-hand side; finish if not constant
-                if (!isCompileTimeConstant(op.getExpressionAt(1), rhs)) {
-                    return false;
-                }
-                // widen numerical types shorter than int
-                promoteNumericTypeToInt(rhs);
+                    if (op instanceof Positive) {
+                        uno = POSITIVE;
+                    } else if (op instanceof Negative) {
+                        uno = NEGATIVE;
+                    } else if (op instanceof BinaryNot) {
+                        uno = BINARY_NOT;
+                    } else if (op instanceof LogicalNot) {
+                        ubo = LOGICAL_NOT;
+                    }
+                    break;
+                case 2: // binary operations
+                    if (!isCompileTimeConstant(op.getExpressionAt(0), res)) {
+                        return false;
+                    }
+                    lhs = res;
+                    promoteNumericTypeToInt(lhs);
+                    /*
+                     * The allocation could be optimized away if the contents of the
+                     * res/lhs object would be stored locally and res would be
+                     * reused for the rhs call. However, performance is not critical
+                     * here.
+                     */
+                    rhs = new ConstantEvaluator.EvaluationResult();
+                    // evaluate right-hand side; finish if not constant
+                    if (!isCompileTimeConstant(op.getExpressionAt(1), rhs)) {
+                        return false;
+                    }
+                    // widen numerical types shorter than int
+                    promoteNumericTypeToInt(rhs);
 
-                // widen the remaining types to match both argument types
-                matchTypes(lhs, rhs);
+                    // widen the remaining types to match both argument types
+                    matchTypes(lhs, rhs);
 
-                if (op instanceof ComparativeOperator) {
-                    if (op instanceof Equals) {
-                        bbo = EQUALS;
-                    } else if (op instanceof NotEquals) {
-                        bbo = NOT_EQUALS;
-                    } else if (op instanceof GreaterThan) {
-                        bbo = GREATER_THAN;
-                    } else if (op instanceof LessThan) {
-                        bbo = LESS_THAN;
-                    } else if (op instanceof GreaterOrEquals) {
-                        bbo = GREATER_OR_EQUALS;
-                    } else if (op instanceof LessOrEquals) {
-                        bbo = LESS_OR_EQUALS;
+                    if (op instanceof ComparativeOperator) {
+                        if (op instanceof Equals) {
+                            bbo = EQUALS;
+                        } else if (op instanceof NotEquals) {
+                            bbo = NOT_EQUALS;
+                        } else if (op instanceof GreaterThan) {
+                            bbo = GREATER_THAN;
+                        } else if (op instanceof LessThan) {
+                            bbo = LESS_THAN;
+                        } else if (op instanceof GreaterOrEquals) {
+                            bbo = GREATER_OR_EQUALS;
+                        } else if (op instanceof LessOrEquals) {
+                            bbo = LESS_OR_EQUALS;
+                        } else if (op instanceof LogicalAnd) {
+                            bbo = LOGICAL_AND;
+                        } else if (op instanceof LogicalOr) {
+                            bbo = LOGICAL_OR;
+                        }
+                    } else if (op instanceof Plus) {
+                        bno = PLUS;
+                    } else if (op instanceof Minus) {
+                        bno = MINUS;
+                    } else if (op instanceof Times) {
+                        bno = TIMES;
+                    } else if (op instanceof Divide) {
+                        bno = DIVIDE;
+                    } else if (op instanceof Modulo) {
+                        bno = MODULO;
+                    } else if (op instanceof ShiftLeft) {
+                        bno = SHIFT_LEFT;
+                    } else if (op instanceof ShiftRight) {
+                        bno = SHIFT_RIGHT;
+                    } else if (op instanceof UnsignedShiftRight) {
+                        bno = UNSIGNED_SHIFT_RIGHT;
+                    } else if (op instanceof BinaryAnd) {
+                        bno = BINARY_AND;
+                    } else if (op instanceof BinaryOr) {
+                        bno = BINARY_OR;
+                    } else if (op instanceof BinaryXOr) {
+                        bno = BINARY_XOR;
                     } else if (op instanceof LogicalAnd) {
                         bbo = LOGICAL_AND;
                     } else if (op instanceof LogicalOr) {
                         bbo = LOGICAL_OR;
                     }
-                } else if (op instanceof Plus) {
-                    bno = PLUS;
-                } else if (op instanceof Minus) {
-                    bno = MINUS;
-                } else if (op instanceof Times) {
-                    bno = TIMES;
-                } else if (op instanceof Divide) {
-                    bno = DIVIDE;
-                } else if (op instanceof Modulo) {
-                    bno = MODULO;
-                } else if (op instanceof ShiftLeft) {
-                    bno = SHIFT_LEFT;
-                } else if (op instanceof ShiftRight) {
-                    bno = SHIFT_RIGHT;
-                } else if (op instanceof UnsignedShiftRight) {
-                    bno = UNSIGNED_SHIFT_RIGHT;
-                } else if (op instanceof BinaryAnd) {
-                    bno = BINARY_AND;
-                } else if (op instanceof BinaryOr) {
-                    bno = BINARY_OR;
-                } else if (op instanceof BinaryXOr) {
-                    bno = BINARY_XOR;
-                } else if (op instanceof LogicalAnd) {
-                    bbo = LOGICAL_AND;
-                } else if (op instanceof LogicalOr) {
-                    bbo = LOGICAL_OR;
-                }
-                break;
-            case 3:
-                // this must be the conditional (?:)
-                if (!isCompileTimeConstant(op.getExpressionAt(0), res)) {
-                    return false;
-                }
-                if (res.getTypeCode() != BOOLEAN_TYPE) {
-                    throw new ModelException("No boolean expression in ?:");
-                }
-                boolean cond = res.getBoolean();
-                // evaluate both sides; finish if not constant
+                    break;
+                case 3:
+                    // this must be the conditional (?:)
+                    if (!isCompileTimeConstant(op.getExpressionAt(0), res)) {
+                        return false;
+                    }
+                    if (res.getTypeCode() != BOOLEAN_TYPE) {
+                        throw new ModelException("No boolean expression in ?:");
+                    }
+                    boolean cond = res.getBoolean();
+                    // evaluate both sides; finish if not constant
 
-                lhs = res; // overwrite old values
-                if (!isCompileTimeConstant(op.getExpressionAt(1), lhs)) {
-                    return false;
-                }
-                rhs = new ConstantEvaluator.EvaluationResult();
-                if (!isCompileTimeConstant(op.getExpressionAt(2), rhs)) {
-                    return false;
-                }
-                matchConditionalTypes(lhs, rhs);
+                    lhs = res; // overwrite old values
+                    if (!isCompileTimeConstant(op.getExpressionAt(1), lhs)) {
+                        return false;
+                    }
+                    rhs = new ConstantEvaluator.EvaluationResult();
+                    if (!isCompileTimeConstant(op.getExpressionAt(2), rhs)) {
+                        return false;
+                    }
+                    matchConditionalTypes(lhs, rhs);
 
-                switch (lhs.getTypeCode()) { // matches type of rhs
-                case BOOLEAN_TYPE:
-                    res.setBoolean(cond ? lhs.getBoolean() : rhs.getBoolean());
-                    break;
-                case BYTE_TYPE:
-                    res.setByte(cond ? lhs.getByte() : rhs.getByte());
-                    break;
-                case SHORT_TYPE:
-                    res.setShort(cond ? lhs.getShort() : rhs.getShort());
-                    break;
-                case CHAR_TYPE:
-                    res.setChar(cond ? lhs.getChar() : rhs.getChar());
-                    break;
-                case INT_TYPE:
-                    res.setInt(cond ? lhs.getInt() : rhs.getInt());
-                    break;
-                case LONG_TYPE:
-                    res.setLong(cond ? lhs.getLong() : rhs.getLong());
-                    break;
-                case FLOAT_TYPE:
-                    res.setFloat(cond ? lhs.getFloat() : rhs.getFloat());
-                    break;
-                case DOUBLE_TYPE:
-                    res.setDouble(cond ? lhs.getDouble() : rhs.getDouble());
-                    break;
-                case STRING_TYPE:
-                    res.setString(cond ? lhs.getString() : rhs.getString());
-                    break;
-                }
-                return true;
+                    switch (lhs.getTypeCode()) { // matches type of rhs
+                        case BOOLEAN_TYPE:
+                            res.setBoolean(cond ? lhs.getBoolean() : rhs.getBoolean());
+                            break;
+                        case BYTE_TYPE:
+                            res.setByte(cond ? lhs.getByte() : rhs.getByte());
+                            break;
+                        case SHORT_TYPE:
+                            res.setShort(cond ? lhs.getShort() : rhs.getShort());
+                            break;
+                        case CHAR_TYPE:
+                            res.setChar(cond ? lhs.getChar() : rhs.getChar());
+                            break;
+                        case INT_TYPE:
+                            res.setInt(cond ? lhs.getInt() : rhs.getInt());
+                            break;
+                        case LONG_TYPE:
+                            res.setLong(cond ? lhs.getLong() : rhs.getLong());
+                            break;
+                        case FLOAT_TYPE:
+                            res.setFloat(cond ? lhs.getFloat() : rhs.getFloat());
+                            break;
+                        case DOUBLE_TYPE:
+                            res.setDouble(cond ? lhs.getDouble() : rhs.getDouble());
+                            break;
+                        case STRING_TYPE:
+                            res.setString(cond ? lhs.getString() : rhs.getString());
+                            break;
+                    }
+                    return true;
             }
 
             if (bno != null) {
                 switch (lhs.getTypeCode()) {
-                case BOOLEAN_TYPE:
-                    lhs.setBoolean(bno.eval(lhs.getBoolean(), rhs.getBoolean()));
-                    break;
-                case INT_TYPE:
-                    lhs.setInt(bno.eval(lhs.getInt(), rhs.getInt()));
-                    break;
-                case LONG_TYPE:
-                    lhs.setLong(bno.eval(lhs.getLong(), rhs.getLong()));
-                    break;
-                case FLOAT_TYPE:
-                    lhs.setFloat(bno.eval(lhs.getFloat(), rhs.getFloat()));
-                    break;
-                case DOUBLE_TYPE:
-                    lhs.setDouble(bno.eval(lhs.getDouble(), rhs.getDouble()));
-                    break;
-                case STRING_TYPE:
-                    lhs.setString(bno.eval(lhs.getString(), rhs.getString()));
-                    break;
+                    case BOOLEAN_TYPE:
+                        lhs.setBoolean(bno.eval(lhs.getBoolean(), rhs.getBoolean()));
+                        break;
+                    case INT_TYPE:
+                        lhs.setInt(bno.eval(lhs.getInt(), rhs.getInt()));
+                        break;
+                    case LONG_TYPE:
+                        lhs.setLong(bno.eval(lhs.getLong(), rhs.getLong()));
+                        break;
+                    case FLOAT_TYPE:
+                        lhs.setFloat(bno.eval(lhs.getFloat(), rhs.getFloat()));
+                        break;
+                    case DOUBLE_TYPE:
+                        lhs.setDouble(bno.eval(lhs.getDouble(), rhs.getDouble()));
+                        break;
+                    case STRING_TYPE:
+                        lhs.setString(bno.eval(lhs.getString(), rhs.getString()));
+                        break;
                 }
                 return true;
             }
 
             if (bbo != null) {
                 switch (lhs.getTypeCode()) {
-                case BOOLEAN_TYPE:
-                    lhs.setBoolean(bbo.eval(lhs.getBoolean(), rhs.getBoolean()));
-                    break;
-                case INT_TYPE:
-                    lhs.setBoolean(bbo.eval(lhs.getInt(), rhs.getInt()));
-                    break;
-                case LONG_TYPE:
-                    lhs.setBoolean(bbo.eval(lhs.getLong(), rhs.getLong()));
-                    break;
-                case FLOAT_TYPE:
-                    lhs.setBoolean(bbo.eval(lhs.getFloat(), rhs.getFloat()));
-                    break;
-                case DOUBLE_TYPE:
-                    lhs.setBoolean(bbo.eval(lhs.getDouble(), rhs.getDouble()));
-                    break;
-                case STRING_TYPE:
-                    lhs.setBoolean(bbo.eval(lhs.getString(), rhs.getString()));
-                    break;
+                    case BOOLEAN_TYPE:
+                        lhs.setBoolean(bbo.eval(lhs.getBoolean(), rhs.getBoolean()));
+                        break;
+                    case INT_TYPE:
+                        lhs.setBoolean(bbo.eval(lhs.getInt(), rhs.getInt()));
+                        break;
+                    case LONG_TYPE:
+                        lhs.setBoolean(bbo.eval(lhs.getLong(), rhs.getLong()));
+                        break;
+                    case FLOAT_TYPE:
+                        lhs.setBoolean(bbo.eval(lhs.getFloat(), rhs.getFloat()));
+                        break;
+                    case DOUBLE_TYPE:
+                        lhs.setBoolean(bbo.eval(lhs.getDouble(), rhs.getDouble()));
+                        break;
+                    case STRING_TYPE:
+                        lhs.setBoolean(bbo.eval(lhs.getString(), rhs.getString()));
+                        break;
                 }
                 return true;
             }
 
             if (uno != null) {
                 switch (res.getTypeCode()) {
-                case BOOLEAN_TYPE:
-                    res.setBoolean(uno.eval(res.getBoolean()));
-                    break;
-                case INT_TYPE:
-                    res.setInt(uno.eval(res.getInt()));
-                    break;
-                case LONG_TYPE:
-                    res.setLong(uno.eval(res.getLong()));
-                    break;
-                case FLOAT_TYPE:
-                    res.setFloat(uno.eval(res.getFloat()));
-                    break;
-                case DOUBLE_TYPE:
-                    res.setDouble(uno.eval(res.getDouble()));
-                    break;
-                case STRING_TYPE:
-                    res.setString(uno.eval(res.getString()));
-                    break;
+                    case BOOLEAN_TYPE:
+                        res.setBoolean(uno.eval(res.getBoolean()));
+                        break;
+                    case INT_TYPE:
+                        res.setInt(uno.eval(res.getInt()));
+                        break;
+                    case LONG_TYPE:
+                        res.setLong(uno.eval(res.getLong()));
+                        break;
+                    case FLOAT_TYPE:
+                        res.setFloat(uno.eval(res.getFloat()));
+                        break;
+                    case DOUBLE_TYPE:
+                        res.setDouble(uno.eval(res.getDouble()));
+                        break;
+                    case STRING_TYPE:
+                        res.setString(uno.eval(res.getString()));
+                        break;
                 }
                 return true;
             }
 
             if (ubo != null) {
                 switch (res.getTypeCode()) {
-                case BOOLEAN_TYPE:
-                    res.setBoolean(ubo.eval(res.getBoolean()));
-                    break;
-                case INT_TYPE:
-                    res.setBoolean(ubo.eval(res.getInt()));
-                    break;
-                case LONG_TYPE:
-                    res.setBoolean(ubo.eval(res.getLong()));
-                    break;
-                case FLOAT_TYPE:
-                    res.setBoolean(ubo.eval(res.getFloat()));
-                    break;
-                case DOUBLE_TYPE:
-                    res.setBoolean(ubo.eval(res.getDouble()));
-                    break;
-                case STRING_TYPE:
-                    res.setBoolean(ubo.eval(res.getString()));
-                    break;
+                    case BOOLEAN_TYPE:
+                        res.setBoolean(ubo.eval(res.getBoolean()));
+                        break;
+                    case INT_TYPE:
+                        res.setBoolean(ubo.eval(res.getInt()));
+                        break;
+                    case LONG_TYPE:
+                        res.setBoolean(ubo.eval(res.getLong()));
+                        break;
+                    case FLOAT_TYPE:
+                        res.setBoolean(ubo.eval(res.getFloat()));
+                        break;
+                    case DOUBLE_TYPE:
+                        res.setBoolean(ubo.eval(res.getDouble()));
+                        break;
+                    case STRING_TYPE:
+                        res.setBoolean(ubo.eval(res.getString()));
+                        break;
                 }
                 return true;
             }
@@ -981,10 +1576,10 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
             Variable v = getSourceInfo().getVariable((VariableReference) expr);
             // is it an enum constant? If so, it's a compile time constant:
             if (v instanceof EnumConstant) {
-            	res.setEnumConstant((EnumConstant)v);
-            	return true;
+                res.setEnumConstant((EnumConstant) v);
+                return true;
             }
-            
+
             // unknown vars are not our problem
             // constants must be final
             if (v == null || !v.isFinal()) {
@@ -1025,43 +1620,43 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
                         return false;
                     }
                     switch (vtype) {
-                    case BOOLEAN_TYPE:
-                        res.setBoolean(Integer.parseInt(val) != 0);
-                        break;
-                    case BYTE_TYPE:
-                        res.setByte((byte) Integer.parseInt(val));
-                        break;
-                    case SHORT_TYPE:
-                        res.setShort((short) Integer.parseInt(val));
-                        break;
-                    case CHAR_TYPE:
-                        res.setChar((char) Integer.parseInt(val));
-                        break;
-                    case INT_TYPE:
-                        res.setInt(Integer.parseInt(val));
-                        break;
-                    case LONG_TYPE:
-                        res.setLong(Long.parseLong(val));
-                        break;
-                    case FLOAT_TYPE:
-                        if (val.equals("NaN")) {
-                            // may occur in byte code?!
-                            res.setFloat(Float.NaN);
-                        } else {
-                            res.setFloat(Float.valueOf(val).floatValue());
-                        }
-                        break;
-                    case DOUBLE_TYPE:
-                        if (val.equals("NaN")) {
-                            // may occur in byte code?!
-                            res.setDouble(Double.NaN);
-                        } else {
-                            res.setDouble(Double.valueOf(val).doubleValue());
-                        }
-                        break;
-                    case STRING_TYPE:
-                        res.setString(val);
-                        break;
+                        case BOOLEAN_TYPE:
+                            res.setBoolean(Integer.parseInt(val) != 0);
+                            break;
+                        case BYTE_TYPE:
+                            res.setByte((byte) Integer.parseInt(val));
+                            break;
+                        case SHORT_TYPE:
+                            res.setShort((short) Integer.parseInt(val));
+                            break;
+                        case CHAR_TYPE:
+                            res.setChar((char) Integer.parseInt(val));
+                            break;
+                        case INT_TYPE:
+                            res.setInt(Integer.parseInt(val));
+                            break;
+                        case LONG_TYPE:
+                            res.setLong(Long.parseLong(val));
+                            break;
+                        case FLOAT_TYPE:
+                            if (val.equals("NaN")) {
+                                // may occur in byte code?!
+                                res.setFloat(Float.NaN);
+                            } else {
+                                res.setFloat(Float.valueOf(val).floatValue());
+                            }
+                            break;
+                        case DOUBLE_TYPE:
+                            if (val.equals("NaN")) {
+                                // may occur in byte code?!
+                                res.setDouble(Double.NaN);
+                            } else {
+                                res.setDouble(Double.valueOf(val).doubleValue());
+                            }
+                            break;
+                        case STRING_TYPE:
+                            res.setString(val);
+                            break;
                     }
                     return true;
                 }
@@ -1135,672 +1730,4 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
 
         public abstract boolean eval(String a);
     }
-
-    final static BinaryNumericOperation PLUS = new BinaryNumericOperation() {
-        public boolean eval(boolean a, boolean b) {
-            fail();
-            return false;
-        }
-
-        public int eval(int a, int b) {
-            return a + b;
-        }
-
-        public long eval(long a, long b) {
-            return a + b;
-        }
-
-        public float eval(float a, float b) {
-            return a + b;
-        }
-
-        public double eval(double a, double b) {
-            return a + b;
-        }
-
-        public String eval(String a, String b) {
-            if (a == null) {
-                fail();
-                return null;
-            }
-            return a + b;
-        }
-    };
-
-    final static BinaryNumericOperation MINUS = new BinaryNumericOperation() {
-        public boolean eval(boolean a, boolean b) {
-            fail();
-            return false;
-        }
-
-        public int eval(int a, int b) {
-            return a - b;
-        }
-
-        public long eval(long a, long b) {
-            return a - b;
-        }
-
-        public float eval(float a, float b) {
-            return a - b;
-        }
-
-        public double eval(double a, double b) {
-            return a - b;
-        }
-
-        public String eval(String a, String b) {
-            fail();
-            return null;
-        }
-    };
-
-    final static BinaryNumericOperation DIVIDE = new BinaryNumericOperation() {
-        public boolean eval(boolean a, boolean b) {
-            fail();
-            return false;
-        }
-
-        public int eval(int a, int b) {
-            return a / b;
-        }
-
-        public long eval(long a, long b) {
-            return a / b;
-        }
-
-        public float eval(float a, float b) {
-            return a / b;
-        }
-
-        public double eval(double a, double b) {
-            return a / b;
-        }
-
-        public String eval(String a, String b) {
-            fail();
-            return null;
-        }
-        // should catch the div-by-zero exception and re-throw a more
-        // meaningful error message
-    };
-
-    final static BinaryNumericOperation MODULO = new BinaryNumericOperation() {
-        public boolean eval(boolean a, boolean b) {
-            fail();
-            return false;
-        }
-
-        public int eval(int a, int b) {
-            return a % b;
-        }
-
-        public long eval(long a, long b) {
-            return a % b;
-        }
-
-        public float eval(float a, float b) {
-            return a % b;
-        }
-
-        public double eval(double a, double b) {
-            return a % b;
-        }
-
-        public String eval(String a, String b) {
-            fail();
-            return null;
-        }
-        // should catch the div-by-zero exception and re-throw a more
-        // meaningful error message
-    };
-
-    final static BinaryNumericOperation TIMES = new BinaryNumericOperation() {
-        public boolean eval(boolean a, boolean b) {
-            fail();
-            return false;
-        }
-
-        public int eval(int a, int b) {
-            return a * b;
-        }
-
-        public long eval(long a, long b) {
-            return a * b;
-        }
-
-        public float eval(float a, float b) {
-            return a * b;
-        }
-
-        public double eval(double a, double b) {
-            return a * b;
-        }
-
-        public String eval(String a, String b) {
-            fail();
-            return null;
-        }
-    };
-
-    final static BinaryNumericOperation SHIFT_LEFT = new BinaryNumericOperation() {
-        public boolean eval(boolean a, boolean b) {
-            fail();
-            return false;
-        }
-
-        public int eval(int a, int b) {
-            return a << b;
-        }
-
-        public long eval(long a, long b) {
-            return a << b;
-        }
-
-        public float eval(float a, float b) {
-            fail();
-            return 0;
-        }
-
-        public double eval(double a, double b) {
-            fail();
-            return 0;
-        }
-
-        public String eval(String a, String b) {
-            fail();
-            return null;
-        }
-    };
-
-    final static BinaryNumericOperation SHIFT_RIGHT = new BinaryNumericOperation() {
-        public boolean eval(boolean a, boolean b) {
-            fail();
-            return false;
-        }
-
-        public int eval(int a, int b) {
-            return a >> b;
-        }
-
-        public long eval(long a, long b) {
-            return a >> b;
-        }
-
-        public float eval(float a, float b) {
-            fail();
-            return 0;
-        }
-
-        public double eval(double a, double b) {
-            fail();
-            return 0;
-        }
-
-        public String eval(String a, String b) {
-            fail();
-            return null;
-        }
-    };
-
-    final static BinaryNumericOperation UNSIGNED_SHIFT_RIGHT = new BinaryNumericOperation() {
-        public boolean eval(boolean a, boolean b) {
-            fail();
-            return false;
-        }
-
-        public int eval(int a, int b) {
-            return a >>> b;
-        }
-
-        public long eval(long a, long b) {
-            return a >>> b;
-        }
-
-        public float eval(float a, float b) {
-            fail();
-            return 0;
-        }
-
-        public double eval(double a, double b) {
-            fail();
-            return 0;
-        }
-
-        public String eval(String a, String b) {
-            fail();
-            return null;
-        }
-    };
-
-    final static BinaryNumericOperation BINARY_AND = new BinaryNumericOperation() {
-        public boolean eval(boolean a, boolean b) {
-            return a & b;
-        }
-
-        public int eval(int a, int b) {
-            return a & b;
-        }
-
-        public long eval(long a, long b) {
-            return a & b;
-        }
-
-        public float eval(float a, float b) {
-            fail();
-            return 0;
-        }
-
-        public double eval(double a, double b) {
-            fail();
-            return 0;
-        }
-
-        public String eval(String a, String b) {
-            fail();
-            return null;
-        }
-    };
-
-    final static BinaryNumericOperation BINARY_OR = new BinaryNumericOperation() {
-        public boolean eval(boolean a, boolean b) {
-            return a | b;
-        }
-
-        public int eval(int a, int b) {
-            return a | b;
-        }
-
-        public long eval(long a, long b) {
-            return a | b;
-        }
-
-        public float eval(float a, float b) {
-            fail();
-            return 0;
-        }
-
-        public double eval(double a, double b) {
-            fail();
-            return 0;
-        }
-
-        public String eval(String a, String b) {
-            fail();
-            return null;
-        }
-    };
-
-    final static BinaryNumericOperation BINARY_XOR = new BinaryNumericOperation() {
-        public boolean eval(boolean a, boolean b) {
-            return a ^ b;
-        }
-
-        public int eval(int a, int b) {
-            return a ^ b;
-        }
-
-        public long eval(long a, long b) {
-            return a ^ b;
-        }
-
-        public float eval(float a, float b) {
-            fail();
-            return 0;
-        }
-
-        public double eval(double a, double b) {
-            fail();
-            return 0;
-        }
-
-        public String eval(String a, String b) {
-            fail();
-            return null;
-        }
-    };
-
-    final static BinaryBooleanOperation EQUALS = new BinaryBooleanOperation() {
-        public boolean eval(boolean a, boolean b) {
-            return a == b;
-        }
-
-        public boolean eval(int a, int b) {
-            return a == b;
-        }
-
-        public boolean eval(long a, long b) {
-            return a == b;
-        }
-
-        public boolean eval(float a, float b) {
-            return a == b;
-        }
-
-        public boolean eval(double a, double b) {
-            return a == b;
-        }
-
-        public boolean eval(String a, String b) {
-            return a == b;
-        }
-        // the String equals relies on the internalization in EvaluationResult
-    };
-
-    final static BinaryBooleanOperation NOT_EQUALS = new BinaryBooleanOperation() {
-        public boolean eval(boolean a, boolean b) {
-            return a != b;
-        }
-
-        public boolean eval(int a, int b) {
-            return a != b;
-        }
-
-        public boolean eval(long a, long b) {
-            return a != b;
-        }
-
-        public boolean eval(float a, float b) {
-            return a != b;
-        }
-
-        public boolean eval(double a, double b) {
-            return a != b;
-        }
-
-        public boolean eval(String a, String b) {
-            return a != b;
-        }
-    };
-
-    final static BinaryBooleanOperation LESS_THAN = new BinaryBooleanOperation() {
-        public boolean eval(boolean a, boolean b) {
-            fail();
-            return false;
-        }
-
-        public boolean eval(int a, int b) {
-            return a < b;
-        }
-
-        public boolean eval(long a, long b) {
-            return a < b;
-        }
-
-        public boolean eval(float a, float b) {
-            return a < b;
-        }
-
-        public boolean eval(double a, double b) {
-            return a < b;
-        }
-
-        public boolean eval(String a, String b) {
-            fail();
-            return false;
-        }
-    };
-
-    final static BinaryBooleanOperation GREATER_THAN = new BinaryBooleanOperation() {
-        public boolean eval(boolean a, boolean b) {
-            fail();
-            return false;
-        }
-
-        public boolean eval(int a, int b) {
-            return a > b;
-        }
-
-        public boolean eval(long a, long b) {
-            return a > b;
-        }
-
-        public boolean eval(float a, float b) {
-            return a > b;
-        }
-
-        public boolean eval(double a, double b) {
-            return a > b;
-        }
-
-        public boolean eval(String a, String b) {
-            fail();
-            return false;
-        }
-    };
-
-    final static BinaryBooleanOperation LESS_OR_EQUALS = new BinaryBooleanOperation() {
-        public boolean eval(boolean a, boolean b) {
-            fail();
-            return false;
-        }
-
-        public boolean eval(int a, int b) {
-            return a <= b;
-        }
-
-        public boolean eval(long a, long b) {
-            return a <= b;
-        }
-
-        public boolean eval(float a, float b) {
-            return a <= b;
-        }
-
-        public boolean eval(double a, double b) {
-            return a <= b;
-        }
-
-        public boolean eval(String a, String b) {
-            fail();
-            return false;
-        }
-    };
-
-    final static BinaryBooleanOperation GREATER_OR_EQUALS = new BinaryBooleanOperation() {
-        public boolean eval(boolean a, boolean b) {
-            fail();
-            return false;
-        }
-
-        public boolean eval(int a, int b) {
-            return a >= b;
-        }
-
-        public boolean eval(long a, long b) {
-            return a >= b;
-        }
-
-        public boolean eval(float a, float b) {
-            return a >= b;
-        }
-
-        public boolean eval(double a, double b) {
-            return a >= b;
-        }
-
-        public boolean eval(String a, String b) {
-            fail();
-            return false;
-        }
-    };
-
-    final static BinaryBooleanOperation LOGICAL_AND = new BinaryBooleanOperation() {
-        public boolean eval(boolean a, boolean b) {
-            return a && b;
-        }
-
-        public boolean eval(int a, int b) {
-            fail();
-            return false;
-        }
-
-        public boolean eval(long a, long b) {
-            fail();
-            return false;
-        }
-
-        public boolean eval(float a, float b) {
-            fail();
-            return false;
-        }
-
-        public boolean eval(double a, double b) {
-            fail();
-            return false;
-        }
-
-        public boolean eval(String a, String b) {
-            fail();
-            return false;
-        }
-    };
-
-    final static BinaryBooleanOperation LOGICAL_OR = new BinaryBooleanOperation() {
-        public boolean eval(boolean a, boolean b) {
-            return a || b;
-        }
-
-        public boolean eval(int a, int b) {
-            fail();
-            return false;
-        }
-
-        public boolean eval(long a, long b) {
-            fail();
-            return false;
-        }
-
-        public boolean eval(float a, float b) {
-            fail();
-            return false;
-        }
-
-        public boolean eval(double a, double b) {
-            fail();
-            return false;
-        }
-
-        public boolean eval(String a, String b) {
-            fail();
-            return false;
-        }
-    };
-
-    final static UnaryBooleanOperation LOGICAL_NOT = new UnaryBooleanOperation() {
-        public boolean eval(boolean a) {
-            return !a;
-        }
-
-        public boolean eval(int a) {
-            fail();
-            return false;
-        }
-
-        public boolean eval(long a) {
-            fail();
-            return false;
-        }
-
-        public boolean eval(float a) {
-            fail();
-            return false;
-        }
-
-        public boolean eval(double a) {
-            fail();
-            return false;
-        }
-
-        public boolean eval(String a) {
-            fail();
-            return false;
-        }
-    };
-
-    final static UnaryNumericOperation POSITIVE = new UnaryNumericOperation() {
-        public boolean eval(boolean a) {
-            fail();
-            return false;
-        }
-
-        public int eval(int a) {
-            return +a;
-        }
-
-        public long eval(long a) {
-            return +a;
-        }
-
-        public float eval(float a) {
-            return +a;
-        }
-
-        public double eval(double a) {
-            return +a;
-        }
-
-        public String eval(String a) {
-            fail();
-            return null;
-        }
-    };
-
-    final static UnaryNumericOperation NEGATIVE = new UnaryNumericOperation() {
-        public boolean eval(boolean a) {
-            fail();
-            return false;
-        }
-
-        public int eval(int a) {
-            return -a;
-        }
-
-        public long eval(long a) {
-            return -a;
-        }
-
-        public float eval(float a) {
-            return -a;
-        }
-
-        public double eval(double a) {
-            return -a;
-        }
-
-        public String eval(String a) {
-            fail();
-            return null;
-        }
-    };
-
-    final static UnaryNumericOperation BINARY_NOT = new UnaryNumericOperation() {
-        public boolean eval(boolean a) {
-            fail();
-            return false;
-        }
-
-        public int eval(int a) {
-            return ~a;
-        }
-
-        public long eval(long a) {
-            return ~a;
-        }
-
-        public float eval(float a) {
-            fail();
-            return 0;
-        }
-
-        public double eval(double a) {
-            fail();
-            return 0;
-        }
-
-        public String eval(String a) {
-            fail();
-            return null;
-        }
-    };
 }

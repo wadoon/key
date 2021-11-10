@@ -2,20 +2,15 @@
 
 package recoder.kit.transformation;
 
-import java.util.List;
-
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.Constructor;
 import recoder.abstraction.Method;
 import recoder.abstraction.Type;
-import recoder.java.declaration.ClassInitializer;
-import recoder.java.declaration.ConstructorDeclaration;
-import recoder.java.declaration.FieldDeclaration;
-import recoder.java.declaration.MemberDeclaration;
-import recoder.java.declaration.MethodDeclaration;
-import recoder.java.declaration.TypeDeclaration;
+import recoder.java.declaration.*;
 import recoder.kit.ProblemReport;
 import recoder.kit.TwoPassTransformation;
+
+import java.util.List;
 
 /**
  * Syntactic transformation that adds the given MemberDeclaration to the list in
@@ -25,37 +20,32 @@ import recoder.kit.TwoPassTransformation;
  * the type declaration. If there is no matching member, a predefined order of
  * member types is followed: fields - initializers - constructors - methods -
  * member types.
- * 
+ *
  * @deprecated Does not (yet) check ambiguity or conflicts.
- *  
  */
 public class AppendMember extends TwoPassTransformation {
 
-    private boolean isVisible;
+    private final boolean isVisible;
 
-    private TypeDeclaration parent;
+    private final TypeDeclaration parent;
 
-    private MemberDeclaration child;
+    private final MemberDeclaration child;
 
     private int insertPosition = -1;
 
     /**
      * Creates a new transformation object that adds the given MemberDeclaration
      * to the list in the given TypeDeclaration at a convenient position.
-     * 
-     * @param sc
-     *            the service configuration to use.
-     * @param isVisible
-     *            flag indicating if this transformation shall be visible.
-     * @param decl
-     *            the declaration to modify. may not be <CODE>null</CODE> and
-     *            must denote a valid identifier name.
-     * @param code
-     *            the modifier to create, encoded using the codes from
-     *            {@link recoder.kit.ModifierKit}.
+     *
+     * @param sc        the service configuration to use.
+     * @param isVisible flag indicating if this transformation shall be visible.
+     * @param decl      the declaration to modify. may not be <CODE>null</CODE> and
+     *                  must denote a valid identifier name.
+     * @param code      the modifier to create, encoded using the codes from
+     *                  {@link recoder.kit.ModifierKit}.
      */
     public AppendMember(CrossReferenceServiceConfiguration sc, boolean isVisible, MemberDeclaration child,
-            TypeDeclaration parent) {
+                        TypeDeclaration parent) {
         super(sc);
         if (child == null || parent == null) {
             throw new IllegalArgumentException("Missing declaration");
@@ -71,11 +61,11 @@ public class AppendMember extends TwoPassTransformation {
 
     /**
      * Finds out where to insert the new member.
-     * 
+     *
      * @return the problem report.
      */
     public ProblemReport analyze() {
-    	List<MemberDeclaration> mdl = parent.getMembers();
+        List<MemberDeclaration> mdl = parent.getMembers();
         if (mdl == null) {
             insertPosition = 0;
             return setProblemReport(NO_PROBLEM);
@@ -126,9 +116,8 @@ public class AppendMember extends TwoPassTransformation {
 
     /**
      * Attaches the member at the proper position.
-     * 
-     * @exception IllegalStateException
-     *                if the analyzation has not been called.
+     *
+     * @throws IllegalStateException if the analyzation has not been called.
      * @see #analyze()
      */
     public void transform() {

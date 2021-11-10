@@ -2,9 +2,6 @@
 
 package recoder.kit.transformation;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ProgramFactory;
 import recoder.java.declaration.VariableSpecification;
@@ -12,35 +9,35 @@ import recoder.java.reference.VariableReference;
 import recoder.kit.ProblemReport;
 import recoder.kit.TwoPassTransformation;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Transformation that renames a variable by renaming all known references to
  * that variable. The new name should not be used for another variable.
- * <P>
+ * <p>
  * <B>Implementation warning: </B> does not (yet) check vadility of new name in
  * the context; does not check if there are byte code types that cannot be
  * changed
- * 
+ *
  * @author AL
  */
 public class RenameVariable extends TwoPassTransformation {
 
-    private VariableSpecification vs;
+    private final VariableSpecification vs;
 
-    private String newName;
+    private final String newName;
 
     private List<VariableReference> refs;
 
     /**
      * Creates a new transformation object that renames a variable and all
      * references to it. The new name should not conflict with another variable.
-     * 
-     * @param sc
-     *            the service configuration to use.
-     * @param vs
-     *            the variable to be renamed; may not be <CODE>null</CODE>.
-     * @param newName
-     *            the new name for the element; may not be <CODE>null</CODE>
-     *            and must denote a valid identifier name.
+     *
+     * @param sc      the service configuration to use.
+     * @param vs      the variable to be renamed; may not be <CODE>null</CODE>.
+     * @param newName the new name for the element; may not be <CODE>null</CODE>
+     *                and must denote a valid identifier name.
      */
     public RenameVariable(CrossReferenceServiceConfiguration sc, VariableSpecification vs, String newName) {
         super(sc);
@@ -56,7 +53,7 @@ public class RenameVariable extends TwoPassTransformation {
 
     /**
      * Collects all references to the variable.
-     * 
+     *
      * @return the problem report.
      */
     public ProblemReport analyze() {
@@ -71,9 +68,8 @@ public class RenameVariable extends TwoPassTransformation {
     /**
      * Locally renames all variable references collected in the analyzation
      * phase.
-     * 
-     * @exception IllegalStateException
-     *                if the analyzation has not been called.
+     *
+     * @throws IllegalStateException if the analyzation has not been called.
      * @see #analyze()
      */
     public void transform() {

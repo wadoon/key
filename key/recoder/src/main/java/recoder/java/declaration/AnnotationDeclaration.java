@@ -11,23 +11,22 @@ import recoder.list.generic.ASTList;
 
 /**
  * @author gutzmann
- *
  */
 public class AnnotationDeclaration extends InterfaceDeclaration {
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -5764583750285766921L;
+     * serialization id
+     */
+    private static final long serialVersionUID = -5764583750285766921L;
 
-	/**
-     * 
+    /**
+     *
      */
     public AnnotationDeclaration() {
         super();
     }
 
-    public AnnotationDeclaration(ASTList<DeclarationSpecifier> modifiers, Identifier name, 
-    		ASTList<MemberDeclaration> members) {
+    public AnnotationDeclaration(ASTList<DeclarationSpecifier> modifiers, Identifier name,
+                                 ASTList<MemberDeclaration> members) {
         super(modifiers, name, null, members);
     }
 
@@ -37,11 +36,11 @@ public class AnnotationDeclaration extends InterfaceDeclaration {
     protected AnnotationDeclaration(AnnotationDeclaration proto) {
         super(proto);
     }
-    
+
     public boolean isInterface() {
         return true;
     }
-    
+
     public boolean isOrdinaryInterface() {
         return false;
     }

@@ -29,9 +29,8 @@ public abstract class TreeChange {
 
     /**
      * Constructor for the change.
-     * 
-     * @param root
-     *            the root of the change.
+     *
+     * @param root the root of the change.
      */
     TreeChange(ProgramElement root) {
         this.root = root;
@@ -41,9 +40,9 @@ public abstract class TreeChange {
      * Checks if this change is included in a bigger one and may be considered
      * redundant for sake of information update. Minor changes are important for
      * the undo mechanism.
-     * 
+     *
      * @return <CODE>true</CODE>, if the changed tree is contained within
-     *         another changed tree that occured in the same update period.
+     * another changed tree that occured in the same update period.
      */
     public boolean isMinor() {
         return isMinor;
@@ -56,7 +55,7 @@ public abstract class TreeChange {
     /**
      * Returns the root of the tree that has changed. Note that the "root" is
      * not necessarily a non terminal.
-     * 
+     *
      * @return the root element of the change.
      */
     public final ProgramElement getChangeRoot() {
@@ -67,7 +66,7 @@ public abstract class TreeChange {
      * Returns the parent of the root of the tree that has changed. The parent
      * may differ from the current parent of the root, if the root has been
      * detached and reattached somewhere else.
-     * 
+     *
      * @return the parent of the root element of the change.
      */
     public abstract NonTerminalProgramElement getChangeRootParent();
@@ -76,7 +75,7 @@ public abstract class TreeChange {
      * Returns the compilation unit that has changed. The unit may differ from
      * the current unit of the root, if the root has been detached and
      * reattached somewhere else. The unit can be equals the change root.
-     * 
+     *
      * @return the compilation unit that has changed.
      */
     public final CompilationUnit getCompilationUnit() {

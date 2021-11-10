@@ -2,18 +2,18 @@
 
 package recoder.io;
 
-import java.io.IOException;
-
 import recoder.ServiceConfiguration;
+
+import java.io.IOException;
 
 /**
  * Facility to import and export project settings in various project files.
- * 
+ *
  * @since 0.63
  */
 public abstract class ProjectFileIO {
 
-    private ServiceConfiguration config;
+    private final ServiceConfiguration config;
 
     public ProjectFileIO(ServiceConfiguration system) {
         config = system;
@@ -35,7 +35,7 @@ public abstract class ProjectFileIO {
      * Loads properties from the project file and returns the file names of the
      * compilation units stored in the project file. It is left to subclasses to
      * locate the project file.
-     * 
+     *
      * @return the filenames of the known compilation units.
      */
     public abstract String[] load() throws IOException;

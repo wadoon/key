@@ -6,7 +6,6 @@ import java.util.List;
 
 /**
  * @Deprecated Not maintained..
- *
  */
 @Deprecated()
 public class ReflectionImport {
@@ -54,7 +53,7 @@ public class ReflectionImport {
             cf.setSuperName(sup.getName());
         }
         cf.setAccessFlags(c.getModifiers() | (c.isAnnotation() ? AccessFlags.ANNOTATION : 0)
-        					| (c.isEnum() ? AccessFlags.ENUM : 0));
+                | (c.isEnum() ? AccessFlags.ENUM : 0));
         cf.setInterfaceNames(getTypeNames(c.getInterfaces()));
 
         java.lang.reflect.Field[] dfields = c.getDeclaredFields();
@@ -65,11 +64,11 @@ public class ReflectionImport {
             String cvalue = null;
             if (Modifier.isFinal(mods) && Modifier.isStatic(mods)) {
                 try {
-                	f.setAccessible(true);
+                    f.setAccessible(true);
                     cvalue = f.get(null).toString();
                 } catch (IllegalAccessException iae) {
-                	// this should never happen!
-                	throw new RuntimeException("Encountered IllegalAccessException during reflection import! Cause: ", iae);
+                    // this should never happen!
+                    throw new RuntimeException("Encountered IllegalAccessException during reflection import! Cause: ", iae);
                 }
             }
             // blank finals will be reported as constant
@@ -93,11 +92,11 @@ public class ReflectionImport {
         for (int i = 0; i < dmethods.length; i += 1) {
             java.lang.reflect.Method m = dmethods[i];
             if (c.isAnnotation()) {
-            	methods.add(new AnnotationPropertyInfo(m.getModifiers(), getTypeName(m.getReturnType()), false/* TODO */, m.getName(),
-            			cf, m.getDefaultValue()));
+                methods.add(new AnnotationPropertyInfo(m.getModifiers(), getTypeName(m.getReturnType()), false/* TODO */, m.getName(),
+                        cf, m.getDefaultValue()));
             } else {
-            	methods.add(new MethodInfo(m.getModifiers(), getTypeName(m.getReturnType()), false/* TODO */, m.getName(), getTypeNames(m
-                    .getParameterTypes()), getTypeNames(m.getExceptionTypes()), cf));
+                methods.add(new MethodInfo(m.getModifiers(), getTypeName(m.getReturnType()), false/* TODO */, m.getName(), getTypeNames(m
+                        .getParameterTypes()), getTypeNames(m.getExceptionTypes()), cf));
             }
         }
         cf.setMethods(methods);

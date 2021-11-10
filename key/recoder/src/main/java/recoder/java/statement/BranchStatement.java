@@ -5,17 +5,17 @@ package recoder.java.statement;
 
 /**
  * Branch statement.
- * 
+ *
  * @author AL
  * @author <TT>AutoDoc</TT>
  */
 
-public abstract class BranchStatement extends JavaStatement  {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	
+public abstract class BranchStatement extends JavaStatement {
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * Branch statement.
@@ -27,9 +27,8 @@ public abstract class BranchStatement extends JavaStatement  {
 
     /**
      * Branch statement.
-     * 
-     * @param proto
-     *            a branch statement.
+     *
+     * @param proto a branch statement.
      */
 
     protected BranchStatement(BranchStatement proto) {
@@ -38,7 +37,7 @@ public abstract class BranchStatement extends JavaStatement  {
 
     /**
      * Get the number of branches in this container.
-     * 
+     *
      * @return the number of branches.
      */
 

@@ -8,22 +8,21 @@ package recoder.service;
 public class IllegalChangeReportException extends RuntimeException {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 1930002520114622048L;
+     * serialization id
+     */
+    private static final long serialVersionUID = 1930002520114622048L;
 
-	/**
+    /**
      * Creates a new illegal change report exception.
      */
     public IllegalChangeReportException() {
-    	super();
+        super();
     }
 
     /**
      * Creates a new illegal change report exception.
-     * 
-     * @param msg
-     *            a string.
+     *
+     * @param msg a string.
      */
     public IllegalChangeReportException(String msg) {
         super(msg);

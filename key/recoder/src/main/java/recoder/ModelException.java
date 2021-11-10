@@ -4,28 +4,27 @@ package recoder;
 
 /**
  * Model exception.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 public class ModelException extends RuntimeException {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -2334025270847777367L;
+     * serialization id
+     */
+    private static final long serialVersionUID = -2334025270847777367L;
 
-	/**
+    /**
      * Model exception.
      */
     public ModelException() {
-    	super();
+        super();
     }
 
     /**
      * Model exception.
-     * 
-     * @param s
-     *            a string.
+     *
+     * @param s a string.
      */
     public ModelException(String s) {
         super(s);

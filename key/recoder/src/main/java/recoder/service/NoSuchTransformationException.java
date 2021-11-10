@@ -7,21 +7,21 @@ import recoder.kit.Transformation;
 
 /**
  * Exception indicating that a transformation is not accessible.
- * 
+ *
  * @author AL.
  */
 public class NoSuchTransformationException extends ModelException {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 1118670095981879663L;
+     * serialization id
+     */
+    private static final long serialVersionUID = 1118670095981879663L;
 
-	/**
+    /**
      * Empty constructor.
      */
     public NoSuchTransformationException() {
-    	super();
+        super();
     }
 
     /**
@@ -33,9 +33,8 @@ public class NoSuchTransformationException extends ModelException {
 
     /**
      * Constructor with an explanation text.
-     * 
-     * @param s
-     *            an explanation.
+     *
+     * @param s an explanation.
      */
     public NoSuchTransformationException(String s) {
         super(s);

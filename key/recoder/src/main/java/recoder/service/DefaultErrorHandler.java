@@ -1,22 +1,19 @@
 package recoder.service;
 
-import java.util.ArrayList;
-import java.util.EventObject;
-import java.util.List;
-
 import recoder.ModelElement;
 import recoder.io.DuplicatePathWarning;
 import recoder.java.ProgramElement;
 
+import java.util.ArrayList;
+import java.util.EventObject;
+import java.util.List;
+
 public class DefaultErrorHandler implements ErrorHandler {
 
-    private int errorCount = 0;
-
-    private int errorThreshold;
-    
-    private List<Exception> errors = new ArrayList<Exception>();
-    
     protected boolean isUpdating = false;
+    private int errorCount = 0;
+    private int errorThreshold;
+    private final List<Exception> errors = new ArrayList<Exception>();
 
     public DefaultErrorHandler() {
         setErrorThreshold(20);
@@ -68,21 +65,19 @@ public class DefaultErrorHandler implements ErrorHandler {
      * {@link recoder.service.UnresolvedReferenceException}s and returns <CODE>
      * true</CODE> if the cause is either part of an incomplete model or
      * contained in template code.
-     * 
+     *
      * @see #isReferingUnavailableCode
      * @see #isTemplateCode
      */
     protected boolean isIgnorable(Exception e) {
-    	if (e instanceof DuplicatePathWarning)
-    		return true;
+        if (e instanceof DuplicatePathWarning)
+            return true;
         if (e instanceof UnresolvedReferenceException) {
             ProgramElement unresolvedReference = ((UnresolvedReferenceException) e).getUnresolvedReference();
             if (isReferingUnavailableCode(unresolvedReference)) {
                 return true;
             }
-            if (isTemplateCode(unresolvedReference)) {
-                return true;
-            }
+            return isTemplateCode(unresolvedReference);
         }
         return false;
     }
@@ -107,11 +102,11 @@ public class DefaultErrorHandler implements ErrorHandler {
     protected void errorMessage(Exception e) {
         String className = e.getClass().getName();
         className = className.substring(className.lastIndexOf('.') + 1);
-        
+
         System.err.println("*** " + errorCount + ": " + className);
         System.err.println(e.getMessage());
         if (!isUpdating)
-        	System.err.println("(Error occurred outside a model update)");
+            System.err.println("(Error occurred outside a model update)");
         System.err.println();
     }
 
@@ -130,7 +125,7 @@ public class DefaultErrorHandler implements ErrorHandler {
         if (isIgnorable(e)) {
             warningMessage(e);
         } else {
-        	errors.add(e);
+            errors.add(e);
             errorCount += 1;
             errorMessage(e);
             if (errorCount > errorThreshold) {
@@ -140,7 +135,7 @@ public class DefaultErrorHandler implements ErrorHandler {
     }
 
     public void modelUpdating(EventObject event) {
-    	isUpdating = true;
+        isUpdating = true;
     }
 
     public void modelUpdated(EventObject event) {

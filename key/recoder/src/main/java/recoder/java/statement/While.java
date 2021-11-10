@@ -9,18 +9,18 @@ import recoder.java.Statement;
 
 /**
  * While.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class While extends LoopStatement {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -8497002453485096424L;
+     * serialization id
+     */
+    private static final long serialVersionUID = -8497002453485096424L;
 
-	/**
+    /**
      * While.
      */
 
@@ -30,9 +30,8 @@ public class While extends LoopStatement {
 
     /**
      * While.
-     * 
-     * @param guard
-     *            an expression.
+     *
+     * @param guard an expression.
      */
 
     public While(Expression guard) {
@@ -42,11 +41,9 @@ public class While extends LoopStatement {
 
     /**
      * While.
-     * 
-     * @param guard
-     *            an expression.
-     * @param body
-     *            a statement.
+     *
+     * @param guard an expression.
+     * @param body  a statement.
      */
 
     public While(Expression guard, Statement body) {
@@ -57,9 +54,8 @@ public class While extends LoopStatement {
 
     /**
      * While.
-     * 
-     * @param proto
-     *            a while.
+     *
+     * @param proto a while.
      */
 
     protected While(While proto) {
@@ -69,7 +65,7 @@ public class While extends LoopStatement {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -83,7 +79,7 @@ public class While extends LoopStatement {
 
     /**
      * Is exit condition.
-     * 
+     *
      * @return the boolean value.
      */
 
@@ -93,7 +89,7 @@ public class While extends LoopStatement {
 
     /**
      * Is checked before iteration.
-     * 
+     *
      * @return the boolean value.
      */
 

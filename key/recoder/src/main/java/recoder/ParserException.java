@@ -4,28 +4,27 @@ package recoder;
 
 /**
  * Parser exception.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 public class ParserException extends Exception {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -7809348545251950515L;
+     * serialization id
+     */
+    private static final long serialVersionUID = -7809348545251950515L;
 
-	/**
+    /**
      * Parser exception.
      */
     public ParserException() {
-    	super();
+        super();
     }
 
     /**
      * Parser exception.
-     * 
-     * @param msg
-     *            a string.
+     *
+     * @param msg a string.
      */
     public ParserException(String msg) {
         super(msg);

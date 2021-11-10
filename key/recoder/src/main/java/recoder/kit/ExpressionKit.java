@@ -2,8 +2,6 @@
 
 package recoder.kit;
 
-import java.util.List;
-
 import recoder.ProgramFactory;
 import recoder.abstraction.PrimitiveType;
 import recoder.abstraction.Type;
@@ -14,20 +12,17 @@ import recoder.java.expression.Assignment;
 import recoder.java.expression.Literal;
 import recoder.java.expression.Operator;
 import recoder.java.expression.ParenthesizedExpression;
-import recoder.java.reference.ArrayReference;
-import recoder.java.reference.ConstructorReference;
-import recoder.java.reference.MethodReference;
-import recoder.java.reference.ReferencePrefix;
-import recoder.java.reference.ReferenceSuffix;
-import recoder.java.reference.VariableReference;
+import recoder.java.reference.*;
 import recoder.list.generic.ASTArrayList;
 import recoder.service.NameInfo;
 import recoder.util.Debug;
 
+import java.util.List;
+
 public class ExpressionKit {
 
     private ExpressionKit() {
-    	super();
+        super();
     }
 
     /**
@@ -36,11 +31,10 @@ public class ExpressionKit {
      * no statements (method calls, assignments) cannot have any side-effects.
      * Parenthesized expressions are not considered statements in this context,
      * even though they technically may appear as such.
-     * 
-     * @param expr
-     *            an expression.
+     *
+     * @param expr an expression.
      * @return <CODE>true</CODE>, if the expression contains expressions,
-     *         <CODE>false</CODE> if it does not.
+     * <CODE>false</CODE> if it does not.
      */
     public static boolean containsStatements(Expression expr) {
         if (expr instanceof Statement) {
@@ -65,11 +59,10 @@ public class ExpressionKit {
      * references. As there are no call-by-reference output parameters in Java,
      * L-value references must occur as first argument of an assigment operator
      * such as <CODE>=</CODE> or <CODE>++</CODE>.
-     * 
-     * @param r
-     *            an expression.
+     *
+     * @param r an expression.
      * @return <CODE>true</CODE> if the specified expression is an L-value,
-     *         <CODE>false</CODE> otherwise.
+     * <CODE>false</CODE> otherwise.
      * @since 0.63
      */
     public static boolean isLValue(Expression r) {
@@ -83,9 +76,8 @@ public class ExpressionKit {
     /**
      * Query that collects all expressions that are evaluated before the given
      * expression in its statement or initializer in the correct order.
-     * 
-     * @param x
-     *            an expression as part of a statement or an initializer.
+     *
+     * @param x an expression as part of a statement or an initializer.
      * @return a mutable list of expressions that preceed the given one.
      */
     public static List<Expression> collectPreceedingExpressions(Expression x) {
@@ -147,13 +139,10 @@ public class ExpressionKit {
      * {@link recoder.java.expression.literal.NullLiteral}, for primitive types
      * their corresponding default value (<CODE>0</CODE>,<CODE>false
      * </CODE>,<CODE>'\0'</CODE>).
-     * 
-     * @param f
-     *            the program factory for the literal to create.
-     * @param ni
-     *            the name info defining the primitive type objects.
-     * @param t
-     *            the type to create a default value for.
+     *
+     * @param f  the program factory for the literal to create.
+     * @param ni the name info defining the primitive type objects.
+     * @param t  the type to create a default value for.
      * @return a new literal object widening to the given type.
      */
     public static Literal createDefaultValue(ProgramFactory f, NameInfo ni, Type t) {

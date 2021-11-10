@@ -6,7 +6,7 @@ import recoder.NamedModelElement;
 
 /**
  * Named program element.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
@@ -14,16 +14,15 @@ public interface NamedProgramElement extends NamedModelElement, NonTerminalProgr
 
     /**
      * Get identifier.
-     * 
+     *
      * @return the identifier.
      */
     Identifier getIdentifier();
 
     /**
      * Set identifier.
-     * 
-     * @param id
-     *            an identifier.
+     *
+     * @param id an identifier.
      */
     void setIdentifier(Identifier id);
 }

@@ -12,7 +12,24 @@ import java.util.StringTokenizer;
  */
 public class FileUtils {
 
+    private final static String ARCHIVE_NAME;
+    private final static String LIB_SUBDIR;
     private static File userDirectory;
+
+    static {
+        if (System.getProperty("os.name").startsWith("Mac")) {
+            ARCHIVE_NAME = "classes.jar";
+            // if someone tells me the right property to fetch the class, I will change
+            // this strange path...
+            LIB_SUBDIR = "../Classes";
+        } else if (System.getProperty("java.version").startsWith("1.1")) {
+            ARCHIVE_NAME = "classes.zip";
+            LIB_SUBDIR = "lib";
+        } else {
+            ARCHIVE_NAME = "rt.jar";
+            LIB_SUBDIR = "lib";
+        }
+    }
 
     public static File getUserDirectory() {
         if (userDirectory == null) {
@@ -78,28 +95,10 @@ public class FileUtils {
         return result.toString();
     }
 
-    private final static String ARCHIVE_NAME;
-    private final static String LIB_SUBDIR;
-
-    static {
-    	if (System.getProperty("os.name").startsWith("Mac")){
-        	ARCHIVE_NAME = "classes.jar";
-        	// if someone tells me the right property to fetch the class, I will change 
-        	// this strange path...
-        	LIB_SUBDIR = "../Classes";
-        } else if (System.getProperty("java.version").startsWith("1.1")) {
-            ARCHIVE_NAME = "classes.zip";
-            LIB_SUBDIR = "lib";
-        } else {
-            ARCHIVE_NAME = "rt.jar";
-            LIB_SUBDIR = "lib";
-        }
-    }
-
     /**
      * Returns the file representing the Java system class archive file, if it
      * exists.
-     * 
+     *
      * @return the Java system class archive file.
      */
     public static File getPathOfSystemClasses() {
@@ -136,7 +135,7 @@ public class FileUtils {
 
     /**
      * Returns the magic ext directory.
-     * 
+     *
      * @return the Java system class archive file.
      * @since 0.72
      */

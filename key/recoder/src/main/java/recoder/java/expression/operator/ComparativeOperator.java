@@ -7,17 +7,17 @@ import recoder.java.expression.Operator;
 
 /**
  * Comparative operator.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public abstract class ComparativeOperator extends Operator {
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+     *
+     */
+    private static final long serialVersionUID = 1L;
 
-	/**
+    /**
      * Comparative operator.
      */
 
@@ -27,11 +27,9 @@ public abstract class ComparativeOperator extends Operator {
 
     /**
      * Comparative operator.
-     * 
-     * @param lhs
-     *            an expression.
-     * @param rhs
-     *            an expression.
+     *
+     * @param lhs an expression.
+     * @param rhs an expression.
      */
 
     public ComparativeOperator(Expression lhs, Expression rhs) {
@@ -40,9 +38,8 @@ public abstract class ComparativeOperator extends Operator {
 
     /**
      * Comparative operator.
-     * 
-     * @param proto
-     *            a comparative operator.
+     *
+     * @param proto a comparative operator.
      */
 
     protected ComparativeOperator(ComparativeOperator proto) {
@@ -52,7 +49,7 @@ public abstract class ComparativeOperator extends Operator {
 
     /**
      * Get arity.
-     * 
+     *
      * @return the int value.
      */
 
@@ -62,7 +59,7 @@ public abstract class ComparativeOperator extends Operator {
 
     /**
      * Get notation.
-     * 
+     *
      * @return the int value.
      */
 

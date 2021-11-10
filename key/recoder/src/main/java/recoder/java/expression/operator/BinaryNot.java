@@ -8,18 +8,18 @@ import recoder.java.expression.Operator;
 
 /**
  * Binary not.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class BinaryNot extends Operator {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 6494982658640409026L;
+     * serialization id
+     */
+    private static final long serialVersionUID = 6494982658640409026L;
 
-	/**
+    /**
      * Binary not.
      */
 
@@ -29,9 +29,8 @@ public class BinaryNot extends Operator {
 
     /**
      * Binary not.
-     * 
-     * @param child
-     *            an expression.
+     *
+     * @param child an expression.
      */
 
     public BinaryNot(Expression child) {
@@ -41,9 +40,8 @@ public class BinaryNot extends Operator {
 
     /**
      * Binary not.
-     * 
-     * @param proto
-     *            a binary not.
+     *
+     * @param proto a binary not.
      */
 
     protected BinaryNot(BinaryNot proto) {
@@ -53,7 +51,7 @@ public class BinaryNot extends Operator {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -63,7 +61,7 @@ public class BinaryNot extends Operator {
 
     /**
      * Get arity.
-     * 
+     *
      * @return the int value.
      */
 
@@ -73,7 +71,7 @@ public class BinaryNot extends Operator {
 
     /**
      * Get precedence.
-     * 
+     *
      * @return the int value.
      */
 
@@ -83,7 +81,7 @@ public class BinaryNot extends Operator {
 
     /**
      * Get notation.
-     * 
+     *
      * @return the int value.
      */
 
@@ -94,9 +92,9 @@ public class BinaryNot extends Operator {
     /**
      * Checks if this operator is left or right associative. Ordinary unary
      * operators are right associative.
-     * 
+     *
      * @return <CODE>true</CODE>, if the operator is left associative, <CODE>
-     *         false</CODE> otherwise.
+     * false</CODE> otherwise.
      */
 
     public boolean isLeftAssociative() {

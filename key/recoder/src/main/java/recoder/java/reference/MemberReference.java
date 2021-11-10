@@ -7,10 +7,10 @@ import recoder.java.Reference;
 
 /**
  * Member reference.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public interface MemberReference extends Reference, ExpressionContainer {
-	// no further declarations
+    // no further declarations
 }

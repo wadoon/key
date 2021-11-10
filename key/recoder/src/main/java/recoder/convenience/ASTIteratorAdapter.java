@@ -8,17 +8,17 @@ import recoder.java.ProgramElement;
 /**
  * the "default" implementation for iterator listeners. This class may serve as
  * a base class for derived specialized versions.
- * 
+ *
  * @author RN
  */
 public class ASTIteratorAdapter implements ASTIteratorListener {
 
     public void enteringNode(ASTIterator it, ProgramElement node) {
-    	// defaults to nothing
+        // defaults to nothing
     }
 
     public void leavingNode(ASTIterator it, ProgramElement node) {
-    	// defaults to nothing
+        // defaults to nothing
     }
 
     public int enterChildren(ASTIterator it, NonTerminalProgramElement thisNode) {
@@ -30,7 +30,7 @@ public class ASTIteratorAdapter implements ASTIteratorListener {
     }
 
     public void returnedFromChildNode(ASTIterator it, NonTerminalProgramElement thisNode, ProgramElement childNode) {
-    	// defaults to nothing
+        // defaults to nothing
     }
 
 }

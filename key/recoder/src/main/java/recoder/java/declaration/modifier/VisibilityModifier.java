@@ -4,30 +4,29 @@ package recoder.java.declaration.modifier;
 
 /**
  * Visibility modifier.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public abstract class VisibilityModifier extends recoder.java.declaration.Modifier {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+     *
+     */
+    private static final long serialVersionUID = 1L;
 
-	/**
+    /**
      * Visibility modifier.
      */
 
     public VisibilityModifier() {
-    	// default constructor
+        // default constructor
     }
 
     /**
      * Visibility modifier.
-     * 
-     * @param proto
-     *            a visibility modifier.
+     *
+     * @param proto a visibility modifier.
      */
 
     protected VisibilityModifier(VisibilityModifier proto) {

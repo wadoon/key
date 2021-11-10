@@ -2,13 +2,7 @@
 
 package recoder.java.expression.operator;
 
-import recoder.java.Expression;
-import recoder.java.ExpressionContainer;
-import recoder.java.NonTerminalProgramElement;
-import recoder.java.ProgramElement;
-import recoder.java.SourceElement;
-import recoder.java.SourceVisitor;
-import recoder.java.StatementContainer;
+import recoder.java.*;
 import recoder.java.declaration.ClassDeclaration;
 import recoder.java.declaration.TypeArgumentDeclaration;
 import recoder.java.declaration.TypeDeclaration;
@@ -28,7 +22,7 @@ import recoder.list.generic.ASTList;
  * if getType() instanceof UserType
  * <LI>Anonymous Inner Class definition and construction <BR>
  * <tt>new XYZ(a<sub>1</sub>, ..., a<sub>n</sub>)
- { m<sub>1</sub>, ..., m<sub>k</sub> }</tt>
+ * { m<sub>1</sub>, ..., m<sub>k</sub> }</tt>
  * <BR>
  * if getType() instanceof UserType && getClassDeclaration() !=<tt>null</tt>
  * </OL>
@@ -38,13 +32,13 @@ import recoder.list.generic.ASTList;
 
 public class New extends TypeOperator implements ConstructorReference, ExpressionStatement, ReferencePrefix,
         ReferenceSuffix, TypeDeclarationContainer {
-	
-    /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -4983184360698832328L;
 
-	/**
+    /**
+     * serialization id
+     */
+    private static final long serialVersionUID = -4983184360698832328L;
+
+    /**
      * Anonymous class.
      */
     protected ClassDeclaration anonymousClass;
@@ -66,9 +60,9 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
     protected StatementContainer statementParent;
 
     private boolean withDiamondOperator;
-    
+
     private ASTList<TypeArgumentDeclaration> constructorCallTypeArgs;
-    
+
     /**
      * New.
      */
@@ -79,13 +73,10 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
 
     /**
      * New.
-     * 
-     * @param accessPath
-     *            a reference prefix.
-     * @param constructorName
-     *            a type reference.
-     * @param arguments
-     *            an expression mutable list.
+     *
+     * @param accessPath      a reference prefix.
+     * @param constructorName a type reference.
+     * @param arguments       an expression mutable list.
      */
 
     public New(ReferencePrefix accessPath, TypeReference constructorName, ASTList<Expression> arguments) {
@@ -97,19 +88,15 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
 
     /**
      * New.
-     * 
-     * @param accessPath
-     *            a reference prefix.
-     * @param constructorName
-     *            a type reference.
-     * @param arguments
-     *            an expression mutable list.
-     * @param anonymousClass
-     *            a class declaration.
+     *
+     * @param accessPath      a reference prefix.
+     * @param constructorName a type reference.
+     * @param arguments       an expression mutable list.
+     * @param anonymousClass  a class declaration.
      */
 
     public New(ReferencePrefix accessPath, TypeReference constructorName, ASTList<Expression> arguments,
-            ClassDeclaration anonymousClass) {
+               ClassDeclaration anonymousClass) {
         this(accessPath, constructorName, arguments);
         setClassDeclaration(anonymousClass);
         makeParentRoleValid();
@@ -117,9 +104,8 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
 
     /**
      * New.
-     * 
-     * @param proto
-     *            a new.
+     *
+     * @param proto a new.
      */
 
     protected New(New proto) {
@@ -135,7 +121,7 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -161,9 +147,9 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
             anonymousClass.setParent(this);
         }
         if (constructorCallTypeArgs != null) {
-        	for (TypeArgumentDeclaration ta : constructorCallTypeArgs) {
-        		ta.setParent(this);
-        	}
+            for (TypeArgumentDeclaration ta : constructorCallTypeArgs) {
+                ta.setParent(this);
+            }
         }
     }
 
@@ -177,7 +163,7 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
 
     /**
      * Get AST parent.
-     * 
+     *
      * @return the non terminal program element.
      */
 
@@ -193,7 +179,7 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
 
     /**
      * Get arity.
-     * 
+     *
      * @return the int value.
      */
 
@@ -203,7 +189,7 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
 
     /**
      * Get precedence.
-     * 
+     *
      * @return the int value.
      */
 
@@ -213,7 +199,7 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
 
     /**
      * Get notation.
-     * 
+     *
      * @return the int value.
      */
 
@@ -223,7 +209,7 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
 
     /**
      * Get statement container.
-     * 
+     *
      * @return the statement container.
      */
     public StatementContainer getStatementContainer() {
@@ -231,8 +217,18 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
     }
 
     /**
+     * Set statement container.
+     *
+     * @param parent a statement container.
+     */
+
+    public void setStatementContainer(StatementContainer parent) {
+        statementParent = parent;
+    }
+
+    /**
      * Get expression container.
-     * 
+     *
      * @return the expression container.
      */
 
@@ -242,9 +238,8 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
 
     /**
      * Set expression container.
-     * 
-     * @param parent
-     *            an expression container.
+     *
+     * @param parent an expression container.
      */
 
     public void setExpressionContainer(ExpressionContainer parent) {
@@ -252,19 +247,8 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
     }
 
     /**
-     * Set statement container.
-     * 
-     * @param parent
-     *            a statement container.
-     */
-
-    public void setStatementContainer(StatementContainer parent) {
-        statementParent = parent;
-    }
-
-    /**
      * Get class declaration.
-     * 
+     *
      * @return the class declaration.
      */
 
@@ -274,9 +258,8 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
 
     /**
      * Set class declaration.
-     * 
-     * @param decl
-     *            a class declaration.
+     *
+     * @param decl a class declaration.
      */
 
     public void setClassDeclaration(ClassDeclaration decl) {
@@ -285,7 +268,7 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
 
     /**
      * Get the number of type declarations in this container.
-     * 
+     *
      * @return the number of type declarations.
      */
 
@@ -310,7 +293,7 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
 
     /**
      * Returns the number of children of this node.
-     * 
+     *
      * @return an int giving the number of children of this node
      */
 
@@ -325,19 +308,17 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
         if (anonymousClass != null)
             result++;
         if (constructorCallTypeArgs != null)
-        	result += constructorCallTypeArgs.size();
+            result += constructorCallTypeArgs.size();
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child
      * array
-     * 
-     * @param index
-     *            an index into this node's "virtual" child array
+     *
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
@@ -365,7 +346,7 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
             index--;
         }
         if (constructorCallTypeArgs != null) {
-        	return constructorCallTypeArgs.get(index);
+            return constructorCallTypeArgs.get(index);
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -375,7 +356,7 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
         // role 1: type reference (for type operators only)
         // role 2: prefix (for New only)
         // role 3: class declaration (for New only)
-    	// role 4 (IDX): type arguments
+        // role 4 (IDX): type arguments
         if (children != null) {
             int index = children.indexOf(child);
             if (index >= 0) {
@@ -392,10 +373,10 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
             return 3;
         }
         if (constructorCallTypeArgs != null) {
-        	int index = constructorCallTypeArgs.indexOf(child);
-        	if (index >= 0) {
-        		return (index << 4) | 4;
-        	}
+            int index = constructorCallTypeArgs.indexOf(child);
+            if (index >= 0) {
+                return (index << 4) | 4;
+            }
         }
         return -1;
     }
@@ -406,14 +387,11 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
      * element can be null - in that case, the child is effectively removed. The
      * parent role of the new child is validated, while the parent link of the
      * replaced child is left untouched.
-     * 
-     * @param p
-     *            the old child.
-     * @param p
-     *            the new child.
+     *
+     * @param p the old child.
+     * @param p the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException
-     *                if the new child cannot take over the role of the old one.
+     * @throws ClassCastException if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
@@ -463,7 +441,7 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
 
     /**
      * Get reference prefix.
-     * 
+     *
      * @return the reference prefix.
      */
 
@@ -473,9 +451,8 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
 
     /**
      * Set reference prefix.
-     * 
-     * @param x
-     *            a reference prefix.
+     *
+     * @param x a reference prefix.
      */
 
     public void setReferencePrefix(ReferencePrefix x) {
@@ -484,7 +461,7 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
 
     /**
      * Get reference suffix.
-     * 
+     *
      * @return the reference suffix.
      */
 
@@ -494,9 +471,8 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
 
     /**
      * Set reference suffix.
-     * 
-     * @param path
-     *            a reference suffix.
+     *
+     * @param path a reference suffix.
      */
 
     public void setReferenceSuffix(ReferenceSuffix path) {
@@ -505,7 +481,7 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
 
     /**
      * Get arguments.
-     * 
+     *
      * @return the expression mutable list.
      */
 
@@ -515,9 +491,8 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
 
     /**
      * Set arguments.
-     * 
-     * @param list
-     *            an expression mutable list.
+     *
+     * @param list an expression mutable list.
      */
 
     public void setArguments(ASTList<Expression> list) {
@@ -527,21 +502,21 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
     public void accept(SourceVisitor v) {
         v.visitNew(this);
     }
-    
+
     public ASTList<TypeArgumentDeclaration> getConstructorRefTypeArguments() {
-    	return constructorCallTypeArgs;
+        return constructorCallTypeArgs;
     }
-    
+
     public void setConstructorRefTypeArguments(ASTList<TypeArgumentDeclaration> list) {
-    	constructorCallTypeArgs = list;
+        constructorCallTypeArgs = list;
     }
-    
+
     public boolean withDiamondOperator() {
-    	return withDiamondOperator;
+        return withDiamondOperator;
     }
 
     public void setWithDiamondOperator(boolean flag) {
-    	this.withDiamondOperator = flag;
+        this.withDiamondOperator = flag;
     }
 
 }

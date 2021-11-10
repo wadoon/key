@@ -2,37 +2,33 @@
 
 package recoder.kit.transformation;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ProgramFactory;
 import recoder.abstraction.Method;
 import recoder.java.declaration.MethodDeclaration;
 import recoder.java.reference.MemberReference;
 import recoder.java.reference.MethodReference;
-import recoder.kit.IllegalName;
-import recoder.kit.MethodKit;
-import recoder.kit.MissingSources;
-import recoder.kit.ProblemReport;
-import recoder.kit.TwoPassTransformation;
+import recoder.kit.*;
 import recoder.service.CrossReferenceSourceInfo;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Transformation that renames a method and all known references to that method.
  * The new name should not be used for another method with the same signature.
- * <P>
+ * <p>
  * <B>Implementation warning: </B> does not (yet) check vadility of new name in
  * the context
- * 
+ *
  * @author AL
  * @author AM
  */
 public class RenameMethod extends TwoPassTransformation {
 
-    private Method methodToRename;
+    private final Method methodToRename;
 
-    private String newName;
+    private final String newName;
 
     private List<MethodDeclaration> methods;
 
@@ -42,14 +38,11 @@ public class RenameMethod extends TwoPassTransformation {
      * Creates a new transformation object that renames a method and all
      * redefined versions and all references to them. The new name should not
      * conflict with another method in any of the occurances.
-     * 
-     * @param sc
-     *            the service configuration to use.
-     * @param method
-     *            the method to be renamed; may not be <CODE>null</CODE>.
-     * @param newName
-     *            the new name for the element; may not be <CODE>null</CODE>
-     *            and must denote a valid identifier name.
+     *
+     * @param sc      the service configuration to use.
+     * @param method  the method to be renamed; may not be <CODE>null</CODE>.
+     * @param newName the new name for the element; may not be <CODE>null</CODE>
+     *                and must denote a valid identifier name.
      */
     public RenameMethod(CrossReferenceServiceConfiguration sc, MethodDeclaration method, String newName) {
         super(sc);
@@ -64,35 +57,14 @@ public class RenameMethod extends TwoPassTransformation {
     }
 
     /**
-     * Problem report indicating that certain method declarations redefining the
-     * method to rename are not available in source code.
-     */
-    public static class MissingMethodDeclarations extends MissingSources {
-
-        /**
-		 * serialization id
-		 */
-		private static final long serialVersionUID = 9214788084198236635L;
-		private List<Method> nonMethodDeclarations;
-
-        MissingMethodDeclarations(List<Method> nonMethodDeclarations) {
-            this.nonMethodDeclarations = nonMethodDeclarations;
-        }
-
-        public List<Method> getNonMethodDeclarations() {
-            return nonMethodDeclarations;
-        }
-    }
-
-    /**
      * Collects all related methods and all references.
-     * 
+     *
      * @return the problem report: {@link recoder.kit.Identity}(the name has
-     *         not changed), {@link recoder.kit.Equivalence}, or
-     *         {@link MissingMethodDeclarations}(some of related methods are
-     *         not available as source code), or {@link IllegalName}.
+     * not changed), {@link recoder.kit.Equivalence}, or
+     * {@link MissingMethodDeclarations}(some of related methods are
+     * not available as source code), or {@link IllegalName}.
      * @see recoder.kit.MethodKit#getAllRelatedMethods(CrossReferenceSourceInfo,
-     *      Method)
+     * Method)
      */
     public ProblemReport analyze() {
         if (newName.equals(methodToRename.getName())) {
@@ -134,9 +106,8 @@ public class RenameMethod extends TwoPassTransformation {
     /**
      * Locally renames the method declaration and all method references
      * collected in the analyzation phase.
-     * 
-     * @exception IllegalStateException
-     *                if the analyzation has not been called.
+     *
+     * @throws IllegalStateException if the analyzation has not been called.
      * @see #analyze()
      */
     public void transform() {
@@ -157,5 +128,26 @@ public class RenameMethod extends TwoPassTransformation {
      */
     public List<MethodDeclaration> getRenamedMethods() {
         return methods;
+    }
+
+    /**
+     * Problem report indicating that certain method declarations redefining the
+     * method to rename are not available in source code.
+     */
+    public static class MissingMethodDeclarations extends MissingSources {
+
+        /**
+         * serialization id
+         */
+        private static final long serialVersionUID = 9214788084198236635L;
+        private final List<Method> nonMethodDeclarations;
+
+        MissingMethodDeclarations(List<Method> nonMethodDeclarations) {
+            this.nonMethodDeclarations = nonMethodDeclarations;
+        }
+
+        public List<Method> getNonMethodDeclarations() {
+            return nonMethodDeclarations;
+        }
     }
 }

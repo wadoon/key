@@ -7,21 +7,21 @@ import recoder.java.expression.Literal;
 
 /**
  * Double literal.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class DoubleLiteral extends Literal {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 6628200854323360553L;
-	/**
+     * serialization id
+     */
+    private static final long serialVersionUID = 6628200854323360553L;
+    /**
      * Textual representation of the value.
      */
 
-	private String value;
+    private String value;
 
     /**
      * Double literal.
@@ -33,9 +33,8 @@ public class DoubleLiteral extends Literal {
 
     /**
      * Double literal.
-     * 
-     * @param value
-     *            a double value.
+     *
+     * @param value a double value.
      */
 
     public DoubleLiteral(double value) {
@@ -44,9 +43,8 @@ public class DoubleLiteral extends Literal {
 
     /**
      * Double literal.
-     * 
-     * @param value
-     *            a string.
+     *
+     * @param value a string.
      */
 
     public DoubleLiteral(String value) {
@@ -55,9 +53,8 @@ public class DoubleLiteral extends Literal {
 
     /**
      * Double literal.
-     * 
-     * @param proto
-     *            a double literal.
+     *
+     * @param proto a double literal.
      */
 
     protected DoubleLiteral(DoubleLiteral proto) {
@@ -67,7 +64,7 @@ public class DoubleLiteral extends Literal {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -76,20 +73,8 @@ public class DoubleLiteral extends Literal {
     }
 
     /**
-     * Set value.
-     * 
-     * @param str
-     *            a string value.
-     */
-
-    public void setValue(String str) {
-        // unchecked
-        this.value = str.intern();
-    }
-
-    /**
      * Get value.
-     * 
+     *
      * @return the string.
      */
 
@@ -97,11 +82,22 @@ public class DoubleLiteral extends Literal {
         return value;
     }
 
+    /**
+     * Set value.
+     *
+     * @param str a string value.
+     */
+
+    public void setValue(String str) {
+        // unchecked
+        this.value = str.intern();
+    }
+
     public void accept(SourceVisitor v) {
         v.visitDoubleLiteral(this);
     }
 
-	public Object getEquivalentJavaType() {
-		return Double.valueOf(value);
-	}
+    public Object getEquivalentJavaType() {
+        return Double.valueOf(value);
+    }
 }

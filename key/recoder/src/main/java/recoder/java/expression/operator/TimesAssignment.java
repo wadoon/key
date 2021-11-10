@@ -8,18 +8,18 @@ import recoder.java.expression.Assignment;
 
 /**
  * Times assignment.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class TimesAssignment extends Assignment {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -1978899655527666905L;
+     * serialization id
+     */
+    private static final long serialVersionUID = -1978899655527666905L;
 
-	/**
+    /**
      * Times assignment.
      */
 
@@ -29,11 +29,9 @@ public class TimesAssignment extends Assignment {
 
     /**
      * Times assignment.
-     * 
-     * @param lhs
-     *            an expression.
-     * @param rhs
-     *            an expression.
+     *
+     * @param lhs an expression.
+     * @param rhs an expression.
      */
 
     public TimesAssignment(Expression lhs, Expression rhs) {
@@ -43,9 +41,8 @@ public class TimesAssignment extends Assignment {
 
     /**
      * Times assignment.
-     * 
-     * @param proto
-     *            a times assignment.
+     *
+     * @param proto a times assignment.
      */
 
     protected TimesAssignment(TimesAssignment proto) {
@@ -55,7 +52,7 @@ public class TimesAssignment extends Assignment {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -65,7 +62,7 @@ public class TimesAssignment extends Assignment {
 
     /**
      * Get arity.
-     * 
+     *
      * @return the int value.
      */
 
@@ -75,7 +72,7 @@ public class TimesAssignment extends Assignment {
 
     /**
      * Get precedence.
-     * 
+     *
      * @return the int value.
      */
 
@@ -85,7 +82,7 @@ public class TimesAssignment extends Assignment {
 
     /**
      * Get notation.
-     * 
+     *
      * @return the int value.
      */
 

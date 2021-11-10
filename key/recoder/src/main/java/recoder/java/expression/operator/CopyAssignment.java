@@ -8,18 +8,18 @@ import recoder.java.expression.Assignment;
 
 /**
  * Copy assignment.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class CopyAssignment extends Assignment {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -7829333990720251044L;
+     * serialization id
+     */
+    private static final long serialVersionUID = -7829333990720251044L;
 
-	/**
+    /**
      * Copy assignment.
      */
 
@@ -29,11 +29,9 @@ public class CopyAssignment extends Assignment {
 
     /**
      * Copy assignment.
-     * 
-     * @param lhs
-     *            an expression.
-     * @param rhs
-     *            an expression.
+     *
+     * @param lhs an expression.
+     * @param rhs an expression.
      */
 
     public CopyAssignment(Expression lhs, Expression rhs) {
@@ -43,9 +41,8 @@ public class CopyAssignment extends Assignment {
 
     /**
      * Copy assignment.
-     * 
-     * @param proto
-     *            a copy assignment.
+     *
+     * @param proto a copy assignment.
      */
 
     protected CopyAssignment(CopyAssignment proto) {
@@ -55,7 +52,7 @@ public class CopyAssignment extends Assignment {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -65,7 +62,7 @@ public class CopyAssignment extends Assignment {
 
     /**
      * Get arity.
-     * 
+     *
      * @return the int value.
      */
 
@@ -75,7 +72,7 @@ public class CopyAssignment extends Assignment {
 
     /**
      * Get precedence.
-     * 
+     *
      * @return the int value.
      */
 
@@ -85,7 +82,7 @@ public class CopyAssignment extends Assignment {
 
     /**
      * Get notation.
-     * 
+     *
      * @return the int value.
      */
 

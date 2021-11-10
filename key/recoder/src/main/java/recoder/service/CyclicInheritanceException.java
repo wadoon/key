@@ -7,23 +7,22 @@ import recoder.abstraction.ClassType;
 
 /**
  * Exception indicating a cyclic inheritance.
- * 
+ *
  * @author AL
  * @since 0.72
  */
 public class CyclicInheritanceException extends ModelException {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -2917658612032872699L;
-	private ClassType baseClass;
+     * serialization id
+     */
+    private static final long serialVersionUID = -2917658612032872699L;
+    private final ClassType baseClass;
 
     /**
      * Empty constructor.
-     * 
-     * @param ct
-     *            a class type which is part of the cycle.
+     *
+     * @param ct a class type which is part of the cycle.
      */
     public CyclicInheritanceException(ClassType ct) {
         this.baseClass = ct;
@@ -31,11 +30,9 @@ public class CyclicInheritanceException extends ModelException {
 
     /**
      * Constructor with an explanation text.
-     * 
-     * @param s
-     *            an explanation.
-     * @param ct
-     *            a class type which is part of the cycle.
+     *
+     * @param s  an explanation.
+     * @param ct a class type which is part of the cycle.
      */
     public CyclicInheritanceException(String s, ClassType ct) {
         super(s);

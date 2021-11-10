@@ -2,16 +2,18 @@
 
 package recoder.java;
 
-/** Any non-SingleLineComment is a multi line comment. */
+/**
+ * Any non-SingleLineComment is a multi line comment.
+ */
 
 public class SingleLineComment extends Comment {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -1462907890949586507L;
+     * serialization id
+     */
+    private static final long serialVersionUID = -1462907890949586507L;
 
-	/**
+    /**
      * Single line comment.
      */
 
@@ -21,9 +23,8 @@ public class SingleLineComment extends Comment {
 
     /**
      * Single line comment.
-     * 
-     * @param text
-     *            a string.
+     *
+     * @param text a string.
      */
 
     public SingleLineComment(String text) {
@@ -32,9 +33,8 @@ public class SingleLineComment extends Comment {
 
     /**
      * Single line comment.
-     * 
-     * @param proto
-     *            a single line comment.
+     *
+     * @param proto a single line comment.
      */
 
     private SingleLineComment(SingleLineComment proto) {
@@ -43,17 +43,16 @@ public class SingleLineComment extends Comment {
 
     @Override
     public void setText(String text) {
-    	if (!text.startsWith("//"))
-        	throw new IllegalArgumentException();
+        if (!text.startsWith("//"))
+            throw new IllegalArgumentException();
         text = text.trim();
         super.setText(text);
     }
-    
 
-    
+
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 

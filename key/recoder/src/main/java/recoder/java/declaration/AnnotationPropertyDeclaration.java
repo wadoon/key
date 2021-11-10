@@ -6,28 +6,23 @@
 package recoder.java.declaration;
 
 import recoder.abstraction.AnnotationProperty;
-import recoder.java.Expression;
-import recoder.java.ExpressionContainer;
-import recoder.java.Identifier;
-import recoder.java.ProgramElement;
-import recoder.java.SourceVisitor;
+import recoder.java.*;
 import recoder.java.reference.TypeReference;
 import recoder.list.generic.ASTList;
 
 /**
  * @author gutzmann
- *
  */
 public class AnnotationPropertyDeclaration extends MethodDeclaration implements AnnotationProperty, ExpressionContainer {
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -1319877992238107401L;
-	
-	private Expression defaultValue;
-    
+     * serialization id
+     */
+    private static final long serialVersionUID = -1319877992238107401L;
+
+    private Expression defaultValue;
+
     /**
-     * 
+     *
      */
     public AnnotationPropertyDeclaration() {
         super();
@@ -42,7 +37,7 @@ public class AnnotationPropertyDeclaration extends MethodDeclaration implements 
      * @param exceptions
      */
     public AnnotationPropertyDeclaration(ASTList<DeclarationSpecifier> modifiers, TypeReference returnType,
-            Identifier name, Expression defaultValue) {
+                                         Identifier name, Expression defaultValue) {
         super(modifiers, returnType, name, null, null);
         this.defaultValue = defaultValue;
         makeParentRoleValid();
@@ -65,15 +60,15 @@ public class AnnotationPropertyDeclaration extends MethodDeclaration implements 
     public Object getDefaultValue() {
         return AnnotationElementValuePair.expressionToJavaObject(defaultValue);
     }
-    
-    public Expression getDefaultValueExpression() {
-    	return defaultValue;
-    }
-    
+
     public void setDefaultValue(Expression e) {
         defaultValue = e;
     }
-    
+
+    public Expression getDefaultValueExpression() {
+        return defaultValue;
+    }
+
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
         if (defaultValue != null)
@@ -95,49 +90,49 @@ public class AnnotationPropertyDeclaration extends MethodDeclaration implements 
             return defaultValue;
         throw new ArrayIndexOutOfBoundsException(index);
     }
-    
+
     public void accept(SourceVisitor v) {
         v.visitAnnotationPropertyDeclaration(this);
     }
-    
+
     public AnnotationPropertyDeclaration deepClone() {
         return new AnnotationPropertyDeclaration(this);
     }
-    
+
     public ProgramElement getChildAt(int index) {
         if (index == super.getChildCount() && defaultValue != null)
             return defaultValue;
         return super.getChildAt(index); // might throw ArrayIndexOutOfBoundsException
     }
-    
+
     public int getChildCount() {
-        return super.getChildCount() + (defaultValue == null ?  0 : 1);
+        return super.getChildCount() + (defaultValue == null ? 0 : 1);
     }
-    
+
     public int getChildPositionCode(ProgramElement child) {
-    	// role 0-7: see MethodDeclaration
+        // role 0-7: see MethodDeclaration
         // role 8: default value
         if (child == defaultValue)
             return 8;
         return super.getChildPositionCode(child);
     }
-    
+
     public boolean isPrivate() {
         return false;
     }
-    
+
     public boolean isProtected() {
         return false;
     }
-    
+
     public boolean isPublic() {
         return true;
     }
-    
+
     public boolean isVarArgMethod() {
         return false;
     }
-    
+
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
         if (p == null)
             throw new NullPointerException();
@@ -147,7 +142,8 @@ public class AnnotationPropertyDeclaration extends MethodDeclaration implements 
             if (r != null) {
                 r.setExpressionContainer(this);
             }
-            return true;        }
+            return true;
+        }
         return super.replaceChild(p, q);
     }
 }

@@ -28,7 +28,7 @@ package recoder.util;
  * As both relations are related by <BLOCKQUOTE><CODE>
  * lessOrEquals(x,&nbsp;y)&nbsp;==&nbsp;(less(x,&nbsp;y)&nbsp;||&nbsp;equals(x,&nbsp;y))
  * </CODE>, </BLOCKQUOTE> this interface extends an equality relation.
- * <P>
+ * <p>
  * <SMALL>The usual way is to calculate all relations at once and returning a
  * status code such as <CODE>int compareTo(x, y)</CODE>. However, this
  * function alone can not capture partial orders and is not efficient if the
@@ -37,25 +37,41 @@ package recoder.util;
  * this should not lead to a noticeable loss of performance. And of course,
  * <CODE>lessOrEquals(x,&nbsp;y)</CODE> should be a bit more comprehensible
  * than <CODE>compareTo(x,&nbsp;y)&nbsp; <=&nbsp;0</CODE>. </SMALL>
- * <P>
+ * <p>
  * Whether or not objects of different type or <CODE>null</CODE> objects are
  * allowed is up to the specific implementation. This <CODE>isComparable
  * </CODE> predicate should be defined for all objects. The orders are total, if
  * the predicate yields true for any input - with the possible exception of
  * <CODE>null</CODE> objects. If two objects are not comparable, the result of
  * the other predicates is not defined unless stated explicitely.
- * 
+ *
  * @author AL
  */
 public interface Order extends Equality {
 
     /**
+     * Natural order relation object based on the objects' natural hash codes.
+     * The order is total except for <CODE>null</CODE> objects.
+     */
+    Order NATURAL = new Order.Natural();
+    /**
+     * Identity order relation object based on the objects' identities. The
+     * order is total, including <CODE>null</CODE> objects (which are minimum
+     * elements).
+     */
+    Order IDENTITY = new Order.Identity();
+    /**
+     * Lexical order relation object based on the objects' textual
+     * representation. The order is total except for <CODE>null</CODE>
+     * objects.
+     */
+    Order LEXICAL = new Order.Lexical();
+
+    /**
      * Check if both objects can be related.
-     * 
-     * @param x
-     *            the first object.
-     * @param y
-     *            the second object.
+     *
+     * @param x the first object.
+     * @param y the second object.
      * @return true if both objects can be compared, false otherwise.
      */
     boolean isComparable(Object x, Object y);
@@ -64,11 +80,9 @@ public interface Order extends Equality {
      * Check if the first object is less than the second one. This comparison is
      * strict: <CODE>less(x,&nbsp;y)</CODE> implies <CODE>!equals(x,&nbsp;y)
      * </CODE>.
-     * 
-     * @param x
-     *            the first object.
-     * @param y
-     *            the second object.
+     *
+     * @param x the first object.
+     * @param y the second object.
      * @return true if the first object is less than the second one.
      */
     boolean less(Object x, Object y);
@@ -77,35 +91,29 @@ public interface Order extends Equality {
      * Check if the first object is greater than the second one. This comparison
      * is strict: <CODE>greater(x,&nbsp;y)</CODE> implies <CODE>
      * !equals(x,&nbsp;y)</CODE>.
-     * 
-     * @param x
-     *            the first object.
-     * @param y
-     *            the second object.
+     *
+     * @param x the first object.
+     * @param y the second object.
      * @return true if the first object is greater than the second one.
      */
     boolean greater(Object x, Object y);
 
     /**
      * Check if the first object is less than or equals the second one.
-     * 
-     * @param x
-     *            the first object.
-     * @param y
-     *            the second object.
+     *
+     * @param x the first object.
+     * @param y the second object.
      * @return true if the first object is less than or equals the second one.
      */
     boolean lessOrEquals(Object x, Object y);
 
     /**
      * Check if the first object is greater than or equals the second one.
-     * 
-     * @param x
-     *            the first object.
-     * @param y
-     *            the second object.
+     *
+     * @param x the first object.
+     * @param y the second object.
      * @return true if the first object is greater than or equals the second
-     *         one.
+     * one.
      */
     boolean greaterOrEquals(Object x, Object y);
 
@@ -147,12 +155,6 @@ public interface Order extends Equality {
     }
 
     /**
-     * Natural order relation object based on the objects' natural hash codes.
-     * The order is total except for <CODE>null</CODE> objects.
-     */
-    Order NATURAL = new Order.Natural();
-
-    /**
      * Identity order implementation comparing objects by address. The
      * implementation uses <CODE>System.identityHashCode</CODE> and implements
      * {@link recoder.util.HashCode}. The order is based upon this encoding
@@ -189,13 +191,6 @@ public interface Order extends Equality {
             return System.identityHashCode(x) >= System.identityHashCode(x);
         }
     }
-
-    /**
-     * Identity order relation object based on the objects' identities. The
-     * order is total, including <CODE>null</CODE> objects (which are minimum
-     * elements).
-     */
-    Order IDENTITY = new Order.Identity();
 
     /**
      * Custom lexical order implementation comparing objects by comparison of a
@@ -264,13 +259,6 @@ public interface Order extends Equality {
             return x != null && y != null;
         }
     }
-
-    /**
-     * Lexical order relation object based on the objects' textual
-     * representation. The order is total except for <CODE>null</CODE>
-     * objects.
-     */
-    Order LEXICAL = new Order.Lexical();
 
 }
 

@@ -2,39 +2,37 @@
 
 package recoder.service;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import recoder.ModelException;
 import recoder.abstraction.ClassType;
 import recoder.java.Import;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Exception indicating that a particular import is ambiguous.
- * 
+ *
  * @author AL
  */
 public class AmbiguousImportException extends ModelException {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 699763267768804228L;
+     * serialization id
+     */
+    private static final long serialVersionUID = 699763267768804228L;
 
-	private Import importStatement;
+    private final Import importStatement;
 
-    private ClassType version1;
+    private final ClassType version1;
 
-    private ClassType version2;
+    private final ClassType version2;
 
     /**
      * Constructor without explanation text.
-     * 
-     * @param importStatement
-     *            the import found to be ambiguous.
-     * @param version1
-     *            the first possible type.
-     * @param version2
-     *            the second possible type.
+     *
+     * @param importStatement the import found to be ambiguous.
+     * @param version1        the first possible type.
+     * @param version2        the second possible type.
      */
     public AmbiguousImportException(Import importStatement, ClassType version1, ClassType version2) {
         this.importStatement = importStatement;
@@ -44,15 +42,11 @@ public class AmbiguousImportException extends ModelException {
 
     /**
      * Constructor with an explanation text.
-     * 
-     * @param s
-     *            an explanation.
-     * @param importStatement
-     *            the import found to be ambiguous.
-     * @param version1
-     *            the first possible type.
-     * @param version2
-     *            the second possible type.
+     *
+     * @param s               an explanation.
+     * @param importStatement the import found to be ambiguous.
+     * @param version1        the first possible type.
+     * @param version2        the second possible type.
      */
     public AmbiguousImportException(String s, Import importStatement, ClassType version1, ClassType version2) {
         super(s);

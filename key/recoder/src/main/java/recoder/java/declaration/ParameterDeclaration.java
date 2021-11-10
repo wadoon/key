@@ -2,14 +2,14 @@
 
 package recoder.java.declaration;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import recoder.java.Identifier;
 import recoder.java.ParameterContainer;
 import recoder.java.ProgramElement;
 import recoder.java.SourceVisitor;
 import recoder.java.reference.TypeReference;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Formal parameters require a VariableSpecificationList of size() <= 1 (size() ==
@@ -19,23 +19,23 @@ import recoder.java.reference.TypeReference;
 public class ParameterDeclaration extends VariableDeclaration {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -7820198330917949601L;
+     * serialization id
+     */
+    private static final long serialVersionUID = -7820198330917949601L;
 
-	/**
+    /**
      * Parent.
      */
 
-	private ParameterContainer parent;
+    private ParameterContainer parent;
 
     /**
      * Var spec.
      */
 
-	private VariableSpecification varSpec;
-    
-	private boolean varArgParameter;
+    private VariableSpecification varSpec;
+
+    private boolean varArgParameter;
 
     /**
      * Parameter declaration.
@@ -47,11 +47,9 @@ public class ParameterDeclaration extends VariableDeclaration {
 
     /**
      * Parameter declaration.
-     * 
-     * @param typeRef
-     *            a type reference.
-     * @param name
-     *            an identifier.
+     *
+     * @param typeRef a type reference.
+     * @param name    an identifier.
      */
 
     public ParameterDeclaration(TypeReference typeRef, VariableSpecification vs) {
@@ -62,9 +60,8 @@ public class ParameterDeclaration extends VariableDeclaration {
 
     /**
      * Parameter declaration.
-     * 
-     * @param proto
-     *            a parameter declaration.
+     *
+     * @param proto a parameter declaration.
      */
 
     protected ParameterDeclaration(ParameterDeclaration proto) {
@@ -80,7 +77,7 @@ public class ParameterDeclaration extends VariableDeclaration {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -108,14 +105,14 @@ public class ParameterDeclaration extends VariableDeclaration {
     }
 
     public List<VariableSpecification> getVariables() {
-    	List<VariableSpecification> res = new ArrayList<VariableSpecification>(1);
+        List<VariableSpecification> res = new ArrayList<VariableSpecification>(1);
         res.add(varSpec);
-    	return res;
+        return res;
     }
 
     /**
      * Get AST parent.
-     * 
+     *
      * @return the non terminal program element.
      */
 
@@ -125,7 +122,7 @@ public class ParameterDeclaration extends VariableDeclaration {
 
     /**
      * Returns the number of children of this node.
-     * 
+     *
      * @return an int giving the number of children of this node
      */
 
@@ -143,12 +140,10 @@ public class ParameterDeclaration extends VariableDeclaration {
     /**
      * Returns the child at the specified index in this node's "virtual" child
      * array
-     * 
-     * @param index
-     *            an index into this node's "virtual" child array
+     *
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
@@ -197,14 +192,11 @@ public class ParameterDeclaration extends VariableDeclaration {
      * element can be null - in that case, the child is effectively removed. The
      * parent role of the new child is validated, while the parent link of the
      * replaced child is left untouched.
-     * 
-     * @param p
-     *            the old child.
-     * @param p
-     *            the new child.
+     *
+     * @param p the old child.
+     * @param p the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException
-     *                if the new child cannot take over the role of the old one.
+     * @throws ClassCastException if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
@@ -246,7 +238,7 @@ public class ParameterDeclaration extends VariableDeclaration {
 
     /**
      * Get parameter container.
-     * 
+     *
      * @return the parameter container.
      */
 
@@ -256,9 +248,8 @@ public class ParameterDeclaration extends VariableDeclaration {
 
     /**
      * Set parameter container.
-     * 
-     * @param c
-     *            a parameter container.
+     *
+     * @param c a parameter container.
      */
 
     public void setParameterContainer(ParameterContainer c) {
@@ -308,13 +299,13 @@ public class ParameterDeclaration extends VariableDeclaration {
     public void accept(SourceVisitor v) {
         v.visitParameterDeclaration(this);
     }
-    
+
     public boolean isVarArg() {
-    	return varArgParameter;
+        return varArgParameter;
     }
-    
+
     public void setVarArg(boolean varArg) {
-    	this.varArgParameter = varArg;
+        this.varArgParameter = varArg;
     }
 
 }

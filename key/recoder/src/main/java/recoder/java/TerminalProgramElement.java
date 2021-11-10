@@ -4,7 +4,7 @@ package recoder.java;
 
 /**
  * Terminal program element.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 

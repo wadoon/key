@@ -2,38 +2,32 @@
 
 package recoder.java.statement;
 
-import recoder.java.Expression;
-import recoder.java.ExpressionContainer;
-import recoder.java.ProgramElement;
-import recoder.java.SourceVisitor;
-import recoder.java.Statement;
-import recoder.java.StatementBlock;
-import recoder.java.StatementContainer;
+import recoder.java.*;
 
 /**
  * Synchronized block.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class SynchronizedBlock extends JavaStatement implements StatementContainer, ExpressionContainer {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -9179480508765855081L;
+     * serialization id
+     */
+    private static final long serialVersionUID = -9179480508765855081L;
 
-	/**
+    /**
      * Expression.
      */
 
-	private Expression expression;
+    private Expression expression;
 
     /**
      * Body.
      */
 
-	private StatementBlock body;
+    private StatementBlock body;
 
     /**
      * Synchronized block.
@@ -45,9 +39,8 @@ public class SynchronizedBlock extends JavaStatement implements StatementContain
 
     /**
      * Synchronized block.
-     * 
-     * @param body
-     *            a statement block.
+     *
+     * @param body a statement block.
      */
 
     public SynchronizedBlock(StatementBlock body) {
@@ -57,11 +50,9 @@ public class SynchronizedBlock extends JavaStatement implements StatementContain
 
     /**
      * Synchronized block.
-     * 
-     * @param e
-     *            an expression.
-     * @param body
-     *            a statement block.
+     *
+     * @param e    an expression.
+     * @param body a statement block.
      */
 
     public SynchronizedBlock(Expression e, StatementBlock body) {
@@ -72,9 +63,8 @@ public class SynchronizedBlock extends JavaStatement implements StatementContain
 
     /**
      * Synchronized block.
-     * 
-     * @param proto
-     *            a synchronized block.
+     *
+     * @param proto a synchronized block.
      */
 
     protected SynchronizedBlock(SynchronizedBlock proto) {
@@ -90,7 +80,7 @@ public class SynchronizedBlock extends JavaStatement implements StatementContain
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -117,14 +107,11 @@ public class SynchronizedBlock extends JavaStatement implements StatementContain
      * element can be null - in that case, the child is effectively removed. The
      * parent role of the new child is validated, while the parent link of the
      * replaced child is left untouched.
-     * 
-     * @param p
-     *            the old child.
-     * @param p
-     *            the new child.
+     *
+     * @param p the old child.
+     * @param p the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException
-     *                if the new child cannot take over the role of the old one.
+     * @throws ClassCastException if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
@@ -152,7 +139,7 @@ public class SynchronizedBlock extends JavaStatement implements StatementContain
 
     /**
      * Get the number of expressions in this container.
-     * 
+     *
      * @return the number of expressions.
      */
 
@@ -175,19 +162,8 @@ public class SynchronizedBlock extends JavaStatement implements StatementContain
     }
 
     /**
-     * Set expression.
-     * 
-     * @param e
-     *            an expression.
-     */
-
-    public void setExpression(Expression e) {
-        expression = e;
-    }
-
-    /**
      * Get expression.
-     * 
+     *
      * @return the expression.
      */
 
@@ -196,8 +172,18 @@ public class SynchronizedBlock extends JavaStatement implements StatementContain
     }
 
     /**
+     * Set expression.
+     *
+     * @param e an expression.
+     */
+
+    public void setExpression(Expression e) {
+        expression = e;
+    }
+
+    /**
      * Returns the number of children of this node.
-     * 
+     *
      * @return an int giving the number of children of this node
      */
 
@@ -213,12 +199,10 @@ public class SynchronizedBlock extends JavaStatement implements StatementContain
     /**
      * Returns the child at the specified index in this node's "virtual" child
      * array
-     * 
-     * @param index
-     *            an index into this node's "virtual" child array
+     *
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
@@ -248,7 +232,7 @@ public class SynchronizedBlock extends JavaStatement implements StatementContain
 
     /**
      * Get body.
-     * 
+     *
      * @return the statement block.
      */
 
@@ -258,9 +242,8 @@ public class SynchronizedBlock extends JavaStatement implements StatementContain
 
     /**
      * Set body.
-     * 
-     * @param body
-     *            a statement block.
+     *
+     * @param body a statement block.
      */
 
     public void setBody(StatementBlock body) {
@@ -269,7 +252,7 @@ public class SynchronizedBlock extends JavaStatement implements StatementContain
 
     /**
      * Get the number of statements in this container.
-     * 
+     *
      * @return the number of statements.
      */
 

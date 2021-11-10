@@ -8,18 +8,18 @@ import recoder.java.expression.Operator;
 
 /**
  * Modulo.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class Modulo extends Operator {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -7252952240290731650L;
+     * serialization id
+     */
+    private static final long serialVersionUID = -7252952240290731650L;
 
-	/**
+    /**
      * Modulo.
      */
 
@@ -29,11 +29,9 @@ public class Modulo extends Operator {
 
     /**
      * Modulo.
-     * 
-     * @param lhs
-     *            an expression.
-     * @param rhs
-     *            an expression.
+     *
+     * @param lhs an expression.
+     * @param rhs an expression.
      */
 
     public Modulo(Expression lhs, Expression rhs) {
@@ -43,9 +41,8 @@ public class Modulo extends Operator {
 
     /**
      * Modulo.
-     * 
-     * @param proto
-     *            a modulo.
+     *
+     * @param proto a modulo.
      */
 
     protected Modulo(Modulo proto) {
@@ -55,7 +52,7 @@ public class Modulo extends Operator {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -65,7 +62,7 @@ public class Modulo extends Operator {
 
     /**
      * Get arity.
-     * 
+     *
      * @return the int value.
      */
 
@@ -75,7 +72,7 @@ public class Modulo extends Operator {
 
     /**
      * Get precedence.
-     * 
+     *
      * @return the int value.
      */
 
@@ -85,7 +82,7 @@ public class Modulo extends Operator {
 
     /**
      * Get notation.
-     * 
+     *
      * @return the int value.
      */
 

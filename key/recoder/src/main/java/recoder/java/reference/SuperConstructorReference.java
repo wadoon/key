@@ -11,38 +11,37 @@ import recoder.list.generic.ASTList;
 
 /**
  * Super constructor reference.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class SuperConstructorReference extends SpecialConstructorReference implements ReferenceSuffix {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 5432343818938120448L;
+     * serialization id
+     */
+    private static final long serialVersionUID = 5432343818938120448L;
 
-	/**
+    /**
      * Access path.
      */
 
-	private ReferencePrefix accessPath;
+    private ReferencePrefix accessPath;
 
-	private ASTList<TypeArgumentDeclaration> typeArguments;
+    private ASTList<TypeArgumentDeclaration> typeArguments;
 
     /**
      * Super constructor reference.
      */
-    
+
     public SuperConstructorReference() {
         makeParentRoleValid();
     }
 
     /**
      * Super constructor reference.
-     * 
-     * @param arguments
-     *            an expression mutable list.
+     *
+     * @param arguments an expression mutable list.
      */
 
     public SuperConstructorReference(ASTList<Expression> arguments) {
@@ -52,11 +51,9 @@ public class SuperConstructorReference extends SpecialConstructorReference imple
 
     /**
      * Super constructor reference.
-     * 
-     * @param path
-     *            a reference prefix.
-     * @param arguments
-     *            an expression mutable list.
+     *
+     * @param path      a reference prefix.
+     * @param arguments an expression mutable list.
      */
 
     public SuperConstructorReference(ReferencePrefix path, ASTList<Expression> arguments) {
@@ -67,9 +64,8 @@ public class SuperConstructorReference extends SpecialConstructorReference imple
 
     /**
      * Super constructor reference.
-     * 
-     * @param proto
-     *            a super constructor reference.
+     *
+     * @param proto a super constructor reference.
      */
 
     protected SuperConstructorReference(SuperConstructorReference proto) {
@@ -94,7 +90,7 @@ public class SuperConstructorReference extends SpecialConstructorReference imple
     public int getChildPositionCode(ProgramElement child) {
         // role 0: prefix
         // role 1 (IDX): parameters
-    	// role 2 (IDX): type args
+        // role 2 (IDX): type args
         if (accessPath == child) {
             return 0;
         }
@@ -105,17 +101,17 @@ public class SuperConstructorReference extends SpecialConstructorReference imple
             }
         }
         if (typeArguments != null) {
-        	int index = arguments.indexOf(child);
-        	if (index >= 0) {
-        		return (index << 4) | 2;
-        	}
+            int index = arguments.indexOf(child);
+            if (index >= 0) {
+                return (index << 4) | 2;
+            }
         }
         return -1;
     }
 
     /**
      * Get reference prefix.
-     * 
+     *
      * @return the reference prefix.
      */
 
@@ -125,9 +121,8 @@ public class SuperConstructorReference extends SpecialConstructorReference imple
 
     /**
      * Set reference prefix.
-     * 
-     * @param qualifier
-     *            a reference prefix.
+     *
+     * @param qualifier a reference prefix.
      */
 
     public void setReferencePrefix(ReferencePrefix qualifier) {
@@ -136,7 +131,7 @@ public class SuperConstructorReference extends SpecialConstructorReference imple
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -151,10 +146,10 @@ public class SuperConstructorReference extends SpecialConstructorReference imple
     public void accept(SourceVisitor v) {
         v.visitSuperConstructorReference(this);
     }
-    
+
     @Override
     public String toString() {
-    	return "<SuperConstructorReference>";
+        return "<SuperConstructorReference>";
     }
 
 }

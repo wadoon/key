@@ -2,15 +2,6 @@
 
 package recoder.io;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import recoder.AbstractService;
 import recoder.ServiceConfiguration;
 import recoder.bytecode.ASMBytecodeParser;
@@ -21,6 +12,15 @@ import recoder.convenience.Naming;
 import recoder.service.ErrorHandler;
 import recoder.util.Debug;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * @author RN
  * @author AL
@@ -28,7 +28,7 @@ import recoder.util.Debug;
 public class DefaultClassFileRepository extends AbstractService implements ClassFileRepository, PropertyChangeListener {
 
     // private PathList searchPath;
-	private final Map<String, ClassFile> classname2cf = new HashMap<String, ClassFile>(64);
+    private final Map<String, ClassFile> classname2cf = new HashMap<String, ClassFile>(64);
 
     /**
      * Cached search path list.
@@ -36,8 +36,7 @@ public class DefaultClassFileRepository extends AbstractService implements Class
     private PathList searchPathList;
 
     /**
-     * @param config
-     *            the configuration this services becomes part of.
+     * @param config the configuration this services becomes part of.
      */
     public DefaultClassFileRepository(ServiceConfiguration config) {
         super(config);
@@ -72,10 +71,9 @@ public class DefaultClassFileRepository extends AbstractService implements Class
 
     /**
      * Searches for the location of the class file for the given class.
-     * 
-     * @param classname
-     *            the name of the class for which the class file should be
-     *            looked up.
+     *
+     * @param classname the name of the class for which the class file should be
+     *                  looked up.
      */
     public DataLocation findClassFile(String classname) {
         return getSearchPathList().find(Naming.dot(Naming.makeFilename(classname), "class"));
@@ -114,11 +112,11 @@ public class DefaultClassFileRepository extends AbstractService implements Class
             Debug.assertNonnull(is, "No input stream for data location");
             final AbstractBytecodeParser bytecodeParser;
             if (useOldBytecodeParser()) {
-            	bytecodeParser = new ByteCodeParser();
+                bytecodeParser = new ByteCodeParser();
             } else {
-            	bytecodeParser = new ASMBytecodeParser();
+                bytecodeParser = new ASMBytecodeParser();
             }
-        	boolean readJava5Signatures = serviceConfiguration.getProjectSettings().java5Allowed();
+            boolean readJava5Signatures = serviceConfiguration.getProjectSettings().java5Allowed();
             result = bytecodeParser.parseClassFile(is, loc.toString(), readJava5Signatures);
             is.close();
             loc.inputStreamClosed();
@@ -134,22 +132,22 @@ public class DefaultClassFileRepository extends AbstractService implements Class
     }
 
     private boolean useOldBytecodeParser() {
-		return Boolean.valueOf(serviceConfiguration.getProjectSettings().getProperty(PropertyNames.USE_OLD_BYTECODE_PARSER));
-	}
+        return Boolean.valueOf(serviceConfiguration.getProjectSettings().getProperty(PropertyNames.USE_OLD_BYTECODE_PARSER));
+    }
 
-	public List<ClassFile> getKnownClassFiles() {
+    public List<ClassFile> getKnownClassFiles() {
         int n = classname2cf.size();
         List<ClassFile> res = new ArrayList<ClassFile>(n);
         for (ClassFile cf : classname2cf.values())
-        	res.add(cf);
+            res.add(cf);
         return res;
     }
 
     public String information() {
         return "" + classname2cf.size() + " class files";
     }
-    
+
     public void reset() {
-    	classname2cf.clear();
+        classname2cf.clear();
     }
 }

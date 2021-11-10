@@ -2,43 +2,17 @@
 
 package recoder.kit;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import recoder.ProgramFactory;
 import recoder.abstraction.Type;
 import recoder.abstraction.Variable;
 import recoder.convenience.Format;
 import recoder.convenience.Formats;
 import recoder.convenience.ProgramElementWalker;
-import recoder.java.Expression;
-import recoder.java.NonTerminalProgramElement;
-import recoder.java.ProgramElement;
-import recoder.java.Statement;
-import recoder.java.StatementBlock;
-import recoder.java.StatementContainer;
-import recoder.java.declaration.ClassInitializer;
-import recoder.java.declaration.LocalVariableDeclaration;
-import recoder.java.declaration.MemberDeclaration;
-import recoder.java.declaration.MethodDeclaration;
-import recoder.java.declaration.VariableSpecification;
+import recoder.java.*;
+import recoder.java.declaration.*;
 import recoder.java.reference.TypeReference;
 import recoder.java.reference.VariableReference;
-import recoder.java.statement.Branch;
-import recoder.java.statement.Case;
-import recoder.java.statement.Catch;
-import recoder.java.statement.Default;
-import recoder.java.statement.Else;
-import recoder.java.statement.ExpressionJumpStatement;
-import recoder.java.statement.Finally;
-import recoder.java.statement.LabelJumpStatement;
-import recoder.java.statement.LabeledStatement;
-import recoder.java.statement.SynchronizedBlock;
-import recoder.java.statement.Then;
-import recoder.java.statement.Try;
+import recoder.java.statement.*;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 import recoder.service.ChangeHistory;
@@ -46,10 +20,12 @@ import recoder.service.CrossReferenceSourceInfo;
 import recoder.service.SourceInfo;
 import recoder.util.Debug;
 
+import java.util.*;
+
 public class StatementKit {
 
     private StatementKit() {
-    	super();
+        super();
     }
 
     /**
@@ -61,13 +37,11 @@ public class StatementKit {
      * the given statement is not inside a {@link recoder.java.StatementBlock}.
      * If the statement has no parent, it is wrapped into a new statement list
      * which then is returned.
-     * 
-     * @param s
-     *            a statement; may not be <CODE>null</CODE>.
-     * @param ch
-     *            the change history; may be <CODE>null</CODE>.
+     *
+     * @param s  a statement; may not be <CODE>null</CODE>.
+     * @param ch the change history; may be <CODE>null</CODE>.
      * @return the mutable statement list that the given statement is part of;
-     *         the list is contained in a new StatementBlock if necessary.
+     * the list is contained in a new StatementBlock if necessary.
      * @see #getStatementMutableList
      * @see #wrapWithStatementBlock
      * @deprecated replaced by first class transformation PrepareStatementList
@@ -76,8 +50,8 @@ public class StatementKit {
         Debug.assertNonnull(s);
         StatementContainer con = s.getStatementContainer();
         if (con == null) {
-        	ASTList<Statement> result = new ASTArrayList<Statement>();
-        	result.add(s);
+            ASTList<Statement> result = new ASTArrayList<Statement>();
+            result.add(s);
             return result;
         }
         ASTList<Statement> result = getStatementMutableList(s);
@@ -100,11 +74,10 @@ public class StatementKit {
      * {@link recoder.java.statement.LabeledStatement}, the list for that
      * labeled statement is returned instead.</LI>
      * </UL>
-     * 
-     * @param s
-     *            a statement; may not be <CODE>null</CODE>.
+     *
+     * @param s a statement; may not be <CODE>null</CODE>.
      * @return the mutable statement list that the given statement is part of,
-     *         or <CODE>null</CODE> if there is none.
+     * or <CODE>null</CODE> if there is none.
      */
     public static ASTList<Statement> getStatementMutableList(Statement s) {
         Debug.assertNonnull(s);
@@ -147,7 +120,7 @@ public class StatementKit {
             }
         }
         if (body == null) {
-        	// TODO ????
+            // TODO ????
             Debug.assertBoolean(true, "Could not handle container of statement " + Format.toString(Formats.ELEMENT_LONG, s));
         }
         if (body instanceof StatementBlock && body != s) {
@@ -165,13 +138,10 @@ public class StatementKit {
      * transformation is safe if the statement is not an instance of
      * {@link recoder.java.declaration.LocalVariableDeclaration}containing a
      * variable that is actually referred.
-     * 
-     * @param s
-     *            a statement to be wrapped by a new statement block.
-     * @param ch
-     *            the change history; may be <CODE>null</CODE>.
+     *
+     * @param s  a statement to be wrapped by a new statement block.
+     * @param ch the change history; may be <CODE>null</CODE>.
      * @return the new statement block replacing <CODE>s</CODE>.
-     * 
      * @deprecated
      */
     public static StatementBlock wrapWithStatementBlock(Statement s, ChangeHistory ch) {
@@ -196,13 +166,11 @@ public class StatementKit {
      * statement is not an instance of
      * {@link recoder.java.declaration.LocalVariableDeclaration}containing a
      * variable that is actually referred from outside.
-     * 
-     * @param xr
-     *            the cross referencer service used.
-     * @param s
-     *            a statement that might be wrapped.
+     *
+     * @param xr the cross referencer service used.
+     * @param s  a statement that might be wrapped.
      * @return <CODE>true</CODE> if wrapping the statement in a block would
-     *         not change the program semantics, <CODE>false</CODE> otherwise.
+     * not change the program semantics, <CODE>false</CODE> otherwise.
      * @deprecated
      */
     public static boolean canSafelyWrapWithStatementBlock(CrossReferenceSourceInfo xr, Statement s) {
@@ -230,13 +198,10 @@ public class StatementKit {
      * expression is replaced by a variable reference to a new temporary
      * variable initialized by the former return value. If necessary, a new
      * statement block is created wrapping the return or throw statement.
-     * 
-     * @param ch
-     *            the change history service (may be <CODE>null</CODE>).
-     * @param si
-     *            the source info service.
-     * @param returnOrThrow
-     *            a return or throw statement.
+     *
+     * @param ch            the change history service (may be <CODE>null</CODE>).
+     * @param si            the source info service.
+     * @param returnOrThrow a return or throw statement.
      * @deprecated will become a first class transformation
      */
     public static void preparePrepend(ChangeHistory ch, SourceInfo si, ExpressionJumpStatement returnOrThrow) {
@@ -275,6 +240,114 @@ public class StatementKit {
     }
 
     /**
+     * Checks if the specified statement is reachable as defined in the static
+     * language semantics.
+     *
+     * @param s  a statement.
+     * @param si the SourceInfo service to use.
+     * @return <CODE>true</CODE> if the statement is reachable, <CODE>false
+     * </CODE> otherwise.
+     * @since 0.71
+     */
+    public static boolean isReachable(Statement s, SourceInfo si) {
+        MemberDeclaration member = MiscKit.getParentMemberDeclaration(s);
+        ControlFlowWalker w = new ControlFlowWalker(member, si);
+        while (w.next()) {
+            if (w.getStatement() == s) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Checks if the end of the specified statement block is reachable as
+     * defined in the static language semantics.
+     *
+     * @param block a statement block.
+     * @param si    the SourceInfo service to use.
+     * @return <CODE>true</CODE> if the end of the block is reachable, <CODE>
+     * false</CODE> otherwise.
+     * @since 0.71
+     */
+    public static boolean hasReachableEnd(StatementBlock block, SourceInfo si) {
+        List<Statement> body = block.getBody();
+        if (body == null || body.isEmpty()) {
+            return true;
+        }
+        Statement dummyExit = block.getFactory().createEmptyStatement();
+        body.add(dummyExit);
+        dummyExit.setStatementContainer(block);
+        boolean result = isReachable(dummyExit, si);
+        body.remove(body.size() - 1);
+        return result;
+    }
+
+    /**
+     * Syntactic query locating the label addressed by the specified labeled
+     * break or continue statement.
+     *
+     * @param s a labeled jump statement.
+     * @return the corresponding labeled statement, or <CODE>null</CODE> if
+     * there is none.
+     * @since 0.71
+     */
+    public static LabeledStatement getCorrespondingLabel(LabelJumpStatement s) {
+        // must be defined before and outward an enclosing loop or block
+        String idText = s.getIdentifier().getText();
+        NonTerminalProgramElement parent = s.getASTParent();
+        while (parent != null) {
+            if (parent instanceof LabeledStatement) {
+                LabeledStatement lstat = (LabeledStatement) parent;
+                if (idText.equals(lstat.getIdentifier().getText())) {
+                    return lstat;
+                }
+            }
+            parent = parent.getASTParent();
+        }
+        return null;
+    }
+
+    /**
+     * For a method declaration or class initializer, returns a list of block
+     * exits, such as return or throw statements, and the body if its exit is
+     * reachable. For other members, returns an empty list.
+     *
+     * @param m  a member declaration.
+     * @param si the SourceInfo service to use.
+     * @return a list of statements that finish the member's body after
+     * execution.
+     * @since 0.72
+     */
+    public static List<Statement> getExits(MemberDeclaration mdecl, SourceInfo si) {
+        Debug.assertNonnull(mdecl, si);
+        List<Statement> result = new ArrayList<Statement>();
+        StatementBlock body = null;
+        if (mdecl instanceof MethodDeclaration) {
+            body = ((MethodDeclaration) mdecl).getBody();
+        } else if (mdecl instanceof ClassInitializer) {
+            body = ((ClassInitializer) mdecl).getBody();
+        }
+        if (body == null) {
+            return Collections.emptyList();
+        }
+        Statement dummyExit = body.getFactory().createEmptyStatement();
+        int s = (body.getBody() == null) ? 0 : body.getBody().size();
+        Transformation.doAttach(dummyExit, body, s);
+        ControlFlowWalker w = new ControlFlowWalker(mdecl, si);
+        while (w.next()) {
+            ProgramElement p = w.getProgramElement();
+            if (p == dummyExit) {
+                result.add(body);
+            } else if (p instanceof ExpressionJumpStatement) {
+                result.add((Statement) p);
+            }
+        }
+        Transformation.doDetach(dummyExit);
+        return result;
+    }
+
+    /**
      * This walker performs a depth first search and reports the reachable
      * statements in the body of the given member. Only non-abstract method
      * declarations, constructor declarations, and class initializers can report
@@ -284,20 +357,20 @@ public class StatementKit {
      * and throw statements are not mapped to corresponding catch clauses. <BR>
      * To create a control flow graph, use the walker and query the succeeding
      * statements for each reported statement.
-     * 
+     *
      * @since 0.71
      */
     public static class ControlFlowWalker implements ProgramElementWalker {
 
-        private SourceInfo si;
+        private final SourceInfo si;
 
         private Statement current;
 
         private List<Statement> successors;
 
-        private Set<Statement> reached;
+        private final Set<Statement> reached;
 
-        private List<Statement> stack;
+        private final List<Statement> stack;
 
         // either a method declaration or class initializer
         public ControlFlowWalker(MemberDeclaration parent, SourceInfo si) {
@@ -350,9 +423,9 @@ public class StatementKit {
 
         /**
          * Returns the successors of the current statement.
-         * 
+         *
          * @return the list of successors of the current statement, or <CODE>
-         *         null</CODE> if the current statement is <CODE>null</CODE>.
+         * null</CODE> if the current statement is <CODE>null</CODE>.
          * @see #getStatement
          * @see recoder.service.SourceInfo#getSucceedingStatements
          */
@@ -368,121 +441,6 @@ public class StatementKit {
         public boolean isReachable(Statement s) {
             return reached.contains(s);
         }
-    }
-
-    /**
-     * Checks if the specified statement is reachable as defined in the static
-     * language semantics.
-     * 
-     * @param s
-     *            a statement.
-     * @param si
-     *            the SourceInfo service to use.
-     * @return <CODE>true</CODE> if the statement is reachable, <CODE>false
-     *         </CODE> otherwise.
-     * @since 0.71
-     */
-    public static boolean isReachable(Statement s, SourceInfo si) {
-        MemberDeclaration member = MiscKit.getParentMemberDeclaration(s);
-        ControlFlowWalker w = new ControlFlowWalker(member, si);
-        while (w.next()) {
-            if (w.getStatement() == s) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Checks if the end of the specified statement block is reachable as
-     * defined in the static language semantics.
-     * 
-     * @param block
-     *            a statement block.
-     * @param si
-     *            the SourceInfo service to use.
-     * @return <CODE>true</CODE> if the end of the block is reachable, <CODE>
-     *         false</CODE> otherwise.
-     * @since 0.71
-     */
-    public static boolean hasReachableEnd(StatementBlock block, SourceInfo si) {
-    	List<Statement> body = block.getBody();
-        if (body == null || body.isEmpty()) {
-            return true;
-        }
-        Statement dummyExit = block.getFactory().createEmptyStatement();
-        body.add(dummyExit);
-        dummyExit.setStatementContainer(block);
-        boolean result = isReachable(dummyExit, si);
-        body.remove(body.size() - 1);
-        return result;
-    }
-
-    /**
-     * Syntactic query locating the label addressed by the specified labeled
-     * break or continue statement.
-     * 
-     * @param s
-     *            a labeled jump statement.
-     * @return the corresponding labeled statement, or <CODE>null</CODE> if
-     *         there is none.
-     * @since 0.71
-     */
-    public static LabeledStatement getCorrespondingLabel(LabelJumpStatement s) {
-        // must be defined before and outward an enclosing loop or block
-        String idText = s.getIdentifier().getText();
-        NonTerminalProgramElement parent = s.getASTParent();
-        while (parent != null) {
-            if (parent instanceof LabeledStatement) {
-                LabeledStatement lstat = (LabeledStatement) parent;
-                if (idText.equals(lstat.getIdentifier().getText())) {
-                    return lstat;
-                }
-            }
-            parent = parent.getASTParent();
-        }
-        return null;
-    }
-
-    /**
-     * For a method declaration or class initializer, returns a list of block
-     * exits, such as return or throw statements, and the body if its exit is
-     * reachable. For other members, returns an empty list.
-     * 
-     * @param m
-     *            a member declaration.
-     * @param si
-     *            the SourceInfo service to use.
-     * @return a list of statements that finish the member's body after
-     *         execution.
-     * @since 0.72
-     */
-    public static List<Statement> getExits(MemberDeclaration mdecl, SourceInfo si) {
-        Debug.assertNonnull(mdecl, si);
-        List<Statement> result = new ArrayList<Statement>();
-        StatementBlock body = null;
-        if (mdecl instanceof MethodDeclaration) {
-            body = ((MethodDeclaration) mdecl).getBody();
-        } else if (mdecl instanceof ClassInitializer) {
-            body = ((ClassInitializer) mdecl).getBody();
-        }
-        if (body == null) {
-            return Collections.emptyList();
-        }
-        Statement dummyExit = body.getFactory().createEmptyStatement();
-        int s = (body.getBody() == null) ? 0 : body.getBody().size();
-        Transformation.doAttach(dummyExit, body, s);
-        ControlFlowWalker w = new ControlFlowWalker(mdecl, si);
-        while (w.next()) {
-            ProgramElement p = w.getProgramElement();
-            if (p == dummyExit) {
-                result.add(body);
-            } else if (p instanceof ExpressionJumpStatement) {
-                result.add((Statement) p);
-            }
-        }
-        Transformation.doDetach(dummyExit);
-        return result;
     }
 
 }

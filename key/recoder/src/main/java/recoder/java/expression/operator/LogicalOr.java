@@ -8,18 +8,18 @@ import recoder.java.expression.Operator;
 
 /**
  * Logical or.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class LogicalOr extends Operator {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 2782994601085095817L;
+     * serialization id
+     */
+    private static final long serialVersionUID = 2782994601085095817L;
 
-	/**
+    /**
      * Logical or.
      */
 
@@ -29,11 +29,9 @@ public class LogicalOr extends Operator {
 
     /**
      * Logical or.
-     * 
-     * @param lhs
-     *            an expression.
-     * @param rhs
-     *            an expression.
+     *
+     * @param lhs an expression.
+     * @param rhs an expression.
      */
 
     public LogicalOr(Expression lhs, Expression rhs) {
@@ -43,9 +41,8 @@ public class LogicalOr extends Operator {
 
     /**
      * Logical or.
-     * 
-     * @param proto
-     *            a logical or.
+     *
+     * @param proto a logical or.
      */
 
     protected LogicalOr(LogicalOr proto) {
@@ -55,7 +52,7 @@ public class LogicalOr extends Operator {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -65,7 +62,7 @@ public class LogicalOr extends Operator {
 
     /**
      * Get arity.
-     * 
+     *
      * @return the int value.
      */
 
@@ -75,7 +72,7 @@ public class LogicalOr extends Operator {
 
     /**
      * Get precedence.
-     * 
+     *
      * @return the int value.
      */
 
@@ -85,7 +82,7 @@ public class LogicalOr extends Operator {
 
     /**
      * Get notation.
-     * 
+     *
      * @return the int value.
      */
 

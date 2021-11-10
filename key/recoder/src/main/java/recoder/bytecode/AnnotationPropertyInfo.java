@@ -9,12 +9,11 @@ import recoder.abstraction.AnnotationProperty;
 
 /**
  * @author gutzmann
- *
  */
 public class AnnotationPropertyInfo extends MethodInfo implements AnnotationProperty {
 
-	Object defaultValue;
-	
+    Object defaultValue;
+
     /**
      * @param accessFlags
      * @param returntype

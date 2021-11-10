@@ -2,52 +2,46 @@
 
 package recoder.java.statement;
 
-import recoder.java.Expression;
-import recoder.java.ExpressionContainer;
-import recoder.java.ProgramElement;
-import recoder.java.SourceElement;
-import recoder.java.SourceVisitor;
-import recoder.java.Statement;
+import recoder.java.*;
 import recoder.list.generic.ASTList;
 
 /**
  * Case.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class Case extends Branch implements ExpressionContainer {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 4344680443480425524L;
+     * serialization id
+     */
+    private static final long serialVersionUID = 4344680443480425524L;
 
-	/**
+    /**
      * Expression.
      */
 
-	private Expression expression;
+    private Expression expression;
 
     /**
      * Body.
      */
 
-	private ASTList<Statement> body;
+    private ASTList<Statement> body;
 
     /**
      * Case.
      */
 
     public Case() {
-    	super();
+        super();
     }
 
     /**
      * Case.
-     * 
-     * @param e
-     *            an expression.
+     *
+     * @param e an expression.
      */
 
     public Case(Expression e) {
@@ -57,11 +51,9 @@ public class Case extends Branch implements ExpressionContainer {
 
     /**
      * Case.
-     * 
-     * @param e
-     *            an expression.
-     * @param body
-     *            a statement mutable list.
+     *
+     * @param e    an expression.
+     * @param body a statement mutable list.
      */
 
     public Case(Expression e, ASTList<Statement> body) {
@@ -72,9 +64,8 @@ public class Case extends Branch implements ExpressionContainer {
 
     /**
      * Case.
-     * 
-     * @param proto
-     *            a case.
+     *
+     * @param proto a case.
      */
 
     protected Case(Case proto) {
@@ -90,7 +81,7 @@ public class Case extends Branch implements ExpressionContainer {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -113,26 +104,24 @@ public class Case extends Branch implements ExpressionContainer {
         }
     }
 
+    @Override
+    public Switch getParent() {
+        return (Switch) parent;
+    }
+
     /**
      * Set parent.
-     * 
-     * @param parent
-     *            a switch.
+     *
+     * @param parent a switch.
      */
 
     public void setParent(Switch parent) {
         this.parent = parent;
     }
 
-    @Override
-    public Switch getParent() {
-    	return (Switch)parent;
-    }
-
-    
     /**
      * Returns the number of children of this node.
-     * 
+     *
      * @return an int giving the number of children of this node
      */
 
@@ -144,17 +133,15 @@ public class Case extends Branch implements ExpressionContainer {
             result += body.size();
         return result;
     }
-    
+
 
     /**
      * Returns the child at the specified index in this node's "virtual" child
      * array
-     * 
-     * @param index
-     *            an index into this node's "virtual" child array
+     *
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
@@ -195,14 +182,11 @@ public class Case extends Branch implements ExpressionContainer {
      * element can be null - in that case, the child is effectively removed. The
      * parent role of the new child is validated, while the parent link of the
      * replaced child is left untouched.
-     * 
-     * @param p
-     *            the old child.
-     * @param p
-     *            the new child.
+     *
+     * @param p the old child.
+     * @param p the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException
-     *                if the new child cannot take over the role of the old one.
+     * @throws ClassCastException if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
@@ -236,7 +220,7 @@ public class Case extends Branch implements ExpressionContainer {
 
     /**
      * Get the number of expressions in this container.
-     * 
+     *
      * @return the number of expressions.
      */
 
@@ -260,7 +244,7 @@ public class Case extends Branch implements ExpressionContainer {
 
     /**
      * Get the number of statements in this container.
-     * 
+     *
      * @return the number of statements.
      */
 
@@ -284,7 +268,7 @@ public class Case extends Branch implements ExpressionContainer {
 
     /**
      * Get expression.
-     * 
+     *
      * @return the expression.
      */
 
@@ -294,9 +278,8 @@ public class Case extends Branch implements ExpressionContainer {
 
     /**
      * Set expression.
-     * 
-     * @param e
-     *            an expression.
+     *
+     * @param e an expression.
      */
 
     public void setExpression(Expression e) {
@@ -317,9 +300,8 @@ public class Case extends Branch implements ExpressionContainer {
 
     /**
      * Set body.
-     * 
-     * @param list
-     *            a statement mutable list.
+     *
+     * @param list a statement mutable list.
      */
 
     public void setBody(ASTList<Statement> list) {
@@ -329,9 +311,9 @@ public class Case extends Branch implements ExpressionContainer {
     public void accept(SourceVisitor v) {
         v.visitCase(this);
     }
-    
+
     public SourceElement getLastElement() {
-    	if (body == null || body.size() == 0) return this;
-        return body.get(body.size()-1).getLastElement();
+        if (body == null || body.size() == 0) return this;
+        return body.get(body.size() - 1).getLastElement();
     }
 }

@@ -2,34 +2,30 @@
 
 package recoder.java.statement;
 
-import recoder.java.Expression;
-import recoder.java.ExpressionContainer;
-import recoder.java.ProgramElement;
-import recoder.java.SourceElement;
-import recoder.java.SourceVisitor;
+import recoder.java.*;
 
 /**
  * Assert statement of Java 1.4.
- * 
+ *
  * @author AL
  */
 
 public class Assert extends JavaStatement implements ExpressionContainer {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -5203926244893543507L;
+     * serialization id
+     */
+    private static final long serialVersionUID = -5203926244893543507L;
 
-	/**
+    /**
      * Assertion condition.
      */
-	private Expression condition;
+    private Expression condition;
 
     /**
      * Assertion message.
      */
-	private Expression message;
+    private Expression message;
 
     /**
      * Trivial constructor.
@@ -40,9 +36,8 @@ public class Assert extends JavaStatement implements ExpressionContainer {
 
     /**
      * Assert.
-     * 
-     * @param cond
-     *            the condition expression (may not be null).
+     *
+     * @param cond the condition expression (may not be null).
      */
     public Assert(Expression cond) {
         this(cond, null);
@@ -50,11 +45,9 @@ public class Assert extends JavaStatement implements ExpressionContainer {
 
     /**
      * Assert.
-     * 
-     * @param cond
-     *            the condition expression (may not be null).
-     * @param msg
-     *            the message expression.
+     *
+     * @param cond the condition expression (may not be null).
+     * @param msg  the message expression.
      */
     public Assert(Expression cond, Expression msg) {
         if (cond == null) {
@@ -67,9 +60,8 @@ public class Assert extends JavaStatement implements ExpressionContainer {
 
     /**
      * Assert.
-     * 
-     * @param proto
-     *            an assert.
+     *
+     * @param proto an assert.
      */
     protected Assert(Assert proto) {
         super(proto);
@@ -84,7 +76,7 @@ public class Assert extends JavaStatement implements ExpressionContainer {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
     public Assert deepClone() {
@@ -97,7 +89,7 @@ public class Assert extends JavaStatement implements ExpressionContainer {
 
     /**
      * Returns the number of children of this node.
-     * 
+     *
      * @return an int giving the number of children of this node
      */
     public int getChildCount() {
@@ -112,12 +104,10 @@ public class Assert extends JavaStatement implements ExpressionContainer {
     /**
      * Returns the child at the specified index in this node's "virtual" child
      * array
-     * 
-     * @param index
-     *            an index into this node's "virtual" child array
+     *
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
@@ -163,14 +153,11 @@ public class Assert extends JavaStatement implements ExpressionContainer {
      * element can be null - in that case, the child is effectively removed. The
      * parent role of the new child is validated, while the parent link of the
      * replaced child is left untouched.
-     * 
-     * @param p
-     *            the old child.
-     * @param p
-     *            the new child.
+     *
+     * @param p the old child.
+     * @param p the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException
-     *                if the new child cannot take over the role of the old one.
+     * @throws ClassCastException if the new child cannot take over the role of the old one.
      */
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
         if (p == null) {
@@ -197,7 +184,7 @@ public class Assert extends JavaStatement implements ExpressionContainer {
 
     /**
      * Get the number of expressions in this container.
-     * 
+     *
      * @return the number of expressions.
      */
     public int getExpressionCount() {
@@ -232,7 +219,7 @@ public class Assert extends JavaStatement implements ExpressionContainer {
 
     /**
      * Gets the condition expression.
-     * 
+     *
      * @return the expression.
      */
     public Expression getCondition() {
@@ -241,9 +228,8 @@ public class Assert extends JavaStatement implements ExpressionContainer {
 
     /**
      * Sets the condition expression.
-     * 
-     * @param expr
-     *            an expression.
+     *
+     * @param expr an expression.
      */
     public void setCondition(Expression expr) {
         condition = expr;
@@ -251,7 +237,7 @@ public class Assert extends JavaStatement implements ExpressionContainer {
 
     /**
      * Gets the message expression.
-     * 
+     *
      * @return the expression.
      */
     public Expression getMessage() {
@@ -260,9 +246,8 @@ public class Assert extends JavaStatement implements ExpressionContainer {
 
     /**
      * Sets the message expression.
-     * 
-     * @param expr
-     *            an expression.
+     *
+     * @param expr an expression.
      */
     public void setMessage(Expression expr) {
         message = expr;

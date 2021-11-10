@@ -2,11 +2,7 @@
 
 package recoder.java.declaration;
 
-import recoder.java.JavaNonTerminalProgramElement;
-import recoder.java.NonTerminalProgramElement;
-import recoder.java.ProgramElement;
-import recoder.java.SourceElement;
-import recoder.java.SourceVisitor;
+import recoder.java.*;
 import recoder.java.reference.TypeReference;
 import recoder.java.reference.TypeReferenceContainer;
 import recoder.list.generic.ASTArrayList;
@@ -14,22 +10,22 @@ import recoder.list.generic.ASTList;
 
 /**
  * Throws.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class Throws extends JavaNonTerminalProgramElement implements TypeReferenceContainer {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 7556905452727718279L;
+     * serialization id
+     */
+    private static final long serialVersionUID = 7556905452727718279L;
 
-	/**
+    /**
      * Parent.
      */
 
-	private MethodDeclaration parent;
+    private MethodDeclaration parent;
 
     /**
      * Exceptions.
@@ -47,9 +43,8 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
 
     /**
      * Throws.
-     * 
-     * @param exception
-     *            a type reference.
+     *
+     * @param exception a type reference.
      */
 
     public Throws(TypeReference exception) {
@@ -60,9 +55,8 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
 
     /**
      * Throws.
-     * 
-     * @param list
-     *            a type reference mutable list.
+     *
+     * @param list a type reference mutable list.
      */
 
     public Throws(ASTList<TypeReference> list) {
@@ -72,9 +66,8 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
 
     /**
      * Throws.
-     * 
-     * @param proto
-     *            a throws.
+     *
+     * @param proto a throws.
      */
 
     protected Throws(Throws proto) {
@@ -87,7 +80,7 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -116,7 +109,7 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
 
     /**
      * Get AST parent.
-     * 
+     *
      * @return the non terminal program element.
      */
 
@@ -126,7 +119,7 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
 
     /**
      * Returns the number of children of this node.
-     * 
+     *
      * @return an int giving the number of children of this node
      */
 
@@ -140,12 +133,10 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
     /**
      * Returns the child at the specified index in this node's "virtual" child
      * array
-     * 
-     * @param index
-     *            an index into this node's "virtual" child array
+     *
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
@@ -172,14 +163,11 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
      * element can be null - in that case, the child is effectively removed. The
      * parent role of the new child is validated, while the parent link of the
      * replaced child is left untouched.
-     * 
-     * @param p
-     *            the old child.
-     * @param p
-     *            the new child.
+     *
+     * @param p the old child.
+     * @param p the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException
-     *                if the new child cannot take over the role of the old one.
+     * @throws ClassCastException if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
@@ -206,7 +194,7 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
 
     /**
      * Get parent.
-     * 
+     *
      * @return the method declaration.
      */
 
@@ -216,9 +204,8 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
 
     /**
      * Set parent.
-     * 
-     * @param decl
-     *            a method declaration.
+     *
+     * @param decl a method declaration.
      */
 
     public void setParent(MethodDeclaration decl) {
@@ -227,7 +214,7 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
 
     /**
      * Get exceptions.
-     * 
+     *
      * @return the type reference mutable list.
      */
 
@@ -237,9 +224,8 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
 
     /**
      * Set exceptions.
-     * 
-     * @param list
-     *            a type reference mutable list.
+     *
+     * @param list a type reference mutable list.
      */
 
     public void setExceptions(ASTList<TypeReference> list) {
@@ -248,7 +234,7 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
 
     /**
      * Get the number of type references in this container.
-     * 
+     *
      * @return the number of type references.
      */
 

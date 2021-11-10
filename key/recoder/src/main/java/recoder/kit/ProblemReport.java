@@ -6,13 +6,12 @@ package recoder.kit;
  * The problem report can be used for interactions. This interface should not be
  * subclassed directly, instead one of {@link recoder.kit.NoProblem}or
  * {@link recoder.kit.Problem}.
- * 
+ *
+ * @author AL
  * @see Transformation#execute
  * @see TwoPassTransformation#analyze
- * 
- * @author AL
  */
 public interface ProblemReport {
-	// nothing here
+    // nothing here
 }
 

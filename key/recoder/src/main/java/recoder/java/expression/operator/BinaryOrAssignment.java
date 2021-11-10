@@ -8,18 +8,18 @@ import recoder.java.expression.Assignment;
 
 /**
  * Binary or assignment.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class BinaryOrAssignment extends Assignment {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 8200577893328544765L;
+     * serialization id
+     */
+    private static final long serialVersionUID = 8200577893328544765L;
 
-	/**
+    /**
      * Binary or assignment.
      */
 
@@ -29,11 +29,9 @@ public class BinaryOrAssignment extends Assignment {
 
     /**
      * Binary or assignment.
-     * 
-     * @param lhs
-     *            an expression.
-     * @param rhs
-     *            an expression.
+     *
+     * @param lhs an expression.
+     * @param rhs an expression.
      */
 
     public BinaryOrAssignment(Expression lhs, Expression rhs) {
@@ -43,9 +41,8 @@ public class BinaryOrAssignment extends Assignment {
 
     /**
      * Binary or assignment.
-     * 
-     * @param proto
-     *            a binary or assignment.
+     *
+     * @param proto a binary or assignment.
      */
 
     protected BinaryOrAssignment(BinaryOrAssignment proto) {
@@ -55,7 +52,7 @@ public class BinaryOrAssignment extends Assignment {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -65,7 +62,7 @@ public class BinaryOrAssignment extends Assignment {
 
     /**
      * Get arity.
-     * 
+     *
      * @return the int value.
      */
 
@@ -75,7 +72,7 @@ public class BinaryOrAssignment extends Assignment {
 
     /**
      * Get precedence.
-     * 
+     *
      * @return the int value.
      */
 
@@ -85,7 +82,7 @@ public class BinaryOrAssignment extends Assignment {
 
     /**
      * Get notation.
-     * 
+     *
      * @return the int value.
      */
 

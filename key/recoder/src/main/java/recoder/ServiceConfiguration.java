@@ -5,35 +5,30 @@ package recoder;
 import recoder.io.ClassFileRepository;
 import recoder.io.ProjectSettings;
 import recoder.io.SourceFileRepository;
-import recoder.service.ByteCodeInfo;
-import recoder.service.ChangeHistory;
-import recoder.service.ConstantEvaluator;
-import recoder.service.ImplicitElementInfo;
-import recoder.service.NameInfo;
-import recoder.service.SourceInfo;
+import recoder.service.*;
 
 /**
  * A configuration of services that can work together.
- * <P>
+ * <p>
  * To exchange a service S1 by a service S2, simply override the corresponding
  * <CODE>makeS</CODE> method.
- * <P>
+ * <p>
  * To provide a complete new Service S, add the following code to a subclass of
  * the DefaultServiceConfiguration:
- * 
+ *
  * <PRE>
- * private S s; 
- * protected void makeServices() { 
- *   super.makeServices(); 
- *   s = makeS(); 
- * } 
- * protected void initServices() { 
- *   super.initServices();
- *   s.initialize(this); 
- * } 
- * protected S makeS() { 
- *   return new S1(...); 
- * } 
+ * private S s;
+ * protected void makeServices() {
+ * super.makeServices();
+ * s = makeS();
+ * }
+ * protected void initServices() {
+ * super.initServices();
+ * s.initialize(this);
+ * }
+ * protected S makeS() {
+ * return new S1(...);
+ * }
  * public final S getS() { return s; }
  * </PRE>
  */

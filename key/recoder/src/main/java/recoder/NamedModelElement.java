@@ -10,16 +10,16 @@ import recoder.util.Order;
 public interface NamedModelElement extends ModelElement {
 
     /**
-     * Return the name of the model element.
-     * 
-     * @return the name of the model element.
-     */
-    String getName();
-
-    /**
      * Lexical order objects comparing names.
      */
     Order LEXICAL_ORDER = new LexicalOrder();
+
+    /**
+     * Return the name of the model element.
+     *
+     * @return the name of the model element.
+     */
+    String getName();
 
     /**
      * Lexical order on names of named model elements. The model elements may be

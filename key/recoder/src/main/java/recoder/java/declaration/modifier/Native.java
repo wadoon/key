@@ -7,30 +7,29 @@ import recoder.java.declaration.Modifier;
 
 /**
  * Native.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class Native extends Modifier {
 
     /**
-	 * serialization id 
-	 */
-	private static final long serialVersionUID = -5292363142166406788L;
+     * serialization id
+     */
+    private static final long serialVersionUID = -5292363142166406788L;
 
-	/**
+    /**
      * Native.
      */
 
     public Native() {
-    	// nothing to do
+        // nothing to do
     }
 
     /**
      * Native.
-     * 
-     * @param proto
-     *            a native.
+     *
+     * @param proto a native.
      */
 
     protected Native(Native proto) {
@@ -39,7 +38,7 @@ public class Native extends Modifier {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 

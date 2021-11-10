@@ -8,18 +8,18 @@ import recoder.java.expression.Operator;
 
 /**
  * Binary X or.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class BinaryXOr extends Operator {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -7163139482513251225L;
+     * serialization id
+     */
+    private static final long serialVersionUID = -7163139482513251225L;
 
-	/**
+    /**
      * Binary X or.
      */
 
@@ -29,11 +29,9 @@ public class BinaryXOr extends Operator {
 
     /**
      * Binary X or.
-     * 
-     * @param lhs
-     *            an expression.
-     * @param rhs
-     *            an expression.
+     *
+     * @param lhs an expression.
+     * @param rhs an expression.
      */
 
     public BinaryXOr(Expression lhs, Expression rhs) {
@@ -43,9 +41,8 @@ public class BinaryXOr extends Operator {
 
     /**
      * Binary X or.
-     * 
-     * @param proto
-     *            a binary X or.
+     *
+     * @param proto a binary X or.
      */
 
     protected BinaryXOr(BinaryXOr proto) {
@@ -55,7 +52,7 @@ public class BinaryXOr extends Operator {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -65,7 +62,7 @@ public class BinaryXOr extends Operator {
 
     /**
      * Get arity.
-     * 
+     *
      * @return the int value.
      */
 
@@ -75,7 +72,7 @@ public class BinaryXOr extends Operator {
 
     /**
      * Get precedence.
-     * 
+     *
      * @return the int value.
      */
 
@@ -85,7 +82,7 @@ public class BinaryXOr extends Operator {
 
     /**
      * Get notation.
-     * 
+     *
      * @return the int value.
      */
 

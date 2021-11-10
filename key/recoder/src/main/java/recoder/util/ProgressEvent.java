@@ -4,18 +4,18 @@ import java.util.EventObject;
 
 /**
  * Event indicating a processing progress.
- * 
- * @since 0.72
+ *
  * @author AL
+ * @since 0.72
  */
 public class ProgressEvent extends EventObject {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -8564312802396719743L;
+     * serialization id
+     */
+    private static final long serialVersionUID = -8564312802396719743L;
 
-	private int workCount;
+    private int workCount;
 
     private int workMax;
 
@@ -34,20 +34,20 @@ public class ProgressEvent extends EventObject {
         return workMax;
     }
 
-    public int getWorkDoneCount() {
-        return workCount;
+    protected void setWorkToDoCount(int count) {
+        this.workMax = count;
     }
 
-    public Object getState() {
-        return state;
+    public int getWorkDoneCount() {
+        return workCount;
     }
 
     protected void setWorkDoneCount(int count) {
         this.workCount = count;
     }
 
-    protected void setWorkToDoCount(int count) {
-        this.workMax = count;
+    public Object getState() {
+        return state;
     }
 
     protected void setState(Object state) {

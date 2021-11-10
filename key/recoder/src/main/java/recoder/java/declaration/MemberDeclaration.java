@@ -6,7 +6,7 @@ import recoder.java.Declaration;
 
 /**
  * Member declaration.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
@@ -14,12 +14,14 @@ public interface MemberDeclaration extends Declaration {
 
     /**
      * Get member parent.
-     * 
+     *
      * @return the type declaration.
      */
     TypeDeclaration getMemberParent();
 
-    /** does *not* add to parent's children list automatically */
+    /**
+     * does *not* add to parent's children list automatically
+     */
     void setMemberParent(TypeDeclaration t);
 
     /**
@@ -46,6 +48,6 @@ public interface MemberDeclaration extends Declaration {
      * Test whether the declaration is strictfp.
      */
     boolean isStrictFp();
-    
+
     MemberDeclaration deepClone();
 }

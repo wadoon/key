@@ -2,6 +2,13 @@
 
 package recoder.io;
 
+import recoder.AbstractService;
+import recoder.ServiceConfiguration;
+import recoder.java.JavaProgramFactory;
+import recoder.service.DefaultErrorHandler;
+import recoder.service.ErrorHandler;
+import recoder.util.FileUtils;
+
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
@@ -12,75 +19,49 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import recoder.AbstractService;
-import recoder.ServiceConfiguration;
-import recoder.java.JavaProgramFactory;
-import recoder.service.DefaultErrorHandler;
-import recoder.service.ErrorHandler;
-import recoder.util.FileUtils;
-
 /**
  * The project settings object manages global properties such as search and
  * output paths, and options for the pretty printer and can save and load a
  * textual representation of these informations.
- * 
+ *
  * @author RN
  * @author AL
  * @author UH (extension class identification)
  */
 public class ProjectSettings extends AbstractService implements PropertyNames {
 
+    private static final FileFilter jarFilter = new FileFilter() {
+        public boolean accept(File pathname) {
+            return pathname.getPath().endsWith(".jar");
+        }
+    };
     /**
      * The default properties.
      */
-    private Properties defaults;
-
+    private final Properties defaults;
     /**
      * @author NAI
      * Location-specific java source version settings
      * key: location identifier
      * value: java source version, allowed values: "1.3", "1.4", "5"
      */
-    private Properties locationSpecificVersionProperties;
-    
+    private final Properties locationSpecificVersionProperties;
     /**
      * The current properties.
      */
-    private Properties properties;
-
+    private final Properties properties;
     /**
      * Auxiliary event propagation manager.
      */
-    private PropertyChangeSupport changes = new PropertyChangeSupport(this);
-
+    private final PropertyChangeSupport changes = new PropertyChangeSupport(this);
     /**
      * The current search path list.
      */
     private PathList searchPathList;
-
     /**
      * The error handler.
      */
     private ErrorHandler errorHandler;
-
-    private String getSystemProperty(String propertyName) {
-        try {
-            return System.getProperty(propertyName);
-        } catch (RuntimeException e) {
-            return null;
-        }
-    }
-
-    // checks for system properties first, then uses hard-coded default value
-    private void setDefault(String propertyName, String defaultValue) {
-        String v = getSystemProperty(propertyName);
-        if (v == null) {
-            v = defaultValue;
-        } else {
-            properties.put(propertyName, v);
-        }
-        defaults.put(propertyName, v);
-    }
 
     /**
      * Creates a new project settings object for the given service
@@ -90,7 +71,7 @@ public class ProjectSettings extends AbstractService implements PropertyNames {
         super(config);
         defaults = new Properties();
         properties = new Properties(defaults);
-        locationSpecificVersionProperties=new Properties();		//NAI
+        locationSpecificVersionProperties = new Properties();        //NAI
 
         String classpath = getSystemProperty(INPUT_PATH);
         if (classpath == null) {
@@ -141,26 +122,43 @@ public class ProjectSettings extends AbstractService implements PropertyNames {
         setErrorHandler(null); // set the error handler; also registers it to the ChangeHistory
         searchPathList = new PathList(classpath);
     }
-    
+
+    private String getSystemProperty(String propertyName) {
+        try {
+            return System.getProperty(propertyName);
+        } catch (RuntimeException e) {
+            return null;
+        }
+    }
+
+    // checks for system properties first, then uses hard-coded default value
+    private void setDefault(String propertyName, String defaultValue) {
+        String v = getSystemProperty(propertyName);
+        if (v == null) {
+            v = defaultValue;
+        } else {
+            properties.put(propertyName, v);
+        }
+        defaults.put(propertyName, v);
+    }
+
     public final boolean java5Allowed() {
         return Boolean.valueOf(properties.getProperty(JAVA_5)).booleanValue();
     }
-    
+
     public final boolean java7Allowed() {
-    	return Boolean.valueOf(properties.getProperty(JAVA_7)).booleanValue();
+        return Boolean.valueOf(properties.getProperty(JAVA_7)).booleanValue();
     }
 
     /**
      * Defines a property with the given name and value and informs all
      * registered listeners. The method will automatically remove all segments
      * from the search path that do not exist.
-     * 
-     * @param key
-     *            the name of the property to set.
-     * @param value
-     *            the value of the property to set.
+     *
+     * @param key   the name of the property to set.
+     * @param value the value of the property to set.
      * @return the old value associated with the key, or <CODE>null</CODE> if
-     *         this property has not been set.
+     * this property has not been set.
      */
     public String setProperty(String key, String value) {
         String oldValue = properties.getProperty(key);
@@ -174,8 +172,8 @@ public class ProjectSettings extends AbstractService implements PropertyNames {
                     errorHandler.setErrorThreshold(Integer.parseInt(value));
                 }
             } else if (TABSIZE.equals(key)) {
-           		((JavaProgramFactory)getServiceConfiguration().getProgramFactory())
-           			.getParser().setTabSize(Integer.parseInt(value));
+                ((JavaProgramFactory) getServiceConfiguration().getProgramFactory())
+                        .getParser().setTabSize(Integer.parseInt(value));
             }
             properties.put(key, value);
             changes.firePropertyChange(key, oldValue, value);
@@ -183,23 +181,22 @@ public class ProjectSettings extends AbstractService implements PropertyNames {
         return oldValue;
     }
 
+    // initialize at startup; also set as current property
+
     /**
      * Returns the property with the given name.
-     * 
-     * @param key
-     *            the name of the property to look for.
+     *
+     * @param key the name of the property to look for.
      * @return the property associated with the given key.
      */
     public String getProperty(String key) {
         return properties.getProperty(key);
     }
 
-    // initialize at startup; also set as current property
     /**
      * Returns the default property with the given name.
-     * 
-     * @param key
-     *            the name of the default property to look for.
+     *
+     * @param key the name of the default property to look for.
      * @return the property associated with the given key.
      */
     public String getDefaultProperty(String key) {
@@ -208,7 +205,7 @@ public class ProjectSettings extends AbstractService implements PropertyNames {
 
     /**
      * Returns a copy of the currently valid properties.
-     * 
+     *
      * @return a copy of the currently valid properties.
      */
     public Properties getProperties() {
@@ -232,23 +229,23 @@ public class ProjectSettings extends AbstractService implements PropertyNames {
         while (paths.hasMoreTokens()) {
             String singlePath = paths.nextToken();
             if (singlePath.endsWith(File.separator + "*.jar")) {
-            	// some duplicate code...
-            	File jars[] = new File(singlePath.substring(0, singlePath.length()-5)).listFiles(new FilenameFilter() {
-					public boolean accept(File dir, String name) {
-						return name.endsWith(".jar");
-					}
-				});
-            	for (File jar : jars) {
-            		String jarPath = jar.getPath();
-            		if (!alreadyExisting.contains(jarPath)) {
-            			if (!firstToken) {
-            				newpathlist.append(File.pathSeparator);
-            			}
-            			newpathlist.append(jarPath);
-            			alreadyExisting.add(jarPath);
-            			firstToken = false;
-            		}
-            	}
+                // some duplicate code...
+                File[] jars = new File(singlePath.substring(0, singlePath.length() - 5)).listFiles(new FilenameFilter() {
+                    public boolean accept(File dir, String name) {
+                        return name.endsWith(".jar");
+                    }
+                });
+                for (File jar : jars) {
+                    String jarPath = jar.getPath();
+                    if (!alreadyExisting.contains(jarPath)) {
+                        if (!firstToken) {
+                            newpathlist.append(File.pathSeparator);
+                        }
+                        newpathlist.append(jarPath);
+                        alreadyExisting.add(jarPath);
+                        firstToken = false;
+                    }
+                }
             }
             if (!alreadyExisting.contains(singlePath) && new File(singlePath).exists()) {
                 if (!firstToken) {
@@ -267,9 +264,9 @@ public class ProjectSettings extends AbstractService implements PropertyNames {
      * Ensures that the class file repository can find "java.lang.Object" by
      * adding the proper path to the search path list. This method must be
      * called explicitly after creation of a service configuration.
-     * 
+     *
      * @return <CODE>true</CODE>, if the class file repository knows how to
-     *         find "Object", <CODE>false</CODE> otherwise.
+     * find "Object", <CODE>false</CODE> otherwise.
      */
     public boolean ensureSystemClassesAreInPath() {
         ClassFileRepository cfr = serviceConfiguration.getClassFileRepository();
@@ -291,7 +288,7 @@ public class ProjectSettings extends AbstractService implements PropertyNames {
      * magic directory by adding the proper path to the search path list. This
      * method must be called explicitly after creation of a service
      * configuration.
-     * 
+     *
      * @since 0.72
      */
     public void ensureExtensionClassesAreInPath() {
@@ -315,7 +312,7 @@ public class ProjectSettings extends AbstractService implements PropertyNames {
             }
         }
         // TODO document this, and check if it works on MAC, ...
-        jars = new File(extDir+"/../").listFiles(ProjectSettings.jarFilter);
+        jars = new File(extDir + "/../").listFiles(ProjectSettings.jarFilter);
         if (jars.length > 0) {
             additions = new StringBuilder();
             for (int i = 0; i < jars.length; i++) {
@@ -324,19 +321,11 @@ public class ProjectSettings extends AbstractService implements PropertyNames {
         }
         setProperty(INPUT_PATH, oldpath + File.pathSeparator + additions);
     }
-    
-
-    private static FileFilter jarFilter = new FileFilter() {
-        public boolean accept(File pathname) {
-            return pathname.getPath().endsWith(".jar");
-        }
-    };
 
     /**
      * Registers a property change listener.
-     * 
-     * @param l
-     *            the listener to register.
+     *
+     * @param l the listener to register.
      */
     public void addPropertyChangeListener(PropertyChangeListener l) {
         changes.addPropertyChangeListener(l);
@@ -344,9 +333,8 @@ public class ProjectSettings extends AbstractService implements PropertyNames {
 
     /**
      * Deregisters a property change listener.
-     * 
-     * @param l
-     *            the listener to deregister.
+     *
+     * @param l the listener to deregister.
      */
     public void removePropertyChangeListener(PropertyChangeListener l) {
         changes.removePropertyChangeListener(l);
@@ -354,7 +342,7 @@ public class ProjectSettings extends AbstractService implements PropertyNames {
 
     /**
      * Returns the current shared search path list.
-     * 
+     *
      * @return the current search path list.
      */
     public PathList getSearchPathList() {
@@ -364,7 +352,7 @@ public class ProjectSettings extends AbstractService implements PropertyNames {
     /**
      * Returns the current error handler. If no error handler is set, a
      * {@link recoder.service.DefaultErrorHandler}will be constructed.
-     * 
+     *
      * @return the current error handler.
      */
     public ErrorHandler getErrorHandler() {
@@ -374,9 +362,8 @@ public class ProjectSettings extends AbstractService implements PropertyNames {
     /**
      * Sets the current error handler and registers it as a change update
      * listener.
-     * 
-     * @param handler
-     *            the new error handler.
+     *
+     * @param handler the new error handler.
      */
     public void setErrorHandler(ErrorHandler handler) {
         if (handler == null) {
@@ -390,13 +377,13 @@ public class ProjectSettings extends AbstractService implements PropertyNames {
             serviceConfiguration.getChangeHistory().addModelUpdateListener(errorHandler);
         }
     }
-    
+
     /**
-     * @author NAI
      * @return
+     * @author NAI
      */
-	public Properties getLocationSpecificVersionProperties() {
-		return locationSpecificVersionProperties;
-	}
+    public Properties getLocationSpecificVersionProperties() {
+        return locationSpecificVersionProperties;
+    }
 
 }

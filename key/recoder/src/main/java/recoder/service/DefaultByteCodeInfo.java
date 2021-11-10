@@ -2,72 +2,35 @@
 
 package recoder.service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import recoder.ServiceConfiguration;
-import recoder.abstraction.ArrayType;
-import recoder.abstraction.ClassType;
-import recoder.abstraction.ClassTypeContainer;
-import recoder.abstraction.Constructor;
-import recoder.abstraction.Field;
-import recoder.abstraction.Member;
-import recoder.abstraction.Method;
 import recoder.abstraction.Package;
-import recoder.abstraction.ParameterizedType;
-import recoder.abstraction.ProgramModelElement;
-import recoder.abstraction.Type;
-import recoder.abstraction.TypeParameter;
-import recoder.bytecode.AnnotationUseInfo;
-import recoder.bytecode.ByteCodeElement;
-import recoder.bytecode.ClassFile;
-import recoder.bytecode.ConstructorInfo;
-import recoder.bytecode.FieldInfo;
-import recoder.bytecode.MemberInfo;
-import recoder.bytecode.MethodInfo;
-import recoder.bytecode.TypeArgumentInfo;
-import recoder.bytecode.TypeParameterInfo;
+import recoder.abstraction.*;
+import recoder.bytecode.*;
 import recoder.convenience.Format;
 import recoder.util.Debug;
 
+import java.util.*;
+
 
 public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements ByteCodeInfo {
-
-    /*
-     * We reuse the class type cache for the class file cache entries. We can do
-     * that as we create cache entries during registration of class files and
-     * registration comes before any query. There is a cache entry for a class
-     * file if and only if it has been registered. Therefore, the class file
-     * cache may not be reset, which would happen after a call to reset().
-     * However, the byte code info should never have to be reset as long as
-     * we do not change byte code.
-     * TODO necessary to do when retrotranslator is run !?
-     */
-    static class ClassFileCacheEntry extends ClassTypeCacheEntry {
-        // could be extended by containment links?
-    }
 
     /**
      * Containment relation. This could be made internal part of the
      * ByteCodeInfo hierarchy.
      */
     private final Map<ProgramModelElement, ClassTypeContainer> element2container = new HashMap<ProgramModelElement, ClassTypeContainer>(256);
-
     /**
      * Member and inner type relation. This could be made part of the NameInfo
      * for packages and part of the ClassFile or the ClassFileCacheEntry.
      */
     private final Map<ClassTypeContainer, ArrayList<ClassType>> containedTypes = new HashMap<ClassTypeContainer, ArrayList<ClassType>>(32);
-
-    /** signature caching */
+    /**
+     * signature caching
+     */
     private final Map<Method, List<Type>> method2signature = new HashMap<Method, List<Type>>(128);
 
     /**
-     * @param config
-     *            the configuration this services becomes part of.
+     * @param config the configuration this services becomes part of.
      */
     public DefaultByteCodeInfo(ServiceConfiguration config) {
         super(config);
@@ -98,102 +61,103 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
     }
 
     private TypeParameterInfo findTypeParameter(MemberInfo mi, String name) {
-    	TypeParameter result = null;
-    	if (mi instanceof MethodInfo) {
-			if (((MethodInfo)mi).getTypeParameters() != null) {
-				for (TypeParameter tp : ((MethodInfo)mi).getTypeParameters()) {
-					if (name.equals(tp.getName())) {
-						result = tp;
-						break;
-					}
-				}
-			}
-		}
-    	ClassType container = mi.getContainingClassType();
-		FOUND: while (result == null && container != null) {
-    		List<? extends TypeParameter> tpl = container.getTypeParameters();
-    		if (tpl != null) {
-    			for (TypeParameter tp : tpl) {
-    				if (name.equals(tp.getName())) {
-    					result = tp;
-    					break FOUND;
-    				}
-    			}
-    		}
-    		container = container.getContainingClassType();
-		}
-		return (TypeParameterInfo)result;
+        TypeParameter result = null;
+        if (mi instanceof MethodInfo) {
+            if (((MethodInfo) mi).getTypeParameters() != null) {
+                for (TypeParameter tp : ((MethodInfo) mi).getTypeParameters()) {
+                    if (name.equals(tp.getName())) {
+                        result = tp;
+                        break;
+                    }
+                }
+            }
+        }
+        ClassType container = mi.getContainingClassType();
+        FOUND:
+        while (result == null && container != null) {
+            List<? extends TypeParameter> tpl = container.getTypeParameters();
+            if (tpl != null) {
+                for (TypeParameter tp : tpl) {
+                    if (name.equals(tp.getName())) {
+                        result = tp;
+                        break FOUND;
+                    }
+                }
+            }
+            container = container.getContainingClassType();
+        }
+        return (TypeParameterInfo) result;
     }
-    
-    public Type getType(ByteCodeElement bce) {
-    	if (bce instanceof ConstructorInfo) {
-    		return null; 
-    	}
-    	Type result = null;
-    	String typeName = bce.getTypeName();
-    	if (typeName.equals("void"))
-    		return null;
-    	if (bce instanceof MemberInfo) {
-    		MemberInfo mi = (MemberInfo)bce;
-    		int idx = typeName.indexOf('[');
-    		int dim = idx == -1 ? 0 : (typeName.length() - idx) / 2;
-    		String baseTypeName = idx == - 1 ? typeName : typeName.substring(0, idx); 
 
-    		// TODO 0.95 should be changed in  
-    		if (mi.isTypeVariable()) {
-        		result = findTypeParameter(mi, baseTypeName);
-        		if (result != null) {
-        			while (dim-- > 0)
-        				result = result.createArrayType();
-        		}
-    		}
-    		
-    	}
-    	if (result == null) 
-    		result = getNameInfo().getType(typeName);
-    	if (bce instanceof MemberInfo) {
-    		List<TypeArgumentInfo> typeArgs;
-    		if (bce instanceof MethodInfo)
-    			typeArgs = ((MethodInfo)bce).getTypeArgumentsForReturnType();
-    		else
-    			typeArgs = ((FieldInfo)bce).getTypeArguments();
-    		if (typeArgs != null && typeArgs.size() != 0) {
-    			if (result instanceof ArrayType) {
-    				result = makeParameterizedArrayType((ArrayType)result, typeArgs);
-    			} else {
-        			// can safely cast, result must not be primitive type if it has type arguments
-    				result = getServiceConfiguration().getImplicitElementInfo().getParameterizedType((ClassType)result, typeArgs);
-    			}
-    		}
-    	}
-    	if (result == null) {
-   			getErrorHandler().reportError(
+    public Type getType(ByteCodeElement bce) {
+        if (bce instanceof ConstructorInfo) {
+            return null;
+        }
+        Type result = null;
+        String typeName = bce.getTypeName();
+        if (typeName.equals("void"))
+            return null;
+        if (bce instanceof MemberInfo) {
+            MemberInfo mi = (MemberInfo) bce;
+            int idx = typeName.indexOf('[');
+            int dim = idx == -1 ? 0 : (typeName.length() - idx) / 2;
+            String baseTypeName = idx == -1 ? typeName : typeName.substring(0, idx);
+
+            // TODO 0.95 should be changed in
+            if (mi.isTypeVariable()) {
+                result = findTypeParameter(mi, baseTypeName);
+                if (result != null) {
+                    while (dim-- > 0)
+                        result = result.createArrayType();
+                }
+            }
+
+        }
+        if (result == null)
+            result = getNameInfo().getType(typeName);
+        if (bce instanceof MemberInfo) {
+            List<TypeArgumentInfo> typeArgs;
+            if (bce instanceof MethodInfo)
+                typeArgs = ((MethodInfo) bce).getTypeArgumentsForReturnType();
+            else
+                typeArgs = ((FieldInfo) bce).getTypeArguments();
+            if (typeArgs != null && typeArgs.size() != 0) {
+                if (result instanceof ArrayType) {
+                    result = makeParameterizedArrayType((ArrayType) result, typeArgs);
+                } else {
+                    // can safely cast, result must not be primitive type if it has type arguments
+                    result = getServiceConfiguration().getImplicitElementInfo().getParameterizedType((ClassType) result, typeArgs);
+                }
+            }
+        }
+        if (result == null) {
+            getErrorHandler().reportError(
                     new UnresolvedBytecodeReferenceException(typeName, bce.getFullName()));
-        	result = getServiceConfiguration().getNameInfo().getUnknownType();
-    	}
-    	result = checkEraseRequired(result);
-    	return result;
+            result = getServiceConfiguration().getNameInfo().getUnknownType();
+        }
+        result = checkEraseRequired(result);
+        return result;
     }
 
     private Type checkEraseRequired(Type t) {
-    	int dim = 0;
-    	while (t instanceof ArrayType) {
-    		t = ((ArrayType)t).getBaseType();
-    		dim++;
-    	}
-    	if (java5Allowed() && t instanceof ClassType && !(t instanceof ArrayType) && !(t instanceof ParameterizedType)){
-        	ClassType ct = (ClassType)t;
-        	if (ct.getTypeParameters() != null && ct.getTypeParameters().size() > 0) {
-        		// The type reference has no type arguments, but the type has type parameters.
-        		t = ((ClassType)t).getErasedType();
-        	}
+        int dim = 0;
+        while (t instanceof ArrayType) {
+            t = ((ArrayType) t).getBaseType();
+            dim++;
         }
-    	while (dim-- > 0) {
-    		t = t.createArrayType();
-    	}
-    	return t;
+        if (java5Allowed() && t instanceof ClassType && !(t instanceof ArrayType) && !(t instanceof ParameterizedType)) {
+            ClassType ct = (ClassType) t;
+            if (ct.getTypeParameters() != null && ct.getTypeParameters().size() > 0) {
+                // The type reference has no type arguments, but the type has type parameters.
+                t = ((ClassType) t).getErasedType();
+            }
+        }
+        while (dim-- > 0) {
+            t = t.createArrayType();
+        }
+        return t;
     }
-    
+
     public Type getType(ProgramModelElement pme) {
         Debug.assertNonnull(pme);
         Type result = null;
@@ -214,7 +178,7 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
         Debug.assertNonnull(pme);
         ProgramModelElement x = element2container.get(pme);
         while ((x != null) && !(x instanceof Package)) {
-            x =element2container.get(x);
+            x = element2container.get(x);
         }
         return (Package) x;
     }
@@ -224,7 +188,7 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
         if (ctc instanceof ByteCodeElement) {
             List<ClassType> ctl = containedTypes.get(ctc);
             if (ctl == null)
-            	return Collections.emptyList();
+                return Collections.emptyList();
             return new ArrayList<ClassType>(ctl);
         } else {
             return ctc.getProgramModelInfo().getTypes(ctc);
@@ -239,23 +203,23 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
         Debug.assertNonnull(ct);
         // TODO cache / register (?)
         if (ct instanceof TypeParameterInfo) {
-        	TypeParameterInfo tp = (TypeParameterInfo)ct;
-        	List<ClassType> res;
-        	res = new ArrayList<ClassType>(tp.getBoundCount());
-        	for (int i = 0; i < tp.getBoundCount(); i++) {
-        		List<TypeArgumentInfo> boundTAs = tp.getBoundTypeArguments(i);
-        		ClassType boundCT = getNameInfo().getClassType(tp.getBoundName(i)); 
-        		if (boundTAs != null && boundTAs.size() > 0) {
-        			// may be an inner type! TypeArgs for the most inner types have to be set.
-        			// outer types may be raw under circumstances (in case of static member types)
-        			// example, for type X<T>.Y<U>: X<String>.Y is never allowed. X.Y<String> may be allowed.
-        			ClassType finalCT = makeParameterizedInnerTypeRec(boundCT, boundTAs);
-        			res.add(finalCT);
-        		} else {
-        			res.add(boundCT);
-        		}
-        	}
-        	return res;
+            TypeParameterInfo tp = (TypeParameterInfo) ct;
+            List<ClassType> res;
+            res = new ArrayList<ClassType>(tp.getBoundCount());
+            for (int i = 0; i < tp.getBoundCount(); i++) {
+                List<TypeArgumentInfo> boundTAs = tp.getBoundTypeArguments(i);
+                ClassType boundCT = getNameInfo().getClassType(tp.getBoundName(i));
+                if (boundTAs != null && boundTAs.size() > 0) {
+                    // may be an inner type! TypeArgs for the most inner types have to be set.
+                    // outer types may be raw under circumstances (in case of static member types)
+                    // example, for type X<T>.Y<U>: X<String>.Y is never allowed. X.Y<String> may be allowed.
+                    ClassType finalCT = makeParameterizedInnerTypeRec(boundCT, boundTAs);
+                    res.add(finalCT);
+                } else {
+                    res.add(boundCT);
+                }
+            }
+            return res;
         }
         ClassFile cf = getClassFile(ct);
         if (cf == null) {
@@ -268,19 +232,19 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
     }
 
     private ParameterizedType makeParameterizedInnerTypeRec(ClassType boundCT,
-			List<TypeArgumentInfo> boundTAs) {
-    	ImplicitElementInfo iei = getServiceConfiguration().getImplicitElementInfo();
-    	int myTPCount = boundCT.getTypeParameters() == null ? 0 : boundCT.getTypeParameters().size(); 
-    	if (myTPCount == boundTAs.size()) {
-        	return iei.getParameterizedType(boundCT, boundTAs);
-    	}
-    	List<TypeArgumentInfo> outerTAs = boundTAs.subList(0, boundTAs.size()-myTPCount);
-    	List<TypeArgumentInfo> myTAs = boundTAs.subList(boundTAs.size()-myTPCount, boundTAs.size());
-    	ParameterizedType outerCT =  makeParameterizedInnerTypeRec(boundCT.getContainingClassType(), outerTAs);
-    	return iei.getParameterizedType(boundCT, myTAs, outerCT);
-	}
+                                                            List<TypeArgumentInfo> boundTAs) {
+        ImplicitElementInfo iei = getServiceConfiguration().getImplicitElementInfo();
+        int myTPCount = boundCT.getTypeParameters() == null ? 0 : boundCT.getTypeParameters().size();
+        if (myTPCount == boundTAs.size()) {
+            return iei.getParameterizedType(boundCT, boundTAs);
+        }
+        List<TypeArgumentInfo> outerTAs = boundTAs.subList(0, boundTAs.size() - myTPCount);
+        List<TypeArgumentInfo> myTAs = boundTAs.subList(boundTAs.size() - myTPCount, boundTAs.size());
+        ParameterizedType outerCT = makeParameterizedInnerTypeRec(boundCT.getContainingClassType(), outerTAs);
+        return iei.getParameterizedType(boundCT, myTAs, outerCT);
+    }
 
-	public List<? extends Field> getFields(ClassType ct) {
+    public List<? extends Field> getFields(ClassType ct) {
         Debug.assertNonnull(ct);
         if (ct instanceof ClassFile) {
             return ((ClassFile) ct).getFieldInfos();
@@ -331,75 +295,76 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
                 if (result == null) {
                     NameInfo ni = getNameInfo();
                     List<Type> res = new ArrayList<Type>(pcount);
-                    // TODO 0.95 - this shouldn't be necessary - 
-                    // set in MethodInfo if it's a type parameter, it's information 
+                    // TODO 0.95 - this shouldn't be necessary -
+                    // set in MethodInfo if it's a type parameter, it's information
                     // available in bytecode!
                     for (int i = 0; i < pcount; i++) {
-                    	Type t = null;
-                   		String basename = ptypes[i];
-                   		int dim;
-                   		if ((dim = basename.indexOf('[')) != -1) // for now, dim isn't the real dimension.
-                   			basename = basename.substring(0, dim);
-                   		List<? extends TypeParameter> tpl;
-                   		boolean checkClassTypeParameters = true;
-                   		// method's type parameters
-                   		// TODO this is copy&paste... use only one list!
-                   		tpl = mi.getTypeParameters();
-                   		if (tpl != null) {
-                   			for (TypeParameter tp : tpl) {
-                   				if (basename.equals(tp.getName())) {
-                   					t = tp;
-                   					if (dim != -1) {
-                   						dim = (ptypes[i].length() - dim) / 2;
-                   						while(dim != 0) {
-                   							t = ni.createArrayType(tp);
-                   							dim--;
-                   						}
-                   					}
-                   					checkClassTypeParameters = false;
-                   					break;
-                   				}
-                   			}
-                   		}
-                   		// class's type parameters
-                   		if (checkClassTypeParameters) {
-                   			ClassType container = mi.getContainingClassType(); 
-                   			OUTER: do {
-                   				tpl = container.getTypeParameters();
-                   				if (tpl != null) {
-                   					for (TypeParameter tp : tpl) {
-                   						if (basename.equals(tp.getName())) {
-                   							t = tp;
-                   							if (dim != -1) {
-                   								dim = (ptypes[i].length() - dim) / 2;
-                   								while(dim != 0) {
-                   									t = ni.createArrayType(tp);
-                   									dim--;
-                   								}
-                   							}
-                   							break OUTER;
-                   						}
-                   					}
-                   				}
-                   				container = container.getContainingClassType();
-                   			} while (container != null);
-                   		}
-                   		if (t == null)
-                   			t = ni.getType(ptypes[i]);
-                   		if (t == null) {
-                   			getErrorHandler().reportError(
+                        Type t = null;
+                        String basename = ptypes[i];
+                        int dim;
+                        if ((dim = basename.indexOf('[')) != -1) // for now, dim isn't the real dimension.
+                            basename = basename.substring(0, dim);
+                        List<? extends TypeParameter> tpl;
+                        boolean checkClassTypeParameters = true;
+                        // method's type parameters
+                        // TODO this is copy&paste... use only one list!
+                        tpl = mi.getTypeParameters();
+                        if (tpl != null) {
+                            for (TypeParameter tp : tpl) {
+                                if (basename.equals(tp.getName())) {
+                                    t = tp;
+                                    if (dim != -1) {
+                                        dim = (ptypes[i].length() - dim) / 2;
+                                        while (dim != 0) {
+                                            t = ni.createArrayType(tp);
+                                            dim--;
+                                        }
+                                    }
+                                    checkClassTypeParameters = false;
+                                    break;
+                                }
+                            }
+                        }
+                        // class's type parameters
+                        if (checkClassTypeParameters) {
+                            ClassType container = mi.getContainingClassType();
+                            OUTER:
+                            do {
+                                tpl = container.getTypeParameters();
+                                if (tpl != null) {
+                                    for (TypeParameter tp : tpl) {
+                                        if (basename.equals(tp.getName())) {
+                                            t = tp;
+                                            if (dim != -1) {
+                                                dim = (ptypes[i].length() - dim) / 2;
+                                                while (dim != 0) {
+                                                    t = ni.createArrayType(tp);
+                                                    dim--;
+                                                }
+                                            }
+                                            break OUTER;
+                                        }
+                                    }
+                                }
+                                container = container.getContainingClassType();
+                            } while (container != null);
+                        }
+                        if (t == null)
+                            t = ni.getType(ptypes[i]);
+                        if (t == null) {
+                            getErrorHandler().reportError(
                                     new UnresolvedBytecodeReferenceException(ptypes[i], m.getFullName()));
-                        	t = getServiceConfiguration().getNameInfo().getUnknownType();
-                   		}
-                   		if (mi.getTypeArgumentsForParam(i) != null
-                   				&& mi.getTypeArgumentsForParam(i).size() > 0) {
-                   			if (t instanceof ArrayType) {
-                   				t = makeParameterizedArrayType((ArrayType)t, mi.getTypeArgumentsForParam(i));
-                   			} else {
-                   				t = getServiceConfiguration().getImplicitElementInfo().getParameterizedType((ClassType)t, mi.getTypeArgumentsForParam(i));
-                   			}
-                   		}
-                    	res.add(t);
+                            t = getServiceConfiguration().getNameInfo().getUnknownType();
+                        }
+                        if (mi.getTypeArgumentsForParam(i) != null
+                                && mi.getTypeArgumentsForParam(i).size() > 0) {
+                            if (t instanceof ArrayType) {
+                                t = makeParameterizedArrayType((ArrayType) t, mi.getTypeArgumentsForParam(i));
+                            } else {
+                                t = getServiceConfiguration().getImplicitElementInfo().getParameterizedType((ClassType) t, mi.getTypeArgumentsForParam(i));
+                            }
+                        }
+                        res.add(t);
                     }
                     result = res;
                     method2signature.put(m, result);
@@ -422,14 +387,14 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
             List<ClassType> res = new ArrayList<ClassType>(etypes.length);
             NameInfo ni = getNameInfo();
             for (String exc : etypes) {
-            	ClassType excT = findTypeParameter(mi, exc);
-            	if (excT == null)
-            		excT = ni.getClassType(exc);
-            	if (excT == null) {
-           			getErrorHandler().reportError(
+                ClassType excT = findTypeParameter(mi, exc);
+                if (excT == null)
+                    excT = ni.getClassType(exc);
+                if (excT == null) {
+                    getErrorHandler().reportError(
                             new UnresolvedBytecodeReferenceException(exc, mi.getFullName() + " (a declared exception)"));
-                	excT = getServiceConfiguration().getNameInfo().getUnknownClassType();
-            	}
+                    excT = getServiceConfiguration().getNameInfo().getUnknownClassType();
+                }
                 res.add(excT);
             }
             return res;
@@ -447,12 +412,12 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
             // already registered
             return;
         }
-        
+
         if (cf.getName().equals("package-info")) {
-        	// this is not really a type, but compiled package annotations. Skip this.
-        	return;
+            // this is not really a type, but compiled package annotations. Skip this.
+            return;
         }
-        
+
         cfce = new ClassFileCacheEntry();
         classTypeCache.put(cf, cfce);
         String classname = cf.getBinaryName();
@@ -464,37 +429,38 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
 
         // get outer scope: package, or outer class
         int ldp = classname.lastIndexOf('$');
-        
+
         // TODO 0.95 - this is a quick fix. Clean up!!
         ClassTypeContainer ctc;
         if (cf.getEnclosingMethod() != null) {
-        	ctc = null;
-        	String s = cf.getEnclosingMethod();
-        	ClassFile clazz = (ClassFile)getNameInfo().getClassType(s.substring(0, s.lastIndexOf('.')).replace('/', '.').replace('$', '.'));
-        	String mname = s.substring(s.lastIndexOf('.')+1, s.lastIndexOf('('));
-        	FIND_METHOD: for (Method mi : clazz.getMethods()) {
-        		if (!mi.getName().equals(mname))
-        			continue;
-        		// TODO 0.95 properly check signature...
-        		String msig = s.substring(s.indexOf('('));
-        		org.objectweb.asm.Type[] sigTypes = org.objectweb.asm.Type.getArgumentTypes(msig);
-        		String[] sig = new String[sigTypes.length + 1];
-        		for (int i = 0; i < sigTypes.length; i++)
-        			sig[i] = sigTypes[i].getClassName();
-        		sig[sigTypes.length] = org.objectweb.asm.Type.getReturnType(s).getClassName();
-        		if (sig.length-1 != mi.getSignature().size())
-        			continue; 
-        		for (int i = 0; i < sig.length-1; i++) {
-        			if (!sig[i].equals(mi.getSignature().get(i).getFullName()))
-        				continue FIND_METHOD;
-        		}
-        		if (mi.getReturnType() != null && !mi.getReturnType().getFullName().equals(sig[sig.length-1]))
-        			continue; // might be a bridge method!
-        		
-        		if (ctc != null)
-        			throw new UnsupportedOperationException("Two methods with same name, one has local/anonymous type - not supported yet!");
-        		ctc = mi;
-        	}
+            ctc = null;
+            String s = cf.getEnclosingMethod();
+            ClassFile clazz = (ClassFile) getNameInfo().getClassType(s.substring(0, s.lastIndexOf('.')).replace('/', '.').replace('$', '.'));
+            String mname = s.substring(s.lastIndexOf('.') + 1, s.lastIndexOf('('));
+            FIND_METHOD:
+            for (Method mi : clazz.getMethods()) {
+                if (!mi.getName().equals(mname))
+                    continue;
+                // TODO 0.95 properly check signature...
+                String msig = s.substring(s.indexOf('('));
+                org.objectweb.asm.Type[] sigTypes = org.objectweb.asm.Type.getArgumentTypes(msig);
+                String[] sig = new String[sigTypes.length + 1];
+                for (int i = 0; i < sigTypes.length; i++)
+                    sig[i] = sigTypes[i].getClassName();
+                sig[sigTypes.length] = org.objectweb.asm.Type.getReturnType(s).getClassName();
+                if (sig.length - 1 != mi.getSignature().size())
+                    continue;
+                for (int i = 0; i < sig.length - 1; i++) {
+                    if (!sig[i].equals(mi.getSignature().get(i).getFullName()))
+                        continue FIND_METHOD;
+                }
+                if (mi.getReturnType() != null && !mi.getReturnType().getFullName().equals(sig[sig.length - 1]))
+                    continue; // might be a bridge method!
+
+                if (ctc != null)
+                    throw new UnsupportedOperationException("Two methods with same name, one has local/anonymous type - not supported yet!");
+                ctc = mi;
+            }
         } else if (ldp >= 0) {
             // we are an inner class
             String outerClassName = classname.substring(0, ldp);
@@ -592,12 +558,12 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
                  * Remark by T.Gutzmann:
                  * The inner class info is meant for the sole purpose of type resolving:
                  * an inner class and a package-level class may have the same name
-                 * (although that violates naming conventions). There are rules for 
+                 * (although that violates naming conventions). There are rules for
                  * resolving this problem on source code level; the information required
                  * are not available in bytecode any more, except in the inner class info ;-)
                  * As of Recoder 0.80, references to inner classes of other types are filtered out
                  * by the bytecode parser.
-                 * 
+                 *
                  ** It is actually possible to receive a non-classfile here! The
                  ** semantics of inner class chunks in class files seems to be a
                  ** bit weird.
@@ -622,10 +588,10 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
                                 + cf.getFullName(), sname));
 
             } else {
-            	List<TypeArgumentInfo> tais = cf.getSuperClassTypeArguments();
-            	// TODO 0.90
-            	if (tais != null && tais.size() > 0)
-            		ct = getServiceConfiguration().getImplicitElementInfo().getParameterizedType(ct, tais);
+                List<TypeArgumentInfo> tais = cf.getSuperClassTypeArguments();
+                // TODO 0.90
+                if (tais != null && tais.size() > 0)
+                    ct = getServiceConfiguration().getImplicitElementInfo().getParameterizedType(ct, tais);
                 list.add(ct);
             }
         }
@@ -638,15 +604,15 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
                                 + cf.getFullName(), iname));
 
             } else {
-            	List<TypeArgumentInfo> tais = cf.getSuperInterfaceTypeArguments(i);
-            	// TODO 0.90
-            	if (tais != null && tais.size() > 0)
-            		ct = getServiceConfiguration().getImplicitElementInfo().getParameterizedType(ct, tais);
+                List<TypeArgumentInfo> tais = cf.getSuperInterfaceTypeArguments(i);
+                // TODO 0.90
+                if (tais != null && tais.size() > 0)
+                    ct = getServiceConfiguration().getImplicitElementInfo().getParameterizedType(ct, tais);
                 list.add(ct);
             }
         }
         if (list.isEmpty()) {
-        	// TODO not necessary? java.lang.Object is automatically inserted by compiler?
+            // TODO not necessary? java.lang.Object is automatically inserted by compiler?
             ClassType jlo = ni.getJavaLangObject();
             if (cf != jlo) {
                 list.add(jlo);
@@ -658,13 +624,27 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
         }
     }
 
-	public Type getAnnotationType(AnnotationUseInfo au) {
-		return getNameInfo().getType(au.getFullReferencedName());
-	}
-	
-	void clear() {
-		containedTypes.clear();
-		element2container.clear();
-		method2signature.clear();
-	}
+    public Type getAnnotationType(AnnotationUseInfo au) {
+        return getNameInfo().getType(au.getFullReferencedName());
+    }
+
+    void clear() {
+        containedTypes.clear();
+        element2container.clear();
+        method2signature.clear();
+    }
+
+    /*
+     * We reuse the class type cache for the class file cache entries. We can do
+     * that as we create cache entries during registration of class files and
+     * registration comes before any query. There is a cache entry for a class
+     * file if and only if it has been registered. Therefore, the class file
+     * cache may not be reset, which would happen after a call to reset().
+     * However, the byte code info should never have to be reset as long as
+     * we do not change byte code.
+     * TODO necessary to do when retrotranslator is run !?
+     */
+    static class ClassFileCacheEntry extends ClassTypeCacheEntry {
+        // could be extended by containment links?
+    }
 }

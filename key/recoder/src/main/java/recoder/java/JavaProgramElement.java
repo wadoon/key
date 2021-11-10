@@ -7,28 +7,22 @@ import recoder.list.generic.ASTList;
 
 /**
  * Top level implementation of a Java {@link ProgramElement}.
- * 
+ *
  * @author AL
  */
 
 public abstract class JavaProgramElement extends JavaSourceElement implements ProgramElement {
-	private static int cur_id = 0;
-	private final int id = cur_id++;
-	
-	public int getID() { 
-		return id; 
-	}
-	
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	/**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+    private static int cur_id = 0;
+    private final int id = cur_id++;
+    /**
      * Comments.
      */
 
-	private ASTList<Comment> comments;
-
+    private ASTList<Comment> comments;
     /**
      * Java program element.
      */
@@ -39,9 +33,8 @@ public abstract class JavaProgramElement extends JavaSourceElement implements Pr
 
     /**
      * Java program element.
-     * 
-     * @param proto
-     *            a java program element.
+     *
+     * @param proto a java program element.
      */
 
     protected JavaProgramElement(JavaProgramElement proto) {
@@ -52,9 +45,13 @@ public abstract class JavaProgramElement extends JavaSourceElement implements Pr
 //        getFactory().trace(this);
     }
 
+    public int getID() {
+        return id;
+    }
+
     /**
      * Get comments.
-     * 
+     *
      * @return the comments.
      */
 
@@ -64,9 +61,8 @@ public abstract class JavaProgramElement extends JavaSourceElement implements Pr
 
     /**
      * Set comments.
-     * 
-     * @param c
-     *            a comment list.
+     *
+     * @param c a comment list.
      */
 
     public void setComments(ASTList<Comment> list) {
@@ -78,7 +74,9 @@ public abstract class JavaProgramElement extends JavaSourceElement implements Pr
         }
     }
 
-    /** Defaults to do nothing. */
+    /**
+     * Defaults to do nothing.
+     */
 
     public void validate() throws ModelException {
         /* Defaults to do nothing. */

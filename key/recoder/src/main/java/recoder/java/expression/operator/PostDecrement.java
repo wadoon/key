@@ -8,18 +8,18 @@ import recoder.java.expression.Assignment;
 
 /**
  * Post decrement.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class PostDecrement extends Assignment {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -1562954246447453685L;
+     * serialization id
+     */
+    private static final long serialVersionUID = -1562954246447453685L;
 
-	/**
+    /**
      * Post decrement.
      */
 
@@ -29,9 +29,8 @@ public class PostDecrement extends Assignment {
 
     /**
      * Post decrement.
-     * 
-     * @param child
-     *            an expression.
+     *
+     * @param child an expression.
      */
 
     public PostDecrement(Expression child) {
@@ -41,9 +40,8 @@ public class PostDecrement extends Assignment {
 
     /**
      * Post decrement.
-     * 
-     * @param proto
-     *            a post decrement.
+     *
+     * @param proto a post decrement.
      */
 
     protected PostDecrement(PostDecrement proto) {
@@ -53,7 +51,7 @@ public class PostDecrement extends Assignment {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -63,7 +61,7 @@ public class PostDecrement extends Assignment {
 
     /**
      * Get arity.
-     * 
+     *
      * @return the int value.
      */
 
@@ -73,7 +71,7 @@ public class PostDecrement extends Assignment {
 
     /**
      * Get precedence.
-     * 
+     *
      * @return the int value.
      */
 
@@ -83,7 +81,7 @@ public class PostDecrement extends Assignment {
 
     /**
      * Get notation.
-     * 
+     *
      * @return the int value.
      */
 

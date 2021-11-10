@@ -4,7 +4,7 @@ package recoder.java;
 
 /**
  * Identifier.
- * 
+ *
  * @author AL
  * @author <TT>AutoDoc</TT>
  */
@@ -12,20 +12,18 @@ package recoder.java;
 public class Identifier extends JavaProgramElement implements TerminalProgramElement {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 4261793022531143013L;
-
-	/**
-     * Parent.
+     * serialization id
      */
-
-	private NonTerminalProgramElement parent;
-
+    private static final long serialVersionUID = 4261793022531143013L;
     /**
      * Id.
      */
     protected String id;
+    /**
+     * Parent.
+     */
+
+    private NonTerminalProgramElement parent;
 
     /**
      * Identifier.
@@ -37,28 +35,19 @@ public class Identifier extends JavaProgramElement implements TerminalProgramEle
 
     /**
      * Identifier.
-     * 
-     * @param text
-     *            a string.
+     *
+     * @param text a string.
      */
 
     public Identifier(String text) {
-        if (!Character.isJavaIdentifierStart(text.charAt(0))) {
-		    throw new IllegalArgumentException((text + " is not a valid Java identifier"));
-		}
-		for (int i = text.length() - 1; i >= 1; i -= 1) {
-		    if (!Character.isJavaIdentifierPart(text.charAt(i))) {
-		        throw new IllegalArgumentException((text + " is not a valid Java identifier"));
-		    }
-		}
-		id = text.intern();
+        isValidIdentifier(text);
+        id = text.intern();
     }
 
     /**
      * Identifier.
-     * 
-     * @param proto
-     *            an identifier.
+     *
+     * @param proto an identifier.
      */
 
     protected Identifier(Identifier proto) {
@@ -66,9 +55,29 @@ public class Identifier extends JavaProgramElement implements TerminalProgramEle
         id = proto.id;
     }
 
+    public static void isValidIdentifier(String text) {
+        int start = 0;
+        int end = text.length() - 1;
+        if (text.startsWith("<")) {
+            start++;
+            if (text.endsWith(">")) {
+                end--;
+            } else {
+                throw new IllegalArgumentException("Identifier starting with < needs to end with >");
+            }
+        }
+        if (text.startsWith("\\")) start++;
+
+        for (int i = end; i >= start; i--) {
+            if (!Character.isJavaIdentifierPart(text.charAt(i))) {
+                throw new IllegalArgumentException((text + " is not a valid Java identifier"));
+            }
+        }
+    }
+
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -78,7 +87,7 @@ public class Identifier extends JavaProgramElement implements TerminalProgramEle
 
     /**
      * Get AST parent.
-     * 
+     *
      * @return the non terminal program element.
      */
 
@@ -88,7 +97,7 @@ public class Identifier extends JavaProgramElement implements TerminalProgramEle
 
     /**
      * Get parent.
-     * 
+     *
      * @return the named program element.
      */
 
@@ -98,18 +107,17 @@ public class Identifier extends JavaProgramElement implements TerminalProgramEle
 
     /**
      * Set parent.
-     * 
-     * @param p
-     *            a named program element.
+     *
+     * @param p a named program element.
      */
 
     public void setParent(NonTerminalProgramElement p) {
         parent = p;
     }
-    
+
     /**
      * Get text. The String is made unambiguous.
-     * 
+     *
      * @return the string.
      */
 
@@ -120,9 +128,9 @@ public class Identifier extends JavaProgramElement implements TerminalProgramEle
     public void accept(SourceVisitor v) {
         v.visitIdentifier(this);
     }
-    
+
     @Override
     public String toString() {
-    	return "<Identifier> " + id;
+        return "<Identifier> " + id;
     }
 }

@@ -8,22 +8,21 @@ import recoder.java.ProgramElement;
 /**
  * Exception indicating that a particular reference (or reference prefix) could
  * not be resolved.
- * 
+ *
  * @author AL.
  */
 public class UnresolvedReferenceException extends ModelException {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 4926742139318960014L;
-	private ProgramElement programElement;
+     * serialization id
+     */
+    private static final long serialVersionUID = 4926742139318960014L;
+    private final ProgramElement programElement;
 
     /**
      * Empty constructor.
-     * 
-     * @param r
-     *            the program element that could not be resolved.
+     *
+     * @param r the program element that could not be resolved.
      */
     public UnresolvedReferenceException(ProgramElement r) {
         programElement = r;
@@ -31,11 +30,9 @@ public class UnresolvedReferenceException extends ModelException {
 
     /**
      * Constructor with an explanation text.
-     * 
-     * @param s
-     *            an explanation.
-     * @param r
-     *            the program element that could not be resolved.
+     *
+     * @param s an explanation.
+     * @param r the program element that could not be resolved.
      */
     public UnresolvedReferenceException(String s, ProgramElement r) {
         super(s);

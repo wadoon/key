@@ -1,8 +1,5 @@
 package recoder.kit.transformation;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.java.CompilationUnit;
 import recoder.java.Import;
@@ -13,29 +10,30 @@ import recoder.service.CrossReferenceSourceInfo;
 import recoder.util.ProgressListener;
 import recoder.util.ProgressListenerManager;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Transformation that removes all superfluous import statements from a
  * compilation unit.
- * 
- * @see recoder.kit.UnitKit#getUnnecessaryImports
- * 
- * @since 0.71
+ *
  * @author AL
+ * @see recoder.kit.UnitKit#getUnnecessaryImports
+ * @since 0.71
  */
 public class RemoveUnusedImports extends TwoPassTransformation {
 
-    private List<CompilationUnit> units;
+    private final List<CompilationUnit> units;
 
-    private List<Import> imports;
+    private final List<Import> imports;
 
-    private ProgressListenerManager listeners = new ProgressListenerManager(this);
+    private final ProgressListenerManager listeners = new ProgressListenerManager(this);
 
     /**
      * Creates a new transformation object that removes unused import statements
      * from all compilation units in the source file repository.
-     * 
-     * @param sc
-     *            the service configuration to use.
+     *
+     * @param sc the service configuration to use.
      */
     public RemoveUnusedImports(CrossReferenceServiceConfiguration sc) {
         this(sc, sc.getSourceFileRepository().getCompilationUnits());
@@ -44,16 +42,14 @@ public class RemoveUnusedImports extends TwoPassTransformation {
     /**
      * Creates a new transformation object that removes unused import
      * statements.
-     * 
-     * @param sc
-     *            the service configuration to use.
-     * @param cu
-     *            a compilation unit that shall be stripped of imports.
+     *
+     * @param sc the service configuration to use.
+     * @param cu a compilation unit that shall be stripped of imports.
      */
     public RemoveUnusedImports(CrossReferenceServiceConfiguration sc, CompilationUnit cu) {
-    	super(sc);
-    	ArrayList<CompilationUnit> al = new ArrayList<CompilationUnit>(1);
-    	al.add(cu);
+        super(sc);
+        ArrayList<CompilationUnit> al = new ArrayList<CompilationUnit>(1);
+        al.add(cu);
         this.units = al;
         imports = new ArrayList<Import>();
     }
@@ -61,11 +57,9 @@ public class RemoveUnusedImports extends TwoPassTransformation {
     /**
      * Creates a new transformation object that removes unused import
      * statements.
-     * 
-     * @param sc
-     *            the service configuration to use.
-     * @param list
-     *            the compilation units that shall be stripped of imports.
+     *
+     * @param sc   the service configuration to use.
+     * @param list the compilation units that shall be stripped of imports.
      */
     public RemoveUnusedImports(CrossReferenceServiceConfiguration sc, List<CompilationUnit> list) {
         super(sc);
@@ -89,7 +83,7 @@ public class RemoveUnusedImports extends TwoPassTransformation {
 
     /**
      * Returns {@link #EQUIVALENCE}or {@link #IDENTITY}.
-     * 
+     *
      * @return the problem report.
      */
     public ProblemReport analyze() {
@@ -115,7 +109,7 @@ public class RemoveUnusedImports extends TwoPassTransformation {
 
     /**
      * Returns the list of redundant imports.
-     * 
+     *
      * @return the list of imports that are/were superfluous.
      */
     public List<Import> getImportList() {
@@ -124,7 +118,7 @@ public class RemoveUnusedImports extends TwoPassTransformation {
 
     /**
      * Returns the compilation units.
-     * 
+     *
      * @return the compilation units.
      */
     public List<CompilationUnit> getCompilationUnits() {

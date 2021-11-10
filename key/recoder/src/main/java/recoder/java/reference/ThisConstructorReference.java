@@ -9,19 +9,19 @@ import recoder.list.generic.ASTList;
 
 /**
  * This constructor reference.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class ThisConstructorReference extends SpecialConstructorReference {
 
-	
-    /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -4669357517439005903L;
 
-	/**
+    /**
+     * serialization id
+     */
+    private static final long serialVersionUID = -4669357517439005903L;
+
+    /**
      * This constructor reference.
      */
 
@@ -31,9 +31,8 @@ public class ThisConstructorReference extends SpecialConstructorReference {
 
     /**
      * This constructor reference.
-     * 
-     * @param arguments
-     *            an expression mutable list.
+     *
+     * @param arguments an expression mutable list.
      */
 
     public ThisConstructorReference(ASTList<Expression> arguments) {
@@ -43,9 +42,8 @@ public class ThisConstructorReference extends SpecialConstructorReference {
 
     /**
      * This constructor reference.
-     * 
-     * @param proto
-     *            a this constructor reference.
+     *
+     * @param proto a this constructor reference.
      */
 
     protected ThisConstructorReference(ThisConstructorReference proto) {
@@ -55,7 +53,7 @@ public class ThisConstructorReference extends SpecialConstructorReference {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -65,7 +63,7 @@ public class ThisConstructorReference extends SpecialConstructorReference {
 
     public int getChildPositionCode(ProgramElement child) {
         // role 0 (IDX): parameters
-    	// role 1 (IDX): type arguments
+        // role 1 (IDX): type arguments
         if (arguments != null) {
             int index = arguments.indexOf(child);
             if (index >= 0) {
@@ -73,10 +71,10 @@ public class ThisConstructorReference extends SpecialConstructorReference {
             }
         }
         if (typeArguments != null) {
-        	int index = arguments.indexOf(child);
-        	if (index >= 0) {
-        		return (index << 4) | 1;
-        	}
+            int index = arguments.indexOf(child);
+            if (index >= 0) {
+                return (index << 4) | 1;
+            }
         }
         return -1;
     }
@@ -84,9 +82,9 @@ public class ThisConstructorReference extends SpecialConstructorReference {
     public void accept(SourceVisitor v) {
         v.visitThisConstructorReference(this);
     }
-    
+
     @Override
     public String toString() {
-    	return "<ThisConstructorReference>";
+        return "<ThisConstructorReference>";
     }
 }

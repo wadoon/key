@@ -2,14 +2,14 @@
 
 package recoder.abstraction;
 
-import java.util.List;
-
 import recoder.service.ImplicitElementInfo;
 import recoder.service.ProgramModelInfo;
 
+import java.util.List;
+
 /**
  * A program model element representing the null type.
- * 
+ *
  * @author AL
  * @author RN
  */
@@ -18,31 +18,31 @@ public class NullType implements ClassType {
     /**
      * The name of this type.
      */
-    public static final String NULL = "null".intern();
+    public static final String NULL = "null";
 
-    private ImplicitElementInfo pmi;
+    private final ImplicitElementInfo pmi;
 
     /**
      * Create a new null type for the given program model info.
-     * 
-     * @param info
-     *            the program model info responsible for this type.
+     *
+     * @param info the program model info responsible for this type.
      */
     public NullType(ImplicitElementInfo info) {
         this.pmi = info;
     }
 
-    
+
     public ArrayType getArrayType() {
-    	throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException();
     }
-    
+
     public ArrayType createArrayType() {
-    	throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException();
     }
+
     /**
      * Returns the name of this element.
-     * 
+     *
      * @return <CODE>"null"</CODE>.
      */
     public String getName() {
@@ -51,21 +51,21 @@ public class NullType implements ClassType {
 
     /**
      * Returns the name of this element.
-     * 
+     *
      * @return <CODE>"null"</CODE>.
      */
     public String getFullName() {
         return NULL;
     }
-    
+
     public String getBinaryName() {
-    	return NULL;
+        return NULL;
     }
 
     /**
      * Returns the instance that can retrieve information about this program
      * model element.
-     * 
+     *
      * @return the program model info of this element.
      */
     public ProgramModelInfo getProgramModelInfo() {
@@ -75,21 +75,20 @@ public class NullType implements ClassType {
     /**
      * Sets the instance that can retrieve information about this program model
      * element.
-     * 
-     * @param info
-     *            the program model info for this element.
+     *
+     * @param info the program model info for this element.
      */
     public void setProgramModelInfo(ProgramModelInfo info) {
         throw new UnsupportedOperationException();
     }
 
     public void validate() {
-    	// always valid
+        // always valid
     }
 
     /**
      * Checks if this member is final.
-     * 
+     *
      * @return <CODE>true</CODE>.
      */
     public boolean isFinal() {
@@ -98,7 +97,7 @@ public class NullType implements ClassType {
 
     /**
      * Checks if this member is static.
-     * 
+     *
      * @return <CODE>true</CODE>.
      */
     public boolean isStatic() {
@@ -107,7 +106,7 @@ public class NullType implements ClassType {
 
     /**
      * Checks if this member is private.
-     * 
+     *
      * @return <CODE>false</CODE>.
      */
     public boolean isPrivate() {
@@ -116,7 +115,7 @@ public class NullType implements ClassType {
 
     /**
      * Checks if this member is protected.
-     * 
+     *
      * @return <CODE>false</CODE>.
      */
     public boolean isProtected() {
@@ -125,7 +124,7 @@ public class NullType implements ClassType {
 
     /**
      * Checks if this member is public.
-     * 
+     *
      * @return <CODE>true</CODE>.
      */
     public boolean isPublic() {
@@ -134,7 +133,7 @@ public class NullType implements ClassType {
 
     /**
      * Checks if this member is strictfp.
-     * 
+     *
      * @return <CODE>false</CODE>.
      */
     public boolean isStrictFp() {
@@ -144,7 +143,7 @@ public class NullType implements ClassType {
     /**
      * Returns the (empty) list of class types locally defined within this
      * container.
-     * 
+     *
      * @return an empty list of contained class types.
      */
     public List<? extends ClassType> getTypes() {
@@ -153,7 +152,7 @@ public class NullType implements ClassType {
 
     /**
      * Returns all class types that are inner types of this class type.
-     * 
+     *
      * @return an empty list of class types.
      */
     public List<ClassType> getAllTypes() {
@@ -162,7 +161,7 @@ public class NullType implements ClassType {
 
     /**
      * Returns the logical parent class of this member.
-     * 
+     *
      * @return the class type containing this member.
      */
     public ClassType getContainingClassType() {
@@ -171,7 +170,7 @@ public class NullType implements ClassType {
 
     /**
      * Returns the enclosing package or class type, or method.
-     * 
+     *
      * @return <CODE>null</CODE>.
      */
     public ClassTypeContainer getContainer() {
@@ -180,17 +179,17 @@ public class NullType implements ClassType {
 
     /**
      * Checks if this class type denotes an interface.
-     * 
+     *
      * @return <CODE>false</CODE>.
      */
     public boolean isInterface() {
         return false;
     }
-    
+
     public boolean isOrdinaryInterface() {
         return false;
     }
-    
+
     public boolean isAnnotationType() {
         return false;
     }
@@ -205,7 +204,7 @@ public class NullType implements ClassType {
 
     /**
      * Checks if this member is abstract.
-     * 
+     *
      * @return <CODE>false</CODE>.
      */
     public boolean isAbstract() {
@@ -214,7 +213,7 @@ public class NullType implements ClassType {
 
     /**
      * Returns the list of locally declared supertypes of this class type.
-     * 
+     *
      * @return the empty list of supertypes of this type.
      */
     public List<ClassType> getSupertypes() {
@@ -224,7 +223,7 @@ public class NullType implements ClassType {
     /**
      * Returns the list of all supertypes of this class type, including this
      * type.
-     * 
+     *
      * @return a list with this element as single member.
      */
     public List<ClassType> getAllSupertypes() {
@@ -233,7 +232,7 @@ public class NullType implements ClassType {
 
     /**
      * Returns the fields locally defined within this class type.
-     * 
+     *
      * @return the (empty) list of field members of this type.
      */
     public List<? extends Field> getFields() {
@@ -243,7 +242,7 @@ public class NullType implements ClassType {
     /**
      * Returns all visible fields that are defined in this class type or any of
      * its supertypes.
-     * 
+     *
      * @return the (empty) list of visible field members of this type.
      */
     public List<Field> getAllFields() {
@@ -252,7 +251,7 @@ public class NullType implements ClassType {
 
     /**
      * Returns the methods locally defined within this class type.
-     * 
+     *
      * @return the (empty) list of methods of this type.
      */
     public List<Method> getMethods() {
@@ -261,7 +260,7 @@ public class NullType implements ClassType {
 
     /**
      * Returns the constructors locally defined within this class type.
-     * 
+     *
      * @return the (empty) list of constructors of this type.
      */
     public List<? extends Constructor> getConstructors() {
@@ -271,7 +270,7 @@ public class NullType implements ClassType {
     /**
      * Returns all visible methods that are defined in this class type or any of
      * its supertypes.
-     * 
+     *
      * @return the (empty) list of visible methods of this type.
      */
     public List<Method> getAllMethods() {
@@ -280,7 +279,7 @@ public class NullType implements ClassType {
 
     /**
      * Returns the package this element is defined in.
-     * 
+     *
      * @return <CODE>null</CODE>.
      */
     public Package getPackage() {
@@ -294,30 +293,30 @@ public class NullType implements ClassType {
         return null;
     }
 
-	public List<? extends TypeParameter> getTypeParameters() {
-		return null;
-	}
-	
-    public String getFullSignature() {
-    	return getFullName();
+    public List<? extends TypeParameter> getTypeParameters() {
+        return null;
     }
-    
-	public NullType getErasedType() {
-		return this;
-	}
+
+    public String getFullSignature() {
+        return getFullName();
+    }
+
+    public NullType getErasedType() {
+        return this;
+    }
 
 
-	public boolean isInner() {
-		return false;
-	}
+    public boolean isInner() {
+        return false;
+    }
 
-	public ClassType getBaseClassType() {
-		return this;
-	}
+    public ClassType getBaseClassType() {
+        return this;
+    }
 
-	@Override
-	public NullType getGenericMember() {
-		return this;
-	}
+    @Override
+    public NullType getGenericMember() {
+        return this;
+    }
 
 }

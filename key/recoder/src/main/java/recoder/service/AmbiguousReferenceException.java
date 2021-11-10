@@ -2,36 +2,34 @@
 
 package recoder.service;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import recoder.ModelException;
 import recoder.abstraction.ProgramModelElement;
 import recoder.java.Reference;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Exception indicating that a particular reference is ambiguous.
- * 
+ *
  * @author AL
  */
 public class AmbiguousReferenceException extends ModelException {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 1106306098306634107L;
+     * serialization id
+     */
+    private static final long serialVersionUID = 1106306098306634107L;
 
-	private Reference reference;
+    private final Reference reference;
 
-    private List<? extends ProgramModelElement> choices;
+    private final List<? extends ProgramModelElement> choices;
 
     /**
      * Constructor without explanation text.
-     * 
-     * @param r
-     *            the ambiguous reference.
-     * @param choices
-     *            the possible resolutions.
+     *
+     * @param r       the ambiguous reference.
+     * @param choices the possible resolutions.
      */
     public AmbiguousReferenceException(Reference r, List<? extends ProgramModelElement> choices) {
         reference = r;
@@ -40,13 +38,10 @@ public class AmbiguousReferenceException extends ModelException {
 
     /**
      * Constructor without explanation text.
-     * 
-     * @param r
-     *            the ambiguous reference.
-     * @param choice1
-     *            one possible resolution.
-     * @param choice2
-     *            a second possible resolution.
+     *
+     * @param r       the ambiguous reference.
+     * @param choice1 one possible resolution.
+     * @param choice2 a second possible resolution.
      */
     public AmbiguousReferenceException(Reference r, ProgramModelElement choice1, ProgramModelElement choice2) {
         reference = r;
@@ -58,13 +53,10 @@ public class AmbiguousReferenceException extends ModelException {
 
     /**
      * Constructor with an explanation text.
-     * 
-     * @param s
-     *            an explanation.
-     * @param r
-     *            the ambiguous reference.
-     * @param choices
-     *            the possible resolutions.
+     *
+     * @param s       an explanation.
+     * @param r       the ambiguous reference.
+     * @param choices the possible resolutions.
      */
     public AmbiguousReferenceException(String s, Reference r, List<? extends ProgramModelElement> choices) {
         super(s);
@@ -74,15 +66,11 @@ public class AmbiguousReferenceException extends ModelException {
 
     /**
      * Constructor with an explanation text.
-     * 
-     * @param s
-     *            an explanation.
-     * @param r
-     *            the ambiguous reference.
-     * @param choice1
-     *            one possible resolution.
-     * @param choice2
-     *            a second possible resolution.
+     *
+     * @param s       an explanation.
+     * @param r       the ambiguous reference.
+     * @param choice1 one possible resolution.
+     * @param choice2 a second possible resolution.
      */
     public AmbiguousReferenceException(String s, Reference r, ProgramModelElement choice1, ProgramModelElement choice2) {
         super(s);

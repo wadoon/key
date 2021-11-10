@@ -5,7 +5,7 @@ package recoder.util;
 /**
  * Different sort algorithms based upon standard arrays and arbitrary total
  * order relations.
- * 
+ *
  * @author AL
  */
 public class Sorting {

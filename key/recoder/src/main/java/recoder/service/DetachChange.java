@@ -35,7 +35,7 @@ public class DetachChange extends TreeChange {
         this.position = position;
         replacement = null;
         if (position < 0) {
-            throw new IllegalChangeReportException("Illegal position code in " + toString());
+            throw new IllegalChangeReportException("Illegal position code in " + this);
         }
     }
 
@@ -49,10 +49,9 @@ public class DetachChange extends TreeChange {
             // could be a compilation unit!
             this.position = parent.getChildPositionCode(rep);
             if (position < 0) {
-                throw new IllegalChangeReportException("Illegal position code in " + replacement.toString());
+                throw new IllegalChangeReportException("Illegal position code in " + replacement);
             }
-        }
-        else position = -1;
+        } else position = -1;
     }
 
     public final NonTerminalProgramElement getChangeRootParent() {
@@ -69,7 +68,7 @@ public class DetachChange extends TreeChange {
 
 
     public String toString() {
-    	StringBuilder buf = new StringBuilder();
+        StringBuilder buf = new StringBuilder();
         if (isMinor()) {
             buf.append("Minor ");
         }

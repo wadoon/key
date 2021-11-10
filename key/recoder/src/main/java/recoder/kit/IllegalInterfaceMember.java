@@ -11,10 +11,10 @@ import recoder.java.declaration.MemberDeclaration;
 public class IllegalInterfaceMember extends Conflict {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -1632587249722947504L;
-	private MemberDeclaration member;
+     * serialization id
+     */
+    private static final long serialVersionUID = -1632587249722947504L;
+    private final MemberDeclaration member;
 
     public IllegalInterfaceMember(MemberDeclaration member) {
         this.member = member;

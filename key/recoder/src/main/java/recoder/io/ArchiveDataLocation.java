@@ -2,20 +2,14 @@
 
 package recoder.io;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.Reader;
-import java.io.Writer;
+import java.io.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 /**
  * This class implements a data location, that describes an entry of a Java
  * archive file. Currently supported formats are ZIP and JAR.
- * 
+ *
  * @author RN
  * @author AL
  */
@@ -23,19 +17,21 @@ public class ArchiveDataLocation implements DataLocation {
 
     public static final String LOCATION_TYPE_ARCHIVE = "ARCHIVE";
 
-    /** the archive file */
+    /**
+     * the archive file
+     */
     ZipFile archiveFile;
 
-    /** the name of the item within the archive */
+    /**
+     * the name of the item within the archive
+     */
     String itemName;
 
     /**
      * creates a new location object.
-     * 
-     * @param archive
-     *            the file that contains the archive
-     * @param itemname
-     *            the name of the item within the archive
+     *
+     * @param archive  the file that contains the archive
+     * @param itemname the name of the item within the archive
      */
     public ArchiveDataLocation(ZipFile archive, String itemname) {
         archiveFile = archive;
@@ -44,11 +40,9 @@ public class ArchiveDataLocation implements DataLocation {
 
     /**
      * creates a new location object.
-     * 
-     * @param archivename
-     *            the name of the archive file
-     * @param itemname
-     *            the name of the item within the archive
+     *
+     * @param archivename the name of the archive file
+     * @param itemname    the name of the item within the archive
      */
     public ArchiveDataLocation(String archivename, String itemname) throws IOException {
         this(new ZipFile(archivename), itemname);
@@ -56,7 +50,7 @@ public class ArchiveDataLocation implements DataLocation {
 
     /**
      * returns the "type" of the data location.
-     * 
+     *
      * @return <tt>LOCATION_TYPE_ARCHIVE</tt>
      */
     public String getType() {
@@ -65,7 +59,7 @@ public class ArchiveDataLocation implements DataLocation {
 
     /**
      * returns the zip file of this archive.
-     * 
+     *
      * @return the zip file of this archive.
      */
     public ZipFile getFile() {
@@ -86,7 +80,7 @@ public class ArchiveDataLocation implements DataLocation {
      * determines whether the data source provides a reader interface. If this
      * is not the case, the reader is placed on top of an input stream, which
      * causes efficiency losses.
-     * 
+     *
      * @return true iff the data location provides reader functionality
      */
     public boolean hasReaderSupport() {
@@ -96,10 +90,9 @@ public class ArchiveDataLocation implements DataLocation {
     /**
      * returns an input stream that can be used to read the archive entry
      * content.
-     * 
+     *
      * @return the input stream for reading the data
-     * @exception IOException
-     *                if the stream cannot be created
+     * @throws IOException if the stream cannot be created
      */
     public InputStream getInputStream() throws IOException {
         InputStream result = null;
@@ -108,33 +101,36 @@ public class ArchiveDataLocation implements DataLocation {
         return result;
     }
 
-    /** tells the location, that the earlier created input stream has been closed */
+    /**
+     * tells the location, that the earlier created input stream has been closed
+     */
     public void inputStreamClosed() {
-    	// but we don't do anything here
+        // but we don't do anything here
     }
 
     /**
      * returns a reader for the according data content. The reader is placed on
      * top of an input stream.
-     * 
+     *
      * @return the according reader
-     * @exception IOException
-     *                thrown if an error occurs with retrieving the reader or
-     *                the underlying input stream from the according data
-     *                object.
+     * @throws IOException thrown if an error occurs with retrieving the reader or
+     *                     the underlying input stream from the according data
+     *                     object.
      */
     public Reader getReader() throws IOException {
         return new InputStreamReader(getInputStream());
     }
 
-    /** tells the location, that the earlier created reader has been closed */
+    /**
+     * tells the location, that the earlier created reader has been closed
+     */
     public void readerClosed() {
         inputStreamClosed();
     }
 
     /**
      * returns false since archives do not provide writa access.
-     * 
+     *
      * @return <tt>false</tt>
      */
     public boolean isWritable() {
@@ -143,7 +139,7 @@ public class ArchiveDataLocation implements DataLocation {
 
     /**
      * returns false since archives do not even provide writa access.
-     * 
+     *
      * @return <tt>false</tt>
      */
     public boolean hasWriterSupport() {
@@ -152,7 +148,7 @@ public class ArchiveDataLocation implements DataLocation {
 
     /**
      * returns <tt>null</tt>
-     * 
+     *
      * @return <tt>null</tt>
      */
     public OutputStream getOutputStream() {
@@ -169,21 +165,23 @@ public class ArchiveDataLocation implements DataLocation {
 
     /**
      * returns <tt>null</tt>
-     * 
+     *
      * @return <tt>null</tt>
      */
     public Writer getWriter() {
         return null;
     }
 
-    /** tells the location, that the earlier created writer has been closed */
+    /**
+     * tells the location, that the earlier created writer has been closed
+     */
     public void writerClosed() {
         // nothing to do since this cannot happen
     }
 
     public boolean equals(Object ob) {
         if (ob instanceof ArchiveDataLocation) {
-        	ArchiveDataLocation adl = (ArchiveDataLocation)ob;
+            ArchiveDataLocation adl = (ArchiveDataLocation) ob;
             return archiveFile.equals(adl.archiveFile) && itemName.equals(adl.itemName);
         }
         return false;

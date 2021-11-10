@@ -2,29 +2,29 @@
 
 package recoder.java.declaration;
 
-import java.util.List;
-
 import recoder.java.SourceElement;
 import recoder.java.reference.TypeReference;
 import recoder.java.reference.TypeReferenceContainer;
 import recoder.list.generic.ASTList;
 
+import java.util.List;
+
 /**
  * Variable declaration.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public abstract class VariableDeclaration extends JavaDeclaration implements TypeReferenceContainer {
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	
-	/**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * Type reference.
      */
-	private TypeReference typeReference;
+    private TypeReference typeReference;
 
     /**
      * Variable declaration.
@@ -36,13 +36,10 @@ public abstract class VariableDeclaration extends JavaDeclaration implements Typ
 
     /**
      * Variable declaration.
-     * 
-     * @param mods
-     *            a modifier mutable list.
-     * @param typeRef
-     *            a type reference.
-     * @param vars
-     *            a variable specification mutable list.
+     *
+     * @param mods    a modifier mutable list.
+     * @param typeRef a type reference.
+     * @param vars    a variable specification mutable list.
      */
 
     public VariableDeclaration(ASTList<DeclarationSpecifier> mods, TypeReference typeRef) {
@@ -53,9 +50,8 @@ public abstract class VariableDeclaration extends JavaDeclaration implements Typ
 
     /**
      * Variable declaration.
-     * 
-     * @param proto
-     *            a variable declaration.
+     *
+     * @param proto a variable declaration.
      */
 
     protected VariableDeclaration(VariableDeclaration proto) {
@@ -87,7 +83,7 @@ public abstract class VariableDeclaration extends JavaDeclaration implements Typ
 
     /**
      * Get the number of type references in this container.
-     * 
+     *
      * @return the number of type references.
      */
 
@@ -111,7 +107,7 @@ public abstract class VariableDeclaration extends JavaDeclaration implements Typ
 
     /**
      * Get type reference.
-     * 
+     *
      * @return the type reference.
      */
 
@@ -121,9 +117,8 @@ public abstract class VariableDeclaration extends JavaDeclaration implements Typ
 
     /**
      * Set type reference.
-     * 
-     * @param t
-     *            a type reference.
+     *
+     * @param t a type reference.
      */
 
     public void setTypeReference(TypeReference t) {
@@ -132,9 +127,9 @@ public abstract class VariableDeclaration extends JavaDeclaration implements Typ
 
     /**
      * Get variables.
-     * WARNING: as of 0.80 final, this is not a mutable list any more due to 
+     * WARNING: as of 0.80 final, this is not a mutable list any more due to
      * implementation of ParameterDeclaration - changes on this list don't have effects there!!
-     * 
+     *
      * @return the variable specification mutable list.
      */
 
@@ -147,17 +142,17 @@ public abstract class VariableDeclaration extends JavaDeclaration implements Typ
     public boolean isFinal() {
         return super.isFinal();
     }
-    
+
     @Override
     public String toString() {
-    	boolean first = true;
-    	StringBuilder sb = new StringBuilder();
-    	for (VariableSpecification vs: getVariables() ) {
-    		if (!first)
-    			sb.append(',');
-    		sb.append(vs.getName());
-    		first = false;
-    	}
-    	return "<"+getClass().getSimpleName()+"> " + sb.toString();
+        boolean first = true;
+        StringBuilder sb = new StringBuilder();
+        for (VariableSpecification vs : getVariables()) {
+            if (!first)
+                sb.append(',');
+            sb.append(vs.getName());
+            first = false;
+        }
+        return "<" + getClass().getSimpleName() + "> " + sb;
     }
 }

@@ -11,19 +11,10 @@ package recoder.util;
  * hashCode</CODE> does not need to be a unique value, but should be different
  * for most different objects to achieve adequate performance. Whether or not
  * <CODE>null</CODE> objects are allowed is up to the specific implementation.
- * 
+ *
  * @author AL
  */
 public interface HashCode extends Equality {
-
-    /**
-     * Return an integer value representing the object.
-     * 
-     * @param x
-     *            an object.
-     * @return the hash code.
-     */
-    int hashCode(Object x);
 
     /**
      * Natural hash code implementation. This object calls and returns <TT>
@@ -31,11 +22,18 @@ public interface HashCode extends Equality {
      * objects.
      */
     HashCode NATURAL = new Order.Natural();
-
     /**
      * Identity hash code implementation. This object calls <CODE>
      * System.identityHashCode(x)</CODE> which will report zero for <CODE>null
      * </CODE> objects.
      */
     HashCode IDENTITY = new Order.Identity();
+
+    /**
+     * Return an integer value representing the object.
+     *
+     * @param x an object.
+     * @return the hash code.
+     */
+    int hashCode(Object x);
 }

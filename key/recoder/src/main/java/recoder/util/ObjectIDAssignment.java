@@ -5,21 +5,20 @@ package recoder.util;
 /**
  * implements a simple object numbering. Each object is assignee a unique long
  * number, which can be used, e.g. for dumping object graphs.
- * 
+ *
  * @author RN
  */
 public class ObjectIDAssignment {
 
     private static long currentId = 0;
 
-    private static Index ids = new Index(HashCode.IDENTITY);
+    private static final Index ids = new Index(HashCode.IDENTITY);
 
     /**
      * retrieves the long id of the given object. If there is currently no such,
      * a new one is automatically created.
-     * 
-     * @param o
-     *            the object to retrieve an id for
+     *
+     * @param o the object to retrieve an id for
      * @return the unique number of that object
      */
     public static long getID(Object o) {
@@ -35,7 +34,7 @@ public class ObjectIDAssignment {
      * tells the assignment manager to forget about the given object. CAUTION:
      * The next call to <tt>getID</tt> for the given object will produce a
      * <b>new </b> id.
-     * 
+     *
      * @param o the object that is not needed anymore.
      */
     public static void releaseID(Object o) {

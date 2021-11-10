@@ -2,18 +2,11 @@
 
 package recoder.java.reference;
 
-import recoder.java.Expression;
-import recoder.java.ExpressionContainer;
-import recoder.java.JavaNonTerminalProgramElement;
-import recoder.java.NonTerminalProgramElement;
-import recoder.java.ProgramElement;
-import recoder.java.Reference;
-import recoder.java.SourceElement;
-import recoder.java.SourceVisitor;
+import recoder.java.*;
 
 /**
  * Super reference.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
@@ -21,27 +14,27 @@ public class SuperReference extends JavaNonTerminalProgramElement implements Ref
         ReferenceSuffix, ExpressionContainer, TypeReferenceContainer {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 1572767136419541150L;
+     * serialization id
+     */
+    private static final long serialVersionUID = 1572767136419541150L;
 
-	/**
+    /**
      * Expression parent.
      */
 
-	private ExpressionContainer expressionParent;
+    private ExpressionContainer expressionParent;
 
     /**
      * Reference parent.
      */
 
-	private ReferenceSuffix referenceParent;
+    private ReferenceSuffix referenceParent;
 
     /**
      * Access path.
      */
 
-	private ReferencePrefix accessPath;
+    private ReferencePrefix accessPath;
 
     /**
      * Super reference.
@@ -53,9 +46,8 @@ public class SuperReference extends JavaNonTerminalProgramElement implements Ref
 
     /**
      * Super reference.
-     * 
-     * @param accessPath
-     *            a reference expression.
+     *
+     * @param accessPath a reference expression.
      */
 
     public SuperReference(ReferencePrefix accessPath) {
@@ -65,9 +57,8 @@ public class SuperReference extends JavaNonTerminalProgramElement implements Ref
 
     /**
      * Super reference.
-     * 
-     * @param proto
-     *            a super reference.
+     *
+     * @param proto a super reference.
      */
 
     protected SuperReference(SuperReference proto) {
@@ -80,7 +71,7 @@ public class SuperReference extends JavaNonTerminalProgramElement implements Ref
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -104,7 +95,7 @@ public class SuperReference extends JavaNonTerminalProgramElement implements Ref
 
     /**
      * Get reference prefix.
-     * 
+     *
      * @return the reference prefix.
      */
 
@@ -122,7 +113,7 @@ public class SuperReference extends JavaNonTerminalProgramElement implements Ref
 
     /**
      * Get reference suffix.
-     * 
+     *
      * @return the reference suffix.
      */
 
@@ -132,9 +123,8 @@ public class SuperReference extends JavaNonTerminalProgramElement implements Ref
 
     /**
      * Set reference suffix.
-     * 
-     * @param x
-     *            a reference suffix.
+     *
+     * @param x a reference suffix.
      */
 
     public void setReferenceSuffix(ReferenceSuffix x) {
@@ -143,7 +133,7 @@ public class SuperReference extends JavaNonTerminalProgramElement implements Ref
 
     /**
      * Get expression container.
-     * 
+     *
      * @return the expression container.
      */
 
@@ -153,9 +143,8 @@ public class SuperReference extends JavaNonTerminalProgramElement implements Ref
 
     /**
      * Set expression container.
-     * 
-     * @param c
-     *            an expression container.
+     *
+     * @param c an expression container.
      */
 
     public void setExpressionContainer(ExpressionContainer c) {
@@ -164,7 +153,7 @@ public class SuperReference extends JavaNonTerminalProgramElement implements Ref
 
     /**
      * Get AST parent.
-     * 
+     *
      * @return the non terminal program element.
      */
 
@@ -178,7 +167,7 @@ public class SuperReference extends JavaNonTerminalProgramElement implements Ref
 
     /**
      * Returns the number of children of this node.
-     * 
+     *
      * @return an int giving the number of children of this node
      */
 
@@ -189,12 +178,10 @@ public class SuperReference extends JavaNonTerminalProgramElement implements Ref
     /**
      * Returns the child at the specified index in this node's "virtual" child
      * array
-     * 
-     * @param index
-     *            an index into this node's "virtual" child array
+     *
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
@@ -215,7 +202,7 @@ public class SuperReference extends JavaNonTerminalProgramElement implements Ref
 
     /**
      * Get the number of expressions in this container.
-     * 
+     *
      * @return the number of expressions.
      */
 
@@ -239,7 +226,7 @@ public class SuperReference extends JavaNonTerminalProgramElement implements Ref
 
     /**
      * Get the number of type references in this container.
-     * 
+     *
      * @return the number of type references.
      */
 
@@ -267,14 +254,11 @@ public class SuperReference extends JavaNonTerminalProgramElement implements Ref
      * element can be null - in that case, the child is effectively removed. The
      * parent role of the new child is validated, while the parent link of the
      * replaced child is left untouched.
-     * 
-     * @param p
-     *            the old child.
-     * @param p
-     *            the new child.
+     *
+     * @param p the old child.
+     * @param p the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException
-     *                if the new child cannot take over the role of the old one.
+     * @throws ClassCastException if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
@@ -295,9 +279,9 @@ public class SuperReference extends JavaNonTerminalProgramElement implements Ref
     public void accept(SourceVisitor v) {
         v.visitSuperReference(this);
     }
-    
+
     @Override
     public String toString() {
-    	return "<super>." + getASTParent().toString();
+        return "<super>." + getASTParent().toString();
     }
 }

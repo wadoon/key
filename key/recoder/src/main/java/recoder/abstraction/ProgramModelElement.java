@@ -10,37 +10,44 @@ import recoder.util.Order;
 
 /**
  * An entity of the program meta model.
- * 
+ *
  * @author AL
  * @author RN
  */
 public interface ProgramModelElement extends NamedModelElement, AccessFlags {
 
     /**
+     * Lexical order objects comparing full names. For partial names, use the
+     * corresponding order of {@link recoder.NamedModelElement}.
+     */
+    Order LEXICAL_ORDER = new LexicalOrder();
+
+    /**
      * Returns the maximal expanded name including all applicable qualifiers.
-     * 
+     *
      * @return the full name of this program model element.
      */
     String getFullName();
-    
+
     /**
      * Returns the <i>binary</i> name. The binary name
      * is the name this program model element would have in bytecode, i.e.,
      * how it either is read by the bytecode parser, or the name a compiler
      * would give this element during the compilation process (if this program
-     * model element is represented in source code). 
+     * model element is represented in source code).
      * See JLS, §13.1
-     * @since 0.92
-     * <!--@param useSlashes if <code>true</code>, slashes are used instead of dots in 
-     * the result, e.g., java/lang/Object instead of java.lang.Object.--> 
+     *
      * @return the bytecode name of this program model element
+     * @since 0.92
+     * <!--@param useSlashes if <code>true</code>, slashes are used instead of dots in
+     * the result, e.g., java/lang/Object instead of java.lang.Object.-->
      */
     String getBinaryName();
 
     /**
      * Returns the instance that can retrieve information about this program
      * model element.
-     * 
+     *
      * @return the program model info of this element.
      */
     ProgramModelInfo getProgramModelInfo();
@@ -48,17 +55,10 @@ public interface ProgramModelElement extends NamedModelElement, AccessFlags {
     /**
      * Sets the instance that can retrieve information about this program model
      * element. Should not be called from outside a service.
-     * 
-     * @param pmi
-     *            the program model info to be used for this element.
+     *
+     * @param pmi the program model info to be used for this element.
      */
     void setProgramModelInfo(ProgramModelInfo pmi);
-
-    /**
-     * Lexical order objects comparing full names. For partial names, use the
-     * corresponding order of {@link recoder.NamedModelElement}.
-     */
-    Order LEXICAL_ORDER = new LexicalOrder();
 
     /**
      * Lexical order on full names of program model elements. For partial names,
@@ -78,7 +78,8 @@ public interface ProgramModelElement extends NamedModelElement, AccessFlags {
             return name.hashCode();
         }
 
-        @SuppressWarnings("all") public final boolean isComparable(Object x, Object y) {
+        @SuppressWarnings("all")
+        public final boolean isComparable(Object x, Object y) {
             return true;
         }
 

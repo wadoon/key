@@ -11,10 +11,10 @@ import recoder.NamedModelElement;
 public class IllegalName extends Problem {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -6773990661739949555L;
-	private NamedModelElement element;
+     * serialization id
+     */
+    private static final long serialVersionUID = -6773990661739949555L;
+    private final NamedModelElement element;
 
     public IllegalName(NamedModelElement element) {
         this.element = element;

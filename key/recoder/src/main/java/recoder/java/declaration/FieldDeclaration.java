@@ -2,9 +2,6 @@
 
 package recoder.java.declaration;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import recoder.java.Identifier;
 import recoder.java.ProgramElement;
 import recoder.java.SourceVisitor;
@@ -13,24 +10,27 @@ import recoder.java.reference.UncollatedReferenceQualifier;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Field declaration.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class FieldDeclaration extends VariableDeclaration implements MemberDeclaration {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 2577966836277961911L;
+     * serialization id
+     */
+    private static final long serialVersionUID = 2577966836277961911L;
 
-	/**
+    /**
      * Parent.
      */
 
-	TypeDeclaration parent;
+    TypeDeclaration parent;
 
     /**
      * Field specs.
@@ -48,16 +48,14 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
 
     /**
      * Field declaration.
-     * 
-     * @param typeRef
-     *            a type reference.
-     * @param name
-     *            an identifier.
+     *
+     * @param typeRef a type reference.
+     * @param name    an identifier.
      */
 
     public FieldDeclaration(TypeReference typeRef, FieldSpecification fs) {
         setTypeReference(typeRef);
-        ASTList<FieldSpecification> list = new ASTArrayList<FieldSpecification>(1); 
+        ASTList<FieldSpecification> list = new ASTArrayList<FieldSpecification>(1);
         list.add(fs);
         setFieldSpecifications(list);
         makeParentRoleValid();
@@ -65,21 +63,17 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
 
     /**
      * Field declaration.
-     * 
-     * @param mods
-     *            a modifier mutable list.
-     * @param typeRef
-     *            a type reference.
-     * @param name
-     *            an identifier.
-     * @param init
-     *            an expression.
+     *
+     * @param mods    a modifier mutable list.
+     * @param typeRef a type reference.
+     * @param name    an identifier.
+     * @param init    an expression.
      */
 
     public FieldDeclaration(ASTList<DeclarationSpecifier> mods, TypeReference typeRef, FieldSpecification fs) {
         setDeclarationSpecifiers(mods);
         setTypeReference(typeRef);
-        ASTList<FieldSpecification> list = new ASTArrayList<FieldSpecification>(1); 
+        ASTList<FieldSpecification> list = new ASTArrayList<FieldSpecification>(1);
         list.add(fs);
         setFieldSpecifications(list);
         makeParentRoleValid();
@@ -87,13 +81,10 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
 
     /**
      * Field declaration.
-     * 
-     * @param mods
-     *            a modifier mutable list.
-     * @param typeRef
-     *            a type reference.
-     * @param vars
-     *            a variable specification mutable list.
+     *
+     * @param mods    a modifier mutable list.
+     * @param typeRef a type reference.
+     * @param vars    a variable specification mutable list.
      */
 
     public FieldDeclaration(ASTList<DeclarationSpecifier> mods, TypeReference typeRef, ASTList<FieldSpecification> vars) {
@@ -105,9 +96,8 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
 
     /**
      * Field declaration.
-     * 
-     * @param proto
-     *            a field declaration.
+     *
+     * @param proto a field declaration.
      */
 
     protected FieldDeclaration(FieldDeclaration proto) {
@@ -125,7 +115,7 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -135,7 +125,7 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
 
     /**
      * Get AST parent.
-     * 
+     *
      * @return the non terminal program element.
      */
 
@@ -145,7 +135,7 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
 
     /**
      * Get member parent.
-     * 
+     *
      * @return the type declaration.
      */
 
@@ -155,9 +145,8 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
 
     /**
      * Set member parent.
-     * 
-     * @param p
-     *            a type declaration.
+     *
+     * @param p a type declaration.
      */
 
     public void setMemberParent(TypeDeclaration p) {
@@ -191,7 +180,7 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
 
     /**
      * Returns the number of children of this node.
-     * 
+     *
      * @return an int giving the number of children of this node
      */
 
@@ -209,12 +198,10 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
     /**
      * Returns the child at the specified index in this node's "virtual" child
      * array
-     * 
-     * @param index
-     *            an index into this node's "virtual" child array
+     *
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
@@ -265,14 +252,11 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
      * element can be null - in that case, the child is effectively removed. The
      * parent role of the new child is validated, while the parent link of the
      * replaced child is left untouched.
-     * 
-     * @param p
-     *            the old child.
-     * @param p
-     *            the new child.
+     *
+     * @param p the old child.
+     * @param p the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException
-     *                if the new child cannot take over the role of the old one.
+     * @throws ClassCastException if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
@@ -294,8 +278,8 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
             }
         }
         if (getTypeReference() == p) {
-        	if (q instanceof UncollatedReferenceQualifier)
-        		q = ((UncollatedReferenceQualifier)q).toTypeReference(); // TODO does this belong here?
+            if (q instanceof UncollatedReferenceQualifier)
+                q = ((UncollatedReferenceQualifier) q).toTypeReference(); // TODO does this belong here?
             TypeReference r = (TypeReference) q;
             setTypeReference(r);
             if (r != null) {

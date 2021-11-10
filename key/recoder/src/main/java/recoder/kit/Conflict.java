@@ -8,10 +8,10 @@ package recoder.kit;
  * information about the reasons.
  */
 public abstract class Conflict extends Problem {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+
 }
 

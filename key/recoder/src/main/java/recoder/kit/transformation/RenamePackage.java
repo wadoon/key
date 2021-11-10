@@ -2,45 +2,38 @@
 
 package recoder.kit.transformation;
 
-import java.util.Collections;
-import java.util.List;
-
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Package;
 import recoder.java.reference.PackageReference;
-import recoder.kit.MissingTypeDeclarations;
-import recoder.kit.NameConflict;
-import recoder.kit.PackageKit;
-import recoder.kit.ProblemReport;
-import recoder.kit.TwoPassTransformation;
+import recoder.kit.*;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Transformation that renames a package by renaming all known references to
  * that package. The new name should not be used for another package, and the
  * package should not be defined in class files which cannot be transformed.
- * 
+ *
  * @author AL
  */
 public class RenamePackage extends TwoPassTransformation {
 
-    private Package pkg;
+    private final Package pkg;
 
-    private String newName;
+    private final String newName;
 
     private List<PackageReference> refs;
 
     /**
      * Creates a new transformation object that renames a package and all
      * references to it. The new name should not conflict with another package.
-     * 
-     * @param sc
-     *            the service configuration to use.
-     * @param pkg
-     *            the package to be renamed; may not be <CODE>null</CODE>.
-     * @param newName
-     *            the new name for the element; may not be <CODE>null</CODE>
-     *            and must denote a valid identifier name.
+     *
+     * @param sc      the service configuration to use.
+     * @param pkg     the package to be renamed; may not be <CODE>null</CODE>.
+     * @param newName the new name for the element; may not be <CODE>null</CODE>
+     *                and must denote a valid identifier name.
      */
     public RenamePackage(CrossReferenceServiceConfiguration sc, Package pkg, String newName) {
         super(sc);
@@ -59,7 +52,7 @@ public class RenamePackage extends TwoPassTransformation {
      * {@link MissingTypeDeclarations}reporting the types without accessible
      * declaration, or a {@link recoder.kit.NameConflict}reporting an already
      * existing package with the given name.
-     * 
+     *
      * @return the problem report.
      */
     public ProblemReport analyze() {
@@ -82,9 +75,8 @@ public class RenamePackage extends TwoPassTransformation {
     /**
      * Locally renames all package references collected in the analyzation
      * phase.
-     * 
-     * @exception IllegalStateException
-     *                if the analyzation has not been called.
+     *
+     * @throws IllegalStateException if the analyzation has not been called.
      * @see #analyze()
      */
     public void transform() {
@@ -92,8 +84,8 @@ public class RenamePackage extends TwoPassTransformation {
         Package p = getNameInfo().createPackage(newName);
         PackageReference pr = PackageKit.createPackageReference(getProgramFactory(), p);
         for (int i = refs.size() - 1; i >= 0; i--) {
-        	PackageReference ref = refs.get(i);
-        	replace(ref, pr.deepClone());
+            PackageReference ref = refs.get(i);
+            replace(ref, pr.deepClone());
         }
 
     }

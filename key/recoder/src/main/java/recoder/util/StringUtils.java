@@ -6,7 +6,7 @@ import java.util.StringTokenizer;
 
 /**
  * This class contains convenience methods for string handling.
- * 
+ *
  * @author RN
  * @author UA
  * @author AL
@@ -100,7 +100,7 @@ public class StringUtils {
      * Cut off a prefix of a dotted name string.
      */
     public static String cutPrefix(String s) {
-        int firstIndex = s.indexOf('.', 0);
+        int firstIndex = s.indexOf('.');
         if (firstIndex == -1)
             return null;
         return s.substring(firstIndex + 1);
@@ -123,7 +123,7 @@ public class StringUtils {
      * Return a prefix of a dotted name string.
      */
     public static String getPrefix(String s) {
-        int firstIndex = s.indexOf('.', 0);
+        int firstIndex = s.indexOf('.');
         if (firstIndex == -1)
             return null;
         return s.substring(0, firstIndex);
@@ -136,7 +136,7 @@ public class StringUtils {
         int lastIndex = s.lastIndexOf(".");
         if (lastIndex == -1)
             return null;
-        return s.substring(lastIndex + 1, s.length());
+        return s.substring(lastIndex + 1);
     }
 
     /**
@@ -206,12 +206,10 @@ public class StringUtils {
      * result. Allowed values are "true", "T", "yes" or "1", and "false", "F",
      * "yes" or "0" respectively. Case is ignored, so "True" or "f" would also
      * considered valid.
-     * 
-     * @param str
-     *            the property value.
+     *
+     * @param str the property value.
      * @return the value of the property, interpreted as a boolean.
-     * @exception IllegalArgumentException
-     *                if the value cannot be interpreted.
+     * @throws IllegalArgumentException if the value cannot be interpreted.
      */
     public static boolean parseBooleanProperty(String str) {
         if (str.equalsIgnoreCase("true"))

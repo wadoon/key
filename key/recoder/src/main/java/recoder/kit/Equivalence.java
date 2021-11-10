@@ -5,14 +5,14 @@ package recoder.kit;
 /**
  * Problem report indicating that the planned transformation is applicable and
  * will not change the functional behavior of the program.
- * <P>
+ * <p>
  * Instead of creating a new object, the
  * {@link recoder.kit.Transformation#EQUIVALENCE}constant should be used.
- * 
+ *
  * @author AL
  */
 public class Equivalence extends NoProblem {
     Equivalence() {
-    	super();
+        super();
     }
 }

@@ -2,27 +2,23 @@
 
 package recoder.convenience;
 
-import java.util.List;
-
 import recoder.ModelElement;
 import recoder.NamedModelElement;
 import recoder.abstraction.Method;
 import recoder.abstraction.ProgramModelElement;
-import recoder.java.CompilationUnit;
-import recoder.java.Identifier;
-import recoder.java.JavaProgramElement;
-import recoder.java.ProgramElement;
-import recoder.java.SourceElement;
+import recoder.java.*;
 import recoder.java.SourceElement.Position;
 import recoder.java.reference.ReferencePrefix;
 import recoder.kit.UnitKit;
 import recoder.util.Debug;
 
+import java.util.List;
+
 /**
  * Create textual descriptions of program elements, program model elements or
  * lists thereof. This class is useful to create readable information for error
  * reports, debugging or model browsers.
- * 
+ *
  * @author AL, RN
  */
 public class Format {
@@ -31,7 +27,7 @@ public class Format {
      * As a utility class, there is no need to create objects.
      */
     private Format() {
-    	super();
+        super();
     }
 
     /**
@@ -106,15 +102,13 @@ public class Format {
      * </TR>
      * </TABLE> Any tag that does not apply does not produce an output (and is
      * omitted, effectively).
-     * <P>
+     * <p>
      * Since 0.72, the method allows to use a single digit in front of each
      * qualifier, which controls minimum indentation. The digit is used for
      * <CODE>%p</CODE>,<CODE>%P</CODE>, and <CODE>%r</CODE>.
-     * 
-     * @param formatText
-     *            the format text, containing tags.
-     * @param e
-     *            the model element to be formatted.
+     *
+     * @param formatText the format text, containing tags.
+     * @param e          the model element to be formatted.
      * @return a textual representation of the model element.
      */
     public static String toString(String formatText, ModelElement e) {
@@ -135,126 +129,126 @@ public class Format {
                     c = formatText.charAt(i);
                 }
                 switch (c) {
-                case 'n':
-                    if (e instanceof NamedModelElement) {
-                        res.append(((NamedModelElement) e).getName());
-                    } else if (e instanceof Identifier) {
-                        res.append(((Identifier) e).getText());
-                    } else if (e instanceof CompilationUnit) {
-                        res.append(((CompilationUnit) e).getPrimaryTypeDeclaration().getName());
-                    }
-                    break;
-                case 'N':
-                    if (e instanceof NamedModelElement) {
-                        if (e instanceof ProgramModelElement) {
-                            res.append(((ProgramModelElement) e).getFullName());
+                    case 'n':
+                        if (e instanceof NamedModelElement) {
+                            res.append(((NamedModelElement) e).getName());
+                        } else if (e instanceof Identifier) {
+                            res.append(((Identifier) e).getText());
+                        } else if (e instanceof CompilationUnit) {
+                            res.append(((CompilationUnit) e).getPrimaryTypeDeclaration().getName());
+                        }
+                        break;
+                    case 'N':
+                        if (e instanceof NamedModelElement) {
+                            if (e instanceof ProgramModelElement) {
+                                res.append(((ProgramModelElement) e).getFullName());
+                                if (e instanceof Method) {
+                                    res.append(toString("%N", ((Method) e).getSignature()));
+                                }
+                            } else if (e instanceof ReferencePrefix) {
+                                res.append(Naming.toPathName((ReferencePrefix) e));
+                            } else {
+                                res.append(((NamedModelElement) e).getName());
+                            }
+                        } else if (e instanceof Identifier) {
+                            res.append(((Identifier) e).getText());
+                        } else if (e instanceof CompilationUnit) {
+                            res.append(Naming.toCanonicalName((CompilationUnit) e));
+                        }
+                        break;
+                    case 'm':
+                        if (e instanceof NamedModelElement) {
+                            res.append(((NamedModelElement) e).getName());
                             if (e instanceof Method) {
                                 res.append(toString("%N", ((Method) e).getSignature()));
                             }
-                        } else if (e instanceof ReferencePrefix) {
-                            res.append(Naming.toPathName((ReferencePrefix) e));
+                        } else if (e instanceof Identifier) {
+                            res.append(((Identifier) e).getText());
+                        } else if (e instanceof CompilationUnit) {
+                            res.append(((CompilationUnit) e).getPrimaryTypeDeclaration().getName());
+                        }
+                        break;
+                    case 's':
+                        if (e instanceof SourceElement) {
+                            res.append(((SourceElement) e).toSource().trim());
+                            if (e instanceof JavaProgramElement)
+                                res.append("(id " + ((JavaProgramElement) e).getID() + ")");
+                        }
+                        break;
+                    case 'c':
+                        if (e == null) {
+                            res.append("null");
                         } else {
-                            res.append(((NamedModelElement) e).getName());
+                            String name = e.getClass().getName();
+                            res.append(name.substring(name.lastIndexOf('.') + 1));
                         }
-                    } else if (e instanceof Identifier) {
-                        res.append(((Identifier) e).getText());
-                    } else if (e instanceof CompilationUnit) {
-                        res.append(Naming.toCanonicalName((CompilationUnit) e));
-                    }
-                    break;
-                case 'm':
-                    if (e instanceof NamedModelElement) {
-                        res.append(((NamedModelElement) e).getName());
-                        if (e instanceof Method) {
-                            res.append(toString("%N", ((Method) e).getSignature()));
-                        }
-                    } else if (e instanceof Identifier) {
-                        res.append(((Identifier) e).getText());
-                    } else if (e instanceof CompilationUnit) {
-                        res.append(((CompilationUnit) e).getPrimaryTypeDeclaration().getName());
-                    }
-                    break;
-                case 's':
-                    if (e instanceof SourceElement) {
-                        res.append(((SourceElement) e).toSource().trim());
-                        if (e instanceof JavaProgramElement)
-                        	res.append( "(id " + ((JavaProgramElement)e).getID() + ")");
-                    }
-                    break;
-                case 'c':
-                    if (e == null) {
-                        res.append("null");
-                    } else {
-                        String name = e.getClass().getName();
-                        res.append(name.substring(name.lastIndexOf('.') + 1));
-                    }
-                    break;
-                case 'C':
-                    if (e == null) {
-                        res.append("null");
-                    } else {
-                        res.append(e.getClass().getName());
-                    }
-                    break;
-                case 'i':
-                    if (e != null) {
-                        int id = System.identityHashCode(e);
-                        if (id < 0) {
-                            res.append(Long.toString((id & 0x7FFFFFFF) | 0x80000000L, 16));
+                        break;
+                    case 'C':
+                        if (e == null) {
+                            res.append("null");
                         } else {
-                            res.append(Integer.toString(id, 16));
+                            res.append(e.getClass().getName());
                         }
-                    }
-                    break;
-                case 'p':
-                    if (e instanceof SourceElement) {
-                        SourceElement se = (SourceElement) e;
-                        se = se.getFirstElement();
-                        if (se != null) {
-                            append(se.getStartPosition(), columns, res);
+                        break;
+                    case 'i':
+                        if (e != null) {
+                            int id = System.identityHashCode(e);
+                            if (id < 0) {
+                                res.append(Long.toString((id & 0x7FFFFFFF) | 0x80000000L, 16));
+                            } else {
+                                res.append(Integer.toString(id, 16));
+                            }
                         }
-                    }
-                    break;
-                case 'P':
-                    if (e instanceof SourceElement) {
-                        SourceElement se = (SourceElement) e;
-                        SourceElement se2 = se.getFirstElement();
-                        if (se2 != null) {
-                            append(se2.getStartPosition(), columns, res);
-                            res.append('-');
-                            se2 = se.getLastElement();
-                            append(se2.getEndPosition(), columns, res);
+                        break;
+                    case 'p':
+                        if (e instanceof SourceElement) {
+                            SourceElement se = (SourceElement) e;
+                            se = se.getFirstElement();
+                            if (se != null) {
+                                append(se.getStartPosition(), columns, res);
+                            }
                         }
-                    }
-                    break;
-                case 'r':
-                    if (e instanceof SourceElement) {
-                        SourceElement se = (SourceElement) e;
-                        se = se.getFirstElement();
-                        if (se != null) {
-                            append(se.getRelativePosition(), columns, res);
+                        break;
+                    case 'P':
+                        if (e instanceof SourceElement) {
+                            SourceElement se = (SourceElement) e;
+                            SourceElement se2 = se.getFirstElement();
+                            if (se2 != null) {
+                                append(se2.getStartPosition(), columns, res);
+                                res.append('-');
+                                se2 = se.getLastElement();
+                                append(se2.getEndPosition(), columns, res);
+                            }
                         }
-                    }
-                    break;
-                case 'u':
-                    if (e instanceof ProgramElement) {
-                        CompilationUnit cu = UnitKit.getCompilationUnit((ProgramElement) e);
-                        if (cu != null) {
-                            res.append(Naming.toCanonicalName(cu));
+                        break;
+                    case 'r':
+                        if (e instanceof SourceElement) {
+                            SourceElement se = (SourceElement) e;
+                            se = se.getFirstElement();
+                            if (se != null) {
+                                append(se.getRelativePosition(), columns, res);
+                            }
                         }
-                    }
-                    break;
-                case 'f':
-                    if (e instanceof ProgramElement) {
-                        CompilationUnit cu = UnitKit.getCompilationUnit((ProgramElement) e);
-                        if (cu != null) {
-                            res.append(cu.getDataLocation());
+                        break;
+                    case 'u':
+                        if (e instanceof ProgramElement) {
+                            CompilationUnit cu = UnitKit.getCompilationUnit((ProgramElement) e);
+                            if (cu != null) {
+                                res.append(Naming.toCanonicalName(cu));
+                            }
                         }
-                    }
-                    break;
-                default:
-                    res.append('%').append(c);
-                    break;
+                        break;
+                    case 'f':
+                        if (e instanceof ProgramElement) {
+                            CompilationUnit cu = UnitKit.getCompilationUnit((ProgramElement) e);
+                            if (cu != null) {
+                                res.append(cu.getDataLocation());
+                            }
+                        }
+                        break;
+                    default:
+                        res.append('%').append(c);
+                        break;
                 }
             }
         }
@@ -292,15 +286,13 @@ public class Format {
     /**
      * Formats a list of model elements. Each element is formatted according to
      * the format string by a call to
-     * {@link #toString(String,String,String,String,ModelElementList)}using
+     * {@link #toString(String, String, String, String, ModelElementList)}using
      * <CODE>"(", ", ", ")"</CODE> formatting.
-     * 
-     * @param formatText
-     *            the format text, containing tags.
-     * @param l
-     *            the list to be formatted.
+     *
+     * @param formatText the format text, containing tags.
+     * @param l          the list to be formatted.
      * @return a textual representation of the list.
-     * @see #toString(String,String,String,String,ModelElementList)
+     * @see #toString(String, String, String, String, ModelElementList)
      */
     public static String toString(String formatText, List<? extends ModelElement> l) {
         return toString(formatText, "(", ", ", ")", l);
@@ -310,17 +302,12 @@ public class Format {
      * Formats a list of model elements. Each element is formatted according to
      * the format string, surrounded by the header/footer and each inner element
      * is followed by a separator.
-     * 
-     * @param formatText
-     *            the format text, containing tags.
-     * @param header
-     *            the list start.
-     * @param separator
-     *            the element separator.
-     * @param footer
-     *            the list start.
-     * @param l
-     *            the list to be formatted.
+     *
+     * @param formatText the format text, containing tags.
+     * @param header     the list start.
+     * @param separator  the element separator.
+     * @param footer     the list start.
+     * @param l          the list to be formatted.
      * @return a textual representation of the list.
      * @since 0.72
      */
@@ -345,11 +332,10 @@ public class Format {
     /**
      * Formats a source element using a default format. The default format
      * string is <CODE>"\"%s\"
-     * 
-     * @%p [%f]"</CODE>.
-     * @param se
-     *            the source element to be formatted.
+     *
+     * @param se the source element to be formatted.
      * @return a textual representation of the source element.
+     * @%p [%f]"</CODE>.
      */
     public static String toString(ProgramElement se) {
         return toString("\"%s\" @%p [%f]", se);
@@ -358,11 +344,10 @@ public class Format {
     /**
      * Formats a program element list using a default format. The default format
      * string is <CODE>"\"%s\"
-     * 
-     * @%p"</CODE>.
-     * @param l
-     *            the list to be formatted.
+     *
+     * @param l the list to be formatted.
      * @return a textual representation of the list.
+     * @%p"</CODE>.
      */
     public static String toString(List<? extends ModelElement> l) {
         return toString("\"%s\" @%p", l);

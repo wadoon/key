@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package recoder.service;
 
@@ -15,23 +15,23 @@ import recoder.java.JavaProgramElement;
  * @author Tobias Gutzmann
  */
 public class SyntaxException extends ModelException {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -1250184152706720604L;
-	private final JavaProgramElement failing;
-	
-	/**
-	 * @param pe The failing program element
-	 * @param s An additional error description
-	 */
-	public SyntaxException(JavaProgramElement failing, String s) {
-		super(s);
-		this.failing = failing;
-	}
-	
-	public JavaProgramElement getFailingElement() {
-		return failing;
-	}
+    /**
+     *
+     */
+    private static final long serialVersionUID = -1250184152706720604L;
+    private final JavaProgramElement failing;
+
+    /**
+     * @param pe The failing program element
+     * @param s An additional error description
+     */
+    public SyntaxException(JavaProgramElement failing, String s) {
+        super(s);
+        this.failing = failing;
+    }
+
+    public JavaProgramElement getFailingElement() {
+        return failing;
+    }
 
 }

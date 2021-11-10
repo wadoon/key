@@ -2,38 +2,38 @@
 
 package recoder.java.declaration;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import recoder.java.*;
 import recoder.java.reference.TypeReference;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Local variable declaration.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class LocalVariableDeclaration extends VariableDeclaration implements LoopInitializer {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -504401927803552291L;
+     * serialization id
+     */
+    private static final long serialVersionUID = -504401927803552291L;
 
-	/**
+    /**
      * Parent.
      */
 
-	private StatementContainer parent;
+    private StatementContainer parent;
 
     /**
      * Var specs.
      */
 
-	private ASTList<VariableSpecification> varSpecs;
+    private ASTList<VariableSpecification> varSpecs;
 
     /**
      * Local variable declaration.
@@ -45,17 +45,14 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
 
     /**
      * Local variable declaration.
-     * 
-     * @param mods
-     *            a modifier mutable list.
-     * @param typeRef
-     *            a type reference.
-     * @param vars
-     *            a variable specification mutable list.
+     *
+     * @param mods    a modifier mutable list.
+     * @param typeRef a type reference.
+     * @param vars    a variable specification mutable list.
      */
 
     public LocalVariableDeclaration(ASTList<DeclarationSpecifier> mods, TypeReference typeRef,
-    		ASTList<VariableSpecification> vars) {
+                                    ASTList<VariableSpecification> vars) {
         setDeclarationSpecifiers(mods);
         setTypeReference(typeRef);
         setVariableSpecifications(vars);
@@ -64,15 +61,11 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
 
     /**
      * Local variable declaration.
-     * 
-     * @param mods
-     *            a modifier mutable list.
-     * @param typeRef
-     *            a type reference.
-     * @param name
-     *            an identifier.
-     * @param init
-     *            an expression.
+     *
+     * @param mods    a modifier mutable list.
+     * @param typeRef a type reference.
+     * @param name    an identifier.
+     * @param init    an expression.
      */
 
     public LocalVariableDeclaration(ASTList<DeclarationSpecifier> mods, TypeReference typeRef, VariableSpecification vs) {
@@ -86,9 +79,8 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
 
     /**
      * Local variable declaration.
-     * 
-     * @param proto
-     *            a local variable declaration.
+     *
+     * @param proto a local variable declaration.
      */
 
     protected LocalVariableDeclaration(LocalVariableDeclaration proto) {
@@ -105,7 +97,7 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -140,7 +132,7 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
 
     /**
      * Returns the number of children of this node.
-     * 
+     *
      * @return an int giving the number of children of this node
      */
 
@@ -158,12 +150,10 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
     /**
      * Returns the child at the specified index in this node's "virtual" child
      * array
-     * 
-     * @param index
-     *            an index into this node's "virtual" child array
+     *
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
@@ -214,14 +204,11 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
      * element can be null - in that case, the child is effectively removed. The
      * parent role of the new child is validated, while the parent link of the
      * replaced child is left untouched.
-     * 
-     * @param p
-     *            the old child.
-     * @param p
-     *            the new child.
+     *
+     * @param p the old child.
+     * @param p the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException
-     *                if the new child cannot take over the role of the old one.
+     * @throws ClassCastException if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
@@ -269,7 +256,7 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
 
     /**
      * Get AST parent.
-     * 
+     *
      * @return the non terminal program element.
      */
 
@@ -279,7 +266,7 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
 
     /**
      * Get statement container.
-     * 
+     *
      * @return the statement container.
      */
 
@@ -289,9 +276,8 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
 
     /**
      * Set statement container.
-     * 
-     * @param c
-     *            a statement container.
+     *
+     * @param c a statement container.
      */
 
     public void setStatementContainer(StatementContainer c) {

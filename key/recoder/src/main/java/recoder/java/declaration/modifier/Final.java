@@ -7,30 +7,29 @@ import recoder.java.declaration.Modifier;
 
 /**
  * Final.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class Final extends Modifier {
 
     /**
-	 * serialization id 
-	 */
-	private static final long serialVersionUID = 7169854150660337404L;
+     * serialization id
+     */
+    private static final long serialVersionUID = 7169854150660337404L;
 
-	/**
+    /**
      * Final.
      */
 
     public Final() {
-    	// nothing to do
+        // nothing to do
     }
 
     /**
      * Final.
-     * 
-     * @param proto
-     *            a final.
+     *
+     * @param proto a final.
      */
 
     protected Final(Final proto) {
@@ -39,7 +38,7 @@ public class Final extends Modifier {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 

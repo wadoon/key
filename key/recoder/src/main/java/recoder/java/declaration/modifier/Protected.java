@@ -6,30 +6,29 @@ import recoder.java.SourceVisitor;
 
 /**
  * Protected.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class Protected extends VisibilityModifier {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 294440790233996705L;
+     * serialization id
+     */
+    private static final long serialVersionUID = 294440790233996705L;
 
-	/**
+    /**
      * Protected.
      */
 
     public Protected() {
-    	// nothing to do
+        // nothing to do
     }
 
     /**
      * Protected.
-     * 
-     * @param proto
-     *            a protected.
+     *
+     * @param proto a protected.
      */
 
     protected Protected(Protected proto) {
@@ -38,7 +37,7 @@ public class Protected extends VisibilityModifier {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 

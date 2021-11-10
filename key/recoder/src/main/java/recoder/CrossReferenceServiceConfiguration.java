@@ -15,7 +15,7 @@ public class CrossReferenceServiceConfiguration extends DefaultServiceConfigurat
     private CrossReferenceSourceInfo crossReferencer;
 
     public CrossReferenceServiceConfiguration() {
-    	super();
+        super();
     }
 
     protected void makeServices() {

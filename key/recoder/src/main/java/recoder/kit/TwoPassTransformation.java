@@ -11,7 +11,7 @@ import recoder.CrossReferenceServiceConfiguration;
  * and a pure syntactic transformation phase, such that model updates during the
  * execution are not necessary. Transformations that only use two-pass
  * transformations are also two-pass transformations.
- * <P>
+ * <p>
  * The transformation execution phase of a one-pass transformation is now split
  * into:
  * <UL>
@@ -37,14 +37,13 @@ public abstract class TwoPassTransformation extends Transformation {
      * configuration. This is useful for bean-like transformation management.
      */
     protected TwoPassTransformation() {
-    	super();
+        super();
     }
 
     /**
      * Creates a new transformation using the given service configuration.
-     * 
-     * @param sc
-     *            the service configuration to use.
+     *
+     * @param sc the service configuration to use.
      */
     public TwoPassTransformation(CrossReferenceServiceConfiguration sc) {
         super(sc);
@@ -56,9 +55,9 @@ public abstract class TwoPassTransformation extends Transformation {
      * but may not change the model directly (the model might be augmented by
      * automatic reload, however). This default implementation sets and returns
      * {@link #NO_PROBLEM}.
-     * 
+     *
      * @return a problem report, an instance of {@link recoder.kit.NoProblem}if
-     *         all requirements have been met.
+     * all requirements have been met.
      */
     public ProblemReport analyze() {
         setProblemReport(NO_PROBLEM);
@@ -73,9 +72,8 @@ public abstract class TwoPassTransformation extends Transformation {
      * begin of the transformation to the change history if this transformation
      * is visible. Redefined methods should call this method via <CODE>
      * super.transform()</CODE> as the first action.
-     * 
-     * @exception IllegalStateException
-     *                if the analysis did not initialize the report.
+     *
+     * @throws IllegalStateException if the analysis did not initialize the report.
      * @see #analyze()
      * @see #isVisible()
      * @see recoder.service.ChangeHistory#begin(Transformation)

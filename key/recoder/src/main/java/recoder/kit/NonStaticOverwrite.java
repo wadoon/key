@@ -11,10 +11,10 @@ import recoder.abstraction.Method;
 public class NonStaticOverwrite extends Conflict {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -3618890938924075301L;
-	private Method method;
+     * serialization id
+     */
+    private static final long serialVersionUID = -3618890938924075301L;
+    private final Method method;
 
     public NonStaticOverwrite(Method method) {
         this.method = method;

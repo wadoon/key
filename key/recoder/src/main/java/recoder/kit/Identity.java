@@ -5,15 +5,15 @@ package recoder.kit;
 /**
  * Problem report indicating that the planned transformation is redundant. The
  * syntactic transformation itself can be skipped.
- * <P>
+ * <p>
  * Instead of creating a new object, the
  * {@link recoder.kit.Transformation#IDENTITY}constant should be used.
- * 
+ *
  * @author AL
  */
 public class Identity extends Equivalence {
     Identity() {
-    	super();
+        super();
     }
 }
 

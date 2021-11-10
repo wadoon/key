@@ -9,7 +9,7 @@ import recoder.java.ProgramElement;
  * A tree walker that allows to customize the traversal. The walker can report
  * elements during ascending, and may skip the traversal of certain subtrees on
  * demand.
- * 
+ *
  * @author AL
  */
 public class CustomTreeWalker extends TreeWalker {
@@ -35,14 +35,6 @@ public class CustomTreeWalker extends TreeWalker {
     }
 
     /**
-     * Decide whether non terminal elements should be reported when returning
-     * from recursion.
-     */
-    public void setReportingReturns(boolean yes) {
-        isReportingReturns = yes;
-    }
-
-    /**
      * Checks whether non terminal elements are reported when returning from
      * recursion. Default is false (no report).
      */
@@ -51,10 +43,18 @@ public class CustomTreeWalker extends TreeWalker {
     }
 
     /**
+     * Decide whether non terminal elements should be reported when returning
+     * from recursion.
+     */
+    public void setReportingReturns(boolean yes) {
+        isReportingReturns = yes;
+    }
+
+    /**
      * Returns true if the current element is left. This element will not be
      * reported any longer. If return reporting is switched off, only terminal
      * elements will be reported as returning.
-     * 
+     *
      * @see #isReportingReturns
      */
     public boolean isReturning() {

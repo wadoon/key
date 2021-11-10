@@ -7,30 +7,29 @@ import recoder.java.expression.Literal;
 
 /**
  * Null literal.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class NullLiteral extends Literal {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -1679522775179075816L;
+     * serialization id
+     */
+    private static final long serialVersionUID = -1679522775179075816L;
 
-	/**
+    /**
      * Null literal.
      */
 
     public NullLiteral() {
-    	// nothing to do
+        // nothing to do
     }
 
     /**
      * Null literal.
-     * 
-     * @param proto
-     *            a null literal.
+     *
+     * @param proto a null literal.
      */
 
     protected NullLiteral(NullLiteral proto) {
@@ -39,7 +38,7 @@ public class NullLiteral extends Literal {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -52,6 +51,6 @@ public class NullLiteral extends Literal {
     }
 
     public Object getEquivalentJavaType() {
-		return null;
-	}
+        return null;
+    }
 }

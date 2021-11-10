@@ -7,17 +7,17 @@ import java.util.List;
 /**
  * Record of the syntactical changes that occured after the last validation of
  * the model.
- * 
+ *
  * @author AL
  * @since 0.5
  */
 public class ChangeHistoryEvent extends java.util.EventObject {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -5303809748311641541L;
-	private List<TreeChange> changeList;
+     * serialization id
+     */
+    private static final long serialVersionUID = -5303809748311641541L;
+    private final List<TreeChange> changeList;
 
     ChangeHistoryEvent(ChangeHistory source, List<TreeChange> changeList) {
         super(source);
@@ -32,7 +32,7 @@ public class ChangeHistoryEvent extends java.util.EventObject {
     }
 
     public String toString() {
-    	StringBuilder res = new StringBuilder();
+        StringBuilder res = new StringBuilder();
         for (int i = 0; i < changeList.size(); i += 1) {
             res.append(changeList.get(i).toString());
             res.append("\n");

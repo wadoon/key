@@ -20,11 +20,11 @@ import recoder.list.generic.ASTList;
 public class ConstructorDeclaration extends MethodDeclaration implements Constructor {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -1852257105076401562L;
+     * serialization id
+     */
+    private static final long serialVersionUID = -1852257105076401562L;
 
-	/**
+    /**
      * Constructor declaration.
      */
 
@@ -34,21 +34,16 @@ public class ConstructorDeclaration extends MethodDeclaration implements Constru
 
     /**
      * Constructor declaration.
-     * 
-     * @param modifier
-     *            a visibility modifier.
-     * @param name
-     *            an identifier.
-     * @param parameters
-     *            a parameter declaration mutable list.
-     * @param exceptions
-     *            a throws.
-     * @param body
-     *            a statement block.
+     *
+     * @param modifier   a visibility modifier.
+     * @param name       an identifier.
+     * @param parameters a parameter declaration mutable list.
+     * @param exceptions a throws.
+     * @param body       a statement block.
      */
 
     public ConstructorDeclaration(VisibilityModifier modifier, Identifier name,
-    		ASTList<ParameterDeclaration> parameters, Throws exceptions, StatementBlock body) {
+                                  ASTList<ParameterDeclaration> parameters, Throws exceptions, StatementBlock body) {
         super(null, null, name, parameters, exceptions, body);
         ASTList<DeclarationSpecifier> mods = new ASTArrayList<DeclarationSpecifier>(1);
         if (modifier != null) {
@@ -60,9 +55,8 @@ public class ConstructorDeclaration extends MethodDeclaration implements Constru
 
     /**
      * Constructor declaration.
-     * 
-     * @param proto
-     *            a constructor declaration.
+     *
+     * @param proto a constructor declaration.
      */
 
     protected ConstructorDeclaration(ConstructorDeclaration proto) {
@@ -72,7 +66,7 @@ public class ConstructorDeclaration extends MethodDeclaration implements Constru
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 

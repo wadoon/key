@@ -7,6 +7,7 @@ import recoder.list.generic.ASTList;
 
 /**
  * TODO
+ *
  * @author Alexander Weigl
  * @version 1 (11/10/21)
  */
@@ -50,23 +51,23 @@ public class ArrayLengthReference implements Expression {
     }
 
     @Override
-    public Position getEndPosition() {
-        return null;
-    }
-
-    @Override
-    public Position getRelativePosition() {
-        return null;
-    }
-
-    @Override
     public void setStartPosition(Position p) {
 
     }
 
     @Override
+    public Position getEndPosition() {
+        return null;
+    }
+
+    @Override
     public void setEndPosition(Position p) {
 
+    }
+
+    @Override
+    public Position getRelativePosition() {
+        return null;
     }
 
     @Override

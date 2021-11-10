@@ -2,34 +2,20 @@
 
 package recoder.kit.transformation;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ProgramFactory;
 import recoder.abstraction.Type;
-import recoder.java.Expression;
-import recoder.java.NonTerminalProgramElement;
-import recoder.java.ProgramElement;
-import recoder.java.Statement;
-import recoder.java.StatementBlock;
-import recoder.java.declaration.ClassInitializer;
-import recoder.java.declaration.FieldDeclaration;
-import recoder.java.declaration.FieldSpecification;
-import recoder.java.declaration.LocalVariableDeclaration;
-import recoder.java.declaration.TypeDeclaration;
-import recoder.java.declaration.VariableSpecification;
+import recoder.java.*;
+import recoder.java.declaration.*;
 import recoder.java.expression.operator.CopyAssignment;
 import recoder.java.reference.TypeReference;
 import recoder.java.reference.VariableReference;
-import recoder.kit.ExpressionKit;
-import recoder.kit.Problem;
-import recoder.kit.ProblemReport;
-import recoder.kit.TwoPassTransformation;
-import recoder.kit.TypeKit;
-import recoder.kit.VariableKit;
+import recoder.kit.*;
 import recoder.service.SourceInfo;
 import recoder.util.Debug;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Transformation that ensures that the given expression is evaluated first
@@ -42,27 +28,27 @@ import recoder.util.Debug;
  * initializer, a new class initializer with appropriate modifier executing the
  * initialization code is inserted before the field. <BR>
  * Example:
- * 
+ *
  * <PRE>
- * 
+ * <p>
  * int x = f(g());
- * 
+ *
  * </PRE>
- * 
+ * <p>
  * becomes
- * 
+ *
  * <PRE>
- * 
+ * <p>
  * double d = g(); int x = f(d);
- * 
+ *
  * </PRE>
- * 
+ * <p>
  * or, if <CODE>x</CODE> is a field:
- * 
+ *
  * <PRE>{ double d = g(); x = f(d); } int x;
- * 
+ *
  * </PRE>
- * 
+ *
  * <DL>
  * <DT>Added:
  * <DD>If the expression was in a field initializer, a new class or object
@@ -81,7 +67,7 @@ import recoder.util.Debug;
  * with possible side-effects are cloned and replaced by new variable references
  * (the clones become initializers of the variable declarations).
  * </DL>
- * 
+ *
  * @author AL
  * @Deprecated - there are currently open issues...
  */
@@ -90,7 +76,7 @@ public class ShiftPreceedingStatementExpressions extends TwoPassTransformation {
     /**
      * The expression to be brought to top-level.
      */
-    private Expression expression;
+    private final Expression expression;
 
     /**
      * Expressions that preceed the input expression; later on only the ones
@@ -130,12 +116,10 @@ public class ShiftPreceedingStatementExpressions extends TwoPassTransformation {
     /**
      * Creates a new transformation object that shifts statement expressions to
      * initializers of new local variables.
-     * 
-     * @param sc
-     *            the service configuration to use.
-     * @param x
-     *            the expression that shall be accessed first in its statement
-     *            or initializer.
+     *
+     * @param sc the service configuration to use.
+     * @param x  the expression that shall be accessed first in its statement
+     *           or initializer.
      */
     public ShiftPreceedingStatementExpressions(CrossReferenceServiceConfiguration sc, Expression x) {
         super(sc);
@@ -150,10 +134,10 @@ public class ShiftPreceedingStatementExpressions extends TwoPassTransformation {
      * new temporary variable declarations with new names, replacement
      * references, and prepares the parent for insertion unless it happens to be
      * a field specification.
-     * 
+     *
      * @return the problem report, may be
-     *         {@link recoder.kit.Transformation#IDENTITY}, or
-     *         {@link recoder.kit.Transformation#EQUIVALENCE}.
+     * {@link recoder.kit.Transformation#IDENTITY}, or
+     * {@link recoder.kit.Transformation#EQUIVALENCE}.
      */
     public ProblemReport analyze() {
         // get all expressions that are executed before x
@@ -179,7 +163,7 @@ public class ShiftPreceedingStatementExpressions extends TwoPassTransformation {
             if (report instanceof Problem) {
                 return setProblemReport(report);
             }
-            parent = (NonTerminalProgramElement)preparer.getStatement();
+            parent = (NonTerminalProgramElement) preparer.getStatement();
         }
         /*
          * if (parent instanceof LocalVariableDeclaration &&
@@ -224,9 +208,9 @@ public class ShiftPreceedingStatementExpressions extends TwoPassTransformation {
         }
         return setProblemReport(EQUIVALENCE);
     }
-    
+
     private List<Expression> collectPreceeding(Expression e) {
-    	List<Expression> res = ExpressionKit.collectPreceedingExpressions(expression);
+        List<Expression> res = ExpressionKit.collectPreceedingExpressions(expression);
         // retain only expressions that might have side-effects
         int exSize = res.size();
         for (int i = exSize - 1; i >= 0; i -= 1) {
@@ -238,9 +222,7 @@ public class ShiftPreceedingStatementExpressions extends TwoPassTransformation {
     }
 
     /**
-     * 
-     * @exception IllegalStateException
-     *                if the analyze() has not been called.
+     * @throws IllegalStateException if the analyze() has not been called.
      * @see #analyze()
      */
     public void transform() {
@@ -258,12 +240,12 @@ public class ShiftPreceedingStatementExpressions extends TwoPassTransformation {
             preparer.transform();
             newParent = preparer.getStatement();
             if (newParent != parent && expression == parent) {
-            	// newParent may be a clone of parent at this time. In that case,
-            	// preceeding-list is from the *old* AST...
-            	// This case happens if the original statement is the only statement in a "body", e.g.,
-            	// if (true) callAMethod(bar()); ...
-            	// TODO apparently, newParent is not used in collectPreceeding (parameter is never used). CHECK THIS.
-            	preceeding = collectPreceeding((Expression)newParent);
+                // newParent may be a clone of parent at this time. In that case,
+                // preceeding-list is from the *old* AST...
+                // This case happens if the original statement is the only statement in a "body", e.g.,
+                // if (true) callAMethod(bar()); ...
+                // TODO apparently, newParent is not used in collectPreceeding (parameter is never used). CHECK THIS.
+                preceeding = collectPreceeding((Expression) newParent);
             }
             List<Statement> destination = preparer.getStatementList();
             parent = (NonTerminalProgramElement) preparer.getStatement();
@@ -315,7 +297,7 @@ public class ShiftPreceedingStatementExpressions extends TwoPassTransformation {
             TypeDeclaration tdecl = fd.getMemberParent();
             attach(ci, tdecl, tdecl.getMembers().indexOf(fd) + 1);
         } else {
-        	throw new RuntimeException("??? parent = " + parent.toString());
+            throw new RuntimeException("??? parent = " + parent.toString());
         }
     }
 
@@ -332,7 +314,7 @@ public class ShiftPreceedingStatementExpressions extends TwoPassTransformation {
      * expression. The expression is now the first one that gets executed. <BR>
      * Take care that this transformation is actually called, even if the
      * analysis resulted in an identity.
-     * 
+     *
      * @return the statement containing the given expression.
      */
     public Statement getEnclosingStatement() {

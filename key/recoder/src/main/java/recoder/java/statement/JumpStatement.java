@@ -4,16 +4,16 @@ package recoder.java.statement;
 
 /**
  * Jump statement.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public abstract class JumpStatement extends JavaStatement {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * Jump statement.
@@ -25,9 +25,8 @@ public abstract class JumpStatement extends JavaStatement {
 
     /**
      * Jump statement.
-     * 
-     * @param proto
-     *            a jump statement.
+     *
+     * @param proto a jump statement.
      */
 
     protected JumpStatement(JumpStatement proto) {

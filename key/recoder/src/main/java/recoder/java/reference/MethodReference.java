@@ -2,22 +2,14 @@
 
 package recoder.java.reference;
 
-import recoder.java.Expression;
-import recoder.java.ExpressionContainer;
-import recoder.java.Identifier;
-import recoder.java.JavaNonTerminalProgramElement;
-import recoder.java.NonTerminalProgramElement;
-import recoder.java.ProgramElement;
-import recoder.java.SourceElement;
-import recoder.java.SourceVisitor;
-import recoder.java.StatementContainer;
+import recoder.java.*;
 import recoder.java.declaration.TypeArgumentDeclaration;
 import recoder.java.expression.ExpressionStatement;
 import recoder.list.generic.ASTList;
 
 /**
  * Method reference.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
@@ -25,50 +17,50 @@ public class MethodReference extends JavaNonTerminalProgramElement implements Me
         ReferenceSuffix, ExpressionStatement, TypeReferenceContainer, NameReference {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -3016310919182753074L;
+     * serialization id
+     */
+    private static final long serialVersionUID = -3016310919182753074L;
 
-	/**
+    /**
      * Expression parent.
      */
 
-	private ExpressionContainer expressionParent;
+    private ExpressionContainer expressionParent;
 
     /**
      * Statement parent.
      */
 
-	private StatementContainer statementParent;
+    private StatementContainer statementParent;
 
     /**
      * Qualifier parent.
      */
 
-	private ReferenceSuffix qualifierParent;
+    private ReferenceSuffix qualifierParent;
 
     /**
      * Access path.
      */
 
-	private ReferencePrefix accessPath;
+    private ReferencePrefix accessPath;
 
     /**
      * Name.
      */
 
-	private Identifier name;
+    private Identifier name;
 
     /**
      * Arguments.
      */
 
-	private ASTList<Expression> arguments;
-    
+    private ASTList<Expression> arguments;
+
     /**
      * Type arguments for explicit generic invocation.
      */
-	private ASTList<TypeArgumentDeclaration> typeArguments;
+    private ASTList<TypeArgumentDeclaration> typeArguments;
 
     /**
      * Method reference.
@@ -80,9 +72,8 @@ public class MethodReference extends JavaNonTerminalProgramElement implements Me
 
     /**
      * Method reference.
-     * 
-     * @param name
-     *            an identifier.
+     *
+     * @param name an identifier.
      */
 
     public MethodReference(Identifier name) {
@@ -92,11 +83,9 @@ public class MethodReference extends JavaNonTerminalProgramElement implements Me
 
     /**
      * Method reference.
-     * 
-     * @param accessPath
-     *            a reference prefix.
-     * @param name
-     *            an identifier.
+     *
+     * @param accessPath a reference prefix.
+     * @param name       an identifier.
      */
 
     public MethodReference(ReferencePrefix accessPath, Identifier name) {
@@ -107,11 +96,9 @@ public class MethodReference extends JavaNonTerminalProgramElement implements Me
 
     /**
      * Method reference.
-     * 
-     * @param name
-     *            an identifier.
-     * @param args
-     *            an expression mutable list.
+     *
+     * @param name an identifier.
+     * @param args an expression mutable list.
      */
 
     public MethodReference(Identifier name, ASTList<Expression> args) {
@@ -122,13 +109,10 @@ public class MethodReference extends JavaNonTerminalProgramElement implements Me
 
     /**
      * Method reference.
-     * 
-     * @param accessPath
-     *            a reference prefix.
-     * @param name
-     *            an identifier.
-     * @param args
-     *            an expression mutable list.
+     *
+     * @param accessPath a reference prefix.
+     * @param name       an identifier.
+     * @param args       an expression mutable list.
      */
 
     public MethodReference(ReferencePrefix accessPath, Identifier name, ASTList<Expression> args) {
@@ -137,9 +121,9 @@ public class MethodReference extends JavaNonTerminalProgramElement implements Me
         setArguments(args);
         makeParentRoleValid();
     }
-    
+
     public MethodReference(ReferencePrefix accessPath, Identifier name, ASTList<Expression> args,
-    		ASTList<TypeArgumentDeclaration> typeArgs) {
+                           ASTList<TypeArgumentDeclaration> typeArgs) {
         setReferencePrefix(accessPath);
         setIdentifier(name);
         setArguments(args);
@@ -149,9 +133,8 @@ public class MethodReference extends JavaNonTerminalProgramElement implements Me
 
     /**
      * Method reference.
-     * 
-     * @param proto
-     *            a method reference.
+     *
+     * @param proto a method reference.
      */
 
     protected MethodReference(MethodReference proto) {
@@ -160,20 +143,20 @@ public class MethodReference extends JavaNonTerminalProgramElement implements Me
             accessPath = (ReferencePrefix) proto.accessPath.deepClone();
         }
         if (proto.name != null) {
-            name =proto.name.deepClone();
+            name = proto.name.deepClone();
         }
         if (proto.arguments != null) {
             arguments = proto.arguments.deepClone();
         }
         if (proto.typeArguments != null) {
-        	typeArguments = proto.typeArguments.deepClone();
+            typeArguments = proto.typeArguments.deepClone();
         }
         makeParentRoleValid();
     }
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -198,8 +181,8 @@ public class MethodReference extends JavaNonTerminalProgramElement implements Me
             }
         }
         if (typeArguments != null) {
-        	for (TypeArgumentDeclaration ta: typeArguments)
-        		ta.setParent(this);
+            for (TypeArgumentDeclaration ta : typeArguments)
+                ta.setParent(this);
         }
     }
 
@@ -209,7 +192,7 @@ public class MethodReference extends JavaNonTerminalProgramElement implements Me
 
     /**
      * Get AST parent.
-     * 
+     *
      * @return the non terminal program element.
      */
 
@@ -225,7 +208,7 @@ public class MethodReference extends JavaNonTerminalProgramElement implements Me
 
     /**
      * Get reference prefix.
-     * 
+     *
      * @return the reference prefix.
      */
 
@@ -235,9 +218,8 @@ public class MethodReference extends JavaNonTerminalProgramElement implements Me
 
     /**
      * Set reference prefix.
-     * 
-     * @param qualifier
-     *            a reference prefix.
+     *
+     * @param qualifier a reference prefix.
      */
 
     public void setReferencePrefix(ReferencePrefix qualifier) {
@@ -246,7 +228,7 @@ public class MethodReference extends JavaNonTerminalProgramElement implements Me
 
     /**
      * Get reference suffix.
-     * 
+     *
      * @return the reference suffix.
      */
 
@@ -256,9 +238,8 @@ public class MethodReference extends JavaNonTerminalProgramElement implements Me
 
     /**
      * Set reference suffix.
-     * 
-     * @param path
-     *            a reference suffix.
+     *
+     * @param path a reference suffix.
      */
 
     public void setReferenceSuffix(ReferenceSuffix path) {
@@ -269,7 +250,7 @@ public class MethodReference extends JavaNonTerminalProgramElement implements Me
 
     /**
      * Get statement container.
-     * 
+     *
      * @return the statement container.
      */
 
@@ -278,33 +259,9 @@ public class MethodReference extends JavaNonTerminalProgramElement implements Me
     }
 
     /**
-     * Get expression container.
-     * 
-     * @return the expression container.
-     */
-
-    public ExpressionContainer getExpressionContainer() {
-        return expressionParent;
-    }
-
-    /**
-     * Set expression container.
-     * 
-     * @param parent
-     *            an expression container.
-     */
-
-    public void setExpressionContainer(ExpressionContainer parent) {
-        expressionParent = parent;
-        statementParent = null;
-        qualifierParent = null;
-    }
-
-    /**
      * Set statement container.
-     * 
-     * @param parent
-     *            a statement container.
+     *
+     * @param parent a statement container.
      */
 
     public void setStatementContainer(StatementContainer parent) {
@@ -314,8 +271,30 @@ public class MethodReference extends JavaNonTerminalProgramElement implements Me
     }
 
     /**
+     * Get expression container.
+     *
+     * @return the expression container.
+     */
+
+    public ExpressionContainer getExpressionContainer() {
+        return expressionParent;
+    }
+
+    /**
+     * Set expression container.
+     *
+     * @param parent an expression container.
+     */
+
+    public void setExpressionContainer(ExpressionContainer parent) {
+        expressionParent = parent;
+        statementParent = null;
+        qualifierParent = null;
+    }
+
+    /**
      * Returns the number of children of this node.
-     * 
+     *
      * @return an int giving the number of children of this node
      */
 
@@ -328,19 +307,17 @@ public class MethodReference extends JavaNonTerminalProgramElement implements Me
         if (arguments != null)
             result += arguments.size();
         if (typeArguments != null)
-        	result += typeArguments.size();
+            result += typeArguments.size();
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child
      * array
-     * 
-     * @param index
-     *            an index into this node's "virtual" child array
+     *
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
@@ -355,16 +332,16 @@ public class MethodReference extends JavaNonTerminalProgramElement implements Me
             index--;
         }
         if (arguments != null) {
-        	int len = arguments.size();
-        	if (len > index)
-        		return arguments.get(index);
-        	index -= len;
+            int len = arguments.size();
+            if (len > index)
+                return arguments.get(index);
+            index -= len;
         }
         if (typeArguments != null) {
-        	int len = typeArguments.size();
-        	if (len > index)
-        		return typeArguments.get(index);
-        	index -= len;
+            int len = typeArguments.size();
+            if (len > index)
+                return typeArguments.get(index);
+            index -= len;
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -373,7 +350,7 @@ public class MethodReference extends JavaNonTerminalProgramElement implements Me
         // role 0: prefix
         // role 1: name
         // role 2 (IDX): parameters
-    	// role 3 (IDX): type arguments
+        // role 3 (IDX): type arguments
         if (accessPath == child) {
             return 0;
         }
@@ -387,10 +364,10 @@ public class MethodReference extends JavaNonTerminalProgramElement implements Me
             }
         }
         if (typeArguments != null) {
-        	int index = typeArguments.indexOf(child);
-        	if (index >= 0) {
-        		return (index << 4) | 3;
-        	}
+            int index = typeArguments.indexOf(child);
+            if (index >= 0) {
+                return (index << 4) | 3;
+            }
         }
         return -1;
     }
@@ -401,14 +378,11 @@ public class MethodReference extends JavaNonTerminalProgramElement implements Me
      * element can be null - in that case, the child is effectively removed. The
      * parent role of the new child is validated, while the parent link of the
      * replaced child is left untouched.
-     * 
-     * @param p
-     *            the old child.
-     * @param p
-     *            the new child.
+     *
+     * @param p the old child.
+     * @param p the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException
-     *                if the new child cannot take over the role of the old one.
+     * @throws ClassCastException if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
@@ -446,23 +420,23 @@ public class MethodReference extends JavaNonTerminalProgramElement implements Me
             }
         }
         if (typeArguments != null) {
-        	int idx = typeArguments.indexOf(p);
-        	if (idx != -1) {
-        		if (q == null) {
-        			typeArguments.remove(idx);
-        		} else {
-        			TypeArgumentDeclaration tad = (TypeArgumentDeclaration) q;
-        			typeArguments.set(idx, tad);
-        			tad.setParent(this);
-        		}
-        	}
+            int idx = typeArguments.indexOf(p);
+            if (idx != -1) {
+                if (q == null) {
+                    typeArguments.remove(idx);
+                } else {
+                    TypeArgumentDeclaration tad = (TypeArgumentDeclaration) q;
+                    typeArguments.set(idx, tad);
+                    tad.setParent(this);
+                }
+            }
         }
         return false;
     }
 
     /**
      * Get the number of type references in this container.
-     * 
+     *
      * @return the number of type references.
      */
 
@@ -486,7 +460,7 @@ public class MethodReference extends JavaNonTerminalProgramElement implements Me
 
     /**
      * Get the number of expressions in this container.
-     * 
+     *
      * @return the number of expressions.
      */
 
@@ -522,7 +496,7 @@ public class MethodReference extends JavaNonTerminalProgramElement implements Me
 
     /**
      * Get name.
-     * 
+     *
      * @return the string.
      */
 
@@ -532,7 +506,7 @@ public class MethodReference extends JavaNonTerminalProgramElement implements Me
 
     /**
      * Get identifier.
-     * 
+     *
      * @return the identifier.
      */
 
@@ -542,9 +516,8 @@ public class MethodReference extends JavaNonTerminalProgramElement implements Me
 
     /**
      * Set identifier.
-     * 
-     * @param id
-     *            an identifier.
+     *
+     * @param id an identifier.
      */
 
     public void setIdentifier(Identifier id) {
@@ -553,7 +526,7 @@ public class MethodReference extends JavaNonTerminalProgramElement implements Me
 
     /**
      * Get arguments.
-     * 
+     *
      * @return the expression mutable list.
      */
 
@@ -563,9 +536,8 @@ public class MethodReference extends JavaNonTerminalProgramElement implements Me
 
     /**
      * Set arguments.
-     * 
-     * @param list
-     *            an expression mutable list.
+     *
+     * @param list an expression mutable list.
      */
 
     public void setArguments(ASTList<Expression> list) {
@@ -575,18 +547,18 @@ public class MethodReference extends JavaNonTerminalProgramElement implements Me
     public void accept(SourceVisitor v) {
         v.visitMethodReference(this);
     }
-    
-    public void setTypeArguments(ASTList<TypeArgumentDeclaration> typeArguments) {
-    	this.typeArguments = typeArguments;
-    }
-    
+
     public ASTList<TypeArgumentDeclaration> getTypeArguments() {
-    	return typeArguments;
+        return typeArguments;
     }
-    
+
+    public void setTypeArguments(ASTList<TypeArgumentDeclaration> typeArguments) {
+        this.typeArguments = typeArguments;
+    }
+
     @Override
     public String toString() {
-    	return "<MethodReference> " + name.getText() + "(" + (arguments == null ? 0 : arguments.size()) + ")";
+        return "<MethodReference> " + name.getText() + "(" + (arguments == null ? 0 : arguments.size()) + ")";
     }
 
 }

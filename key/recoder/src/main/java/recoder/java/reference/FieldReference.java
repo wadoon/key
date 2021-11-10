@@ -2,15 +2,11 @@
 
 package recoder.java.reference;
 
-import recoder.java.Expression;
-import recoder.java.Identifier;
-import recoder.java.ProgramElement;
-import recoder.java.SourceElement;
-import recoder.java.SourceVisitor;
+import recoder.java.*;
 
 /**
  * Field reference.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
@@ -18,29 +14,28 @@ public class FieldReference extends VariableReference implements MemberReference
         TypeReferenceContainer {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -1475141413582182288L;
-	
-	/**
+     * serialization id
+     */
+    private static final long serialVersionUID = -1475141413582182288L;
+
+    /**
      * Reference prefix.
      */
 
-	private ReferencePrefix prefix;
+    private ReferencePrefix prefix;
 
     /**
      * Field reference.
      */
 
     public FieldReference() {
-    	// nothing to do
+        // nothing to do
     }
 
     /**
      * Field reference.
-     * 
-     * @param id
-     *            an identifier.
+     *
+     * @param id an identifier.
      */
 
     public FieldReference(Identifier id) {
@@ -49,11 +44,9 @@ public class FieldReference extends VariableReference implements MemberReference
 
     /**
      * Field reference.
-     * 
-     * @param prefix
-     *            a reference prefix.
-     * @param id
-     *            an identifier.
+     *
+     * @param prefix a reference prefix.
+     * @param id     an identifier.
      */
 
     public FieldReference(ReferencePrefix prefix, Identifier id) {
@@ -64,9 +57,8 @@ public class FieldReference extends VariableReference implements MemberReference
 
     /**
      * Field reference.
-     * 
-     * @param proto
-     *            a field reference.
+     *
+     * @param proto a field reference.
      */
 
     protected FieldReference(FieldReference proto) {
@@ -79,7 +71,7 @@ public class FieldReference extends VariableReference implements MemberReference
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -100,7 +92,7 @@ public class FieldReference extends VariableReference implements MemberReference
 
     /**
      * Returns the number of children of this node.
-     * 
+     *
      * @return an int giving the number of children of this node
      */
 
@@ -116,12 +108,10 @@ public class FieldReference extends VariableReference implements MemberReference
     /**
      * Returns the child at the specified index in this node's "virtual" child
      * array
-     * 
-     * @param index
-     *            an index into this node's "virtual" child array
+     *
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
@@ -151,7 +141,7 @@ public class FieldReference extends VariableReference implements MemberReference
 
     /**
      * Get reference prefix.
-     * 
+     *
      * @return the reference prefix.
      */
 
@@ -161,9 +151,8 @@ public class FieldReference extends VariableReference implements MemberReference
 
     /**
      * Set reference prefix.
-     * 
-     * @param prefix
-     *            a reference prefix.
+     *
+     * @param prefix a reference prefix.
      */
 
     public void setReferencePrefix(ReferencePrefix prefix) {
@@ -172,7 +161,7 @@ public class FieldReference extends VariableReference implements MemberReference
 
     /**
      * Get the number of type references in this container.
-     * 
+     *
      * @return the number of type references.
      */
 
@@ -196,7 +185,7 @@ public class FieldReference extends VariableReference implements MemberReference
 
     /**
      * Get the number of expressions in this container.
-     * 
+     *
      * @return the number of expressions.
      */
 
@@ -224,14 +213,11 @@ public class FieldReference extends VariableReference implements MemberReference
      * element can be null - in that case, the child is effectively removed. The
      * parent role of the new child is validated, while the parent link of the
      * replaced child is left untouched.
-     * 
-     * @param p
-     *            the old child.
-     * @param p
-     *            the new child.
+     *
+     * @param p the old child.
+     * @param p the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException
-     *                if the new child cannot take over the role of the old one.
+     * @throws ClassCastException if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
@@ -264,9 +250,9 @@ public class FieldReference extends VariableReference implements MemberReference
     public void accept(SourceVisitor v) {
         v.visitFieldReference(this);
     }
-    
+
     @Override
     public String toString() {
-    	return "<FieldReference> " + getName(); 
+        return "<FieldReference> " + getName();
     }
 }

@@ -8,18 +8,18 @@ import recoder.java.expression.Operator;
 
 /**
  * Positive.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class Positive extends Operator {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 1940491451479434738L;
+     * serialization id
+     */
+    private static final long serialVersionUID = 1940491451479434738L;
 
-	/**
+    /**
      * Positive.
      */
 
@@ -29,9 +29,8 @@ public class Positive extends Operator {
 
     /**
      * Positive.
-     * 
-     * @param child
-     *            an expression.
+     *
+     * @param child an expression.
      */
 
     public Positive(Expression child) {
@@ -41,9 +40,8 @@ public class Positive extends Operator {
 
     /**
      * Positive.
-     * 
-     * @param proto
-     *            a positive.
+     *
+     * @param proto a positive.
      */
 
     protected Positive(Positive proto) {
@@ -53,7 +51,7 @@ public class Positive extends Operator {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -63,7 +61,7 @@ public class Positive extends Operator {
 
     /**
      * Get arity.
-     * 
+     *
      * @return the int value.
      */
 
@@ -73,7 +71,7 @@ public class Positive extends Operator {
 
     /**
      * Get precedence.
-     * 
+     *
      * @return the int value.
      */
 
@@ -83,7 +81,7 @@ public class Positive extends Operator {
 
     /**
      * Get notation.
-     * 
+     *
      * @return the int value.
      */
 
@@ -94,9 +92,9 @@ public class Positive extends Operator {
     /**
      * Checks if this operator is left or right associative. Ordinary unary
      * operators are right associative.
-     * 
+     *
      * @return <CODE>true</CODE>, if the operator is left associative, <CODE>
-     *         false</CODE> otherwise.
+     * false</CODE> otherwise.
      */
 
     public boolean isLeftAssociative() {

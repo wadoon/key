@@ -8,17 +8,17 @@ import recoder.java.Declaration;
 
 /**
  * Exception indicating that a particular declaration is ambiguous.
- * 
+ *
  * @author AL
  */
 public class AmbiguousDeclarationException extends ModelException {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -412059506748522072L;
+     * serialization id
+     */
+    private static final long serialVersionUID = -412059506748522072L;
 
-	private Declaration declaration;
+    private Declaration declaration;
 
     private ProgramModelElement conflictingElement;
 
@@ -31,11 +31,9 @@ public class AmbiguousDeclarationException extends ModelException {
 
     /**
      * Constructor without explanation text.
-     * 
-     * @param declaration
-     *            the declaration found to be ambiguous.
-     * @param conflictingElement
-     *            the alternative declaration, found earlier.
+     *
+     * @param declaration        the declaration found to be ambiguous.
+     * @param conflictingElement the alternative declaration, found earlier.
      */
     public AmbiguousDeclarationException(Declaration declaration, ProgramModelElement conflictingElement) {
         this.declaration = declaration;
@@ -44,13 +42,10 @@ public class AmbiguousDeclarationException extends ModelException {
 
     /**
      * Constructor with an explanation text.
-     * 
-     * @param s
-     *            an explanation.
-     * @param declaration
-     *            the declaration found to be ambiguous.
-     * @param conflictingElement
-     *            the alternative declaration, found earlier.
+     *
+     * @param s                  an explanation.
+     * @param declaration        the declaration found to be ambiguous.
+     * @param conflictingElement the alternative declaration, found earlier.
      */
     public AmbiguousDeclarationException(String s, Declaration declaration, ProgramModelElement conflictingElement) {
         super(s);

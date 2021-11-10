@@ -4,16 +4,7 @@ package recoder.java.declaration;
 
 import recoder.abstraction.Type;
 import recoder.abstraction.Variable;
-import recoder.java.Declaration;
-import recoder.java.Expression;
-import recoder.java.ExpressionContainer;
-import recoder.java.Identifier;
-import recoder.java.JavaNonTerminalProgramElement;
-import recoder.java.NamedProgramElement;
-import recoder.java.NonTerminalProgramElement;
-import recoder.java.ProgramElement;
-import recoder.java.SourceElement;
-import recoder.java.SourceVisitor;
+import recoder.java.*;
 import recoder.list.generic.ASTList;
 import recoder.service.ProgramModelInfo;
 import recoder.service.SourceInfo;
@@ -25,7 +16,7 @@ import recoder.service.SourceInfo;
  * to the enclosing variable declaration and are therefore discouraged. This was
  * necessary to subtype Declaration as analyses are interested in the exact
  * location of a variable name.
- * 
+ *
  * @author AL
  */
 
@@ -33,39 +24,35 @@ public class VariableSpecification extends JavaNonTerminalProgramElement impleme
         ExpressionContainer, Variable {
 
     /**
-	 * serialization id 
-	 */
-	private static final long serialVersionUID = -2190909599303924076L;
+     * serialization id
+     */
+    private static final long serialVersionUID = -2190909599303924076L;
 
-	/**
+    /**
      * Parent.
      */
 
-	VariableDeclaration parent;
-
-    /**
-     * Name.
-     */
-
-    private Identifier name;
-
-    /**
-     * Initializer.
-     */
-
-    private Expression initializer;
-
-    /**
-     * Dimensions.
-     */
-
-    private int dimensions;
-
+    VariableDeclaration parent;
     /**
      * Service.
      */
 
     SourceInfo service;
+    /**
+     * Name.
+     */
+
+    private Identifier name;
+    /**
+     * Initializer.
+     */
+
+    private Expression initializer;
+    /**
+     * Dimensions.
+     */
+
+    private int dimensions;
 
     /**
      * Variable specification.
@@ -77,9 +64,8 @@ public class VariableSpecification extends JavaNonTerminalProgramElement impleme
 
     /**
      * Variable specification.
-     * 
-     * @param name
-     *            an identifier.
+     *
+     * @param name an identifier.
      */
 
     public VariableSpecification(Identifier name) {
@@ -89,11 +75,9 @@ public class VariableSpecification extends JavaNonTerminalProgramElement impleme
 
     /**
      * Variable specification.
-     * 
-     * @param name
-     *            an identifier.
-     * @param init
-     *            an expression.
+     *
+     * @param name an identifier.
+     * @param init an expression.
      */
 
     public VariableSpecification(Identifier name, Expression init) {
@@ -105,13 +89,10 @@ public class VariableSpecification extends JavaNonTerminalProgramElement impleme
 
     /**
      * Variable specification.
-     * 
-     * @param name
-     *            an identifier.
-     * @param dimensions
-     *            an int value.
-     * @param init
-     *            an expression.
+     *
+     * @param name       an identifier.
+     * @param dimensions an int value.
+     * @param init       an expression.
      */
 
     public VariableSpecification(Identifier name, int dimensions, Expression init) {
@@ -124,9 +105,8 @@ public class VariableSpecification extends JavaNonTerminalProgramElement impleme
 
     /**
      * Variable specification.
-     * 
-     * @param proto
-     *            a variable specification.
+     *
+     * @param proto a variable specification.
      */
 
     protected VariableSpecification(VariableSpecification proto) {
@@ -143,7 +123,7 @@ public class VariableSpecification extends JavaNonTerminalProgramElement impleme
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -166,7 +146,7 @@ public class VariableSpecification extends JavaNonTerminalProgramElement impleme
 
     /**
      * Get AST parent.
-     * 
+     *
      * @return the non terminal program element.
      */
 
@@ -176,7 +156,7 @@ public class VariableSpecification extends JavaNonTerminalProgramElement impleme
 
     /**
      * Returns the number of children of this node.
-     * 
+     *
      * @return an int giving the number of children of this node
      */
 
@@ -192,12 +172,10 @@ public class VariableSpecification extends JavaNonTerminalProgramElement impleme
     /**
      * Returns the child at the specified index in this node's "virtual" child
      * array
-     * 
-     * @param index
-     *            an index into this node's "virtual" child array
+     *
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
@@ -231,14 +209,11 @@ public class VariableSpecification extends JavaNonTerminalProgramElement impleme
      * element can be null - in that case, the child is effectively removed. The
      * parent role of the new child is validated, while the parent link of the
      * replaced child is left untouched.
-     * 
-     * @param p
-     *            the old child.
-     * @param p
-     *            the new child.
+     *
+     * @param p the old child.
+     * @param p the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException
-     *                if the new child cannot take over the role of the old one.
+     * @throws ClassCastException if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
@@ -266,19 +241,8 @@ public class VariableSpecification extends JavaNonTerminalProgramElement impleme
     }
 
     /**
-     * Set parent.
-     * 
-     * @param parent
-     *            a variable declaration.
-     */
-
-    public void setParent(VariableDeclaration parent) {
-        this.parent = parent;
-    }
-
-    /**
      * Get parent.
-     * 
+     *
      * @return the variable declaration.
      */
 
@@ -287,8 +251,18 @@ public class VariableSpecification extends JavaNonTerminalProgramElement impleme
     }
 
     /**
+     * Set parent.
+     *
+     * @param parent a variable declaration.
+     */
+
+    public void setParent(VariableDeclaration parent) {
+        this.parent = parent;
+    }
+
+    /**
      * Get the number of expressions in this container.
-     * 
+     *
      * @return the number of expressions.
      */
 
@@ -312,7 +286,7 @@ public class VariableSpecification extends JavaNonTerminalProgramElement impleme
 
     /**
      * Get name.
-     * 
+     *
      * @return the string.
      */
 
@@ -322,7 +296,7 @@ public class VariableSpecification extends JavaNonTerminalProgramElement impleme
 
     /**
      * Get identifier.
-     * 
+     *
      * @return the identifier.
      */
 
@@ -332,9 +306,8 @@ public class VariableSpecification extends JavaNonTerminalProgramElement impleme
 
     /**
      * Set identifier.
-     * 
-     * @param id
-     *            an identifier.
+     *
+     * @param id an identifier.
      */
 
     public void setIdentifier(Identifier id) {
@@ -342,10 +315,19 @@ public class VariableSpecification extends JavaNonTerminalProgramElement impleme
     }
 
     /**
+     * Get dimensions.
+     *
+     * @return the int value.
+     */
+
+    public int getDimensions() {
+        return dimensions;
+    }
+
+    /**
      * Set dimensions.
-     * 
-     * @param dimensions
-     *            an int value.
+     *
+     * @param dimensions an int value.
      */
 
     public void setDimensions(int dimensions) {
@@ -356,29 +338,8 @@ public class VariableSpecification extends JavaNonTerminalProgramElement impleme
     }
 
     /**
-     * Get dimensions.
-     * 
-     * @return the int value.
-     */
-
-    public int getDimensions() {
-        return dimensions;
-    }
-
-    /**
-     * Set initializer.
-     * 
-     * @param expr
-     *            an expression.
-     */
-
-    public void setInitializer(Expression expr) {
-        initializer = expr;
-    }
-
-    /**
      * Get initializer.
-     * 
+     *
      * @return the expression.
      */
 
@@ -387,8 +348,18 @@ public class VariableSpecification extends JavaNonTerminalProgramElement impleme
     }
 
     /**
+     * Set initializer.
+     *
+     * @param expr an expression.
+     */
+
+    public void setInitializer(Expression expr) {
+        initializer = expr;
+    }
+
+    /**
      * Get modifiers of the enclosing declaration.
-     * 
+     *
      * @return the modifier mutable list.
      */
 
@@ -398,9 +369,8 @@ public class VariableSpecification extends JavaNonTerminalProgramElement impleme
 
     /**
      * Set modifiers of the enclosing declaration.
-     * 
-     * @param m
-     *            a modifier mutable list.
+     *
+     * @param m a modifier mutable list.
      */
 
     public void setDeclarationSpecifiers(ASTList<DeclarationSpecifier> m) {
@@ -430,9 +400,9 @@ public class VariableSpecification extends JavaNonTerminalProgramElement impleme
     }
 
     public void setProgramModelInfo(ProgramModelInfo service) {
-    	if (!(service instanceof SourceInfo))
-    		throw new IllegalArgumentException("service for VariableSpecification must be of type SourceInfo.");
-        this.service = (SourceInfo)service;
+        if (!(service instanceof SourceInfo))
+            throw new IllegalArgumentException("service for VariableSpecification must be of type SourceInfo.");
+        this.service = (SourceInfo) service;
     }
 
     private void updateModel() {
@@ -449,9 +419,9 @@ public class VariableSpecification extends JavaNonTerminalProgramElement impleme
     public String getFullName() {
         return getName();
     }
-    
+
     public String getBinaryName() {
-    	return getName();
+        return getName();
     }
 
     public SourceElement getFirstElement() {

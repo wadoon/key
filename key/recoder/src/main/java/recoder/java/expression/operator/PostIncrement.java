@@ -8,18 +8,18 @@ import recoder.java.expression.Assignment;
 
 /**
  * Post increment.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class PostIncrement extends Assignment {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 4938790165047335376L;
+     * serialization id
+     */
+    private static final long serialVersionUID = 4938790165047335376L;
 
-	/**
+    /**
      * Post increment.
      */
 
@@ -29,9 +29,8 @@ public class PostIncrement extends Assignment {
 
     /**
      * Post increment.
-     * 
-     * @param child
-     *            an expression.
+     *
+     * @param child an expression.
      */
 
     public PostIncrement(Expression child) {
@@ -41,9 +40,8 @@ public class PostIncrement extends Assignment {
 
     /**
      * Post increment.
-     * 
-     * @param proto
-     *            a post increment.
+     *
+     * @param proto a post increment.
      */
 
     protected PostIncrement(PostIncrement proto) {
@@ -53,7 +51,7 @@ public class PostIncrement extends Assignment {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -63,7 +61,7 @@ public class PostIncrement extends Assignment {
 
     /**
      * Get arity.
-     * 
+     *
      * @return the int value.
      */
 
@@ -73,7 +71,7 @@ public class PostIncrement extends Assignment {
 
     /**
      * Get precedence.
-     * 
+     *
      * @return the int value.
      */
 
@@ -83,7 +81,7 @@ public class PostIncrement extends Assignment {
 
     /**
      * Get notation.
-     * 
+     *
      * @return the int value.
      */
 

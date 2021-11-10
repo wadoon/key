@@ -2,60 +2,52 @@
 
 package recoder.java.statement;
 
-import java.util.Collections;
-import java.util.List;
-
-import recoder.java.ParameterContainer;
-import recoder.java.ProgramElement;
-import recoder.java.SourceElement;
-import recoder.java.SourceVisitor;
-import recoder.java.Statement;
-import recoder.java.StatementBlock;
-import recoder.java.VariableScope;
+import recoder.java.*;
 import recoder.java.declaration.ParameterDeclaration;
 import recoder.java.declaration.VariableSpecification;
 import recoder.util.Debug;
 
+import java.util.Collections;
+import java.util.List;
+
 /**
  * Catch.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class Catch extends Branch implements ParameterContainer, VariableScope {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -6747731923114431193L;
+     * serialization id
+     */
+    private static final long serialVersionUID = -6747731923114431193L;
 
-	/**
+    /**
      * Parameter.
      */
 
-	private ParameterDeclaration parameter;
+    private ParameterDeclaration parameter;
 
     /**
      * Body.
      */
 
-	private StatementBlock body;
+    private StatementBlock body;
 
     /**
      * Catch.
      */
 
     public Catch() {
-    	super();
+        super();
     }
 
     /**
      * Catch.
-     * 
-     * @param e
-     *            a parameter declaration.
-     * @param body
-     *            a statement.
+     *
+     * @param e    a parameter declaration.
+     * @param body a statement.
      */
 
     public Catch(ParameterDeclaration e, StatementBlock body) {
@@ -67,9 +59,8 @@ public class Catch extends Branch implements ParameterContainer, VariableScope {
 
     /**
      * Catch.
-     * 
-     * @param proto
-     *            a catch.
+     *
+     * @param proto a catch.
      */
 
     protected Catch(Catch proto) {
@@ -85,7 +76,7 @@ public class Catch extends Branch implements ParameterContainer, VariableScope {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -112,7 +103,7 @@ public class Catch extends Branch implements ParameterContainer, VariableScope {
 
     /**
      * Returns the number of children of this node.
-     * 
+     *
      * @return an int giving the number of children of this node
      */
 
@@ -128,12 +119,10 @@ public class Catch extends Branch implements ParameterContainer, VariableScope {
     /**
      * Returns the child at the specified index in this node's "virtual" child
      * array
-     * 
-     * @param index
-     *            an index into this node's "virtual" child array
+     *
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
@@ -168,14 +157,11 @@ public class Catch extends Branch implements ParameterContainer, VariableScope {
      * element can be null - in that case, the child is effectively removed. The
      * parent role of the new child is validated, while the parent link of the
      * replaced child is left untouched.
-     * 
-     * @param p
-     *            the old child.
-     * @param p
-     *            the new child.
+     *
+     * @param p the old child.
+     * @param p the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException
-     *                if the new child cannot take over the role of the old one.
+     * @throws ClassCastException if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
@@ -203,7 +189,7 @@ public class Catch extends Branch implements ParameterContainer, VariableScope {
 
     /**
      * Get the number of statements in this container.
-     * 
+     *
      * @return the number of statements.
      */
 
@@ -227,7 +213,7 @@ public class Catch extends Branch implements ParameterContainer, VariableScope {
 
     /**
      * Get the number of parameters in this container.
-     * 
+     *
      * @return the number of parameters.
      */
 
@@ -252,7 +238,7 @@ public class Catch extends Branch implements ParameterContainer, VariableScope {
 
     /**
      * Get body.
-     * 
+     *
      * @return the statement.
      */
 
@@ -262,9 +248,8 @@ public class Catch extends Branch implements ParameterContainer, VariableScope {
 
     /**
      * Set body.
-     * 
-     * @param statement
-     *            a statement.
+     *
+     * @param statement a statement.
      */
 
     public void setBody(Statement statement) {
@@ -273,9 +258,8 @@ public class Catch extends Branch implements ParameterContainer, VariableScope {
 
     /**
      * Set parent.
-     * 
-     * @param parent
-     *            a try.
+     *
+     * @param parent a try.
      */
 
     public void setParent(Try parent) {
@@ -284,7 +268,7 @@ public class Catch extends Branch implements ParameterContainer, VariableScope {
 
     /**
      * Get parameter declaration.
-     * 
+     *
      * @return the parameter declaration.
      */
 
@@ -294,9 +278,8 @@ public class Catch extends Branch implements ParameterContainer, VariableScope {
 
     /**
      * Set parameter declaration.
-     * 
-     * @param p
-     *            a parameter declaration.
+     *
+     * @param p a parameter declaration.
      */
 
     public void setParameterDeclaration(ParameterDeclaration p) {
@@ -308,14 +291,14 @@ public class Catch extends Branch implements ParameterContainer, VariableScope {
     }
 
     public void setDefinedScope(boolean defined) {
-    	// ignore
+        // ignore
     }
 
     public List<VariableSpecification> getVariablesInScope() {
         if (parameter != null) {
             return parameter.getVariables();
         }
-        return Collections.<VariableSpecification>emptyList();
+        return Collections.emptyList();
     }
 
     public VariableSpecification getVariableInScope(String name) {

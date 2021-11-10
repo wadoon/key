@@ -35,14 +35,17 @@
 package net.sf.retrotranslator.transformer;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.StringTokenizer;
 
 /**
  * @author Taras Puchko
  */
 public class Retrotranslator {
 
-    private LinkedList<FileContainer> src = new LinkedList<FileContainer>();
+    private final LinkedList<FileContainer> src = new LinkedList<FileContainer>();
     private FileContainer dest;
     private boolean stripsign;
     private boolean stripannot;
@@ -58,7 +61,7 @@ public class Retrotranslator {
     private boolean syncfinal;
     private boolean keepclasslit;
     private ReflectionMode reflectionMode = ReflectionMode.NORMAL;
-    private List<File> classpath = new ArrayList<File>();
+    private final List<File> classpath = new ArrayList<File>();
     private MessageLogger logger;
     private SourceMask sourceMask = new SourceMask(null);
     private String embed;
@@ -68,6 +71,32 @@ public class Retrotranslator {
     private ClassLoader classLoader;
 
     public Retrotranslator() {
+    }
+
+    private static void printUsage() {
+        String version = Retrotranslator.class.getPackage().getImplementationVersion();
+        String suffix = (version == null) ? "" : "-" + version;
+        System.out.println("Usage: java -jar retrotranslator-transformer" + suffix +
+                ".jar [-srcdir <path> | -srcjar <file>] [-destdir <path> | -destjar <file>] [-support <features>]" +
+                " [-lazy] [-reflection <mode>] [-stripannot] [-stripsign] [-advanced] [-retainapi] [-retainflags]" +
+                " [-verify] [-uptodatecheck] [-target <version>] [-classpath <path>] [-srcmask <mask>] [-verbose]" +
+                " [-embed <package>] [-backport <packages>] [-smart] [-syncvolatile] [-syncfinal] [-keepclasslit]");
+    }
+
+    public static void main(String[] args) {
+        if (args.length == 0) {
+            printUsage();
+            return;
+        }
+        try {
+            if (!new Retrotranslator().execute(args)) {
+                System.exit(2);
+            }
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+            printUsage();
+            System.exit(1);
+        }
     }
 
     public void addSrcdir(File srcdir) {
@@ -355,32 +384,6 @@ public class Retrotranslator {
             }
         }
         return run();
-    }
-
-    private static void printUsage() {
-        String version = Retrotranslator.class.getPackage().getImplementationVersion();
-        String suffix = (version == null) ? "" : "-" + version;
-        System.out.println("Usage: java -jar retrotranslator-transformer" + suffix +
-                ".jar [-srcdir <path> | -srcjar <file>] [-destdir <path> | -destjar <file>] [-support <features>]" +
-                " [-lazy] [-reflection <mode>] [-stripannot] [-stripsign] [-advanced] [-retainapi] [-retainflags]" +
-                " [-verify] [-uptodatecheck] [-target <version>] [-classpath <path>] [-srcmask <mask>] [-verbose]" +
-                " [-embed <package>] [-backport <packages>] [-smart] [-syncvolatile] [-syncfinal] [-keepclasslit]");
-    }
-
-    public static void main(String[] args) {
-        if (args.length == 0) {
-            printUsage();
-            return;
-        }
-        try {
-            if (!new Retrotranslator().execute(args)) {
-                System.exit(2);
-            }
-        } catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
-            printUsage();
-            System.exit(1);
-        }
     }
 
 }

@@ -6,47 +6,35 @@
 package recoder.java.declaration;
 
 import recoder.abstraction.ElementValuePair;
-import recoder.java.Expression;
-import recoder.java.ExpressionContainer;
-import recoder.java.JavaNonTerminalProgramElement;
-import recoder.java.NonTerminalProgramElement;
-import recoder.java.ProgramElement;
-import recoder.java.SourceElement;
-import recoder.java.SourceVisitor;
+import recoder.java.*;
 import recoder.java.expression.Literal;
 import recoder.java.reference.AnnotationPropertyReference;
 
 /**
  * @author gutzmann
- *
  */
 public class AnnotationElementValuePair extends JavaNonTerminalProgramElement implements ExpressionContainer, ElementValuePair {
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -8603363313540445285L;
+     * serialization id
+     */
+    private static final long serialVersionUID = -8603363313540445285L;
 
-	private AnnotationUseSpecification parent;
-    
-	private AnnotationPropertyReference element;
-    
-	private Expression elementValue;
-    
+    private AnnotationUseSpecification parent;
+
+    private AnnotationPropertyReference element;
+
+    private Expression elementValue;
+
     /**
-     * 
+     *
      */
     public AnnotationElementValuePair() {
         super();
     }
-    
+
     public AnnotationElementValuePair(AnnotationPropertyReference elem, Expression elementValue) {
         this.element = elem;
         this.elementValue = elementValue;
-    }
-    
-    public void makeParentRoleValid() {
-        if (element != null) element.setParent(this);
-        if (elementValue != null) elementValue.setExpressionContainer(this);
     }
 
     /**
@@ -55,10 +43,30 @@ public class AnnotationElementValuePair extends JavaNonTerminalProgramElement im
     protected AnnotationElementValuePair(AnnotationElementValuePair proto) {
         super(proto);
         if (proto.element != null)
-        	element = proto.element.deepClone();
+            element = proto.element.deepClone();
         if (proto.elementValue != null)
-        	elementValue = proto.elementValue.deepClone();
+            elementValue = proto.elementValue.deepClone();
         makeParentRoleValid();
+    }
+
+    /**
+     * TODO move this somewhere where it belongs...
+     *
+     * @param expr
+     * @return
+     */
+    static Object expressionToJavaObject(Expression expr) {
+        if (expr instanceof Literal) {
+            return ((Literal) expr).getEquivalentJavaType();
+        }
+        // TODO
+        throw new RuntimeException("Do not understand type of expression " +
+                "in AnnotationElementValuePair.getValue()... (TODO)");
+    }
+
+    public void makeParentRoleValid() {
+        if (element != null) element.setParent(this);
+        if (elementValue != null) elementValue.setExpressionContainer(this);
     }
 
     /* (non-Javadoc)
@@ -75,53 +83,54 @@ public class AnnotationElementValuePair extends JavaNonTerminalProgramElement im
      * @see recoder.java.NonTerminalProgramElement#getChildAt(int)
      */
     public ProgramElement getChildAt(int index) {
-    	int i = index;
-    	if (element != null) {
-    		if (i == 0) return element;
-    		i--;
-    	}
-    	if (elementValue != null) {
-    		if (i == 0) return elementValue;
-    		i--;
-    	}
-    	throw new ArrayIndexOutOfBoundsException(index);
+        int i = index;
+        if (element != null) {
+            if (i == 0) return element;
+            i--;
+        }
+        if (elementValue != null) {
+            if (i == 0) return elementValue;
+            i--;
+        }
+        throw new ArrayIndexOutOfBoundsException(index);
     }
 
     public SourceElement getFirstElement() {
-		return element != null ? element.getFirstElement() : (elementValue != null ? elementValue.getFirstElement() : this);
-	}
-    public SourceElement getLastElement() {
-    	return elementValue != null ? elementValue.getLastElement() : (element != null ? element.getLastElement() : this);
+        return element != null ? element.getFirstElement() : (elementValue != null ? elementValue.getFirstElement() : this);
     }
-    
+
+    public SourceElement getLastElement() {
+        return elementValue != null ? elementValue.getLastElement() : (element != null ? element.getLastElement() : this);
+    }
+
     /* (non-Javadoc)
      * @see recoder.java.NonTerminalProgramElement#getChildPositionCode(recoder.java.ProgramElement)
      */
     public int getChildPositionCode(ProgramElement child) {
-    	// role 0: element
-    	// role 1: elementValue
-    	if (child == element) return 0;
-    	if (child == elementValue) return 1;
-    	return -1;
+        // role 0: element
+        // role 1: elementValue
+        if (child == element) return 0;
+        if (child == elementValue) return 1;
+        return -1;
     }
 
     /* (non-Javadoc)
      * @see recoder.java.NonTerminalProgramElement#replaceChild(recoder.java.ProgramElement, recoder.java.ProgramElement)
      */
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-    	if (p == null) throw new NullPointerException();
-    	if (p == element) {
-    		element = (AnnotationPropertyReference)q;
-    		if (element != null)
-    			element.setParent(this);
-    		return true;
-    	}
-    	if (p == elementValue) {
-    		elementValue = (Expression)q;
-    		if (elementValue != null)
-    			elementValue.setExpressionContainer(this);
-    		return true;
-    	}
+        if (p == null) throw new NullPointerException();
+        if (p == element) {
+            element = (AnnotationPropertyReference) q;
+            if (element != null)
+                element.setParent(this);
+            return true;
+        }
+        if (p == elementValue) {
+            elementValue = (Expression) q;
+            if (elementValue != null)
+                elementValue.setExpressionContainer(this);
+            return true;
+        }
         return false;
     }
 
@@ -145,21 +154,21 @@ public class AnnotationElementValuePair extends JavaNonTerminalProgramElement im
     public AnnotationElementValuePair deepClone() {
         return new AnnotationElementValuePair(this);
     }
-    
+
     public Expression getElementValue() {
         return elementValue;
     }
-    
+
     public void setElementValue(Expression elementValue) {
-    	this.elementValue = elementValue;
+        this.elementValue = elementValue;
     }
-    
+
     public AnnotationPropertyReference getElement() {
         return element;
     }
-    
+
     public void setElement(AnnotationPropertyReference ref) {
-    	this.element = ref;
+        this.element = ref;
     }
 
     /* (non-Javadoc)
@@ -177,37 +186,23 @@ public class AnnotationElementValuePair extends JavaNonTerminalProgramElement im
             return elementValue;
         throw new ArrayIndexOutOfBoundsException(index);
     }
-    
+
+    public AnnotationUseSpecification getParent() {
+        return parent;
+    }
+
     public void setParent(AnnotationUseSpecification parent) {
         this.parent = parent;
     }
-    
-    public AnnotationUseSpecification getParent() {
-    	return parent;
-    }
-    
-    /**
-     * TODO move this somewhere where it belongs...
-     * @param expr
-     * @return
-     */
-    static Object expressionToJavaObject(Expression expr) {
-		if (expr instanceof Literal) {
-			return ((Literal)expr).getEquivalentJavaType();
-		}
-		// TODO
-		throw new RuntimeException("Do not understand type of expression " +
-				"in AnnotationElementValuePair.getValue()... (TODO)");
+
+    public Object getValue() {
+        return expressionToJavaObject(elementValue);
     }
 
-	public Object getValue() {
-		return expressionToJavaObject(elementValue);
-	}
-
-	public String getElementName() {
-		if (element == null)
-			return "(default value)"; // TODO correct text
-		return getFactory().getServiceConfiguration().getSourceInfo().getAnnotationProperty(element).getFullName();
-	}
+    public String getElementName() {
+        if (element == null)
+            return "(default value)"; // TODO correct text
+        return getFactory().getServiceConfiguration().getSourceInfo().getAnnotationProperty(element).getFullName();
+    }
 
 }

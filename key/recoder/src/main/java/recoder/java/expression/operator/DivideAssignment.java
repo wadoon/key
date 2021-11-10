@@ -8,18 +8,18 @@ import recoder.java.expression.Assignment;
 
 /**
  * Divide assignment.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class DivideAssignment extends Assignment {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 3806208146891527861L;
+     * serialization id
+     */
+    private static final long serialVersionUID = 3806208146891527861L;
 
-	/**
+    /**
      * Divide assignment.
      */
 
@@ -29,11 +29,9 @@ public class DivideAssignment extends Assignment {
 
     /**
      * Divide assignment.
-     * 
-     * @param lhs
-     *            an expression.
-     * @param rhs
-     *            an expression.
+     *
+     * @param lhs an expression.
+     * @param rhs an expression.
      */
 
     public DivideAssignment(Expression lhs, Expression rhs) {
@@ -43,9 +41,8 @@ public class DivideAssignment extends Assignment {
 
     /**
      * Divide assignment.
-     * 
-     * @param proto
-     *            a divide assignment.
+     *
+     * @param proto a divide assignment.
      */
 
     protected DivideAssignment(DivideAssignment proto) {
@@ -55,7 +52,7 @@ public class DivideAssignment extends Assignment {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -65,7 +62,7 @@ public class DivideAssignment extends Assignment {
 
     /**
      * Get arity.
-     * 
+     *
      * @return the int value.
      */
 
@@ -75,7 +72,7 @@ public class DivideAssignment extends Assignment {
 
     /**
      * Get precedence.
-     * 
+     *
      * @return the int value.
      */
 
@@ -85,7 +82,7 @@ public class DivideAssignment extends Assignment {
 
     /**
      * Get notation.
-     * 
+     *
      * @return the int value.
      */
 

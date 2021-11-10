@@ -19,11 +19,11 @@ public interface AccessFlags {
     int SYNCHRONIZED = 0x0020;
 
     int VOLATILE = 0x0040;
-    
+
     int BRIDGE = 0x0040; // as of Java 5, shared with VOLATILE
 
     int TRANSIENT = 0x0080;
-    
+
     int VARARGS = 0x0080; // as of Java 5, shared with TRANSIENT
 
     int NATIVE = 0x0100;
@@ -33,12 +33,12 @@ public interface AccessFlags {
     int ABSTRACT = 0x0400;
 
     int STRICT = 0x0800;
-    
+
     int SYNTHETIC = 0x1000; // as of Java 5 (optional flag)
-    
+
     int ANNOTATION = 0x2000; // as of Java 5
-    
+
     int ENUM = 0x4000; // as of Java 5
-    
-    
+
+
 }

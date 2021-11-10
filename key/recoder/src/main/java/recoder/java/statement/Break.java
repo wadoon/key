@@ -7,18 +7,18 @@ import recoder.java.SourceVisitor;
 
 /**
  * Break.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class Break extends LabelJumpStatement {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 6926617993568300612L;
+     * serialization id
+     */
+    private static final long serialVersionUID = 6926617993568300612L;
 
-	/**
+    /**
      * Break.
      */
 
@@ -28,9 +28,8 @@ public class Break extends LabelJumpStatement {
 
     /**
      * Break.
-     * 
-     * @param label
-     *            an identifier.
+     *
+     * @param label an identifier.
      */
 
     public Break(Identifier label) {
@@ -40,9 +39,8 @@ public class Break extends LabelJumpStatement {
 
     /**
      * Break.
-     * 
-     * @param proto
-     *            a break.
+     *
+     * @param proto a break.
      */
 
     protected Break(Break proto) {
@@ -52,7 +50,7 @@ public class Break extends LabelJumpStatement {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 

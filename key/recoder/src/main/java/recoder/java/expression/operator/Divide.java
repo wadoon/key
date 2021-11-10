@@ -8,18 +8,18 @@ import recoder.java.expression.Operator;
 
 /**
  * Divide.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class Divide extends Operator {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -5919215185261848809L;
+     * serialization id
+     */
+    private static final long serialVersionUID = -5919215185261848809L;
 
-	/**
+    /**
      * Divide.
      */
 
@@ -29,11 +29,9 @@ public class Divide extends Operator {
 
     /**
      * Divide.
-     * 
-     * @param lhs
-     *            an expression.
-     * @param rhs
-     *            an expression.
+     *
+     * @param lhs an expression.
+     * @param rhs an expression.
      */
 
     public Divide(Expression lhs, Expression rhs) {
@@ -43,9 +41,8 @@ public class Divide extends Operator {
 
     /**
      * Divide.
-     * 
-     * @param proto
-     *            a divide.
+     *
+     * @param proto a divide.
      */
 
     protected Divide(Divide proto) {
@@ -55,7 +52,7 @@ public class Divide extends Operator {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -65,7 +62,7 @@ public class Divide extends Operator {
 
     /**
      * Get arity.
-     * 
+     *
      * @return the int value.
      */
 
@@ -75,7 +72,7 @@ public class Divide extends Operator {
 
     /**
      * Get precedence.
-     * 
+     *
      * @return the int value.
      */
 
@@ -85,7 +82,7 @@ public class Divide extends Operator {
 
     /**
      * Get notation.
-     * 
+     *
      * @return the int value.
      */
 

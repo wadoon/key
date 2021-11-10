@@ -2,24 +2,13 @@
 
 package recoder.kit;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import recoder.ModelElement;
 import recoder.ProgramFactory;
 import recoder.abstraction.ArrayType;
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Package;
 import recoder.abstraction.Type;
-import recoder.convenience.ForestWalker;
-import recoder.convenience.Format;
-import recoder.convenience.Formats;
-import recoder.convenience.ModelElementFilter;
-import recoder.convenience.Naming;
-import recoder.convenience.TreeWalker;
+import recoder.convenience.*;
 import recoder.java.CompilationUnit;
 import recoder.java.Import;
 import recoder.java.ProgramElement;
@@ -35,6 +24,8 @@ import recoder.service.SourceInfo;
 import recoder.util.Debug;
 import recoder.util.Order;
 
+import java.util.*;
+
 public class UnitKit {
 
     private UnitKit() {
@@ -46,9 +37,8 @@ public class UnitKit {
      * is located in. Returns <CODE>null</CODE>, if the element is <CODE>
      * null</CODE> or not a part of a compilation unit. If the element is
      * already a compilation unit, the element is returned.
-     * 
-     * @param p
-     *            a program element.
+     *
+     * @param p a program element.
      * @return the compilation unit of the given element, or <CODE>null</CODE>.
      */
     public static CompilationUnit getCompilationUnit(ProgramElement p) {
@@ -60,11 +50,12 @@ public class UnitKit {
         }
         return null;
     }
-    
+
     /**
-     * Query that checks if <code>pe</code> is reachable  in the AST of 
+     * Query that checks if <code>pe</code> is reachable  in the AST of
      * CompilationUnit <code>cu</code>. Useful, e.g., for debugging,
      * to ensure that links are set correctly during transformations.
+     *
      * @param p
      * @param cu
      * @return
@@ -72,17 +63,17 @@ public class UnitKit {
      * TODO 0.90 update doc
      */
     public static void assertPartOf(final ProgramElement pe, List<CompilationUnit> cu) {
-    	ForestWalker tw = new ForestWalker(cu);
-    	ModelElementFilter mef = new ModelElementFilter() {
-			public boolean accept(ModelElement e) {
-				return e == pe;
-			}
-		};
-		boolean res = tw.next(mef);
-		if (tw.next(mef)) 
-			throw new RuntimeException("ProgramElement found twice!?");
-		if (!res)
-			throw new RuntimeException("ProgramElement not part of CompilationUnit");
+        ForestWalker tw = new ForestWalker(cu);
+        ModelElementFilter mef = new ModelElementFilter() {
+            public boolean accept(ModelElement e) {
+                return e == pe;
+            }
+        };
+        boolean res = tw.next(mef);
+        if (tw.next(mef))
+            throw new RuntimeException("ProgramElement found twice!?");
+        if (!res)
+            throw new RuntimeException("ProgramElement not part of CompilationUnit");
     }
 
     private static ClassType getNecessaryImportedType(CrossReferenceSourceInfo xi, Import imp) {
@@ -119,7 +110,7 @@ public class UnitKit {
         for (int j = types.size() - 1; j >= 0 && !result; j -= 1) {
             ClassType ct = types.get(j);
             if (!coveredTypes.contains(ct)) {
-            	List<TypeReference> refs = TypeKit.getReferences(xrsi, ct, cu, false);
+                List<TypeReference> refs = TypeKit.getReferences(xrsi, ct, cu, false);
                 for (int k = refs.size() - 1; k >= 0; k -= 1) {
                     if (refs.get(k).getASTParent().getASTParent() == cu) {
                         refs.remove(k);
@@ -139,13 +130,11 @@ public class UnitKit {
      * does not seem worthwhile to check. A wildcarded import is considered
      * unused if the only types with the given prefixes are imported by
      * corresponding single type imports.
-     * 
+     * <p>
      * Static imports are not considered yet, which is a TODO
-     * 
-     * @param xrsi
-     *            the cross reference source info to use.
-     * @param cu
-     *            the compilation unit to find unnecessary imports in.
+     *
+     * @param xrsi the cross reference source info to use.
+     * @param cu   the compilation unit to find unnecessary imports in.
      * @return a list of unnecessary imports in the unit.
      */
     public static List<Import> getUnnecessaryImports(CrossReferenceSourceInfo xrsi, CompilationUnit cu) {
@@ -198,8 +187,8 @@ public class UnitKit {
     // as are all single type imports that are not necessary.
     // Static imports are left untouched for now (TODO - Gutzmann)
     public static void normalizeImports(ChangeHistory ch, CrossReferenceSourceInfo xrsi, CompilationUnit cu,
-            boolean removeMultiTypeImports, boolean removeSingleTypeImports, boolean addJavaLangImports,
-            boolean addDefaultPackageImports) {
+                                        boolean removeMultiTypeImports, boolean removeSingleTypeImports, boolean addJavaLangImports,
+                                        boolean addDefaultPackageImports) {
         Debug.assertNonnull(xrsi, cu);
         // first step: collect all external class types referred to in the unit
         Set<ClassType> importTypes = new HashSet<ClassType>();
@@ -218,7 +207,7 @@ public class UnitKit {
                         && !((type instanceof TypeDeclaration) && MiscKit.contains(cu, (TypeDeclaration) type))
                         && (addDefaultPackageImports || ((ClassType) type).getPackage() != unitPackage)
                         && (addJavaLangImports || !type.getFullName().startsWith("java.lang."))) {
-                    importTypes.add((ClassType)type);
+                    importTypes.add((ClassType) type);
                 }
             }
         }
@@ -272,13 +261,10 @@ public class UnitKit {
      * Transformation that appends an import specification for the given class
      * type. This method does not check whether the import is needed or
      * redundant.
-     * 
-     * @param ch
-     *            the change history to notify (may be <CODE>null</CODE>).
-     * @param cu
-     *            the unit to create the import for.
-     * @param ct
-     *            the class type to create the import for.
+     *
+     * @param ch the change history to notify (may be <CODE>null</CODE>).
+     * @param cu the unit to create the import for.
+     * @param ct the class type to create the import for.
      * @return the new import.
      */
     public static Import appendImport(ChangeHistory ch, CompilationUnit cu, ClassType ct) {
@@ -289,13 +275,10 @@ public class UnitKit {
      * Transformation that appends an import specification for the given class
      * type. This method does not check whether the import is needed or
      * redundant.
-     * 
-     * @param ch
-     *            the change history to notify (may be <CODE>null</CODE>).
-     * @param cu
-     *            the unit to create the import for.
-     * @param typeName
-     *            the class type name to create the import for.
+     *
+     * @param ch       the change history to notify (may be <CODE>null</CODE>).
+     * @param cu       the unit to create the import for.
+     * @param typeName the class type name to create the import for.
      * @return the new import.
      * @deprecated should become a fully grown transformation.
      */
@@ -314,18 +297,14 @@ public class UnitKit {
      * given location by importing it on demand. If the type is already known,
      * <CODE>null</CODE> is returned, otherwise the new import specification
      * that imports the type directly.
-     * 
-     * @param ch
-     *            the change history to report to (may be <CODE>null</CODE>).
-     * @param si
-     *            the source info service.
-     * @param typeName
-     *            the fully qualified name of the type to be known at the unit
-     *            level.
-     * @param context
-     *            the context in which the type should be known.
+     *
+     * @param ch       the change history to report to (may be <CODE>null</CODE>).
+     * @param si       the source info service.
+     * @param typeName the fully qualified name of the type to be known at the unit
+     *                 level.
+     * @param context  the context in which the type should be known.
      * @return a new import specification as added to the compilation unit, or
-     *         <CODE>null</CODE> if no new import was needed.
+     * <CODE>null</CODE> if no new import was needed.
      * @deprecated needs further testing - use at your own risks
      */
     public static Import ensureImport(ChangeHistory ch, SourceInfo si, String typeName, ProgramElement context) {
@@ -340,14 +319,11 @@ public class UnitKit {
     /**
      * Transformation that ensures that all type references in the given subtree
      * are resolvable by importing the corresponding types on demand.
-     * 
-     * @param ch
-     *            the change history to report to (may be <CODE>null</CODE>).
-     * @param si
-     *            the source info service.
-     * @param root
-     *            the root element in a subtree containing type references to
-     *            check.
+     *
+     * @param ch   the change history to report to (may be <CODE>null</CODE>).
+     * @param si   the source info service.
+     * @param root the root element in a subtree containing type references to
+     *             check.
      * @deprecated needs further testing - use at your own risks
      */
     public static void ensureImports(ChangeHistory ch, SourceInfo si, ProgramElement root) {
@@ -369,7 +345,8 @@ public class UnitKit {
         }
     }
 
-    /** sort imports lexically and insert one blank line between different
+    /**
+     * sort imports lexically and insert one blank line between different
      * top level names
      * !!!!!!!!!!!!!!!!!!!! untested !!!!!!!!!!!!!!!
      */
@@ -383,7 +360,7 @@ public class UnitKit {
         for (int i = 0; i < il.size(); i += 1) {
             Import imp = il.get(i);
             if (imp.isStaticImport() && !imp.isMultiImport()) {
-                MethodReference ref = (MethodReference)imp.getReference();
+                MethodReference ref = (MethodReference) imp.getReference();
                 // TODO Gutzmann - untested!
                 names[i] = Naming.toPathName(ref.getReferencePrefix(), "." + ref.getName());
             } else {

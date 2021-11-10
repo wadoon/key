@@ -2,40 +2,12 @@
 
 package recoder.service;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Pattern;
-
 import recoder.AbstractService;
 import recoder.ParserException;
 import recoder.ServiceConfiguration;
-import recoder.abstraction.AnnotationProperty;
-import recoder.abstraction.ArrayType;
-import recoder.abstraction.ClassType;
-import recoder.abstraction.ClassTypeContainer;
-import recoder.abstraction.Constructor;
-import recoder.abstraction.EnumConstant;
-import recoder.abstraction.ErasedType;
-import recoder.abstraction.Field;
-import recoder.abstraction.Member;
-import recoder.abstraction.Method;
-import recoder.abstraction.NullType;
 import recoder.abstraction.Package;
-import recoder.abstraction.ParameterizedType;
-import recoder.abstraction.PrimitiveType;
-import recoder.abstraction.ProgramModelElement;
-import recoder.abstraction.Type;
-import recoder.abstraction.TypeArgument;
+import recoder.abstraction.*;
 import recoder.abstraction.TypeArgument.WildcardMode;
-import recoder.abstraction.TypeParameter;
-import recoder.abstraction.Variable;
 import recoder.bytecode.ClassFile;
 import recoder.bytecode.FieldInfo;
 import recoder.bytecode.ReflectionImport;
@@ -52,58 +24,33 @@ import recoder.java.declaration.TypeParameterDeclaration;
 import recoder.parser.JavaCCParser;
 import recoder.util.Debug;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.StringReader;
+import java.util.*;
+import java.util.regex.Pattern;
+
 public class DefaultNameInfo extends AbstractService implements NameInfo, PropertyChangeListener {
 
-    /** Maps fully qualified class names to their according types. */
-    private final Map<String, Type> name2type = new HashMap<String, Type>(128);
+    // search mode codes
+    private final static int NO_SEARCH = 0;
+    private final static int SEARCH_SOURCE = 1;
+    private final static int SEARCH_CLASS = 2;
+    private final static int SEARCH_REFLECT = 3;
 
-    /** Caches queries for parameterized types */
-    final Map<String, ParameterizedType> paramTypesCache = new HashMap<String, ParameterizedType>(128);
-
-    /** maps fully qualified variable names to their according variables */
-    private final Map<String, Field> name2field = new HashMap<String, Field>(128);
-
-    /** maps package names to package objects */
-    private Map<String, Package> name2package = new HashMap<String, Package>(64);
-    
     // the predefined types
-
-    private ClassType nullType;
-
-    private ClassType javaLangObject;
-
-    private ClassType javaLangString;
-
-    private ClassType javaLangClass;
-
-    private ClassType javaLangCloneable;
-
-    private ClassType javaIoSerializable;
-
-    private ClassType javaLangRunnable;
-    
-    private ClassType javaLangBoolean;
-    
-    private ClassType javaLangByte;
-    
-    private ClassType javaLangCharacter;
-
-    private ClassType javaLangShort;
-    
-    private ClassType javaLangInteger;
-
-    private ClassType javaLangLong;
-
-    private ClassType javaLangFloat;
-    
-    private ClassType javaLangDouble;
-
-    private ClassType javaLangAnnotationAnnotation;
-    
-    private ClassType javaLangEnum;
-
-    private ClassType javaLangIterable;
-
+    /**
+     * Caches queries for parameterized types
+     */
+    final Map<String, ParameterizedType> paramTypesCache = new HashMap<String, ParameterizedType>(128);
+    /**
+     * Maps fully qualified class names to their according types.
+     */
+    private final Map<String, Type> name2type = new HashMap<String, Type>(128);
+    /**
+     * maps fully qualified variable names to their according variables
+     */
+    private final Map<String, Field> name2field = new HashMap<String, Field>(128);
     private final PrimitiveType intType = new PrimitiveType("int");
     private final PrimitiveType booleanType = new PrimitiveType("boolean");
     private final PrimitiveType longType = new PrimitiveType("long");
@@ -112,20 +59,57 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
     private final PrimitiveType floatType = new PrimitiveType("float");
     private final PrimitiveType byteType = new PrimitiveType("byte");
     private final PrimitiveType shortType = new PrimitiveType("short");
-    
+    /**
+     * The unknown elements. They are used for error handling and to mark
+     * entities as "known-as-unknown" internally.
+     */
+    private final ProgramModelElement unknownElement = new UnknownProgramModelElement();
+    private final ClassType unknownClassType = new UnknownClassType();
+    private final Type unknownType = unknownClassType;
+    private final Package unknownPackage = new Package("<unknownPackage>", null);
+    private final Method unknownMethod = new UnknownMethod();
+    private final Constructor unknownConstructor = new UnknownConstructor();
+    private final Variable unknownVariable = new UnknownVariable();
+    private final Field unknownField = new UnknownField();
+    private final AnnotationProperty unknownAnnotationProperty = new UnknownAnnotationProperty();
+    /**
+     * maps package names to package objects
+     */
+    private Map<String, Package> name2package = new HashMap<String, Package>(64);
+    private ClassType nullType;
+    private ClassType javaLangObject;
+    private ClassType javaLangString;
+    private ClassType javaLangClass;
+    private ClassType javaLangCloneable;
+    private ClassType javaIoSerializable;
+    private ClassType javaLangRunnable;
+    private ClassType javaLangBoolean;
+    private ClassType javaLangByte;
+    private ClassType javaLangCharacter;
+    private ClassType javaLangShort;
+    private ClassType javaLangInteger;
+    private ClassType javaLangLong;
+    private ClassType javaLangFloat;
+    private ClassType javaLangDouble;
+    private ClassType javaLangAnnotationAnnotation;
+    private ClassType javaLangEnum;
+    private ClassType javaLangIterable;
+    // the current search mode
+    private int[] searchMode;
+    private final UnknownProgramModelElementInfo unknownProgramModelInfo = new UnknownProgramModelElementInfo();
+
     /**
      * Creates a new initialized definition table.
-     * 
-     * @param config
-     *            the configuration this services becomes part of.
+     *
+     * @param config the configuration this services becomes part of.
      */
     public DefaultNameInfo(ServiceConfiguration config) {
         super(config);
-        PrimitiveType[] pts = new PrimitiveType[] { intType, booleanType, longType, doubleType,
-        							charType, floatType, byteType, shortType};
+        PrimitiveType[] pts = new PrimitiveType[]{intType, booleanType, longType, doubleType,
+                charType, floatType, byteType, shortType};
         for (PrimitiveType pt : pts) {
-        	name2type.put(pt.getName(), pt);
-        	pt.setProgramModelInfo(getImplicitElementInfo());
+            name2type.put(pt.getName(), pt);
+            pt.setProgramModelInfo(getImplicitElementInfo());
         }
     }
 
@@ -144,18 +128,6 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
         }
     }
 
-    // search mode codes
-    private final static int NO_SEARCH = 0;
-
-    private final static int SEARCH_SOURCE = 1;
-
-    private final static int SEARCH_CLASS = 2;
-
-    private final static int SEARCH_REFLECT = 3;
-
-    // the current search mode
-    private int[] searchMode;
-
     // parses the class search mode property and creates the internal
     // representation. Ignores everything that does not fit.
     private void updateSearchMode() {
@@ -167,24 +139,23 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
         searchMode = new int[prop.length()];
         for (int i = 0; i < searchMode.length; i++) {
             switch (prop.charAt(i)) {
-            case 's':
-            case 'S':
-                searchMode[i] = SEARCH_SOURCE;
-                break;
-            case 'c':
-            case 'C':
-                searchMode[i] = SEARCH_CLASS;
-                break;
-            case 'r':
-            case 'R':
-                searchMode[i] = SEARCH_REFLECT;
-                break;
-            default:
-                searchMode[i] = NO_SEARCH;
+                case 's':
+                case 'S':
+                    searchMode[i] = SEARCH_SOURCE;
+                    break;
+                case 'c':
+                case 'C':
+                    searchMode[i] = SEARCH_CLASS;
+                    break;
+                case 'r':
+                case 'R':
+                    searchMode[i] = SEARCH_REFLECT;
+                    break;
+                default:
+                    searchMode[i] = NO_SEARCH;
             }
         }
     }
-
 
     final void updateModel() {
         serviceConfiguration.getChangeHistory().updateModel();
@@ -214,7 +185,7 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
         Debug.assertNonnull(ct);
         String name = ct.getFullName();
         Type ob = name2type.put(name, ct);
-        if (ob != null && ob != ct && !(ob instanceof UnknownClassType)) { 
+        if (ob != null && ob != ct && !(ob instanceof UnknownClassType)) {
             Debug.log("Internal Warning - Multiple registration of " + Format.toString("%N [%i]", ct)
                     + Format.toString(" --- was: %N [%i]", ob));
         }
@@ -259,27 +230,27 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
         }
         return javaLangCharacter;
     }
-    
+
     public ClassType getJavaLangShort() {
         if (javaLangShort == null) {
             javaLangShort = getClassType("java.lang.Short");
         }
         return javaLangShort;
-    }  
-    
+    }
+
     public ClassType getJavaLangInteger() {
         if (javaLangInteger == null) {
             javaLangInteger = getClassType("java.lang.Integer");
         }
         return javaLangInteger;
-    }    
-    
+    }
+
     public ClassType getJavaLangLong() {
         if (javaLangLong == null) {
             javaLangLong = getClassType("java.lang.Long");
         }
         return javaLangLong;
-    }    
+    }
 
     public ClassType getJavaLangFloat() {
         if (javaLangFloat == null) {
@@ -294,7 +265,7 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
         }
         return javaLangDouble;
     }
-    
+
     public ClassType getJavaLangClass() {
         if (javaLangClass == null) {
             javaLangClass = getClassType("java.lang.Class");
@@ -322,26 +293,26 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
         }
         return javaIoSerializable;
     }
-    
+
     public ClassType getJavaLangAnnotationAnnotation() {
         if (javaLangAnnotationAnnotation == null) {
             javaLangAnnotationAnnotation = getClassType("java.lang.annotation.Annotation");
         }
         return javaLangAnnotationAnnotation;
     }
-    
+
     public ClassType getJavaLangEnum() {
-    	if (javaLangEnum == null) {
-    		javaLangEnum = getClassType("java.lang.Enum");
-    	}
-    	return javaLangEnum;
+        if (javaLangEnum == null) {
+            javaLangEnum = getClassType("java.lang.Enum");
+        }
+        return javaLangEnum;
     }
-    
+
     public ClassType getJavaLangIterable() {
-    	if (javaLangIterable == null) {
-    		javaLangIterable = getClassType("java.lang.Iterable");
-    	}
-    	return javaLangIterable;
+        if (javaLangIterable == null) {
+            javaLangIterable = getClassType("java.lang.Iterable");
+        }
+        return javaLangIterable;
     }
 
     public ClassType getNullType() {
@@ -424,18 +395,18 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
 
     @Deprecated
     public ArrayType createArrayType(Type basetype) {
-    	return basetype.createArrayType();
+        return basetype.createArrayType();
     }
-    
+
     @Deprecated
     public ArrayType createArrayType(Type basetype, int dimensions) {
-    	if (dimensions < 1)
-    		throw new IllegalArgumentException("dimensions must be >= 1");
-    	Type result = basetype; 
-    	while (dimensions-- > 0) {
-    		result = result.createArrayType();
-    	}
-    	return (ArrayType)result;
+        if (dimensions < 1)
+            throw new IllegalArgumentException("dimensions must be >= 1");
+        Type result = basetype;
+        while (dimensions-- > 0) {
+            result = result.createArrayType();
+        }
+        return (ArrayType) result;
     }
 
     @Deprecated
@@ -445,35 +416,35 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
     }
 
     public Type getType(String name) {
-    	String sname = name.trim();
+        String sname = name.trim();
         Debug.assertNonnull(name);
         updateModel();
-        
+
         int dim = 0;
         while (sname.endsWith("[]")) {
-        	dim++;
-        	sname = sname.substring(0, sname.length()-2);
+            dim++;
+            sname = sname.substring(0, sname.length() - 2);
         }
         Type result = null;
-        
+
         String name_with_args = sname;
         String typeArgs = null;
         int idx = sname.indexOf('<');
         if (idx > -1) {
-        	result = paramTypesCache.get(sname);
-        	if (result == null) { // otherwise, "fall through" to array creation below
-        		typeArgs = sname.substring(idx, sname.length()); 
-        		sname = sname.substring(0, idx);
-        	}
+            result = paramTypesCache.get(sname);
+            if (result == null) { // otherwise, "fall through" to array creation below
+                typeArgs = sname.substring(idx);
+                sname = sname.substring(0, idx);
+            }
         }
 
         if (result == null)
-        	result = name2type.get(sname);
-        
+            result = name2type.get(sname);
+
         if (result == null) {
-        	result = name2type.get("java.lang."+sname);
-        	if (result == unknownType)
-        		result = null;
+            result = name2type.get("java.lang." + sname);
+            if (result == unknownType)
+                result = null;
         }
 
         if (result == unknownType) {
@@ -482,9 +453,9 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
             // try to load the required information
             if (loadClass(sname)) {
                 result = name2type.get(sname);
-            } 
-            if ((result == null || result == unknownType) && loadClass("java.lang."+sname)) {
-            	result = name2type.get("java.lang."+sname);
+            }
+            if ((result == null || result == unknownType) && loadClass("java.lang." + sname)) {
+                result = name2type.get("java.lang." + sname);
                 if (result == unknownType) {
                     return null;
                 }
@@ -494,47 +465,47 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
             name2type.put(sname, (result != null) ? result : unknownType);
         }
         if (typeArgs != null && result != null) {
-        	// new in 0.90 - allow to query for ParameterizedType
-        	// TODO more efficient !!!???
-        	StringReader sr = new StringReader(typeArgs);
-        	JavaCCParser parser = new JavaCCParser(sr);
-        	parser.initialize(sr, (JavaProgramFactory)getServiceConfiguration().getProgramFactory());
-        	List<TypeArgumentDeclaration> tads = null;
-    		try {
-				tads = parser.TypeArguments();
-				if (!parser.getNextToken().image.equals(""))
-					throw new IllegalArgumentException(name); // tailing characters->error
-			} catch (ParserException e) { // includes IOException, which won't occur
-				throw new IllegalArgumentException(name);
-			}
-    		List<TypeArgument> tis = new ArrayList<TypeArgument>(tads.size());
-    		for (TypeArgumentDeclaration tad : tads) {
-    			WildcardMode wm = tad.getWildcardMode();
-    			if (wm != WildcardMode.Any) {
-    				tad.setWildcardMode(WildcardMode.None);
-    				String sig = TypeArgument.DescriptionImpl.getFullDescription(tad, true);
-    				ClassType argType = getClassType(sig);
-    				if (argType == null)
-    					return null; // can't resolve one of the type args -> return null for complete type
-    				DefaultProgramModelInfo pmi = (DefaultProgramModelInfo)getServiceConfiguration().getSourceInfo();
-    				if (argType instanceof ParameterizedType) {
-    					ParameterizedType pt = (ParameterizedType)argType;
-    					tis.add(pmi.new ResolvedTypeArgument(wm, pt.getGenericType(), pt.getTypeArgs(), null));  // TODO check last param
-    				} else {
-    					tis.add(pmi.new ResolvedTypeArgument(wm, argType, null, null));  // TODO check last param
-    				}
-    			} else {
-    				DefaultProgramModelInfo pmi = (DefaultProgramModelInfo)getServiceConfiguration().getSourceInfo();
-    				tis.add(pmi.new ResolvedTypeArgument(wm, null, null, null));   // TODO check last param
-    			}
-    		}
-        	result = getServiceConfiguration().getImplicitElementInfo().getParameterizedType((ClassType)result, tis);
-            paramTypesCache.put(name_with_args, (ParameterizedType)result);
+            // new in 0.90 - allow to query for ParameterizedType
+            // TODO more efficient !!!???
+            StringReader sr = new StringReader(typeArgs);
+            JavaCCParser parser = new JavaCCParser(sr);
+            parser.initialize(sr, (JavaProgramFactory) getServiceConfiguration().getProgramFactory());
+            List<TypeArgumentDeclaration> tads = null;
+            try {
+                tads = parser.TypeArguments();
+                if (!parser.getNextToken().image.equals(""))
+                    throw new IllegalArgumentException(name); // tailing characters->error
+            } catch (ParserException e) { // includes IOException, which won't occur
+                throw new IllegalArgumentException(name);
+            }
+            List<TypeArgument> tis = new ArrayList<TypeArgument>(tads.size());
+            for (TypeArgumentDeclaration tad : tads) {
+                WildcardMode wm = tad.getWildcardMode();
+                if (wm != WildcardMode.Any) {
+                    tad.setWildcardMode(WildcardMode.None);
+                    String sig = TypeArgument.DescriptionImpl.getFullDescription(tad, true);
+                    ClassType argType = getClassType(sig);
+                    if (argType == null)
+                        return null; // can't resolve one of the type args -> return null for complete type
+                    DefaultProgramModelInfo pmi = (DefaultProgramModelInfo) getServiceConfiguration().getSourceInfo();
+                    if (argType instanceof ParameterizedType) {
+                        ParameterizedType pt = (ParameterizedType) argType;
+                        tis.add(pmi.new ResolvedTypeArgument(wm, pt.getGenericType(), pt.getTypeArgs(), null));  // TODO check last param
+                    } else {
+                        tis.add(pmi.new ResolvedTypeArgument(wm, argType, null, null));  // TODO check last param
+                    }
+                } else {
+                    DefaultProgramModelInfo pmi = (DefaultProgramModelInfo) getServiceConfiguration().getSourceInfo();
+                    tis.add(pmi.new ResolvedTypeArgument(wm, null, null, null));   // TODO check last param
+                }
+            }
+            result = getServiceConfiguration().getImplicitElementInfo().getParameterizedType((ClassType) result, tis);
+            paramTypesCache.put(name_with_args, (ParameterizedType) result);
         }
         // this goes last - no array type should end up in the caches!
         if (result != null) {
-           	for (int i = 0; i < dim; i++)
-           		result = result.createArrayType();
+            for (int i = 0; i < dim; i++)
+                result = result.createArrayType();
         }
         return result;
     }
@@ -611,7 +582,7 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
         if (fields == null) {
             return null;
         }
-        String shortname = name.substring(ldp+1);
+        String shortname = name.substring(ldp + 1);
         for (int i = 0; i < fields.size(); i++) {
             String fname = fields.get(i).getName();
             if (/*name == fname || */shortname.equals(fname)) {
@@ -639,17 +610,17 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
         boolean result = false;
         for (int i = 0; !result && i < searchMode.length; i += 1) {
             switch (searchMode[i]) {
-            case SEARCH_SOURCE:
-                result = loadClassFromSourceCode(classname);
-                break;
-            case SEARCH_CLASS:
-                result = loadClassFromPrecompiledCode(classname);
-                break;
-            case SEARCH_REFLECT:
-                result = loadClassByReflection(classname);
-                break;
-            default:
-                break;
+                case SEARCH_SOURCE:
+                    result = loadClassFromSourceCode(classname);
+                    break;
+                case SEARCH_CLASS:
+                    result = loadClassFromPrecompiledCode(classname);
+                    break;
+                case SEARCH_REFLECT:
+                    result = loadClassByReflection(classname);
+                    break;
+                default:
+                    break;
             }
         }
         return result;
@@ -690,8 +661,8 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
             Debug.error("Error trying to retrieve source file for type " + classname + "\n" + "Exception was " + e);
             e.printStackTrace();
         }
-        // added check the for name2type.containsKey below as of 0.93. 
-        // In the rare case that there is a class B in a package a.b, 
+        // added check the for name2type.containsKey below as of 0.93.
+        // In the rare case that there is a class B in a package a.b,
         // and the input folder is set to src/a (thus not the "root"),
         // and a check for a class B in a package b is performed, then
         // "true" is incorrectly returned. Happens e.g. when analyzing
@@ -719,7 +690,7 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
         return "" + name2package.size() + " packages with " + (name2type.size() - unknown) + " types (" + unknown
                 + " were pure speculations) and " + name2field.size() + " fields";
     }
-    
+
     public void unregisterClassType(String fullname) {
         Debug.assertNonnull(fullname);
         name2type.remove(fullname);
@@ -736,88 +707,306 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
         for (int i = cf.size() - 1; i >= 0; i -= 1) {
             ClassTypeContainer ctc = cf.get(i).getContainer();
             if (ctc instanceof Package) {
-                n2p.put(ctc.getFullName(), (Package)ctc);
+                n2p.put(ctc.getFullName(), (Package) ctc);
             }
         }
         name2package = n2p;
     }
 
-    private class UnknownProgramModelElementInfo extends DefaultProgramModelInfo {
-    	UnknownProgramModelElementInfo() {
-    		super(DefaultNameInfo.this.getServiceConfiguration());
-    	}
-		public ClassTypeContainer getClassTypeContainer(ClassType ct) {
-			return unknownClassType;
-		}
-
-		public List<? extends Constructor> getConstructors(ClassType ct) {
-			ArrayList<Constructor> res = new ArrayList<Constructor>(1);
-			res.add(unknownConstructor);
-			return res;
-		}
-
-		public ClassType getContainingClassType(Member m) {
-			return unknownClassType;
-		}
-
-		/**
-		 * returns Collections.emptyList()
-		 */
-		public List<ClassType> getExceptions(Method m) {
-			// we don't know...
-			return Collections.emptyList();
-		}
-
-		/**
-		 * returns Collections.emptyList()
-		 */
-
-		public List<? extends Field> getFields(ClassType ct) {
-			// we don't know...
-			return Collections.emptyList();
-		}
-
-		/**
-		 * returns Collections.emptyList()
-		 */
-
-		public List<Method> getMethods(ClassType ct) {
-			// we don't know... do we ?
-			return Collections.emptyList();
-		}
-
-		public Package getPackage(ProgramModelElement pme) {
-			return unknownPackage;
-		}
-
-		public Type getReturnType(Method m) {
-			return unknownType;
-		}
-
-		public List<Type> getSignature(Method m) {
-			// we don't know...
-			return null;
-		}
-
-		public List<ClassType> getSupertypes(ClassType ct) {
-			// we don't know...
-			// TODO return empty list?
-			return null;
-		}
-
-		public Type getType(ProgramModelElement pme) {
-			// we don't know...
-			return null;
-		}
-
-		public List<? extends ClassType> getTypes(ClassTypeContainer ctc) {
-			// we don't know...
-			// TODO return empty list ?
-			return null;
-		}
+    public ClassType getUnknownClassType() {
+        return unknownClassType;
     }
 
-	private UnknownProgramModelElementInfo unknownProgramModelInfo = new UnknownProgramModelElementInfo();
+    public ProgramModelElement getUnknownElement() {
+        return unknownElement;
+    }
+
+    public Package getUnknownPackage() {
+        return unknownPackage;
+    }
+
+    public Method getUnknownMethod() {
+        return unknownMethod;
+    }
+
+    public Constructor getUnknownConstructor() {
+        return unknownConstructor;
+    }
+
+    public Variable getUnknownVariable() {
+        return unknownVariable;
+    }
+
+    public Field getUnknownField() {
+        return unknownField;
+    }
+
+    public Type getUnknownType() {
+        return unknownType;
+    }
+
+    public AnnotationProperty getUnknownAnnotationProperty() {
+        return unknownAnnotationProperty;
+    }
+
+    /**
+     * this method is used if a type rename can be identified by the source info, mainly when
+     * an AttachChange of an Identifier follows directly to a DetachChange of an Identifier
+     * on the same parent. This leaves ArrayTypes untouched.
+     *
+     * @param ct
+     * @param unregisterFrom
+     * @param registerTo
+     */
+    void handleTypeRename(ClassType ct, String unregisterFrom, String registerTo) {
+        boolean register = false;
+        boolean unregister = false;
+        Object old = name2type.get(registerTo);
+        // this might be part of a valid package move, so do not corrupt caches
+        if (old == null || old == unknownType)
+            register = true;
+        old = name2type.get(unregisterFrom);
+        if (old == ct)
+            unregister = true;
+        if (unregister)
+            unregisterClassType(unregisterFrom);
+        Type removed;
+        // TODO check - arrays shouldn't be in cache any more... This should be removed, right?
+        String newArrayName = registerTo + "[]";
+        String arrayRemove = unregisterFrom + "[]";
+        while ((removed = name2type.remove(arrayRemove)) != null) {
+            name2type.put(newArrayName, removed);
+            arrayRemove += "[]";
+            newArrayName += "[]";
+        }
+        if (register)
+            register(ct);
+
+        // original type name is now known to be unknown
+        name2type.put(unregisterFrom, unknownClassType); // this prevents reloading of class file from disk
+
+        // fields of this type
+        List<? extends Field> fl = ct.getFields();
+        for (int f = 0, fm = fl.size(); f < fm; f++) {
+            Field currentField = fl.get(f);
+            String fieldremove = unregisterFrom + "." + currentField.getName();
+            if (unregister)
+                unregisterField(fieldremove);
+            if (register)
+                register(currentField);
+        }
+    }
+
+    public List<ClassType> getClassTypes(String pattern) {
+        pattern = adjustPattern(pattern);
+        Pattern patt = Pattern.compile(pattern);
+        ArrayList<ClassType> result = new ArrayList<ClassType>();
+        for (ClassType t : getClassTypes()) {
+            if (patt.matcher(t.getFullName()).matches())
+                result.add(t);
+        }
+        result.trimToSize();
+        return result;
+    }
+
+    private String adjustPattern(String pattern) {
+        pattern = pattern.replace("**", "!");
+        pattern = pattern.replace("*", "(\\w)*");
+        pattern = pattern.replace("!", "(\\w|\\.)*");
+        pattern = pattern.replace("?", ".");
+        pattern = pattern.replace("$", "\\$");
+        return pattern;
+    }
+
+    public List<Method> getMethods(String pattern) {
+        return getMethods(pattern, false);
+    }
+
+    public List<Method> getMethods(String pattern, boolean includeConstructors) {
+        String type = pattern.substring(0, pattern.indexOf('('));
+        String type2 = null;
+        if (type.lastIndexOf('.') > 0)
+            type2 = type.substring(0, type.lastIndexOf('.'));
+        String sig = pattern.substring(pattern.indexOf('(') + 1, pattern.length() - 1);
+
+        sig = sig.replace("**", "!");
+        sig = sig.replace("*", "(\\w|\\.|\\[|\\])+");
+        sig = sig.replace("!", "(\\w|,|\\.|\\[|\\])*");
+        sig = sig.replace("?", ".");
+        sig = sig.replace("$", "\\$");
+        sig = sig.replace("[", "\\[");
+        sig = sig.replace("]", "\\]");
+
+        Pattern sigPattern = Pattern.compile(sig);
+
+        List<ClassType> types = getClassTypes(type);
+        if (type2 != null) {
+            List<ClassType> types2 = getClassTypes(type2);
+            types.removeAll(types2); // TODO quick (imperformant) fix for avoiding duplicates...
+            types.addAll(types2);
+        }
+
+        ArrayList<Method> result = new ArrayList<Method>();
+        type = adjustPattern(type);
+        Pattern methPattern = Pattern.compile(type);
+        for (ClassType t : types) {
+            List<Method> methsAndConstrs = t.getMethods();
+            if (includeConstructors)
+                methsAndConstrs.addAll(t.getConstructors());
+            for (Method m : methsAndConstrs) {
+                // need to check again if the full method name matches (the type-thing above is just an approximation)
+                if (!methPattern.matcher(m.getFullName()).matches())
+                    continue;
+                if (sigPattern.matcher(makeSigString(m.getSignature(), true)).matches())
+                    result.add(m);
+                else if (sigPattern.matcher(makeSigString(m.getSignature(), false)).matches())
+                    result.add(m);
+            }
+        }
+        result.trimToSize();
+        return result;
+    }
+
+    private String makeSigString(List<Type> signature, boolean fullName) {
+        StringBuilder result = new StringBuilder();
+
+        boolean first = true;
+        for (Type t : signature) {
+            if (!first)
+                result.append(',');
+            else
+                first = false;
+            if (fullName)
+                result.append(t.getFullName());
+            else
+                result.append(t.getName());
+        }
+        return result.toString();
+    }
+
+    public void resetBytecode() {
+        paramTypesCache.clear();
+        for (Iterator<Type> it = name2type.values().iterator(); it.hasNext(); ) {
+            Type t = it.next();
+            if (t instanceof ClassFile)
+                it.remove();
+        }
+        for (Iterator<Field> it = name2field.values().iterator(); it.hasNext(); ) {
+            Field f = it.next();
+            if (f instanceof FieldInfo)
+                it.remove();
+        }
+        if (javaIoSerializable instanceof ClassFile)
+            javaIoSerializable = null;
+        if (javaLangAnnotationAnnotation instanceof ClassFile)
+            javaLangAnnotationAnnotation = null;
+        if (javaLangBoolean instanceof ClassFile)
+            javaLangBoolean = null;
+        if (javaLangByte instanceof ClassFile)
+            javaLangByte = null;
+        if (javaLangCharacter instanceof ClassFile)
+            javaLangCharacter = null;
+        if (javaLangClass instanceof ClassFile)
+            javaLangClass = null;
+        if (javaLangCloneable instanceof ClassFile)
+            javaLangCloneable = null;
+        if (javaLangDouble instanceof ClassFile)
+            javaLangDouble = null;
+        if (javaLangEnum instanceof ClassFile)
+            javaLangEnum = null;
+        if (javaLangFloat instanceof ClassFile)
+            javaLangFloat = null;
+        if (javaLangInteger instanceof ClassFile)
+            javaLangInteger = null;
+        if (javaLangLong instanceof ClassFile)
+            javaLangLong = null;
+        if (javaLangObject instanceof ClassFile)
+            javaLangObject = null;
+        if (javaLangRunnable instanceof ClassFile)
+            javaLangRunnable = null;
+        if (javaLangShort instanceof ClassFile)
+            javaLangShort = null;
+        if (javaLangString instanceof ClassFile)
+            javaLangString = null;
+        ((DefaultByteCodeInfo) getByteCodeInfo()).clear();
+        ((DefaultClassFileRepository) getClassFileRepository()).reset();
+    }
+
+    private class UnknownProgramModelElementInfo extends DefaultProgramModelInfo {
+        UnknownProgramModelElementInfo() {
+            super(DefaultNameInfo.this.getServiceConfiguration());
+        }
+
+        public ClassTypeContainer getClassTypeContainer(ClassType ct) {
+            return unknownClassType;
+        }
+
+        public List<? extends Constructor> getConstructors(ClassType ct) {
+            ArrayList<Constructor> res = new ArrayList<Constructor>(1);
+            res.add(unknownConstructor);
+            return res;
+        }
+
+        public ClassType getContainingClassType(Member m) {
+            return unknownClassType;
+        }
+
+        /**
+         * returns Collections.emptyList()
+         */
+        public List<ClassType> getExceptions(Method m) {
+            // we don't know...
+            return Collections.emptyList();
+        }
+
+        /**
+         * returns Collections.emptyList()
+         */
+
+        public List<? extends Field> getFields(ClassType ct) {
+            // we don't know...
+            return Collections.emptyList();
+        }
+
+        /**
+         * returns Collections.emptyList()
+         */
+
+        public List<Method> getMethods(ClassType ct) {
+            // we don't know... do we ?
+            return Collections.emptyList();
+        }
+
+        public Package getPackage(ProgramModelElement pme) {
+            return unknownPackage;
+        }
+
+        public Type getReturnType(Method m) {
+            return unknownType;
+        }
+
+        public List<Type> getSignature(Method m) {
+            // we don't know...
+            return null;
+        }
+
+        public List<ClassType> getSupertypes(ClassType ct) {
+            // we don't know...
+            // TODO return empty list?
+            return null;
+        }
+
+        public Type getType(ProgramModelElement pme) {
+            // we don't know...
+            return null;
+        }
+
+        public List<? extends ClassType> getTypes(ClassTypeContainer ctc) {
+            // we don't know...
+            // TODO return empty list ?
+            return null;
+        }
+    }
 
     class UnknownProgramModelElement implements ProgramModelElement {
         public String getName() {
@@ -827,9 +1016,9 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
         public String getFullName() {
             return getName();
         }
-        
+
         public String getBinaryName() {
-        	return getFullName();
+            return getFullName();
         }
 
         public ProgramModelInfo getProgramModelInfo() {
@@ -837,14 +1026,15 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
         }
 
         public void setProgramModelInfo(ProgramModelInfo pmi) {
-        	// ignore/won't happen
+            // ignore/won't happen
         }
 
         public void validate() {
-        	// always valid
+            // always valid
         }
+
         public UnknownProgramModelElement deepClone() {
-        	throw new UnsupportedOperationException("Cannot deep-clone implicit information");
+            throw new UnsupportedOperationException("Cannot deep-clone implicit information");
         }
 
     }
@@ -877,15 +1067,19 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
         public boolean isStrictFp() {
             return false;
         }
-    	
+
         @Override
-    	public UnknownMember getGenericMember() {
-    		return this;
-    	}
+        public UnknownMember getGenericMember() {
+            return this;
+        }
 
     }
 
     class UnknownClassType extends UnknownMember implements ClassType {
+        private final ErasedType erasedType =
+                new ErasedType(this, getServiceConfiguration().getImplicitElementInfo());
+        private ArrayType arrayType;
+
         public String getName() {
             return "<unknownClassType>";
         }
@@ -905,11 +1099,11 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
         public boolean isInterface() {
             return false;
         }
-        
+
         public boolean isOrdinaryInterface() {
             return false;
         }
-        
+
         public boolean isAnnotationType() {
             return true;
         }
@@ -966,44 +1160,39 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
             return null;
         }
 
-		public List<? extends EnumConstant> getEnumConstants() {
-			return null;
-		}
+        public List<? extends EnumConstant> getEnumConstants() {
+            return null;
+        }
 
-		public List<TypeParameterDeclaration> getTypeParameters() {
-			return null;
-		}
-		
-		public String getFullSignature() {
-			return getFullName();
-		}
+        public List<TypeParameterDeclaration> getTypeParameters() {
+            return null;
+        }
 
-		private ArrayType arrayType;
-		
+        public String getFullSignature() {
+            return getFullName();
+        }
 
-		public ArrayType createArrayType() {
-			if (arrayType == null)
-				arrayType = new ArrayType(this, getServiceConfiguration().getImplicitElementInfo());
-			return arrayType;
-		}
+        public ArrayType createArrayType() {
+            if (arrayType == null)
+                arrayType = new ArrayType(this, getServiceConfiguration().getImplicitElementInfo());
+            return arrayType;
+        }
 
-		public ArrayType getArrayType() {
-			return arrayType;
-		}
+        public ArrayType getArrayType() {
+            return arrayType;
+        }
 
-		private final ErasedType erasedType = 
-			new ErasedType(this, getServiceConfiguration().getImplicitElementInfo());
-		
-		public ErasedType getErasedType() {
-			return erasedType;
-		}
+        public ErasedType getErasedType() {
+            return erasedType;
+        }
 
-		public boolean isInner() {
-			return false;
-		}
-		public ClassType getBaseClassType() {
-			return this;
-		}
+        public boolean isInner() {
+            return false;
+        }
+
+        public ClassType getBaseClassType() {
+            return this;
+        }
     }
 
     class UnknownMethod extends UnknownMember implements Method {
@@ -1059,14 +1248,14 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
             return null;
         }
 
-		public List<? extends TypeParameter> getTypeParameters() {
-			return null;
-		}
+        public List<? extends TypeParameter> getTypeParameters() {
+            return null;
+        }
 
-		@Override
-		public String getFullSignature() {
-			return getName() + "(<UnknownParameters>)";
-		}
+        @Override
+        public String getFullSignature() {
+            return getName() + "(<UnknownParameters>)";
+        }
     }
 
     class UnknownConstructor extends UnknownMethod implements Constructor {
@@ -1102,254 +1291,14 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
             return null;
         }
 
-		public List<? extends TypeArgument> getTypeArguments() {
-			return null;
-		}
+        public List<? extends TypeArgument> getTypeArguments() {
+            return null;
+        }
     }
-    
+
     class UnknownAnnotationProperty extends UnknownMethod implements AnnotationProperty {
-		public Object getDefaultValue() {
-			return null;
-		}
-	}
-
-    /**
-     * The unknown elements. They are used for error handling and to mark
-     * entities as "known-as-unknown" internally.
-     */
-    private final ProgramModelElement unknownElement = new UnknownProgramModelElement();
-
-    private final ClassType unknownClassType = new UnknownClassType();
-
-    private final Type unknownType = unknownClassType;
-
-    private final Package unknownPackage = new Package("<unknownPackage>", null);
-
-    private final Method unknownMethod = new UnknownMethod();
-
-    private final Constructor unknownConstructor = new UnknownConstructor();
-
-    private final Variable unknownVariable = new UnknownVariable();
-
-    private final Field unknownField = new UnknownField();
-    
-    private final AnnotationProperty unknownAnnotationProperty = new UnknownAnnotationProperty();
-
-    public ClassType getUnknownClassType() {
-        return unknownClassType;
-    }
-
-    public ProgramModelElement getUnknownElement() {
-        return unknownElement;
-    }
-
-    public Package getUnknownPackage() {
-        return unknownPackage;
-    }
-
-    public Method getUnknownMethod() {
-        return unknownMethod;
-    }
-
-    public Constructor getUnknownConstructor() {
-        return unknownConstructor;
-    }
-
-    public Variable getUnknownVariable() {
-        return unknownVariable;
-    }
-
-    public Field getUnknownField() {
-        return unknownField;
-    }
-
-    public Type getUnknownType() {
-        return unknownType;
-    }
-    
-    public AnnotationProperty getUnknownAnnotationProperty() {
-    	return unknownAnnotationProperty;
-    }
-
-    /**
-     * this method is used if a type rename can be identified by the source info, mainly when
-     * an AttachChange of an Identifier follows directly to a DetachChange of an Identifier
-     * on the same parent. This leaves ArrayTypes untouched.
-     * @param ct
-     * @param unregisterFrom
-     * @param registerTo
-     */
-    void handleTypeRename(ClassType ct, String unregisterFrom, String registerTo) {
-        boolean register = false;
-        boolean unregister = false;
-        Object old = name2type.get(registerTo);
-        // this might be part of a valid package move, so do not corrupt caches
-        if (old == null || old == unknownType)
-            register = true;
-        old = name2type.get(unregisterFrom);
-        if (old == ct)
-            unregister = true;
-        if (unregister)
-            unregisterClassType(unregisterFrom);
-        Type removed;
-        // TODO check - arrays shouldn't be in cache any more... This should be removed, right?
-        String newArrayName = registerTo + "[]";
-        String arrayRemove = unregisterFrom + "[]";
-        while ((removed = name2type.remove(arrayRemove)) != null) {
-            name2type.put(newArrayName, removed);
-            arrayRemove += "[]";
-            newArrayName += "[]";
-        }
-        if (register)
-            register(ct);
-
-        // original type name is now known to be unknown
-        name2type.put(unregisterFrom, unknownClassType); // this prevents reloading of class file from disk
-
-        // fields of this type
-        List<? extends Field> fl = ct.getFields();
-        for (int f = 0, fm = fl.size(); f < fm; f++) {
-            Field currentField = fl.get(f);
-            String fieldremove = unregisterFrom + "." + currentField.getName();
-            if (unregister)
-                unregisterField(fieldremove);
-            if (register)
-                register(currentField);
+        public Object getDefaultValue() {
+            return null;
         }
     }
-
-	public List<ClassType> getClassTypes(String pattern) {
-		pattern = adjustPattern(pattern);
-		Pattern patt = Pattern.compile(pattern);
-		ArrayList<ClassType> result = new ArrayList<ClassType>();
-		for (ClassType t : getClassTypes()) {
-			if (patt.matcher(t.getFullName()).matches())
-				result.add(t);
-		}
-		result.trimToSize();
-		return result;
-	}
-
-	private String adjustPattern(String pattern) {
-		pattern = pattern.replace("**", "!");
-		pattern = pattern.replace("*", "(\\w)*");
-		pattern = pattern.replace("!", "(\\w|\\.)*");
-		pattern = pattern.replace("?", ".");
-		pattern = pattern.replace("$", "\\$");
-		return pattern;
-	}
-
-	public List<Method> getMethods(String pattern) {
-		return getMethods(pattern, false);
-	}
-	
-	public List<Method> getMethods(String pattern, boolean includeConstructors) {
-		String type = pattern.substring(0, pattern.indexOf('('));
-		String type2 = null;
-		if (type.lastIndexOf('.') > 0)
-			type2 = type.substring(0, type.lastIndexOf('.'));
-		String sig = pattern.substring(pattern.indexOf('(')+1, pattern.length()-1);
-		
-		sig = sig.replace("**", "!");
-		sig = sig.replace("*", "(\\w|\\.|\\[|\\])+");
-		sig = sig.replace("!", "(\\w|,|\\.|\\[|\\])*");
-		sig = sig.replace("?", ".");
-		sig = sig.replace("$", "\\$");
-		sig = sig.replace("[", "\\[");
-		sig = sig.replace("]", "\\]");
-		
-		Pattern sigPattern = Pattern.compile(sig);
-		
-		List<ClassType> types = getClassTypes(type);
-		if (type2 != null) {
-			List<ClassType> types2 = getClassTypes(type2);
-			types.removeAll(types2); // TODO quick (imperformant) fix for avoiding duplicates...
-			types.addAll(types2);
-		}
-		
-		ArrayList<Method> result = new ArrayList<Method>();
-		type = adjustPattern(type);
-		Pattern methPattern = Pattern.compile(type);
-		for (ClassType t : types) {
-			List<Method> methsAndConstrs = t.getMethods();
-			if (includeConstructors)
-				methsAndConstrs.addAll(t.getConstructors());
-			for (Method m : methsAndConstrs) {
-				// need to check again if the full method name matches (the type-thing above is just an approximation)
-				if (!methPattern.matcher(m.getFullName()).matches())
-					continue;
-				if (sigPattern.matcher(makeSigString(m.getSignature(), true)).matches())
-					result.add(m);
-				else if (sigPattern.matcher(makeSigString(m.getSignature(), false)).matches())
-					result.add(m);
-			}
-		}
-		result.trimToSize();
-		return result;
-	}
-
-	private String makeSigString(List<Type> signature, boolean fullName) {
-		StringBuilder result = new StringBuilder();
-
-		boolean first = true;
-		for (Type t : signature) {
-			if (!first)
-				result.append(',');
-			else
-				first = false;
-			if (fullName)
-				result.append(t.getFullName());
-			else
-				result.append(t.getName());
-		}
-		return result.toString();
-	}
-
-	public void resetBytecode() {
-		paramTypesCache.clear();
-		for (Iterator<Type> it = name2type.values().iterator(); it.hasNext();) {
-			Type t = it.next();
-			if (t instanceof ClassFile)
-				it.remove();
-		}
-		for (Iterator<Field> it = name2field.values().iterator(); it.hasNext();) {
-			Field f = it.next();
-			if (f instanceof FieldInfo)
-				it.remove();
-		}
-		if (javaIoSerializable instanceof ClassFile)
-			javaIoSerializable = null;
-		if (javaLangAnnotationAnnotation instanceof ClassFile)
-			javaLangAnnotationAnnotation = null;
-		if (javaLangBoolean instanceof ClassFile)
-			javaLangBoolean = null;
-		if (javaLangByte instanceof ClassFile)
-			javaLangByte = null;
-		if (javaLangCharacter instanceof ClassFile)
-			javaLangCharacter = null;
-		if (javaLangClass instanceof ClassFile)
-			javaLangClass = null;
-		if (javaLangCloneable instanceof ClassFile)
-			javaLangCloneable = null;
-		if (javaLangDouble instanceof ClassFile)
-			javaLangDouble = null;
-		if (javaLangEnum instanceof ClassFile)
-			javaLangEnum = null;
-		if (javaLangFloat instanceof ClassFile)
-			javaLangFloat = null;
-		if (javaLangInteger instanceof ClassFile)
-			javaLangInteger = null;
-		if (javaLangLong instanceof ClassFile)
-			javaLangLong = null;
-		if (javaLangObject instanceof ClassFile)
-			javaLangObject = null;
-		if (javaLangRunnable instanceof ClassFile)
-			javaLangRunnable = null;
-		if (javaLangShort instanceof ClassFile)
-			javaLangShort = null;
-		if (javaLangString instanceof ClassFile)
-			javaLangString = null;
-		((DefaultByteCodeInfo)getByteCodeInfo()).clear();
-		((DefaultClassFileRepository)getClassFileRepository()).reset();
-	}
 }

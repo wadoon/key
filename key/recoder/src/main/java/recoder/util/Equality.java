@@ -16,21 +16,10 @@ package recoder.util;
  * </UL>
  * Whether or not objects of different type or <CODE>null</CODE> objects are
  * allowed is up to the specific implementation.
- * 
+ *
  * @author AL
  */
 public interface Equality {
-
-    /**
-     * Compares two objects for equality.
-     * 
-     * @param x
-     *            the first object.
-     * @param y
-     *            the second object.
-     * @return true, if x equals y, false otherwise.
-     */
-    boolean equals(Object x, Object y);
 
     /**
      * Natural equality relation object. The implementation calls x.equals(y),
@@ -38,11 +27,19 @@ public interface Equality {
      * must be symmetric).
      */
     Equality NATURAL = Order.NATURAL;
-
     /**
      * Identity equality relation object. The implementation compares x and y
      * for object identity (x&nbsp;==&nbsp;y). Two <CODE>null</CODE> objects
      * are considered equal.
      */
     Equality IDENTITY = Order.IDENTITY;
+
+    /**
+     * Compares two objects for equality.
+     *
+     * @param x the first object.
+     * @param y the second object.
+     * @return true, if x equals y, false otherwise.
+     */
+    boolean equals(Object x, Object y);
 }

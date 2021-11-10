@@ -2,13 +2,7 @@
 
 package recoder.java.expression;
 
-import recoder.java.Expression;
-import recoder.java.ExpressionContainer;
-import recoder.java.NonTerminalProgramElement;
-import recoder.java.ProgramElement;
-import recoder.java.SourceElement;
-import recoder.java.SourceVisitor;
-import recoder.java.StatementContainer;
+import recoder.java.*;
 import recoder.java.reference.ReferencePrefix;
 import recoder.java.reference.ReferenceSuffix;
 
@@ -20,11 +14,11 @@ import recoder.java.reference.ReferenceSuffix;
 public class ParenthesizedExpression extends Operator implements ExpressionStatement, ReferencePrefix {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 5087638517523549125L;
+     * serialization id
+     */
+    private static final long serialVersionUID = 5087638517523549125L;
 
-	/**
+    /**
      * Access parent.
      */
     protected ReferenceSuffix accessParent;
@@ -44,9 +38,8 @@ public class ParenthesizedExpression extends Operator implements ExpressionState
 
     /**
      * Parenthesized expression.
-     * 
-     * @param child
-     *            an expression.
+     *
+     * @param child an expression.
      */
 
     public ParenthesizedExpression(Expression child) {
@@ -56,9 +49,8 @@ public class ParenthesizedExpression extends Operator implements ExpressionState
 
     /**
      * Parenthesized expression.
-     * 
-     * @param proto
-     *            a parenthesized expression.
+     *
+     * @param proto a parenthesized expression.
      */
     protected ParenthesizedExpression(ParenthesizedExpression proto) {
         super(proto);
@@ -67,7 +59,7 @@ public class ParenthesizedExpression extends Operator implements ExpressionState
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
     public ParenthesizedExpression deepClone() {
@@ -76,7 +68,7 @@ public class ParenthesizedExpression extends Operator implements ExpressionState
 
     /**
      * Get AST parent.
-     * 
+     *
      * @return the non terminal program element.
      */
     public NonTerminalProgramElement getASTParent() {
@@ -91,7 +83,7 @@ public class ParenthesizedExpression extends Operator implements ExpressionState
 
     /**
      * Get statement container.
-     * 
+     *
      * @return the statement container.
      */
     public StatementContainer getStatementContainer() {
@@ -100,9 +92,8 @@ public class ParenthesizedExpression extends Operator implements ExpressionState
 
     /**
      * Set statement container.
-     * 
-     * @param parent
-     *            a statement container.
+     *
+     * @param parent a statement container.
      */
     public void setStatementContainer(StatementContainer parent) {
         statementParent = parent;
@@ -112,9 +103,8 @@ public class ParenthesizedExpression extends Operator implements ExpressionState
 
     /**
      * Set expression container.
-     * 
-     * @param c
-     *            an expression container.
+     *
+     * @param c an expression container.
      */
     public void setExpressionContainer(ExpressionContainer c) {
         expressionParent = c;
@@ -124,7 +114,7 @@ public class ParenthesizedExpression extends Operator implements ExpressionState
 
     /**
      * Returns the number of children of this node.
-     * 
+     *
      * @return an int giving the number of children of this node
      */
 
@@ -135,12 +125,10 @@ public class ParenthesizedExpression extends Operator implements ExpressionState
     /**
      * Returns the child at the specified index in this node's "virtual" child
      * array
-     * 
-     * @param index
-     *            an index into this node's "virtual" child array
+     *
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
         if (children != null) {
@@ -151,7 +139,7 @@ public class ParenthesizedExpression extends Operator implements ExpressionState
 
     /**
      * Get reference suffix.
-     * 
+     *
      * @return the reference suffix.
      */
 
@@ -161,9 +149,8 @@ public class ParenthesizedExpression extends Operator implements ExpressionState
 
     /**
      * Set reference suffix.
-     * 
-     * @param path
-     *            a reference suffix.
+     *
+     * @param path a reference suffix.
      */
 
     public void setReferenceSuffix(ReferenceSuffix path) {
@@ -174,7 +161,7 @@ public class ParenthesizedExpression extends Operator implements ExpressionState
 
     /**
      * Get arity.
-     * 
+     *
      * @return the int value.
      */
     public int getArity() {
@@ -183,7 +170,7 @@ public class ParenthesizedExpression extends Operator implements ExpressionState
 
     /**
      * Get precedence.
-     * 
+     *
      * @return the int value.
      */
 
@@ -193,7 +180,7 @@ public class ParenthesizedExpression extends Operator implements ExpressionState
 
     /**
      * Get notation.
-     * 
+     *
      * @return the int value.
      */
 

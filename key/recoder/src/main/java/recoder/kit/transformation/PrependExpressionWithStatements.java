@@ -17,14 +17,14 @@ import recoder.service.ChangeHistory;
 /**
  * Transformation that prepends a given expression (such as a method or variable
  * reference) with a statement or a list of statements.
- * 
+ *
  * @author AL
  */
 public class PrependExpressionWithStatements extends TwoPassTransformation {
 
-    private Expression expression;
+    private final Expression expression;
 
-    private ASTList<Statement> statements;
+    private final ASTList<Statement> statements;
 
     private ShiftPreceedingStatementExpressions shifter;
 
@@ -32,13 +32,10 @@ public class PrependExpressionWithStatements extends TwoPassTransformation {
      * Creates a new transformation object that inserts the given statements
      * such that no state changes take place between the statements and the
      * evaluation of the expression.
-     * 
-     * @param sc
-     *            the service configuration to use.
-     * @param x
-     *            the expression that shall be prepended.
-     * @param statements
-     *            the statements to prepend.
+     *
+     * @param sc         the service configuration to use.
+     * @param x          the expression that shall be prepended.
+     * @param statements the statements to prepend.
      */
     public PrependExpressionWithStatements(CrossReferenceServiceConfiguration sc, Expression x, ASTList<Statement> statements) {
         super(sc);
@@ -56,23 +53,19 @@ public class PrependExpressionWithStatements extends TwoPassTransformation {
      * Creates a new transformation object that inserts the given statement such
      * that no state changes take place between the statement and the evaluation
      * of the expression.
-     * 
-     * @param sc
-     *            the service configuration to use.
-     * @param x
-     *            the expression that shall be prepended.
-     * @param statement
-     *            the statement to prepend.
+     *
+     * @param sc        the service configuration to use.
+     * @param x         the expression that shall be prepended.
+     * @param statement the statement to prepend.
      */
     public PrependExpressionWithStatements(CrossReferenceServiceConfiguration sc, Expression x, Statement statement) {
         this(sc, x, new ASTArrayList<Statement>(statement));
     }
 
     /**
-     * 
      * @return the problem report, may be
-     *         {@link recoder.kit.Transformation#IDENTITY}, or
-     *         {@link recoder.kit.Transformation#EQUIVALENCE}.
+     * {@link recoder.kit.Transformation#IDENTITY}, or
+     * {@link recoder.kit.Transformation#EQUIVALENCE}.
      */
     public ProblemReport analyze() {
         if (statements.isEmpty()) {
@@ -109,9 +102,7 @@ public class PrependExpressionWithStatements extends TwoPassTransformation {
     }
 
     /**
-     * 
-     * @exception IllegalStateException
-     *                if the analysis has not been called.
+     * @throws IllegalStateException if the analysis has not been called.
      * @see #analyze()
      * @see recoder.kit.transformation.ShiftPreceedingStatementExpressions
      * @see recoder.kit.transformation.PrepareStatementList

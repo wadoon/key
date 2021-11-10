@@ -8,18 +8,18 @@ import recoder.java.expression.Assignment;
 
 /**
  * Minus assignment.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class MinusAssignment extends Assignment {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -1043954220632471820L;
+     * serialization id
+     */
+    private static final long serialVersionUID = -1043954220632471820L;
 
-	/**
+    /**
      * Minus assignment.
      */
 
@@ -29,11 +29,9 @@ public class MinusAssignment extends Assignment {
 
     /**
      * Minus assignment.
-     * 
-     * @param lhs
-     *            an expression.
-     * @param rhs
-     *            an expression.
+     *
+     * @param lhs an expression.
+     * @param rhs an expression.
      */
 
     public MinusAssignment(Expression lhs, Expression rhs) {
@@ -43,9 +41,8 @@ public class MinusAssignment extends Assignment {
 
     /**
      * Minus assignment.
-     * 
-     * @param proto
-     *            a minus assignment.
+     *
+     * @param proto a minus assignment.
      */
 
     protected MinusAssignment(MinusAssignment proto) {
@@ -55,7 +52,7 @@ public class MinusAssignment extends Assignment {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -65,7 +62,7 @@ public class MinusAssignment extends Assignment {
 
     /**
      * Get arity.
-     * 
+     *
      * @return the int value.
      */
 
@@ -75,7 +72,7 @@ public class MinusAssignment extends Assignment {
 
     /**
      * Get precedence.
-     * 
+     *
      * @return the int value.
      */
 
@@ -85,7 +82,7 @@ public class MinusAssignment extends Assignment {
 
     /**
      * Get notation.
-     * 
+     *
      * @return the int value.
      */
 

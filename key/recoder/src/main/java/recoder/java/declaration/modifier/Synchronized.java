@@ -7,30 +7,29 @@ import recoder.java.declaration.Modifier;
 
 /**
  * Synchronized.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class Synchronized extends Modifier {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -4425302603634609276L;
+     * serialization id
+     */
+    private static final long serialVersionUID = -4425302603634609276L;
 
-	/**
+    /**
      * Synchronized.
      */
 
     public Synchronized() {
-    	// nothing to do
+        // nothing to do
     }
 
     /**
      * Synchronized.
-     * 
-     * @param proto
-     *            a synchronized.
+     *
+     * @param proto a synchronized.
      */
 
     protected Synchronized(Synchronized proto) {
@@ -39,7 +38,7 @@ public class Synchronized extends Modifier {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 

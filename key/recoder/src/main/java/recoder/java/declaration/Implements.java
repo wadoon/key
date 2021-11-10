@@ -8,18 +8,18 @@ import recoder.list.generic.ASTList;
 
 /**
  * Implements.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class Implements extends InheritanceSpecification {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 8977810702311137411L;
+     * serialization id
+     */
+    private static final long serialVersionUID = 8977810702311137411L;
 
-	/**
+    /**
      * Implements.
      */
 
@@ -29,9 +29,8 @@ public class Implements extends InheritanceSpecification {
 
     /**
      * Implements.
-     * 
-     * @param supertype
-     *            a type reference.
+     *
+     * @param supertype a type reference.
      */
 
     public Implements(TypeReference supertype) {
@@ -41,9 +40,8 @@ public class Implements extends InheritanceSpecification {
 
     /**
      * Implements.
-     * 
-     * @param list
-     *            a type reference mutable list.
+     *
+     * @param list a type reference mutable list.
      */
 
     public Implements(ASTList<TypeReference> list) {
@@ -53,9 +51,8 @@ public class Implements extends InheritanceSpecification {
 
     /**
      * Implements.
-     * 
-     * @param proto
-     *            an implements.
+     *
+     * @param proto an implements.
      */
 
     protected Implements(Implements proto) {
@@ -65,7 +62,7 @@ public class Implements extends InheritanceSpecification {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 

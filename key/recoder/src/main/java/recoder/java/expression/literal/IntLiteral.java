@@ -7,22 +7,22 @@ import recoder.java.expression.Literal;
 
 /**
  * Int literal.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class IntLiteral extends Literal {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -5285529378094375335L;
-	
-	/**
+     * serialization id
+     */
+    private static final long serialVersionUID = -5285529378094375335L;
+
+    /**
      * Textual representation of the value.
      */
 
-	private String value;
+    private String value;
 
     /**
      * Int literal.
@@ -34,9 +34,8 @@ public class IntLiteral extends Literal {
 
     /**
      * Int literal.
-     * 
-     * @param value
-     *            an int value.
+     *
+     * @param value an int value.
      */
 
     public IntLiteral(int value) {
@@ -45,9 +44,8 @@ public class IntLiteral extends Literal {
 
     /**
      * Int literal.
-     * 
-     * @param value
-     *            a string.
+     *
+     * @param value a string.
      */
 
     public IntLiteral(String value) {
@@ -56,9 +54,8 @@ public class IntLiteral extends Literal {
 
     /**
      * Int literal.
-     * 
-     * @param proto
-     *            an int literal.
+     *
+     * @param proto an int literal.
      */
 
     protected IntLiteral(IntLiteral proto) {
@@ -68,7 +65,7 @@ public class IntLiteral extends Literal {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -77,20 +74,8 @@ public class IntLiteral extends Literal {
     }
 
     /**
-     * Set value.
-     * 
-     * @param str
-     *            a string value.
-     */
-
-    public void setValue(String str) {
-        // unchecked
-        this.value = str.intern();
-    }
-
-    /**
      * Get value.
-     * 
+     *
      * @return the string.
      */
 
@@ -98,11 +83,22 @@ public class IntLiteral extends Literal {
         return value;
     }
 
+    /**
+     * Set value.
+     *
+     * @param str a string value.
+     */
+
+    public void setValue(String str) {
+        // unchecked
+        this.value = str.intern();
+    }
+
     public void accept(SourceVisitor v) {
         v.visitIntLiteral(this);
     }
 
-	public Object getEquivalentJavaType() {
-		return Integer.valueOf(value);
-	}
+    public Object getEquivalentJavaType() {
+        return Integer.valueOf(value);
+    }
 }

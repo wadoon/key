@@ -11,27 +11,26 @@ package recoder;
  * the exception is thrown only for one reason: When exchanging an Identifier which
  * is contained in a PackageSpecification. A workaround is to exchange either the
  * containing PackageReference or the containing PackageSpecification.
- *   
- * @author Tobias Gutzmann
  *
+ * @author Tobias Gutzmann
  */
 public class IllegalTransformationException extends RuntimeException {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * 
-	 */
-	public IllegalTransformationException() {
-		// standard constructor
-	}
+    /**
+     *
+     */
+    public IllegalTransformationException() {
+        // standard constructor
+    }
 
-	/**
-	 * @param message
-	 */
-	public IllegalTransformationException(String message) {
-		super(message);
-	}
+    /**
+     * @param message
+     */
+    public IllegalTransformationException(String message) {
+        super(message);
+    }
 }

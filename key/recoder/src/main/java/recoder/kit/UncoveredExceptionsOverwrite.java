@@ -11,10 +11,10 @@ import recoder.abstraction.Method;
 public class UncoveredExceptionsOverwrite extends Conflict {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 1648909642243255075L;
-	private Method method;
+     * serialization id
+     */
+    private static final long serialVersionUID = 1648909642243255075L;
+    private final Method method;
 
     public UncoveredExceptionsOverwrite(Method method) {
         this.method = method;

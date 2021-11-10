@@ -3,13 +3,7 @@
 package recoder.java.reference;
 
 import recoder.convenience.Naming;
-import recoder.java.Expression;
-import recoder.java.Identifier;
-import recoder.java.JavaNonTerminalProgramElement;
-import recoder.java.NonTerminalProgramElement;
-import recoder.java.ProgramElement;
-import recoder.java.SourceElement;
-import recoder.java.SourceVisitor;
+import recoder.java.*;
 import recoder.java.declaration.TypeArgumentDeclaration;
 import recoder.list.generic.ASTList;
 
@@ -24,17 +18,17 @@ import recoder.list.generic.ASTList;
 
 public class TypeReference extends JavaNonTerminalProgramElement implements TypeReferenceInfix, TypeReferenceContainer,
         PackageReferenceContainer, MemberReference {
-	
-    /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -8415845940952618808L;
 
-	/**
+    /**
+     * serialization id
+     */
+    private static final long serialVersionUID = -8415845940952618808L;
+
+    /**
      * Parent.
      */
 
-	private TypeReferenceContainer parent;
+    private TypeReferenceContainer parent;
 
     /**
      * Prefix.
@@ -51,7 +45,7 @@ public class TypeReference extends JavaNonTerminalProgramElement implements Type
      * Type Arguments
      */
     private ASTList<TypeArgumentDeclaration> typeArguments;
-    
+
     /**
      * Name.
      */
@@ -63,14 +57,13 @@ public class TypeReference extends JavaNonTerminalProgramElement implements Type
      */
 
     public TypeReference() {
-    	// nothing to do here
+        // nothing to do here
     }
 
     /**
      * Type reference.
-     * 
-     * @param name
-     *            an identifier.
+     *
+     * @param name an identifier.
      */
 
     public TypeReference(Identifier name) {
@@ -80,11 +73,9 @@ public class TypeReference extends JavaNonTerminalProgramElement implements Type
 
     /**
      * Type reference.
-     * 
-     * @param prefix
-     *            a reference prefix.
-     * @param name
-     *            an identifier.
+     *
+     * @param prefix a reference prefix.
+     * @param name   an identifier.
      */
 
     public TypeReference(ReferencePrefix prefix, Identifier name) {
@@ -95,11 +86,9 @@ public class TypeReference extends JavaNonTerminalProgramElement implements Type
 
     /**
      * Type reference.
-     * 
-     * @param name
-     *            an identifier.
-     * @param dim
-     *            an int value.
+     *
+     * @param name an identifier.
+     * @param dim  an int value.
      */
 
     public TypeReference(Identifier name, int dim) {
@@ -107,18 +96,17 @@ public class TypeReference extends JavaNonTerminalProgramElement implements Type
         setDimensions(dim);
         makeParentRoleValid();
     }
-    
+
     public TypeReference(Identifier name, ASTList<TypeArgumentDeclaration> typeArgs) {
-    	setIdentifier(name);
-    	this.typeArguments = typeArgs;
-    	makeParentRoleValid();
+        setIdentifier(name);
+        this.typeArguments = typeArgs;
+        makeParentRoleValid();
     }
 
     /**
      * Type reference.
-     * 
-     * @param proto
-     *            a type reference.
+     *
+     * @param proto a type reference.
      */
 
     protected TypeReference(TypeReference proto) {
@@ -130,7 +118,7 @@ public class TypeReference extends JavaNonTerminalProgramElement implements Type
             name = proto.name.deepClone();
         }
         if (proto.typeArguments != null) {
-        	typeArguments = proto.typeArguments.deepClone();
+            typeArguments = proto.typeArguments.deepClone();
         }
         dimensions = proto.dimensions;
         makeParentRoleValid();
@@ -138,7 +126,7 @@ public class TypeReference extends JavaNonTerminalProgramElement implements Type
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -158,9 +146,9 @@ public class TypeReference extends JavaNonTerminalProgramElement implements Type
             name.setParent(this);
         }
         if (typeArguments != null) {
-        	for(TypeArgumentDeclaration ta : typeArguments) {
-        		ta.setParent(this);
-        	}
+            for (TypeArgumentDeclaration ta : typeArguments) {
+                ta.setParent(this);
+            }
         }
     }
 
@@ -170,7 +158,7 @@ public class TypeReference extends JavaNonTerminalProgramElement implements Type
 
     /**
      * Get AST parent.
-     * 
+     *
      * @return the non terminal program element.
      */
 
@@ -180,7 +168,7 @@ public class TypeReference extends JavaNonTerminalProgramElement implements Type
 
     /**
      * Returns the number of children of this node.
-     * 
+     *
      * @return an int giving the number of children of this node
      */
 
@@ -191,19 +179,17 @@ public class TypeReference extends JavaNonTerminalProgramElement implements Type
         if (name != null)
             result++;
         if (typeArguments != null)
-        	result += typeArguments.size();
+            result += typeArguments.size();
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child
      * array
-     * 
-     * @param index
-     *            an index into this node's "virtual" child array
+     *
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
@@ -218,7 +204,7 @@ public class TypeReference extends JavaNonTerminalProgramElement implements Type
             index--;
         }
         if (typeArguments != null) {
-        	return typeArguments.get(index);
+            return typeArguments.get(index);
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -226,7 +212,7 @@ public class TypeReference extends JavaNonTerminalProgramElement implements Type
     public int getChildPositionCode(ProgramElement child) {
         // role 0: prefix
         // role 1: name
-       	// role 2(idx): type argument
+        // role 2(idx): type argument
         if (prefix == child) {
             return 0;
         }
@@ -234,16 +220,16 @@ public class TypeReference extends JavaNonTerminalProgramElement implements Type
             return 1;
         }
         if (typeArguments != null) {
-        	int idx = typeArguments.indexOf(child);
-        	if (idx != -1)
-        		return (idx << 4) | 2;
+            int idx = typeArguments.indexOf(child);
+            if (idx != -1)
+                return (idx << 4) | 2;
         }
         return -1;
     }
 
     /**
      * Get the number of type references in this container.
-     * 
+     *
      * @return the number of type references.
      */
 
@@ -267,7 +253,7 @@ public class TypeReference extends JavaNonTerminalProgramElement implements Type
 
     /**
      * Get the number of expressions in this container.
-     * 
+     *
      * @return the number of expressions.
      */
 
@@ -295,14 +281,11 @@ public class TypeReference extends JavaNonTerminalProgramElement implements Type
      * element can be null - in that case, the child is effectively removed. The
      * parent role of the new child is validated, while the parent link of the
      * replaced child is left untouched.
-     * 
-     * @param p
-     *            the old child.
-     * @param p
-     *            the new child.
+     *
+     * @param p the old child.
+     * @param p the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException
-     *                if the new child cannot take over the role of the old one.
+     * @throws ClassCastException if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
@@ -326,23 +309,23 @@ public class TypeReference extends JavaNonTerminalProgramElement implements Type
             return true;
         }
         if (typeArguments != null) {
-        	int idx = typeArguments.indexOf(p);
-        	if (idx != -1) {
-        		if (q == null) {
-        			typeArguments.remove(idx);
-        		} else {
-        			typeArguments.set(idx, (TypeArgumentDeclaration)q);
-        			((TypeArgumentDeclaration)q).setParent(this);
-        		}
-        		return true;
-        	}
+            int idx = typeArguments.indexOf(p);
+            if (idx != -1) {
+                if (q == null) {
+                    typeArguments.remove(idx);
+                } else {
+                    typeArguments.set(idx, (TypeArgumentDeclaration) q);
+                    ((TypeArgumentDeclaration) q).setParent(this);
+                }
+                return true;
+            }
         }
         return false;
     }
 
     /**
      * Get parent.
-     * 
+     *
      * @return the type reference container.
      */
 
@@ -352,9 +335,8 @@ public class TypeReference extends JavaNonTerminalProgramElement implements Type
 
     /**
      * Set parent.
-     * 
-     * @param elem
-     *            a type reference container.
+     *
+     * @param elem a type reference container.
      */
 
     public void setParent(TypeReferenceContainer elem) {
@@ -363,7 +345,7 @@ public class TypeReference extends JavaNonTerminalProgramElement implements Type
 
     /**
      * Get reference prefix.
-     * 
+     *
      * @return the reference prefix.
      */
 
@@ -372,8 +354,18 @@ public class TypeReference extends JavaNonTerminalProgramElement implements Type
     }
 
     /**
+     * Set reference prefix.
+     *
+     * @param x a reference prefix.
+     */
+
+    public void setReferencePrefix(ReferencePrefix x) {
+        prefix = x;
+    }
+
+    /**
      * Get the package reference.
-     * 
+     *
      * @return the package reference.
      */
 
@@ -382,19 +374,8 @@ public class TypeReference extends JavaNonTerminalProgramElement implements Type
     }
 
     /**
-     * Set reference prefix.
-     * 
-     * @param x
-     *            a reference prefix.
-     */
-
-    public void setReferencePrefix(ReferencePrefix x) {
-        prefix = x;
-    }
-
-    /**
      * Get reference suffix.
-     * 
+     *
      * @return the reference suffix.
      */
 
@@ -404,9 +385,8 @@ public class TypeReference extends JavaNonTerminalProgramElement implements Type
 
     /**
      * Set reference suffix.
-     * 
-     * @param x
-     *            a reference suffix, must also be a type reference container.
+     *
+     * @param x a reference suffix, must also be a type reference container.
      */
 
     public void setReferenceSuffix(ReferenceSuffix x) {
@@ -415,7 +395,7 @@ public class TypeReference extends JavaNonTerminalProgramElement implements Type
 
     /**
      * Get dimensions.
-     * 
+     *
      * @return the int value.
      */
 
@@ -425,9 +405,8 @@ public class TypeReference extends JavaNonTerminalProgramElement implements Type
 
     /**
      * Set dimensions.
-     * 
-     * @param dim
-     *            an int value.
+     *
+     * @param dim an int value.
      */
 
     public void setDimensions(int dim) {
@@ -436,7 +415,7 @@ public class TypeReference extends JavaNonTerminalProgramElement implements Type
 
     /**
      * Get name.
-     * 
+     *
      * @return the string.
      */
 
@@ -446,7 +425,7 @@ public class TypeReference extends JavaNonTerminalProgramElement implements Type
 
     /**
      * Get identifier.
-     * 
+     *
      * @return the identifier.
      */
 
@@ -456,9 +435,8 @@ public class TypeReference extends JavaNonTerminalProgramElement implements Type
 
     /**
      * Set identifier.
-     * 
-     * @param id
-     *            an identifier.
+     *
+     * @param id an identifier.
      */
 
     public void setIdentifier(Identifier id) {
@@ -468,18 +446,18 @@ public class TypeReference extends JavaNonTerminalProgramElement implements Type
     public void accept(SourceVisitor v) {
         v.visitTypeReference(this);
     }
-    
-    public void setTypeArguments(ASTList<TypeArgumentDeclaration> ta) {
-    	this.typeArguments = ta;
-    }
-    
+
     public ASTList<TypeArgumentDeclaration> getTypeArguments() {
-    	return typeArguments;
+        return typeArguments;
     }
-    
+
+    public void setTypeArguments(ASTList<TypeArgumentDeclaration> ta) {
+        this.typeArguments = ta;
+    }
+
     @Override
     public String toString() {
-    	return "<TypeReference> " + Naming.toPathName(this);
+        return "<TypeReference> " + Naming.toPathName(this);
     }
 
 }

@@ -2,13 +2,7 @@
 
 package recoder.java.expression.operator;
 
-import recoder.java.Expression;
-import recoder.java.ExpressionContainer;
-import recoder.java.NonTerminalProgramElement;
-import recoder.java.ProgramElement;
-import recoder.java.Reference;
-import recoder.java.SourceElement;
-import recoder.java.SourceVisitor;
+import recoder.java.*;
 import recoder.java.expression.ArrayInitializer;
 import recoder.java.reference.ReferencePrefix;
 import recoder.java.reference.ReferenceSuffix;
@@ -22,24 +16,24 @@ import recoder.list.generic.ASTList;
  * <tt>new XYZ[d<sub>1</sub>]...[d<sub>n</sub>]</tt>
  * <LI>Initialized array construction <BR>
  * <tt>new XYZ[]...[] { a<sub>1</sub>, ..., a<sub>n</sub> }
- </OL>
- Contrary to an ordinary New, a NewArray is no ConstructorReference (since
- all ArrayType constructors are predefined) and is not used as a Statement
- (since there are no side effects in the constructor). No access path is
- required for new, since there is no inner class problem.
- <P>
- NewArray has either a list of dimension length expressions, or
- a single ArrayInitializer.
+ * </OL>
+ * Contrary to an ordinary New, a NewArray is no ConstructorReference (since
+ * all ArrayType constructors are predefined) and is not used as a Statement
+ * (since there are no side effects in the constructor). No access path is
+ * required for new, since there is no inner class problem.
+ * <p>
+ * NewArray has either a list of dimension length expressions, or
+ * a single ArrayInitializer.
  */
 
 public class NewArray extends TypeOperator implements Reference, ReferencePrefix {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 836360320945022449L;
+     * serialization id
+     */
+    private static final long serialVersionUID = 836360320945022449L;
 
-	/**
+    /**
      * Dimensions.
      */
 
@@ -67,11 +61,9 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
 
     /**
      * New array.
-     * 
-     * @param arrayName
-     *            a type reference.
-     * @param dimExpr
-     *            an expression mutable list.
+     *
+     * @param arrayName a type reference.
+     * @param dimExpr   an expression mutable list.
      */
 
     public NewArray(TypeReference arrayName, ASTList<Expression> dimExpr) {
@@ -82,13 +74,10 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
 
     /**
      * New array.
-     * 
-     * @param arrayName
-     *            a type reference.
-     * @param dimensions
-     *            an int value.
-     * @param initializer
-     *            an array initializer.
+     *
+     * @param arrayName   a type reference.
+     * @param dimensions  an int value.
+     * @param initializer an array initializer.
      */
 
     public NewArray(TypeReference arrayName, int dimensions, ArrayInitializer initializer) {
@@ -100,9 +89,8 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
 
     /**
      * New array.
-     * 
-     * @param proto
-     *            a new array.
+     *
+     * @param proto a new array.
      */
 
     protected NewArray(NewArray proto) {
@@ -116,7 +104,7 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -165,7 +153,7 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
 
     /**
      * Get AST parent.
-     * 
+     *
      * @return the non terminal program element.
      */
 
@@ -179,7 +167,7 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
 
     /**
      * Get arity.
-     * 
+     *
      * @return the int value.
      */
 
@@ -189,7 +177,7 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
 
     /**
      * Get precedence.
-     * 
+     *
      * @return the int value.
      */
 
@@ -199,7 +187,7 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
 
     /**
      * Get notation.
-     * 
+     *
      * @return the int value.
      */
 
@@ -209,7 +197,7 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
 
     /**
      * Get reference suffix.
-     * 
+     *
      * @return the reference suffix.
      */
 
@@ -219,9 +207,8 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
 
     /**
      * Set reference suffix.
-     * 
-     * @param path
-     *            a reference suffix.
+     *
+     * @param path a reference suffix.
      */
 
     public void setReferenceSuffix(ReferenceSuffix path) {
@@ -230,7 +217,7 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
 
     /**
      * Get expression container.
-     * 
+     *
      * @return the expression container.
      */
 
@@ -240,9 +227,8 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
 
     /**
      * Set expression container.
-     * 
-     * @param parent
-     *            an expression container.
+     *
+     * @param parent an expression container.
      */
 
     public void setExpressionContainer(ExpressionContainer parent) {
@@ -251,7 +237,7 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
 
     /**
      * Get dimensions.
-     * 
+     *
      * @return the int value.
      */
 
@@ -269,19 +255,8 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
     }
 
     /**
-     * Set array initializer.
-     * 
-     * @param init
-     *            an array initializer.
-     */
-
-    public void setArrayInitializer(ArrayInitializer init) {
-        arrayInitializer = init;
-    }
-
-    /**
      * Get array initializer.
-     * 
+     *
      * @return the array initializer.
      */
 
@@ -290,8 +265,18 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
     }
 
     /**
+     * Set array initializer.
+     *
+     * @param init an array initializer.
+     */
+
+    public void setArrayInitializer(ArrayInitializer init) {
+        arrayInitializer = init;
+    }
+
+    /**
      * Returns the number of children of this node.
-     * 
+     *
      * @return an int giving the number of children of this node
      */
 
@@ -309,12 +294,10 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
     /**
      * Returns the child at the specified index in this node's "virtual" child
      * array
-     * 
-     * @param index
-     *            an index into this node's "virtual" child array
+     *
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
@@ -340,7 +323,7 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
 
     /**
      * Get the number of expressions in this container.
-     * 
+     *
      * @return the number of expressions.
      */
 
@@ -382,14 +365,11 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
      * element can be null - in that case, the child is effectively removed. The
      * parent role of the new child is validated, while the parent link of the
      * replaced child is left untouched.
-     * 
-     * @param p
-     *            the old child.
-     * @param p
-     *            the new child.
+     *
+     * @param p the old child.
+     * @param p the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException
-     *                if the new child cannot take over the role of the old one.
+     * @throws ClassCastException if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {

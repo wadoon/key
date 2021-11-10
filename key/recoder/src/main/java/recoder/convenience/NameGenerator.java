@@ -12,7 +12,7 @@ import recoder.abstraction.Type;
  * generator can be configured for short style (temporary variables) or long
  * style (public names) naming schemes. The generator takes care that no Java
  * keywords are generated.
- * 
+ *
  * @author AL
  */
 public class NameGenerator {
@@ -31,12 +31,19 @@ public class NameGenerator {
      * Long style attempting to closely match the original name.
      */
     public final static int LONG_STYLE = +1;
+    /**
+     * Attempt counter. Can grow up to infinity.
+     */
+    private int attempt = 0;
+    /**
+     * Array of derived candidates.
+     */
+    private String[] derivates;
 
     /**
      * Create a generator for names based on the given name using default style.
-     * 
-     * @param base
-     *            the base name.
+     *
+     * @param base the base name.
      */
     public NameGenerator(String base) {
         this(base, DEFAULT_STYLE);
@@ -44,11 +51,9 @@ public class NameGenerator {
 
     /**
      * Create a generator for names based on the given name and style.
-     * 
-     * @param base
-     *            the base name.
-     * @param strategy
-     *            the style to use.
+     *
+     * @param base     the base name.
+     * @param strategy the style to use.
      */
     public NameGenerator(String base, int strategy) {
         guessNames(base, strategy);
@@ -57,9 +62,8 @@ public class NameGenerator {
     /**
      * Create a generator for names based on the given type name. Uses short
      * style for primitive types, default style otherwise.
-     * 
-     * @param type
-     *            the type to derive a name from.
+     *
+     * @param type the type to derive a name from.
      */
     public NameGenerator(Type type) {
         while (type instanceof ArrayType) {
@@ -72,87 +76,15 @@ public class NameGenerator {
         }
     }
 
-    /**
-     * Attempt counter. Can grow up to infinity.
-     */
-    private int attempt = 0;
-
-    /**
-     * Array of derived candidates.
-     */
-    private String[] derivates;
-
-    /**
-     * Returns the next name candidate.
-     * 
-     * @return the next derivation of the base name.
-     */
-    public String getNextCandidate() {
-        String res;
-        if (attempt < derivates.length) {
-            res = derivates[attempt];
-        } else {
-            res = derivates[0] + (2 + attempt - derivates.length);
-        }
-        attempt += 1;
-        return res;
-    }
-
     private static String[] getLetters(String base) {
         char c = Character.toLowerCase(base.charAt(0));
         if (c < 'y') {
-            return new String[] { base, "" + (char) (c + 1), "" + (char) (c + 2) };
+            return new String[]{base, "" + (char) (c + 1), "" + (char) (c + 2)};
         }
         if (c < 'z') {
-            return new String[] { base, "" + (char) (c + 1) };
+            return new String[]{base, "" + (char) (c + 1)};
         }
-        return new String[] { base };
-    }
-
-    // combine words:
-    // if there are too many of them (4+), use first, shortest candidates only
-    // otherwise, go from long to short forms from left to right
-    private void guessNames(String base, int strategy) {
-        String[] words = separateWords(base);
-        int len = words.length;
-        if (strategy == DEFAULT_STYLE) {
-            strategy = (len >= 4) ? SHORT_STYLE : LONG_STYLE;
-        }
-        String[][] shortCuts = new String[len][];
-        for (int i = 0; i < len; i += 1) {
-            shortCuts[i] = deriveShortCuts(i, words);
-        }
-        if (strategy == SHORT_STYLE) {
-        	StringBuilder res = new StringBuilder(len);
-            for (int i = 0; i < len; i += 1) {
-                res.append(shortCuts[i][0]);
-            }
-            if (len == 1) {
-                derivates = getLetters(res.toString());
-            } else {
-                derivates = new String[] { res.toString() };
-            }
-        } else {
-            int c = 1;
-            for (int i = 0; i < len; i += 1) {
-                c += shortCuts[i].length - 1;
-            }
-            derivates = new String[c];
-            c = 0;
-            for (int i = 0; i < len; i += 1) {
-                for (int k = shortCuts[i].length - ((i == 0) ? 1 : 2); k >= 0; k -= 1) {
-                	StringBuilder buf = new StringBuilder();
-                    for (int j = 0; j < i; j += 1) {
-                        buf.append(shortCuts[j][0]);
-                    }
-                    buf.append(shortCuts[i][k]);
-                    for (int j = i + 1; j < len; j += 1) {
-                        buf.append(words[j]);
-                    }
-                    derivates[c++] = buf.toString();
-                }
-            }
-        }
+        return new String[]{base};
     }
 
     /**
@@ -163,7 +95,7 @@ public class NameGenerator {
      */
     private static String[] separateWords(String base) {
         int len = base.length();
-        StringBuilder[] buf = new StringBuilder[(len+1) / 2];
+        StringBuilder[] buf = new StringBuilder[(len + 1) / 2];
         int w = 0;
         buf[w] = new StringBuilder();
         buf[w].append(base.charAt(0));
@@ -286,5 +218,67 @@ public class NameGenerator {
             result[i] = res[i];
         }
         return result;
+    }
+
+    /**
+     * Returns the next name candidate.
+     *
+     * @return the next derivation of the base name.
+     */
+    public String getNextCandidate() {
+        String res;
+        if (attempt < derivates.length) {
+            res = derivates[attempt];
+        } else {
+            res = derivates[0] + (2 + attempt - derivates.length);
+        }
+        attempt += 1;
+        return res;
+    }
+
+    // combine words:
+    // if there are too many of them (4+), use first, shortest candidates only
+    // otherwise, go from long to short forms from left to right
+    private void guessNames(String base, int strategy) {
+        String[] words = separateWords(base);
+        int len = words.length;
+        if (strategy == DEFAULT_STYLE) {
+            strategy = (len >= 4) ? SHORT_STYLE : LONG_STYLE;
+        }
+        String[][] shortCuts = new String[len][];
+        for (int i = 0; i < len; i += 1) {
+            shortCuts[i] = deriveShortCuts(i, words);
+        }
+        if (strategy == SHORT_STYLE) {
+            StringBuilder res = new StringBuilder(len);
+            for (int i = 0; i < len; i += 1) {
+                res.append(shortCuts[i][0]);
+            }
+            if (len == 1) {
+                derivates = getLetters(res.toString());
+            } else {
+                derivates = new String[]{res.toString()};
+            }
+        } else {
+            int c = 1;
+            for (int i = 0; i < len; i += 1) {
+                c += shortCuts[i].length - 1;
+            }
+            derivates = new String[c];
+            c = 0;
+            for (int i = 0; i < len; i += 1) {
+                for (int k = shortCuts[i].length - ((i == 0) ? 1 : 2); k >= 0; k -= 1) {
+                    StringBuilder buf = new StringBuilder();
+                    for (int j = 0; j < i; j += 1) {
+                        buf.append(shortCuts[j][0]);
+                    }
+                    buf.append(shortCuts[i][k]);
+                    for (int j = i + 1; j < len; j += 1) {
+                        buf.append(words[j]);
+                    }
+                    derivates[c++] = buf.toString();
+                }
+            }
+        }
     }
 }

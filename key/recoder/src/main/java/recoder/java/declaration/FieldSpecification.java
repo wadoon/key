@@ -2,8 +2,6 @@
 
 package recoder.java.declaration;
 
-import java.util.List;
-
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Field;
 import recoder.convenience.Naming;
@@ -14,14 +12,16 @@ import recoder.java.SourceVisitor;
 import recoder.list.generic.ASTList;
 import recoder.util.Debug;
 
+import java.util.List;
+
 public class FieldSpecification extends VariableSpecification implements Field {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -8228158502939901347L;
+     * serialization id
+     */
+    private static final long serialVersionUID = -8228158502939901347L;
 
-	/**
+    /**
      * Field specification.
      */
 
@@ -31,9 +31,8 @@ public class FieldSpecification extends VariableSpecification implements Field {
 
     /**
      * Field specification.
-     * 
-     * @param name
-     *            an identifier.
+     *
+     * @param name an identifier.
      */
 
     public FieldSpecification(Identifier name) {
@@ -42,11 +41,9 @@ public class FieldSpecification extends VariableSpecification implements Field {
 
     /**
      * Field specification.
-     * 
-     * @param name
-     *            an identifier.
-     * @param init
-     *            an expression.
+     *
+     * @param name an identifier.
+     * @param init an expression.
      */
 
     public FieldSpecification(Identifier name, Expression init) {
@@ -55,13 +52,10 @@ public class FieldSpecification extends VariableSpecification implements Field {
 
     /**
      * Field specification.
-     * 
-     * @param name
-     *            an identifier.
-     * @param dimensions
-     *            an int value.
-     * @param init
-     *            an expression.
+     *
+     * @param name       an identifier.
+     * @param dimensions an int value.
+     * @param init       an expression.
      */
 
     public FieldSpecification(Identifier name, int dimensions, Expression init) {
@@ -70,9 +64,8 @@ public class FieldSpecification extends VariableSpecification implements Field {
 
     /**
      * Field specification.
-     * 
-     * @param proto
-     *            a field specification.
+     *
+     * @param proto a field specification.
      */
 
     protected FieldSpecification(FieldSpecification proto) {
@@ -81,34 +74,12 @@ public class FieldSpecification extends VariableSpecification implements Field {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
     public FieldSpecification deepClone() {
         return new FieldSpecification(this);
-    }
-
-    /**
-     * Set parent.
-     * 
-     * @param parent
-     *            must be a field declaration.
-     */
-
-    public void setParent(VariableDeclaration parent) {
-        setParent((FieldDeclaration) parent);
-    }
-
-    /**
-     * Set parent.
-     * 
-     * @param parent
-     *            a field declaration.
-     */
-
-    public void setParent(FieldDeclaration parent) {
-        super.setParent(parent);
     }
 
     /**
@@ -169,15 +140,15 @@ public class FieldSpecification extends VariableSpecification implements Field {
             Debug.log("Zero service while " + Debug.makeStackTrace());
             updateModel();
         }
-        return service.getContainingClassType((ProgramElement)this);
+        return service.getContainingClassType((ProgramElement) this);
     }
 
     public String getFullName() {
         return Naming.getFullName(this);
     }
-    
+
     public String getBinaryName() {
-    	return getContainingClassType().getBinaryName() + "." + getName();
+        return getContainingClassType().getBinaryName() + "." + getName();
     }
 
     public void accept(SourceVisitor v) {
@@ -190,28 +161,48 @@ public class FieldSpecification extends VariableSpecification implements Field {
     public List<AnnotationUseSpecification> getAnnotations() {
         return parent.getAnnotations();
     }
-    
+
     /**
-     * get type arguments of parent's type reference 
+     * get type arguments of parent's type reference
      */
     public ASTList<TypeArgumentDeclaration> getTypeArguments() {
-    	return getParent().getTypeReference().getTypeArguments();
+        return getParent().getTypeReference().getTypeArguments();
     }
-    
+
     @Override
     public String toString() {
-    	return "<FieldSpecification> " + getName();
+        return "<FieldSpecification> " + getName();
     }
-    
+
     @Override
     public FieldDeclaration getParent() {
-    	return (FieldDeclaration)super.getParent();
+        return (FieldDeclaration) super.getParent();
     }
-    
-	@Override
-	public FieldSpecification getGenericMember() {
-		return this;
-	}
+
+    /**
+     * Set parent.
+     *
+     * @param parent must be a field declaration.
+     */
+
+    public void setParent(VariableDeclaration parent) {
+        setParent((FieldDeclaration) parent);
+    }
+
+    /**
+     * Set parent.
+     *
+     * @param parent a field declaration.
+     */
+
+    public void setParent(FieldDeclaration parent) {
+        super.setParent(parent);
+    }
+
+    @Override
+    public FieldSpecification getGenericMember() {
+        return this;
+    }
 
 
 }

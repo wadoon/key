@@ -9,8 +9,7 @@ import java.util.List;
 
 /**
  * @author gutzmann
- *
  */
 public interface AnnotationUse {
-	List<? extends ElementValuePair> getElementValuePairs();
+    List<? extends ElementValuePair> getElementValuePairs();
 }

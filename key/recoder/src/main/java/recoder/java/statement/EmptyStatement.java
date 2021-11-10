@@ -2,44 +2,38 @@
 
 package recoder.java.statement;
 
-import recoder.java.JavaProgramElement;
-import recoder.java.NonTerminalProgramElement;
-import recoder.java.SourceVisitor;
-import recoder.java.Statement;
-import recoder.java.StatementContainer;
-import recoder.java.TerminalProgramElement;
+import recoder.java.*;
 
 /**
  * Empty statement.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class EmptyStatement extends JavaProgramElement implements Statement, TerminalProgramElement {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 7235639345998336043L;
-	/**
+     * serialization id
+     */
+    private static final long serialVersionUID = 7235639345998336043L;
+    /**
      * Parent.
      */
 
-	private StatementContainer parent;
+    private StatementContainer parent;
 
     /**
      * Empty statement.
      */
 
     public EmptyStatement() {
-    	super();
+        super();
     }
 
     /**
      * Empty statement.
-     * 
-     * @param proto
-     *            an empty statement.
+     *
+     * @param proto an empty statement.
      */
 
     protected EmptyStatement(EmptyStatement proto) {
@@ -48,7 +42,7 @@ public class EmptyStatement extends JavaProgramElement implements Statement, Ter
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -58,7 +52,7 @@ public class EmptyStatement extends JavaProgramElement implements Statement, Ter
 
     /**
      * Get AST parent.
-     * 
+     *
      * @return the non terminal program element.
      */
 
@@ -68,7 +62,7 @@ public class EmptyStatement extends JavaProgramElement implements Statement, Ter
 
     /**
      * Get statement container.
-     * 
+     *
      * @return the statement container.
      */
 
@@ -78,9 +72,8 @@ public class EmptyStatement extends JavaProgramElement implements Statement, Ter
 
     /**
      * Set statement container.
-     * 
-     * @param c
-     *            a statement container.
+     *
+     * @param c a statement container.
      */
 
     public void setStatementContainer(StatementContainer c) {

@@ -2,32 +2,28 @@
 
 package recoder.java;
 
-import java.io.IOException;
-import java.io.LineNumberReader;
-import java.io.PrintWriter;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Properties;
-import java.util.Vector;
+import java.io.*;
+import java.util.*;
 
 /**
  * Information about the tags in a java style structured comment (DocComment).
  * Such a comment has an introductionary description and a list of tagged
  * descriptions.
- * 
+ *
  * @author RN
  * @author AL
  */
 
 public class TagInfo {
 
-    /** the raw (unparsed) comment string. */
+    /**
+     * the raw (unparsed) comment string.
+     */
     String rawComment;
 
-    /** the introductionary comment lines without comment characters. */
+    /**
+     * the introductionary comment lines without comment characters.
+     */
 
     String introText;
 
@@ -50,9 +46,8 @@ public class TagInfo {
     /**
      * Creates a new instance from the given string. The given string must not
      * be <CODE>null</CODE>.
-     * 
-     * @param comment
-     *            the string containing the comment.
+     *
+     * @param comment the string containing the comment.
      */
 
     protected TagInfo(DocComment dc) {
@@ -62,10 +57,9 @@ public class TagInfo {
     /**
      * Strips comment characters from the beginning and end of the given string
      * representing a single line.
-     * 
-     * @param line
-     *            the string representing the line. The line is assumed to be
-     *            non empty.
+     *
+     * @param line the string representing the line. The line is assumed to be
+     *             non empty.
      * @return the stripped and trimmed string
      */
 
@@ -155,7 +149,7 @@ public class TagInfo {
     /**
      * Returns the introductionary text of the comment. This is the text
      * starting at the beginning of the comment to the first tag.
-     * 
+     *
      * @return the intro of the comment.
      */
 
@@ -168,7 +162,7 @@ public class TagInfo {
     /**
      * Determines whether or not there are tags contained in the underlying
      * comment.
-     * 
+     *
      * @return <tt>true</tt> iff the comment contains tags.
      */
 
@@ -178,7 +172,7 @@ public class TagInfo {
 
     /**
      * determines the number of tags in the underlying comment
-     * 
+     *
      * @return the number of tags specified in the comment
      */
 
@@ -191,7 +185,7 @@ public class TagInfo {
     /**
      * return an iterator of tags contained in the comment in order of their
      * appearance in the comment.
-     * 
+     *
      * @return an non-empty iterator.
      */
 
@@ -199,7 +193,7 @@ public class TagInfo {
         if (!analyzed)
             parseRawComment();
         if (tagNames == null) {
-            return Collections.<String>emptyList().iterator();
+            return Collections.emptyIterator();
         } else {
             return tagNames.iterator();
         }
@@ -208,9 +202,8 @@ public class TagInfo {
     /**
      * returns the text for the given tag or <tt>null</tt> if that tag is not
      * defined.
-     * 
-     * @param tag
-     *            the name of the tag
+     *
+     * @param tag the name of the tag
      * @return the value of that tag or <tt>null</tt>
      */
 

@@ -2,9 +2,9 @@
 
 package recoder.java;
 
-import java.util.List;
-
 import recoder.java.declaration.VariableSpecification;
+
+import java.util.List;
 
 /**
  * The property of a non terminal program element to define a scope for
@@ -13,7 +13,7 @@ import recoder.java.declaration.VariableSpecification;
 
 public interface VariableScope extends ScopeDefiningElement {
 
-	List<? extends VariableSpecification> getVariablesInScope();
+    List<? extends VariableSpecification> getVariablesInScope();
 
     VariableSpecification getVariableInScope(String name);
 

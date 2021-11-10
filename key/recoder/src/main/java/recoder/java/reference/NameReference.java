@@ -10,5 +10,5 @@ import recoder.java.Reference;
  */
 
 public interface NameReference extends NamedProgramElement, Reference {
-	// no declarations here
+    // no declarations here
 }

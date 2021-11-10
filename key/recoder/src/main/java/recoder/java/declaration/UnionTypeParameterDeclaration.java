@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package recoder.java.declaration;
 
@@ -11,82 +11,82 @@ import recoder.list.generic.ASTList;
 
 /**
  * A union type as used in multi-catch clauses.
- * 
+ *
  * @author Tobias Gutzmann
  *
  */
 public class UnionTypeParameterDeclaration extends ParameterDeclaration {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -4701076660649706284L;
-	
-	private ASTList<TypeReference> typeReferences;
-	
-	/**
-	 * 
-	 */
-	public UnionTypeParameterDeclaration() {
-		// do nothing
-	}
+    /**
+     *
+     */
+    private static final long serialVersionUID = -4701076660649706284L;
 
-	/**
-	 * @param typeRef
-	 * @param vs
-	 */
-	public UnionTypeParameterDeclaration(ASTList<TypeReference> typeRefs, VariableSpecification vs) {
-		super(null, vs);
-		this.typeReferences = typeRefs;
-	}
+    private ASTList<TypeReference> typeReferences;
 
-	/**
-	 * @param proto
-	 */
-	public UnionTypeParameterDeclaration(UnionTypeParameterDeclaration proto) {
-		super(proto);
-		if (proto.typeReferences != null) 
-			typeReferences = proto.typeReferences.deepClone();
-		makeParentRoleValid();
-	}
+    /**
+     *
+     */
+    public UnionTypeParameterDeclaration() {
+        // do nothing
+    }
 
-	/**
-	 * delegate to internal 
-	 */
-	@Override
-	public TypeReference getTypeReference() {
-		if (typeReferences.size() > 1)
-			throw new IllegalStateException("This is a multi-typeReference, getTypeReference() must not be called upon it");
-		if (typeReferences.size() == 1)
-			return typeReferences.get(0);
-		return null;
-	}
-	
-	@Override
-	public void setTypeReference(TypeReference t) {
-		// overwrites existing ones
-		typeReferences = new ASTArrayList<>(t);
-	}
-	
-	@Override
-	public int getTypeReferenceCount() {
-		return typeReferences == null ? 0 : typeReferences.size();
-	}
-	
-	@Override
-	public TypeReference getTypeReferenceAt(int index) {
-		if (typeReferences == null || index >= typeReferences.size())
-			throw new ArrayIndexOutOfBoundsException();
-		return typeReferences.get(index);
-	}
-	
-	public ASTList<TypeReference> getTypeReferences() {
-		return typeReferences;
-	}
-	
-	public void setTypeReferences(ASTList<TypeReference> typeReferences) {
-		this.typeReferences = typeReferences;
-	}
+    /**
+     * @param typeRef
+     * @param vs
+     */
+    public UnionTypeParameterDeclaration(ASTList<TypeReference> typeRefs, VariableSpecification vs) {
+        super(null, vs);
+        this.typeReferences = typeRefs;
+    }
+
+    /**
+     * @param proto
+     */
+    public UnionTypeParameterDeclaration(UnionTypeParameterDeclaration proto) {
+        super(proto);
+        if (proto.typeReferences != null)
+            typeReferences = proto.typeReferences.deepClone();
+        makeParentRoleValid();
+    }
+
+    /**
+     * delegate to internal
+     */
+    @Override
+    public TypeReference getTypeReference() {
+        if (typeReferences.size() > 1)
+            throw new IllegalStateException("This is a multi-typeReference, getTypeReference() must not be called upon it");
+        if (typeReferences.size() == 1)
+            return typeReferences.get(0);
+        return null;
+    }
+
+    @Override
+    public void setTypeReference(TypeReference t) {
+        // overwrites existing ones
+        typeReferences = new ASTArrayList<>(t);
+    }
+
+    @Override
+    public int getTypeReferenceCount() {
+        return typeReferences == null ? 0 : typeReferences.size();
+    }
+
+    @Override
+    public TypeReference getTypeReferenceAt(int index) {
+        if (typeReferences == null || index >= typeReferences.size())
+            throw new ArrayIndexOutOfBoundsException();
+        return typeReferences.get(index);
+    }
+
+    public ASTList<TypeReference> getTypeReferences() {
+        return typeReferences;
+    }
+
+    public void setTypeReferences(ASTList<TypeReference> typeReferences) {
+        this.typeReferences = typeReferences;
+    }
 
     public int getChildCount() {
         int result = 0;
@@ -130,9 +130,9 @@ public class UnionTypeParameterDeclaration extends ParameterDeclaration {
             }
         }
         if (typeReferences != null) {
-        	int idx = typeReferences.indexOf(child);
-        	if (idx != -1)
-        		return (idx << 4) | 1;
+            int idx = typeReferences.indexOf(child);
+            if (idx != -1)
+                return (idx << 4) | 1;
         }
         if (getVariableSpecification() == child) {
             return 2;
@@ -146,7 +146,7 @@ public class UnionTypeParameterDeclaration extends ParameterDeclaration {
      * element can be null - in that case, the child is effectively removed. The
      * parent role of the new child is validated, while the parent link of the
      * replaced child is left untouched.
-     * 
+     *
      * @param p
      *            the old child.
      * @param p
@@ -184,32 +184,32 @@ public class UnionTypeParameterDeclaration extends ParameterDeclaration {
         }
         count = (typeReferences == null) ? 0 : typeReferences.size();
         for (int i = 0; i < count; i++) {
-        	if (typeReferences.get(i) == p) {
-        		if (q == null) {
-        			typeReferences.remove(i);
-        		} else {
-        			TypeReference r = (TypeReference) q;
-        			typeReferences.set(i,  r);
-        			r.setParent(this);
-        		}
-        		return true;
-        	}
+            if (typeReferences.get(i) == p) {
+                if (q == null) {
+                    typeReferences.remove(i);
+                } else {
+                    TypeReference r = (TypeReference) q;
+                    typeReferences.set(i, r);
+                    r.setParent(this);
+                }
+                return true;
+            }
         }
         return false;
     }
 
     @Override
     public void makeParentRoleValid() {
-    	super.makeParentRoleValid();
-    	if (typeReferences != null) {
-    		for (TypeReference tr: typeReferences) {
-    			tr.setParent(this);
-    		}
-    	}
+        super.makeParentRoleValid();
+        if (typeReferences != null) {
+            for (TypeReference tr : typeReferences) {
+                tr.setParent(this);
+            }
+        }
     }
-    
+
     @Override
     public void accept(SourceVisitor v) {
-    	v.visitUnionTypeParameterDeclaration(this);
+        v.visitUnionTypeParameterDeclaration(this);
     }
 }

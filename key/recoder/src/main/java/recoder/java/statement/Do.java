@@ -9,18 +9,18 @@ import recoder.java.Statement;
 
 /**
  * Do.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class Do extends LoopStatement {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -1933906789623152123L;
+     * serialization id
+     */
+    private static final long serialVersionUID = -1933906789623152123L;
 
-	/**
+    /**
      * Do.
      */
 
@@ -30,9 +30,8 @@ public class Do extends LoopStatement {
 
     /**
      * Do.
-     * 
-     * @param guard
-     *            an expression.
+     *
+     * @param guard an expression.
      */
 
     public Do(Expression guard) {
@@ -43,11 +42,9 @@ public class Do extends LoopStatement {
 
     /**
      * Do.
-     * 
-     * @param guard
-     *            an expression.
-     * @param body
-     *            a statement.
+     *
+     * @param guard an expression.
+     * @param body  a statement.
      */
 
     public Do(Expression guard, Statement body) {
@@ -58,9 +55,8 @@ public class Do extends LoopStatement {
 
     /**
      * Do.
-     * 
-     * @param proto
-     *            a do.
+     *
+     * @param proto a do.
      */
 
     protected Do(Do proto) {
@@ -70,7 +66,7 @@ public class Do extends LoopStatement {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -84,7 +80,7 @@ public class Do extends LoopStatement {
 
     /**
      * Is exit condition.
-     * 
+     *
      * @return the boolean value.
      */
 
@@ -94,7 +90,7 @@ public class Do extends LoopStatement {
 
     /**
      * Is checked before iteration.
-     * 
+     *
      * @return the boolean value.
      */
 

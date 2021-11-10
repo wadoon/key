@@ -7,7 +7,7 @@ import recoder.java.ProgramElement;
 
 /**
  * Walks a syntax tree in iterator-like fashion.
- * 
+ *
  * @author AL
  */
 public abstract class AbstractTreeWalker implements ProgramElementWalker, Cloneable {
@@ -71,7 +71,7 @@ public abstract class AbstractTreeWalker implements ProgramElementWalker, Clonea
     /**
      * Proceeds to the next element, if available. Returns true, if there is
      * one, false otherwise.
-     * 
+     *
      * @return true if the iterator points to an object.
      */
     public abstract boolean next();
@@ -79,7 +79,7 @@ public abstract class AbstractTreeWalker implements ProgramElementWalker, Clonea
     /**
      * Returns the current ProgramElement of the iteration, or null if there is
      * no more element.
-     * 
+     *
      * @return the current ProgramElement, or <CODE>null</CODE>.
      * @see #next()
      */

@@ -7,7 +7,7 @@ import recoder.java.declaration.ParameterDeclaration;
 /**
  * Describes program elements that contain
  * {@link recoder.java.declaration.ParameterDeclaration}s.
- * 
+ *
  * @author AL
  */
 
@@ -15,7 +15,7 @@ public interface ParameterContainer extends StatementContainer {
 
     /**
      * Get the number of parameters in this container.
-     * 
+     *
      * @return the number of parameters.
      */
     int getParameterDeclarationCount();

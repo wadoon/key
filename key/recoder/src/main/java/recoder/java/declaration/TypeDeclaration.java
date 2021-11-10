@@ -2,81 +2,62 @@
 
 package recoder.java.declaration;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import recoder.abstraction.ArrayType;
-import recoder.abstraction.ClassType;
-import recoder.abstraction.ClassTypeContainer;
-import recoder.abstraction.Constructor;
-import recoder.abstraction.ErasedType;
-import recoder.abstraction.Field;
-import recoder.abstraction.Method;
 import recoder.abstraction.Package;
+import recoder.abstraction.*;
 import recoder.convenience.Naming;
-import recoder.java.Identifier;
-import recoder.java.NamedProgramElement;
-import recoder.java.NonTerminalProgramElement;
-import recoder.java.SourceElement;
-import recoder.java.TypeScope;
-import recoder.java.VariableScope;
+import recoder.java.*;
 import recoder.list.generic.ASTList;
 import recoder.service.ProgramModelInfo;
 import recoder.service.SourceInfo;
 import recoder.util.Debug;
 
+import java.util.*;
+
 /**
  * Type declaration.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 public abstract class TypeDeclaration extends JavaDeclaration implements NamedProgramElement, MemberDeclaration,
         TypeDeclarationContainer, ClassType, VariableScope, TypeScope {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-
-	/**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+    /**
+     * Undefined scope tag.
+     */
+    @SuppressWarnings("all")
+    private final static Map UNDEFINED_SCOPE = Collections.unmodifiableMap(new HashMap(0));
+    /**
+     * Scope table for types.
+     */
+    @SuppressWarnings("unchecked")
+    protected Map<String, TypeDeclaration> name2type = UNDEFINED_SCOPE;
+    /**
+     * Scope table for fields.
+     */
+    @SuppressWarnings("unchecked")
+    protected Map<String, FieldSpecification> name2field = UNDEFINED_SCOPE;
+    /**
      * Name.
      */
-	Identifier name;
-
+    Identifier name;
     /**
      * Parent.
      */
-	TypeDeclarationContainer parent;
-
+    TypeDeclarationContainer parent;
     /**
      * Members.
      */
     ASTList<MemberDeclaration> members;
-
     /**
      * Service.
      */
-    private  SourceInfo service;
-
+    private SourceInfo service;
     private ArrayType arrayType;
-    
-    /**
-     * Undefined scope tag.
-     */
-    @SuppressWarnings("all") private final static Map UNDEFINED_SCOPE = Collections.unmodifiableMap(new HashMap(0));
-
-    /**
-     * Scope table for types.
-     */
-    @SuppressWarnings("unchecked") protected Map<String, TypeDeclaration> name2type = UNDEFINED_SCOPE;
-
-    /**
-     * Scope table for fields.
-     */
-    @SuppressWarnings("unchecked") protected Map<String, FieldSpecification> name2field = UNDEFINED_SCOPE;
+    private ErasedType erasedType;
 
     /**
      * Type declaration.
@@ -87,9 +68,8 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
 
     /**
      * Type declaration.
-     * 
-     * @param name
-     *            an identifier.
+     *
+     * @param name an identifier.
      */
     public TypeDeclaration(Identifier name) {
         setIdentifier(name);
@@ -98,11 +78,9 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
 
     /**
      * Type declaration.
-     * 
-     * @param mods
-     *            a modifier mutable list.
-     * @param name
-     *            an identifier.
+     *
+     * @param mods a modifier mutable list.
+     * @param name an identifier.
      */
     public TypeDeclaration(ASTList<DeclarationSpecifier> mods, Identifier name) {
         super(mods);
@@ -112,9 +90,8 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
 
     /**
      * Type declaration.
-     * 
-     * @param proto
-     *            a type declaration.
+     *
+     * @param proto a type declaration.
      */
     protected TypeDeclaration(TypeDeclaration proto) {
         super(proto);
@@ -160,7 +137,7 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
 
     /**
      * Get name.
-     * 
+     *
      * @return the string.
      */
     public final String getName() {
@@ -169,7 +146,7 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
 
     /**
      * Get identifier.
-     * 
+     *
      * @return the identifier.
      */
     public Identifier getIdentifier() {
@@ -178,9 +155,8 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
 
     /**
      * Set identifier.
-     * 
-     * @param id
-     *            an identifier.
+     *
+     * @param id an identifier.
      */
     public void setIdentifier(Identifier id) {
         name = id;
@@ -188,7 +164,7 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
 
     /**
      * Get parent.
-     * 
+     *
      * @return the type declaration container.
      */
     public TypeDeclarationContainer getParent() {
@@ -196,8 +172,17 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
     }
 
     /**
+     * Set parent.
+     *
+     * @param p a type declaration container.
+     */
+    public void setParent(TypeDeclarationContainer p) {
+        parent = p;
+    }
+
+    /**
      * Get member parent.
-     * 
+     *
      * @return the type declaration.
      */
     public TypeDeclaration getMemberParent() {
@@ -209,20 +194,9 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
     }
 
     /**
-     * Set parent.
-     * 
-     * @param p
-     *            a type declaration container.
-     */
-    public void setParent(TypeDeclarationContainer p) {
-        parent = p;
-    }
-
-    /**
      * Set member parent.
-     * 
-     * @param p
-     *            a type declaration.
+     *
+     * @param p a type declaration.
      */
     public void setMemberParent(TypeDeclaration p) {
         parent = p;
@@ -230,7 +204,7 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
 
     /**
      * Get AST parent.
-     * 
+     *
      * @return the non terminal program element.
      */
     public NonTerminalProgramElement getASTParent() {
@@ -239,7 +213,7 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
 
     /**
      * Get members.
-     * 
+     *
      * @return the member declaration mutable list.
      */
     public ASTList<MemberDeclaration> getMembers() {
@@ -248,9 +222,8 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
 
     /**
      * Set members.
-     * 
-     * @param list
-     *            a member declaration mutable list.
+     *
+     * @param list a member declaration mutable list.
      */
     public void setMembers(ASTList<MemberDeclaration> list) {
         members = list;
@@ -258,7 +231,7 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
 
     /**
      * Get the number of type declarations in this container.
-     * 
+     *
      * @return the number of type declarations.
      */
     public int getTypeDeclarationCount() {
@@ -271,7 +244,7 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
             }
         }
         if (getTypeParameters() != null)
-        	count += getTypeParameters().size();
+            count += getTypeParameters().size();
         return count;
     }
 
@@ -296,7 +269,7 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
             }
         }
         if (getTypeParameters() != null) {
-        	return getTypeParameters().get(index); // may throw exception
+            return getTypeParameters().get(index); // may throw exception
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -355,9 +328,9 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
     }
 
     public void setProgramModelInfo(ProgramModelInfo service) {
-    	if (!(service instanceof SourceInfo))
-    		throw new IllegalArgumentException("service for TypeDeclaration must be of type SourceInfo.");
-        this.service = (SourceInfo)service;
+        if (!(service instanceof SourceInfo))
+            throw new IllegalArgumentException("service for TypeDeclaration must be of type SourceInfo.");
+        this.service = (SourceInfo) service;
     }
 
     private void updateModel() {
@@ -367,30 +340,27 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
     public String getFullName() {
         return Naming.getFullName(this);
     }
-    
-    
-    
-	public String getBinaryName() {
-		// TODO needs some other refactorings first... (TypeDeclarationContainer!?)
-		if (true)
-			throw new RuntimeException();
-    	ClassTypeContainer ctc = getContainer();
-    	if (getName() == null) {
-    		// anonymous
-    	}
-    	
-    	if (ctc instanceof Package)
-			return getFullName(); // Top-level class
-		if (ctc instanceof ClassType)
-			return ((ClassType)ctc).getBinaryName() + "$" + getName();
-		if (ctc instanceof Method)
-			return getFullName(); // TODO local class
-		if (ctc == null) {
-			// TODO 0.92 ???
-		}
-		return null;
-	}
 
+    public String getBinaryName() {
+        // TODO needs some other refactorings first... (TypeDeclarationContainer!?)
+        if (true)
+            throw new RuntimeException();
+        ClassTypeContainer ctc = getContainer();
+        if (getName() == null) {
+            // anonymous
+        }
+
+        if (ctc instanceof Package)
+            return getFullName(); // Top-level class
+        if (ctc instanceof ClassType)
+            return ctc.getBinaryName() + "$" + getName();
+        if (ctc instanceof Method)
+            return getFullName(); // TODO local class
+        if (ctc == null) {
+            // TODO 0.92 ???
+        }
+        return null;
+    }
 
     public ClassTypeContainer getContainer() {
         if (service == null) {
@@ -404,13 +374,13 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
     }
 
     public TypeDeclaration getContainingClassType() {
-    	NonTerminalProgramElement cur = parent;
-    	while (cur != null) {
-    		if (cur instanceof TypeDeclaration)
-    			return (TypeDeclaration)cur;
-    		cur = cur.getASTParent();
-    	}
-    	return null;
+        NonTerminalProgramElement cur = parent;
+        while (cur != null) {
+            if (cur instanceof TypeDeclaration)
+                return (TypeDeclaration) cur;
+            cur = cur.getASTParent();
+        }
+        return null;
     }
 
     public Package getPackage() {
@@ -457,8 +427,8 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
             Debug.error("Service not defined in TypeDeclaration " + getName());
         }
         @SuppressWarnings("unchecked")
-    	List<FieldSpecification> fields = (List<FieldSpecification>)service.getFields(this);
-		return fields;
+        List<FieldSpecification> fields = service.getFields(this);
+        return fields;
     }
 
     public List<Field> getAllFields() {
@@ -505,7 +475,7 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
         return service.getConstructors(this);
     }
 
-   public List<TypeDeclaration> getTypes() {
+    public List<TypeDeclaration> getTypes() {
         if (service == null) {
             Debug.log("Zero service while " + Debug.makeStackTrace());
             updateModel();
@@ -514,8 +484,8 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
             Debug.error("Service not defined in TypeDeclaration " + getName());
         }
         @SuppressWarnings("unchecked")
-    	List<TypeDeclaration> types = (List<TypeDeclaration>)service.getTypes(this);
-		return types;
+        List<TypeDeclaration> types = service.getTypes(this);
+        return types;
     }
 
     public List<ClassType> getAllTypes() {
@@ -534,7 +504,7 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
     }
 
     @SuppressWarnings("unchecked")
-	public void setDefinedScope(boolean defined) {
+    public void setDefinedScope(boolean defined) {
         if (!defined) {
             name2type = UNDEFINED_SCOPE;
             name2field = UNDEFINED_SCOPE;
@@ -549,7 +519,7 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
             return Collections.emptyList();
         }
         List<TypeDeclaration> res = new ArrayList<TypeDeclaration>();
-        for(TypeDeclaration td : name2type.values()) {
+        for (TypeDeclaration td : name2type.values()) {
             res.add(td);
         }
         return res;
@@ -568,7 +538,7 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
         if (name2type == null || name2type == UNDEFINED_SCOPE) {
             name2type = new HashMap<String, TypeDeclaration>();
         }
-        name2type.put(tname, (TypeDeclaration)type);
+        name2type.put(tname, (TypeDeclaration) type);
     }
 
     public void removeTypeFromScope(String tname) {
@@ -581,7 +551,7 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
 
     public List<FieldSpecification> getFieldsInScope() {
         if (name2field == null || name2field.isEmpty()) {
-        	return Collections.emptyList();
+            return Collections.emptyList();
         }
         List<FieldSpecification> res = new ArrayList<FieldSpecification>(name2field.size());
         for (FieldSpecification fs : name2field.values()) {
@@ -607,7 +577,7 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
         if (name2field == null || name2field == UNDEFINED_SCOPE) {
             name2field = new HashMap<String, FieldSpecification>();
         }
-        name2field.put(var.getName(), (FieldSpecification)var);
+        name2field.put(var.getName(), (FieldSpecification) var);
     }
 
     public void removeVariableFromScope(String tname) {
@@ -617,57 +587,55 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
         }
         name2field.remove(tname);
     }
-    
+
     public abstract ASTList<TypeParameterDeclaration> getTypeParameters();
-    
+
     @Override
     public String toString() {
-    	return getClass().getSimpleName() + " " + getFullName();
+        return getClass().getSimpleName() + " " + getFullName();
     }
-    
+
     public abstract TypeDeclaration deepClone();
 
-	public String getFullSignature() {
-		String res = getFullName();
-		ASTList<TypeParameterDeclaration> tps = getTypeParameters();
-		if (tps == null || tps.size() == 0)
-			return res;
-		res += "<";
-		String delim = "";
-		for (TypeParameterDeclaration tpd : tps) {
-			res += delim;
-			res += tpd.getFullSignature();
-			delim = ",";
-		}
-		res += ">";
-		return res;
-	}
+    public String getFullSignature() {
+        String res = getFullName();
+        ASTList<TypeParameterDeclaration> tps = getTypeParameters();
+        if (tps == null || tps.size() == 0)
+            return res;
+        res += "<";
+        String delim = "";
+        for (TypeParameterDeclaration tpd : tps) {
+            res += delim;
+            res += tpd.getFullSignature();
+            delim = ",";
+        }
+        res += ">";
+        return res;
+    }
 
-	public ArrayType getArrayType() {
-		return arrayType;
-	}
+    public ArrayType getArrayType() {
+        return arrayType;
+    }
 
-	public ArrayType createArrayType() {
-		if (arrayType == null)
-			arrayType = new ArrayType(this, service.getServiceConfiguration().getImplicitElementInfo());
-		return arrayType;
-	}
-	
-	private ErasedType erasedType;
-	
-	public ErasedType getErasedType() {
-		if (erasedType == null)
-			erasedType = new ErasedType(this, getFactory().getServiceConfiguration().getImplicitElementInfo());
-		return erasedType;
-	}
-	
-	public ClassType getBaseClassType() {
-		return this;
-	}
+    public ArrayType createArrayType() {
+        if (arrayType == null)
+            arrayType = new ArrayType(this, service.getServiceConfiguration().getImplicitElementInfo());
+        return arrayType;
+    }
 
-	@Override
-	public TypeDeclaration getGenericMember() {
-		return this;
-	}
+    public ErasedType getErasedType() {
+        if (erasedType == null)
+            erasedType = new ErasedType(this, getFactory().getServiceConfiguration().getImplicitElementInfo());
+        return erasedType;
+    }
+
+    public ClassType getBaseClassType() {
+        return this;
+    }
+
+    @Override
+    public TypeDeclaration getGenericMember() {
+        return this;
+    }
 
 }

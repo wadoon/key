@@ -13,11 +13,11 @@ import recoder.java.expression.Operator;
 public class Plus extends Operator {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 560126060000682104L;
+     * serialization id
+     */
+    private static final long serialVersionUID = 560126060000682104L;
 
-	/**
+    /**
      * Plus.
      */
 
@@ -27,11 +27,9 @@ public class Plus extends Operator {
 
     /**
      * Plus.
-     * 
-     * @param lhs
-     *            an expression.
-     * @param rhs
-     *            an expression.
+     *
+     * @param lhs an expression.
+     * @param rhs an expression.
      */
 
     public Plus(Expression lhs, Expression rhs) {
@@ -41,9 +39,8 @@ public class Plus extends Operator {
 
     /**
      * Plus.
-     * 
-     * @param proto
-     *            a plus.
+     *
+     * @param proto a plus.
      */
 
     protected Plus(Plus proto) {
@@ -53,7 +50,7 @@ public class Plus extends Operator {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -63,7 +60,7 @@ public class Plus extends Operator {
 
     /**
      * Get arity.
-     * 
+     *
      * @return the int value.
      */
 
@@ -73,7 +70,7 @@ public class Plus extends Operator {
 
     /**
      * Get precedence.
-     * 
+     *
      * @return the int value.
      */
 
@@ -83,7 +80,7 @@ public class Plus extends Operator {
 
     /**
      * Get notation.
-     * 
+     *
      * @return the int value.
      */
 

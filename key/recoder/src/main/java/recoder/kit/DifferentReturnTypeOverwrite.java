@@ -11,10 +11,10 @@ import recoder.abstraction.Method;
 public class DifferentReturnTypeOverwrite extends Conflict {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 1569165840299545025L;
-	private Method method;
+     * serialization id
+     */
+    private static final long serialVersionUID = 1569165840299545025L;
+    private final Method method;
 
     public DifferentReturnTypeOverwrite(Method method) {
         this.method = method;

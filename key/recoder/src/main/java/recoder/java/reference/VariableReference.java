@@ -2,18 +2,11 @@
 
 package recoder.java.reference;
 
-import recoder.java.Expression;
-import recoder.java.ExpressionContainer;
-import recoder.java.Identifier;
-import recoder.java.JavaNonTerminalProgramElement;
-import recoder.java.NonTerminalProgramElement;
-import recoder.java.ProgramElement;
-import recoder.java.SourceElement;
-import recoder.java.SourceVisitor;
+import recoder.java.*;
 
 /**
  * Variable reference.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
@@ -21,37 +14,33 @@ public class VariableReference extends JavaNonTerminalProgramElement implements 
         ReferencePrefix {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 3652444943086603166L;
-
-	/**
-     * Access parent.
+     * serialization id
      */
-	private ReferenceSuffix accessParent;
-
-    /**
-     * Parent.
-     */
-	private ExpressionContainer parent;
-
+    private static final long serialVersionUID = 3652444943086603166L;
     /**
      * Name.
      */
-	Identifier name;
+    Identifier name;
+    /**
+     * Access parent.
+     */
+    private ReferenceSuffix accessParent;
+    /**
+     * Parent.
+     */
+    private ExpressionContainer parent;
 
     /**
      * Variable reference.
      */
     public VariableReference() {
-    	super();
+        super();
     }
 
     /**
      * Variable reference.
-     * 
-     * @param id
-     *            an identifier.
+     *
+     * @param id an identifier.
      */
 
     public VariableReference(Identifier id) {
@@ -61,9 +50,8 @@ public class VariableReference extends JavaNonTerminalProgramElement implements 
 
     /**
      * Variable reference.
-     * 
-     * @param proto
-     *            a variable reference.
+     *
+     * @param proto a variable reference.
      */
     protected VariableReference(VariableReference proto) {
         super(proto);
@@ -75,7 +63,7 @@ public class VariableReference extends JavaNonTerminalProgramElement implements 
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
     public VariableReference deepClone() {
@@ -93,7 +81,7 @@ public class VariableReference extends JavaNonTerminalProgramElement implements 
 
     /**
      * Get AST parent.
-     * 
+     *
      * @return the non terminal program element.
      */
     public NonTerminalProgramElement getASTParent() {
@@ -106,7 +94,7 @@ public class VariableReference extends JavaNonTerminalProgramElement implements 
 
     /**
      * Returns the number of children of this node.
-     * 
+     *
      * @return an int giving the number of children of this node
      */
     public int getChildCount() {
@@ -116,12 +104,10 @@ public class VariableReference extends JavaNonTerminalProgramElement implements 
     /**
      * Returns the child at the specified index in this node's "virtual" child
      * array
-     * 
-     * @param index
-     *            an index into this node's "virtual" child array
+     *
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
         if (name != null) {
@@ -141,7 +127,7 @@ public class VariableReference extends JavaNonTerminalProgramElement implements 
 
     /**
      * Get reference suffix.
-     * 
+     *
      * @return the reference suffix.
      */
     public ReferenceSuffix getReferenceSuffix() {
@@ -150,9 +136,8 @@ public class VariableReference extends JavaNonTerminalProgramElement implements 
 
     /**
      * Set reference suffix.
-     * 
-     * @param path
-     *            a reference suffix.
+     *
+     * @param path a reference suffix.
      */
     public void setReferenceSuffix(ReferenceSuffix path) {
         this.accessParent = path;
@@ -164,14 +149,11 @@ public class VariableReference extends JavaNonTerminalProgramElement implements 
      * element can be null - in that case, the child is effectively removed. The
      * parent role of the new child is validated, while the parent link of the
      * replaced child is left untouched.
-     * 
-     * @param p
-     *            the old child.
-     * @param p
-     *            the new child.
+     *
+     * @param p the old child.
+     * @param p the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException
-     *                if the new child cannot take over the role of the old one.
+     * @throws ClassCastException if the new child cannot take over the role of the old one.
      */
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
         if (p == null) {
@@ -190,7 +172,7 @@ public class VariableReference extends JavaNonTerminalProgramElement implements 
 
     /**
      * Get expression container.
-     * 
+     *
      * @return the expression container.
      */
     public ExpressionContainer getExpressionContainer() {
@@ -199,9 +181,8 @@ public class VariableReference extends JavaNonTerminalProgramElement implements 
 
     /**
      * Set expression container.
-     * 
-     * @param c
-     *            an expression container.
+     *
+     * @param c an expression container.
      */
     public void setExpressionContainer(ExpressionContainer c) {
         parent = c;
@@ -209,7 +190,7 @@ public class VariableReference extends JavaNonTerminalProgramElement implements 
 
     /**
      * Get name.
-     * 
+     *
      * @return the string.
      */
     public final String getName() {
@@ -218,7 +199,7 @@ public class VariableReference extends JavaNonTerminalProgramElement implements 
 
     /**
      * Get identifier.
-     * 
+     *
      * @return the identifier.
      */
     public Identifier getIdentifier() {
@@ -227,9 +208,8 @@ public class VariableReference extends JavaNonTerminalProgramElement implements 
 
     /**
      * Set identifier.
-     * 
-     * @param id
-     *            an identifier.
+     *
+     * @param id an identifier.
      */
     public void setIdentifier(Identifier id) {
         name = id;
@@ -242,9 +222,9 @@ public class VariableReference extends JavaNonTerminalProgramElement implements 
     public void accept(SourceVisitor v) {
         v.visitVariableReference(this);
     }
-    
+
     @Override
     public String toString() {
-    	return "<VariableReference> " + getName();
+        return "<VariableReference> " + getName();
     }
 }

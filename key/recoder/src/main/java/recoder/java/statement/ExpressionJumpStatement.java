@@ -8,22 +8,22 @@ import recoder.java.ProgramElement;
 
 /**
  * Expression jump statement.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public abstract class ExpressionJumpStatement extends JumpStatement implements ExpressionContainer {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * Expression.
      */
 
-	private Expression expression;
+    private Expression expression;
 
     /**
      * Expression jump statement.
@@ -35,9 +35,8 @@ public abstract class ExpressionJumpStatement extends JumpStatement implements E
 
     /**
      * Expression jump statement.
-     * 
-     * @param expr
-     *            an expression.
+     *
+     * @param expr an expression.
      */
 
     public ExpressionJumpStatement(Expression expr) {
@@ -49,9 +48,8 @@ public abstract class ExpressionJumpStatement extends JumpStatement implements E
 
     /**
      * Expression jump statement.
-     * 
-     * @param proto
-     *            an expression jump statement.
+     *
+     * @param proto an expression jump statement.
      */
 
     protected ExpressionJumpStatement(ExpressionJumpStatement proto) {
@@ -78,14 +76,11 @@ public abstract class ExpressionJumpStatement extends JumpStatement implements E
      * element can be null - in that case, the child is effectively removed. The
      * parent role of the new child is validated, while the parent link of the
      * replaced child is left untouched.
-     * 
-     * @param p
-     *            the old child.
-     * @param p
-     *            the new child.
+     *
+     * @param p the old child.
+     * @param p the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException
-     *                if the new child cannot take over the role of the old one.
+     * @throws ClassCastException if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
@@ -105,7 +100,7 @@ public abstract class ExpressionJumpStatement extends JumpStatement implements E
 
     /**
      * Get the number of expressions in this container.
-     * 
+     *
      * @return the number of expressions.
      */
 
@@ -129,7 +124,7 @@ public abstract class ExpressionJumpStatement extends JumpStatement implements E
 
     /**
      * Get expression.
-     * 
+     *
      * @return the expression.
      */
 
@@ -139,9 +134,8 @@ public abstract class ExpressionJumpStatement extends JumpStatement implements E
 
     /**
      * Set expression.
-     * 
-     * @param expr
-     *            an expression.
+     *
+     * @param expr an expression.
      */
 
     public void setExpression(Expression expr) {
@@ -150,7 +144,7 @@ public abstract class ExpressionJumpStatement extends JumpStatement implements E
 
     /**
      * Returns the number of children of this node.
-     * 
+     *
      * @return an int giving the number of children of this node
      */
 
@@ -161,12 +155,10 @@ public abstract class ExpressionJumpStatement extends JumpStatement implements E
     /**
      * Returns the child at the specified index in this node's "virtual" child
      * array
-     * 
-     * @param index
-     *            an index into this node's "virtual" child array
+     *
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {

@@ -7,18 +7,18 @@ import recoder.java.SourceVisitor;
 
 /**
  * Greater than.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class GreaterThan extends ComparativeOperator {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -5808604922619258847L;
+     * serialization id
+     */
+    private static final long serialVersionUID = -5808604922619258847L;
 
-	/**
+    /**
      * Greater than.
      */
 
@@ -28,11 +28,9 @@ public class GreaterThan extends ComparativeOperator {
 
     /**
      * Greater than.
-     * 
-     * @param lhs
-     *            an expression.
-     * @param rhs
-     *            an expression.
+     *
+     * @param lhs an expression.
+     * @param rhs an expression.
      */
 
     public GreaterThan(Expression lhs, Expression rhs) {
@@ -42,9 +40,8 @@ public class GreaterThan extends ComparativeOperator {
 
     /**
      * Greater than.
-     * 
-     * @param proto
-     *            a greater than.
+     *
+     * @param proto a greater than.
      */
 
     protected GreaterThan(GreaterThan proto) {
@@ -54,7 +51,7 @@ public class GreaterThan extends ComparativeOperator {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -64,7 +61,7 @@ public class GreaterThan extends ComparativeOperator {
 
     /**
      * Get precedence.
-     * 
+     *
      * @return the int value.
      */
 

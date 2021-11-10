@@ -2,57 +2,31 @@
 
 package recoder.kit;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EventObject;
-import java.util.List;
-
 import recoder.ProgramFactory;
-import recoder.abstraction.ArrayType;
-import recoder.abstraction.ClassType;
-import recoder.abstraction.ClassTypeContainer;
-import recoder.abstraction.ErasedType;
-import recoder.abstraction.Member;
 import recoder.abstraction.Package;
-import recoder.abstraction.ParameterizedType;
-import recoder.abstraction.PrimitiveType;
-import recoder.abstraction.Type;
-import recoder.abstraction.TypeArgument;
-import recoder.abstraction.TypeParameter;
+import recoder.abstraction.*;
 import recoder.abstraction.TypeArgument.WildcardMode;
 import recoder.convenience.TreeWalker;
 import recoder.java.Identifier;
 import recoder.java.NonTerminalProgramElement;
 import recoder.java.ProgramElement;
-import recoder.java.declaration.ClassDeclaration;
-import recoder.java.declaration.ConstructorDeclaration;
-import recoder.java.declaration.DeclarationSpecifier;
-import recoder.java.declaration.FieldDeclaration;
-import recoder.java.declaration.FieldSpecification;
-import recoder.java.declaration.Implements;
-import recoder.java.declaration.InterfaceDeclaration;
-import recoder.java.declaration.MemberDeclaration;
-import recoder.java.declaration.MethodDeclaration;
-import recoder.java.declaration.Throws;
-import recoder.java.declaration.TypeArgumentDeclaration;
-import recoder.java.declaration.TypeDeclaration;
-import recoder.java.declaration.VariableSpecification;
+import recoder.java.declaration.*;
 import recoder.java.reference.FieldReference;
 import recoder.java.reference.ReferencePrefix;
 import recoder.java.reference.TypeReference;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
-import recoder.service.CrossReferenceSourceInfo;
-import recoder.service.DefaultErrorHandler;
-import recoder.service.ErrorHandler;
-import recoder.service.NameInfo;
-import recoder.service.ProgramModelInfo;
-import recoder.service.SourceInfo;
+import recoder.service.*;
 import recoder.util.Debug;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EventObject;
+import java.util.List;
 
 /**
  * this class implements basic functions for type handling.
- * 
+ *
  * @author Uwe Assmann
  * @author Andreas Ludwig
  * @author Rainer Neumann
@@ -68,9 +42,8 @@ public class TypeKit {
      * Factory method that creates a new type reference fitting to the
      * constructor declaration. The reference is not prefixed as its use context
      * is unknown. This method is useful for creating factory classes.
-     * 
-     * @param decl
-     *            a constructor declaration.
+     *
+     * @param decl a constructor declaration.
      * @return the newly created type reference, parent links are valid.
      */
     public static TypeReference createTypeReference(ConstructorDeclaration decl) {
@@ -82,96 +55,93 @@ public class TypeKit {
 
     /**
      * Factory method that creates a type reference with prefixes
-     * (UncollatedReferenceQualifiers) from a qualified name. 
+     * (UncollatedReferenceQualifiers) from a qualified name.
      * Qualified name may denote an array type by ending with a
      * sequence of <b>[]</b>.
-     * 
-     * 
-     * @param f
-     *            the program factory to use.
-     * @param qualifiedName
-     *            a qualified (= potentially dotted) name.
+     *
+     * @param f             the program factory to use.
+     * @param qualifiedName a qualified (= potentially dotted) name.
      * @return a type reference to the given type; parent links of the reference
-     *         are made valid.
+     * are made valid.
      */
     public static TypeReference createTypeReference(ProgramFactory f, String qualifiedName) {
-    	return createTypeReference(f, qualifiedName, 0);
+        return createTypeReference(f, qualifiedName, 0);
     }
-    
+
     /**
      * Factory method that creates a type reference with prefixes
      * (UncollatedReferenceQualifiers) from a qualified name with
-     * a given dimension. 
+     * a given dimension.
      * Qualified name may denote an array type by ending with a
      * sequence of <b>[]</b>, in which case the two dimensions -
      * explicitly given and contained in the qualfied name -
      * are added.
-     * 
-     * @param f  the program factory to use.
+     *
+     * @param f             the program factory to use.
      * @param qualifiedName a qualified (= potentially dotted) name.
-     * @param dim the dimension to add to the qualified name provided.
+     * @param dim           the dimension to add to the qualified name provided.
      * @return a type reference to the given type; parent links of the reference
-     *         are made valid.
+     * are made valid.
      */
     public static TypeReference createTypeReference(ProgramFactory f, String qualifiedName, int dim) {
-    	int idx = qualifiedName.indexOf('[');
-    	int dimm = 0;
-    	if (idx > -1) {
-    		dimm = (qualifiedName.length() - idx) / 2;
-        	qualifiedName = qualifiedName.substring(0,idx);
-    	}
-    	TypeReference tr = MiscKit.createUncollatedReferenceQualifier(f, qualifiedName).toTypeReference();
+        int idx = qualifiedName.indexOf('[');
+        int dimm = 0;
+        if (idx > -1) {
+            dimm = (qualifiedName.length() - idx) / 2;
+            qualifiedName = qualifiedName.substring(0, idx);
+        }
+        TypeReference tr = MiscKit.createUncollatedReferenceQualifier(f, qualifiedName).toTypeReference();
         tr.setDimensions(dimm + dim);
         return tr;
     }
 
     public static ASTList<TypeArgumentDeclaration> makeTypeArgRef(ProgramFactory f, List<? extends TypeArgument> tas) {
-    	ASTList<TypeArgumentDeclaration> res = new ASTArrayList<TypeArgumentDeclaration>(tas.size());
-    	for (TypeArgument ta : tas) {
-    		TypeReference tr = null;
-    		if (ta.getWildcardMode() != WildcardMode.Any)
-    			tr = createTypeReference(f, ta.getTypeName());
-    		if (ta.getTypeArguments() != null)
-    			tr.setTypeArguments(makeTypeArgRef(f, ta.getTypeArguments()));
-    		res.add(f.createTypeArgumentDeclaration(tr, ta.getWildcardMode()));
-    	}
-    	return res;
+        ASTList<TypeArgumentDeclaration> res = new ASTArrayList<TypeArgumentDeclaration>(tas.size());
+        for (TypeArgument ta : tas) {
+            TypeReference tr = null;
+            if (ta.getWildcardMode() != WildcardMode.Any)
+                tr = createTypeReference(f, ta.getTypeName());
+            if (ta.getTypeArguments() != null)
+                tr.setTypeArguments(makeTypeArgRef(f, ta.getTypeArguments()));
+            res.add(f.createTypeArgumentDeclaration(tr, ta.getWildcardMode()));
+        }
+        return res;
     }
-    
+
     public static ASTList<TypeArgumentDeclaration> makeTypeArgRef(SourceInfo si, List<? extends TypeArgument> tas, ProgramElement context) {
-    	ASTList<TypeArgumentDeclaration> res = new ASTArrayList<TypeArgumentDeclaration>(tas.size());
-    	for (TypeArgument ta : tas) {
-    		TypeReference tr = null;
-    		if (ta.getWildcardMode() != WildcardMode.Any)
-    			tr = createTypeReference(si, si.getType(ta.getTypeName(), context), context);
-    		if (ta.getTypeArguments() != null)
-    			tr.setTypeArguments(makeTypeArgRef(si, ta.getTypeArguments(), context));
-    		res.add(context.getFactory().createTypeArgumentDeclaration(tr, ta.getWildcardMode()));
-    	}
-    	return res;
+        ASTList<TypeArgumentDeclaration> res = new ASTArrayList<TypeArgumentDeclaration>(tas.size());
+        for (TypeArgument ta : tas) {
+            TypeReference tr = null;
+            if (ta.getWildcardMode() != WildcardMode.Any)
+                tr = createTypeReference(si, si.getType(ta.getTypeName(), context), context);
+            if (ta.getTypeArguments() != null)
+                tr.setTypeArguments(makeTypeArgRef(si, ta.getTypeArguments(), context));
+            res.add(context.getFactory().createTypeArgumentDeclaration(tr, ta.getWildcardMode()));
+        }
+        return res;
     }
-    
+
     public static TypeReference createTypeReference(ProgramFactory f, Type t, int dim, boolean addTypeArgs) {
-    	while (dim-- > 0)
-    		t = t.createArrayType();
-    	return createTypeReference(f, t, addTypeArgs);
+        while (dim-- > 0)
+            t = t.createArrayType();
+        return createTypeReference(f, t, addTypeArgs);
     }
- 
+
     public static TypeReference createTypeReference(ProgramFactory f, Type t, boolean addTypeArgs) {
         TypeReference result = null;
         if (t instanceof ParameterizedType) {
-        	ParameterizedType pt = ((ParameterizedType)t);
-        	result = createTypeReference(f, pt.getGenericType());
-        	if (addTypeArgs)
-        		result.setTypeArguments(makeTypeArgRef(f, pt.getAllTypeArgs()));
+            ParameterizedType pt = ((ParameterizedType) t);
+            result = createTypeReference(f, pt.getGenericType());
+            if (addTypeArgs)
+                result.setTypeArguments(makeTypeArgRef(f, pt.getAllTypeArgs()));
         } else if (t instanceof PrimitiveType || t instanceof TypeParameter) {
             result = f.createTypeReference(f.createIdentifier(t.getName()));
         } else if (t instanceof ArrayType) {
             result = createTypeReference(f, ((ArrayType) t).getBaseType());
             result.setDimensions(result.getDimensions() + 1);
         } else if (t instanceof ClassType) {
-        	if (t instanceof ErasedType)
-        		t = ((ErasedType)t).getGenericType();
+            if (t instanceof ErasedType)
+                t = ((ErasedType) t).getGenericType();
             result = f.createTypeReference(f.createIdentifier(t.getName()));
             ClassTypeContainer ctc = ((ClassType) t).getContainer();
             if (ctc instanceof Package) {
@@ -179,100 +149,97 @@ public class TypeKit {
             } else if (ctc instanceof ClassType) {
                 result.setReferencePrefix(createTypeReference(f, (ClassType) ctc));
             }
-        } 
+        }
         if (result == null) {
-        	throw new RuntimeException("Unknown type: " + t.getClass().getName());
+            throw new RuntimeException("Unknown type: " + t.getClass().getName());
         }
         result.makeParentRoleValid();
         return result;
     }
-    
+
     /**
      * Factory method that creates a new type reference derived by the name of
      * the given type.
-     * 
-     * @param f
-     *            the program factory to be used.
-     * @param t
-     *            the type which shall be referenced.
+     *
+     * @param f the program factory to be used.
+     * @param t the type which shall be referenced.
      * @return a type reference to the given type; parent links of the reference
-     *         are made valid.
+     * are made valid.
      */
     public static TypeReference createTypeReference(ProgramFactory f, Type t) {
-    	return createTypeReference(f, t, true);
+        return createTypeReference(f, t, true);
     }
-    
+
     /**
      * Factory method that creates a new type reference derived by the name of
      * the given type.
-     * 
-     * @param f
-     *            the program factory to be used.
-     * @param t
-     *            the type which shall be referenced.
-     * @param dim
-     * 			  the dimension of the type (note that if t is already an array type,
-     * 			  the dimension will be increased by dim)
+     *
+     * @param f   the program factory to be used.
+     * @param t   the type which shall be referenced.
+     * @param dim the dimension of the type (note that if t is already an array type,
+     *            the dimension will be increased by dim)
      * @return a type reference to the given type; parent links of the reference
-     *         are made valid.
+     * are made valid.
      */
     public static TypeReference createTypeReference(ProgramFactory f, Type t, int dim) {
-    	while (dim-- > 0)
-    		t = t.createArrayType();
-    	return createTypeReference(f, t);
+        while (dim-- > 0)
+            t = t.createArrayType();
+        return createTypeReference(f, t);
     }
 
-    
+
     public static TypeReference createTypeReference(SourceInfo si, Type t, ProgramElement context) {
-    	return createTypeReference(si, t, context, true);
+        return createTypeReference(si, t, context, true);
     }
+
     /**
      * Factory method that creates a new type reference derived by the name of
      * the given type and tries to minimize its qualification using the given
      * context for the type reference. The context should describe the position
      * the type reference will be inserted into, usually a statement container.
-     * 
-     * @param si
-     *            the source info to be used.
-     * @param t
-     *            the type which shall be referenced.
-     * @param context
-     *            a program element from which the type shall be addressed (may
-     *            not be <CODE>null</CODE>).
+     *
+     * @param si      the source info to be used.
+     * @param t       the type which shall be referenced.
+     * @param context a program element from which the type shall be addressed (may
+     *                not be <CODE>null</CODE>).
      * @return a minimal type reference to the given type; parent links of the
-     *         reference are made valid.
+     * reference are made valid.
      */
     public static TypeReference createTypeReference(SourceInfo si, Type t, ProgramElement context, boolean addTypeArgs) {
         TypeReference result = null;
         ProgramFactory f = context.getFactory();
         if (t instanceof ParameterizedType) {
-        	ParameterizedType pt = ((ParameterizedType)t);
-        	result = createTypeReference(si, pt.getGenericType(), context);
-        	if (addTypeArgs) {
-        		result.setTypeArguments(makeTypeArgRef(si, pt.getAllTypeArgs(), context));
-        	}
+            ParameterizedType pt = ((ParameterizedType) t);
+            result = createTypeReference(si, pt.getGenericType(), context);
+            if (addTypeArgs) {
+                result.setTypeArguments(makeTypeArgRef(si, pt.getAllTypeArgs(), context));
+            }
         } else if (t instanceof PrimitiveType || t instanceof TypeParameter) {
             result = f.createTypeReference(f.createIdentifier(t.getName()));
         } else if (t instanceof ArrayType) {
             result = createTypeReference(si, ((ArrayType) t).getBaseType(), context, addTypeArgs);
             result.setDimensions(result.getDimensions() + 1);
         } else if (t instanceof ClassType) {
-        	if (t instanceof ErasedType)
-        		t = ((ErasedType)t).getGenericType();
+            if (t instanceof ErasedType)
+                t = ((ErasedType) t).getGenericType();
             result = f.createTypeReference(f.createIdentifier(t.getName()));
             ClassTypeContainer ctc = ((ClassType) t).getContainer();
             ErrorHandler handler = si.getServiceConfiguration().getProjectSettings().getErrorHandler();
 
             class TempErrorHandler extends DefaultErrorHandler {
-            	boolean errorOccured = false;
-            	@Override
-            	public void modelUpdated(EventObject event) { /* ignore */}
-            	@Override
-            	public void reportError(Exception e) { errorOccured = true; }
+                boolean errorOccured = false;
+
+                @Override
+                public void modelUpdated(EventObject event) { /* ignore */}
+
+                @Override
+                public void reportError(Exception e) {
+                    errorOccured = true;
+                }
             }
             TempErrorHandler eh = new TempErrorHandler();
             si.getServiceConfiguration().getProjectSettings().setErrorHandler(eh);
-            
+
             if ((ctc != null && si.getType(t.getName(), context) != t) || eh.errorOccured) {
                 if (ctc instanceof Package) {
                     result.setReferencePrefix(PackageKit.createPackageReference(f, (Package) ctc));
@@ -281,22 +248,21 @@ public class TypeKit {
                 }
             }
             // restore old error handler!
-            si.getServiceConfiguration().getProjectSettings().setErrorHandler(handler); 
+            si.getServiceConfiguration().getProjectSettings().setErrorHandler(handler);
         }
         if (result == null)
-        	throw new RuntimeException("Cannot handle " + t.getClass());
+            throw new RuntimeException("Cannot handle " + t.getClass());
         result.makeAllParentRolesValid();
         return result;
     }
 
     /**
      * creates an abstract super class (interface) for the given class.
-     * 
-     * @param concrete
-     *            public class to abstractify
+     *
+     * @param concrete public class to abstractify
      */
     public static InterfaceDeclaration createAbstractSuperClass(NameInfo ni, ClassDeclaration cdecl,
-            String abstractsupername) throws NameClashException {
+                                                                String abstractsupername) throws NameClashException {
         // assert that c is a public class and not an interface
         /*
          * Problems may still occur with nested classes, especially anonymous
@@ -350,15 +316,15 @@ public class TypeKit {
                     MethodDeclaration md = (MethodDeclaration) cmemd;
 
                     if (!md.isStatic() && md.isPublic() && !(md instanceof ConstructorDeclaration)
-                    //!!!!!!!!!!!!!!!!!! Die folgende Methode gibt es noch
-                    // nicht !!!!!!!!!!!!!
-                    // && !cdecl.overridesInherited(md)
+                        //!!!!!!!!!!!!!!!!!! Die folgende Methode gibt es noch
+                        // nicht !!!!!!!!!!!!!
+                        // && !cdecl.overridesInherited(md)
                     ) {
                         imembers.add(MethodKit.createAbstractMethodDeclaration(md, true));
                     } else
                         continue;
                 } else if (cmemd instanceof TypeDeclaration) {
-                    imembers.add( cmemd.deepClone());
+                    imembers.add(cmemd.deepClone());
                 } else
                     continue;
             }
@@ -434,7 +400,7 @@ public class TypeKit {
         res.setIdentifier(factory.createIdentifier("Abstract" + decl.getName()));
         DeclarationSpecifier vis = decl.getVisibilityModifier();
         if (vis != null) {
-        	ASTList<DeclarationSpecifier> imods = new ASTArrayList<DeclarationSpecifier>(1);
+            ASTList<DeclarationSpecifier> imods = new ASTArrayList<DeclarationSpecifier>(1);
             imods.add((DeclarationSpecifier) vis.deepClone());
             res.setDeclarationSpecifiers(imods);
         }
@@ -495,7 +461,7 @@ public class TypeKit {
      * <p>
      * m2(int i, int i2) { delegatingObject.m2(i,i2); }
      * <p>}
-     * 
+     *
      * @deprecated needs rework
      */
     public static ClassDeclaration createAdapterClass(String adapterName, ClassDeclaration classDecl) {
@@ -503,7 +469,7 @@ public class TypeKit {
         ReferencePrefix delegationObject = new FieldReference(factory.createIdentifier("delegationObject"
                 + classDecl.getName()));
         ClassDeclaration adapterClass = factory.createClassDeclaration(new ASTArrayList<DeclarationSpecifier>(), factory
-                .createIdentifier(adapterName), factory.createExtends(), factory.createImplements(),
+                        .createIdentifier(adapterName), factory.createExtends(), factory.createImplements(),
                 new ASTArrayList<MemberDeclaration>());
 
         // Create an adapter interface with delegating methods
@@ -521,12 +487,12 @@ public class TypeKit {
         }
         return adapterClass;
     }
-   
+
     /**
      * @deprecated still untested.
      */
     public static List<TypeReference> getInfluencedReferences(CrossReferenceSourceInfo xr, String newTypeName,
-            NonTerminalProgramElement context) {
+                                                              NonTerminalProgramElement context) {
         Debug.assertNonnull(xr, newTypeName, context);
         // check from the point of view of a scope defining element
         context = MiscKit.getScopeDefiningElement(context);
@@ -558,22 +524,18 @@ public class TypeKit {
      * reference information is collected from the tree. The filtering mode is
      * faster if the tree contains more nodes than there are global references
      * to the given type.
-     * 
-     * @param xr
-     *            the cross referencer to use.
-     * @param t
-     *            a type.
-     * @param root
-     *            the root of an arbitrary syntax tree.
-     * @param scanTree
-     *            flag indicating the search strategy; if <CODE>true</CODE>,
-     *            local cross reference information is build, otherwise the
-     *            global cross reference information is filtered.
+     *
+     * @param xr       the cross referencer to use.
+     * @param t        a type.
+     * @param root     the root of an arbitrary syntax tree.
+     * @param scanTree flag indicating the search strategy; if <CODE>true</CODE>,
+     *                 local cross reference information is build, otherwise the
+     *                 global cross reference information is filtered.
      * @return the list of references to the given type in the given tree, can
-     *         be empty but not <CODE>null</CODE>.
+     * be empty but not <CODE>null</CODE>.
      */
     public static List<TypeReference> getReferences(CrossReferenceSourceInfo xr, Type t,
-            NonTerminalProgramElement root, boolean scanTree) {
+                                                    NonTerminalProgramElement root, boolean scanTree) {
         Debug.assertNonnull(xr, t, root);
         List<TypeReference> result = new ArrayList<TypeReference>();
         if (scanTree) {
@@ -585,7 +547,7 @@ public class TypeKit {
                 }
             }
         } else {
-        	List<TypeReference> refs = xr.getReferences(t, true);
+            List<TypeReference> refs = xr.getReferences(t, true);
             for (int i = 0, s = refs.size(); i < s; i += 1) {
                 TypeReference tr = refs.get(i);
                 if (MiscKit.contains(root, tr)) {
@@ -601,14 +563,13 @@ public class TypeKit {
      * For a package, this includes all class types of that package, for a class
      * type, this includes all defined constructors, fields, methods, and inner
      * types, and for a method, this includes all inner types.
-     * 
-     * @param ct
-     *            the class type to collect members from.
+     *
+     * @param ct the class type to collect members from.
      * @return a mutable list of all members of the given class type.
      */
     public static List<Member> getMembers(ClassTypeContainer ctc) {
-    	List<Member> result = new ArrayList<Member>();
-    	List<? extends Member> mlist;
+        List<Member> result = new ArrayList<Member>();
+        List<? extends Member> mlist;
         if (ctc instanceof ClassType) {
             ClassType ct = (ClassType) ctc;
             mlist = ct.getConstructors();
@@ -635,11 +596,9 @@ public class TypeKit {
      * Query returning the super class of the given class type. If the class type
      * is an interface or has no explicit extended type, java.lang.Object will
      * be reported (also for java.lang.Object itself).
-     * 
-     * @param ni
-     *            the name info service to use.
-     * @param ct
-     *            the class type to get the super class from.
+     *
+     * @param ni the name info service to use.
+     * @param ct the class type to get the super class from.
      * @return the super class.
      */
     public static ClassType getSuperClass(NameInfo ni, ClassType ct) {
@@ -657,15 +616,13 @@ public class TypeKit {
 
     /**
      * Query comparing the visibility of two members.
-     * 
-     * @param x
-     *            the first member.
-     * @param y
-     *            the second member.
+     *
+     * @param x the first member.
+     * @param y the second member.
      * @return <CODE>true</CODE> if the first member is less visible than the
-     *         second (in the order "private" - "" (package) - "protected" -
-     *         "public" where applicable), <CODE>false</CODE> if it is as
-     *         least as visible.
+     * second (in the order "private" - "" (package) - "protected" -
+     * "public" where applicable), <CODE>false</CODE> if it is as
+     * least as visible.
      */
     public static boolean isLessVisible(Member x, Member y) {
         if (x.isPublic()) {
@@ -687,15 +644,12 @@ public class TypeKit {
      * Checks if for each class type in the first type list there is a super
      * type in the second. This is useful to check if a exception lists is less
      * or equally strict that the other.
-     * 
-     * @param tsi
-     *            the type system info to use.
-     * @param x
-     *            a class list, may not be <CODE>null</CODE>.
-     * @param y
-     *            a class list, may not be <CODE>null</CODE>.
+     *
+     * @param tsi the type system info to use.
+     * @param x   a class list, may not be <CODE>null</CODE>.
+     * @param y   a class list, may not be <CODE>null</CODE>.
      * @return <CODE>true</CODE> if the first list of class types is covered
-     *         by the second one, <CODE>false</CODE> otherwise.
+     * by the second one, <CODE>false</CODE> otherwise.
      */
     public static boolean isCovered(ProgramModelInfo pmi, List<? extends ClassType> x, List<? extends ClassType> y) {
         Debug.assertNonnull(x, y);
@@ -719,11 +673,10 @@ public class TypeKit {
      * non-static non-constructor body-less methods, and public interface and
      * class declarations. This method does not criticize the use of redundant
      * modifiers such as abstract or static.
-     * 
-     * @param member
-     *            a potential interface member.
+     *
+     * @param member a potential interface member.
      * @return <CODE>true</CODE> if the given member could become a member of
-     *         an interface, <CODE>false</CODE> otherwise.
+     * an interface, <CODE>false</CODE> otherwise.
      */
     public static boolean isValidInterfaceMember(MemberDeclaration member) {
         if (!member.isPublic()) {
@@ -745,20 +698,15 @@ public class TypeKit {
             return !(member instanceof ConstructorDeclaration) && !member.isStatic()
                     && ((MethodDeclaration) member).getBody() == null;
         }
-        if (member instanceof TypeDeclaration) {
-            return true;
-        }
-        return false;
+        return member instanceof TypeDeclaration;
     }
 
     /**
      * Gets all types in the given list that are subtypes of other types in the
      * list.
-     * 
-     * @param pmi
-     *            the program model info service to use.
-     * @param list
-     *            a list of class types.
+     *
+     * @param pmi  the program model info service to use.
+     * @param list a list of class types.
      * @return a list of class types that have supertypes in the list.
      * @see #removeCoveredSubtypes
      * @since 0.71
@@ -772,15 +720,13 @@ public class TypeKit {
     /**
      * Removes types in the given list that are subtypes of other types in the
      * list and returns the removed types in a new list.
-     * 
-     * @param pmi
-     *            the program model info service to use.
-     * @param list
-     *            a mutable list of class types.
+     *
+     * @param pmi  the program model info service to use.
+     * @param list a mutable list of class types.
      * @return a set of class types that have supertypes in the list and that
-     *         have been removed.
-     * @since 0.71
+     * have been removed.
      * @see #getCoveredSubtypes
+     * @since 0.71
      */
     public static List<ClassType> removeCoveredSubtypes(ProgramModelInfo pmi, List<ClassType> list) {
         List<ClassType> removed = new ArrayList<ClassType>();
@@ -806,12 +752,9 @@ public class TypeKit {
      * java.lang.Object</CODE>, but does cover double extensions or
      * implementations of interfaces as well as transitive interface
      * inheritance.
-     * 
-     * @param si
-     *            the source info service to use.
-     * @param td
-     *            the type declaration to check for inheritance redundancy.
-     * 
+     *
+     * @param si the source info service to use.
+     * @param td the type declaration to check for inheritance redundancy.
      * @since 0.71
      */
     public static List<TypeReference> getRedundantSuperInterfaces(SourceInfo si, TypeDeclaration td) {
@@ -866,16 +809,13 @@ public class TypeKit {
      * clause. This does not cover redundant extensions of <CODE>
      * java.lang.RuntimeException</CODE> or subclasses, but does cover double
      * declarations as well as transitive exceptions.
-     * 
-     * @param si
-     *            the source info service to use.
-     * @param t
-     *            the throws clause to check for redundancy.
-     * 
+     *
+     * @param si the source info service to use.
+     * @param t  the throws clause to check for redundancy.
      * @since 0.71
      */
     public static List<TypeReference> getRedundantExceptions(SourceInfo si, Throws t) {
-    	List<TypeReference> exceptions = t.getExceptions();
+        List<TypeReference> exceptions = t.getExceptions();
         List<TypeReference> redundantReferences = new ArrayList<TypeReference>();
         List<ClassType> types = new ArrayList<ClassType>(exceptions.size());
         for (int i = 0; i < exceptions.size(); i += 1) {

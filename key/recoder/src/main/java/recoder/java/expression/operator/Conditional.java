@@ -13,11 +13,11 @@ import recoder.list.generic.ASTArrayList;
 public class Conditional extends Operator {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -3581491297079611854L;
+     * serialization id
+     */
+    private static final long serialVersionUID = -3581491297079611854L;
 
-	/**
+    /**
      * Conditional.
      */
 
@@ -27,13 +27,10 @@ public class Conditional extends Operator {
 
     /**
      * Conditional.
-     * 
-     * @param guard
-     *            an expression.
-     * @param thenExpr
-     *            an expression.
-     * @param elseExpr
-     *            an expression.
+     *
+     * @param guard    an expression.
+     * @param thenExpr an expression.
+     * @param elseExpr an expression.
      */
 
     public Conditional(Expression guard, Expression thenExpr, Expression elseExpr) {
@@ -46,9 +43,8 @@ public class Conditional extends Operator {
 
     /**
      * Conditional.
-     * 
-     * @param proto
-     *            a conditional.
+     *
+     * @param proto a conditional.
      */
 
     protected Conditional(Conditional proto) {
@@ -58,7 +54,7 @@ public class Conditional extends Operator {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -68,7 +64,7 @@ public class Conditional extends Operator {
 
     /**
      * Get arity.
-     * 
+     *
      * @return the int value.
      */
 
@@ -78,7 +74,7 @@ public class Conditional extends Operator {
 
     /**
      * Get precedence.
-     * 
+     *
      * @return the int value.
      */
 
@@ -88,7 +84,7 @@ public class Conditional extends Operator {
 
     /**
      * Get notation.
-     * 
+     *
      * @return the int value.
      */
 
@@ -99,9 +95,9 @@ public class Conditional extends Operator {
     /**
      * Checks if this operator is left or right associative. Conditionals are
      * right associative.
-     * 
+     *
      * @return <CODE>true</CODE>, if the operator is left associative, <CODE>
-     *         false</CODE> otherwise.
+     * false</CODE> otherwise.
      */
 
     public boolean isLeftAssociative() {

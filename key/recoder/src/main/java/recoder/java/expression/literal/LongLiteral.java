@@ -7,22 +7,22 @@ import recoder.java.expression.Literal;
 
 /**
  * Long literal.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class LongLiteral extends Literal {
 
     /**
-	 * serialization id 
-	 */
-	private static final long serialVersionUID = -8507020453717633759L;
-	
-	/**
+     * serialization id
+     */
+    private static final long serialVersionUID = -8507020453717633759L;
+
+    /**
      * Textual representation of the value.
      */
 
-	private String value;
+    private String value;
 
     /**
      * Long literal.
@@ -34,9 +34,8 @@ public class LongLiteral extends Literal {
 
     /**
      * Long literal.
-     * 
-     * @param value
-     *            a long value.
+     *
+     * @param value a long value.
      */
 
     public LongLiteral(long value) {
@@ -45,9 +44,8 @@ public class LongLiteral extends Literal {
 
     /**
      * Long literal.
-     * 
-     * @param value
-     *            a string.
+     *
+     * @param value a string.
      */
 
     public LongLiteral(String value) {
@@ -56,9 +54,8 @@ public class LongLiteral extends Literal {
 
     /**
      * Long literal.
-     * 
-     * @param proto
-     *            a long literal.
+     *
+     * @param proto a long literal.
      */
 
     protected LongLiteral(LongLiteral proto) {
@@ -68,7 +65,7 @@ public class LongLiteral extends Literal {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -77,20 +74,8 @@ public class LongLiteral extends Literal {
     }
 
     /**
-     * Set value.
-     * 
-     * @param str
-     *            a string value.
-     */
-
-    public void setValue(String str) {
-        // unchecked
-        this.value = str.intern();
-    }
-
-    /**
      * Get value.
-     * 
+     *
      * @return the string.
      */
 
@@ -98,11 +83,22 @@ public class LongLiteral extends Literal {
         return value;
     }
 
+    /**
+     * Set value.
+     *
+     * @param str a string value.
+     */
+
+    public void setValue(String str) {
+        // unchecked
+        this.value = str.intern();
+    }
+
     public void accept(SourceVisitor v) {
         v.visitLongLiteral(this);
     }
 
-	public Object getEquivalentJavaType() {
-		return Long.valueOf(value);
-	}
+    public Object getEquivalentJavaType() {
+        return Long.valueOf(value);
+    }
 }

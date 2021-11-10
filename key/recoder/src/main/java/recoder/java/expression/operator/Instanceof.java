@@ -10,18 +10,18 @@ import recoder.java.reference.TypeReference;
 
 /**
  * Instanceof.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class Instanceof extends TypeOperator {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 6100795662310024426L;
+     * serialization id
+     */
+    private static final long serialVersionUID = 6100795662310024426L;
 
-	/**
+    /**
      * Instanceof.
      */
 
@@ -31,11 +31,9 @@ public class Instanceof extends TypeOperator {
 
     /**
      * Instanceof.
-     * 
-     * @param child
-     *            an expression.
-     * @param typeref
-     *            a type reference.
+     *
+     * @param child   an expression.
+     * @param typeref a type reference.
      */
 
     public Instanceof(Expression child, TypeReference typeref) {
@@ -45,9 +43,8 @@ public class Instanceof extends TypeOperator {
 
     /**
      * Instanceof.
-     * 
-     * @param proto
-     *            an instanceof.
+     *
+     * @param proto an instanceof.
      */
 
     protected Instanceof(Instanceof proto) {
@@ -57,7 +54,7 @@ public class Instanceof extends TypeOperator {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -67,7 +64,7 @@ public class Instanceof extends TypeOperator {
 
     /**
      * Returns the number of children of this node.
-     * 
+     *
      * @return an int giving the number of children of this node
      */
 
@@ -87,12 +84,10 @@ public class Instanceof extends TypeOperator {
     /**
      * Returns the child at the specified index in this node's "virtual" child
      * array
-     * 
-     * @param index
-     *            an index into this node's "virtual" child array
+     *
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
@@ -114,7 +109,7 @@ public class Instanceof extends TypeOperator {
 
     /**
      * Get arity.
-     * 
+     *
      * @return the int value.
      */
 
@@ -124,7 +119,7 @@ public class Instanceof extends TypeOperator {
 
     /**
      * Get precedence.
-     * 
+     *
      * @return the int value.
      */
 
@@ -134,7 +129,7 @@ public class Instanceof extends TypeOperator {
 
     /**
      * Get notation.
-     * 
+     *
      * @return the int value.
      */
 

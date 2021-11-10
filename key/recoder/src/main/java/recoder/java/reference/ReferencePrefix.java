@@ -6,7 +6,7 @@ import recoder.java.ProgramElement;
 
 /**
  * Reference prefix.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
@@ -19,9 +19,8 @@ public interface ReferencePrefix extends ProgramElement {
 
     /**
      * Set reference suffix.
-     * 
-     * @param path
-     *            a reference suffix.
+     *
+     * @param path a reference suffix.
      */
     void setReferenceSuffix(ReferenceSuffix path);
 }

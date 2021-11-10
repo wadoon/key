@@ -2,12 +2,6 @@
 
 package recoder.java;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import recoder.abstraction.ClassType;
 import recoder.java.declaration.TypeDeclaration;
 import recoder.java.declaration.TypeDeclarationContainer;
@@ -16,9 +10,11 @@ import recoder.java.statement.JavaStatement;
 import recoder.list.generic.ASTList;
 import recoder.util.Debug;
 
+import java.util.*;
+
 /**
  * Statement block.
- * 
+ *
  * @author AL
  * @author <TT>AutoDoc</TT>
  */
@@ -26,33 +22,31 @@ import recoder.util.Debug;
 public class StatementBlock extends JavaStatement implements StatementContainer, TypeDeclarationContainer,
         VariableScope, TypeScope {
 
-	/**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -3288497346043639754L;
-
-	/**
-     * Body.
+    /**
+     * serialization id
      */
-	private ASTList<Statement> body;
-
+    private static final long serialVersionUID = -3288497346043639754L;
     /**
      * Undefined scope tag.
      */
 
-    @SuppressWarnings("all") private final static Map UNDEFINED_SCOPE = Collections.emptyMap();
-
+    @SuppressWarnings("all")
+    private final static Map UNDEFINED_SCOPE = Collections.emptyMap();
+    /**
+     * Body.
+     */
+    private ASTList<Statement> body;
     /**
      * Scope table for types.
      */
     @SuppressWarnings("unchecked")
-	private Map<String, TypeDeclaration> name2type = UNDEFINED_SCOPE;
+    private Map<String, TypeDeclaration> name2type = UNDEFINED_SCOPE;
 
     /**
      * Scope table for fields.
      */
     @SuppressWarnings("unchecked")
-	private Map<String, VariableSpecification> name2var = UNDEFINED_SCOPE;
+    private Map<String, VariableSpecification> name2var = UNDEFINED_SCOPE;
 
     /**
      * Statement block.
@@ -63,9 +57,8 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
 
     /**
      * Statement block.
-     * 
-     * @param block
-     *            a statement mutable list.
+     *
+     * @param block a statement mutable list.
      */
     public StatementBlock(ASTList<Statement> block) {
         setBody(block);
@@ -74,9 +67,8 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
 
     /**
      * Statement block.
-     * 
-     * @param proto
-     *            a statement block.
+     *
+     * @param proto a statement block.
      */
 
     protected StatementBlock(StatementBlock proto) {
@@ -89,7 +81,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -111,7 +103,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
 
     /**
      * Get body.
-     * 
+     *
      * @return the statement mutable list.
      */
 
@@ -121,9 +113,8 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
 
     /**
      * Set body.
-     * 
-     * @param list
-     *            a statement mutable list.
+     *
+     * @param list a statement mutable list.
      */
 
     public void setBody(ASTList<Statement> list) {
@@ -136,14 +127,11 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
      * element can be null - in that case, the child is effectively removed. The
      * parent role of the new child is validated, while the parent link of the
      * replaced child is left untouched.
-     * 
-     * @param p
-     *            the old child.
-     * @param p
-     *            the new child.
+     *
+     * @param p the old child.
+     * @param p the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException
-     *                if the new child cannot take over the role of the old one.
+     * @throws ClassCastException if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
@@ -169,7 +157,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
 
     /**
      * Returns the number of children of this node.
-     * 
+     *
      * @return an int giving the number of children of this node
      */
 
@@ -180,12 +168,10 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
     /**
      * Returns the child at the specified index in this node's "virtual" child
      * array
-     * 
-     * @param index
-     *            an index into this node's "virtual" child array
+     *
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
@@ -211,7 +197,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
 
     /**
      * Get the number of statements in this container.
-     * 
+     *
      * @return the number of statements.
      */
 
@@ -235,7 +221,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
 
     /**
      * Get the number of type declarations in this container.
-     * 
+     *
      * @return the number of type declarations.
      */
 
@@ -280,7 +266,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
     }
 
     @SuppressWarnings("unchecked")
-	public void setDefinedScope(boolean defined) {
+    public void setDefinedScope(boolean defined) {
         if (!defined) {
             name2type = UNDEFINED_SCOPE;
             name2var = UNDEFINED_SCOPE;
@@ -292,7 +278,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
 
     public List<TypeDeclaration> getTypesInScope() {
         if (name2type == null || name2type.isEmpty()) {
-            return Collections.emptyList(); 
+            return Collections.emptyList();
         }
         List<TypeDeclaration> res = new ArrayList<TypeDeclaration>(name2type.size());
         for (TypeDeclaration td : name2type.values()) {
@@ -314,7 +300,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
         if (name2type == null || name2type == UNDEFINED_SCOPE) {
             name2type = new HashMap<String, TypeDeclaration>();
         }
-        name2type.put(name, (TypeDeclaration)type);
+        name2type.put(name, (TypeDeclaration) type);
     }
 
     public void removeTypeFromScope(String name) {
@@ -327,7 +313,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
 
     public List<VariableSpecification> getVariablesInScope() {
         if (name2var == null || name2var.isEmpty()) {
-        	return Collections.emptyList();
+            return Collections.emptyList();
         }
         List<VariableSpecification> res = new ArrayList<VariableSpecification>(name2var.size());
         for (VariableSpecification vs : name2var.values()) {

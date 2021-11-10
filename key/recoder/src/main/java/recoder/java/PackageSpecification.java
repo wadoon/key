@@ -10,22 +10,22 @@ import recoder.list.generic.ASTList;
 
 /**
  * Package specification.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class PackageSpecification extends JavaNonTerminalProgramElement implements PackageReferenceContainer {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -6415275246661492494L;
+     * serialization id
+     */
+    private static final long serialVersionUID = -6415275246661492494L;
 
-	/**
+    /**
      * Parent.
      */
 
-	private CompilationUnit parent;
+    private CompilationUnit parent;
 
     /**
      * Reference.
@@ -34,7 +34,7 @@ public class PackageSpecification extends JavaNonTerminalProgramElement implemen
     private PackageReference reference;
 
     private ASTList<AnnotationUseSpecification> annotations;
-    
+
     /**
      * Package specification.
      */
@@ -45,9 +45,8 @@ public class PackageSpecification extends JavaNonTerminalProgramElement implemen
 
     /**
      * Package specification.
-     * 
-     * @param pkg
-     *            a package reference.
+     *
+     * @param pkg a package reference.
      */
 
     public PackageSpecification(PackageReference pkg) {
@@ -57,9 +56,8 @@ public class PackageSpecification extends JavaNonTerminalProgramElement implemen
 
     /**
      * Package specification.
-     * 
-     * @param proto
-     *            a package specification.
+     *
+     * @param proto a package specification.
      */
 
     protected PackageSpecification(PackageSpecification proto) {
@@ -72,7 +70,7 @@ public class PackageSpecification extends JavaNonTerminalProgramElement implemen
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -87,8 +85,8 @@ public class PackageSpecification extends JavaNonTerminalProgramElement implemen
     public void makeParentRoleValid() {
         reference.setParent(this);
         if (annotations != null) {
-        	for (int i = 0; i < annotations.size(); i++)
-        		annotations.get(i).setParent(this);
+            for (int i = 0; i < annotations.size(); i++)
+                annotations.get(i).setParent(this);
         }
     }
 
@@ -98,7 +96,7 @@ public class PackageSpecification extends JavaNonTerminalProgramElement implemen
 
     /**
      * Get AST parent.
-     * 
+     *
      * @return the non terminal program element.
      */
 
@@ -108,7 +106,7 @@ public class PackageSpecification extends JavaNonTerminalProgramElement implemen
 
     /**
      * Returns the number of children of this node.
-     * 
+     *
      * @return an int giving the number of children of this node
      */
 
@@ -117,19 +115,17 @@ public class PackageSpecification extends JavaNonTerminalProgramElement implemen
         if (reference != null)
             result++;
         if (annotations != null)
-        	result += annotations.size();
+            result += annotations.size();
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child
      * array
-     * 
-     * @param index
-     *            an index into this node's "virtual" child array
+     *
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
@@ -143,15 +139,15 @@ public class PackageSpecification extends JavaNonTerminalProgramElement implemen
 
     public int getChildPositionCode(ProgramElement child) {
         // role 0: reference
-    	// role 1 (idx): annotation use
+        // role 1 (idx): annotation use
         if (child == reference) {
             return 0;
         }
         if (annotations != null) {
-        	int idx = annotations.indexOf(child);
-        	if (idx != -1) {
-        		return (idx << 4) | 1;
-        	}
+            int idx = annotations.indexOf(child);
+            if (idx != -1) {
+                return (idx << 4) | 1;
+            }
         }
         return -1;
     }
@@ -162,14 +158,11 @@ public class PackageSpecification extends JavaNonTerminalProgramElement implemen
      * element can be null - in that case, the child is effectively removed. The
      * parent role of the new child is validated, while the parent link of the
      * replaced child is left untouched.
-     * 
-     * @param p
-     *            the old child.
-     * @param p
-     *            the new child.
+     *
+     * @param p the old child.
+     * @param p the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException
-     *                if the new child cannot take over the role of the old one.
+     * @throws ClassCastException if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
@@ -186,19 +179,19 @@ public class PackageSpecification extends JavaNonTerminalProgramElement implemen
         }
         int idx = annotations.indexOf(p);
         if (idx != -1) {
-        	AnnotationUseSpecification aus = (AnnotationUseSpecification)q;
-        	annotations.set(idx, aus);
-        	if (aus != null) {
-        		aus.setParent(this);
-        	}
-        	return true;
+            AnnotationUseSpecification aus = (AnnotationUseSpecification) q;
+            annotations.set(idx, aus);
+            if (aus != null) {
+                aus.setParent(this);
+            }
+            return true;
         }
         return false;
     }
 
     /**
      * Get parent.
-     * 
+     *
      * @return the compilation unit.
      */
 
@@ -208,9 +201,8 @@ public class PackageSpecification extends JavaNonTerminalProgramElement implemen
 
     /**
      * Set parent.
-     * 
-     * @param u
-     *            a compilation unit.
+     *
+     * @param u a compilation unit.
      */
 
     public void setParent(CompilationUnit u) {
@@ -219,7 +211,7 @@ public class PackageSpecification extends JavaNonTerminalProgramElement implemen
 
     /**
      * Get package reference.
-     * 
+     *
      * @return the package reference.
      */
 
@@ -229,9 +221,8 @@ public class PackageSpecification extends JavaNonTerminalProgramElement implemen
 
     /**
      * Set package reference.
-     * 
-     * @param ref
-     *            a package reference.
+     *
+     * @param ref a package reference.
      */
 
     public void setPackageReference(PackageReference ref) {
@@ -241,17 +232,17 @@ public class PackageSpecification extends JavaNonTerminalProgramElement implemen
     public void accept(SourceVisitor v) {
         v.visitPackageSpecification(this);
     }
-    
-    public void setAnnotations(ASTList<AnnotationUseSpecification> annotations) {
-    	this.annotations = annotations;
-    }
-    
+
     public ASTList<AnnotationUseSpecification> getAnnotations() {
-    	return annotations;
+        return annotations;
     }
-    
+
+    public void setAnnotations(ASTList<AnnotationUseSpecification> annotations) {
+        this.annotations = annotations;
+    }
+
     @Override
     public String toString() {
-    	return "<PackageSpecification> " + Naming.toPathName(reference);
+        return "<PackageSpecification> " + Naming.toPathName(reference);
     }
 }

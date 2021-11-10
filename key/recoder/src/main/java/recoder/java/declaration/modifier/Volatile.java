@@ -7,30 +7,29 @@ import recoder.java.declaration.Modifier;
 
 /**
  * Volatile.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class Volatile extends Modifier {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -8915246411373317235L;
+     * serialization id
+     */
+    private static final long serialVersionUID = -8915246411373317235L;
 
-	/**
+    /**
      * Volatile.
      */
 
     public Volatile() {
-    	// nothing to do
+        // nothing to do
     }
 
     /**
      * Volatile.
-     * 
-     * @param proto
-     *            a volatile.
+     *
+     * @param proto a volatile.
      */
 
     protected Volatile(Volatile proto) {
@@ -39,7 +38,7 @@ public class Volatile extends Modifier {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 

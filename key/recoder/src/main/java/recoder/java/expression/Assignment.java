@@ -12,11 +12,11 @@ import recoder.java.StatementContainer;
 
 public abstract class Assignment extends Operator implements ExpressionStatement {
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	
-	/**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * either statementParent or expressionParent is null, in case of
      * ambiguities (e.g. Assignment as a parent), prefer an ExpressionContainer
      * as parent. We could resolve these problems by introduction of an
@@ -24,7 +24,7 @@ public abstract class Assignment extends Operator implements ExpressionStatement
      * ExpressionContainer.
      */
 
-	private StatementContainer statementParent;
+    private StatementContainer statementParent;
 
     /**
      * Assignment.
@@ -36,9 +36,8 @@ public abstract class Assignment extends Operator implements ExpressionStatement
 
     /**
      * Assignment.
-     * 
-     * @param unaryChild
-     *            an expression.
+     *
+     * @param unaryChild an expression.
      */
 
     public Assignment(Expression unaryChild) {
@@ -47,11 +46,9 @@ public abstract class Assignment extends Operator implements ExpressionStatement
 
     /**
      * Assignment.
-     * 
-     * @param lhs
-     *            an expression.
-     * @param rhs
-     *            an expression.
+     *
+     * @param lhs an expression.
+     * @param rhs an expression.
      */
 
     public Assignment(Expression lhs, Expression rhs) {
@@ -60,9 +57,8 @@ public abstract class Assignment extends Operator implements ExpressionStatement
 
     /**
      * Assignment.
-     * 
-     * @param proto
-     *            an assignment.
+     *
+     * @param proto an assignment.
      */
 
     protected Assignment(Assignment proto) {
@@ -71,7 +67,7 @@ public abstract class Assignment extends Operator implements ExpressionStatement
 
     /**
      * Get AST parent.
-     * 
+     *
      * @return the non terminal program element.
      */
 
@@ -85,7 +81,7 @@ public abstract class Assignment extends Operator implements ExpressionStatement
 
     /**
      * Get statement container.
-     * 
+     *
      * @return the statement container.
      */
 
@@ -95,9 +91,8 @@ public abstract class Assignment extends Operator implements ExpressionStatement
 
     /**
      * Set statement container.
-     * 
-     * @param c
-     *            a statement container.
+     *
+     * @param c a statement container.
      */
 
     public void setStatementContainer(StatementContainer c) {
@@ -107,13 +102,13 @@ public abstract class Assignment extends Operator implements ExpressionStatement
     /**
      * Checks if this operator is left or right associative. Assignments are
      * right associative.
-     * 
+     *
      * @return false
      */
 
     public boolean isLeftAssociative() {
         return false;
     }
-    
+
     public abstract Assignment deepClone();
 }

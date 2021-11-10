@@ -2,12 +2,7 @@
 
 package recoder.java.expression;
 
-import recoder.java.Expression;
-import recoder.java.ExpressionContainer;
-import recoder.java.JavaNonTerminalProgramElement;
-import recoder.java.NonTerminalProgramElement;
-import recoder.java.ProgramElement;
-import recoder.java.SourceVisitor;
+import recoder.java.*;
 import recoder.list.generic.ASTList;
 
 /**
@@ -22,15 +17,15 @@ import recoder.list.generic.ASTList;
 public class ArrayInitializer extends JavaNonTerminalProgramElement implements Expression, ExpressionContainer {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 7171507009155916797L;
+     * serialization id
+     */
+    private static final long serialVersionUID = 7171507009155916797L;
 
-	/**
+    /**
      * Expression parent.
      */
 
-	private ExpressionContainer expressionParent;
+    private ExpressionContainer expressionParent;
 
     /**
      * Children.
@@ -43,18 +38,31 @@ public class ArrayInitializer extends JavaNonTerminalProgramElement implements E
      */
 
     public ArrayInitializer() {
-    	super();
+        super();
     }
 
     /**
      * Array initializer.
-     * 
-     * @param args
-     *            an expression mutable list.
+     *
+     * @param args an expression mutable list.
      */
 
     public ArrayInitializer(ASTList<Expression> args) {
         setArguments(args);
+        makeParentRoleValid();
+    }
+
+    /**
+     * Array initializer.
+     *
+     * @param proto an array initializer.
+     */
+
+    protected ArrayInitializer(ArrayInitializer proto) {
+        super(proto);
+        if (proto.children != null) {
+            children = proto.children.deepClone();
+        }
         makeParentRoleValid();
     }
 
@@ -71,23 +79,8 @@ public class ArrayInitializer extends JavaNonTerminalProgramElement implements E
     }
 
     /**
-     * Array initializer.
-     * 
-     * @param proto
-     *            an array initializer.
-     */
-
-    protected ArrayInitializer(ArrayInitializer proto) {
-        super(proto);
-        if (proto.children != null) {
-            children = proto.children.deepClone();
-        }
-        makeParentRoleValid();
-    }
-
-    /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -97,7 +90,7 @@ public class ArrayInitializer extends JavaNonTerminalProgramElement implements E
 
     /**
      * Get AST parent.
-     * 
+     *
      * @return the non terminal program element.
      */
 
@@ -107,7 +100,7 @@ public class ArrayInitializer extends JavaNonTerminalProgramElement implements E
 
     /**
      * Returns the number of children of this node.
-     * 
+     *
      * @return an int giving the number of children of this node
      */
 
@@ -118,12 +111,10 @@ public class ArrayInitializer extends JavaNonTerminalProgramElement implements E
     /**
      * Returns the child at the specified index in this node's "virtual" child
      * array
-     * 
-     * @param index
-     *            an index into this node's "virtual" child array
+     *
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
@@ -146,7 +137,7 @@ public class ArrayInitializer extends JavaNonTerminalProgramElement implements E
 
     /**
      * Get expression container.
-     * 
+     *
      * @return the expression container.
      */
 
@@ -156,9 +147,8 @@ public class ArrayInitializer extends JavaNonTerminalProgramElement implements E
 
     /**
      * Set expression container.
-     * 
-     * @param c
-     *            an expression container.
+     *
+     * @param c an expression container.
      */
 
     public void setExpressionContainer(ExpressionContainer c) {
@@ -167,7 +157,7 @@ public class ArrayInitializer extends JavaNonTerminalProgramElement implements E
 
     /**
      * Get the number of expressions in this container.
-     * 
+     *
      * @return the number of expressions.
      */
 
@@ -195,14 +185,11 @@ public class ArrayInitializer extends JavaNonTerminalProgramElement implements E
      * element can be null - in that case, the child is effectively removed. The
      * parent role of the new child is validated, while the parent link of the
      * replaced child is left untouched.
-     * 
-     * @param p
-     *            the old child.
-     * @param p
-     *            the new child.
+     *
+     * @param p the old child.
+     * @param p the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException
-     *                if the new child cannot take over the role of the old one.
+     * @throws ClassCastException if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
@@ -228,7 +215,7 @@ public class ArrayInitializer extends JavaNonTerminalProgramElement implements E
 
     /**
      * Get arguments.
-     * 
+     *
      * @return the expression mutable list.
      */
 
@@ -238,9 +225,8 @@ public class ArrayInitializer extends JavaNonTerminalProgramElement implements E
 
     /**
      * Set arguments.
-     * 
-     * @param list
-     *            an expression mutable list.
+     *
+     * @param list an expression mutable list.
      */
 
     public void setArguments(ASTList<Expression> list) {

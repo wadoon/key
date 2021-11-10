@@ -13,7 +13,7 @@ import recoder.java.reference.TypeReference;
 
 /**
  * Creates JavaBean compliant setter/getter access methods.
- * 
+ * <p>
  * Wishlist: - should always make the field private - options for setter/getter
  * for visibility modifier; usually getter should be more public that setter -
  * option to allow insertion of NullPointerException for non-primitive types -
@@ -22,11 +22,11 @@ import recoder.java.reference.TypeReference;
  */
 public class Property implements DesignPattern {
 
-    private FieldDeclaration field;
+    private final FieldDeclaration field;
 
-    private MethodDeclaration getter;
+    private final MethodDeclaration getter;
 
-    private MethodDeclaration setter;
+    private final MethodDeclaration setter;
 
     private MethodDeclaration indexedGetter;
 
@@ -84,7 +84,7 @@ public class Property implements DesignPattern {
 
     /**
      * Get total number of participants.
-     * 
+     *
      * @return the number of participants.
      */
     public int getParticipantCount() {
@@ -104,12 +104,10 @@ public class Property implements DesignPattern {
 
     /**
      * Get a participants by its index.
-     * 
-     * @param index
-     *            an index of a participant.
+     *
+     * @param index an index of a participant.
      * @return the participant.
-     * @exception IndexOutOfBoundsException,
-     *                if the index is not in bounds.
+     * @throws IndexOutOfBoundsException, if the index is not in bounds.
      */
     public ModelElement getParticipantAt(int index) {
         if (field != null) {

@@ -26,7 +26,7 @@ import java.util.HashMap;
  * </ul>
  * </li>
  * </ul>
- * 
+ *
  * @author RN
  */
 public abstract class CommandLineProgram {
@@ -53,6 +53,8 @@ public abstract class CommandLineProgram {
     public boolean showHelp;
 
     // the following methods have to be redefined in derived classes
+    private final OptionManager om = new OptionManager();
+    private final java.util.Map<String, Field> vars = new HashMap<String, Field>();
 
     protected abstract String getArgsDescription();
 
@@ -66,6 +68,8 @@ public abstract class CommandLineProgram {
     protected void registerOptions() {
         registerSimpleOpt("showHelp", "h", "help", "display help information");
     }
+
+    // the following methods are used to register options
 
     /**
      * Creates a new program instance. First, register options, parse arguments,
@@ -92,8 +96,8 @@ public abstract class CommandLineProgram {
     protected void handleOptionException(OptionException oe) {
         try {
             setVariables();
-        } catch (Exception e) { 
-        	// TODO: really ignore?
+        } catch (Exception e) {
+            // TODO: really ignore?
         }
         if (showHelp) {
             usage(true, 0);
@@ -103,36 +107,34 @@ public abstract class CommandLineProgram {
         }
     }
 
-    // the following methods are used to register options
-
     protected final void registerSimpleOpt(String varName, String shortOpt, String longOpt, String descr) {
         registerSimpleOpt(varName, shortOpt, longOpt, descr, ZERO_OR_ONE);
     }
 
     protected final void registerSimpleOpt(String varName, String shortOpt, String longOpt, String descr,
-            int multiplicity) {
+                                           int multiplicity) {
         registerVar(varName, shortOpt, Boolean.FALSE);
         om.addOption(OptionManager.SIMPLE, multiplicity, shortOpt, longOpt, descr);
     }
 
     protected final void registerSwitchOpt(String varName, String shortOpt, String longOpt, String descr,
-            boolean defaultVal) {
+                                           boolean defaultVal) {
         registerSwitchOpt(varName, shortOpt, longOpt, descr, ZERO_OR_ONE, defaultVal);
     }
 
     protected final void registerSwitchOpt(String varName, String shortOpt, String longOpt, String descr,
-            int multiplicity, boolean defaultVal) {
+                                           int multiplicity, boolean defaultVal) {
         registerVar(varName, shortOpt, new Boolean(defaultVal));
         om.addOption(OptionManager.SWITCH, multiplicity, shortOpt, longOpt, descr);
     }
 
     protected final void registerBooleanOpt(String varName, String shortOpt, String longOpt, String descr,
-            boolean defaultVal) {
+                                            boolean defaultVal) {
         registerBooleanOpt(varName, shortOpt, longOpt, descr, ZERO_OR_ONE, defaultVal);
     }
 
     protected final void registerBooleanOpt(String varName, String shortOpt, String longOpt, String descr,
-            int multiplicity, boolean defaultVal) {
+                                            int multiplicity, boolean defaultVal) {
         registerVar(varName, shortOpt, new Boolean(defaultVal));
         om.addOption(OptionManager.BOOL, multiplicity, shortOpt, longOpt, descr);
     }
@@ -142,18 +144,18 @@ public abstract class CommandLineProgram {
     }
 
     protected final void registerNumberOpt(String varName, String shortOpt, String longOpt, String descr,
-            int multiplicity, int defaultVal) {
+                                           int multiplicity, int defaultVal) {
         registerVar(varName, shortOpt, new Integer(defaultVal));
         om.addOption(OptionManager.NUM, multiplicity, shortOpt, longOpt, descr);
     }
 
     protected final void registerStringOpt(String varName, String shortOpt, String longOpt, String descr,
-            String defaultVal) {
+                                           String defaultVal) {
         registerStringOpt(varName, shortOpt, longOpt, descr, ZERO_OR_ONE, defaultVal);
     }
 
     protected final void registerStringOpt(String varName, String shortOpt, String longOpt, String descr,
-            int multiplicity, String defaultVal) {
+                                           int multiplicity, String defaultVal) {
         registerVar(varName, shortOpt, defaultVal);
         om.addOption(OptionManager.STRING, multiplicity, shortOpt, longOpt, descr);
     }
@@ -178,10 +180,6 @@ public abstract class CommandLineProgram {
             }
         }
     }
-
-    private OptionManager om = new OptionManager();
-
-    private java.util.Map<String, Field> vars = new HashMap<String, Field>();
 
     private void registerVar(String varName, String optStr, Object defVal) {
         try {

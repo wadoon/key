@@ -2,12 +2,7 @@
 
 package recoder.java.expression;
 
-import recoder.java.Expression;
-import recoder.java.ExpressionContainer;
-import recoder.java.JavaNonTerminalProgramElement;
-import recoder.java.NonTerminalProgramElement;
-import recoder.java.ProgramElement;
-import recoder.java.SourceElement;
+import recoder.java.*;
 import recoder.java.expression.operator.New;
 import recoder.java.reference.ReferencePrefix;
 import recoder.list.generic.ASTArrayList;
@@ -15,47 +10,43 @@ import recoder.list.generic.ASTList;
 
 /**
  * Operator base class.
- * 
+ *
  * @author AL
  */
 
 public abstract class Operator extends JavaNonTerminalProgramElement implements Expression, ExpressionContainer {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	
-    /**
-     * Expression parent.
-     */
-
-	protected ExpressionContainer expressionParent;
-
-    /**
-     * Children.
-     */
-
-	protected ASTList<Expression> children;
-
     /**
      * Relative positioning of the operator.
      */
 
     public final static int PREFIX = 0, INFIX = 1, POSTFIX = 2;
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+    /**
+     * Expression parent.
+     */
+
+    protected ExpressionContainer expressionParent;
+    /**
+     * Children.
+     */
+
+    protected ASTList<Expression> children;
 
     /**
      * Operator.
      */
 
     public Operator() {
-       	// nothing to do...
+        // nothing to do...
     }
 
     /**
      * Operator.
-     * 
-     * @param unaryChild
-     *            an expression.
+     *
+     * @param unaryChild an expression.
      */
 
     public Operator(Expression unaryChild) {
@@ -66,11 +57,9 @@ public abstract class Operator extends JavaNonTerminalProgramElement implements 
 
     /**
      * Operator.
-     * 
-     * @param lhs
-     *            an expression.
-     * @param rhs
-     *            an expression.
+     *
+     * @param lhs an expression.
+     * @param rhs an expression.
      */
 
     public Operator(Expression lhs, Expression rhs) {
@@ -82,9 +71,8 @@ public abstract class Operator extends JavaNonTerminalProgramElement implements 
 
     /**
      * Operator.
-     * 
-     * @param proto
-     *            an operator.
+     *
+     * @param proto an operator.
      */
 
     protected Operator(Operator proto) {
@@ -93,6 +81,15 @@ public abstract class Operator extends JavaNonTerminalProgramElement implements 
             children = proto.children.deepClone();
         }
         // makeParentRoleValid() called by subclasses' constructors
+    }
+
+    /**
+     * @return true, if a has a higher priority (a lower precendence value) than
+     * b.
+     */
+
+    public static boolean precedes(Operator a, Operator b) {
+        return a.getPrecedence() < b.getPrecedence();
     }
 
     /**
@@ -107,7 +104,9 @@ public abstract class Operator extends JavaNonTerminalProgramElement implements 
         }
     }
 
-    /** getArity() == getASTchildren().size() */
+    /**
+     * getArity() == getASTchildren().size()
+     */
 
     public abstract int getArity();
 
@@ -116,15 +115,6 @@ public abstract class Operator extends JavaNonTerminalProgramElement implements 
      */
 
     public abstract int getPrecedence();
-
-    /**
-     * @return true, if a has a higher priority (a lower precendence value) than
-     *         b.
-     */
-
-    public static boolean precedes(Operator a, Operator b) {
-        return a.getPrecedence() < b.getPrecedence();
-    }
 
     /**
      * @return INFIX, PREFIX, or POSTFIX.
@@ -137,9 +127,9 @@ public abstract class Operator extends JavaNonTerminalProgramElement implements 
      * defines the order in which the arguments are evaluated (left-to-right or
      * right-to-left). The default is left associative. Unary operators,
      * assignments and conditionals are right associative.
-     * 
+     *
      * @return <CODE>true</CODE>, if the operator is left associative, <CODE>
-     *         false</CODE> otherwise.
+     * false</CODE> otherwise.
      */
 
     public boolean isLeftAssociative() {
@@ -148,38 +138,38 @@ public abstract class Operator extends JavaNonTerminalProgramElement implements 
 
     public SourceElement getFirstElement() {
         switch (getNotation()) {
-        case INFIX:
-        case POSTFIX:
-        	// The code below has been introduced in 0.93 in order to 
-        	// to reduce recursion in certain cases.
-        	Expression child0 = children.get(0);
-        	while (child0 instanceof Operator 
-        			&& !(child0 instanceof ParenthesizedExpression)
-        			&& !(child0 instanceof New)
-        			&& (((Operator)child0).getNotation() == INFIX 
-        					|| ((Operator)child0).getNotation() == POSTFIX))
-        		child0 = ((Operator)child0).children.get(0);
-            return child0.getFirstElement();
-        case PREFIX:
-        default:
-            return this;
+            case INFIX:
+            case POSTFIX:
+                // The code below has been introduced in 0.93 in order to
+                // to reduce recursion in certain cases.
+                Expression child0 = children.get(0);
+                while (child0 instanceof Operator
+                        && !(child0 instanceof ParenthesizedExpression)
+                        && !(child0 instanceof New)
+                        && (((Operator) child0).getNotation() == INFIX
+                        || ((Operator) child0).getNotation() == POSTFIX))
+                    child0 = ((Operator) child0).children.get(0);
+                return child0.getFirstElement();
+            case PREFIX:
+            default:
+                return this;
         }
     }
 
     public SourceElement getLastElement() {
         switch (getNotation()) {
-        case INFIX:
-        case PREFIX:
-            return children.get(getArity() - 1).getLastElement();
-        case POSTFIX:
-        default:
-            return this;
+            case INFIX:
+            case PREFIX:
+                return children.get(getArity() - 1).getLastElement();
+            case POSTFIX:
+            default:
+                return this;
         }
     }
 
     /**
      * Get AST parent.
-     * 
+     *
      * @return the non terminal program element.
      */
 
@@ -189,7 +179,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement implements 
 
     /**
      * Returns the number of children of this node.
-     * 
+     *
      * @return an int giving the number of children of this node
      */
 
@@ -200,12 +190,10 @@ public abstract class Operator extends JavaNonTerminalProgramElement implements 
     /**
      * Returns the child at the specified index in this node's "virtual" child
      * array
-     * 
-     * @param index
-     *            an index into this node's "virtual" child array
+     *
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
@@ -232,7 +220,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement implements 
 
     /**
      * Get expression container.
-     * 
+     *
      * @return the expression container.
      */
 
@@ -242,9 +230,8 @@ public abstract class Operator extends JavaNonTerminalProgramElement implements 
 
     /**
      * Set expression container.
-     * 
-     * @param c
-     *            an expression container.
+     *
+     * @param c an expression container.
      */
 
     public void setExpressionContainer(ExpressionContainer c) {
@@ -253,7 +240,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement implements 
 
     /**
      * Get the number of expressions in this container.
-     * 
+     *
      * @return the number of expressions.
      */
 
@@ -281,14 +268,11 @@ public abstract class Operator extends JavaNonTerminalProgramElement implements 
      * element can be null - in that case, the child is effectively removed. The
      * parent role of the new child is validated, while the parent link of the
      * replaced child is left untouched.
-     * 
-     * @param p
-     *            the old child.
-     * @param p
-     *            the new child.
+     *
+     * @param p the old child.
+     * @param p the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException
-     *                if the new child cannot take over the role of the old one.
+     * @throws ClassCastException if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
@@ -314,7 +298,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement implements 
 
     /**
      * Get arguments.
-     * 
+     *
      * @return the expression mutable list.
      */
 
@@ -324,9 +308,8 @@ public abstract class Operator extends JavaNonTerminalProgramElement implements 
 
     /**
      * Set arguments.
-     * 
-     * @param list
-     *            an expression mutable list.
+     *
+     * @param list an expression mutable list.
      */
 
     public void setArguments(ASTList<Expression> list) {
@@ -335,7 +318,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement implements 
 
     /**
      * Is to be parenthesized.
-     * 
+     *
      * @return the boolean value.
      */
 

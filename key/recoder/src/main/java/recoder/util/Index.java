@@ -11,39 +11,17 @@ import java.util.NoSuchElementException;
  * Implements an object-to-index assignment. An object can be assigned a long
  * value. This is required to avoid repeated creations of pseudo objects
  * representing numbers.
- * 
+ *
  * @author RN
  */
 public class Index implements Cloneable {
 
-    static class Entry {
-        int hash;
-
-        Object key;
-
-        long value;
-
-        Entry next;
-
-        public Entry(int hash, Object key, long value, Entry next) {
-            this.hash = hash;
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
-
-        protected Object clone() {
-            return new Entry(hash, key, value, (next != null) ? (Entry) next.clone() : null);
-        }
-    }
-
-    private transient Entry table[];
+    private final HashCode hasher;
+    private transient Entry[] table;
 
     private transient int count;
 
     private transient int ld;
-
-    private final HashCode hasher;
 
     public Index() {
         this(null, 8);
@@ -89,7 +67,7 @@ public class Index implements Cloneable {
         int newCapacity = oldCapacity * 2;
         ld -= 1;
         Entry[] newMap = table = new Entry[newCapacity];
-        for (int i = oldCapacity; i-- > 0;) {
+        for (int i = oldCapacity; i-- > 0; ) {
             Entry e = oldMap[i];
             while (e != null) {
                 int index = (-1640531527 * e.hash) >>> ld;
@@ -102,8 +80,8 @@ public class Index implements Cloneable {
     }
 
     public boolean contains(long value) {
-        Entry tab[] = table;
-        for (int i = tab.length; i-- > 0;) {
+        Entry[] tab = table;
+        for (int i = tab.length; i-- > 0; ) {
             for (Entry e = tab[i]; e != null; e = e.next) {
                 if (e.value == value) {
                     return true;
@@ -126,9 +104,8 @@ public class Index implements Cloneable {
 
     /**
      * retrieves the assigne long value for the given object.
-     * 
-     * @param key
-     *            the objct to look for
+     *
+     * @param key the objct to look for
      * @return the assigned long value, or -1L if there is none.
      */
     public long get(Object key) {
@@ -144,12 +121,10 @@ public class Index implements Cloneable {
 
     /**
      * assigns the given long value to the specified key.
-     * 
-     * @param key
-     *            the object to assign a value to
-     * @param value
-     *            the long value to be assigned. This value must be greater or
-     *            equal to 0
+     *
+     * @param key   the object to assign a value to
+     * @param value the long value to be assigned. This value must be greater or
+     *              equal to 0
      */
     public long put(Object key, long value) {
         Debug.assertBoolean(value >= 0);
@@ -189,28 +164,18 @@ public class Index implements Cloneable {
     }
 
     public void clear() {
-        Entry tab[] = table;
-        for (int index = tab.length; --index >= 0;) {
+        Entry[] tab = table;
+        for (int index = tab.length; --index >= 0; ) {
             tab[index] = null;
         }
         count = 0;
     }
 
-    /*
-     * public void copyKeysInto(Object[] array) { Entry table[] = this.table;
-     * for (int i = 0, j = 0; i < table.length; i++) { Entry entry = table[i];
-     * while (entry != null) { array[j++] = entry.key; entry = entry.next; } } }
-     * 
-     * public void copyValuesInto(Object[] array) { Entry table[] = this.table;
-     * for (int i = 0, j = 0; i < table.length; i++) { Entry entry = table[i];
-     * while (entry != null) { array[j++] = entry.value; entry = entry.next; } } }
-     */
-
     public Object clone() {
         try {
             Index t = (Index) super.clone();
             t.table = new Entry[table.length];
-            for (int i = table.length; i-- > 0;) {
+            for (int i = table.length; i-- > 0; ) {
                 t.table[i] = (table[i] != null) ? (Entry) table[i].clone() : null;
             }
             return t;
@@ -218,6 +183,16 @@ public class Index implements Cloneable {
             throw new InternalError();
         }
     }
+
+    /*
+     * public void copyKeysInto(Object[] array) { Entry table[] = this.table;
+     * for (int i = 0, j = 0; i < table.length; i++) { Entry entry = table[i];
+     * while (entry != null) { array[j++] = entry.key; entry = entry.next; } } }
+     *
+     * public void copyValuesInto(Object[] array) { Entry table[] = this.table;
+     * for (int i = 0, j = 0; i < table.length; i++) { Entry entry = table[i];
+     * while (entry != null) { array[j++] = entry.value; entry = entry.next; } } }
+     */
 
     public String toString() {
         int max = size() - 1;
@@ -235,14 +210,35 @@ public class Index implements Cloneable {
         return buf.toString();
     }
 
+    static class Entry {
+        int hash;
+
+        Object key;
+
+        long value;
+
+        Entry next;
+
+        public Entry(int hash, Object key, long value, Entry next) {
+            this.hash = hash;
+            this.key = key;
+            this.value = value;
+            this.next = next;
+        }
+
+        protected Object clone() {
+            return new Entry(hash, key, value, (next != null) ? (Entry) next.clone() : null);
+        }
+    }
+
     private static class Enumerator implements Enumeration<Object> {
         int index;
 
-        Entry table[];
+        Entry[] table;
 
         Entry entry;
 
-        Enumerator(Entry table[]) {
+        Enumerator(Entry[] table) {
             this.table = table;
             this.index = table.length;
         }

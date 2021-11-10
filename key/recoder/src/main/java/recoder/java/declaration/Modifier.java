@@ -9,22 +9,22 @@ import recoder.java.TerminalProgramElement;
 
 /**
  * Modifier.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public abstract class Modifier extends JavaProgramElement implements DeclarationSpecifier, TerminalProgramElement {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	
-	/**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * Parent.
      */
 
-	private Declaration parent;
+    private Declaration parent;
 
     /**
      * Modifier.
@@ -36,9 +36,8 @@ public abstract class Modifier extends JavaProgramElement implements Declaration
 
     /**
      * Modifier.
-     * 
-     * @param proto
-     *            a modifier.
+     *
+     * @param proto a modifier.
      */
 
     protected Modifier(Modifier proto) {
@@ -47,7 +46,7 @@ public abstract class Modifier extends JavaProgramElement implements Declaration
 
     /**
      * Get AST parent.
-     * 
+     *
      * @return the non terminal program element.
      */
 
@@ -57,7 +56,7 @@ public abstract class Modifier extends JavaProgramElement implements Declaration
 
     /**
      * Get parent.
-     * 
+     *
      * @return the declaration.
      */
 
@@ -67,9 +66,8 @@ public abstract class Modifier extends JavaProgramElement implements Declaration
 
     /**
      * Set parent.
-     * 
-     * @param parent
-     *            a declaration.
+     *
+     * @param parent a declaration.
      */
 
     public void setParent(Declaration parent) {

@@ -7,30 +7,29 @@ import recoder.java.declaration.Modifier;
 
 /**
  * Transient.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class Transient extends Modifier {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 3518754803226194289L;
+     * serialization id
+     */
+    private static final long serialVersionUID = 3518754803226194289L;
 
-	/**
+    /**
      * Transient.
      */
 
     public Transient() {
-    	// nothing to do
+        // nothing to do
     }
 
     /**
      * Transient.
-     * 
-     * @param proto
-     *            a transient.
+     *
+     * @param proto a transient.
      */
 
     protected Transient(Transient proto) {
@@ -39,7 +38,7 @@ public class Transient extends Modifier {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 

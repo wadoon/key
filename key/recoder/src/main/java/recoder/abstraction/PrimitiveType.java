@@ -2,21 +2,21 @@
 
 package recoder.abstraction;
 
-import java.util.List;
-
 import recoder.service.ProgramModelInfo;
+
+import java.util.List;
 
 /**
  * A program model element representing primitive types.
- * 
+ *
  * @author AL
  * @author RN
  * @author Tobias Gutzmann
  */
 public class PrimitiveType implements Type {
-	private ArrayType arrayType;
-	
-    private String name;
+    private ArrayType arrayType;
+
+    private final String name;
 
     private ProgramModelInfo pmi;
 
@@ -28,20 +28,20 @@ public class PrimitiveType implements Type {
         this.name = name.intern();
         this.pmi = pmi;
     }
-    
+
     public ArrayType getArrayType() {
-    	return arrayType;
+        return arrayType;
     }
-    
+
     public ArrayType createArrayType() {
-    	if (arrayType == null)
-    		arrayType = new ArrayType(this, pmi.getServiceConfiguration().getImplicitElementInfo());
-    	return arrayType;
+        if (arrayType == null)
+            arrayType = new ArrayType(this, pmi.getServiceConfiguration().getImplicitElementInfo());
+        return arrayType;
     }
 
     /**
      * Returns the name of this type.
-     * 
+     *
      * @return the name of this type.
      */
     public String getName() {
@@ -50,21 +50,21 @@ public class PrimitiveType implements Type {
 
     /**
      * Returns the name of type.
-     * 
+     *
      * @return the full name of this program model element.
      */
     public String getFullName() {
         return name;
     }
-    
-	public String getBinaryName() {
-		return name;
-	}
+
+    public String getBinaryName() {
+        return name;
+    }
 
     /**
      * Returns the instance that can retrieve information about this program
      * model element.
-     * 
+     *
      * @return the program model info of this element.
      */
     public ProgramModelInfo getProgramModelInfo() {
@@ -74,38 +74,37 @@ public class PrimitiveType implements Type {
     /**
      * Sets the instance that can retrieve information about this program model
      * element.
-     * 
-     * @param service
-     *            the program model info for this element.
+     *
+     * @param service the program model info for this element.
      */
     public void setProgramModelInfo(ProgramModelInfo service) {
-    	if (pmi != null)
-    		throw new RuntimeException("Service already set!");
+        if (pmi != null)
+            throw new RuntimeException("Service already set!");
         this.pmi = service;
     }
 
     public void validate() {
-    	// not checked yet
+        // not checked yet
     }
-    
+
     public String getFullSignature() {
-    	return getFullName();
+        return getFullName();
     }
-    
+
     public PrimitiveType deepClone() {
-    	throw new UnsupportedOperationException("Cannot deep-clone primitive types");
+        throw new UnsupportedOperationException("Cannot deep-clone primitive types");
     }
 
-	public List<PrimitiveType> getAllSupertypes() {
-		return pmi.getAllSupertypes(this);
-	}
+    public List<PrimitiveType> getAllSupertypes() {
+        return pmi.getAllSupertypes(this);
+    }
 
-	public List<PrimitiveType> getSupertypes() {
-		return pmi.getSupertypes(this);
-	}
-	
-	@Override 
-	public String toString() {
-		return "<Primitive Type> " + name;
-	}
+    public List<PrimitiveType> getSupertypes() {
+        return pmi.getSupertypes(this);
+    }
+
+    @Override
+    public String toString() {
+        return "<Primitive Type> " + name;
+    }
 }

@@ -5,28 +5,27 @@ package recoder.bytecode;
 
 /**
  * Byte Code format Exception.
- * 
+ *
  * @author AL
  */
 public class ByteCodeFormatException extends RuntimeException {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -6748189319137209773L;
+     * serialization id
+     */
+    private static final long serialVersionUID = -6748189319137209773L;
 
-	/**
+    /**
      * Trivial Constructor.
      */
     public ByteCodeFormatException() {
-    	super();
+        super();
     }
 
     /**
      * Constructor with description text.
-     * 
-     * @param msg
-     *            a description.
+     *
+     * @param msg a description.
      */
     public ByteCodeFormatException(String msg) {
         super(msg);

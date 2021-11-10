@@ -2,18 +2,18 @@
 
 package recoder.bytecode;
 
-import java.util.List;
-
 import recoder.abstraction.Field;
 import recoder.abstraction.Type;
 import recoder.convenience.Naming;
+
+import java.util.List;
 
 public class FieldInfo extends MemberInfo implements Field {
 
     protected String type;
 
     protected String constantValue;
-    
+
     protected List<TypeArgumentInfo> typeArgs;
 
     public FieldInfo(int accessFlags, String name, String type, boolean typeIsTypeVariable, ClassFile cf, String constantValue, List<TypeArgumentInfo> typeArgs) {
@@ -39,24 +39,24 @@ public class FieldInfo extends MemberInfo implements Field {
     public String getFullName() {
         return Naming.getFullName(this);
     }
-    
-    
-	public String getBinaryName() {
-		return getContainingClassType().getBinaryName() + "." + getName();
-	}
-    
-    public List<TypeArgumentInfo> getTypeArguments() {
-    	return typeArgs;
+
+
+    public String getBinaryName() {
+        return getContainingClassType().getBinaryName() + "." + getName();
     }
-    
+
+    public List<TypeArgumentInfo> getTypeArguments() {
+        return typeArgs;
+    }
+
     @Override
     public String toString() {
-    	return "%BC%" + getName();
+        return "%BC%" + getName();
     }
-    
-	@Override
-	public FieldInfo getGenericMember() {
-		return this;
-	}
+
+    @Override
+    public FieldInfo getGenericMember() {
+        return this;
+    }
 
 }

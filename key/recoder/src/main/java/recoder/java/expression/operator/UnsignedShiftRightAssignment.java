@@ -8,18 +8,18 @@ import recoder.java.expression.Assignment;
 
 /**
  * Unsigned shift right assignment.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class UnsignedShiftRightAssignment extends Assignment {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 1895345140424768114L;
+     * serialization id
+     */
+    private static final long serialVersionUID = 1895345140424768114L;
 
-	/**
+    /**
      * Unsigned shift right assignment.
      */
 
@@ -29,11 +29,9 @@ public class UnsignedShiftRightAssignment extends Assignment {
 
     /**
      * Unsigned shift right assignment.
-     * 
-     * @param lhs
-     *            an expression.
-     * @param rhs
-     *            an expression.
+     *
+     * @param lhs an expression.
+     * @param rhs an expression.
      */
 
     public UnsignedShiftRightAssignment(Expression lhs, Expression rhs) {
@@ -43,9 +41,8 @@ public class UnsignedShiftRightAssignment extends Assignment {
 
     /**
      * Unsigned shift right assignment.
-     * 
-     * @param proto
-     *            an unsigned shift right assignment.
+     *
+     * @param proto an unsigned shift right assignment.
      */
 
     protected UnsignedShiftRightAssignment(UnsignedShiftRightAssignment proto) {
@@ -55,7 +52,7 @@ public class UnsignedShiftRightAssignment extends Assignment {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -65,7 +62,7 @@ public class UnsignedShiftRightAssignment extends Assignment {
 
     /**
      * Get arity.
-     * 
+     *
      * @return the int value.
      */
 
@@ -75,7 +72,7 @@ public class UnsignedShiftRightAssignment extends Assignment {
 
     /**
      * Get precedence.
-     * 
+     *
      * @return the int value.
      */
 
@@ -85,7 +82,7 @@ public class UnsignedShiftRightAssignment extends Assignment {
 
     /**
      * Get notation.
-     * 
+     *
      * @return the int value.
      */
 

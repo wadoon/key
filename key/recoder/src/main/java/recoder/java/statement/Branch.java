@@ -8,16 +8,16 @@ import recoder.java.StatementContainer;
 
 /**
  * Branch.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public abstract class Branch extends JavaNonTerminalProgramElement implements StatementContainer {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * Parent.
@@ -30,14 +30,13 @@ public abstract class Branch extends JavaNonTerminalProgramElement implements St
      */
 
     public Branch() {
-    	super();
+        super();
     }
 
     /**
      * Branch.
-     * 
-     * @param proto
-     *            a branch.
+     *
+     * @param proto a branch.
      */
 
     protected Branch(Branch proto) {
@@ -46,7 +45,7 @@ public abstract class Branch extends JavaNonTerminalProgramElement implements St
 
     /**
      * Get AST parent.
-     * 
+     *
      * @return the non terminal program element.
      */
 
@@ -56,7 +55,7 @@ public abstract class Branch extends JavaNonTerminalProgramElement implements St
 
     /**
      * Get parent.
-     * 
+     *
      * @return the branch statement.
      */
 

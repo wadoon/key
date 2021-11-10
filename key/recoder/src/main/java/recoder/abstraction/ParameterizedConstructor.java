@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package recoder.abstraction;
 
@@ -10,16 +10,16 @@ import recoder.service.ImplicitElementInfo;
  *
  */
 public class ParameterizedConstructor extends ParameterizedMethod implements
-		Constructor {
+        Constructor {
 
-	/**
-	 * @param genericMethod
-	 * @param parentClassType
-	 * @param service
-	 */
-	public ParameterizedConstructor(Constructor genericConstr,
-			ParameterizedType parentClassType, ImplicitElementInfo service) {
-		super(genericConstr, parentClassType, service);
-	}
+    /**
+     * @param genericMethod
+     * @param parentClassType
+     * @param service
+     */
+    public ParameterizedConstructor(Constructor genericConstr,
+                                    ParameterizedType parentClassType, ImplicitElementInfo service) {
+        super(genericConstr, parentClassType, service);
+    }
 
 }

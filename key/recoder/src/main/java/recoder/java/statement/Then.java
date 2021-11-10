@@ -9,34 +9,33 @@ import recoder.java.Statement;
 
 /**
  * Then.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class Then extends Branch {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -1254648718755211568L;
-	
-	/**
+     * serialization id
+     */
+    private static final long serialVersionUID = -1254648718755211568L;
+
+    /**
      * Body.
      */
-	private Statement body;
+    private Statement body;
 
     /**
      * Then.
      */
     public Then() {
-    	super();
+        super();
     }
 
     /**
      * Then.
-     * 
-     * @param body
-     *            a statement.
+     *
+     * @param body a statement.
      */
 
     public Then(Statement body) {
@@ -46,9 +45,8 @@ public class Then extends Branch {
 
     /**
      * Then.
-     * 
-     * @param proto
-     *            a then.
+     *
+     * @param proto a then.
      */
 
     protected Then(Then proto) {
@@ -61,7 +59,7 @@ public class Then extends Branch {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -89,7 +87,7 @@ public class Then extends Branch {
 
     /**
      * Returns the number of children of this node.
-     * 
+     *
      * @return an int giving the number of children of this node
      */
 
@@ -100,12 +98,10 @@ public class Then extends Branch {
     /**
      * Returns the child at the specified index in this node's "virtual" child
      * array
-     * 
-     * @param index
-     *            an index into this node's "virtual" child array
+     *
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
@@ -130,14 +126,11 @@ public class Then extends Branch {
      * element can be null - in that case, the child is effectively removed. The
      * parent role of the new child is validated, while the parent link of the
      * replaced child is left untouched.
-     * 
-     * @param p
-     *            the old child.
-     * @param p
-     *            the new child.
+     *
+     * @param p the old child.
+     * @param p the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException
-     *                if the new child cannot take over the role of the old one.
+     * @throws ClassCastException if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
@@ -157,7 +150,7 @@ public class Then extends Branch {
 
     /**
      * Get the number of statements in this container.
-     * 
+     *
      * @return the number of statements.
      */
 
@@ -190,9 +183,8 @@ public class Then extends Branch {
 
     /**
      * Set body.
-     * 
-     * @param statement
-     *            a statement.
+     *
+     * @param statement a statement.
      */
 
     public void setBody(Statement statement) {
@@ -201,9 +193,8 @@ public class Then extends Branch {
 
     /**
      * Set parent.
-     * 
-     * @param parent
-     *            an if.
+     *
+     * @param parent an if.
      */
 
     public void setParent(If parent) {

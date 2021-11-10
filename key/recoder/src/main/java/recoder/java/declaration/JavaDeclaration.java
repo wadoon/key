@@ -2,43 +2,32 @@
 
 package recoder.java.declaration;
 
+import recoder.java.Declaration;
+import recoder.java.JavaNonTerminalProgramElement;
+import recoder.java.declaration.modifier.*;
+import recoder.list.generic.ASTList;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import recoder.java.Declaration;
-import recoder.java.JavaNonTerminalProgramElement;
-import recoder.java.declaration.modifier.Abstract;
-import recoder.java.declaration.modifier.Final;
-import recoder.java.declaration.modifier.Native;
-import recoder.java.declaration.modifier.Private;
-import recoder.java.declaration.modifier.Protected;
-import recoder.java.declaration.modifier.Public;
-import recoder.java.declaration.modifier.Static;
-import recoder.java.declaration.modifier.StrictFp;
-import recoder.java.declaration.modifier.Synchronized;
-import recoder.java.declaration.modifier.Transient;
-import recoder.java.declaration.modifier.VisibilityModifier;
-import recoder.java.declaration.modifier.Volatile;
-import recoder.list.generic.ASTList;
-
 /**
  * Java declaration.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public abstract class JavaDeclaration extends JavaNonTerminalProgramElement implements Declaration {
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	
-	/**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * Modifiers.
      */
 
-	ASTList<DeclarationSpecifier> declarationSpecifiers;
+    ASTList<DeclarationSpecifier> declarationSpecifiers;
 
     /**
      * Java declaration.
@@ -50,9 +39,8 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement impl
 
     /**
      * Java declaration.
-     * 
-     * @param mods
-     *            a modifier mutable list.
+     *
+     * @param mods a modifier mutable list.
      */
 
     public JavaDeclaration(ASTList<DeclarationSpecifier> mods) {
@@ -62,9 +50,8 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement impl
 
     /**
      * Java declaration.
-     * 
-     * @param proto
-     *            a java declaration.
+     *
+     * @param proto a java declaration.
      */
 
     protected JavaDeclaration(JavaDeclaration proto) {
@@ -77,21 +64,21 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement impl
 
     /**
      * Get modifiers.
-     * 
+     *
      * @return an list containing all modifiers but no annotations. Changes on the list do not reflect
      * changes on the AST!
      */
     public List<Modifier> getModifiers() {
-        if (declarationSpecifiers == null) 
-        	return Collections.emptyList();
+        if (declarationSpecifiers == null)
+            return Collections.emptyList();
         ArrayList<Modifier> mml = new ArrayList<Modifier>();
-		for (int i = 0, max = declarationSpecifiers.size(); i < max; i++) {
-			DeclarationSpecifier ds = declarationSpecifiers.get(i);
-			if (ds instanceof Modifier)
-				mml.add((Modifier)ds);
-		}
-		mml.trimToSize();
-		return mml;
+        for (int i = 0, max = declarationSpecifiers.size(); i < max; i++) {
+            DeclarationSpecifier ds = declarationSpecifiers.get(i);
+            if (ds instanceof Modifier)
+                mml.add((Modifier) ds);
+        }
+        mml.trimToSize();
+        return mml;
     }
 
     /**
@@ -102,18 +89,18 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement impl
             return Collections.emptyList();
         List<AnnotationUseSpecification> result = new ArrayList<AnnotationUseSpecification>(declarationSpecifiers.size());
         int s = declarationSpecifiers.size();
-        for(int i = 0; i < s; i++) {
+        for (int i = 0; i < s; i++) {
             DeclarationSpecifier ds = declarationSpecifiers.get(i);
             if (ds instanceof AnnotationUseSpecification)
-                result.add((AnnotationUseSpecification)ds);
+                result.add((AnnotationUseSpecification) ds);
         }
         return result;
     }
-       
+
     public ASTList<DeclarationSpecifier> getDeclarationSpecifiers() {
         return declarationSpecifiers;
     }
-    
+
     public void setDeclarationSpecifiers(ASTList<DeclarationSpecifier> m) {
         declarationSpecifiers = m;
     }

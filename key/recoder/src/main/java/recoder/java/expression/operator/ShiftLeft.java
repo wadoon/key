@@ -8,18 +8,18 @@ import recoder.java.expression.Operator;
 
 /**
  * Shift left.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class ShiftLeft extends Operator {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 840153660638293507L;
+     * serialization id
+     */
+    private static final long serialVersionUID = 840153660638293507L;
 
-	/**
+    /**
      * Shift left.
      */
 
@@ -29,11 +29,9 @@ public class ShiftLeft extends Operator {
 
     /**
      * Shift left.
-     * 
-     * @param lhs
-     *            an expression.
-     * @param rhs
-     *            an expression.
+     *
+     * @param lhs an expression.
+     * @param rhs an expression.
      */
 
     public ShiftLeft(Expression lhs, Expression rhs) {
@@ -43,9 +41,8 @@ public class ShiftLeft extends Operator {
 
     /**
      * Shift left.
-     * 
-     * @param proto
-     *            a shift left.
+     *
+     * @param proto a shift left.
      */
 
     protected ShiftLeft(ShiftLeft proto) {
@@ -55,7 +52,7 @@ public class ShiftLeft extends Operator {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -65,7 +62,7 @@ public class ShiftLeft extends Operator {
 
     /**
      * Get arity.
-     * 
+     *
      * @return the int value.
      */
 
@@ -75,7 +72,7 @@ public class ShiftLeft extends Operator {
 
     /**
      * Get precedence.
-     * 
+     *
      * @return the int value.
      */
 
@@ -85,7 +82,7 @@ public class ShiftLeft extends Operator {
 
     /**
      * Get notation.
-     * 
+     *
      * @return the int value.
      */
 

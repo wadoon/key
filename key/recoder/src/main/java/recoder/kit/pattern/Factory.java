@@ -2,22 +2,18 @@
 
 package recoder.kit.pattern;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import recoder.ModelElement;
 import recoder.ModelException;
 import recoder.abstraction.Constructor;
 import recoder.abstraction.DefaultConstructor;
-import recoder.java.declaration.ClassDeclaration;
-import recoder.java.declaration.ConstructorDeclaration;
-import recoder.java.declaration.MemberDeclaration;
-import recoder.java.declaration.MethodDeclaration;
-import recoder.java.declaration.TypeDeclaration;
+import recoder.java.declaration.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Factory implements DesignPattern {
 
-    private List<FactoryMethod> factoryMethods;
+    private final List<FactoryMethod> factoryMethods;
 
     public Factory(List<FactoryMethod> factoryMethods) {
         this.factoryMethods = factoryMethods;
@@ -53,7 +49,7 @@ public class Factory implements DesignPattern {
      * declaration.
      */
     public void addFactoryMethods(ClassDeclaration decl) {
-    	List<? extends Constructor> cl = decl.getConstructors();
+        List<? extends Constructor> cl = decl.getConstructors();
         for (int i = 0; i < cl.size(); i++) {
             if (cl.get(i) instanceof DefaultConstructor) {
                 FactoryMethod m = new FactoryMethod(decl);
@@ -78,7 +74,7 @@ public class Factory implements DesignPattern {
 
     /**
      * Get total number of participants.
-     * 
+     *
      * @return the number of participants.
      */
     public int getParticipantCount() {
@@ -87,12 +83,10 @@ public class Factory implements DesignPattern {
 
     /**
      * Get a participants by its index.
-     * 
-     * @param index
-     *            an index of a participant.
+     *
+     * @param index an index of a participant.
      * @return the participant.
-     * @exception IndexOutOfBoundsException,
-     *                if the index is not in bounds.
+     * @throws IndexOutOfBoundsException, if the index is not in bounds.
      */
     public ModelElement getParticipantAt(int index) {
         if (factoryMethods != null) {

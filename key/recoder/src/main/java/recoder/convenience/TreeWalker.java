@@ -9,7 +9,7 @@ import recoder.java.ProgramElement;
  * Walks a syntax tree in depth-first order. This roughly yields the syntactical
  * order of the program elements, except for closing parentheses and other
  * implicit lexical tokens.
- * 
+ *
  * @author AL
  */
 public class TreeWalker extends AbstractTreeWalker {

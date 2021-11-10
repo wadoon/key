@@ -11,10 +11,10 @@ import recoder.NamedModelElement;
 public class NameConflict extends Conflict {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -2147929685769271562L;
-	private NamedModelElement reason;
+     * serialization id
+     */
+    private static final long serialVersionUID = -2147929685769271562L;
+    private final NamedModelElement reason;
 
     /**
      * Creates a new problem report with the given element as the reason of the
@@ -26,7 +26,7 @@ public class NameConflict extends Conflict {
 
     /**
      * Returns the element that produced the name conflict.
-     * 
+     *
      * @return a named element.
      */
     public NamedModelElement getReason() {

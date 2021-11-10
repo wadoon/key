@@ -8,18 +8,18 @@ import recoder.java.expression.Assignment;
 
 /**
  * Pre decrement.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class PreDecrement extends Assignment {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -7068320649989091567L;
+     * serialization id
+     */
+    private static final long serialVersionUID = -7068320649989091567L;
 
-	/**
+    /**
      * Pre decrement.
      */
 
@@ -29,9 +29,8 @@ public class PreDecrement extends Assignment {
 
     /**
      * Pre decrement.
-     * 
-     * @param child
-     *            an expression.
+     *
+     * @param child an expression.
      */
 
     public PreDecrement(Expression child) {
@@ -41,9 +40,8 @@ public class PreDecrement extends Assignment {
 
     /**
      * Pre decrement.
-     * 
-     * @param proto
-     *            a pre decrement.
+     *
+     * @param proto a pre decrement.
      */
 
     protected PreDecrement(PreDecrement proto) {
@@ -53,7 +51,7 @@ public class PreDecrement extends Assignment {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -63,7 +61,7 @@ public class PreDecrement extends Assignment {
 
     /**
      * Get arity.
-     * 
+     *
      * @return the int value.
      */
 
@@ -73,7 +71,7 @@ public class PreDecrement extends Assignment {
 
     /**
      * Get precedence.
-     * 
+     *
      * @return the int value.
      */
 
@@ -83,7 +81,7 @@ public class PreDecrement extends Assignment {
 
     /**
      * Get notation.
-     * 
+     *
      * @return the int value.
      */
 

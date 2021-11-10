@@ -2,70 +2,56 @@
 
 package recoder.java.statement;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import recoder.abstraction.ClassType;
-import recoder.java.Expression;
-import recoder.java.ExpressionContainer;
-import recoder.java.ProgramElement;
-import recoder.java.SourceElement;
-import recoder.java.SourceVisitor;
-import recoder.java.TypeScope;
-import recoder.java.VariableScope;
+import recoder.java.*;
 import recoder.java.declaration.TypeDeclaration;
 import recoder.java.declaration.VariableSpecification;
 import recoder.list.generic.ASTList;
 import recoder.util.Debug;
 
+import java.util.*;
+
 /**
  * Switch.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class Switch extends BranchStatement implements ExpressionContainer, VariableScope, TypeScope {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 1L;
+     * serialization id
+     */
+    private static final long serialVersionUID = 1L;
+    /**
+     * Undefined scope tag.
+     */
 
-	/**
+    @SuppressWarnings("all")
+    private final static Map UNDEFINED_SCOPE = Collections.emptyMap();
+    /**
      * Branches.
      */
 
-	private ASTList<Branch> branches;
-
+    private ASTList<Branch> branches;
     /**
      * Expression.
      */
 
     private Expression expression;
-
-    /**
-     * Undefined scope tag.
-     */
-
-    @SuppressWarnings("all") 
-    private final static Map UNDEFINED_SCOPE = Collections.emptyMap();
-
     /**
      * Scope table for types.
      */
 
     @SuppressWarnings("unchecked")
-	private Map<String, TypeDeclaration> name2type = UNDEFINED_SCOPE;
+    private Map<String, TypeDeclaration> name2type = UNDEFINED_SCOPE;
 
     /**
      * Scope table for fields.
      */
 
     @SuppressWarnings("unchecked")
-	private Map<String, VariableSpecification> name2var = UNDEFINED_SCOPE;
+    private Map<String, VariableSpecification> name2var = UNDEFINED_SCOPE;
 
     /**
      * Switch.
@@ -77,9 +63,8 @@ public class Switch extends BranchStatement implements ExpressionContainer, Vari
 
     /**
      * Switch.
-     * 
-     * @param e
-     *            an expression.
+     *
+     * @param e an expression.
      */
 
     public Switch(Expression e) {
@@ -89,11 +74,9 @@ public class Switch extends BranchStatement implements ExpressionContainer, Vari
 
     /**
      * Switch.
-     * 
-     * @param e
-     *            an expression.
-     * @param branches
-     *            a branch mutable list.
+     *
+     * @param e        an expression.
+     * @param branches a branch mutable list.
      */
 
     public Switch(Expression e, ASTList<Branch> branches) {
@@ -104,9 +87,8 @@ public class Switch extends BranchStatement implements ExpressionContainer, Vari
 
     /**
      * Switch.
-     * 
-     * @param proto
-     *            a switch.
+     *
+     * @param proto a switch.
      */
 
     protected Switch(Switch proto) {
@@ -122,7 +104,7 @@ public class Switch extends BranchStatement implements ExpressionContainer, Vari
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -132,7 +114,7 @@ public class Switch extends BranchStatement implements ExpressionContainer, Vari
 
     /**
      * Returns the number of children of this node.
-     * 
+     *
      * @return an int giving the number of children of this node
      */
 
@@ -148,12 +130,10 @@ public class Switch extends BranchStatement implements ExpressionContainer, Vari
     /**
      * Returns the child at the specified index in this node's "virtual" child
      * array
-     * 
-     * @param index
-     *            an index into this node's "virtual" child array
+     *
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
@@ -209,14 +189,11 @@ public class Switch extends BranchStatement implements ExpressionContainer, Vari
      * element can be null - in that case, the child is effectively removed. The
      * parent role of the new child is validated, while the parent link of the
      * replaced child is left untouched.
-     * 
-     * @param p
-     *            the old child.
-     * @param p
-     *            the new child.
+     *
+     * @param p the old child.
+     * @param p the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException
-     *                if the new child cannot take over the role of the old one.
+     * @throws ClassCastException if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
@@ -254,7 +231,7 @@ public class Switch extends BranchStatement implements ExpressionContainer, Vari
 
     /**
      * Get the number of expressions in this container.
-     * 
+     *
      * @return the number of expressions.
      */
 
@@ -277,10 +254,19 @@ public class Switch extends BranchStatement implements ExpressionContainer, Vari
     }
 
     /**
+     * Get expression.
+     *
+     * @return the expression.
+     */
+
+    public Expression getExpression() {
+        return expression;
+    }
+
+    /**
      * Set expression.
-     * 
-     * @param e
-     *            an expression.
+     *
+     * @param e an expression.
      */
 
     public void setExpression(Expression e) {
@@ -291,29 +277,8 @@ public class Switch extends BranchStatement implements ExpressionContainer, Vari
     }
 
     /**
-     * Get expression.
-     * 
-     * @return the expression.
-     */
-
-    public Expression getExpression() {
-        return expression;
-    }
-
-    /**
-     * Set branch list.
-     * 
-     * @param branches
-     *            a branch mutable list.
-     */
-
-    public void setBranchList(ASTList<Branch> branches) {
-        this.branches = branches;
-    }
-
-    /**
      * Get branch list.
-     * 
+     *
      * @return the branch mutable list.
      */
 
@@ -322,8 +287,18 @@ public class Switch extends BranchStatement implements ExpressionContainer, Vari
     }
 
     /**
+     * Set branch list.
+     *
+     * @param branches a branch mutable list.
+     */
+
+    public void setBranchList(ASTList<Branch> branches) {
+        this.branches = branches;
+    }
+
+    /**
      * Get the number of branches in this container.
-     * 
+     *
      * @return the number of branches.
      */
 
@@ -350,7 +325,7 @@ public class Switch extends BranchStatement implements ExpressionContainer, Vari
     }
 
     @SuppressWarnings("unchecked")
-	public void setDefinedScope(boolean defined) {
+    public void setDefinedScope(boolean defined) {
         if (!defined) {
             name2type = UNDEFINED_SCOPE;
             name2var = UNDEFINED_SCOPE;
@@ -365,7 +340,7 @@ public class Switch extends BranchStatement implements ExpressionContainer, Vari
             return Collections.emptyList();
         }
         List<TypeDeclaration> res = new ArrayList<TypeDeclaration>(name2type.size());
-        for(TypeDeclaration td : name2type.values()) {
+        for (TypeDeclaration td : name2type.values()) {
             res.add(td);
         }
         return res;
@@ -384,7 +359,7 @@ public class Switch extends BranchStatement implements ExpressionContainer, Vari
         if (name2type == null || name2type == UNDEFINED_SCOPE) {
             name2type = new HashMap<String, TypeDeclaration>();
         }
-        name2type.put(name, (TypeDeclaration)type);
+        name2type.put(name, (TypeDeclaration) type);
     }
 
     public void removeTypeFromScope(String name) {
@@ -433,9 +408,9 @@ public class Switch extends BranchStatement implements ExpressionContainer, Vari
     public void accept(SourceVisitor v) {
         v.visitSwitch(this);
     }
-    
+
     public SourceElement getLastElement() {
-    	if (getBranchCount() == 0) return this;
-        return getBranchAt(getBranchCount()-1).getLastElement();
+        if (getBranchCount() == 0) return this;
+        return getBranchAt(getBranchCount() - 1).getLastElement();
     }
 }

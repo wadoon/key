@@ -8,18 +8,18 @@ import recoder.java.expression.Operator;
 
 /**
  * Logical and.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class LogicalAnd extends Operator {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -2981535131033326663L;
+     * serialization id
+     */
+    private static final long serialVersionUID = -2981535131033326663L;
 
-	/**
+    /**
      * Logical and.
      */
 
@@ -29,11 +29,9 @@ public class LogicalAnd extends Operator {
 
     /**
      * Logical and.
-     * 
-     * @param lhs
-     *            an expression.
-     * @param rhs
-     *            an expression.
+     *
+     * @param lhs an expression.
+     * @param rhs an expression.
      */
 
     public LogicalAnd(Expression lhs, Expression rhs) {
@@ -43,9 +41,8 @@ public class LogicalAnd extends Operator {
 
     /**
      * Logical and.
-     * 
-     * @param proto
-     *            a logical and.
+     *
+     * @param proto a logical and.
      */
 
     protected LogicalAnd(LogicalAnd proto) {
@@ -55,7 +52,7 @@ public class LogicalAnd extends Operator {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -65,7 +62,7 @@ public class LogicalAnd extends Operator {
 
     /**
      * Get arity.
-     * 
+     *
      * @return the int value.
      */
 
@@ -75,7 +72,7 @@ public class LogicalAnd extends Operator {
 
     /**
      * Get precedence.
-     * 
+     *
      * @return the int value.
      */
 
@@ -85,7 +82,7 @@ public class LogicalAnd extends Operator {
 
     /**
      * Get notation.
-     * 
+     *
      * @return the int value.
      */
 

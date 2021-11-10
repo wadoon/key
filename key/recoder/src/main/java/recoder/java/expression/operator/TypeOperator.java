@@ -10,15 +10,15 @@ import recoder.java.reference.TypeReferenceContainer;
 
 /**
  * Type operator.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public abstract class TypeOperator extends Operator implements TypeReferenceContainer {
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+     *
+     */
+    private static final long serialVersionUID = 1L;
 
 
     /**
@@ -35,11 +35,9 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
 
     /**
      * Type operator.
-     * 
-     * @param unaryChild
-     *            an expression.
-     * @param typeref
-     *            a type reference.
+     *
+     * @param unaryChild an expression.
+     * @param typeref    a type reference.
      */
     public TypeOperator(Expression unaryChild, TypeReference typeref) {
         super(unaryChild);
@@ -48,13 +46,10 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
 
     /**
      * Type operator.
-     * 
-     * @param lhs
-     *            an expression.
-     * @param rhs
-     *            an expression.
-     * @param typeref
-     *            a type reference.
+     *
+     * @param lhs     an expression.
+     * @param rhs     an expression.
+     * @param typeref a type reference.
      */
     public TypeOperator(Expression lhs, Expression rhs, TypeReference typeref) {
         super(lhs, rhs);
@@ -63,9 +58,8 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
 
     /**
      * Type operator.
-     * 
-     * @param proto
-     *            a type operator.
+     *
+     * @param proto a type operator.
      */
     protected TypeOperator(TypeOperator proto) {
         super(proto);
@@ -104,7 +98,7 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
 
     /**
      * Get the number of type references in this container.
-     * 
+     *
      * @return the number of type references.
      */
     public int getTypeReferenceCount() {
@@ -130,14 +124,11 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
      * element can be null - in that case, the child is effectively removed. The
      * parent role of the new child is validated, while the parent link of the
      * replaced child is left untouched.
-     * 
-     * @param p
-     *            the old child.
-     * @param p
-     *            the new child.
+     *
+     * @param p the old child.
+     * @param p the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException
-     *                if the new child cannot take over the role of the old one.
+     * @throws ClassCastException if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
@@ -172,7 +163,7 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
 
     /**
      * Get type reference.
-     * 
+     *
      * @return the type reference.
      */
 
@@ -182,9 +173,8 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
 
     /**
      * Set type reference.
-     * 
-     * @param t
-     *            a type reference.
+     *
+     * @param t a type reference.
      */
 
     public void setTypeReference(TypeReference t) {

@@ -10,13 +10,11 @@ import recoder.service.ProgramModelInfo;
 public abstract class ByteCodeElement implements ProgramModelElement {
 
     protected int accessFlags;
-
+    protected ByteCodeInfo service;
     private String name;
 
-    protected ByteCodeInfo service;
-
     public ByteCodeElement() {
-    	super();
+        super();
     }
 
     public ByteCodeElement(int accessFlags) {
@@ -91,13 +89,13 @@ public abstract class ByteCodeElement implements ProgramModelElement {
     }
 
     public void setProgramModelInfo(ProgramModelInfo service) {
-    	if (!(service instanceof ByteCodeInfo))
-    		throw new IllegalArgumentException("service for ByteCodeElement must be of type ByteCodeInfo.");
-        this.service = (ByteCodeInfo)service;
+        if (!(service instanceof ByteCodeInfo))
+            throw new IllegalArgumentException("service for ByteCodeElement must be of type ByteCodeInfo.");
+        this.service = (ByteCodeInfo) service;
     }
 
     public void validate() throws ModelException {
-    	// not checked yet
+        // not checked yet
     }
 
 }

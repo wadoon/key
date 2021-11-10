@@ -8,18 +8,18 @@ import recoder.java.expression.Assignment;
 
 /**
  * Pre increment.
- * 
+ *
  * @author <TT>AutoDoc</TT>
  */
 
 public class PreIncrement extends Assignment {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -1081530758324817367L;
+     * serialization id
+     */
+    private static final long serialVersionUID = -1081530758324817367L;
 
-	/**
+    /**
      * Pre increment.
      */
 
@@ -29,9 +29,8 @@ public class PreIncrement extends Assignment {
 
     /**
      * Pre increment.
-     * 
-     * @param child
-     *            an expression.
+     *
+     * @param child an expression.
      */
 
     public PreIncrement(Expression child) {
@@ -41,9 +40,8 @@ public class PreIncrement extends Assignment {
 
     /**
      * Pre increment.
-     * 
-     * @param proto
-     *            a pre increment.
+     *
+     * @param proto a pre increment.
      */
 
     protected PreIncrement(PreIncrement proto) {
@@ -53,7 +51,7 @@ public class PreIncrement extends Assignment {
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -63,7 +61,7 @@ public class PreIncrement extends Assignment {
 
     /**
      * Get arity.
-     * 
+     *
      * @return the int value.
      */
 
@@ -73,7 +71,7 @@ public class PreIncrement extends Assignment {
 
     /**
      * Get precedence.
-     * 
+     *
      * @return the int value.
      */
 
@@ -83,7 +81,7 @@ public class PreIncrement extends Assignment {
 
     /**
      * Get notation.
-     * 
+     *
      * @return the int value.
      */
 

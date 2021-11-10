@@ -2,8 +2,6 @@
 
 package recoder.kit;
 
-import java.util.List;
-
 import recoder.ProgramFactory;
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Member;
@@ -12,70 +10,61 @@ import recoder.java.declaration.DeclarationSpecifier;
 import recoder.java.declaration.MemberDeclaration;
 import recoder.java.declaration.Modifier;
 import recoder.java.declaration.TypeDeclaration;
-import recoder.java.declaration.modifier.Abstract;
-import recoder.java.declaration.modifier.Final;
-import recoder.java.declaration.modifier.Native;
-import recoder.java.declaration.modifier.Private;
-import recoder.java.declaration.modifier.Protected;
-import recoder.java.declaration.modifier.Public;
-import recoder.java.declaration.modifier.Static;
-import recoder.java.declaration.modifier.StrictFp;
-import recoder.java.declaration.modifier.Synchronized;
-import recoder.java.declaration.modifier.Transient;
-import recoder.java.declaration.modifier.VisibilityModifier;
-import recoder.java.declaration.modifier.Volatile;
+import recoder.java.declaration.modifier.*;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 import recoder.service.ChangeHistory;
 import recoder.service.SourceInfo;
 import recoder.util.Debug;
 
+import java.util.List;
+
 /**
  * this class implements basic functions for modifier handling.
- * 
+ *
  * @author Andreas Ludwig
  * @author Rainer Neumann
  */
 public class ModifierKit implements recoder.bytecode.AccessFlags {
-
-    private ModifierKit() {
-    	super();
-    }
 
     /**
      * The virtual "package" modifier code.
      */
     public final static int PACKAGE = INTERFACE;
 
+    private ModifierKit() {
+        super();
+    }
+
     public static Modifier createModifier(ProgramFactory f, int code) {
         Debug.assertNonnull(f);
         switch (code) {
-        case PACKAGE:
-            return null;
-        case PUBLIC:
-            return f.createPublic();
-        case PROTECTED:
-            return f.createProtected();
-        case PRIVATE:
-            return f.createPrivate();
-        case STATIC:
-            return f.createStatic();
-        case FINAL:
-            return f.createFinal();
-        case ABSTRACT:
-            return f.createAbstract();
-        case SYNCHRONIZED:
-            return f.createSynchronized();
-        case TRANSIENT:
-            return f.createTransient();
-        case STRICT:
-            return f.createStrictFp();
-        case VOLATILE:
-            return f.createVolatile();
-        case NATIVE:
-            return f.createNative();
-        default:
-            throw new IllegalArgumentException("Unsupported modifier code " + code);
+            case PACKAGE:
+                return null;
+            case PUBLIC:
+                return f.createPublic();
+            case PROTECTED:
+                return f.createProtected();
+            case PRIVATE:
+                return f.createPrivate();
+            case STATIC:
+                return f.createStatic();
+            case FINAL:
+                return f.createFinal();
+            case ABSTRACT:
+                return f.createAbstract();
+            case SYNCHRONIZED:
+                return f.createSynchronized();
+            case TRANSIENT:
+                return f.createTransient();
+            case STRICT:
+                return f.createStrictFp();
+            case VOLATILE:
+                return f.createVolatile();
+            case NATIVE:
+                return f.createNative();
+            default:
+                throw new IllegalArgumentException("Unsupported modifier code " + code);
         }
     }
 
@@ -146,6 +135,7 @@ public class ModifierKit implements recoder.bytecode.AccessFlags {
     // obeys the standard JavaDOC modifier order convention:
     // VisibilityModifier as first, then abstract or (static - final)
     // all others go to the last position
+
     /**
      * @deprecated replaced by recoder.kit.transformation.Modify
      */
@@ -156,120 +146,120 @@ public class ModifierKit implements recoder.bytecode.AccessFlags {
         DeclarationSpecifier m;
         int insertPos = 0;
         switch (code) {
-        case PACKAGE:
-            if (code == PACKAGE) {
+            case PACKAGE:
+                if (code == PACKAGE) {
+                    m = getVisibilityModifier(decl);
+                    if (m != null) {
+                        MiscKit.remove(ch, m);
+                    }
+                    return null;
+                }
+            case PUBLIC:
                 m = getVisibilityModifier(decl);
+                if (m instanceof Public) {
+                    return null;
+                }
                 if (m != null) {
                     MiscKit.remove(ch, m);
                 }
-                return null;
-            }
-        case PUBLIC:
-            m = getVisibilityModifier(decl);
-            if (m instanceof Public) {
-                return null;
-            }
-            if (m != null) {
-                MiscKit.remove(ch, m);
-            }
-            if (mods == null) {
-                decl.setDeclarationSpecifiers(mods = new ASTArrayList<DeclarationSpecifier>());
-            }
-            m = fact.createPublic();
-            insertPos = 0;
-            break;
-        case PROTECTED:
-            m = getVisibilityModifier(decl);
-            if (m instanceof Protected) {
-                return null;
-            }
-            if (m != null) {
-                MiscKit.remove(ch, m);
-            }
-            if (mods == null) {
-                decl.setDeclarationSpecifiers(mods = new ASTArrayList<DeclarationSpecifier>());
-            }
-            m = fact.createProtected();
-            insertPos = 0;
-            break;
-        case PRIVATE:
-            m = getVisibilityModifier(decl);
-            if (m instanceof Private) {
-                return null;
-            }
-            if (m != null) {
-                MiscKit.remove(ch, m);
-            }
-            if (mods == null) {
-                decl.setDeclarationSpecifiers(mods = new ASTArrayList<DeclarationSpecifier>());
-            }
-            m = fact.createPrivate();
-            insertPos = 0;
-            break;
-        case STATIC:
-            if (containsModifier(decl, Static.class)) {
-                return null;
-            }
-            m = getVisibilityModifier(decl);
-            insertPos = (m == null) ? 0 : 1;
-            m = fact.createStatic();
-            break;
-        case FINAL:
-            if (containsModifier(decl, Final.class)) {
-                return null;
-            }
-            m = getVisibilityModifier(decl);
-            insertPos = (m == null) ? 0 : 1;
-            if (containsModifier(decl, Static.class)) {
-                insertPos += 1;
-            }
-            m = fact.createFinal();
-            break;
-        case ABSTRACT:
-            if (containsModifier(decl, Abstract.class)) {
-                return null;
-            }
-            m = getVisibilityModifier(decl);
-            insertPos = (m == null) ? 0 : 1;
-            m = fact.createAbstract();
-            break;
-        case SYNCHRONIZED:
-            if (containsModifier(decl, Synchronized.class)) {
-                return null;
-            }
-            insertPos = (mods == null) ? 0 : mods.size();
-            m = fact.createSynchronized();
-            break;
-        case TRANSIENT:
-            if (containsModifier(decl, Transient.class)) {
-                return null;
-            }
-            insertPos = (mods == null) ? 0 : mods.size();
-            m = fact.createTransient();
-            break;
-        case STRICT:
-            if (containsModifier(decl, StrictFp.class)) {
-                return null;
-            }
-            insertPos = (mods == null) ? 0 : mods.size();
-            m = fact.createStrictFp();
-            break;
-        case VOLATILE:
-            if (containsModifier(decl, Volatile.class)) {
-                return null;
-            }
-            insertPos = (mods == null) ? 0 : mods.size();
-            m = fact.createVolatile();
-            break;
-        case NATIVE:
-            if (containsModifier(decl, Native.class)) {
-                return null;
-            }
-            insertPos = (mods == null) ? 0 : mods.size();
-            m = fact.createNative();
-            break;
-        default:
-            throw new IllegalArgumentException("Unsupported modifier code " + code);
+                if (mods == null) {
+                    decl.setDeclarationSpecifiers(mods = new ASTArrayList<DeclarationSpecifier>());
+                }
+                m = fact.createPublic();
+                insertPos = 0;
+                break;
+            case PROTECTED:
+                m = getVisibilityModifier(decl);
+                if (m instanceof Protected) {
+                    return null;
+                }
+                if (m != null) {
+                    MiscKit.remove(ch, m);
+                }
+                if (mods == null) {
+                    decl.setDeclarationSpecifiers(mods = new ASTArrayList<DeclarationSpecifier>());
+                }
+                m = fact.createProtected();
+                insertPos = 0;
+                break;
+            case PRIVATE:
+                m = getVisibilityModifier(decl);
+                if (m instanceof Private) {
+                    return null;
+                }
+                if (m != null) {
+                    MiscKit.remove(ch, m);
+                }
+                if (mods == null) {
+                    decl.setDeclarationSpecifiers(mods = new ASTArrayList<DeclarationSpecifier>());
+                }
+                m = fact.createPrivate();
+                insertPos = 0;
+                break;
+            case STATIC:
+                if (containsModifier(decl, Static.class)) {
+                    return null;
+                }
+                m = getVisibilityModifier(decl);
+                insertPos = (m == null) ? 0 : 1;
+                m = fact.createStatic();
+                break;
+            case FINAL:
+                if (containsModifier(decl, Final.class)) {
+                    return null;
+                }
+                m = getVisibilityModifier(decl);
+                insertPos = (m == null) ? 0 : 1;
+                if (containsModifier(decl, Static.class)) {
+                    insertPos += 1;
+                }
+                m = fact.createFinal();
+                break;
+            case ABSTRACT:
+                if (containsModifier(decl, Abstract.class)) {
+                    return null;
+                }
+                m = getVisibilityModifier(decl);
+                insertPos = (m == null) ? 0 : 1;
+                m = fact.createAbstract();
+                break;
+            case SYNCHRONIZED:
+                if (containsModifier(decl, Synchronized.class)) {
+                    return null;
+                }
+                insertPos = (mods == null) ? 0 : mods.size();
+                m = fact.createSynchronized();
+                break;
+            case TRANSIENT:
+                if (containsModifier(decl, Transient.class)) {
+                    return null;
+                }
+                insertPos = (mods == null) ? 0 : mods.size();
+                m = fact.createTransient();
+                break;
+            case STRICT:
+                if (containsModifier(decl, StrictFp.class)) {
+                    return null;
+                }
+                insertPos = (mods == null) ? 0 : mods.size();
+                m = fact.createStrictFp();
+                break;
+            case VOLATILE:
+                if (containsModifier(decl, Volatile.class)) {
+                    return null;
+                }
+                insertPos = (mods == null) ? 0 : mods.size();
+                m = fact.createVolatile();
+                break;
+            case NATIVE:
+                if (containsModifier(decl, Native.class)) {
+                    return null;
+                }
+                insertPos = (mods == null) ? 0 : mods.size();
+                m = fact.createNative();
+                break;
+            default:
+                throw new IllegalArgumentException("Unsupported modifier code " + code);
         }
         mods.add(insertPos, m);
         m.setParent(decl); // make parent role valid
@@ -286,6 +276,7 @@ public class ModifierKit implements recoder.bytecode.AccessFlags {
     // inner types; this case rarely occurs and will be handled by assigning
     // package visibility -- which also is what a byte code compiler would
     // generate anyway.
+
     /**
      * @deprecated will be replaced; does not make visible redefined members
      */

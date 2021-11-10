@@ -4,26 +4,13 @@ package recoder.util;
  * Helper class that handles progress listener registration and broadcasts.
  * Caches and reuses the event object, so listeners should not store the event
  * object.
- * 
+ *
  * @author AL
  * @since 0.72
  */
 public final class ProgressListenerManager {
 
-    private class ReuseableProgressEvent extends ProgressEvent {
-
-        /**
-		 * serialization id
-		 */
-		private static final long serialVersionUID = -8120253607435943831L;
-
-		public ReuseableProgressEvent(Object source, int workDone, int workToDo, Object state) {
-            super(source, workDone, workToDo, state);
-        }
-    }
-
     private final ReuseableProgressEvent progressEvent;
-
     private ProgressListener[] progressListeners = new ProgressListener[0];
 
     public ProgressListenerManager(Object source) {
@@ -102,6 +89,18 @@ public final class ProgressListenerManager {
                     break;
                 }
             }
+        }
+    }
+
+    private class ReuseableProgressEvent extends ProgressEvent {
+
+        /**
+         * serialization id
+         */
+        private static final long serialVersionUID = -8120253607435943831L;
+
+        public ReuseableProgressEvent(Object source, int workDone, int workToDo, Object state) {
+            super(source, workDone, workToDo, state);
         }
     }
 }

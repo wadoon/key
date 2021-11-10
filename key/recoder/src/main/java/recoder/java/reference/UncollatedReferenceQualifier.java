@@ -3,16 +3,7 @@
 package recoder.java.reference;
 
 import recoder.convenience.Naming;
-import recoder.java.Expression;
-import recoder.java.ExpressionContainer;
-import recoder.java.Identifier;
-import recoder.java.Import;
-import recoder.java.JavaNonTerminalProgramElement;
-import recoder.java.NonTerminalProgramElement;
-import recoder.java.ProgramElement;
-import recoder.java.Reference;
-import recoder.java.SourceElement;
-import recoder.java.SourceVisitor;
+import recoder.java.*;
 import recoder.java.declaration.TypeArgumentDeclaration;
 import recoder.list.generic.ASTList;
 
@@ -21,7 +12,7 @@ import recoder.list.generic.ASTList;
  * currently not known which exact program element this reference represents,
  * this class inherits from many different program elements, where inheritance
  * means "may be one of these" instead of "is a".
- * 
+ *
  * @author AL
  * @author RN
  */
@@ -30,15 +21,15 @@ public class UncollatedReferenceQualifier extends JavaNonTerminalProgramElement 
         ExpressionContainer, TypeReferenceContainer, PackageReferenceContainer, Expression {
 
     /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -1896030875000030810L;
+     * serialization id
+     */
+    private static final long serialVersionUID = -1896030875000030810L;
 
-	/**
+    /**
      * Parent. Can be an expression container, or import.
      */
 
-	private NonTerminalProgramElement parent;
+    private NonTerminalProgramElement parent;
 
     /**
      * Non-suffix container.
@@ -54,7 +45,7 @@ public class UncollatedReferenceQualifier extends JavaNonTerminalProgramElement 
      * Type Arguments
      */
     private ASTList<TypeArgumentDeclaration> typeArguments;
-    
+
     /**
      * Name.
      */
@@ -66,14 +57,13 @@ public class UncollatedReferenceQualifier extends JavaNonTerminalProgramElement 
      */
 
     public UncollatedReferenceQualifier() {
-    	// nothing to do here
+        // nothing to do here
     }
 
     /**
      * Uncollated reference qualifier.
-     * 
-     * @param id
-     *            an identifier.
+     *
+     * @param id an identifier.
      */
 
     public UncollatedReferenceQualifier(Identifier id) {
@@ -83,11 +73,9 @@ public class UncollatedReferenceQualifier extends JavaNonTerminalProgramElement 
 
     /**
      * Uncollated reference qualifier.
-     * 
-     * @param prefix
-     *            a reference prefix.
-     * @param id
-     *            an identifier.
+     *
+     * @param prefix a reference prefix.
+     * @param id     an identifier.
      */
 
     public UncollatedReferenceQualifier(ReferencePrefix prefix, Identifier id) {
@@ -98,9 +86,8 @@ public class UncollatedReferenceQualifier extends JavaNonTerminalProgramElement 
 
     /**
      * Uncollated reference qualifier.
-     * 
-     * @param proto
-     *            an uncollated reference qualifier.
+     *
+     * @param proto an uncollated reference qualifier.
      */
 
     protected UncollatedReferenceQualifier(UncollatedReferenceQualifier proto) {
@@ -112,14 +99,14 @@ public class UncollatedReferenceQualifier extends JavaNonTerminalProgramElement 
             name = proto.name.deepClone();
         }
         if (proto.typeArguments != null) {
-        	typeArguments = proto.typeArguments.deepClone();
+            typeArguments = proto.typeArguments.deepClone();
         }
         makeParentRoleValid();
     }
 
     /**
      * Deep clone.
-     * 
+     *
      * @return the object.
      */
 
@@ -139,8 +126,8 @@ public class UncollatedReferenceQualifier extends JavaNonTerminalProgramElement 
             name.setParent(this);
         }
         if (typeArguments != null) {
-        	for(TypeArgumentDeclaration ta : typeArguments)
-        		ta.setParent(this);
+            for (TypeArgumentDeclaration ta : typeArguments)
+                ta.setParent(this);
         }
     }
 
@@ -150,7 +137,7 @@ public class UncollatedReferenceQualifier extends JavaNonTerminalProgramElement 
 
     /**
      * Get AST parent.
-     * 
+     *
      * @return the non terminal program element.
      */
 
@@ -164,14 +151,11 @@ public class UncollatedReferenceQualifier extends JavaNonTerminalProgramElement 
      * element can be null - in that case, the child is effectively removed. The
      * parent role of the new child is validated, while the parent link of the
      * replaced child is left untouched.
-     * 
-     * @param p
-     *            the old child.
-     * @param p
-     *            the new child.
+     *
+     * @param p the old child.
+     * @param p the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException
-     *                if the new child cannot take over the role of the old one.
+     * @throws ClassCastException if the new child cannot take over the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
@@ -195,23 +179,23 @@ public class UncollatedReferenceQualifier extends JavaNonTerminalProgramElement 
             return true;
         }
         if (typeArguments != null) {
-        	int idx = typeArguments.indexOf(p);
-        	if (idx != -1) {
-        		if (q == null) {
-        			typeArguments.remove(idx);
-        		} else {
-        			typeArguments.set(idx, (TypeArgumentDeclaration)q);
-        			((TypeArgumentDeclaration)q).setParent(this);
-        		}
-        		return true;
-        	}
+            int idx = typeArguments.indexOf(p);
+            if (idx != -1) {
+                if (q == null) {
+                    typeArguments.remove(idx);
+                } else {
+                    typeArguments.set(idx, (TypeArgumentDeclaration) q);
+                    ((TypeArgumentDeclaration) q).setParent(this);
+                }
+                return true;
+            }
         }
         return false;
     }
 
     /**
      * Get expression container.
-     * 
+     *
      * @return the expression container.
      */
 
@@ -224,19 +208,18 @@ public class UncollatedReferenceQualifier extends JavaNonTerminalProgramElement 
 
     /**
      * Set expression container.
-     * 
-     * @param c
-     *            an expression container.
+     *
+     * @param c an expression container.
      */
 
     public void setExpressionContainer(ExpressionContainer c) {
         parent = c;
         suffix = null;
     }
-    
+
     /**
      * Returns the number of children of this node.
-     * 
+     *
      * @return an int giving the number of children of this node
      */
 
@@ -247,19 +230,17 @@ public class UncollatedReferenceQualifier extends JavaNonTerminalProgramElement 
         if (name != null)
             result++;
         if (typeArguments != null)
-        	result += typeArguments.size();
+            result += typeArguments.size();
         return result;
     }
 
     /**
      * Returns the child at the specified index in this node's "virtual" child
      * array
-     * 
-     * @param index
-     *            an index into this node's "virtual" child array
+     *
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
@@ -274,7 +255,7 @@ public class UncollatedReferenceQualifier extends JavaNonTerminalProgramElement 
             index--;
         }
         if (typeArguments != null) {
-        	return typeArguments.get(index);
+            return typeArguments.get(index);
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -282,7 +263,7 @@ public class UncollatedReferenceQualifier extends JavaNonTerminalProgramElement 
     public int getChildPositionCode(ProgramElement child) {
         // role 0: prefix
         // role 1: name
-    	// role 2(idx): type argument
+        // role 2(idx): type argument
         if (prefix == child) {
             return 0;
         }
@@ -290,16 +271,16 @@ public class UncollatedReferenceQualifier extends JavaNonTerminalProgramElement 
             return 1;
         }
         if (typeArguments != null) {
-        	int idx = typeArguments.indexOf(child);
-        	if (idx != -1)
-        		return (idx << 4) | 2;
+            int idx = typeArguments.indexOf(child);
+            if (idx != -1)
+                return (idx << 4) | 2;
         }
         return -1;
     }
 
     /**
      * Get the number of type references in this container.
-     * 
+     *
      * @return the number of type references.
      */
 
@@ -323,7 +304,7 @@ public class UncollatedReferenceQualifier extends JavaNonTerminalProgramElement 
 
     /**
      * Get the package reference.
-     * 
+     *
      * @return the package reference.
      */
 
@@ -333,7 +314,7 @@ public class UncollatedReferenceQualifier extends JavaNonTerminalProgramElement 
 
     /**
      * Get the number of expressions in this container.
-     * 
+     *
      * @return the number of expressions.
      */
 
@@ -357,7 +338,7 @@ public class UncollatedReferenceQualifier extends JavaNonTerminalProgramElement 
 
     /**
      * Get reference prefix.
-     * 
+     *
      * @return the reference prefix.
      */
 
@@ -367,9 +348,8 @@ public class UncollatedReferenceQualifier extends JavaNonTerminalProgramElement 
 
     /**
      * Set reference prefix.
-     * 
-     * @param prefix
-     *            a reference prefix.
+     *
+     * @param prefix a reference prefix.
      */
 
     public void setReferencePrefix(ReferencePrefix prefix) {
@@ -378,7 +358,7 @@ public class UncollatedReferenceQualifier extends JavaNonTerminalProgramElement 
 
     /**
      * Get reference suffix.
-     * 
+     *
      * @return the reference suffix.
      */
 
@@ -388,9 +368,8 @@ public class UncollatedReferenceQualifier extends JavaNonTerminalProgramElement 
 
     /**
      * Set reference suffix.
-     * 
-     * @param x
-     *            a reference suffix.
+     *
+     * @param x a reference suffix.
      */
 
     public void setReferenceSuffix(ReferenceSuffix x) {
@@ -401,9 +380,8 @@ public class UncollatedReferenceQualifier extends JavaNonTerminalProgramElement 
     /**
      * Sets an import statement as parent. Useful for Java 5 only,
      * where Identifiers are part of static imports.
-     * 
-     * @param imp
-     *            an import statement.
+     *
+     * @param imp an import statement.
      */
 
     public void setParent(Import imp) {
@@ -413,7 +391,7 @@ public class UncollatedReferenceQualifier extends JavaNonTerminalProgramElement 
 
     /**
      * Get name.
-     * 
+     *
      * @return the string.
      */
 
@@ -423,7 +401,7 @@ public class UncollatedReferenceQualifier extends JavaNonTerminalProgramElement 
 
     /**
      * Get identifier.
-     * 
+     *
      * @return the identifier.
      */
 
@@ -433,9 +411,8 @@ public class UncollatedReferenceQualifier extends JavaNonTerminalProgramElement 
 
     /**
      * Set identifier.
-     * 
-     * @param id
-     *            an identifier.
+     *
+     * @param id an identifier.
      */
 
     public void setIdentifier(Identifier id) {
@@ -451,7 +428,7 @@ public class UncollatedReferenceQualifier extends JavaNonTerminalProgramElement 
 
     /**
      * To variable reference.
-     * 
+     *
      * @return the variable reference.
      */
 
@@ -467,7 +444,7 @@ public class UncollatedReferenceQualifier extends JavaNonTerminalProgramElement 
 
     /**
      * To field reference.
-     * 
+     *
      * @return the variable reference.
      */
 
@@ -484,7 +461,7 @@ public class UncollatedReferenceQualifier extends JavaNonTerminalProgramElement 
 
     /**
      * To type reference.
-     * 
+     *
      * @return the type reference.
      */
 
@@ -501,7 +478,7 @@ public class UncollatedReferenceQualifier extends JavaNonTerminalProgramElement 
 
     /**
      * To package reference. Converts the prefix, if necessary.
-     * 
+     *
      * @return the package reference.
      */
 
@@ -521,17 +498,17 @@ public class UncollatedReferenceQualifier extends JavaNonTerminalProgramElement 
     public void accept(SourceVisitor v) {
         v.visitUncollatedReferenceQualifier(this);
     }
-    
-    public void setTypeArguments(ASTList<TypeArgumentDeclaration> ta) {
-    	this.typeArguments = ta;
-    }
-    
+
     public ASTList<TypeArgumentDeclaration> getTypeArguments() {
-    	return typeArguments;
+        return typeArguments;
     }
-    
+
+    public void setTypeArguments(ASTList<TypeArgumentDeclaration> ta) {
+        this.typeArguments = ta;
+    }
+
     @Override
     public String toString() {
-    	return "<URQ> " + Naming.toPathName(this);
+        return "<URQ> " + Naming.toPathName(this);
     }
 }

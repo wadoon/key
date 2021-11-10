@@ -8,7 +8,7 @@ import recoder.java.ProgramElement;
 /**
  * A "generic" iterator that traverses an AST and notifies a possibly registered
  * ASTIteratorListener.
- * 
+ *
  * @author RN
  */
 public class ASTIterator {
@@ -31,21 +31,22 @@ public class ASTIterator {
      */
     public static final int ENTER_ALL = 2;
 
-    /** The listener that is notified during AST traversal. */
+    /**
+     * The listener that is notified during AST traversal.
+     */
     ASTIteratorListener listener = null;
 
     /**
      * Creates a new ASTIterator.
      */
     public ASTIterator() {
-    	super();
+        super();
     }
 
     /**
      * Creates a new ASTIterator assigned to the given listener.
-     * 
-     * @param l
-     *            the iterator listener
+     *
+     * @param l the iterator listener
      */
     public ASTIterator(ASTIteratorListener l) {
         setListener(l);
@@ -53,9 +54,8 @@ public class ASTIterator {
 
     /**
      * Assigns a certain listener to the iterator.
-     * 
-     * @param l
-     *            the listener
+     *
+     * @param l the listener
      */
     public void setListener(ASTIteratorListener l) {
         listener = l;
@@ -63,9 +63,8 @@ public class ASTIterator {
 
     /**
      * Performs a depth first search traversal through the given AST.
-     * 
-     * @param pe
-     *            the AST element to iterate through
+     *
+     * @param pe the AST element to iterate through
      */
     public void iterate(ProgramElement pe) {
         if (listener != null) {
@@ -78,9 +77,8 @@ public class ASTIterator {
     /**
      * Recurses through the given AST in depth first search order. This method
      * calls the ASTIteratorListener methods.
-     * 
-     * @param pe
-     *            the current program element.
+     *
+     * @param pe the current program element.
      */
     protected void recurse(ProgramElement pe) {
         if (pe != null) {
@@ -89,24 +87,24 @@ public class ASTIterator {
                 NonTerminalProgramElement ntpe = (NonTerminalProgramElement) pe;
                 int childCount;
                 switch (listener.enterChildren(this, ntpe)) {
-                case ASTIterator.ENTER_NONE:
-                    break;
-                case ASTIterator.ENTER_SOME:
-                    childCount = ntpe.getChildCount();
-                    for (int i = 0; i < childCount; i++) {
-                        ProgramElement child = ntpe.getChildAt(i);
-                        if (listener.enterChildNode(this, ntpe, child)) {
-                            recurse(child);
-                            listener.returnedFromChildNode(this, ntpe, child);
+                    case ASTIterator.ENTER_NONE:
+                        break;
+                    case ASTIterator.ENTER_SOME:
+                        childCount = ntpe.getChildCount();
+                        for (int i = 0; i < childCount; i++) {
+                            ProgramElement child = ntpe.getChildAt(i);
+                            if (listener.enterChildNode(this, ntpe, child)) {
+                                recurse(child);
+                                listener.returnedFromChildNode(this, ntpe, child);
+                            }
                         }
-                    }
-                    break;
-                case ASTIterator.ENTER_ALL:
-                    childCount = ntpe.getChildCount();
-                    for (int i = 0; i < childCount; i++) {
-                        ProgramElement child = ntpe.getChildAt(i);
-                        recurse(child);
-                    }
+                        break;
+                    case ASTIterator.ENTER_ALL:
+                        childCount = ntpe.getChildCount();
+                        for (int i = 0; i < childCount; i++) {
+                            ProgramElement child = ntpe.getChildAt(i);
+                            recurse(child);
+                        }
                 }
             }
             listener.leavingNode(this, pe);
@@ -117,16 +115,15 @@ public class ASTIterator {
      * Recurses through the given AST in depth first search order. This method
      * is only called if no iterator listener has been assigned. The purpose of
      * this method is to be specialized within subclasses:
-     * 
+     *
      * <PRE>
-     * 
+     * <p>
      * protected void simpleRecurse(ProgramElement pe) {
      * super.simpleRecurse(pe); dosomething(pe); }
-     * 
+     *
      * </PRE>
-     * 
-     * @param pe
-     *            the current program element.
+     *
+     * @param pe the current program element.
      */
     protected void simpleRecurse(ProgramElement pe) {
         if (pe instanceof NonTerminalProgramElement) {

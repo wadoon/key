@@ -2,40 +2,29 @@
 
 package recoder.io;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Properties;
-import java.util.StringTokenizer;
-
 import recoder.ServiceConfiguration;
 import recoder.convenience.Naming;
 import recoder.java.CompilationUnit;
 import recoder.util.FileUtils;
 
+import java.io.*;
+import java.util.*;
+
 /**
  * Imports and exports simple properties files.
- * 
+ *
  * @since 0.63
  */
 public class DefaultProjectFileIO extends ProjectFileIO implements PropertyNames {
 
-    private File file;
+    private final File file;
 
     /**
      * Sets up a new project file IO facility that reads from and/or writes to
      * the specified (.properties) file.
-     * 
-     * @param system
-     *            the service configuration to initialize.
-     * @param projectFile
-     *            the project file to load and/or save.
+     *
+     * @param system      the service configuration to initialize.
+     * @param projectFile the project file to load and/or save.
      */
     public DefaultProjectFileIO(ServiceConfiguration system, File projectFile) {
         super(system);
@@ -47,7 +36,7 @@ public class DefaultProjectFileIO extends ProjectFileIO implements PropertyNames
 
     /**
      * Returns the project file assigned.
-     * 
+     *
      * @return the current project file.
      */
     public File getProjectFile() {
@@ -104,12 +93,12 @@ public class DefaultProjectFileIO extends ProjectFileIO implements PropertyNames
     }
 
     private String resolvePathnames(String parentDir, String relativePathList) {
-    	StringBuilder newpath = new StringBuilder();
+        StringBuilder newpath = new StringBuilder();
         if (File.pathSeparatorChar == ':')
             relativePathList = relativePathList.replace(';', ':');
         else if (File.pathSeparatorChar == ';'
-            && relativePathList.indexOf(":\\") == -1
-            && relativePathList.indexOf(":/") == -1)
+                && relativePathList.indexOf(":\\") == -1
+                && relativePathList.indexOf(":/") == -1)
             relativePathList = relativePathList.replace(':', ';');
         StringTokenizer paths = new StringTokenizer(relativePathList, File.pathSeparator);
         boolean firstToken = true;

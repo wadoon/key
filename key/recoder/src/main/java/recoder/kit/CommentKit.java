@@ -2,20 +2,15 @@
 
 package recoder.kit;
 
-import java.util.List;
-
 import recoder.ProgramFactory;
 import recoder.java.DocComment;
-import recoder.java.declaration.ClassDeclaration;
-import recoder.java.declaration.FieldDeclaration;
-import recoder.java.declaration.MethodDeclaration;
-import recoder.java.declaration.ParameterDeclaration;
-import recoder.java.declaration.Throws;
-import recoder.java.declaration.TypeDeclaration;
+import recoder.java.declaration.*;
 import recoder.java.reference.TypeReference;
 import recoder.service.NameInfo;
 import recoder.service.SourceInfo;
 import recoder.util.Debug;
+
+import java.util.List;
 
 public class CommentKit {
 
@@ -26,12 +21,10 @@ public class CommentKit {
     /**
      * Factory method creating an empty or faked comment conforming to JavaDoc
      * conventions for the given method declaration.
-     * 
-     * @param method
-     *            a non- <CODE>null</CODE> method declaration.
-     * @param dummy
-     *            flag to indicate whether a fake comment text should be
-     *            inserted.
+     *
+     * @param method a non- <CODE>null</CODE> method declaration.
+     * @param dummy  flag to indicate whether a fake comment text should be
+     *               inserted.
      * @return a brand-new doc comment.
      */
     public static DocComment createDoc(MethodDeclaration method, boolean dummy) {
@@ -62,7 +55,7 @@ public class CommentKit {
         }
         Throws th = method.getThrown();
         if (th != null) {
-        	List<TypeReference> excepts = th.getExceptions();
+            List<TypeReference> excepts = th.getExceptions();
             for (int i = 0; i < excepts.size(); i += 1) {
                 TypeReference tr = excepts.get(i);
                 text.append("  @exception " + tr.getName());
@@ -78,12 +71,10 @@ public class CommentKit {
     /**
      * Factory method creating an empty or faked comment conforming to JavaDoc
      * conventions for the given field declaration.
-     * 
-     * @param field
-     *            a non- <CODE>null</CODE> field declaration.
-     * @param dummy
-     *            flag to indicate whether a fake comment text should be
-     *            inserted.
+     *
+     * @param field a non- <CODE>null</CODE> field declaration.
+     * @param dummy flag to indicate whether a fake comment text should be
+     *              inserted.
      * @return a brand-new doc comment.
      */
     public static DocComment createDoc(FieldDeclaration field, boolean dummy) {
@@ -102,16 +93,12 @@ public class CommentKit {
      * conventions for the given field declaration. This variant creates an
      * empty serial tag when the enclosing type is a class implementing <CODE>
      * java.io.Serializable</CODE>.
-     * 
-     * @param si
-     *            the source info service.
-     * @param ni
-     *            the name info service.
-     * @param field
-     *            a non- <CODE>null</CODE> field declaration.
-     * @param dummy
-     *            flag to indicate whether a fake comment text should be
-     *            inserted.
+     *
+     * @param si    the source info service.
+     * @param ni    the name info service.
+     * @param field a non- <CODE>null</CODE> field declaration.
+     * @param dummy flag to indicate whether a fake comment text should be
+     *              inserted.
      * @return a brand-new doc comment.
      */
     public static DocComment createDoc(SourceInfo si, NameInfo ni, FieldDeclaration field, boolean dummy) {
@@ -136,12 +123,10 @@ public class CommentKit {
     /**
      * Factory method creating an empty or faked comment conforming to JavaDoc
      * conventions for the given type declaration.
-     * 
-     * @param type
-     *            a non- <CODE>null</CODE> type declaration.
-     * @param dummy
-     *            flag to indicate whether a fake comment text should be
-     *            inserted.
+     *
+     * @param type  a non- <CODE>null</CODE> type declaration.
+     * @param dummy flag to indicate whether a fake comment text should be
+     *              inserted.
      * @return a brand-new doc comment.
      */
     public static DocComment createDoc(TypeDeclaration type, boolean dummy) {
@@ -159,12 +144,10 @@ public class CommentKit {
      * Guesses a documentation for the given type (reference). The generated
      * documentation perfectly describes the type, given that it is perfectly
      * self-explanatory ;)
-     * 
-     * @param tr
-     *            a type reference.
-     * @param returned
-     *            flag indicating if the documentation should describe a method
-     *            return value.
+     *
+     * @param tr       a type reference.
+     * @param returned flag indicating if the documentation should describe a method
+     *                 return value.
      * @return the description string.
      */
     static String guessDocumentation(TypeReference tr, boolean returned) {
@@ -177,21 +160,21 @@ public class CommentKit {
         }
         String ty = guessDocumentation(tn, false);
         switch (tr.getDimensions()) {
-        case 0:
-            if (returned) {
-                return "the " + ty;
-            }
-            if ("aeiouAEIOU".indexOf(ty.charAt(0)) >= 0) {
-                return "an " + ty;
-            } else {
-                return "a " + ty;
-            }
-        case 1:
-            return (returned ? "the" : "an") + " array of " + ty;
-        case 2:
-            return (returned ? "the" : "a") + " matrix of " + ty;
-        default:
-            return (returned ? "the" : "a") + " multi-dimensional array of " + ty;
+            case 0:
+                if (returned) {
+                    return "the " + ty;
+                }
+                if ("aeiouAEIOU".indexOf(ty.charAt(0)) >= 0) {
+                    return "an " + ty;
+                } else {
+                    return "a " + ty;
+                }
+            case 1:
+                return (returned ? "the" : "an") + " array of " + ty;
+            case 2:
+                return (returned ? "the" : "a") + " matrix of " + ty;
+            default:
+                return (returned ? "the" : "a") + " multi-dimensional array of " + ty;
         }
     }
 
@@ -199,12 +182,10 @@ public class CommentKit {
      * Derives a documentation from a given name. The method assumes that the
      * Sun conventions are met and separates the words: <TT>
      * guessDocumentation("HelloWorld", false) == "hello world."</TT>
-     * 
-     * @param name
-     *            a string used as an identifier.
-     * @param capital
-     *            flag indicating if the first word of the derived documentation
-     *            should start with a capital letter.
+     *
+     * @param name    a string used as an identifier.
+     * @param capital flag indicating if the first word of the derived documentation
+     *                should start with a capital letter.
      * @return the description string.
      */
     static String guessDocumentation(String name, boolean capital) {

@@ -28,22 +28,22 @@ public class FactoryMethod implements DesignPattern {
     /**
      * Creates a new factory method using the given constructor. Given a
      * constructor of the form
-     * 
+     *
      * <PRE>
-     * 
+     * <p>
      * [Modifiers] [Typename] ([Parameters]>) [Exceptions]
-     * 
+     *
      * </PRE>
-     * 
+     * <p>
      * the created producer looks like
-     * 
+     *
      * <PRE>
-     * 
+     * <p>
      * [Modifiers] [Typename] create[Typename]([Arguments]) [Exceptions] {
      * return new [Typename]([Arguments]); }
-     * 
+     *
      * </PRE>
-     * 
+     * <p>
      * where the [Arguments] have the same names as in the [Parameters] list.
      */
     public FactoryMethod(ConstructorDeclaration product) {
@@ -112,7 +112,7 @@ public class FactoryMethod implements DesignPattern {
 
     /**
      * Get total number of participants.
-     * 
+     *
      * @return the number of participants.
      */
     public int getParticipantCount() {
@@ -126,12 +126,10 @@ public class FactoryMethod implements DesignPattern {
 
     /**
      * Get a participants by its index.
-     * 
-     * @param index
-     *            an index of a participant.
+     *
+     * @param index an index of a participant.
      * @return the participant.
-     * @exception IndexOutOfBoundsException,
-     *                if the index is not in bounds.
+     * @throws IndexOutOfBoundsException, if the index is not in bounds.
      */
     public ModelElement getParticipantAt(int index) {
         if (producer != null) {
