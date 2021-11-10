@@ -101,9 +101,9 @@ public class Services implements TermServices {
         this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
         this.termBuilderWithoutCache = new TermBuilder(new TermFactory(), this);
         this.specRepos = new SpecificationRepository(this);
-        cee = new ConstantExpressionEvaluator(this);
+        cee = new ConstantExpressionEvaluator(javaService.createJavaParser());
         typeconverter = new TypeConverter(this);
-        javainfo = new JavaInfo(new KeYProgModelInfo(typeconverter, new KeYRecoderExcHandler()), this);
+        javainfo = null; //TODO new JavaInfo(new KeYProgModelInfo(typeconverter, new KeYRecoderExcHandler()), this);
         nameRecorder = new NameRecorder();
     }
 
@@ -118,9 +118,9 @@ public class Services implements TermServices {
         this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
         this.termBuilderWithoutCache = new TermBuilder(new TermFactory(), this);
         this.specRepos = new SpecificationRepository(this);
-        cee = new ConstantExpressionEvaluator(this);
+        cee = new ConstantExpressionEvaluator(javaService.createJavaParser());
         typeconverter = new TypeConverter(this);
-        javainfo = new JavaInfo(new KeYProgModelInfo(this, crsc, rec2key, typeconverter), this);
+        javainfo = null;//TODO new JavaInfo(new KeYProgModelInfo(typeconverter, new KeYRecoderExcHandler()), this);
         nameRecorder = new NameRecorder();
     }
 

@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.java.ast.declaration;
 
+import com.github.javaparser.ast.body.EnumConstantDeclaration;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -38,7 +39,7 @@ public class EnumClassDeclaration extends ClassDeclaration {
     /**
      * store the program variables which represent the enum constants
      */
-    private final List<IProgramVariable> constants = new ArrayList<IProgramVariable>();
+    private final List<IProgramVariable> constants = new ArrayList<>();
 
     /**
      * create a new EnumClassDeclaration that describes an enum defintion. It
@@ -57,7 +58,7 @@ public class EnumClassDeclaration extends ClassDeclaration {
         super(children, fullName, isLibrary);
 
         for (EnumConstantDeclaration ecd : enumConstantDeclarations) {
-            String constName = ecd.getEnumConstantSpecification().getName();
+            String constName = ecd.getNameAsString();
             constants.add(findAttr(constName));
         }
     }
