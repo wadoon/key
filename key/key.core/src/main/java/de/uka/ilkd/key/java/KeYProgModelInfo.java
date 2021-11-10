@@ -447,12 +447,16 @@ public class KeYProgModelInfo{
 	 */
     public ImmutableList<ProgramMethod> getAllProgramMethodsLocallyDeclared(KeYJavaType ct){
         List<recoder.abstraction.Method> rml = getRecoderMethods(ct);
-        ImmutableList<ProgramMethod> result = ImmutableSLList.<ProgramMethod>nil();
+        ImmutableList<ProgramMethod> result = ImmutableSLList.nil();
         for (int i=rml.size()-1; i>=0; i--) {
-            recoder.abstraction.Method rm=rml.get(i);
-	    if(!(rm instanceof recoder.bytecode.MethodInfo)){
-		result = result.prepend((ProgramMethod) rec2key().toKeY(rm));
-	    }
+            recoder.abstraction.Method rm = rml.get(i);
+            if(!(rm instanceof recoder.bytecode.MethodInfo)){
+                final var element = (ProgramMethod) rec2key().toKeY(rm);
+                if (element != null) {
+                    result = result.prepend(element);
+                }
+
+            }
         }
         return result;
     }
