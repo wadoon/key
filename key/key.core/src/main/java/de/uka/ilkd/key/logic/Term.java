@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.logic;
 
+import javax.annotation.Nullable;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -190,4 +191,19 @@ public interface Term extends SVSubstitute, Sorted {
      * @see TermLabel#isStrategyRelevant
      */
     boolean equalsModIrrelevantTermLabels(Object o);
+
+    /**
+     * Checks if {@code o} is a term syntactically equal to this one, ignoring <b>all</b> term
+     * labels.
+     *
+     * @param o an object
+     * @return {@code true} iff {@code o} is a term syntactically equal to this ignoring term labels
+     */
+    boolean equalsModTermLabels(Object o);
+
+    /**
+     * Returns an human-readable source of this term. For example the filename
+     * with line and offset.
+     */
+    default @Nullable String getOrigin() {return null;}
 }

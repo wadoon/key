@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.uka.ilkd.key.settings.NewSMTTranslationSettings;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -70,7 +71,7 @@ public class ModelGenerator implements SolverLauncherListener{
 	 * @return
 	 */
 	private SolverLauncher prepareLauncher(){
-		TestGenerationSettings settings = ProofIndependentSettings.DEFAULT_INSTANCE.getTestGenerationSettings();
+		final TestGenerationSettings settings = TestGenerationSettings.getInstance();
 		final ProofIndependentSMTSettings piSettings = ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().clone();
 		
 
@@ -79,7 +80,7 @@ public class ModelGenerator implements SolverLauncherListener{
 		pdSettings.invariantForall = settings.invariantForAll();
 		// invoke z3 for counterexamples
 		final SMTSettings smtsettings = new SMTSettings(pdSettings,
-				piSettings, null);
+				piSettings, new NewSMTTranslationSettings(), null);
 		return new SolverLauncher(smtsettings);
 	}
 
