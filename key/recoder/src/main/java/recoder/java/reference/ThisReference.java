@@ -27,7 +27,7 @@ public class ThisReference extends JavaNonTerminalProgramElement implements Refe
 	/**
      * Expression parent.
      */
-	private ExpressionContainer expressionParent;
+    protected ExpressionContainer expressionParent;
 
     /**
      * Reference parent.

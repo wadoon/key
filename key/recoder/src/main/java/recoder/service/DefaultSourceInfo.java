@@ -200,7 +200,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo implements Source
     /**
      * Performance cache for predefined primitive types.
      */
-    private final Map<String, Type> name2primitiveType = new HashMap<String, Type>(16);
+    protected final Map<String, Type> name2primitiveType = new HashMap<String, Type>(16);
 
     /**
      * Initializes the new service; called by the configuration.
@@ -454,7 +454,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo implements Source
         return (c instanceof ConstructorDeclaration) ? (ConstructorDeclaration) c : null;
     }
 
-    private ClassType getFromUnitPackage(String name, CompilationUnit cu) {
+    protected ClassType getFromUnitPackage(String name, CompilationUnit cu) {
         String xname = Naming.getPackageName(cu);
         if (xname.length() > 0) {
             xname = Naming.dot(xname, name);
@@ -465,7 +465,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo implements Source
     }
 
     // traverse *all* directly imported types
-    private ClassType getFromTypeImports(String name, List<Import> il) {
+    protected ClassType getFromTypeImports(String name, List<Import> il) {
         if (DEBUG)
             Debug.log("Checking " + name + " in type imports");
         ClassType result = null;
@@ -613,7 +613,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo implements Source
      * partial name such as <CODE>A.B</CODE> where <CODE>b</CODE> is a
      * member class of <CODE>A</CODE>.
      */
-    private ClassType getLocalType(String name, TypeScope scope) {
+    protected ClassType getLocalType(String name, TypeScope scope) {
         ClassType result = null;
         int dotPos = name.indexOf('.');
         String shortName = (dotPos == -1) ? name : name.substring(0, dotPos);
@@ -640,7 +640,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo implements Source
      * Searches an inherited member type of the given name. The method does also
      * report locally defined member types of the given type.
      */
-    private ClassType getInheritedType(String name, ClassType ct) {
+    protected ClassType getInheritedType(String name, ClassType ct) {
         int dotPos = name.indexOf('.');
         String shortName = (dotPos == -1) ? name : name.substring(0, dotPos);
         // it does not pay to check if ct has any non-trivial supertypes
@@ -1753,7 +1753,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo implements Source
      * Returns a field with the given name from the given class type or from the
      * bottommost supertype that defines it.
      */
-    private Field getInheritedField(String name, ClassType ct) {
+    protected Field getInheritedField(String name, ClassType ct) {
         // for private use only - no model update required
         List<? extends Field> fl = ct.getAllFields();
         int nf = fl.size();

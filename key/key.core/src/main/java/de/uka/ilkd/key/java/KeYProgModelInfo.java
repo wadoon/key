@@ -388,8 +388,7 @@ public class KeYProgModelInfo{
         recoder.abstraction.ClassType rct
             = (recoder.abstraction.ClassType) rec2key().toRecoder(ct);
 	List<? extends recoder.abstraction.Constructor> res
-		= rct.getProgramModelInfo().getConstructors
-	    (rct, getRecoderTypes(signature));
+		= rct.getProgramModelInfo().getConstructors(rct, getRecoderTypes(signature), /*TODO weigl */ null);
 	return res;
     }
 

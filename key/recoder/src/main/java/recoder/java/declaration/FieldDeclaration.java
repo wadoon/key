@@ -5,6 +5,7 @@ package recoder.java.declaration;
 import java.util.ArrayList;
 import java.util.List;
 
+import recoder.java.Identifier;
 import recoder.java.ProgramElement;
 import recoder.java.SourceVisitor;
 import recoder.java.reference.TypeReference;
@@ -115,6 +116,11 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
             fieldSpecs = proto.fieldSpecs.deepClone();
         }
         makeParentRoleValid();
+    }
+
+    //TODO weigl backport for KeY support
+    public FieldDeclaration(ASTList<DeclarationSpecifier> modifiers, TypeReference typeReference, Identifier identifier, Object o) {
+        this(modifiers, typeReference, new FieldSpecification(identifier));
     }
 
     /**

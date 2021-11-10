@@ -23,6 +23,11 @@ public class PrimitiveType implements Type {
     public PrimitiveType(String name) {
         this.name = name.intern();
     }
+
+    public PrimitiveType(String name, ProgramModelInfo pmi) {
+        this.name = name.intern();
+        this.pmi = pmi;
+    }
     
     public ArrayType getArrayType() {
     	return arrayType;

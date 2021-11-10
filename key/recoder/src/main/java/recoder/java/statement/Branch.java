@@ -23,7 +23,7 @@ public abstract class Branch extends JavaNonTerminalProgramElement implements St
      * Parent.
      */
 
-	BranchStatement parent;
+    protected BranchStatement parent;
 
     /**
      * Branch.

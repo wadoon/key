@@ -41,7 +41,9 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement i
      * Defaults to do nothing.
      */
 
-    public abstract void makeParentRoleValid();
+    public void makeParentRoleValid() {
+        //TODO weigl something todo?
+    };
 
     /**
      * Defaults to attempt a depth-first traversal using a
@@ -63,7 +65,7 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement i
      * @return the role code of the given position code.
      * @see NonTerminalProgramElement#getChildPositionCode(ProgramElement)
      */
-    public final int getRoleOfChild(int positionCode) {
+    public int getRoleOfChild(int positionCode) {
         return positionCode & 15;
     }
 
@@ -76,7 +78,7 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement i
      *            the exact child to look for.
      * @return the index of the given child, or <CODE>-1</CODE>.
      */
-    public final int getIndexOfChild(ProgramElement child) {
+    public int getIndexOfChild(ProgramElement child) {
         int i;
         for (i = getChildCount() - 1; i >= 0 && (getChildAt(i) != child); i--) {
             /* logic is contained in loop control */

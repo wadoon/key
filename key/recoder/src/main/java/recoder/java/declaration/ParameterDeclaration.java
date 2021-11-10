@@ -5,6 +5,7 @@ package recoder.java.declaration;
 import java.util.ArrayList;
 import java.util.List;
 
+import recoder.java.Identifier;
 import recoder.java.ParameterContainer;
 import recoder.java.ProgramElement;
 import recoder.java.SourceVisitor;
@@ -71,6 +72,10 @@ public class ParameterDeclaration extends VariableDeclaration {
         varSpec = proto.varSpec.deepClone();
         varArgParameter = proto.varArgParameter;
         makeParentRoleValid();
+    }
+
+    public ParameterDeclaration(TypeReference typeRef, Identifier identifier) {
+        this(typeRef, new VariableSpecification(identifier));
     }
 
     /**

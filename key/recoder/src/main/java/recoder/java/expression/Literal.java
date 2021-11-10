@@ -25,7 +25,7 @@ public abstract class Literal extends JavaProgramElement implements Expression, 
      * Expression parent.
      */
 
-	private ExpressionContainer expressionParent;
+    protected ExpressionContainer expressionParent;
 
     /**
      * Literal.

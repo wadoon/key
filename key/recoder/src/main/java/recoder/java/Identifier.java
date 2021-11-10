@@ -9,7 +9,7 @@ package recoder.java;
  * @author <TT>AutoDoc</TT>
  */
 
-public final class Identifier extends JavaProgramElement implements TerminalProgramElement {
+public class Identifier extends JavaProgramElement implements TerminalProgramElement {
 
     /**
 	 * serialization id
@@ -25,8 +25,7 @@ public final class Identifier extends JavaProgramElement implements TerminalProg
     /**
      * Id.
      */
-
-    private final String id;
+    protected String id;
 
     /**
      * Identifier.

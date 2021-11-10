@@ -167,7 +167,11 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
     public JavaProgramFactory() { 
     	// nothing to do
     }
-    
+
+    public static ProgramFactory getInstance() {
+        return new JavaProgramFactory();
+    }
+
     // TODO I rather have this removed for the future...
     public JavaCCParser getParser() {
     	return parser;

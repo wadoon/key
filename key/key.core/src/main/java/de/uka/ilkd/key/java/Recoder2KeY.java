@@ -1082,8 +1082,10 @@ public class Recoder2KeY implements JavaReader {
             if(javaType == null) continue;
             typeName = javaType.getFullName();
 
-            recoder.java.declaration.FieldDeclaration recVar = new recoder.java.declaration.FieldDeclaration(null, name2typeReference(typeName),
-                    new ExtendedIdentifier(keyVarSpec.getName()), null);
+            final recoder.java.declaration.FieldSpecification fieldSpec =
+                    new recoder.java.declaration.FieldSpecification(new ExtendedIdentifier(keyVarSpec.getName()));
+            recoder.java.declaration.FieldDeclaration recVar = new recoder.java.declaration.FieldDeclaration(
+                    null, name2typeReference(typeName), fieldSpec);
 
             list.add(recVar);
             classContext.makeAllParentRolesValid();

@@ -5,11 +5,7 @@ package recoder.java.declaration;
 import java.util.ArrayList;
 import java.util.List;
 
-import recoder.java.LoopInitializer;
-import recoder.java.NonTerminalProgramElement;
-import recoder.java.ProgramElement;
-import recoder.java.SourceVisitor;
-import recoder.java.StatementContainer;
+import recoder.java.*;
 import recoder.java.reference.TypeReference;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
@@ -101,6 +97,10 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
             varSpecs = proto.varSpecs.deepClone();
         }
         makeParentRoleValid();
+    }
+
+    public LocalVariableDeclaration(TypeReference typeReference, Identifier identifier) {
+        this(null, typeReference, new VariableSpecification(identifier));
     }
 
     /**
