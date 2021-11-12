@@ -37,17 +37,24 @@ public class SideProof {
 		this(s, sequent, 10000);
 	}
 
-	
 	boolean proofEquality(Term loc1, Term loc2) {
 		Term fml = tb.equals(loc1, loc2);
 		Sequent sideSeq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(fml), false, true).sequent();
 
 		Set<Term> locSetVars = new HashSet<Term>();
-		for (Term t : loc1.subs()) {
-			locSetVars.addAll(collectProgramAndLogicVariables(t));
+		if (loc1.subs().isEmpty()) {
+			locSetVars.addAll(collectProgramAndLogicVariables(loc1));
+		} else {
+			for (Term t : loc1.subs()) {
+				locSetVars.addAll(collectProgramAndLogicVariables(t));
+			}
 		}
-		for (Term t : loc2.subs()) {
-			locSetVars.addAll(collectProgramAndLogicVariables(t));
+		if (loc2.subs().isEmpty()) {
+			locSetVars.addAll(collectProgramAndLogicVariables(loc2));
+		} else {
+			for (Term t : loc2.subs()) {
+				locSetVars.addAll(collectProgramAndLogicVariables(t));
+			}
 		}
 
 		Set<Term> anteFmlVars = new HashSet<Term>();
@@ -76,7 +83,7 @@ public class SideProof {
 				succFmlVars = collectProgramAndLogicVariables(sfSucc.formula());
 				for (Term tfv : succFmlVars) {
 					if (locSetVars.contains(tfv)) {
-						if (tempAnteToAdd.add(sfSucc)) {
+						if (tempSuccToAdd.add(sfSucc)) {
 							sideSeq = sideSeq.addFormula(sfSucc, false, true).sequent();
 							locSetVars.addAll(succFmlVars);
 							break;
@@ -87,26 +94,32 @@ public class SideProof {
 		} while (size != locSetVars.size());
 		boolean closed = isProvable(sideSeq, services);
 		// true: Holds, false: Unknown
-//		if (!closed) {
-//			System.out.println("========================\n"+ProofSaver.printAnything(sideSeq, services));		
-//			System.out.println(loc1 + " is NOT equal to " + loc2);
+//		if (closed) {
+//			System.out.println("Equlity: "+sideSeq);
+//			System.out.println(loc1 + " is NOT equal to " + loc2 + " in: \n" + ProofSaver.printAnything(sideSeq, services));
+//			System.out.println("the original seq: "+ seq);
 //		}
-//		else System.out.println("Yaaaaaaaaaaaaaaaaaaaaaaaaay");
 		return closed;
 	}
-	
-	
+
 	boolean proofSubSet(Term loc1, Term loc2) {
 		Term fml = tb.subset(loc1, loc2);
 		Sequent sideSeq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(fml), false, true).sequent();
-//		sideSeq = sideSeq.addFormula(cIndexFormula, true, true).sequent();
 
 		Set<Term> locSetVars = new HashSet<Term>();
-		for (Term t : loc1.subs()) {
-			locSetVars.addAll(collectProgramAndLogicVariables(t));
+		if (loc1.subs().isEmpty()) {
+			locSetVars.addAll(collectProgramAndLogicVariables(loc1));
+		} else {
+			for (Term t : loc1.subs()) {
+				locSetVars.addAll(collectProgramAndLogicVariables(t));
+			}
 		}
-		for (Term t : loc2.subs()) {
-			locSetVars.addAll(collectProgramAndLogicVariables(t));
+		if (loc2.subs().isEmpty()) {
+			locSetVars.addAll(collectProgramAndLogicVariables(loc2));
+		} else {
+			for (Term t : loc2.subs()) {
+				locSetVars.addAll(collectProgramAndLogicVariables(t));
+			}
 		}
 
 		Set<Term> anteFmlVars = new HashSet<Term>();
@@ -135,7 +148,7 @@ public class SideProof {
 				succFmlVars = collectProgramAndLogicVariables(sfSucc.formula());
 				for (Term tfv : succFmlVars) {
 					if (locSetVars.contains(tfv)) {
-						if (tempAnteToAdd.add(sfSucc)) {
+						if (tempSuccToAdd.add(sfSucc)) {
 							sideSeq = sideSeq.addFormula(sfSucc, false, true).sequent();
 							locSetVars.addAll(succFmlVars);
 							break;
@@ -159,11 +172,20 @@ public class SideProof {
 //		sideSeq = sideSeq.addFormula(cIndexFormula, true, true).sequent();
 
 		Set<Term> locSetVars = new HashSet<Term>();
-		for (Term t : ts1.subs()) {
-			locSetVars.addAll(collectProgramAndLogicVariables(t));
+
+		if (ts1.subs().isEmpty()) {
+			locSetVars.addAll(collectProgramAndLogicVariables(ts1));
+		} else {
+			for (Term t : ts1.subs()) {
+				locSetVars.addAll(collectProgramAndLogicVariables(t));
+			}
 		}
-		for (Term t : ts2.subs()) {
-			locSetVars.addAll(collectProgramAndLogicVariables(t));
+		if (ts2.subs().isEmpty()) {
+			locSetVars.addAll(collectProgramAndLogicVariables(ts2));
+		} else {
+			for (Term t : ts2.subs()) {
+				locSetVars.addAll(collectProgramAndLogicVariables(t));
+			}
 		}
 
 		Set<Term> anteFmlVars = new HashSet<Term>();
@@ -175,7 +197,6 @@ public class SideProof {
 			size = locSetVars.size();
 			for (SequentFormula sfAnte : seq.antecedent()) {
 				anteFmlVars = collectProgramAndLogicVariables(sfAnte.formula());
-
 				for (Term tfv : anteFmlVars) {
 					if (locSetVars.contains(tfv)) {
 						if (tempAnteToAdd.add(sfAnte)) {
@@ -192,7 +213,7 @@ public class SideProof {
 				succFmlVars = collectProgramAndLogicVariables(sfSucc.formula());
 				for (Term tfv : succFmlVars) {
 					if (locSetVars.contains(tfv)) {
-						if (tempAnteToAdd.add(sfSucc)) {
+						if (tempSuccToAdd.add(sfSucc)) {
 							sideSeq = sideSeq.addFormula(sfSucc, false, true).sequent();
 							locSetVars.addAll(succFmlVars);
 							break;
@@ -203,6 +224,12 @@ public class SideProof {
 		} while (size != locSetVars.size());
 
 		boolean closed = isProvable(sideSeq, services);
+//		if (closed) {
+//			System.out.println("Less than: " + sideSeq);
+//			System.out.println(
+//					ts1 + " is NOT less than " + ts2 + " in: \n" + ProofSaver.printAnything(sideSeq, services));
+//			System.out.println("the original seq: " + seq);
+//		}
 		return closed;
 	}
 
@@ -211,12 +238,20 @@ public class SideProof {
 		Set<Term> locSetVars = new HashSet<Term>();
 		Sequent sideSeq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(fml_1), false, true).sequent();
 
-		for (Term t : ts1.subs())
-			locSetVars.addAll(collectProgramAndLogicVariables(t));
-		for (Term t : ts2.subs())
-			locSetVars.addAll(collectProgramAndLogicVariables(t));
-//		System.out.println("locsetvars: " + locSetVars);
-//		System.out.println("Original sequent ====>>>>>>\n" + ProofSaver.printAnything(seq, services));
+		if (ts1.subs().isEmpty()) {
+			locSetVars.addAll(collectProgramAndLogicVariables(ts1));
+		} else {
+			for (Term t : ts1.subs()) {
+				locSetVars.addAll(collectProgramAndLogicVariables(t));
+			}
+		}
+		if (ts2.subs().isEmpty()) {
+			locSetVars.addAll(collectProgramAndLogicVariables(ts2));
+		} else {
+			for (Term t : ts2.subs()) {
+				locSetVars.addAll(collectProgramAndLogicVariables(t));
+			}
+		}
 
 		Set<Term> anteFmlVars = new HashSet<Term>();
 		Set<SequentFormula> tempAnteToAdd = new HashSet<SequentFormula>();
@@ -243,7 +278,7 @@ public class SideProof {
 				succFmlVars = collectProgramAndLogicVariables(sfSucc.formula());
 				for (Term tfv : succFmlVars) {
 					if (locSetVars.contains(tfv)) {
-						if (tempAnteToAdd.add(sfSucc)) {
+						if (tempSuccToAdd.add(sfSucc)) {
 							sideSeq = sideSeq.addFormula(sfSucc, false, true).sequent();
 							locSetVars.addAll(succFmlVars);
 							break;
@@ -252,12 +287,8 @@ public class SideProof {
 				}
 			}
 		} while (size != locSetVars.size());
-		// System.out.println(sideSeq);
+
 		boolean closed = isProvable(sideSeq, services);
-//		if (!closed) {
-//			System.out.println(ts1 + " intersect " + ts2 + " is EMPTY. Because:");
-//			System.out.println(ProofSaver.printAnything(sideSeq, services));
-//		}
 		return closed;
 	}
 
@@ -291,7 +322,7 @@ public class SideProof {
 //		}
 //System.out.println("==>" + info.getAppliedRuleApps());
 
-		boolean closed  = info.getProof().closed();
+		boolean closed = info.getProof().closed();
 //		if(!closed) {
 //			System.out.println(" proof could not be closed for " + ProofSaver.printAnything(seq2prove, services));
 //		}
@@ -304,23 +335,22 @@ public class SideProof {
 //	}
 
 	private Set<Term> collectProgramAndLogicVariables(Term term) {
-
 		Set<Term> res = new HashSet<Term>();
 		if (!term.containsJavaBlockRecursive()) {
-			if (term.op() instanceof ProgramVariable)
+			if (term.op() instanceof ProgramVariable) {
 				res.add(term);
-			else if (term.op() instanceof Function && term.sort() != Sort.FORMULA
-					&& (term.arity() == 0 || term.arity() == 1) && term.freeVars().isEmpty())
+			} else if (term.op() instanceof Function && term.sort() != Sort.FORMULA
+					&& (term.arity() == 0 || term.arity() == 1) && term.freeVars().isEmpty()) {
 				res.add(term);
 
-			else
+			} else
 				for (Term sub : term.subs())
 					res.addAll(collectProgramAndLogicVariables(sub));
 		}
 		return res;
 	}
 
-	public void setMaxStep(int i) {
-		maxRuleApp = i;
-	}
+//	public void setMaxStep(int i) {
+//		maxRuleApp = i;
+//	}
 }
