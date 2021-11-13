@@ -27,10 +27,10 @@ import de.uka.ilkd.key.pp.PosInSequent;
 public abstract class SequentViewMenu<T extends SequentView> extends JMenu {
     private static final long serialVersionUID = -366978815217974621L;
 
-    /** @see #addClipboardItem(MenuControl) */
+    /** @see #addClipboardItem(SequentViewMenu.MenuControl) */
     private static final String COPY_TO_CLIPBOARD = "Copy to clipboard";
 
-    /** @see #createNameCreationInfoSection(MenuControl) */
+    /** @see #createNameCreationInfoSection(SequentViewMenu.MenuControl) */
     private static final String NAME_CREATION_INFO = "View name creation info";
 
     /** The position of the selected term. */
@@ -90,6 +90,7 @@ public abstract class SequentViewMenu<T extends SequentView> extends JMenu {
                 getSequentView().getMainWindow().getMediator());
 
         for (Action action : actions) {
+            KeYGuiExtensionFacade.sortActionIntoMenu(action, this);
             add(action);
         }
     }

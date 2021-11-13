@@ -1,5 +1,9 @@
 class Test {
-    public static final int CONST = 42;
-    //@ensures \result == 42;
-    public int foo() {return CONST;}
+    //@requires 0 <= x <= 10;
+    //@requires 0 <= y <= 10;
+    //@ensures \result >= 0 ;
+    public int foo(int x, int y) {
+        int z = x + y;
+        return z;
+    }
 }

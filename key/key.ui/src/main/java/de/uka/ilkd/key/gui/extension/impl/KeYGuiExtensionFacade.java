@@ -113,7 +113,7 @@ public final class KeYGuiExtensionFacade {
         actions.forEach(act -> sortActionIntoMenu(act, menuBar, new JMenu()));
     }
 
-    private static Iterator<String> getMenuPath(Action act) {
+    public static Iterator<String> getMenuPath(Action act) {
         Object path = act.getValue(KeyAction.PATH);
         String spath;
         if (path == null) {
@@ -124,7 +124,7 @@ public final class KeYGuiExtensionFacade {
         return Pattern.compile(Pattern.quote(".")).splitAsStream(spath).iterator();
     }
 
-    private static void sortActionIntoMenu(Action act, JMenu menu) {
+    public static void sortActionIntoMenu(Action act, JMenu menu) {
         Iterator<String> mpath = getMenuPath(act);
         JMenu a = findMenu(menu, mpath);
 
@@ -135,7 +135,7 @@ public final class KeYGuiExtensionFacade {
         }
     }
 
-    private static void sortActionIntoMenu(Action act, JPopupMenu menu) {
+    public static void sortActionIntoMenu(Action act, JPopupMenu menu) {
         Iterator<String> mpath = getMenuPath(act);
         JMenu a = findMenu(menu, mpath);
 
@@ -154,7 +154,7 @@ public final class KeYGuiExtensionFacade {
         }
     }
 
-    private static void sortActionIntoMenu(Action act, JMenuBar menuBar, JMenu defaultMenu) {
+    public static void sortActionIntoMenu(Action act, JMenuBar menuBar, JMenu defaultMenu) {
         Iterator<String> mpath = getMenuPath(act);
         JMenu a = findMenu(menuBar, mpath, defaultMenu);
 
@@ -165,7 +165,7 @@ public final class KeYGuiExtensionFacade {
         }
     }
 
-    private static JMenu findMenu(JMenuBar menuBar, Iterator<String> mpath, JMenu defaultMenu) {
+    public static JMenu findMenu(JMenuBar menuBar, Iterator<String> mpath, JMenu defaultMenu) {
         if (mpath.hasNext()) {
             String cur = mpath.next();
             for (int i = 0; i < menuBar.getMenuCount(); i++) {
@@ -201,7 +201,7 @@ public final class KeYGuiExtensionFacade {
         }
     }
 
-    private static JMenu findMenu(JMenu menu, Iterator<String> mpath) {
+    public static JMenu findMenu(JMenu menu, Iterator<String> mpath) {
         if (mpath.hasNext()) {
             String cur = mpath.next();
             Component[] children = menu.getMenuComponents();

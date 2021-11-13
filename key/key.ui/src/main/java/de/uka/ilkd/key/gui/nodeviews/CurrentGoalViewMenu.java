@@ -13,23 +13,12 @@
 
 package de.uka.ilkd.key.gui.nodeviews;
 
-import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.util.*;
-
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofMacroMenu;
+import de.uka.ilkd.key.gui.extension.api.DefaultContextMenuKind;
+import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.join.JoinMenuItem;
 import de.uka.ilkd.key.gui.mergerule.MergeRuleMenuItem;
 import de.uka.ilkd.key.gui.smt.SMTMenuItem;
@@ -57,11 +46,19 @@ import de.uka.ilkd.key.settings.ViewSettings;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.util.List;
+import java.util.*;
 
 /**
  * The menu shown by a {@link CurrentGoalViewListener} when the user clicks on a
  * {@link CurrentGoalView}.
- *
+ * <p>
  * Shows all {@link Taclet}s that are applicable at a selected position.
  */
 public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> {
@@ -106,8 +103,8 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
      * @param pos         the PosInSequent
      */
     CurrentGoalViewMenu(CurrentGoalView sequentView, ImmutableList<TacletApp> findList,
-            ImmutableList<TacletApp> rewriteList, ImmutableList<TacletApp> noFindList,
-            ImmutableList<BuiltInRule> builtInList, PosInSequent pos) {
+                        ImmutableList<TacletApp> rewriteList, ImmutableList<TacletApp> noFindList,
+                        ImmutableList<BuiltInRule> builtInList, PosInSequent pos) {
         super(sequentView, pos);
         this.mediator = sequentView.getMediator();
 
@@ -123,15 +120,14 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
      * Removes the unsound "introduceAxiom" taclet from the list of displayed
      * taclets.
      *
-     * @param list
-     *            The list from which to filter.
+     * @param list The list from which to filter.
      * @return The original list, without the "introduceAxiom" taclet.
      */
     private static ImmutableList<TacletApp>
-            removeIntroduceAxiomTaclet(ImmutableList<TacletApp> list) {
+    removeIntroduceAxiomTaclet(ImmutableList<TacletApp> list) {
         return list.stream().filter(
-                app -> !app.rule().name().toString()
-                        .equals(INTRODUCE_AXIOM_TACLET_NAME))
+                        app -> !app.rule().name().toString()
+                                .equals(INTRODUCE_AXIOM_TACLET_NAME))
                 .collect(ImmutableSLList.toImmutableList());
     }
 
@@ -169,7 +165,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
      * @param control the action listener.
      */
     private void createMenu(ImmutableList<TacletApp> find, ImmutableList<TacletApp> noFind,
-            ImmutableList<BuiltInRule> builtInList, MenuControl control) {
+                            ImmutableList<BuiltInRule> builtInList, MenuControl control) {
         addActionListener(control);
 
         ImmutableList<TacletApp> toAdd = sort(find, comp);
@@ -186,6 +182,8 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
             add(new JLabel(NO_RULES_APPLICABLE));
         }
 
+        addExplorationExtension(builtInList, toAdd, control);
+
         createBuiltInRuleMenu(builtInList, control);
         createDelayedCutJoinMenu(control);
         createMergeRuleMenu();
@@ -195,9 +193,6 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
         }
         createFocussedAutoModeMenu(control);
         addMacroMenu();
-
-        addSeparator();
-        addExtensionMenu();
 
         addSeparator();
         addClipboardItem(control);
@@ -216,10 +211,39 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                 }
             }
         }
+        addExtensionMenu();
     }
 
+    public static class GoalViewData {
+        public final ImmutableList<BuiltInRule> builtInList;
+        public final ImmutableList<TacletApp> toAdd;
+        public final MenuControl control;
+        public final CurrentGoalViewMenu goalView;
+
+        public GoalViewData(CurrentGoalViewMenu currentGoalViewMenu, ImmutableList<BuiltInRule> builtInList,
+                            ImmutableList<TacletApp> toAdd, MenuControl control) {
+            this.goalView = currentGoalViewMenu;
+            this.builtInList = builtInList;
+            this.toAdd = toAdd;
+            this.control = control;
+        }
+    }
+
+    private void addExplorationExtension(
+            ImmutableList<BuiltInRule> builtInList,
+            ImmutableList<TacletApp> toAdd, MenuControl control) {
+        GoalViewData goalViewData = new GoalViewData(this, builtInList, toAdd, control);
+        var actions = KeYGuiExtensionFacade.getContextMenuItems(
+                DefaultContextMenuKind.GOAL_VIEW,
+                goalViewData, getSequentView().getMainWindow().getMediator());
+        for (var action : actions) {
+            KeYGuiExtensionFacade.sortActionIntoMenu(action,this);
+        }
+    }
+
+
     private void createBuiltInRuleMenu(ImmutableList<BuiltInRule> builtInList,
-            MenuControl control) {
+                                       MenuControl control) {
 
         if (!builtInList.isEmpty()) {
             addSeparator();
@@ -355,7 +379,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
      * This method is also used by the KeYIDE has to be static and public.
      */
     public static ImmutableList<TacletApp> sort(ImmutableList<TacletApp> finds,
-            TacletAppComparator comp) {
+                                                TacletAppComparator comp) {
         ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
 
         List<TacletApp> list = new ArrayList<TacletApp>(finds.size());
@@ -425,7 +449,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
             }
             if (!mediator.getFilterForInteractiveProving().filter(taclet)) {
                 continue;
-        }
+            }
 
             if (isRareRule(taclet)) {
                 rareTaclets.add(app);
@@ -440,7 +464,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
         for (TacletApp app : normalTaclets) {
             target.add(createMenuItem(app, control));
             ++currentSize;
-            if(currentSize>= TOO_MANY_TACLETS_THRESHOLD){
+            if (currentSize >= TOO_MANY_TACLETS_THRESHOLD) {
                 JMenu newTarget = new JMenu(MORE_RULES);
                 target.add(newTarget);
                 target = newTarget;
@@ -494,7 +518,8 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
         /*if (more.getItemCount() > 0) {
             add(more);
         }*/
-        }
+    }
+
     private boolean isRareRule(Taclet taclet) {
         if (clutterRules.contains(taclet.name().toString())) {
             return true;
@@ -583,83 +608,83 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                 PosInOccurrence occ = getPos().getPosInOccurrence();
 
                 switch (((JMenuItem) e.getSource()).getText()) {
-                case DISABLE_ABBREVIATION:
-                    if (occ != null && occ.posInTerm() != null) {
-                        mediator.getNotationInfo().getAbbrevMap().setEnabled(occ.subTerm(), false);
-                        getSequentView().printSequent();
-                    }
-
-                    break;
-
-                case ENABLE_ABBREVIATION:
-                    if (occ != null && occ.posInTerm() != null) {
-                        mediator.getNotationInfo().getAbbrevMap().setEnabled(occ.subTerm(), true);
-                        getSequentView().printSequent();
-                    }
-
-                    break;
-
-                case CREATE_ABBREVIATION:
-                    if (occ != null && occ.posInTerm() != null) {
-                        // trim string, otherwise window gets too large (bug #1430)
-                        final String oldTerm = occ.subTerm().toString();
-                        final String term = oldTerm.length() > 200 ? oldTerm.substring(0, 200)
-                                : oldTerm;
-                        String abbreviation = (String) JOptionPane.showInputDialog(new JFrame(),
-                                "Enter abbreviation for term: \n" + term, "New Abbreviation",
-                                JOptionPane.QUESTION_MESSAGE, null, null, "");
-
-                        try {
-                            if (abbreviation != null) {
-                                if (!validAbbreviation(abbreviation)) {
-                                    JOptionPane.showMessageDialog(new JFrame(),
-                                            "Only letters, numbers and '_' are allowed for Abbreviations",
-                                            "Sorry",
-                                            JOptionPane.INFORMATION_MESSAGE);
-                                } else {
-                                    mediator.getNotationInfo().getAbbrevMap().put(occ.subTerm(),
-                                            abbreviation, true);
-                                    getSequentView().printSequent();
-                                }
-                            }
-                        } catch (AbbrevException sce) {
-                            JOptionPane.showMessageDialog(new JFrame(), sce.getMessage(), "Sorry",
-                                    JOptionPane.INFORMATION_MESSAGE);
+                    case DISABLE_ABBREVIATION:
+                        if (occ != null && occ.posInTerm() != null) {
+                            mediator.getNotationInfo().getAbbrevMap().setEnabled(occ.subTerm(), false);
+                            getSequentView().printSequent();
                         }
-                    }
 
-                    break;
+                        break;
 
-                case CHANGE_ABBREVIATION:
-                    if (occ != null && occ.posInTerm() != null) {
-                        String abbreviation = (String) JOptionPane.showInputDialog(new JFrame(),
-                                "Enter abbreviation for term: \n" + occ.subTerm().toString(),
-                                "Change Abbreviation", JOptionPane.QUESTION_MESSAGE, null, null,
-                                mediator.getNotationInfo().getAbbrevMap().getAbbrev(occ.subTerm())
-                                        .substring(1));
-                        try {
-                            if (abbreviation != null) {
-                                if (!validAbbreviation(abbreviation)) {
-                                    JOptionPane.showMessageDialog(new JFrame(),
-                                            "Only letters, numbers and '_'"
-                                                    + "are allowed for Abbreviations",
-                                            "Sorry", JOptionPane.INFORMATION_MESSAGE);
-                                } else {
-                                    mediator.getNotationInfo().getAbbrevMap()
-                                            .changeAbbrev(occ.subTerm(), abbreviation);
-                                    getSequentView().printSequent();
-                                }
-                            }
-                        } catch (AbbrevException sce) {
-                            JOptionPane.showMessageDialog(new JFrame(), sce.getMessage(), "Sorry",
-                                    JOptionPane.INFORMATION_MESSAGE);
+                    case ENABLE_ABBREVIATION:
+                        if (occ != null && occ.posInTerm() != null) {
+                            mediator.getNotationInfo().getAbbrevMap().setEnabled(occ.subTerm(), true);
+                            getSequentView().printSequent();
                         }
-                    }
 
-                    break;
+                        break;
 
-                default:
-                    super.actionPerformed(e);
+                    case CREATE_ABBREVIATION:
+                        if (occ != null && occ.posInTerm() != null) {
+                            // trim string, otherwise window gets too large (bug #1430)
+                            final String oldTerm = occ.subTerm().toString();
+                            final String term = oldTerm.length() > 200 ? oldTerm.substring(0, 200)
+                                    : oldTerm;
+                            String abbreviation = (String) JOptionPane.showInputDialog(new JFrame(),
+                                    "Enter abbreviation for term: \n" + term, "New Abbreviation",
+                                    JOptionPane.QUESTION_MESSAGE, null, null, "");
+
+                            try {
+                                if (abbreviation != null) {
+                                    if (!validAbbreviation(abbreviation)) {
+                                        JOptionPane.showMessageDialog(new JFrame(),
+                                                "Only letters, numbers and '_' are allowed for Abbreviations",
+                                                "Sorry",
+                                                JOptionPane.INFORMATION_MESSAGE);
+                                    } else {
+                                        mediator.getNotationInfo().getAbbrevMap().put(occ.subTerm(),
+                                                abbreviation, true);
+                                        getSequentView().printSequent();
+                                    }
+                                }
+                            } catch (AbbrevException sce) {
+                                JOptionPane.showMessageDialog(new JFrame(), sce.getMessage(), "Sorry",
+                                        JOptionPane.INFORMATION_MESSAGE);
+                            }
+                        }
+
+                        break;
+
+                    case CHANGE_ABBREVIATION:
+                        if (occ != null && occ.posInTerm() != null) {
+                            String abbreviation = (String) JOptionPane.showInputDialog(new JFrame(),
+                                    "Enter abbreviation for term: \n" + occ.subTerm().toString(),
+                                    "Change Abbreviation", JOptionPane.QUESTION_MESSAGE, null, null,
+                                    mediator.getNotationInfo().getAbbrevMap().getAbbrev(occ.subTerm())
+                                            .substring(1));
+                            try {
+                                if (abbreviation != null) {
+                                    if (!validAbbreviation(abbreviation)) {
+                                        JOptionPane.showMessageDialog(new JFrame(),
+                                                "Only letters, numbers and '_'"
+                                                        + "are allowed for Abbreviations",
+                                                "Sorry", JOptionPane.INFORMATION_MESSAGE);
+                                    } else {
+                                        mediator.getNotationInfo().getAbbrevMap()
+                                                .changeAbbrev(occ.subTerm(), abbreviation);
+                                        getSequentView().printSequent();
+                                    }
+                                }
+                            } catch (AbbrevException sce) {
+                                JOptionPane.showMessageDialog(new JFrame(), sce.getMessage(), "Sorry",
+                                        JOptionPane.INFORMATION_MESSAGE);
+                            }
+                        }
+
+                        break;
+
+                    default:
+                        super.actionPerformed(e);
                 }
             }
         }
