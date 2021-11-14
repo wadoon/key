@@ -427,9 +427,10 @@ public interface ProgramModelInfo extends Service {
      * given type and have a signature that is compatible to the given one.
      * The visibilityContext is used to perform visibility checks.
      *
-     * @param ct        the class type to get constructors from.
-     * @param signature the statical type signature of a callee.
-     * @param context   the context which to use for visibility checks. If null, no visibility check is performed.
+     * @param ct                the class type to get constructors from.
+     * @param signature         the statical type signature of a callee.
+     * @param visibilityContext the context which to use for visibility checks. If null,
+     *                          no visibility check is performed.
      * @return the constructors that correspond best to the given constraints.
      */
     List<? extends Constructor> getConstructors(ClassType ct, List<Type> signature, ClassType visibilityContext);
