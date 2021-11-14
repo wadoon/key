@@ -20,6 +20,7 @@ import java.util.stream.Stream;
  * @version 1 (11/13/21)
  */
 @KeYGuiExtension.Info(name = "Explorative Sideproof Rules",
+        disabled = true,
         optional = true,
         experimental = false,
         description = "Allows to do stuff...",

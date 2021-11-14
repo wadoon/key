@@ -26,6 +26,9 @@ import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 /**
  * The interface ProofMacro is the entry point to a general strategy extension
  * system.
@@ -162,9 +165,9 @@ public interface ProofMacro {
      *
      * @return <code>true</code>, if the macro is allowed to be applied
      */
-    public boolean canApplyTo(Proof proof,
-                              ImmutableList<Goal> goals,
-                              PosInOccurrence posInOcc);
+    public boolean canApplyTo(@Nonnull Proof proof,
+                              @Nonnull ImmutableList<Goal> goals,
+                              @Nullable PosInOccurrence posInOcc);
 
     /**
      * Can this macro be applied on the given node?

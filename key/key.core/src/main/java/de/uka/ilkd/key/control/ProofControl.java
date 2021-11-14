@@ -63,7 +63,14 @@ public interface ProofControl {
     *           the PosInSequent where to look for applicable rules
     */
    public ImmutableList<BuiltInRule> getBuiltInRule(Goal focusedGoal, PosInOccurrence pos);
-   
+
+   /**
+    *
+    * @param taclet
+    * @param goal
+    * @param pos
+    * @return
+    */
    public boolean selectedTaclet(Taclet taclet, Goal goal, PosInOccurrence pos);
    
    /**

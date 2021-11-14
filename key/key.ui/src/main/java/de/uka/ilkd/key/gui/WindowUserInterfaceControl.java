@@ -13,9 +13,7 @@
 
 package de.uka.ilkd.key.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.Dimension;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
@@ -298,7 +296,15 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
     @Override
     public void completeAndApplyTacletMatch(TacletInstantiationModel[] models,
                                             Goal goal) {
-        new TacletMatchCompletionDialog(mainWindow, models, goal, mainWindow.getMediator());
+        var dlg = new TacletMatchCompletionDialog(mainWindow, models, goal, mainWindow.getMediator());
+        dlg.setVisible(true);
+    }
+
+    public void completeAndApplyTacletMatchAndWait(TacletInstantiationModel[] models,
+                                            Goal goal) {
+        var dlg = new TacletMatchCompletionDialog(mainWindow, models, goal, mainWindow.getMediator());
+        dlg.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
+        dlg.setVisible(true);
     }
 
     @Override
