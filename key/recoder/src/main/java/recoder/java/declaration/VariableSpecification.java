@@ -392,6 +392,10 @@ public class VariableSpecification extends JavaNonTerminalProgramElement impleme
      */
 
     public boolean isFinal() {
+        if(parent==null) {
+            System.err.println("ERROR: parent is null");
+            return false;
+        }
         return parent.isFinal();
     }
 

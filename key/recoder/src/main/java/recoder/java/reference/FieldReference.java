@@ -74,7 +74,6 @@ public class FieldReference extends VariableReference implements MemberReference
      *
      * @return the object.
      */
-
     public FieldReference deepClone() {
         return new FieldReference(this);
     }
