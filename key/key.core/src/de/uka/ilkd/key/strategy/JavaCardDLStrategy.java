@@ -1299,10 +1299,11 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 		Namespace<Function> funcNames = getServices().getNamespaces().functions();
 		final Operator noRaW = funcNames.lookup("noRaW");
 		final Operator noWaR = funcNames.lookup("noWaR");
+		final Operator noWaW = funcNames.lookup("noWaW");
 		final Operator noR = funcNames.lookup("noR");
 		final Operator noW = funcNames.lookup("noW");
 
-		final TermFeature isDepPredicate = or(op(noRaW), or(op(noWaR), op(noR), op(noW)));
+		final TermFeature isDepPredicate = or(op(noRaW), or(op(noWaR), or(op(noWaW), op(noR), op(noW))));
 		bindRuleSet(d, "pull_out_dep_locations",
 				add(applyTF(FocusProjection.create(1), isDepPredicate),
 						applyTF(FocusProjection.create(2), ff.update), applyTF("t", IsNonRigidTermFeature.INSTANCE),
@@ -1315,6 +1316,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 				ifZero(applyTF(findLocSet, op(setMinus)), not(eq(sub(findLocSet, 1), instOfNonStrict("loc1"))), longConst(0))));
 	
 		bindRuleSet(d, "dep_replace_known", add(longConst(8000), EqNonDuplicateAppFeature.INSTANCE));
+		bindRuleSet(d, "dep_pred_known", longConst(100));
 	}
 
 	private void setupPullOutGcd(RuleSetDispatchFeature d, String ruleSet, boolean roundingUp) {
@@ -1884,6 +1886,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
 		bindRuleSet(d, "dep_replace_known", ifZero(MatchedIfFeature.INSTANCE,
 				add(DiffFindAndIfFeature.INSTANCE, not(contains(instOf("loc2"), instOf("loc1"))))));
+
 		return d;
 	}
 

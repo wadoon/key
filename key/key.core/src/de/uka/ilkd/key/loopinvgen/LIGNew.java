@@ -92,7 +92,7 @@ public class LIGNew {
 //			System.out.println(term);
 //		}
 		int itrNumber = -1;
-		PredicateRefinementNew pr0 = new PredicateRefinementNew(services, currentGoal.sequent(), allPreds, index,itrNumber);
+		PredicateRefinementNew2 pr0 = new PredicateRefinementNew2(services, currentGoal.sequent(), allPreds, index,itrNumber);
 		allPreds=pr0.predicateCheckAndRefine();
 //		System.out.println(ProofSaver.printAnything(seq, services));
 		
@@ -106,7 +106,7 @@ public class LIGNew {
 			
 			currentGoal = ruleApp.findLoopUnwindTacletGoal(goalsAfterShift);
 //			currentIndexFormula = currentIndexEq(currentGoal.sequent(), index);
-			PredicateRefinementNew pr = new PredicateRefinementNew(services, currentGoal.sequent(), allPreds, index, itrNumber);
+			PredicateRefinementNew2 pr = new PredicateRefinementNew2(services, currentGoal.sequent(), allPreds, index, itrNumber);
 			allPreds=pr.predicateCheckAndRefine();
 			itrNumber ++;
 			System.out.println("Iteration Number " + itrNumber);
