@@ -34,7 +34,7 @@ public class SideProof {
 	}
 
 	public SideProof(Services s, Sequent sequent) {
-		this(s, sequent, 10000);
+		this(s, sequent, 200000);
 	}
 
 	boolean proofEquality(Term loc1, Term loc2) {
@@ -233,6 +233,74 @@ public class SideProof {
 		return closed;
 	}
 
+	boolean proofLEQ(Term ts1, Term ts2) {
+		Term fml = tb.leq(ts1, ts2);
+		Sequent sideSeq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(fml), false, true).sequent();
+//		sideSeq = sideSeq.addFormula(cIndexFormula, true, true).sequent();
+
+		Set<Term> locSetVars = new HashSet<Term>();
+
+		if (ts1.subs().isEmpty()) {
+			locSetVars.addAll(collectProgramAndLogicVariables(ts1));
+		} else {
+			for (Term t : ts1.subs()) {
+				locSetVars.addAll(collectProgramAndLogicVariables(t));
+			}
+		}
+		if (ts2.subs().isEmpty()) {
+			locSetVars.addAll(collectProgramAndLogicVariables(ts2));
+		} else {
+			for (Term t : ts2.subs()) {
+				locSetVars.addAll(collectProgramAndLogicVariables(t));
+			}
+		}
+
+		Set<Term> anteFmlVars = new HashSet<Term>();
+		Set<SequentFormula> tempAnteToAdd = new HashSet<SequentFormula>();
+		Set<SequentFormula> tempSuccToAdd = new HashSet<SequentFormula>();
+		int size;
+
+		do {
+			size = locSetVars.size();
+			for (SequentFormula sfAnte : seq.antecedent()) {
+				anteFmlVars = collectProgramAndLogicVariables(sfAnte.formula());
+				for (Term tfv : anteFmlVars) {
+					if (locSetVars.contains(tfv)) {
+						if (tempAnteToAdd.add(sfAnte)) {
+							sideSeq = sideSeq.addFormula(sfAnte, true, true).sequent();
+							locSetVars.addAll(anteFmlVars);
+							break;
+						}
+					}
+				}
+			}
+
+			Set<Term> succFmlVars = new HashSet<Term>();
+			for (SequentFormula sfSucc : seq.succedent()) {
+				succFmlVars = collectProgramAndLogicVariables(sfSucc.formula());
+				for (Term tfv : succFmlVars) {
+					if (locSetVars.contains(tfv)) {
+						if (tempSuccToAdd.add(sfSucc)) {
+							sideSeq = sideSeq.addFormula(sfSucc, false, true).sequent();
+							locSetVars.addAll(succFmlVars);
+							break;
+						}
+					}
+				}
+			}
+		} while (size != locSetVars.size());
+
+		boolean closed = isProvable(sideSeq, services);
+//		if (closed) {
+//			System.out.println("Less than: " + sideSeq);
+//			System.out.println(
+//					ts1 + " is NOT less than " + ts2 + " in: \n" + ProofSaver.printAnything(sideSeq, services));
+//			System.out.println("the original seq: " + seq);
+//		}
+		return closed;
+	}
+
+	
 	boolean proofNonEmptyIntersection(Term ts1, Term ts2) {
 		Term fml_1 = tb.not(tb.equals(tb.intersect(ts1, ts2), tb.empty()));
 		Set<Term> locSetVars = new HashSet<Term>();

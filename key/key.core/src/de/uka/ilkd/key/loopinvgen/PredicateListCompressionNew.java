@@ -8,6 +8,7 @@ import com.sun.org.apache.xpath.internal.operations.Equals;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.DependenciesLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
+import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
@@ -28,7 +29,7 @@ public class PredicateListCompressionNew {
 	private SideProof sProof;
 	private final boolean ailias;
 	private Set<Term> allPreds = new HashSet<>();
-
+	private LocSetLDT locSetLDT;
 	public PredicateListCompressionNew(Services s, Sequent sequent, Set<Term> preds, boolean ailiasing) {
 		services = s;
 		tb = services.getTermBuilder();
@@ -48,6 +49,7 @@ public class PredicateListCompressionNew {
 		sProof = new SideProof(services, seq, 500);
 		ailias = ailiasing;
 		allPreds = preds;
+		locSetLDT = new LocSetLDT(services);
 	}
 
 	public Set<Term> compression() {
@@ -65,34 +67,69 @@ public class PredicateListCompressionNew {
 			}
 		}
 		result.addAll(finalCompPredListCompression(compPredsList));
-		result.addAll(depPredListCompressionBySubset(depPredsList));
+//		result.addAll(compPredsList);
+		result.addAll(depPredListCompressionByPredicate(depPredListCompressionBySET(depPredsList)));
 		return result;
 
 	}
 
-	private Set<Term> depPredListCompressionBySubset(Set<Term> fDepPredList) {
+	private Set<Term> depPredListCompressionBySET(Set<Term> fDepPredList) {
 		Set<Term> toDelete = new HashSet<>();
-
+		Set<Term> toAdd = new HashSet<>();
 		for (Term depPred1 : fDepPredList) {
 			for (Term depPred2 : fDepPredList) {
-				if (depPred1.op().equals(depPred2.op()) && !depPred1.sub(0).equals(depPred2.sub(0))
-						&& depPred1.sub(0).sub(0).equals(depPred2.sub(0).sub(0))) {
-					Boolean loc1SubSetloc2 = sProof.proofSubSet(depPred1.sub(0), depPred2.sub(0));
-
-					if (loc1SubSetloc2) {
+				if (depPred1.op() == depPred2.op() && depPred1.sub(0)!=depPred2.sub(0)) {
+					if (sProof.proofSubSet(depPred1.sub(0), depPred2.sub(0))) {
 						toDelete.add(depPred1);
-					} else {
-						Boolean loc2SubSetloc1 = sProof.proofSubSet(depPred2.sub(0), depPred1.sub(0));
-						if (loc2SubSetloc1)
+					} else if(sProof.proofSubSet(depPred2.sub(0), depPred1.sub(0)) && depPred1.sub(0)!=depPred2.sub(0)){
+						toDelete.add(depPred2);
+					} else if(depPred1.sub(0).op()==locSetLDT.getArrayRange() && depPred2.sub(0).op()==locSetLDT.getArrayRange()) {
+						if(depPred1.sub(0).sub(0)==depPred2.sub(0).sub(0) && depPred1.sub(0).sub(2)==depPred2.sub(0).sub(1)) {
+							toDelete.add(depPred1);
 							toDelete.add(depPred2);
+							if(depPred1.op()==depLDT.getNoR()) {
+								toAdd.add(tb.noR(tb.arrayRange(depPred1.sub(0).sub(0), depPred1.sub(0).sub(1), depPred2.sub(0).sub(2))));
+							} else if(depPred1.op()==depLDT.getNoRaW()) {
+								toAdd.add(tb.noRaW(tb.arrayRange(depPred1.sub(0).sub(0), depPred1.sub(0).sub(1), depPred2.sub(0).sub(2))));
+							} else if(depPred1.op()==depLDT.getNoWaR()) {
+								toAdd.add(tb.noWaR(tb.arrayRange(depPred1.sub(0).sub(0), depPred1.sub(0).sub(1), depPred2.sub(0).sub(2))));
+							} else if(depPred1.op()==depLDT.getNoWaW()) {
+								toAdd.add(tb.noWaW(tb.arrayRange(depPred1.sub(0).sub(0), depPred1.sub(0).sub(1), depPred2.sub(0).sub(2))));
+							} else if(depPred1.op()==depLDT.getNoW()) {
+								toAdd.add(tb.noW(tb.arrayRange(depPred1.sub(0).sub(0), depPred1.sub(0).sub(1), depPred2.sub(0).sub(2))));
+							} 
+						}
 					}
 				}
 			}
 		}
+		fDepPredList.addAll(toAdd);
 		fDepPredList.removeAll(toDelete);
 //		fDepPredList = refineAiliasing(fDepPredList, toDelete);
-		toDelete.removeAll(toDelete);
 
+		//		fDepPredList = refineAiliasing(fDepPredList, toDelete);
+//		System.out.println("deleted by compression: " + toDelete);
+
+//		if (ailias) {
+//			for (Term depPred1 : fDepPredList) {
+//				for (Term depPred2 : fDepPredList) {
+//					if (depPred1.op().equals(depPred2.op()) && !depPred1.sub(0).sub(0).equals(depPred2.sub(0).sub(0))) {
+//						if (sProof.proofEquality(depPred1.sub(0), depPred2.sub(0))) {
+//							if (!toDelete.contains(depPred2)) {
+//								toDelete.add(depPred1);
+//							}
+//						}
+//					}
+//				}
+//			}
+//		}
+
+
+		return fDepPredList;
+	}
+
+	private Set<Term> depPredListCompressionByPredicate(Set<Term> fDepPredList){
+		Set<Term> toDelete = new HashSet<>();
 		for (Term depPred1 : fDepPredList) {
 			for (Term depPred2 : fDepPredList) {
 				if (depPred1.op().equals(depLDT.getNoR())) {
@@ -112,31 +149,11 @@ public class PredicateListCompressionNew {
 			}
 		}
 		fDepPredList.removeAll(toDelete);
-//		fDepPredList = refineAiliasing(fDepPredList, toDelete);
-//		System.out.println("deleted by compression: " + toDelete);
-		toDelete.removeAll(toDelete);
-
-		if (ailias) {
-			for (Term depPred1 : fDepPredList) {
-				for (Term depPred2 : fDepPredList) {
-					if (depPred1.op().equals(depPred2.op()) && !depPred1.sub(0).sub(0).equals(depPred2.sub(0).sub(0))) {
-						if (sProof.proofEquality(depPred1.sub(0), depPred2.sub(0))) {
-							if (!toDelete.contains(depPred2)) {
-								toDelete.add(depPred1);
-							}
-						}
-					}
-				}
-			}
-		}
-
-		fDepPredList.removeAll(toDelete);
-
 		return fDepPredList;
 	}
-
 	private Set<Term> finalCompPredListCompression(Set<Term> fCompPredList) {
 		Set<Term> toDelete = new HashSet<>();
+		Set<Term> toAdd = new HashSet<>();
 		for (Term compPred1 : fCompPredList) {
 			for (Term compPred2 : fCompPredList) {
 				if (compPred1.sub(0).equals(compPred2.sub(0)) && compPred1.sub(1).equals(compPred2.sub(1))) { // a X b
@@ -144,16 +161,21 @@ public class PredicateListCompressionNew {
 																												// Y b
 					if (compPred1.op().equals(geq) && compPred2.op().equals(gt)) {
 						toDelete.add(compPred2);
-					} else if (compPred1.op().equals(gt) && compPred2.op().equals(geq)) {
-						toDelete.add(compPred1);
 					} else if (compPred1.op().equals(leq) && compPred2.op().equals(lt)) {
 						toDelete.add(compPred2);
-					} else if (compPred1.op().equals(lt) && compPred2.op().equals(leq)) {
-						toDelete.add(compPred1);
-					} if (compPred1.op().equals(Equality.EQUALS) && compPred2.op().equals(geq)) {
+					} else if (compPred1.op().equals(Equality.EQUALS) && compPred2.op().equals(geq)) {
 						toDelete.add(compPred1);
 					} else if (compPred1.op().equals(Equality.EQUALS) && compPred2.op().equals(leq)) {
 						toDelete.add(compPred1);
+					} 
+//					else if (compPred1.op().equals(gt) && compPred2.op().equals(lt)) { //There should not be such a case because this means the inv is wrong
+//						toDelete.add(compPred1);
+//						toDelete.add(compPred2);
+//					}
+					else if (compPred1.op().equals(geq) && compPred2.op().equals(leq)) {
+						toDelete.add(compPred1);
+						toDelete.add(compPred2);
+						toAdd.add(tb.equals(compPred1.sub(0), compPred1.sub(1)));
 					}
 					
 				} else if (compPred1.sub(0).equals(compPred2.sub(1)) && compPred1.sub(1).equals(compPred2.sub(0))) { // a
@@ -165,13 +187,15 @@ public class PredicateListCompressionNew {
 																														// a
 					if (compPred1.op().equals(gt) && compPred2.op().equals(lt)) {
 						toDelete.add(compPred1);
-					} else if (compPred1.op().equals(lt) && compPred2.op().equals(gt)) {
+					} else if (compPred1.op().equals(geq) && compPred2.op().equals(lt)) {
+						toDelete.add(compPred2);
+					} else if (compPred1.op().equals(leq) && compPred2.op().equals(gt)) {
 						toDelete.add(compPred2);
 					} else if (compPred1.op().equals(geq) && compPred2.op().equals(leq)) {
 						toDelete.add(compPred1);
-					} else if (compPred1.op().equals(leq) && compPred2.op().equals(geq)) {
 						toDelete.add(compPred2);
-					} if (compPred1.op().equals(Equality.EQUALS) && compPred2.op().equals(geq)) {
+						toAdd.add(tb.equals(compPred1.sub(0), compPred1.sub(1)));
+					} else if (compPred1.op().equals(Equality.EQUALS) && compPred2.op().equals(geq)) {
 						toDelete.add(compPred1);
 					} else if (compPred1.op().equals(Equality.EQUALS) && compPred2.op().equals(leq)) {
 						toDelete.add(compPred1);
