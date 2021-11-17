@@ -1290,14 +1290,23 @@ public class TermBuilder {
      * @return a term representing the value
      */
     public Term fpTerm(float value) {
+        boolean neg = false;
+        if (value < 0) {
+            neg = true;
+            value = value * -1;
+        }
         int bitPattern = Float.floatToIntBits(value);
         String patternStr = Integer.toUnsignedString(bitPattern);
         Term numberTerm = numberTerm(patternStr);
         // NOTE: The following needs to be removed in future since
         // FP will only take one argument soon.
         Term redundantZero = numberTerm("0");
-        return func(services.getTypeConverter().getFloatLDT().getFloatSymbol(),
-                numberTerm, redundantZero);
+        Term ret = func(services.getTypeConverter().getFloatLDT().getFloatSymbol(), numberTerm, redundantZero);
+        if (neg) {
+            return func(services.getTypeConverter().getFloatLDT().getJavaUnaryMinus(), ret);
+        } else {
+            return ret;
+        }
     }
 
     /**
@@ -1307,14 +1316,23 @@ public class TermBuilder {
      * @return a term representing the value
      */
     public Term dfpTerm(double value) {
+        boolean neg = false;
+        if (value < 0) {
+            neg = true;
+            value = value * -1;
+        }
         long bitPattern = Double.doubleToLongBits(value);
         String patternStr = Long.toUnsignedString(bitPattern);
         Term numberTerm = numberTerm(patternStr);
         // NOTE: The following needs to be removed in future since
         // FP will only take one argument soon.
         Term redundantZero = numberTerm("0");
-        return func(services.getTypeConverter().getDoubleLDT().getDoubleSymbol(),
-                numberTerm, redundantZero);
+        Term ret = func(services.getTypeConverter().getDoubleLDT().getDoubleSymbol(), numberTerm, redundantZero);
+        if (neg) {
+            return func(services.getTypeConverter().getDoubleLDT().getJavaUnaryMinus(), ret);
+        } else {
+            return ret;
+        }
     }
 
     public Term add(Term t1, Term t2) {
