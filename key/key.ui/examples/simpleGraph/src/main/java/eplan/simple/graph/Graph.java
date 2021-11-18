@@ -153,8 +153,38 @@ public class Graph {
         return returnval;
     }
 
-    public Edge[] getAllEdgesAt(Node n) {
-        return null;
+
+    /*@ public normal_behavior
+      @ requires \invariant_for(n);
+      @ assignable \nothing;
+      @ ensures \result != null;
+      @ ensures (\forall int j; j >= 0 && j < \result.length; \result[j].start == n || \result[j].end == n || \result[j] == null);
+      @*/
+    public /*@ nullable @*/ Edge[] getAllEdgesAt(Node n) {
+        Edge[] returnval = new Edge[edges.length];
+        int pos = 0;
+
+
+        /*@ loop_invariant
+          @ i >= 0 && i <= edges.length && pos >= 0 && pos <= i &&
+          @   (\forall int j; j >= 0 && j < pos; returnval[j].start == n || returnval[j].end == n) &&
+          @   (\forall int k; k >= pos && k < returnval.length; returnval[k] == null);
+          @ assignable returnval[*];
+          @ decreases edges.length - i;
+          @*/
+        for (int i = 0; i < edges.length; i++) {
+            Edge tempEdge = edges[i];
+            Node startNode = tempEdge.getStart();
+            Node endNode = tempEdge.getEnd();
+
+            if (startNode == n || endNode == n) {
+                returnval[pos] = tempEdge;
+                pos++;
+            }
+
+        }
+
+        return returnval;
     }
 
     public static void main(String[] args) {
