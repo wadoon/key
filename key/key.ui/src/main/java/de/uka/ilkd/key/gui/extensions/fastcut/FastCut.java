@@ -99,7 +99,7 @@ public class FastCut implements KeYGuiExtension, KeYGuiExtension.ContextMenu {
     private Collection<? extends Action> getFastInstantiations(KeYMediator mediator,
                                                                CurrentGoalViewMenu.GoalViewData underlyingObject,
                                                                Proof proof) {
-        var allRight = InstantiationFileHandler.getInstantiationListsFor(ALLRIGHT_TACLET_NAME.toString())
+/*        var allRight = InstantiationFileHandler.getInstantiationListsFor(ALLRIGHT_TACLET_NAME.toString())
                 .stream().map(it -> it.get(0));
         var exLeft = InstantiationFileHandler.getInstantiationListsFor(ALLRIGHT_TACLET_NAME.toString())
                 .stream().map(it -> it.get(0));
@@ -110,6 +110,9 @@ public class FastCut implements KeYGuiExtension, KeYGuiExtension.ContextMenu {
                         create(allRight, kio, ApplyFastAllRight::new, mediator, underlyingObject),
                         create(exLeft, kio, ApplyExLeftRight::new, mediator, underlyingObject))
                 .collect(Collectors.toList());
+
+ */
+        return Collections.emptyList();
     }
 
     private Stream<Action> create(Stream<String> instantiations, KeyIO kio, CreateAction constr,
@@ -130,7 +133,7 @@ public class FastCut implements KeYGuiExtension, KeYGuiExtension.ContextMenu {
         var lines = InstantiationFileHandler.getInstantiationListsFor(CUT_TACLET_NAME.toString())
                 .stream().map(it -> it.get(0));
         var kio = new KeyIO(proof.getServices());
-        var seq = new ArrayList<Action>(InstantiationFileHandler.SAVE_COUNT);
+        var seq = new ArrayList<Action>();//InstantiationFileHandler.SAVE_COUNT);
         lines.forEach(it -> {
             Term term;
             try {
