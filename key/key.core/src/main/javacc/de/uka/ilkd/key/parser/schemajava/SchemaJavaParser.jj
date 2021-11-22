@@ -3085,12 +3085,12 @@ Expression PrimaryExpression() :
 	    if (tmpResult instanceof SVWrapper) {
 		s = ((SVWrapper)tmpResult).getSV().sort();
 	    }
-	    if ("length".equals(suffix.id.getText()) && isLeftHandSide(s)) {
+	    /*if ("length".equals(suffix.id.getText()) && isLeftHandSide(s)) {
 		    result = new ArrayLengthReference(tmpResult);
 		    checkConstruction(result);
 		    setPrefixInfo(result);
 		    return result;
-		} else {
+		} else*/ {
 		    tmpResult = factory.createUncollatedReferenceQualifier(tmpResult, suffix.id);
           ((UncollatedReferenceQualifier)tmpResult).setTypeArguments(suffix.typeArgs);
           suffix.typeArgs = null;

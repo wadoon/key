@@ -1423,7 +1423,7 @@ public class Recoder2KeYConverter {
     /**
      * converts a recoder array length reference to a usual KeY field reference
      */
-    public FieldReference convert(
+    /*public FieldReference convert(
             recoder.java.reference.ArrayLengthReference alr) {
         recoder.abstraction.Type recoderType = getServiceConfiguration()
         .getCrossReferenceSourceInfo()
@@ -1437,7 +1437,7 @@ public class Recoder2KeYConverter {
         // is what i think)
         return new FieldReference(length, (ReferencePrefix) callConvert(alr
                 .getReferencePrefix()));
-    }
+    }*/
 
     /**
      * converts a recoder field reference. A ProgramVariable is created
