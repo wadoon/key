@@ -60,31 +60,17 @@ public class LIGNew {
 		
 //		System.out.println("Goals before shift: "+services.getProof().openGoals());
 		ImmutableList<Goal> goalsAfterShift = ruleApp.applyShiftUpdateRule(services.getProof().openGoals());
-//		System.out.println("number of goals after shift: " + goalsAfterShift.size());
+//		System.out.println("number of goals after shift 0: " + goalsAfterShift.size());// It is always one
 //		System.out.println("Goals after shift: "+ ProofSaver.printAnything(goalsAfterShift.head().sequent(), services));
 		ImmutableList<Goal> goalsAfterUnwind = null;
 
-		Goal currentGoal = goalsAfterShift.head();
-//		System.out.println(currentGoal);
-//		ConstructAllCompPreds cac = new ConstructAllCompPreds(services, low, index, high);
-//		allPreds.addAll(cac.cons());
-		//Initial set of Comparison predicates
-		allPreds.add(tb.lt(low, index));// l<i 
-		allPreds.add(tb.gt(index, low));//i>l
-		allPreds.add(tb.gt(index, high));// i>h 
-		allPreds.add(tb.lt(high, index));//h<i
-		allPreds.add(tb.gt(low, high));// l>h 
-		allPreds.add(tb.lt(high, low));//h<l
+		Goal currentGoal = goalsAfterShift.head();//Number of goals after shift does not change
 		
-//		allPreds.add(tb.geq(index, low));// i>=l 
-//		allPreds.add(tb.leq(index, high));// i<=h 
-//		allPreds.add(tb.geq(low, high));// l<=h 
-		//Initial set of dependence predicates
+		allPreds.add(tb.leq(index, low));// i<=l 
+		allPreds.add(tb.geq(index, high));// i>=h 
 		for (Term arr : arrays) {
-			allPreds.add(tb.noR(tb.arrayRange(arr, low, index)));
-			allPreds.add(tb.noR(tb.arrayRange(arr, index, high)));
-			allPreds.add(tb.noW(tb.arrayRange(arr, low, index)));
-			allPreds.add(tb.noW(tb.arrayRange(arr, index, high)));
+			allPreds.add(tb.noR(tb.arrayRange(arr, low, high)));
+			allPreds.add(tb.noW(tb.arrayRange(arr, low, high)));
 		}
 
 //		System.out.println("Initial Predicate Set: ");
@@ -97,20 +83,28 @@ public class LIGNew {
 //		System.out.println(ProofSaver.printAnything(seq, services));
 		
 		do {
+			itrNumber ++;
+			System.out.println("Iteration Number: " + itrNumber);
+			
 			oldPreds.removeAll(oldPreds);
 			oldPreds.addAll(allPreds);
 
 			goalsAfterUnwind = ruleApp.applyUnwindRule(goalsAfterShift);
+//			System.out.println("Number of goals after unwind: " + goalsAfterUnwind.size());
+//			System.out.println("Goal After Unwind:" + goalsAfterUnwind);
+//			System.out.println(goalsAfterUnwind);
 			goalsAfterShift = ruleApp.applyShiftUpdateRule(goalsAfterUnwind);
-//			System.out.println("Goal After Shift: " + goalsAfterShift);
+//			System.out.println("Number of goals after shift: " + goalsAfterShift.size());
+//			System.out.println("Goal After Shift:" + goalsAfterShift);
 			
 			currentGoal = ruleApp.findLoopUnwindTacletGoal(goalsAfterShift);
 //			currentIndexFormula = currentIndexEq(currentGoal.sequent(), index);
+//			System.out.println("Before refinement: " + currentGoal.sequent());
 			PredicateRefinementNew2 pr = new PredicateRefinementNew2(services, currentGoal.sequent(), allPreds, index, itrNumber);
 			allPreds=pr.predicateCheckAndRefine();
-			itrNumber ++;
-			System.out.println("Iteration Number " + itrNumber);
-		} while (allPreds.size() != oldPreds.size() && itrNumber <10);
+			
+//			System.out.println("ALL PREDICATES Size:" + allPreds.size());
+		} while (allPreds.size()!=oldPreds.size() && itrNumber < 2);
 		
 		
 		
@@ -122,13 +116,18 @@ public class LIGNew {
 		}
 		System.out.println(" of size " + allPreds.size());
 		
-//		PredicateListCompressionNew plcNew = new PredicateListCompressionNew(services, currentGoal.sequent(), allPreds, false);
-//
-//		allPreds = plcNew.compression();
-//		System.out.println("Compressed LIG is the conjunction of: ");
-//		for (Term term : allPreds) {
-//			System.out.println(term);
-//		}
+		PredicateListCompressionNew plcNew = new PredicateListCompressionNew(services, currentGoal.sequent(), allPreds, false);
+
+		allPreds = plcNew.compression();
+		System.out.println("LOOP INVARIANT is: ");
+		int invSize = allPreds.size();
+		for (Term term : allPreds) {
+			invSize--;
+			if(invSize!=0)
+				System.out.println(term + " & ");
+			else
+				System.out.println(term);
+		}
 //		System.out.println(" of size " + allPreds.size());
 	}
 

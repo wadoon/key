@@ -81,9 +81,11 @@ public class PredicateListCompressionNew {
 				if (depPred1.op() == depPred2.op() && depPred1.sub(0)!=depPred2.sub(0)) {
 					if (sProof.proofSubSet(depPred1.sub(0), depPred2.sub(0))) {
 						toDelete.add(depPred1);
-					} else if(sProof.proofSubSet(depPred2.sub(0), depPred1.sub(0)) && depPred1.sub(0)!=depPred2.sub(0)){
-						toDelete.add(depPred2);
-					} else if(depPred1.sub(0).op()==locSetLDT.getArrayRange() && depPred2.sub(0).op()==locSetLDT.getArrayRange()) {
+					} 
+//					else if(sProof.proofSubSet(depPred2.sub(0), depPred1.sub(0)) && depPred1.sub(0)!=depPred2.sub(0)){
+//						toDelete.add(depPred2);
+//					} 
+					else if(depPred1.sub(0).op()==locSetLDT.getArrayRange() && depPred2.sub(0).op()==locSetLDT.getArrayRange()) {
 						if(depPred1.sub(0).sub(0)==depPred2.sub(0).sub(0) && depPred1.sub(0).sub(2)==depPred2.sub(0).sub(1)) {
 							toDelete.add(depPred1);
 							toDelete.add(depPred2);
@@ -151,12 +153,13 @@ public class PredicateListCompressionNew {
 		fDepPredList.removeAll(toDelete);
 		return fDepPredList;
 	}
+	
 	private Set<Term> finalCompPredListCompression(Set<Term> fCompPredList) {
 		Set<Term> toDelete = new HashSet<>();
 		Set<Term> toAdd = new HashSet<>();
 		for (Term compPred1 : fCompPredList) {
 			for (Term compPred2 : fCompPredList) {
-				if (compPred1.sub(0).equals(compPred2.sub(0)) && compPred1.sub(1).equals(compPred2.sub(1))) { // a X b
+				if (sProof.proofEquality(compPred1.sub(0),compPred2.sub(0)) && sProof.proofEquality(compPred1.sub(1), compPred2.sub(1))) { // a X b
 																												// && a
 																												// Y b
 					if (compPred1.op().equals(geq) && compPred2.op().equals(gt)) {
@@ -178,7 +181,7 @@ public class PredicateListCompressionNew {
 						toAdd.add(tb.equals(compPred1.sub(0), compPred1.sub(1)));
 					}
 					
-				} else if (compPred1.sub(0).equals(compPred2.sub(1)) && compPred1.sub(1).equals(compPred2.sub(0))) { // a
+				} else if (sProof.proofEquality(compPred1.sub(0), compPred2.sub(1)) && sProof.proofEquality(compPred1.sub(1), compPred2.sub(0))) { // a
 																														// X
 																														// b
 																														// &&
@@ -200,9 +203,63 @@ public class PredicateListCompressionNew {
 					} else if (compPred1.op().equals(Equality.EQUALS) && compPred2.op().equals(leq)) {
 						toDelete.add(compPred1);
 					}
+				} else if(sProof.proofEquality(compPred1.sub(0), compPred2.sub(0)) && !sProof.proofEquality(compPred1.sub(1),compPred2.sub(1))) {
+					if((compPred1.op() == lt && compPred2.op() == lt) || (compPred1.op() == lt && compPred2.op() == leq)) {
+						if(sProof.proofLT(compPred1.sub(1), compPred2.sub(1))) {
+							toDelete.add(compPred1);
+						} else {
+							toDelete.add(compPred2);
+						}
+					} else if((compPred1.op() == gt && compPred2.op() == gt) || (compPred1.op() == gt && compPred2.op() == geq)) {
+						if(sProof.proofLT(compPred1.sub(1), compPred2.sub(1))) {
+							toDelete.add(compPred2);
+						} else {
+							toDelete.add(compPred1);
+						}
+					} else if((compPred1.op() == leq && compPred2.op() == leq) || (compPred1.op() == leq && compPred2.op() == lt)) {
+						if(sProof.proofLT(compPred1.sub(1), compPred2.sub(1))) {
+							toDelete.add(compPred1);
+						} else {
+							toDelete.add(compPred2);
+						}
+					} else if((compPred1.op() == geq && compPred2.op() == geq) || (compPred1.op() == gt && compPred2.op() == gt)) {
+						if(sProof.proofLT(compPred1.sub(1), compPred2.sub(1))) {
+							toDelete.add(compPred2);
+						} else {
+							toDelete.add(compPred1);
+						}
+					}
+					
+				} else if(compPred1.op() == compPred2.op() && sProof.proofEquality(compPred1.sub(1), compPred2.sub(1)) && !sProof.proofEquality(compPred1.sub(0),compPred2.sub(0))) {
+					if(compPred1.op() == lt) {
+						if(sProof.proofLT(compPred1.sub(0), compPred2.sub(0))) {
+							toDelete.add(compPred1);
+						} else {
+							toDelete.add(compPred2);
+						}
+					} else if(compPred1.op() == gt) {
+						if(sProof.proofLT(compPred1.sub(0), compPred2.sub(0))) {
+							toDelete.add(compPred2);
+						} else {
+							toDelete.add(compPred1);
+						}
+					} else if(compPred1.op() == leq) {
+						if(sProof.proofLT(compPred1.sub(0), compPred2.sub(0))) {
+							toDelete.add(compPred1);
+						} else {
+							toDelete.add(compPred2);
+						}
+					} else if(compPred1.op() == geq) {
+						if(sProof.proofLT(compPred1.sub(0), compPred2.sub(0))) {
+							toDelete.add(compPred2);
+						} else {
+							toDelete.add(compPred1);
+						}
+					}
+					
 				}
 
-			}
+			} 
 		}
 		fCompPredList.removeAll(toDelete);
 //		System.out.println("deleted by compression: " + toDelete);

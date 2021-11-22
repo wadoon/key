@@ -87,11 +87,11 @@ public class RuleApplication {
 				IBuiltInRuleApp bApp = findShiftUpdateRuleApp(
 						g.ruleAppIndex().getBuiltInRules(g, new PosInOccurrence(sf, PosInTerm.getTopLevel(), false)));
 				if (bApp != null) {
-//					System.out.println("Goal of taclet shiftUpdate" + " is: " + g);
+					System.out.println("Goal of taclet shiftUpdate" + " is: " + g);
 					return g;
 				}
 			}
-//			System.out.println("Taclet shiftUpdate" + " is not applicable at " + g);
+			System.out.println("Taclet shiftUpdate" + " is not applicable at " + g);
 		}
 		return null;
 	}
@@ -99,7 +99,7 @@ public class RuleApplication {
 	private IBuiltInRuleApp findShiftUpdateRuleApp(ImmutableList<IBuiltInRuleApp> tApp) {
 		for (IBuiltInRuleApp app : tApp) {
 			if (ShiftUpdateRule.SHIFT_UPDATE_NAME.equals(app.rule().name())) {
-//				System.out.println(ShiftUpdateRule.SHIFT_UPDATE_NAME + " rule is among applicable rules.");
+				System.out.println(ShiftUpdateRule.SHIFT_UPDATE_NAME + " rule is among applicable rules.");
 				return app;
 			}
 		}
@@ -126,10 +126,11 @@ public class RuleApplication {
 			TacletApp app = tApp.head();
 			app = app.tryToInstantiate(services);
 			ImmutableList<Goal> goals = currentGoal.apply(app);
-
+			
 			ps.start(goals);
 
-//			System.out.println("Number of Open Goals after applying unwind: " + currentGoal.proof().openGoals().size());
+			System.out.println("Number of Open Goals after applying unwind: " + currentGoal.proof().openGoals().size());
+			System.out.println("Open Goals after applying unwind: " + currentGoal.proof().openGoals());
 			return currentGoal.proof().openGoals();
 //			return services.getProof().openEnabledGoals();
 		}
@@ -144,7 +145,7 @@ public class RuleApplication {
 					return g;
 				}
 			}
-//			System.out.println("Taclet loopUnwind is not applicable at " + g);
+			System.out.println("Taclet loopUnwind is not applicable at " + g);
 		}
 		return null;
 	}

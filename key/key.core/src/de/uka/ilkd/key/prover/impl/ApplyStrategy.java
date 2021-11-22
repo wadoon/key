@@ -123,7 +123,7 @@ public class ApplyStrategy extends AbstractProverCore {
                                                  g, app);
         } else {
             assert g != null;
-            g.apply(app);
+//            g.apply(app);
 //            if (COUNTER % 2000 == 0) {
 //    		try  { new de.uka.ilkd.key.proof.io.ProofSaver(g.proof(), "C:\\Users\\Asma\\test.proof", "").save();} catch (java.io.IOException io) {System.out.println("oops"+io);}
 //            System.out.println(ProofSaver.printAnything(g.sequent(), g.proof().getServices()));
