@@ -22,7 +22,7 @@ public final class InstantiationFileHandler {
 
     public static final String LINE_END = System.getProperty("line.separator");
 
-    public static final int SAVE_COUNT = 10;
+    public static final int SAVE_COUNT = 10 ;
 
     private static HashMap<String, List<List<String>>> hm;
 
