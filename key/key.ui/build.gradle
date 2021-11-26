@@ -51,6 +51,7 @@ distZip {
 
 application {
     mainClassName = "de.uka.ilkd.key.core.Main"
+
 }
 
 run {

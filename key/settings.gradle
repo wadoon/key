@@ -1,6 +1,8 @@
 include "key.util"
 include "key.ui"
 include "key.core"
+include "key.java"
+
 //include "key.core:informationflow"
 include "key.core:rifl"
 include "key.core.symbolic_execution"
