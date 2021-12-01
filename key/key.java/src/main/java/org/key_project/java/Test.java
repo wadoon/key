@@ -23,6 +23,9 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.math.BigInteger;
 
+import static org.key_project.java.JavaSorts.JAVA_CATCH;
+import static org.key_project.java.JavaSorts.JAVA_STATEMENT;
+
 /**
  * @author Alexander Weigl
  * @version 1 (11/25/21)
@@ -63,7 +66,7 @@ public class Test {
         return mv.term;
     }
 
-    static class MV<tb> extends SourceVisitor {
+    static class MV extends SourceVisitor {
         public Term term;
 
         @Override
@@ -555,7 +558,26 @@ public class Test {
 
         @Override
         public void visitTry(Try x) {
-            super.visitTry(x);
+            x.getBody().accept(this);
+            var body = term;
+            term = null;
+            createCatchClauses(x.getBranchList());
+            var catc = term;
+
+            Term finBody;
+            if(hasFinally(x.)) {
+
+            }else{
+                finBody = tf.createTerm(jops.EmptyStmt);
+            }
+
+            TryStmt = createJavaStatement("Try", JAVA_STATEMENT, JAVA_CATCH, JAVA_STATEMENT);
+
+            term = tf.createTerm(jops.TryStmt, body, catc, finBody)
+        }
+
+        private void createCatchClauses(ASTList<Branch> branchList) {
+
         }
 
         @Override
