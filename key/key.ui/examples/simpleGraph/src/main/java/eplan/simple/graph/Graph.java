@@ -154,21 +154,37 @@ public class Graph {
     }
 
 
-    /*@ public normal_behavior
+    /* public normal_behavior
       @ requires \invariant_for(n);
       @ assignable \nothing;
       @ ensures \result != null;
       @ ensures (\forall int j; j >= 0 && j < \result.length; \result[j].start == n || \result[j].end == n || \result[j] == null);
+      @*/
+
+    /*@ public normal_behavior
+      @ requires \invariant_for(n);
+      @ assignable \nothing;
+      @ ensures \result != null;
+      @ ensures (\forall int j; j >= 0 && j < \result.length; \result[j].start.equals(n) || \result[j].end.equals(n) || \result[j] == null);
       @*/
     public /*@ nullable @*/ Edge[] getAllEdgesAt(Node n) {
         Edge[] returnval = new Edge[edges.length];
         int pos = 0;
 
 
-        /*@ loop_invariant
+        /* loop_invariant
           @ i >= 0 && i <= edges.length && pos >= 0 && pos <= i &&
           @   (\forall int j; j >= 0 && j < pos; returnval[j].start == n || returnval[j].end == n) &&
           @   (\forall int k; k >= pos && k < returnval.length; returnval[k] == null);
+          @ assignable returnval[*];
+          @ decreases edges.length - i;
+          @*/
+
+        /*@ loop_invariant
+          @ i >= 0 && i <= edges.length && pos >= 0 && pos <= i &&
+          @   (\forall int j; j >= 0 && j < pos; returnval[j] != null && (returnval[j].getStart().equals(n) || returnval[j].getEnd().equals(n))) &&
+          @   (\forall int k; k >= pos && k < returnval.length; returnval[k] == null) &&
+          @   (\forall int j; j >= 0 && j < pos; (\exists int m; m >= 0 && m < i; returnval[j] == edges[m]));
           @ assignable returnval[*];
           @ decreases edges.length - i;
           @*/
