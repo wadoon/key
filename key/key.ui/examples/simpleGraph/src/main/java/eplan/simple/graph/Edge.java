@@ -36,7 +36,7 @@ public final class Edge {
 
     /*@ public normal_behavior
       @ assignable \strictly_nothing;
-      @ accessible this.id, this.start, this.end;
+      @ accessible this.id;
       @ ensures \result == this.id;
       @*/
     public int getId() {
@@ -45,7 +45,7 @@ public final class Edge {
 
     /*@ public normal_behavior
       @ assignable \strictly_nothing;
-      @ accessible this.start, this.end;
+      @ accessible this.start;
       @ ensures \result == this.start;
       @*/
     public Node getStart() {
@@ -54,7 +54,7 @@ public final class Edge {
 
     /*@ public normal_behavior
       @ assignable \strictly_nothing;
-      @ accessible this.end, this.start;
+      @ accessible this.end;
       @ ensures \result == this.end;
       @*/
     public Node getEnd() {
