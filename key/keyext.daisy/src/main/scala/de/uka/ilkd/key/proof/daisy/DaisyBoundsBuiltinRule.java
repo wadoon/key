@@ -87,7 +87,7 @@ public class DaisyBoundsBuiltinRule implements BuiltInRule {
      */
     private Pair<Float, Float> daisyComputeBounds(List<Term> preconditions, List<Term> lets, Term floatExpr, Services services) {
 
-        return DaisyAPI.computeRange(preconditions,floatExpr,lets,services);
+        return DaisyAPI.computeFloatRange(preconditions,floatExpr,lets,services);
     }
 
     @Override
