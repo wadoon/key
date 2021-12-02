@@ -94,7 +94,7 @@ public class DaisyBoundsBuiltinRule implements BuiltInRule {
        @return a lower and upper bound for the floating point expression
      */
     private Pair<Float, Float> daisyComputeFloatBounds(List<Term> preconditions, List<Term> lets, Term floatExpr, Services services) {
-        return DaisyAPI.computeRange(preconditions,floatExpr,lets,services);
+        return DaisyAPI.computeFloatRange(preconditions,floatExpr,lets,services);
     }
 
     private Pair<Double, Double> daisyComputeDoubleBounds(List<Term> preconditions, List<Term> lets, Term floatExpr, Services services) {
