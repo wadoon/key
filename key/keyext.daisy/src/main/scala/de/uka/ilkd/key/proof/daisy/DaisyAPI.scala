@@ -115,7 +115,7 @@ object DaisyAPI {
       val varName = termDetails.asScala.filter(p => !p.asInstanceOf[Term].isRigid).toList.head.asInstanceOf[Term].op().name().asInstanceOf[ProgramElementName].getProgramName
       val literal = termDetails.asScala.filter(p => p.asInstanceOf[Term].isRigid).toList.head.asInstanceOf[Term]
 
-      val d: Double = doubleLTD.translateTerm(literal, new ExtList, services).asInstanceOf[DoubleLiteral].value
+      val d: Double = doubleLTD.translateTerm(literal, new ExtList, services).asInstanceOf[de.uka.ilkd.key.java.expression.literal.DoubleLiteral].getValue.toDouble
 
       updatePreCondsMap(varName, d)
     }
@@ -138,16 +138,17 @@ object DaisyAPI {
   def convertToDaisyExpr(lets: util.List[Term], term: Term, varIds: List[Identifier], services: Services): Expr = {
 
     val floatLDT = new FloatLDT(services)
+    val doubleLDT = new DoubleLDT(services)
     val op: Operator = term.op()
     val subTerms = term.subs()
 
-    if (op == floatLDT.getAddIEEE)
+    if (op == floatLDT.getAddIEEE || op == doubleLDT.getAddIEEE)
       Plus(convertToDaisyExpr(lets, subTerms.get(1), varIds, services), convertToDaisyExpr(lets, subTerms.get(2), varIds, services))
-    else if (op == floatLDT.getSubIEEE)
+    else if (op == floatLDT.getSubIEEE || op == doubleLDT.getSubIEEE)
       Minus(convertToDaisyExpr(lets, subTerms.get(1), varIds, services), convertToDaisyExpr(lets, subTerms.get(2), varIds, services))
-    else if (op == floatLDT.getMulIEEE)
+    else if (op == floatLDT.getMulIEEE || op == doubleLDT.getMulIEEE)
       Times(convertToDaisyExpr(lets, subTerms.get(1), varIds, services), convertToDaisyExpr(lets, subTerms.get(2), varIds, services))
-    else if (op == floatLDT.getDivIEEE)
+    else if (op == floatLDT.getDivIEEE || op == doubleLDT.getDivIEEE)
       Division(convertToDaisyExpr(lets, subTerms.get(1), varIds, services), convertToDaisyExpr(lets, subTerms.get(2), varIds, services))
     // if variable
     else if (!op.isRigid && op.arity() == 0) {
@@ -158,8 +159,8 @@ object DaisyAPI {
     else if (op.name().toString == "FP") {
       val fl: Float = floatLDT.translateTerm(term, new ExtList, services).asInstanceOf[FloatLiteral].getValue.toFloat
       Trees.FloatLiteral(fl)
-    } else if (op.name().toString == "FP" && term.sort().name().toString == "double") {
-      val db: Double = floatLDT.translateTerm(term, new ExtList, services).asInstanceOf[DoubleLiteral].value
+    } else if (op.name().toString == "DFP") {
+      val db: Double = doubleLDT.translateTerm(term, new ExtList, services).asInstanceOf[de.uka.ilkd.key.java.expression.literal.DoubleLiteral].getValue.toDouble
       Trees.DoubleLiteral(db)
     }
     else throw new IllegalArgumentException("Operation " + op + " not supported")
