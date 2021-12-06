@@ -44,6 +44,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
 
+import de.uka.ilkd.key.logic.TermFactory;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -998,8 +999,15 @@ public class InvariantConfigurator {
                 Term result = null;
                 index = inputPane.getSelectedIndex();
                 final Sort locSetSort = services.getTypeConverter().getLocSetLDT().targetSort();
+                String string = invariants.get(index)[MOD_IDX].get(heap.toString());
+                if(string.trim().equals("\\strictly_nothing")) {
+                    // FIXME
+                    // This is a hack that has been introduced to be able
+                    // to enter "strictly_nothing" also in interactive mode.
+                    return services.getTermBuilder().strictlyNothing();
+                }
                 result = parser.parse(
-                        new StringReader(invariants.get(index)[MOD_IDX].get(heap.toString())), locSetSort,
+                        new StringReader(string), locSetSort,
                         services, services.getNamespaces(), getAbbrevMap());
                 return result;
             }
