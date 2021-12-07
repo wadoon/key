@@ -2,6 +2,11 @@ package eplan.simple.graph;
 
 public final class Node {
 
+    /*@ model boolean mod_equals( nullable Object o) {return (o instanceof Node) && ((Node)o).id == id; }
+
+      @*/
+
+
     /* public invariant (\forall Node n; n.id == this.id; n == this); */
     //@ accessible \inv: \nothing;
     final private /*@ spec_public @*/ int id;

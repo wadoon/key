@@ -193,7 +193,7 @@ public class Graph {
             Node startNode = tempEdge.getStart();
             Node endNode = tempEdge.getEnd();
 
-            if (startNode == n || endNode == n) {
+            if (startNode.equals(n) || endNode.equals(n)) {
                 returnval[pos] = tempEdge;
                 pos++;
             }

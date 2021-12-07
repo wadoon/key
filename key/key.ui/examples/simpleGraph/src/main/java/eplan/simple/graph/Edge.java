@@ -39,7 +39,7 @@ public final class Edge {
       @ accessible this.id;
       @ ensures \result == this.id;
       @*/
-    public int getId() {
+    public /*@ helper @*/ int getId() {
         return id;
     }
 
@@ -48,7 +48,7 @@ public final class Edge {
       @ accessible this.start;
       @ ensures \result == this.start;
       @*/
-    public Node getStart() {
+    public /*@ helper @*/ Node getStart() {
         return start;
     }
 
@@ -57,7 +57,7 @@ public final class Edge {
       @ accessible this.end;
       @ ensures \result == this.end;
       @*/
-    public Node getEnd() {
+    public /*@ helper @*/ Node getEnd() {
         return end;
     }
 }
