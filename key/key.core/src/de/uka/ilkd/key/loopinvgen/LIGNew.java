@@ -17,6 +17,8 @@ import de.uka.ilkd.key.java.expression.operator.LessOrEquals;
 import de.uka.ilkd.key.java.expression.operator.LessThan;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.ldt.DependenciesLDT;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -39,10 +41,12 @@ public class LIGNew {
 	private Term low, high, index, guard;
 	private Set<Term> arrays = new HashSet<>();
 	private final RuleApplication ruleApp;
-	private Set<Term> oldPreds = new HashSet<>();
-	private Set<Term> allPreds = new HashSet<>();
+	private Set<Term> oldDepPreds = new HashSet<>();
+	private Set<Term> allDepPreds = new HashSet<>();
+	private Set<Term> oldCompPreds = new HashSet<>();
+	private Set<Term> allCompPreds = new HashSet<>();
 	private final DependenciesLDT depLDT;
-	
+
 	public LIGNew(Services s, Sequent sequent) {
 		seq = sequent;
 		System.out.println(seq);
@@ -57,20 +61,22 @@ public class LIGNew {
 		getLow(seq);
 		getIndexAndHigh(seq);
 		getLocSet(seq);
-		
+
 //		System.out.println("Goals before shift: "+services.getProof().openGoals());
 		ImmutableList<Goal> goalsAfterShift = ruleApp.applyShiftUpdateRule(services.getProof().openGoals());
-//		System.out.println("number of goals after shift 0: " + goalsAfterShift.size());// It is always one
-//		System.out.println("Goals after shift: "+ ProofSaver.printAnything(goalsAfterShift.head().sequent(), services));
+//		System.out.println("SHIFTED");
+		System.out.println("number of goals after shift -1: " + goalsAfterShift.size());// It is always one
+		System.out.println(
+				"Goals after shift -1: " + ProofSaver.printAnything(goalsAfterShift.head().sequent(), services));
 		ImmutableList<Goal> goalsAfterUnwind = null;
 
-		Goal currentGoal = goalsAfterShift.head();//Number of goals after shift does not change
-		
-		allPreds.add(tb.leq(index, low));// i<=l 
-		allPreds.add(tb.geq(index, high));// i>=h 
+		Goal currentGoal = goalsAfterShift.head();// Number of goals after shift does not change
+
+		allCompPreds.add(tb.geq(index, low));// i>=l
+		allCompPreds.add(tb.leq(index, high));// i<=h
 		for (Term arr : arrays) {
-			allPreds.add(tb.noR(tb.arrayRange(arr, low, high)));
-			allPreds.add(tb.noW(tb.arrayRange(arr, low, high)));
+			allDepPreds.add(tb.noR(tb.arrayRange(arr, low, high)));
+			allDepPreds.add(tb.noW(tb.arrayRange(arr, low, high)));
 		}
 
 //		System.out.println("Initial Predicate Set: ");
@@ -78,57 +84,111 @@ public class LIGNew {
 //			System.out.println(term);
 //		}
 		int itrNumber = -1;
-		PredicateRefinementNew2 pr0 = new PredicateRefinementNew2(services, currentGoal.sequent(), allPreds, index,itrNumber);
-		allPreds=pr0.predicateCheckAndRefine();
+		PredicateRefinementNew3 pr0 = new PredicateRefinementNew3(services, currentGoal.sequent(), allDepPreds,
+				allCompPreds, index, itrNumber);
+		SetTuple<Set<Term>, Set<Term>> refinedPreds = pr0.predicateCheckAndRefine();
 //		System.out.println(ProofSaver.printAnything(seq, services));
-		
+		allDepPreds = refinedPreds.first;
+		allCompPreds = refinedPreds.second;
+
+		for (Goal g : goalsAfterShift) {
+			g = abstractGoal(g);
+		}
+
 		do {
-			itrNumber ++;
+			itrNumber++;
 			System.out.println("Iteration Number: " + itrNumber);
-			
-			oldPreds.removeAll(oldPreds);
-			oldPreds.addAll(allPreds);
+
+			oldDepPreds.removeAll(oldDepPreds);
+			oldCompPreds.removeAll(oldCompPreds);
+
+			oldDepPreds.addAll(allDepPreds);
+			oldCompPreds.addAll(allCompPreds);
 
 			goalsAfterUnwind = ruleApp.applyUnwindRule(goalsAfterShift);
-//			System.out.println("Number of goals after unwind: " + goalsAfterUnwind.size());
-//			System.out.println("Goal After Unwind:" + goalsAfterUnwind);
+//			System.out.println("UNWIND");
+			System.out.println("Number of goals after unwind: " + goalsAfterUnwind.size());
+			System.out.println("Goals After Unwind:" + goalsAfterUnwind);
 //			System.out.println(goalsAfterUnwind);
 			goalsAfterShift = ruleApp.applyShiftUpdateRule(goalsAfterUnwind);
-//			System.out.println("Number of goals after shift: " + goalsAfterShift.size());
-//			System.out.println("Goal After Shift:" + goalsAfterShift);
-			
+//			System.out.println("SHIFT");
+			System.out.println("Number of goals after shift: " + goalsAfterShift.size());
+			System.out.println("Goals After Shift:" + goalsAfterShift);
+
 			currentGoal = ruleApp.findLoopUnwindTacletGoal(goalsAfterShift);
+			System.out.println("Current Goal: " + currentGoal);
+
 //			currentIndexFormula = currentIndexEq(currentGoal.sequent(), index);
 //			System.out.println("Before refinement: " + currentGoal.sequent());
-			PredicateRefinementNew2 pr = new PredicateRefinementNew2(services, currentGoal.sequent(), allPreds, index, itrNumber);
-			allPreds=pr.predicateCheckAndRefine();
-			
+			PredicateRefinementNew3 pr = new PredicateRefinementNew3(services, currentGoal.sequent(), allDepPreds,
+					allCompPreds, index, itrNumber);
+			refinedPreds = pr.predicateCheckAndRefine();
+			allDepPreds = refinedPreds.first;
+			allCompPreds = refinedPreds.second;
+
+//			currentGoal = abstractGoal(currentGoal);
+			for (Goal g : goalsAfterShift) {
+				g = abstractGoal(g);
+			}
+
+			// if(!compPredsFixedPoint && (allCompPreds.size()==oldCompPreds.size())) {
+//				compPredsFixedPoint = true;
+//				System.out.println("CompPredSet fixed point at iteration: " + itrNumber);
+//				System.out.println("and CompPredSet is: " + allCompPreds);
+//			}
+
 //			System.out.println("ALL PREDICATES Size:" + allPreds.size());
-		} while (allPreds.size()!=oldPreds.size() && itrNumber < 2);
-		
-		
-		
+		} while (allCompPreds.size() != oldCompPreds.size() || allDepPreds.size() != oldDepPreds.size()
+				|| itrNumber < 2);
+
 		System.out.println("===========Terminated===========");
 		System.out.println("Number of iterations at the end: " + itrNumber);
 		System.out.println("LIG is the conjunction of: ");
-		for (Term term : allPreds) {
+		for (Term term : allDepPreds) {
 			System.out.println(term);
 		}
-		System.out.println(" of size " + allPreds.size());
-		
-		PredicateListCompressionNew plcNew = new PredicateListCompressionNew(services, currentGoal.sequent(), allPreds, false);
-
-		allPreds = plcNew.compression();
-		System.out.println("LOOP INVARIANT is: ");
-		int invSize = allPreds.size();
-		for (Term term : allPreds) {
-			invSize--;
-			if(invSize!=0)
-				System.out.println(term + " & ");
-			else
-				System.out.println(term);
+		for (Term term : allCompPreds) {
+			System.out.println(term);
 		}
+		System.out.println(" of size " + allDepPreds.size() + " plus " + allCompPreds.size());
+//		
+//		PredicateListCompressionNew plcNew = new PredicateListCompressionNew(services, currentGoal.sequent(), allPreds, false);
+//
+//		allPreds = plcNew.compression();
+//		System.out.println("LOOP INVARIANT is: ");
+//		int invSize = allPreds.size();
+//		for (Term term : allPreds) {
+//			invSize--;
+//			if(invSize!=0)
+//				System.out.println(term + " & ");
+//			else
+//				System.out.println(term);
+//		}
 //		System.out.println(" of size " + allPreds.size());
+	}
+
+	private Goal abstractGoal(Goal currentGoal) {
+		System.out.println("Goal: " + currentGoal);
+		for (SequentFormula cgsf : currentGoal.sequent().antecedent()) {
+			PosInOccurrence p = new PosInOccurrence(cgsf, PosInTerm.getTopLevel(), true);
+			currentGoal.removeFormula(p);
+		}
+//		for(SequentFormula cgsf:currentGoal.sequent().succedent()) {
+//			PosInOccurrence p = new PosInOccurrence(cgsf, PosInTerm.getTopLevel(), false);
+//			if(!cgsf.formula().containsJavaBlockRecursive()) {
+//				currentGoal.removeFormula(p);
+//			}
+//		}
+		for (Term cp : allCompPreds) {
+			currentGoal.addFormula(new SequentFormula(cp), true, false);
+//			currentGoal.addFormula(new SequentFormula(cp), false, false);
+		}
+		for (Term cp : allDepPreds) {
+			currentGoal.addFormula(new SequentFormula(cp), true, false);
+//			currentGoal.addFormula(new SequentFormula(cp), false, false);
+		}
+		System.out.println("Modified Goal: " + currentGoal);
+		return currentGoal;
 	}
 
 	void getLow(Sequent seq) {

@@ -1315,8 +1315,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 		bindRuleSet(d, "dep_setMinus", ifZero(MatchedIfFeature.INSTANCE, 
 				ifZero(applyTF(findLocSet, op(setMinus)), not(eq(sub(findLocSet, 1), instOfNonStrict("loc1"))), longConst(0))));
 	
-		bindRuleSet(d, "dep_replace_known", add(longConst(8000), EqNonDuplicateAppFeature.INSTANCE));
+		bindRuleSet(d, "dep_replace_known", add(longConst(8000), NonDuplicateAppFeature.INSTANCE));//EqNonDuplicateAppFeature
 		bindRuleSet(d, "dep_pred_known", longConst(100));
+		bindRuleSet(d, "saturate_dep_locset_relations", longConst(-1000));
 	}
 
 	private void setupPullOutGcd(RuleSetDispatchFeature d, String ruleSet, boolean roundingUp) {
@@ -1832,7 +1833,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 			depSpecF = ConditionalFeature.createConditional(depFilter, inftyConst());
 		}
 
-		return add(NonDuplicateAppFeature.INSTANCE, depSpecF);
+		return add(NonDuplicateAppFeature.INSTANCE, depSpecF);		
 	}
 
 	private RuleSetDispatchFeature setupApprovalDispatcher() {
@@ -1887,6 +1888,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 		bindRuleSet(d, "dep_replace_known", ifZero(MatchedIfFeature.INSTANCE,
 				add(DiffFindAndIfFeature.INSTANCE, not(contains(instOf("loc2"), instOf("loc1"))))));
 
+		bindRuleSet(d, "dep_pred_known", NonDuplicateAppModPositionFeature.INSTANCE);
+		bindRuleSet(d, "saturate_dep_locset_relations", NonDuplicateAppModPositionFeature.INSTANCE);
 		return d;
 	}
 

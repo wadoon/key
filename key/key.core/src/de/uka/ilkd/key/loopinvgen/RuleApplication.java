@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.loopinvgen;
 
+import java.io.IOException;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -11,7 +13,6 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
@@ -20,6 +21,8 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
+import de.uka.ilkd.key.proof.io.ProofSaver;
+import java.io.File;
 
 public class RuleApplication {
 
@@ -48,7 +51,7 @@ public class RuleApplication {
 
 		ps.setStrategyProperties(sp);
 		ps.getProof().getSettings().getStrategySettings().setActiveStrategyProperties(sp);
-		ps.setMaxRuleApplications(10000);
+		ps.setMaxRuleApplications(15000);//Only Change This
 		ps.setTimeout(-1);
 
 		proof = ps.getProof();
@@ -73,8 +76,18 @@ public class RuleApplication {
 			}
 		}
 		if (app != null) {		
-			ps.start(currentGoal.apply(app));
+			final ImmutableList<Goal> goals = currentGoal.apply(app);
 //			System.out.println("Number of Open Goals after applying Shift: " + currentGoal.proof().openGoals().size());
+//			System.out.println("seq:"+ProofSaver.printAnything(currentGoal.sequent(), services));
+			ps.start(goals);
+//			try {		
+				System.out.println("Number of Open Goals after simplification: " + ps.getProof().openGoals().size() + "+++" + (ps.getProof() == currentGoal.proof()));
+
+//				new ProofSaver(ps.getProof(), new File("C:\\Users\\Asma\\testAfterSEAfterShift.key")).save();
+//			} catch (IOException e) {
+				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
 			return currentGoal.proof().openGoals();
 //			return services.getProof().openEnabledGoals();
 		}
@@ -91,7 +104,7 @@ public class RuleApplication {
 					return g;
 				}
 			}
-			System.out.println("Taclet shiftUpdate" + " is not applicable at " + g);
+//			System.out.println("Taclet shiftUpdate" + " is not applicable at " + g);
 		}
 		return null;
 	}
@@ -129,8 +142,8 @@ public class RuleApplication {
 			
 			ps.start(goals);
 
-			System.out.println("Number of Open Goals after applying unwind: " + currentGoal.proof().openGoals().size());
-			System.out.println("Open Goals after applying unwind: " + currentGoal.proof().openGoals());
+//			System.out.println("Number of Open Goals after applying unwind: " + currentGoal.proof().openGoals().size());
+//			System.out.println("Open Goals after applying unwind: " + currentGoal.proof().openGoals());
 			return currentGoal.proof().openGoals();
 //			return services.getProof().openEnabledGoals();
 		}
@@ -145,7 +158,7 @@ public class RuleApplication {
 					return g;
 				}
 			}
-			System.out.println("Taclet loopUnwind is not applicable at " + g);
+//			System.out.println("Taclet loopUnwind is not applicable at " + g);
 		}
 		return null;
 	}

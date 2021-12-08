@@ -95,6 +95,53 @@ public class TestPredicateConstruction {
 		}
 	}
 
+//-------------------------------------------------------------------
+//--------------------------------SF4.0 slides-----------------------
+//-------------------------------------------------------------------
+	public void noDependence() {//
+
+		Term succFormula;
+
+		try {
+			succFormula = parse("{i:=0}\\<{" + "			while (i<n) {a[i] = b[i];" + "			i++;}"
+					+ "		}\\>true");
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			if (e.getCause() != null) {
+				System.out.println(e.getCause().getMessage());
+			}
+			e.printStackTrace();
+			return;
+		}
+		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(succFormula), false, true).sequent();
+
+		String[] arrLeft = { "noW(arrayRange(b,0,n))","noR(arrayRange(b,0,n))","b!=null", "b.length>n", "a.length>n","noW(arrayRange(a,0,n))","noR(arrayRange(a,0,n))","a!=null", "n = 100" };
+		try {
+			for (String fml : arrLeft) {
+				seq = seq.addFormula(new SequentFormula(parse(fml)), true, true).sequent();
+			}
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			if (e.getCause() != null) {
+				System.out.println(e.getCause().getMessage());
+			}
+			e.printStackTrace();
+			return;
+		}
+////	Old system:
+//		LIGMultipleArrays cur = new LIGMultipleArrays(services, seq);
+//		cur.mainAlg();
+		
+////	New system:
+		LIGNew curNew = new LIGNew(services, seq);
+		curNew.mainAlg();
+	}
+
+	
+//-------------------------------------------------------------------	
+	
+	
+	
 	public void shiftArrayToLeft() {//DONE
 
 		Term succFormula;
@@ -134,44 +181,44 @@ public class TestPredicateConstruction {
 		curNew.mainAlg();
 	}
 
-//	public void shiftArrayWithDependenceInsideIteration() { //Done
-//
-//		Term succFormula;
-//
-//		try {
-//			succFormula = parse("{i:=0}\\<{" + "			while (i<a.length-1) {a[i] = 1; a[i] = a[i+1];" + "			i++;}"
-//					+ "		}\\>true");
-//		} catch (Exception e) {
-//			System.out.println(e.getMessage());
-//			if (e.getCause() != null) {
-//				System.out.println(e.getCause().getMessage());
-//			}
-//			e.printStackTrace();
-//			return;
-//		}
-//		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(succFormula), false, true).sequent();
-//
-//		String[] arrLeft = { "noW(arrayRange(a,0,a.length))","noR(arrayRange(a,0,a.length))","a!=null", "a.length > 10" };
-//		try {
-//			for (String fml : arrLeft) {
-//				seq = seq.addFormula(new SequentFormula(parse(fml)), true, true).sequent();
-//			}
-//		} catch (Exception e) {
-//			System.out.println(e.getMessage());
-//			if (e.getCause() != null) {
-//				System.out.println(e.getCause().getMessage());
-//			}
-//			e.printStackTrace();
-//			return;
-//		}
-//////	Old system:
-////		LIGMultipleArrays cur = new LIGMultipleArrays(services, seq);
-////		cur.mainAlg();
-//		
-//////	New system:
-//		LIGNew curNew = new LIGNew(services, seq);
-//		curNew.mainAlg();
-//	}
+	public void shiftArrayWithDependenceInsideIteration() { //Done
+
+		Term succFormula;
+
+		try {
+			succFormula = parse("{i:=0}\\<{" + "			while (i<a.length-1) {a[i] = a[i+1];" + "			i++;}"
+					+ "		}\\>true");
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			if (e.getCause() != null) {
+				System.out.println(e.getCause().getMessage());
+			}
+			e.printStackTrace();
+			return;
+		}
+		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(succFormula), false, true).sequent();
+
+		String[] arrLeft = { "noW(arrayRange(a,0,a.length))","noR(arrayRange(a,0,a.length))","a!=null", "a.length > 10" };
+		try {
+			for (String fml : arrLeft) {
+				seq = seq.addFormula(new SequentFormula(parse(fml)), true, true).sequent();
+			}
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			if (e.getCause() != null) {
+				System.out.println(e.getCause().getMessage());
+			}
+			e.printStackTrace();
+			return;
+		}
+////	Old system:
+//		LIGMultipleArrays cur = new LIGMultipleArrays(services, seq);
+//		cur.mainAlg();
+		
+////	New system:
+		LIGNew curNew = new LIGNew(services, seq);
+		curNew.mainAlg();
+	}
 
 	
 //	public void shiftArrayToLeftWithFunc() { //Done
@@ -580,7 +627,7 @@ public class TestPredicateConstruction {
 	public static void main(String[] args) {
 		TestPredicateConstruction tpc = new TestPredicateConstruction();
 		long start = System.currentTimeMillis();
-		tpc.conditionDifferentNumberOfEvents();
+		tpc.shiftArrayToLeft();
 		long end = System.currentTimeMillis();
 		System.out.println("Loop Invariant Generation and Pretty Printing took " + (end - start) + " ms");
 	}
