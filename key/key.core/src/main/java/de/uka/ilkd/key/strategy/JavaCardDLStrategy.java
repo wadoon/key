@@ -473,13 +473,17 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         switch (methProp) {
         case StrategyProperties.METHOD_CONTRACT:
+            ProjectionToTerm methodName = instOfNonStrict("#mn");
+            Feature isGetter = ifZero(applyTFNonStrict(methodName, IsGetterTermFeature.INSTANCE), longConst(-100), longConst(2000));
+
+
             /*
              * If method treatment by contracts is chosen, this does not mean
              * that method expansion is disabled. The original cost was 200 and
              * is now increased to 2000 in order to repress method expansion
              * stronger when method treatment by contracts is chosen.
              */
-            bindRuleSet(d, "method_expand", longConst(2000));
+            bindRuleSet(d, "method_expand", isGetter);
             break;
         case StrategyProperties.METHOD_EXPAND:
             bindRuleSet(d, "method_expand", longConst(100));
