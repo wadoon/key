@@ -54,7 +54,7 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
      * Time in milliseconds after which a simplification attempt of a
      * distinguishing formula times out.
      */
-    private static final int SIMPLIFICATION_TIMEOUT_MS = 10000;//1000
+    private static final int SIMPLIFICATION_TIMEOUT_MS = 500;//1000
 
     public static MergeByIfThenElse instance() {
         if (INSTANCE == null) {
@@ -64,7 +64,7 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
     }
 
     private static final String DISPLAY_NAME = "MergeByIfThenElse";
-    static final int MAX_UPDATE_TERM_DEPTH_FOR_CHECKING = 8;
+    static final int MAX_UPDATE_TERM_DEPTH_FOR_CHECKING = 4;//8
 
     /*
      * (non-Javadoc)
@@ -278,9 +278,9 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
         }
 
         // Try an automatic simplification
-//        distinguishingFormula =
-//                trySimplify(services.getProof(), distinguishingFormula, true,
-//                        SIMPLIFICATION_TIMEOUT_MS);
+        distinguishingFormula =
+                trySimplify(services.getProof(), distinguishingFormula, true,
+                        SIMPLIFICATION_TIMEOUT_MS);
 
         return new Quadruple<Term, Term, Term, Boolean>(distinguishingFormula,
                 commuteSides ? elseTerm : ifTerm, commuteSides ? ifTerm

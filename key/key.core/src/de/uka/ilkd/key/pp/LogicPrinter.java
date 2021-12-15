@@ -39,6 +39,7 @@ import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Equality;
@@ -799,7 +800,39 @@ public class LogicPrinter {
         printSequent(seq, true);
     }
 
+    /**
+     * Pretty-print a sequent.
+     * The sequent arrow is rendered as <code>=&gt;</code>.  If the
+     * sequent doesn't fit in one line, a line break is inserted after each
+     * formula, the sequent arrow is on a line of its own, and formulae
+     * are indented w.r.t. the arrow.
+     * A line-break is printed after the Sequent.
+     * No filtering is done.
+     * @param seq The Sequent to be pretty-printed
+     */
+    public void printSequentAsFormula(Sequent seq, Services services) {
+    	
+        final TermBuilder tb = services.getTermBuilder();
+		Term antecFml = tb.tt();
+        for (SequentFormula sf : seq.antecedent()) {
+        	antecFml = tb.and(antecFml, sf.formula());
+        }
 
+        Term succFml = tb.ff();
+        for (SequentFormula sf : seq.succedent()) {
+        	succFml = tb.or(succFml, sf.formula());
+        }
+
+        try {
+			printTerm(tb.imp(antecFml, succFml));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			RuntimeException re = new RuntimeException();
+			re.initCause(e);
+			throw re;
+		}
+    }
     /**
      * Pretty-prints a Semisequent.  Formulae are separated by commas.
      *
@@ -861,7 +894,7 @@ public class LogicPrinter {
             if(t.hasLabels() && !getVisibleTermLabels(t).isEmpty()
 					&& notationInfo.getNotation(t.op()).getPriority() < NotationInfo.PRIORITY_ATOM) {
                 layouter.print("(");
-            }
+            }            
             notationInfo.getNotation(t.op()).print(t,this);
             if(t.hasLabels() && !getVisibleTermLabels(t).isEmpty()
 					&& notationInfo.getNotation(t.op()).getPriority() < NotationInfo.PRIORITY_ATOM) {

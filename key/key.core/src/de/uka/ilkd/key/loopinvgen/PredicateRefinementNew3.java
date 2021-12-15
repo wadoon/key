@@ -123,6 +123,7 @@ public class PredicateRefinementNew3 {
 		if (provable && pred.op() == services.getTypeConverter().getDependenciesLDT().getNoWaR()) {
 			System.out.println("We have a Problem: \\n" + ProofSaver.printAnything(sideSeq, services));
 		}
+		
 		return provable;
 	}
 

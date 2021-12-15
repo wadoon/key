@@ -56,7 +56,7 @@ public class LIGNew {
 		tb = services.getTermBuilder();
 		depLDT = new DependenciesLDT(services);
 	}
-
+	
 	public void mainAlg() {
 		getLow(seq);
 		getIndexAndHigh(seq);

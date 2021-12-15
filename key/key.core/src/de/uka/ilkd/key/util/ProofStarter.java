@@ -252,7 +252,6 @@ public class ProofStarter {
 
            ApplyStrategyInfo result;
            proof.setRuleAppIndexToAutoMode();
-           
            result = prover.start(proof, goals, maxSteps, timeout, strategy.isStopAtFirstNonCloseableGoal());          
            
            if (result.isError()) {

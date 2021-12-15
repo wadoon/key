@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.loopinvgen;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -34,7 +35,7 @@ public class SideProof {
 	}
 
 	public SideProof(Services s, Sequent sequent) {
-		this(s, sequent, 100000);
+		this(s, sequent, 20000);
 	}
 
 	boolean proofEquality(Term loc1, Term loc2) {
@@ -374,16 +375,20 @@ public class SideProof {
 
 		final StrategyProperties sp = ps.getProof().getActiveStrategyFactory().getSettingsDefinition()
 				.getDefaultPropertiesFactory().createDefaultStrategyProperties();
-		sp.setProperty(StrategyProperties.OSS_OPTIONS_KEY, StrategyProperties.OSS_OFF);
+		
 		ps.setStrategyProperties(sp);
 
 		ps.getProof().getSettings().getStrategySettings().setActiveStrategyProperties(sp);
 
+		
 		ps.setMaxRuleApplications(maxRuleApp);
 		ps.setTimeout(-1);
 //		System.out.println("strategy prop. " + sp);
 
 		final ApplyStrategyInfo info = ps.start();
+		System.out.println(info.getAppliedRuleApps() + ":" + info.toString());
+		
+		
 //		System.out.println("rules: "+ ps.getProof().getStatistics());
 //		if (!info.getProof().closed()) {
 //			System.out.println("Open Goals: " + info.getProof().openGoals());
@@ -391,13 +396,22 @@ public class SideProof {
 //System.out.println("==>" + info.getAppliedRuleApps());
 
 		boolean closed = info.getProof().closed();
-//		if(!closed) {
-//			System.out.println(" proof could not be closed for " + ProofSaver.printAnything(seq2prove, services));
-//		}
+		if(!closed) {
+//			System.out.println(info.reason() + " CO" + COUNTER);
+//			System.out.println(" proof could not be closed for " + ps.getProof());
+			try {
+				new ProofSaver(ps.getProof(), new java.io.File("C:\\Users\\Asma\\testNoRaWFalse"+COUNTER+".key")).save();
+				System.out.println(COUNTER);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			COUNTER++;
+		}
 //		System.out.println(closed);
 		return closed;
 	}
-
+static long COUNTER=0;
 //	Term expr2term(Expression expr) {
 //		return this.services.getTypeConverter().convertToLogicElement(expr);
 //	}

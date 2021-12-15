@@ -300,7 +300,7 @@ public class Layouter {
 	    while(totalSize-totalOutput > out.space() &&
 		  !delimStack.isEmpty()) {
 		popBottom().setInfiniteSize();
-		advanceLeft();
+	    advanceLeft(); 
 	    }
 	}
 	return this;

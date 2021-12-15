@@ -15,6 +15,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
+import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -51,7 +52,7 @@ public class RuleApplication {
 
 		ps.setStrategyProperties(sp);
 		ps.getProof().getSettings().getStrategySettings().setActiveStrategyProperties(sp);
-		ps.setMaxRuleApplications(15000);//Only Change This
+		ps.setMaxRuleApplications(20000);//Only Change This
 		ps.setTimeout(-1);
 
 		proof = ps.getProof();
@@ -100,7 +101,7 @@ public class RuleApplication {
 				IBuiltInRuleApp bApp = findShiftUpdateRuleApp(
 						g.ruleAppIndex().getBuiltInRules(g, new PosInOccurrence(sf, PosInTerm.getTopLevel(), false)));
 				if (bApp != null) {
-					System.out.println("Goal of taclet shiftUpdate" + " is: " + g);
+//					System.out.println("Goal of taclet shiftUpdate" + " is: " + g);
 					return g;
 				}
 			}
@@ -112,7 +113,7 @@ public class RuleApplication {
 	private IBuiltInRuleApp findShiftUpdateRuleApp(ImmutableList<IBuiltInRuleApp> tApp) {
 		for (IBuiltInRuleApp app : tApp) {
 			if (ShiftUpdateRule.SHIFT_UPDATE_NAME.equals(app.rule().name())) {
-				System.out.println(ShiftUpdateRule.SHIFT_UPDATE_NAME + " rule is among applicable rules.");
+//				System.out.println(ShiftUpdateRule.SHIFT_UPDATE_NAME + " rule is among applicable rules.");
 				return app;
 			}
 		}
@@ -140,8 +141,9 @@ public class RuleApplication {
 			app = app.tryToInstantiate(services);
 			ImmutableList<Goal> goals = currentGoal.apply(app);
 			
-			ps.start(goals);
+			ApplyStrategyInfo info = ps.start(goals);
 
+//			System.out.println(info.getAppliedRuleApps() + ":" + info.toString());
 //			System.out.println("Number of Open Goals after applying unwind: " + currentGoal.proof().openGoals().size());
 //			System.out.println("Open Goals after applying unwind: " + currentGoal.proof().openGoals());
 			return currentGoal.proof().openGoals();

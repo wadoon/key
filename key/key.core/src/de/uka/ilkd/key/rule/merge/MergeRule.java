@@ -310,6 +310,7 @@ public class MergeRule implements BuiltInRule {
                 i++;
             }
         }
+                
         return newGoals;
     }
 

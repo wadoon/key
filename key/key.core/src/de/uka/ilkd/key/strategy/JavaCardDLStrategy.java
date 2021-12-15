@@ -1312,14 +1312,27 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 		final Operator setMinus = getServices().getTypeConverter().getLocSetLDT().getSetMinus();
 		final ProjectionToTerm findLocSet = sub(FocusProjection.create(0), 0);
 		
-		bindRuleSet(d, "dep_setMinus", ifZero(MatchedIfFeature.INSTANCE, 
-				ifZero(applyTF(findLocSet, op(setMinus)), not(eq(sub(findLocSet, 1), instOfNonStrict("loc1"))), longConst(0))));
+		final Feature noDoubleMinus = ifZero(MatchedIfFeature.INSTANCE, 
+				ifZero(applyTF(findLocSet, op(setMinus)), not(eq(sub(findLocSet, 1), instOfNonStrict("loc1"))), longConst(0)));
+	
+		TermBuffer arg2 = new TermBuffer();
+		
+		
+//		final Feature noDoubleMinus = ifZero(MatchedIfFeature.INSTANCE, 
+//				forEach(arg2, SubtermGenerator.leftTraverse(findLocSet, op(setMinus)),
+//						not(eq(instOfNonStrict("loc1"), arg2))), longConst(0));
+//	
+		bindRuleSet(d, "dep_setMinus", noDoubleMinus);
 	
 		bindRuleSet(d, "dep_replace_known", add(longConst(8000), NonDuplicateAppFeature.INSTANCE));//EqNonDuplicateAppFeature
-		bindRuleSet(d, "dep_pred_known", longConst(100));
-		bindRuleSet(d, "saturate_dep_locset_relations", longConst(-1000));
-	}
+		
+		Feature depth = applyTF(FocusFormulaProjection.INSTANCE, rec(any(), longTermConst(1)));
 
+		bindRuleSet(d, "dep_pred_known", add(ScaleFeature.createScaled(depth, 1000), longConst(100)));
+		bindRuleSet(d, "dep_pred_known_2", add(noDoubleMinus,longConst(100)));
+		bindRuleSet(d, "saturate_dep_locset_relations", add(noDoubleMinus,NonDuplicateAppModPositionFeature.INSTANCE,longConst(-1000)));
+	}
+	
 	private void setupPullOutGcd(RuleSetDispatchFeature d, String ruleSet, boolean roundingUp) {
 		final TermBuffer gcd = new TermBuffer();
 
@@ -2005,7 +2018,13 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 	 *         by the strategy).
 	 */
 	public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal) {
-		return costComputationF.computeCost(app, pio, goal);
+		final RuleAppCost computeCost = costComputationF.computeCost(app, pio, goal);
+		if (app.rule().name().toString().contains("ifthenelse_split") &&
+				computeCost instanceof TopRuleAppCost) {
+			System.out.println("Infinite costs:"+app+""
+					+ "\n\t "+pio.subTerm());
+		}
+		return computeCost;
 	}
 
 	/**

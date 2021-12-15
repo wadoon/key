@@ -158,6 +158,7 @@ public class OutputStreamProofSaver {
             final ProofOblInput po =
                     proof.getServices().getSpecificationRepository()
                     .getProofOblInput(proof);
+ 
             printer = createLogicPrinter(proof.getServices(), false);
 
             // profile
@@ -233,7 +234,7 @@ public class OutputStreamProofSaver {
                 }
                 final Sequent problemSeq = proof.root().sequent();
                 ps.println("\\problem {");
-                printer.printSemisequent(problemSeq.succedent());
+                printer.printSequentAsFormula(problemSeq, proof.getServices());
                 ps.println(printer.result());
                 ps.println("}\n");
             }
