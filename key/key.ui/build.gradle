@@ -26,6 +26,9 @@ dependencies {
 
     runtimeOnly project(":keyext.interactionlog")
     //runtimeOnly project(":keyext.script.ui")
+
+    // Python bridge libray
+    implementation "net.sf.py4j:py4j:0.10.9.2"
 }
 
 task createExamplesZip(type: Zip) {
