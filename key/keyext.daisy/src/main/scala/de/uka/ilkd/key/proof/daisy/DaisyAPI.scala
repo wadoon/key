@@ -150,6 +150,8 @@ object DaisyAPI {
       Times(convertToDaisyExpr(lets, subTerms.get(1), varIds, services), convertToDaisyExpr(lets, subTerms.get(2), varIds, services))
     else if (op == floatLDT.getDivIEEE || op == doubleLDT.getDivIEEE)
       Division(convertToDaisyExpr(lets, subTerms.get(1), varIds, services), convertToDaisyExpr(lets, subTerms.get(2), varIds, services))
+    else if (op == floatLDT.getJavaUnaryMinus || op == doubleLDT.getJavaUnaryMinus)
+      UMinus(convertToDaisyExpr(lets, subTerms.get(0), varIds, services))
     // if variable
     else if (!op.isRigid && op.arity() == 0) {
       val varName = op.name().asInstanceOf[ProgramElementName].getProgramName
