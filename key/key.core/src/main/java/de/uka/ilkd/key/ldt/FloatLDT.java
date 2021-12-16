@@ -229,7 +229,7 @@ public final class FloatLDT extends LDT implements IFloatingPointLDT {
 
 
     @Override
-    public Expression translateTerm(Term t, ExtList children, Services services) {
+    public FloatLiteral translateTerm(Term t, ExtList children, Services services) {
 	if(!containsFunction((Function) t.op())) {
 	    return null;
 	}
@@ -380,5 +380,10 @@ public final class FloatLDT extends LDT implements IFloatingPointLDT {
 
     public Function getRoundingModeRNE() {
 	return roundingModeRNE;
+    }
+
+    @Override
+    public Function getLiteralSymbol() {
+        return getFloatSymbol();
     }
 }

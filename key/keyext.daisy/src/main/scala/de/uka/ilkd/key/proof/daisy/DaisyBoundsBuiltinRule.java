@@ -5,6 +5,7 @@ import de.uka.ilkd.key.ldt.DoubleLDT;
 import de.uka.ilkd.key.ldt.FloatLDT;
 import de.uka.ilkd.key.ldt.IFloatingPointLDT;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BuiltInRule;
@@ -22,10 +23,9 @@ public class DaisyBoundsBuiltinRule implements BuiltInRule {
 
     /**
      * Finds bounds on floating point variables on the sequent,
-     * i.e., terms of the form "x cmp c" where x is a float variable,
-     * cmp a comparator and c a floating point literal.
+     * i.e., terms of the form "x cmp c" where x is a float expression,
+     * cmp a comparator and c a floating point literal (possibly negated).
      * @param sequent the current sequent
-     * @param services
      * @return a list of terms representing bounds on fp variables
      */
     private List<Term> gatherPreconditions(Sequent sequent, IFloatingPointLDT ldt, Services services) {
@@ -33,7 +33,7 @@ public class DaisyBoundsBuiltinRule implements BuiltInRule {
         ImmutableList<SequentFormula> anteFormulas = sequent.antecedent().asList();
         for (SequentFormula sf : anteFormulas) {
             Operator op = sf.formula().op();
-            if (isCmp(op, ldt) && isLitCmp(sf.formula(), ldt)) {
+            if (isCmp(op, ldt) && isValueComparison(sf.formula(), ldt)) {
                 res.add(sf.formula());
             }
         }
@@ -42,7 +42,7 @@ public class DaisyBoundsBuiltinRule implements BuiltInRule {
         ImmutableList<SequentFormula> succFormulas = sequent.succedent().asList();
         for (SequentFormula sf : succFormulas) {
             Operator op = sf.formula().op();
-            if (isCmp(op, ldt) && isLitCmp(sf.formula(), ldt)) {
+            if (isCmp(op, ldt) && isValueComparison(sf.formula(), ldt)) {
                 Term negated = tb.not(sf.formula());
                 res.add(negated);
             }
@@ -50,19 +50,15 @@ public class DaisyBoundsBuiltinRule implements BuiltInRule {
         return res;
     }
 
-    // return true if both subterms are either float literals or simple variables
-    private boolean isLitCmp(Term t, IFloatingPointLDT ldt) {
-        if (ldt instanceof FloatLDT) {
-            FloatLDT fldt = (FloatLDT) ldt;
-            return (t.sub(0).subs().size() == 0 || t.sub(0).op() == fldt.getFloatSymbol())
-                    && (t.sub(1).subs().size() == 0 || t.sub(1).op() == fldt.getFloatSymbol());
-        } else if (ldt instanceof DoubleLDT) {
-            DoubleLDT dldt = (DoubleLDT) ldt;
-            return (t.sub(0).subs().size() == 0 || t.sub(0).op() == dldt.getDoubleSymbol())
-                    && (t.sub(1).subs().size() == 0 || t.sub(1).op() == dldt.getDoubleSymbol());
-        } else { //should be unreachable
-            return false;
-        }
+    /**
+     * @param t A term representing a floating point comparison
+     * @return true iff one of the subterms is a (possibly negated) float literal
+     */
+    private boolean isValueComparison(Term t, IFloatingPointLDT ldt) {
+        Operator op0 = t.sub(0).op(), op1 = t.sub(1).op();
+        Function literalSymbol = ldt.getLiteralSymbol();
+        Function javaUnaryMinus = ldt.getJavaUnaryMinus();
+        return (op0 == literalSymbol || op0 == javaUnaryMinus || op1 == literalSymbol || op1 == javaUnaryMinus);
     }
 
     private boolean isCmp(Operator op, IFloatingPointLDT ldt) {
@@ -103,41 +99,26 @@ public class DaisyBoundsBuiltinRule implements BuiltInRule {
 
     @Override
     public boolean isApplicable(Goal goal, PosInOccurrence pio) {
-        return isFloatApplicable(goal, pio) || isDoubleApplicable(goal, pio);
-    }
-
-    // must return false if some bounds are not specified
-    public boolean isFloatApplicable(Goal goal, PosInOccurrence pio) {
         if (pio == null) return false;
         Services services = goal.proof().getServices();
         Operator op = pio.subTerm().op();
-        return isFloatOp(op, services);
+        return isFloatOp(op, services) || isDoubleOp(op, services);
     }
 
     private boolean isFloatOp(Operator op, Services services) {
         FloatLDT floatLDT = new FloatLDT(services);
-        boolean res = (op == floatLDT.getAddIEEE()
+        return (op == floatLDT.getAddIEEE()
                 || op == floatLDT.getSubIEEE()
                 || op == floatLDT.getMulIEEE()
                 || op == floatLDT.getDivIEEE());
-        return res;
     }
 
-    // must return false if some bounds are not specified
-    public boolean isDoubleApplicable(Goal goal, PosInOccurrence pio) {
-        if (pio == null) return false;
-        Services services = goal.proof().getServices();
-        Operator op = pio.subTerm().op();
-        return isDoubleOp(services, op);
-    }
-
-    private boolean isDoubleOp(Services services, Operator op) {
+    private boolean isDoubleOp(Operator op, Services services) {
         DoubleLDT doubleLDT = new DoubleLDT(services);
-        boolean res = (op == doubleLDT.getAddIEEE()
+        return (op == doubleLDT.getAddIEEE()
                 || op == doubleLDT.getSubIEEE()
                 || op == doubleLDT.getMulIEEE()
                 || op == doubleLDT.getDivIEEE());
-        return res;
     }
 
     @Override
@@ -161,29 +142,21 @@ public class DaisyBoundsBuiltinRule implements BuiltInRule {
         List<Term> letExprs = gatherLetExprs(seq, ldt);
         TermBuilder tb = services.getTermBuilder();
         final ImmutableList<Goal> result = goal.split(1);
+        final Goal resultGoal = result.head();
+        Term upperTerm, lowerTerm;
         if (isFloat) {
             Pair<Float, Float> bounds = daisyComputeFloatBounds(precs, letExprs, expr, services);
-            Term lowerTerm = floatToTerm(bounds.first, services);
-            Term upperTerm = floatToTerm(bounds.second, services);
-
-            final Goal resultGoal = result.head();
-
-            Term resLower = tb.func(ldt.getGreaterOrEquals(), expr, lowerTerm);
-            Term resUpper = tb.func(ldt.getLessOrEquals(), expr, upperTerm);
-            resultGoal.addFormula(new SequentFormula(resLower), true, false);
-            resultGoal.addFormula(new SequentFormula(resUpper), true, false);
-        } else {
+            lowerTerm = floatToTerm(bounds.first, services);
+            upperTerm = floatToTerm(bounds.second, services);
+        } else { //double
             Pair<Double, Double> bounds = daisyComputeDoubleBounds(precs, letExprs, expr, services);
-            Term lowerTerm = doubleToTerm(bounds.first, services);
-            Term upperTerm = doubleToTerm(bounds.second, services);
-
-            final Goal resultGoal = result.head();
-
-            Term resLower = tb.func(ldt.getGreaterOrEquals(), expr, lowerTerm);
-            Term resUpper = tb.func(ldt.getLessOrEquals(), expr, upperTerm);
-            resultGoal.addFormula(new SequentFormula(resLower), true, false);
-            resultGoal.addFormula(new SequentFormula(resUpper), true, false);
+            lowerTerm = doubleToTerm(bounds.first, services);
+            upperTerm = doubleToTerm(bounds.second, services);
         }
+        Term resLower = tb.func(ldt.getGreaterOrEquals(), expr, lowerTerm);
+        Term resUpper = tb.func(ldt.getLessOrEquals(), expr, upperTerm);
+        resultGoal.addFormula(new SequentFormula(resLower), true, false);
+        resultGoal.addFormula(new SequentFormula(resUpper), true, false);
         return result;
     }
 

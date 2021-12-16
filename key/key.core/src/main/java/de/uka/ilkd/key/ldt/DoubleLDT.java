@@ -274,7 +274,7 @@ public final class DoubleLDT extends LDT implements IFloatingPointLDT {
 
 
     @Override
-    public Expression translateTerm(Term t, ExtList children, Services services) {
+    public DoubleLiteral translateTerm(Term t, ExtList children, Services services) {
         Function f = (Function)t.op();
         IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
 
@@ -409,6 +409,11 @@ public final class DoubleLDT extends LDT implements IFloatingPointLDT {
 
     public Function getRoundingModeRNE() {
 	return roundingModeRNE;
+    }
+
+    @Override
+    public Function getLiteralSymbol() {
+        return getDoubleSymbol();
     }
 
     public Function getRoundingModeRTN() {

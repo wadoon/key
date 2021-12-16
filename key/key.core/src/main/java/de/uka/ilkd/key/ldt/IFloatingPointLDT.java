@@ -44,4 +44,5 @@ public interface IFloatingPointLDT {
     public Function getDivIEEE();
     public Function getAbs();
     public Function getRoundingModeRNE();
+    public Function getLiteralSymbol();
 }
