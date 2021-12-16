@@ -26,7 +26,6 @@ import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
@@ -158,17 +157,11 @@ public final class ClassInvariantImpl implements ClassInvariant {
 
     @Override
     public Term getInv(ParsableVariable selfVar, TermServices services) {
-        TermBuilder tb = services.getTermBuilder();
         final Map<Operator, Operator> replaceMap
         	= getReplaceMap(selfVar, services);
         final OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         Term res = or.replace(originalInv);
-        res = tb.convertToFormula(res);
-        if (!isStatic()) {
-            //TODO
-            //res = tb.and(tb.created(selfVar), res);
-            res = tb.and(tb.not(tb.equals(tb.var(selfVar),tb.NULL())), res);
-        }
+        res = services.getTermBuilder().convertToFormula(res);
         return res;
     }
 

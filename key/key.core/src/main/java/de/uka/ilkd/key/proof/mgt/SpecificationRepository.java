@@ -1232,7 +1232,7 @@ public final class SpecificationRepository {
                         kjt);
                 final ProgramVariable selfVar = tb.selfVar(kjt, false);
 
-                Term invDef = tb.tt();
+                Term invDef = tb.not(tb.equals(tb.var(selfVar),tb.NULL()));
                 Term staticInvDef = tb.tt();
 
                 for (ClassInvariant inv : myInvs) {
