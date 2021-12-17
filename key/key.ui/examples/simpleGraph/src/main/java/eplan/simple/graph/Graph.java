@@ -165,7 +165,7 @@ public class Graph {
       @ requires \invariant_for(n);
       @ assignable \nothing;
       @ ensures \result != null;
-      @ ensures (\forall int j; j >= 0 && j < \result.length; \result[j].start.equals(n) || \result[j].end.equals(n) || \result[j] == null);
+      @ ensures (\forall int j; j >= 0 && j < \result.length; \result[j].getStart().equals(n) || \result[j].getEnd().equals(n) || \result[j] == null);
       @*/
     public /*@ nullable @*/ Edge[] getAllEdgesAt(Node n) {
         Edge[] returnval = new Edge[edges.length];
