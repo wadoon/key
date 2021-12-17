@@ -1330,6 +1330,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
 		bindRuleSet(d, "dep_pred_known", add(ScaleFeature.createScaled(depth, 1000), longConst(100)));
 		bindRuleSet(d, "dep_pred_known_2", add(noDoubleMinus,longConst(100)));
+		bindRuleSet(d, "dep_pred_known_3", add(noDoubleMinus,longConst(1)));
 		bindRuleSet(d, "saturate_dep_locset_relations", add(noDoubleMinus,NonDuplicateAppModPositionFeature.INSTANCE,longConst(-1000)));
 	}
 	
@@ -2019,11 +2020,11 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 	 */
 	public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal) {
 		final RuleAppCost computeCost = costComputationF.computeCost(app, pio, goal);
-		if (app.rule().name().toString().contains("ifthenelse_split") &&
-				computeCost instanceof TopRuleAppCost) {
-			System.out.println("Infinite costs:"+app+""
-					+ "\n\t "+pio.subTerm());
-		}
+//		if (app.rule().name().toString().contains("ifthenelse_split") &&
+//				computeCost instanceof TopRuleAppCost) {
+//			System.out.println("Infinite costs:"+app+""
+//					+ "\n\t "+pio.subTerm());
+//		}
 		return computeCost;
 	}
 

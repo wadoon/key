@@ -82,7 +82,7 @@ public class RuleApplication {
 //			System.out.println("seq:"+ProofSaver.printAnything(currentGoal.sequent(), services));
 			ps.start(goals);
 //			try {		
-				System.out.println("Number of Open Goals after simplification: " + ps.getProof().openGoals().size() + "+++" + (ps.getProof() == currentGoal.proof()));
+//				System.out.println("Number of Open Goals after simplification: " + ps.getProof().openGoals().size() + "+++" + (ps.getProof() == currentGoal.proof()));
 
 //				new ProofSaver(ps.getProof(), new File("C:\\Users\\Asma\\testAfterSEAfterShift.key")).save();
 //			} catch (IOException e) {

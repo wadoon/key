@@ -65,14 +65,14 @@ public class LIGNew {
 //		System.out.println("Goals before shift: "+services.getProof().openGoals());
 		ImmutableList<Goal> goalsAfterShift = ruleApp.applyShiftUpdateRule(services.getProof().openGoals());
 //		System.out.println("SHIFTED");
-		System.out.println("number of goals after shift -1: " + goalsAfterShift.size());// It is always one
-		System.out.println(
-				"Goals after shift -1: " + ProofSaver.printAnything(goalsAfterShift.head().sequent(), services));
+//		System.out.println("number of goals after shift -1: " + goalsAfterShift.size());// It is always one
+//		System.out.println(
+//				"Goals after shift -1: " + ProofSaver.printAnything(goalsAfterShift.head().sequent(), services));
 		ImmutableList<Goal> goalsAfterUnwind = null;
 
 		Goal currentGoal = goalsAfterShift.head();// Number of goals after shift does not change
 
-		allCompPreds.add(tb.geq(index, low));// i>=l
+		allCompPreds.add(tb.equals(index, low));// i>=l
 		allCompPreds.add(tb.leq(index, high));// i<=h
 		for (Term arr : arrays) {
 			allDepPreds.add(tb.noR(tb.arrayRange(arr, low, high)));
@@ -107,16 +107,16 @@ public class LIGNew {
 
 			goalsAfterUnwind = ruleApp.applyUnwindRule(goalsAfterShift);
 //			System.out.println("UNWIND");
-			System.out.println("Number of goals after unwind: " + goalsAfterUnwind.size());
-			System.out.println("Goals After Unwind:" + goalsAfterUnwind);
+//			System.out.println("Number of goals after unwind: " + goalsAfterUnwind.size());
+//			System.out.println("Goals After Unwind:" + goalsAfterUnwind);
 //			System.out.println(goalsAfterUnwind);
 			goalsAfterShift = ruleApp.applyShiftUpdateRule(goalsAfterUnwind);
 //			System.out.println("SHIFT");
-			System.out.println("Number of goals after shift: " + goalsAfterShift.size());
-			System.out.println("Goals After Shift:" + goalsAfterShift);
+//			System.out.println("Number of goals after shift: " + goalsAfterShift.size());
+//			System.out.println("Goals After Shift:" + goalsAfterShift);
 
 			currentGoal = ruleApp.findLoopUnwindTacletGoal(goalsAfterShift);
-			System.out.println("Current Goal: " + currentGoal);
+//			System.out.println("Current Goal: " + currentGoal);
 
 //			currentIndexFormula = currentIndexEq(currentGoal.sequent(), index);
 //			System.out.println("Before refinement: " + currentGoal.sequent());
@@ -168,7 +168,7 @@ public class LIGNew {
 	}
 
 	private Goal abstractGoal(Goal currentGoal) {
-		System.out.println("Goal: " + currentGoal);
+//		System.out.println("Goal: " + currentGoal);
 		for (SequentFormula cgsf : currentGoal.sequent().antecedent()) {
 			PosInOccurrence p = new PosInOccurrence(cgsf, PosInTerm.getTopLevel(), true);
 			currentGoal.removeFormula(p);
@@ -187,7 +187,7 @@ public class LIGNew {
 			currentGoal.addFormula(new SequentFormula(cp), true, false);
 //			currentGoal.addFormula(new SequentFormula(cp), false, false);
 		}
-		System.out.println("Modified Goal: " + currentGoal);
+//		System.out.println("Modified Goal: " + currentGoal);
 		return currentGoal;
 	}
 

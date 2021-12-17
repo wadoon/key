@@ -98,6 +98,7 @@ public class PredicateRefinementNew3 {
 
 
 	private boolean sequentImpliesPredicate(Term pred) {
+//		System.out.println("sequentImpliesPredicate is called for: "+pred);
 		Sequent sideSeq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(pred), false, true).sequent();
 		for (SequentFormula sequentFormula : seq.antecedent()) {
 			sideSeq = sideSeq.addFormula(sequentFormula, true, false).sequent();
@@ -109,7 +110,7 @@ public class PredicateRefinementNew3 {
 			}
 		}
 
-//		System.out.println("in: " +  sideSeq);
+//		System.out.println("is Provable called for: " +  pred);
 		final boolean provable = sProof.isProvable(sideSeq, services);
 //		if (!provable && (pred.op() == intLDT.getLessThan() || pred.op() == intLDT.getLessOrEquals()
 //				|| pred.op() == intLDT.getGreaterThan() || pred.op() == intLDT.getGreaterOrEquals()
@@ -119,10 +120,12 @@ public class PredicateRefinementNew3 {
 //		else if (provable && pred.op() == services.getTypeConverter().getDependenciesLDT().getNoR()) {
 //			System.out.println("Check: " + ProofSaver.printAnything(sideSeq, services));
 //		}
-		System.out.println("Proof " + pred + ":  "+ provable);
-		if (provable && pred.op() == services.getTypeConverter().getDependenciesLDT().getNoWaR()) {
-			System.out.println("We have a Problem: \\n" + ProofSaver.printAnything(sideSeq, services));
-		}
+		System.out.println("Proof " + pred + ":  "+ provable);// + " in the following seq:");
+//		System.out.println(sideSeq);
+//		System.out.println("---------------------------------------------------------------");
+//		if (provable && pred.op() == services.getTypeConverter().getDependenciesLDT().getNoWaR()) {
+//			System.out.println("We have a Problem: \\n" + ProofSaver.printAnything(sideSeq, services));
+//		}
 		
 		return provable;
 	}
@@ -413,8 +416,10 @@ public class PredicateRefinementNew3 {
 				result.add(tb.geq(low, high));
 			} else if (pred.op() == intLDT.getLessOrEquals()) {// Think again
 				result.add(tb.gt(low, high));
+				result.add(tb.equals(low, high));
 			} else if (pred.op() == intLDT.getGreaterOrEquals()) {// Think again
 				result.add(tb.lt(low, high));
+				result.add(tb.equals(low, high));
 			} else if (pred.op() == Equality.EQUALS) {
 				result.add(tb.gt(low, high));
 				result.add(tb.lt(low, high));
@@ -439,8 +444,8 @@ public class PredicateRefinementNew3 {
 			} else if (pred.op() == intLDT.getGreaterOrEquals()) {
 				result.add(tb.geq(left, tb.subtract(right, tb.one())));
 			} else if (pred.op() == Equality.EQUALS) {
-				result.add(tb.gt(left, right));
-				result.add(tb.lt(right, left));
+				result.add(tb.geq(left, right));
+				result.add(tb.leq(right, left));
 			}
 		}
 //		System.out.println(result);
