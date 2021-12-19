@@ -15,7 +15,6 @@ import de.uka.ilkd.key.java.expression.operator.GreaterThan;
 import de.uka.ilkd.key.java.expression.operator.LessOrEquals;
 import de.uka.ilkd.key.java.expression.operator.LessThan;
 import de.uka.ilkd.key.java.statement.While;
-import de.uka.ilkd.key.ldt.DependenciesLDT;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.ProgramPrefix;
@@ -29,7 +28,6 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.util.Pair;
 
 public class LIGNew {
@@ -44,7 +42,6 @@ public class LIGNew {
 	private Set<Term> allDepPreds = new HashSet<>();
 	private Set<Term> oldCompPreds = new HashSet<>();
 	private Set<Term> allCompPreds = new HashSet<>();
-	private final DependenciesLDT depLDT;
 
 	public LIGNew(Services s, Sequent sequent) {
 		seq = sequent;
@@ -53,7 +50,6 @@ public class LIGNew {
 //		services = proof.getServices();// New service after unwind
 		services = ruleApp.services;
 		tb = services.getTermBuilder();
-		depLDT = new DependenciesLDT(services);
 	}
 	
 	public void mainAlg() {
