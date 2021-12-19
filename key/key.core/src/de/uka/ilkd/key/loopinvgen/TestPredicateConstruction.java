@@ -3,6 +3,7 @@ package de.uka.ilkd.key.loopinvgen;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.URL;
 
 import org.antlr.runtime.RecognitionException;
 import org.key_project.util.collection.ImmutableSLList;
@@ -24,9 +25,9 @@ import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserConfig;
 import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.pp.AbbrevMap;
-import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.MergeContract;
+import de.uka.ilkd.key.util.KeYResourceManager;
 
 public class TestPredicateConstruction {
 
@@ -35,10 +36,11 @@ public class TestPredicateConstruction {
 	private final NamespaceSet nss;
 	private final Services services;
 
-	private String pathToTestKeYFile = "C:\\Users\\Asma\\git\\LIG_3\\key\\key\\key.core\\src\\de\\uka\\ilkd\\key\\loopinvgen\\test.key";
+//	private String pathToTestKeYFile = "C:\\Users\\Asma\\git\\LIG_3\\key\\key\\key.core\\src\\de\\uka\\ilkd\\key\\loopinvgen\\test.key";
 
 	TestPredicateConstruction() {
-		services = HelperClassParsingTests.createServices(new File(pathToTestKeYFile));
+		URL urlToTestFile = KeYResourceManager.getManager().getResourceFile(this, "test.key");
+		services = HelperClassParsingTests.createServices(new File(urlToTestFile.getFile()));
 		tb = services.getTermBuilder();
 		nss = services.getNamespaces();
 		tf = tb.tf();

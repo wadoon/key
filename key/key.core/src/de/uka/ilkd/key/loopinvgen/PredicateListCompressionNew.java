@@ -3,8 +3,6 @@ package de.uka.ilkd.key.loopinvgen;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.sun.org.apache.xpath.internal.operations.Equals;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.DependenciesLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;

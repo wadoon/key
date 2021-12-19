@@ -3,7 +3,6 @@ package de.uka.ilkd.key.loopinvgen;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.commons.math3.util.IterationEvent;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.Expression;
@@ -25,13 +24,13 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.util.Pair;
 
 public class LIGNew {
 
@@ -86,7 +85,7 @@ public class LIGNew {
 		int itrNumber = -1;
 		PredicateRefinementNew3 pr0 = new PredicateRefinementNew3(services, currentGoal.sequent(), allDepPreds,
 				allCompPreds, index, itrNumber);
-		SetTuple<Set<Term>, Set<Term>> refinedPreds = pr0.predicateCheckAndRefine();
+		Pair<Set<Term>, Set<Term>> refinedPreds = pr0.predicateCheckAndRefine();
 //		System.out.println(ProofSaver.printAnything(seq, services));
 		allDepPreds = refinedPreds.first;
 		allCompPreds = refinedPreds.second;
