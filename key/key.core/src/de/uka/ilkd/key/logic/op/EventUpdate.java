@@ -29,7 +29,7 @@ public final class EventUpdate extends AbstractSortedOperator {
    
  
     private EventUpdate() {
-	super(new Name("event-update"), 
+	super(new Name("\\event"), 
 	      new Sort[]{Sort.ANY, Sort.ANY, Sort.ANY}, 
 	      Sort.UPDATE,
 	      false);

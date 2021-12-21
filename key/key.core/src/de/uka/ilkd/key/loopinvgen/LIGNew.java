@@ -15,6 +15,7 @@ import de.uka.ilkd.key.java.expression.operator.GreaterThan;
 import de.uka.ilkd.key.java.expression.operator.LessOrEquals;
 import de.uka.ilkd.key.java.expression.operator.LessThan;
 import de.uka.ilkd.key.java.statement.While;
+import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.ProgramPrefix;
@@ -42,6 +43,7 @@ public class LIGNew {
 	private Set<Term> allDepPreds = new HashSet<>();
 	private Set<Term> oldCompPreds = new HashSet<>();
 	private Set<Term> allCompPreds = new HashSet<>();
+	private final IntegerLDT intLDT;
 
 	public LIGNew(Services s, Sequent sequent) {
 		seq = sequent;
@@ -50,6 +52,7 @@ public class LIGNew {
 //		services = proof.getServices();// New service after unwind
 		services = ruleApp.services;
 		tb = services.getTermBuilder();
+		intLDT = services.getTypeConverter().getIntegerLDT();
 	}
 	
 	public void mainAlg() {
@@ -57,6 +60,18 @@ public class LIGNew {
 		getIndexAndHigh(seq);
 		getLocSet(seq);
 
+		for (SequentFormula sf : seq.antecedent()) {
+			if (!sf.formula().containsJavaBlockRecursive() && isComparisonOperator(sf.formula())) {
+				allCompPreds.add(sf.formula());
+			}
+		}
+		for (SequentFormula sf : seq.succedent()) {
+			if (!sf.formula().containsJavaBlockRecursive() && isComparisonOperator(sf.formula())) {
+				allCompPreds.add(tb.not(sf.formula()));
+			}
+		}
+
+		
 //		System.out.println("Goals before shift: "+services.getProof().openGoals());
 		ImmutableList<Goal> goalsAfterShift = ruleApp.applyShiftUpdateRule(services.getProof().openGoals());
 //		System.out.println("SHIFTED");
@@ -67,6 +82,8 @@ public class LIGNew {
 
 		Goal currentGoal = goalsAfterShift.head();// Number of goals after shift does not change
 
+		
+		
 		allCompPreds.add(tb.equals(index, low));// i>=l
 		allCompPreds.add(tb.leq(index, high));// i<=h
 		for (Term arr : arrays) {
@@ -86,9 +103,9 @@ public class LIGNew {
 		allDepPreds = refinedPreds.first;
 		allCompPreds = refinedPreds.second;
 
-		for (Goal g : goalsAfterShift) {
-			g = abstractGoal(g);
-		}
+//		for (Goal g : goalsAfterShift) {
+//			g = abstractGoal(g);
+//		}
 
 		do {
 			itrNumber++;
@@ -102,16 +119,16 @@ public class LIGNew {
 
 			goalsAfterUnwind = ruleApp.applyUnwindRule(goalsAfterShift);
 //			System.out.println("UNWIND");
-//			System.out.println("Number of goals after unwind: " + goalsAfterUnwind.size());
+			System.out.println("Number of goals after unwind: " + goalsAfterUnwind.size());
 //			System.out.println("Goals After Unwind:" + goalsAfterUnwind);
 //			System.out.println(goalsAfterUnwind);
 			goalsAfterShift = ruleApp.applyShiftUpdateRule(goalsAfterUnwind);
 //			System.out.println("SHIFT");
-//			System.out.println("Number of goals after shift: " + goalsAfterShift.size());
-//			System.out.println("Goals After Shift:" + goalsAfterShift);
+			System.out.println("Number of goals after shift: " + goalsAfterShift.size());
+			System.out.println("Goals After Shift:" + goalsAfterShift);
 
 			currentGoal = ruleApp.findLoopUnwindTacletGoal(goalsAfterShift);
-//			System.out.println("Current Goal: " + currentGoal);
+			System.out.println("Current Goal: " + currentGoal);
 
 //			currentIndexFormula = currentIndexEq(currentGoal.sequent(), index);
 //			System.out.println("Before refinement: " + currentGoal.sequent());
@@ -126,13 +143,7 @@ public class LIGNew {
 				g = abstractGoal(g);
 			}
 
-			// if(!compPredsFixedPoint && (allCompPreds.size()==oldCompPreds.size())) {
-//				compPredsFixedPoint = true;
-//				System.out.println("CompPredSet fixed point at iteration: " + itrNumber);
-//				System.out.println("and CompPredSet is: " + allCompPreds);
-//			}
-
-//			System.out.println("ALL PREDICATES Size:" + allPreds.size());
+			System.out.println("Dep Preds: " + allDepPreds);
 		} while (allCompPreds.size() != oldCompPreds.size() || allDepPreds.size() != oldDepPreds.size()
 				|| itrNumber < 2);
 
@@ -168,12 +179,12 @@ public class LIGNew {
 			PosInOccurrence p = new PosInOccurrence(cgsf, PosInTerm.getTopLevel(), true);
 			currentGoal.removeFormula(p);
 		}
-//		for(SequentFormula cgsf:currentGoal.sequent().succedent()) {
-//			PosInOccurrence p = new PosInOccurrence(cgsf, PosInTerm.getTopLevel(), false);
-//			if(!cgsf.formula().containsJavaBlockRecursive()) {
-//				currentGoal.removeFormula(p);
-//			}
-//		}
+		for(SequentFormula cgsf:currentGoal.sequent().succedent()) {
+			PosInOccurrence p = new PosInOccurrence(cgsf, PosInTerm.getTopLevel(), false);
+			if(!cgsf.formula().containsJavaBlockRecursive()) {
+				currentGoal.removeFormula(p);
+			}
+		}
 		for (Term cp : allCompPreds) {
 			currentGoal.addFormula(new SequentFormula(cp), true, false);
 //			currentGoal.addFormula(new SequentFormula(cp), false, false);
@@ -308,4 +319,17 @@ public class LIGNew {
 		}
 	}
 
+	private boolean isComparisonOperator(Term pred) {
+		boolean isComparison;
+		if (pred.op() == intLDT.getLessThan() ||
+			pred.op() == intLDT.getGreaterThan() || 
+		    pred.op() == intLDT.getLessOrEquals() ||
+		    pred.op() == intLDT.getGreaterOrEquals() || 
+		    pred.op() == Equality.EQUALS) {		
+			isComparison = true;
+		} else {
+			isComparison = false;
+		}
+		return isComparison;
+	}
 }

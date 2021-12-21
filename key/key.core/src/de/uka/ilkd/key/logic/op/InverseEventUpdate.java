@@ -9,7 +9,7 @@ public final class InverseEventUpdate extends AbstractSortedOperator {
 	   
 	 
     private InverseEventUpdate() {
-	super(new Name("inverse-event-update"), 
+	super(new Name("\\invEvUp"), 
 	      new Sort[]{Sort.ANY, Sort.ANY, Sort.ANY}, 
 	      Sort.UPDATE,
 	      false);

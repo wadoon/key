@@ -52,8 +52,14 @@ public class RuleApplication {
 
 		ps.setStrategyProperties(sp);
 		ps.getProof().getSettings().getStrategySettings().setActiveStrategyProperties(sp);
-		ps.setMaxRuleApplications(20000);//Only Change This
-		ps.setTimeout(-1);
+		ps.getProof().getSettings().getStrategySettings().setMaxSteps(80000);
+		ps.getProof().getEnv().getInitConfigForEnvironment().getSettings().getStrategySettings().setMaxSteps(80000);
+		ps.getProof().getSettings().getStrategySettings().setTimeout(120000);;
+		ps.getProof().getEnv().getInitConfigForEnvironment().getSettings().getStrategySettings().setMaxSteps(120000);
+
+		
+		ps.setMaxRuleApplications(80000);//Only Change This
+		ps.setTimeout(120000);
 
 		proof = ps.getProof();
 		services = proof.getServices();
@@ -80,7 +86,7 @@ public class RuleApplication {
 			final ImmutableList<Goal> goals = currentGoal.apply(app);
 //			System.out.println("Number of Open Goals after applying Shift: " + currentGoal.proof().openGoals().size());
 //			System.out.println("seq:"+ProofSaver.printAnything(currentGoal.sequent(), services));
-			ps.start(goals);
+//			ps.start(goals);
 //			try {		
 //				System.out.println("Number of Open Goals after simplification: " + ps.getProof().openGoals().size() + "+++" + (ps.getProof() == currentGoal.proof()));
 
@@ -89,7 +95,8 @@ public class RuleApplication {
 				// TODO Auto-generated catch block
 //				e.printStackTrace();
 //			}
-			return currentGoal.proof().openGoals();
+			return goals;
+			//			return currentGoal.proof().openGoals();
 //			return services.getProof().openEnabledGoals();
 		}
 		return null;

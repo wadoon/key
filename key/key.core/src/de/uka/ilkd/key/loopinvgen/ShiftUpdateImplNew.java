@@ -51,7 +51,7 @@ public class ShiftUpdateImplNew {
 //		System.out.println("After complete shift: "+ g.sequent());
 		// add program formula again
 		g.addFormula(new SequentFormula(UpdateApplication.getTarget(loopFormula)), pos.isInAntec(), true);
-//		System.out.println("Putting program back: "+ g.sequent());
+		System.out.println("Putting program back: "+ g.sequent());
 	}
 
 	/**
