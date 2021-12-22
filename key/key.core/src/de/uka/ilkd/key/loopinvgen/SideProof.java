@@ -35,7 +35,7 @@ public class SideProof {
 	}
 
 	public SideProof(Services s, Sequent sequent) {
-		this(s, sequent, 80000);
+		this(s, sequent, 100000);
 	}
 
 	boolean proofEquality(Term loc1, Term loc2) {
@@ -369,8 +369,21 @@ public class SideProof {
 	protected boolean isProvable(Sequent seq2prove, Services services) {
 		final ProofStarter ps = new ProofStarter(false);
 //		System.out.println("isProvable: " + seq2prove);
-
+		
+		Term antec = tb.tt();
+		for (SequentFormula sf : seq2prove.antecedent()) {
+			antec = tb.and(antec, sf.formula());
+		}
+		
+		Term succ = tb.ff();
+		for (SequentFormula sf : seq2prove.succedent()) {
+			succ = tb.or(succ, sf.formula());
+		}
+		
+		seq2prove = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(tb.imp(antec, succ)), false, true).sequent();
+		
 		final ProofEnvironment env = SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(services.getProof());
+
 		try {
 			ps.init(seq2prove, env, "IsInRange Proof");
 		} catch (ProofInputException pie) {
@@ -389,6 +402,8 @@ public class SideProof {
 		ps.setTimeout(-1);
 //		System.out.println("strategy prop. " + sp);
 
+		
+		
 		final ApplyStrategyInfo info = ps.start();
 //		System.out.println(info.getAppliedRuleApps() + ":" + info.toString());
 		

@@ -52,14 +52,14 @@ public class RuleApplication {
 
 		ps.setStrategyProperties(sp);
 		ps.getProof().getSettings().getStrategySettings().setActiveStrategyProperties(sp);
-		ps.getProof().getSettings().getStrategySettings().setMaxSteps(80000);
-		ps.getProof().getEnv().getInitConfigForEnvironment().getSettings().getStrategySettings().setMaxSteps(80000);
-		ps.getProof().getSettings().getStrategySettings().setTimeout(120000);;
-		ps.getProof().getEnv().getInitConfigForEnvironment().getSettings().getStrategySettings().setMaxSteps(120000);
+		ps.getProof().getSettings().getStrategySettings().setMaxSteps(100000);
+		ps.getProof().getEnv().getInitConfigForEnvironment().getSettings().getStrategySettings().setMaxSteps(100000);
+		ps.getProof().getSettings().getStrategySettings().setTimeout(-1);
+		ps.getProof().getEnv().getInitConfigForEnvironment().getSettings().getStrategySettings().setTimeout(-1);
 
 		
-		ps.setMaxRuleApplications(80000);//Only Change This
-		ps.setTimeout(120000);
+		ps.setMaxRuleApplications(100000);//Only Change This
+		ps.setTimeout(-1);
 
 		proof = ps.getProof();
 		services = proof.getServices();
