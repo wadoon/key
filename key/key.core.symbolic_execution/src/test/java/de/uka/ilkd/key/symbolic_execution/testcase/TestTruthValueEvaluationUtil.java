@@ -755,10 +755,10 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
     */
    @Test public void testNotLastEvaluationGivesTruthValue() throws Exception {
       // Create expected results
-      ExpectedBranchResult goal53 = new ExpectedBranchResult(new ExpectedTruthValueResult("3.0", TruthValue.TRUE), new ExpectedTruthValueResult("6.0", TruthValue.TRUE), new ExpectedTruthValueResult("4.0", TruthValue.TRUE), new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("8.0", TruthValue.TRUE), new ExpectedTruthValueResult("1.0", TruthValue.TRUE), new ExpectedTruthValueResult("1.12", TruthValue.FALSE), new ExpectedTruthValueResult("1.13", TruthValue.TRUE), new ExpectedTruthValueResult("2.0", TruthValue.TRUE));
+      ExpectedBranchResult goal53 = new ExpectedBranchResult(new ExpectedTruthValueResult("3.0", TruthValue.TRUE), new ExpectedTruthValueResult("6.0", TruthValue.TRUE), new ExpectedTruthValueResult("4.0", TruthValue.TRUE), new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("8.0", TruthValue.TRUE), new ExpectedTruthValueResult("1.0", TruthValue.TRUE), new ExpectedTruthValueResult("1.17", TruthValue.FALSE), new ExpectedTruthValueResult("1.18", TruthValue.TRUE), new ExpectedTruthValueResult("2.0", TruthValue.TRUE));
       ExpectedBranchResult goal41 = new ExpectedBranchResult(new ExpectedTruthValueResult("3.0", TruthValue.TRUE), new ExpectedTruthValueResult("0.0", TruthValue.TRUE));
       ExpectedBranchResult goal39 = new ExpectedBranchResult(new ExpectedTruthValueResult("3.0", TruthValue.TRUE), new ExpectedTruthValueResult("0.0", TruthValue.TRUE));
-      ExpectedBranchResult goal55 = new ExpectedBranchResult(new ExpectedTruthValueResult("3.0", TruthValue.TRUE), new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("1.11", TruthValue.TRUE));
+      ExpectedBranchResult goal55 = new ExpectedBranchResult(new ExpectedTruthValueResult("3.0", TruthValue.TRUE), new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("1.15", TruthValue.TRUE));
       ExpectedTruthValueEvaluationResult result = new ExpectedTruthValueEvaluationResult(goal53, goal41, goal39, goal55);
       // Perform test
       doTruthValueEvaluationTest("/set/truthValueNotLastEvaluationGivesTruthValue/test/NotLastEvaluationGivesTruthValue.proof", 
