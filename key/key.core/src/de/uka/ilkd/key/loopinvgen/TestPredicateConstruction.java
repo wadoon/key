@@ -161,7 +161,8 @@ public class TestPredicateConstruction {
 		}
 		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(succFormula), false, true).sequent();
 
-		String[] arrLeft = { "noW(arrayRange(a,0,a.length))","noR(arrayRange(a,0,a.length))","a!=null", "a.length > 10" };
+		String[] arrLeft = { "noW(arrayRange(a,0,a.length))","noR(arrayRange(a,0,a.length))", "a.length > 10" };
+		String[] arrRight = { "a=null" };
 		try {
 			for (String fml : arrLeft) {
 				seq = seq.addFormula(new SequentFormula(parse(fml)), true, true).sequent();
@@ -174,6 +175,21 @@ public class TestPredicateConstruction {
 			e.printStackTrace();
 			return;
 		}
+		
+		try {
+			for (String fml : arrRight) {
+				seq = seq.addFormula(new SequentFormula(parse(fml)), false, false).sequent();
+			}
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			if (e.getCause() != null) {
+				System.out.println(e.getCause().getMessage());
+			}
+			e.printStackTrace();
+			return;
+		}
+
+		
 ////	Old system:
 //		LIGMultipleArrays cur = new LIGMultipleArrays(services, seq);
 //		cur.mainAlg();
@@ -591,7 +607,7 @@ public class TestPredicateConstruction {
 	public static void main(String[] args) {
 		TestPredicateConstruction tpc = new TestPredicateConstruction();
 		long start = System.currentTimeMillis();
-		tpc.conditionDifferentNumberOfEvents();
+		tpc.shiftArrayToLeft();
 		long end = System.currentTimeMillis();
 		System.out.println("Loop Invariant Generation and Pretty Printing took " + (end - start) + " ms");
 	}

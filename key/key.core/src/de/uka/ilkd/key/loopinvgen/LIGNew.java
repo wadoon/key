@@ -15,6 +15,7 @@ import de.uka.ilkd.key.java.expression.operator.GreaterThan;
 import de.uka.ilkd.key.java.expression.operator.LessOrEquals;
 import de.uka.ilkd.key.java.expression.operator.LessThan;
 import de.uka.ilkd.key.java.statement.While;
+import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
@@ -45,7 +46,6 @@ public class LIGNew {
 	private Set<Term> oldCompPreds = new HashSet<>();
 	private Set<Term> allCompPreds = new HashSet<>();
 	private final IntegerLDT intLDT;
-
 	public LIGNew(Services s, Sequent sequent) {
 		seq = sequent;
 		System.out.println(seq);
@@ -61,6 +61,7 @@ public class LIGNew {
 		getIndexAndHigh(seq);
 		getLocSet(seq);
 
+		
 		for (SequentFormula sf : seq.antecedent()) {
 			if (!sf.formula().containsJavaBlockRecursive() && isComparisonOperator(sf.formula())) {
 				allCompPreds.add(sf.formula());
@@ -92,7 +93,7 @@ public class LIGNew {
 			allDepPreds.add(tb.noW(tb.arrayRange(arr, low, high)));
 		}
 
-//		System.out.println("Initial Predicate Set: ");
+		System.out.println("Initial comp Predicate Set: " + allCompPreds);
 //		for (Term term : allPreds) {
 //			System.out.println(term);
 //		}
@@ -333,4 +334,5 @@ public class LIGNew {
 		}
 		return isComparison;
 	}
+	
 }
