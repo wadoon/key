@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.loopinvgen;
 
-import java.io.IOException;
-
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -22,11 +20,11 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
-import de.uka.ilkd.key.proof.io.ProofSaver;
-import java.io.File;
 
 public class RuleApplication {
 
+	private static final int TIME_OUT = 120000;
+	private static final int MAX_RULE_APP = 30000;
 	private final Sequent seq;
 	final Services services;
 	private ProofStarter ps;
@@ -52,14 +50,14 @@ public class RuleApplication {
 
 		ps.setStrategyProperties(sp);
 		ps.getProof().getSettings().getStrategySettings().setActiveStrategyProperties(sp);
-		ps.getProof().getSettings().getStrategySettings().setMaxSteps(100000);
-		ps.getProof().getEnv().getInitConfigForEnvironment().getSettings().getStrategySettings().setMaxSteps(100000);
-		ps.getProof().getSettings().getStrategySettings().setTimeout(-1);
-		ps.getProof().getEnv().getInitConfigForEnvironment().getSettings().getStrategySettings().setTimeout(-1);
+		ps.getProof().getSettings().getStrategySettings().setMaxSteps(MAX_RULE_APP);
+		ps.getProof().getEnv().getInitConfigForEnvironment().getSettings().getStrategySettings().setMaxSteps(MAX_RULE_APP);
+		ps.getProof().getSettings().getStrategySettings().setTimeout(TIME_OUT);;
+		ps.getProof().getEnv().getInitConfigForEnvironment().getSettings().getStrategySettings().setTimeout(TIME_OUT);
 
 		
-		ps.setMaxRuleApplications(100000);//Only Change This
-		ps.setTimeout(-1);
+		ps.setMaxRuleApplications(MAX_RULE_APP);//Only Change This
+		ps.setTimeout(TIME_OUT);
 
 		proof = ps.getProof();
 		services = proof.getServices();

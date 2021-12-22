@@ -139,7 +139,7 @@ public class LIGNew {
 			refinedPreds = pr.predicateCheckAndRefine();
 			allDepPreds = refinedPreds.first;
 			allCompPreds = refinedPreds.second;
-
+			
 //			currentGoal = abstractGoal(currentGoal);
 			for (Goal g : goalsAfterShift) {
 				g = abstractGoal(g);
