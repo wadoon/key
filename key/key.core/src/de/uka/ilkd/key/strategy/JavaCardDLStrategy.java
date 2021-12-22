@@ -1320,7 +1320,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 		final Feature noDoubleMinus = ifZero(MatchedIfFeature.INSTANCE, 
 				let(assumesLocSet, instOfNonStrict("loc1"), 
 						sum(findSubTerms, SubtermGenerator.leftTraverse(findLocSet, op(setMinus)), 
-								not(eq(assumesLocSet, sub(findSubTerms,1))))), longConst(0));
+								ifZero(applyTF(findSubTerms,op(setMinus)), not(eq(assumesLocSet, sub(findSubTerms,1))), longConst(0)))), longConst(0));
 		
 		
 //		final Feature noDoubleMinus = ifZero(MatchedIfFeature.INSTANCE, 
