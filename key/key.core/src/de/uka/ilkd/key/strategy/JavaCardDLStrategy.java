@@ -1312,10 +1312,15 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 		final Operator setMinus = getServices().getTypeConverter().getLocSetLDT().getSetMinus();
 		final ProjectionToTerm findLocSet = sub(FocusProjection.create(0), 0);
 		
-		final Feature noDoubleMinus = ifZero(MatchedIfFeature.INSTANCE, 
+/*		final Feature noDoubleMinus = ifZero(MatchedIfFeature.INSTANCE, 
 				ifZero(applyTF(findLocSet, op(setMinus)), not(eq(sub(findLocSet, 1), instOfNonStrict("loc1"))), longConst(0)));
-	
-		TermBuffer arg2 = new TermBuffer();
+*/
+		TermBuffer assumesLocSet = new TermBuffer();
+		TermBuffer findSubTerms = new TermBuffer();
+		final Feature noDoubleMinus = ifZero(MatchedIfFeature.INSTANCE, 
+				let(assumesLocSet, instOfNonStrict("loc1"), 
+						sum(findSubTerms, SubtermGenerator.leftTraverse(findLocSet, op(setMinus)), 
+								not(eq(assumesLocSet, sub(findSubTerms,1))))), longConst(0));
 		
 		
 //		final Feature noDoubleMinus = ifZero(MatchedIfFeature.INSTANCE, 
@@ -1330,8 +1335,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
 		bindRuleSet(d, "dep_pred_known", add(ScaleFeature.createScaled(depth, 1000), longConst(100)));
 		bindRuleSet(d, "dep_pred_known_2", add(noDoubleMinus,longConst(100)));
-		bindRuleSet(d, "dep_pred_known_3", add(longConst(-1000)));
+		bindRuleSet(d, "dep_pred_known_3", add(noDoubleMinus,longConst(-500)));
+		bindRuleSet(d, "saturate_dep_locset_relations_def", add(noDoubleMinus,NonDuplicateAppModPositionFeature.INSTANCE,longConst(5000)));
 		bindRuleSet(d, "saturate_dep_locset_relations", add(noDoubleMinus,NonDuplicateAppModPositionFeature.INSTANCE,longConst(-1000)));
+
 	}
 	
 	private void setupPullOutGcd(RuleSetDispatchFeature d, String ruleSet, boolean roundingUp) {
