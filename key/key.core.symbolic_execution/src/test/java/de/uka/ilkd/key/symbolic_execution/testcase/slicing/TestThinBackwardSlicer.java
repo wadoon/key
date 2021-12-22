@@ -187,9 +187,9 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     */
    @Test public void testLoopInvariantNestedListFieldsTest() throws Exception {
       doSlicingTest("/slicing/loopInvariantNestedListFieldsTest/LoopInvariantNestedListFieldsTest.proof", 
-                    new ReturnSelector(424),
+                    new ReturnSelector(434),
                     true,
-                    67);
+                    77);
    }
 
    /** 
@@ -374,9 +374,9 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     */
    @Test public void testAliasChanged() throws Exception {
       doSlicingTest("/slicing/aliasChanged/AliasChanged.proof", 
-                    new ReturnSelector(203),
+                    new ReturnSelector(207),
                     false,
-                    198, 194, 86, 57);
+                    202, 198, 94, 65);
    }
 
    /**
@@ -385,9 +385,9 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     */
    @Test public void testAliasNotAvailable() throws Exception {
       doSlicingTest("/slicing/aliasNotAvailable/AliasNotAvailable.proof", 
-                    new ReturnSelector(178),
+                    new ReturnSelector(182),
                     false,
-                    173, 169, 98, 77);
+                    177, 173, 102, 81);
    }
 
    /**
@@ -418,9 +418,9 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     */
    @Test public void testInstanceFieldsAliased() throws Exception {
       doSlicingTest("/slicing/instanceFieldsAliased/InstanceFieldsAliased.proof", 
-                    new ReturnSelector(185),
+                    new ReturnSelector(189),
                     false,
-                    180, 176, 68);
+                    184, 180, 76);
    }
    
    /**
@@ -429,9 +429,9 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     */
    @Test public void testNestedInstanceFields() throws Exception {
       doSlicingTest("/slicing/nestedInstanceFields/NestedInstanceFields.proof", 
-                    new ReturnSelector(142),
+                    new ReturnSelector(146),
                     false,
-                    137, 133, 41, 27);
+                    141, 137, 47, 33);
    }
    
    /**
