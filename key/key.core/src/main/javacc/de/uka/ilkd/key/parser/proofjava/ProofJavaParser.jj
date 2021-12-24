@@ -571,6 +571,8 @@ TOKEN :
 {
   < IDENTIFIER: <LETTER> (<LETTER>|<DIGIT>)* ("#" (<DIGIT>)* )? >
 |
+  < ESCAPED_IDENTIFIER: "\\" <LETTER> (<LETTER>|<DIGIT>)* ("#" (<DIGIT>)* )? >
+|
   < #LETTER:
       [
        "\u0024",
@@ -615,14 +617,6 @@ TOKEN :
 {
  < DL_EMBEDDED_FUNCTION:
     "\\dl_" <LETTER> (<LETTER>|<DIGIT>)*
- >
-}
-
-// token for all map symbols except "\\map_empty"
-TOKEN :
-{
- < MAP_FUNCTION:
-    "\\map_get" | "\\map_singleton" | "\\map_override" | "\\seq_2_map" | "\\map_remove" | "\\map_update" | "\\in_domain" | "\\domain_implies_created" | "\\map_size" | "\\is_finite"
  >
 }
 
@@ -2102,7 +2096,7 @@ Identifier ShortName() :
 	Identifier result;
 }
 {
-  (<IDENTIFIER>
+  ( (<IDENTIFIER>|<ESCAPED_IDENTIFIER>)
   {
     result = factory.createIdentifier(token.image);
     setPrefixInfo(result);
@@ -2710,10 +2704,10 @@ Expression UnaryExpression() :
   result = PreDecrementExpression()
 |
   result = UnaryExpressionNotPlusMinus()
-|
-  result = ADTGetter()
-|
-  result = GeneralEscapeExpression()
+//|
+//  result = ADTGetter()
+//|
+//  result = GeneralEscapeExpression()
 )
   {
     checkConstruction(result);
@@ -2793,6 +2787,7 @@ Expression UnaryExpressionNotPlusMinus() :
 
 }
 
+/*
 Expression ADTGetter() :
 {
     Expression result;
@@ -2821,6 +2816,7 @@ Expression ADTGetter() :
         return result;
     }
 }
+*/
 
 // This production is to determine lookahead only. The LOOKAHEAD specifications
 // below are not used, but they are there just to indicate that we know about
@@ -2932,7 +2928,14 @@ Expression PrimaryExpression() :
           setPostfixInfo(tmpResult);
           break;
       case PrimaryPrefixReturnValue.QUALIFIED_NAME:
-          tmpResult = prefix.name;
+          Expression e = factory.handleEscapedIdentifier(prefix.name);
+          if (e instanceof ReferencePrefix) {
+              tmpResult = (ReferencePrefix) e;
+          } else {
+              checkConstruction(e);
+              setPostfixInfo(e);
+              return e;
+          }
           break;
       case PrimaryPrefixReturnValue.PASSIVE_EXPR:
           tmpResult = (PassiveExpression)prefix.expr;
@@ -3038,13 +3041,23 @@ Expression PrimaryExpression() :
           // method call -determine the kind of method
           if (tmpResult instanceof UncollatedReferenceQualifier) {
               // this is a normal method call
-              tmpResult = factory.createMethodReference
-              (((UncollatedReferenceQualifier)tmpResult).getReferencePrefix(),
-               ((UncollatedReferenceQualifier)tmpResult).getIdentifier(),
-               suffix.args, ((UncollatedReferenceQualifier)tmpResult).getTypeArguments());
+              Expression expr = factory.createMethodReferenceOrEscapeFunction(
+                      ((UncollatedReferenceQualifier)tmpResult).getReferencePrefix(),
+                      ((UncollatedReferenceQualifier)tmpResult).getIdentifier(),
+                      suffix.args,
+                      ((UncollatedReferenceQualifier)tmpResult).getTypeArguments());
 
-              setPrefixInfo(tmpResult);
-              setPostfixInfo(tmpResult);
+              setPrefixInfo(expr);
+              setPostfixInfo(expr);
+
+              if(expr instanceof ReferencePrefix) {
+                tmpResult = (ReferencePrefix) expr;
+              }
+              else {
+                  return expr;
+              }
+
+
           } else {
               throw new ParseException("Arguments without method name?");
           }
@@ -3160,21 +3173,21 @@ PrimaryPrefixReturnValue PrimaryPrefix() :
         prefix.type = PrimaryPrefixReturnValue.QUALIFIED_NAME;
         prefix.name = qn;
   }
-|
+/*|
     expr = ADTConstructor()
     {
         // XXX now primary expression (otherwise could not use expressions like \seq_reverse(x).length
         prefix.type = PrimaryPrefixReturnValue.ADT_CONSTRUCT;
         prefix.expr = expr;
     }
-)
+*/)
   {
       return prefix;
   }
 }
 
 
-
+/*
 Expression ADTConstructor() :
 {
     Expression result;
@@ -3283,6 +3296,7 @@ Expression GeneralEscapeExpression() :
     }
     
 }
+*/
 
 PrimarySuffixReturnValue PrimarySuffix() :
 {
@@ -3415,10 +3429,9 @@ Literal Literal() :
   }
 | result = BooleanLiteral()
 | result = NullLiteral()
-| result = EmptySetLiteral()
-| result = EmptySeqLiteral()
-| result = EmptyMapLiteral()
-
+//| result = EmptySetLiteral()
+//| result = EmptySeqLiteral()
+//| result = EmptyMapLiteral()
 )
   {
     checkConstruction(result);
@@ -3459,6 +3472,7 @@ NullLiteral NullLiteral() :
   }
 }
 
+/*
 EmptySetLiteral EmptySetLiteral() :
 {
     EmptySetLiteral result;
@@ -3497,6 +3511,7 @@ EmptyMapLiteral EmptyMapLiteral() :
       return result;
   }
 }
+*/
 
 ASTList<Expression> Arguments() :
 {

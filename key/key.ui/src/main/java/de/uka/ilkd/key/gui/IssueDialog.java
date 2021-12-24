@@ -3,7 +3,6 @@ package de.uka.ilkd.key.gui;
 import de.uka.ilkd.key.gui.actions.EditSourceFileAction;
 import de.uka.ilkd.key.gui.actions.SendFeedbackAction;
 import de.uka.ilkd.key.gui.configuration.Config;
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.sourceview.JavaDocument;
 import de.uka.ilkd.key.gui.sourceview.TextLineNumber;
 import de.uka.ilkd.key.gui.utilities.SquigglyUnderlinePainter;
@@ -14,8 +13,6 @@ import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExceptionTools;
-import de.uka.ilkd.key.util.parsing.LocatableException;
-import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.IOUtil;
 
@@ -32,7 +29,6 @@ import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -52,27 +48,33 @@ import java.util.stream.Collectors;
  *     <li>if the message contains a stacktrace, it is optionally displayed</li>
  * </ul>
  *
- * @implNote The given PositionedStrings are assumed to have <b>1-based line and column numbers</b>,
- *           since this conforms to 1) the line numbers shown in the dialog and 2) the
- *           usual representation in text editors.
- *
  * @author Alexander Weigl
  * @author Wolfram Pfeifer: adaptations for also showing exceptions, making it the single dialog for
- *                          all parser error messages in KeY
- * @version 1 (6/8/21)
+ * all parser error messages in KeY
  * @version 2 (11/15/21)
+ * @implNote The given PositionedStrings are assumed to have <b>1-based line and column numbers</b>,
+ * since this conforms to 1) the line numbers shown in the dialog and 2) the
+ * usual representation in text editors.
  */
 public final class IssueDialog extends JDialog {
-    /** regex to find web urls in string messages */
+    /**
+     * regex to find web urls in string messages
+     */
     private static final Pattern HTTP_REGEX = Pattern.compile("https?://[^\\s]+");
 
-    /** warnings which have been marked to be ignored by the user (in this KeY run) */
+    /**
+     * warnings which have been marked to be ignored by the user (in this KeY run)
+     */
     private static final Set<PositionedString> ignoredWarnings = new HashSet<>();
 
-    /** the single critical issue that is shown in this dialog */
+    /**
+     * the single critical issue that is shown in this dialog
+     */
     private final Throwable throwable;
 
-    /** the warnings that are shown in this dialog */
+    /**
+     * the warnings that are shown in this dialog
+     */
     private final List<PositionedIssueString> warnings;
 
     private final Map<String, String> fileContentsCache = new HashMap<>();
@@ -93,13 +95,17 @@ public final class IssueDialog extends JDialog {
     private final JSplitPane splitBottom = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true);
     private final JPanel stacktracePanel = new JPanel(new BorderLayout());
 
-    /** flag to switch between dialog for warnings and critical issues where parsing is aborted.
-     * In the latter case only a single exception is show, which can also not be ignored */
+    /**
+     * flag to switch between dialog for warnings and critical issues where parsing is aborted.
+     * In the latter case only a single exception is show, which can also not be ignored
+     */
     private final boolean critical;
 
-    /** Reacts to selection events to the "Show details" checkbox (fold/unfold stacktrace).
+    /**
+     * Reacts to selection events to the "Show details" checkbox (fold/unfold stacktrace).
      * Performs some calculations to make the dialog only expand/collapse the stacktrace panel, but
-     * keep the rest of the dialog looking the same as before. */
+     * keep the rest of the dialog looking the same as before.
+     */
     private final transient ItemListener detailsBoxListener = e -> {
         int width = getWidth();
         int height = getHeight();
@@ -134,6 +140,7 @@ public final class IssueDialog extends JDialog {
     /**
      * Escapes special HTML chars the Strings of the warning messages and decorates weblinks such
      * that they are clickable.
+     *
      * @param warnings the warnings to decorate
      * @return the list of decorated and escaped (otherwise unchanged) warnings
      */
@@ -160,7 +167,7 @@ public final class IssueDialog extends JDialog {
             sb.append(escapedTail);
 
             return new PositionedIssueString(sb.toString(), pis.fileName, pis.pos,
-                pis.additionalInfo);
+                    pis.additionalInfo);
         }).collect(Collectors.toList());
     }
 
@@ -198,8 +205,8 @@ public final class IssueDialog extends JDialog {
             head = "The following exception occurred:";
         } else {
             head = String.format(
-                "The following non-fatal problems occurred when translating your %s specifications:",
-                SLEnvInput.getLanguage());
+                    "The following non-fatal problems occurred when translating your %s specifications:",
+                    SLEnvInput.getLanguage());
         }
         JLabel label = new JLabel(head);
         label.setBorder(BorderFactory.createEmptyBorder(5, 5, 2, 5));
@@ -230,13 +237,13 @@ public final class IssueDialog extends JDialog {
 
         // minimizing the stacktrace unchecks the details checkbox
         splitBottom.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY,
-            e -> {
-                // temporarily remove item listener to prevent infinite loop
-                chkDetails.removeItemListener(detailsBoxListener);
-                int newLoc = (int) e.getNewValue();
-                chkDetails.setSelected(newLoc < splitBottom.getMaximumDividerLocation());
-                chkDetails.addItemListener(detailsBoxListener);
-            }
+                e -> {
+                    // temporarily remove item listener to prevent infinite loop
+                    chkDetails.removeItemListener(detailsBoxListener);
+                    int newLoc = (int) e.getNewValue();
+                    chkDetails.setSelected(newLoc < splitBottom.getMaximumDividerLocation());
+                    chkDetails.addItemListener(detailsBoxListener);
+                }
         );
 
         // ensures that the buttons fit into a single row
@@ -275,7 +282,7 @@ public final class IssueDialog extends JDialog {
         listWarnings.addListSelectionListener(e -> updateStackTrace(listWarnings.getSelectedValue()));
         // enable/disable "open file" and "show details"
         listWarnings.addListSelectionListener(e ->
-            btnOpenFile.setEnabled(listWarnings.getSelectedValue().hasFilename()));
+                btnOpenFile.setEnabled(listWarnings.getSelectedValue().hasFilename()));
         listWarnings.addListSelectionListener(e -> {
             if (listWarnings.getSelectedValue().additionalInfo.isEmpty()) {
                 chkDetails.setSelected(false);
@@ -299,11 +306,11 @@ public final class IssueDialog extends JDialog {
             public void mouseClicked(MouseEvent e) {
                 int row = listWarnings.locationToIndex(e.getPoint());
                 ListCellRenderer<? super PositionedIssueString> renderer =
-                    listWarnings.getCellRenderer();
+                        listWarnings.getCellRenderer();
                 PositionedIssueString value = listWarnings.getModel().getElementAt(row);
                 JTextPane textPane =
-                    (JTextPane) renderer.getListCellRendererComponent(listWarnings, value, row,
-                        false, false);
+                        (JTextPane) renderer.getListCellRendererComponent(listWarnings, value, row,
+                                false, false);
                 // this line is very important, otherwise textPane would have a size of 0x0!!!
                 textPane.setBounds(listWarnings.getCellBounds(row, row));
                 Rectangle cellRect = listWarnings.getCellBounds(row, row);
@@ -311,7 +318,7 @@ public final class IssueDialog extends JDialog {
                 int y = e.getY() - cellRect.y;
 
                 MouseEvent translated = new MouseEvent(textPane, e.getID(), e.getWhen(),
-                    e.getModifiersEx(), x, y, e.getClickCount(), false);
+                        e.getModifiersEx(), x, y, e.getClickCount(), false);
 
                 Element elem = getHyperlinkElement(translated);
                 if (elem != null) {
@@ -322,7 +329,7 @@ public final class IssueDialog extends JDialog {
                         if (href != null) {
                             try {
                                 textPane.fireHyperlinkUpdate(new HyperlinkEvent(textPane,
-                                    HyperlinkEvent.EventType.ACTIVATED, new URL(href)));
+                                        HyperlinkEvent.EventType.ACTIVATED, new URL(href)));
                             } catch (MalformedURLException exc) {
                                 exc.printStackTrace();
                             }
@@ -341,11 +348,11 @@ public final class IssueDialog extends JDialog {
             public void mouseMoved(MouseEvent e) {
                 int row = listWarnings.locationToIndex(e.getPoint());
                 ListCellRenderer<? super PositionedIssueString> renderer =
-                    listWarnings.getCellRenderer();
+                        listWarnings.getCellRenderer();
                 PositionedIssueString value = listWarnings.getModel().getElementAt(row);
                 JTextPane textPane =
-                    (JTextPane) renderer.getListCellRendererComponent(listWarnings, value, row,
-                        false, false);
+                        (JTextPane) renderer.getListCellRendererComponent(listWarnings, value, row,
+                                false, false);
                 // this line is very important, otherwise textPane would have a size of 0x0!!!
                 textPane.setBounds(listWarnings.getCellBounds(row, row));
                 Rectangle cellRect = listWarnings.getCellBounds(row, row);
@@ -353,8 +360,8 @@ public final class IssueDialog extends JDialog {
                 int y = e.getY() - cellRect.y;
 
                 MouseEvent translated =
-                    new MouseEvent(textPane, e.getID(), e.getWhen(), e.getModifiersEx(), x, y,
-                        e.getClickCount(), false);
+                        new MouseEvent(textPane, e.getID(), e.getWhen(), e.getModifiersEx(), x, y,
+                                e.getClickCount(), false);
 
                 Element elem = getHyperlinkElement(translated);
                 if (elem != null) {
@@ -365,7 +372,7 @@ public final class IssueDialog extends JDialog {
                         if (href != null && !entered) {
                             entered = true;
                             listWarnings.setCursor(
-                                Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                                    Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                         }
                     }
                 } else if (entered) {
@@ -413,6 +420,7 @@ public final class IssueDialog extends JDialog {
     /**
      * Gets the hyper link element (i.e., the anchor tag of the HTMLDocument) the mouse cursor
      * currently points to.
+     *
      * @param event the mouse event, needed to get the position of the cursor
      * @return the corresponding tag element or null if the mouse does not currently point to one
      */
@@ -469,14 +477,14 @@ public final class IssueDialog extends JDialog {
         btnOpenFile.setAction(action);
 
         btnOK.registerKeyboardAction(
-            event -> {
-                if (event.getActionCommand().equals("ESC")) {
-                    btnOK.doClick();
-                }
-            },
-            "ESC",
-            KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-            JComponent.WHEN_IN_FOCUSED_WINDOW);
+                event -> {
+                    if (event.getActionCommand().equals("ESC")) {
+                        btnOK.doClick();
+                    }
+                },
+                "ESC",
+                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+                JComponent.WHEN_IN_FOCUSED_WINDOW);
 
         // by default, do not ignore any warnings
         chkIgnoreWarnings.setSelected(false);
@@ -505,7 +513,8 @@ public final class IssueDialog extends JDialog {
     /**
      * Shows the dialog with a single exception. The stacktrace is extracted and can optionally be
      * shown in the dialog.
-     * @param parent the parent of the dialog (will be blocked)
+     *
+     * @param parent    the parent of the dialog (will be blocked)
      * @param exception the exception to display
      */
     public static void showExceptionDialog(Window parent, Throwable exception) {
@@ -517,7 +526,8 @@ public final class IssueDialog extends JDialog {
 
     /**
      * Shows the dialog of a set of (non-critical) parser warnings.
-     * @param parent the parent of the dialog (will be blocked)
+     *
+     * @param parent   the parent of the dialog (will be blocked)
      * @param warnings the set of warnings, will be sorted by file when displaying
      */
     public static void showWarningsIfNecessary(Window parent,
@@ -528,12 +538,12 @@ public final class IssueDialog extends JDialog {
         if (!warn.isEmpty()) {
             // ensure that each warning has at least an empty additionalInfo
             Set<PositionedIssueString> issues = warnings.stream()
-                .map(o -> o instanceof PositionedIssueString ? (PositionedIssueString)o
-                    : new PositionedIssueString(o, ""))
-                .collect(Collectors.toSet());
+                    .map(o -> o instanceof PositionedIssueString ? (PositionedIssueString) o
+                            : new PositionedIssueString(o, ""))
+                    .collect(Collectors.toSet());
 
             IssueDialog dialog = new IssueDialog(parent,
-                SLEnvInput.getLanguage() + " warning(s)", issues, false);
+                    SLEnvInput.getLanguage() + " warning(s)", issues, false);
             dialog.setVisible(true);
             dialog.dispose();
         }
@@ -542,6 +552,7 @@ public final class IssueDialog extends JDialog {
     /**
      * Extracts message, position, and stracktrace from the given exception. To be successful, the
      * exception must have a location (see {@link ExceptionTools#getLocation(Throwable)}).
+     *
      * @param exception the exception to extract the data from
      * @return a new PositionedIssueString created from the data
      */
@@ -555,10 +566,14 @@ public final class IssueDialog extends JDialog {
             String filename = "";
             Position pos = Position.UNDEFINED;
             if (Location.isValidLocation(location)) {
-                 filename = new File(location.getFileURL().toURI()).toString();
-                 pos = new Position(location.getLine(), location.getColumn());
+                try {
+                    filename = new File(location.getFileURL().toURI()).toString();
+                    pos = new Position(location.getLine(), location.getColumn());
+                    return new PositionedIssueString(message, filename, pos, info);
+                } catch (IllegalArgumentException e) {
+                    e.printStackTrace();
+                }
             }
-            return new PositionedIssueString(message, filename, pos, info);
         } catch (URISyntaxException | IOException e) {
             // We must not suppress the dialog here -> catch and print only to debug stream
             Debug.out("Creating a Location failed for " + exception, e);
@@ -580,8 +595,11 @@ public final class IssueDialog extends JDialog {
      */
     private static class PositionedIssueString extends PositionedString {
 
-        /** contains additional information, e.g., a stacktrace */
-        private final @Nonnull String additionalInfo;
+        /**
+         * contains additional information, e.g., a stacktrace
+         */
+        private final @Nonnull
+        String additionalInfo;
 
         public PositionedIssueString(@Nonnull String text, @Nullable String fileName,
                                      @Nullable Position pos, @Nonnull String additionalInfo) {
@@ -688,10 +706,10 @@ public final class IssueDialog extends JDialog {
         try {
             if (critical) {
                 dh.addHighlight(offset, end,
-                    new SquigglyUnderlinePainter(Color.RED, 2, 1f));
+                        new SquigglyUnderlinePainter(Color.RED, 2, 1f));
             } else {
                 dh.addHighlight(offset, end,
-                    new SquigglyUnderlinePainter(Color.ORANGE, 2, 1f));
+                        new SquigglyUnderlinePainter(Color.ORANGE, 2, 1f));
             }
         } catch (BadLocationException ignore) {
             // ignore
@@ -730,7 +748,7 @@ public final class IssueDialog extends JDialog {
     }
 
     private static class PositionedStringListRenderer
-        implements ListCellRenderer<PositionedString> {
+            implements ListCellRenderer<PositionedString> {
         private final JTextPane textPane = new JTextPane();
 
         PositionedStringListRenderer() {
@@ -749,14 +767,14 @@ public final class IssueDialog extends JDialog {
 
         @Override
         public Component getListCellRendererComponent(JList<? extends PositionedString> list,
-                                                      PositionedString value,  int index,
+                                                      PositionedString value, int index,
                                                       boolean isSelected, boolean cellHasFocus) {
             textPane.setContentType("text/html");
             textPane.setText(value.text);
             // use a compound border to have both: a bit more space and small lines between the rows
             textPane.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY),
-                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+                    BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY),
+                    BorderFactory.createEmptyBorder(5, 5, 5, 5)));
             if (isSelected) {
                 textPane.setBackground(list.getSelectionBackground());
                 textPane.setForeground(list.getSelectionForeground());
