@@ -146,7 +146,7 @@ public class LIGNew {
 			}
 
 			System.out.println("Dep Preds: " + allDepPreds);
-		} while (allCompPreds.size() != oldCompPreds.size() || allDepPreds.size() != oldDepPreds.size()
+		} while (!allCompPreds.equals(oldCompPreds) || !allDepPreds.equals(oldDepPreds)
 				|| itrNumber < 2);
 
 		System.out.println("===========Terminated===========");

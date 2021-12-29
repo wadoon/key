@@ -131,7 +131,7 @@ public class PredicateRefinementNew3 {
 		result.addAll(weakenByIndexANDPredicate(unProven));
 		if (itrNumber < 1) {
 //			System.out.println("Weaken by Subset for "+unProven);
-			result.addAll(weakenBySubSetANDPredicate(unProven));
+			result.addAll(weakenBySubSet(unProven));
 		}
 //		System.out.println("index added: ");
 //		result.addAll(weakenByIndex(unProven));// 0 or 2
@@ -155,12 +155,11 @@ public class PredicateRefinementNew3 {
 			result.add(tb.noWaW(unProven.sub(0)));
 		}
 //		}
-		// TODO Also add weakening for the relaxed predicates
 //		System.out.println(result);
 		return result;
 	}
 
-	private Set<Term> weakenBySubSetANDPredicate(Term unProven) {
+	private Set<Term> weakenBySubSet(Term unProven) {
 		Set<Term> result = new HashSet<>();
 		final Term locSet = unProven.sub(0);
 		Term lowSingleton = null;
@@ -186,25 +185,10 @@ public class PredicateRefinementNew3 {
 				result.add(tb.noR(subLoc));
 				result.add(tb.noR(lowSingleton));
 				result.add(tb.noR(highSingleton));
-//					result.add(tb.noRaW(subLoc));
-//					result.add(tb.noRaW(lowSingleton));
-//					result.add(tb.noRaW(highSingleton));
-//					result.add(tb.noWaR(subLoc));
-//					result.add(tb.noWaR(lowSingleton));
-//					result.add(tb.noWaR(highSingleton));
 			} else if (unProven.op().equals(depLDT.getNoW())) {
 				result.add(tb.noW(subLoc));
 				result.add(tb.noW(lowSingleton));
 				result.add(tb.noW(highSingleton));
-//					result.add(tb.noWaR(subLoc));
-//					result.add(tb.noWaR(lowSingleton));
-//					result.add(tb.noWaR(highSingleton));
-//					result.add(tb.noRaW(subLoc));
-//					result.add(tb.noRaW(lowSingleton));
-//					result.add(tb.noRaW(highSingleton));
-//					result.add(tb.noWaW(subLoc));
-//					result.add(tb.noWaW(lowSingleton));
-//					result.add(tb.noWaW(highSingleton));
 			} else if (unProven.op().equals(depLDT.getNoRaW())) {
 				result.add(tb.noRaW(subLoc));
 				result.add(tb.noRaW(lowSingleton));
@@ -220,7 +204,6 @@ public class PredicateRefinementNew3 {
 			}
 //			}
 		}
-		// TODO Also add weakening for the relaxed predicates
 //		System.out.println(result);
 		return result;
 	}
@@ -332,19 +315,9 @@ public class PredicateRefinementNew3 {
 				if (pred.op() == depLDT.getNoR()) {
 					result.add(tb.noR(lowToI));
 					result.add(tb.noR(iToHigh));
-//					result.add(tb.noRaW(lowToI));
-//					result.add(tb.noRaW(iToHigh));
-//					result.add(tb.noWaR(lowToI));
-//					result.add(tb.noWaR(iToHigh));
 				} else if (pred.op() == depLDT.getNoW()) {
 					result.add(tb.noW(lowToI));
 					result.add(tb.noW(iToHigh));
-//					result.add(tb.noRaW(lowToI));
-//					result.add(tb.noRaW(iToHigh));
-//					result.add(tb.noWaR(lowToI));
-//					result.add(tb.noWaR(iToHigh));
-//					result.add(tb.noWaW(lowToI));
-//					result.add(tb.noWaW(iToHigh));
 				} else if (pred.op() == depLDT.getNoRaW()) {
 					result.add(tb.noRaW(lowToI));
 					result.add(tb.noRaW(iToHigh));

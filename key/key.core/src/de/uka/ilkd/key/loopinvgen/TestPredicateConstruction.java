@@ -388,7 +388,8 @@ public class TestPredicateConstruction {
 //		System.out.println("Formula with merge point: "+ProofSaver.printAnything(formula, services));
 
 		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(formula), false, true).sequent();
-		String[] arrLeft = { /* "i=0", */"noR(arrayRange(a,0,a.length))", "noW(arrayRange(a,0,a.length))","a!=null", "a.length>10" };
+		String[] arrLeft = {"noR(arrayRange(a,0,a.length))", "noW(arrayRange(a,0,a.length))","a!=null", "a.length>10" };
+		String[] arrRight = {"a=null"};
 		try {
 			for (String fml : arrLeft) {
 				seq = seq.addFormula(new SequentFormula(parse(fml)), true, true).sequent();
@@ -412,12 +413,9 @@ public class TestPredicateConstruction {
 
 		Recoder2KeY r2k = new Recoder2KeY(services, nss);
 		
-		//// a bit of a lengthy parsing
-		
 		try {
 			
 			formula = parse("{i:=0}\\<{while (i<=a.length-1) {"
-//							+ "				a[i] = 1;"
 							+ "				if(i> (a.length-1)/2){"
 							+ "					a[i] = 1;"
 							+ "				}\n"
@@ -453,12 +451,10 @@ public class TestPredicateConstruction {
 		
 //		System.out.println("Formula with merge point: "+ProofSaver.printAnything(formula, services));
 
-		//////////////////////////
-		
-		
 		
 		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(formula), false, true).sequent();
-		String[] arrLeft = { /* "i=0", */"noW(arrayRange(a,0,a.length))","noR(arrayRange(a,0,a.length))","a!=null", "a.length>10" };
+		String[] arrLeft = { "noW(arrayRange(a,0,a.length))","noR(arrayRange(a,0,a.length))","a!=null", "a.length>10" };
+		String[] arrRight = {"a=null" };
 		try {
 			for (String fml : arrLeft) {
 				seq = seq.addFormula(new SequentFormula(parse(fml)), true, true).sequent();
@@ -472,10 +468,21 @@ public class TestPredicateConstruction {
 			e.printStackTrace();
 			return;
 		}
-		//// Old System
-//		LIGMultipleArrays cur = new LIGMultipleArrays(services, seq);
-//		cur.mainAlg();
-		//// New System
+		try {
+			for (String fml : arrRight) {
+				seq = seq.addFormula(new SequentFormula(parse(fml)), false, false).sequent();
+
+			}
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			if (e.getCause() != null) {
+				System.out.println(e.getCause().getMessage());
+			}
+			e.printStackTrace();
+			return;
+		}
+
+
 		LIGNew curNew = new LIGNew(services, seq);
 		curNew.mainAlg();
 	
