@@ -59,6 +59,36 @@ pipeline {
                                 style: 'line',
                                 title: '2 Total number of rule apps',
                                 useDescr: true, yaxis: '#rule apps'
+
+
+                        plot csvFileName: 'plot-4abbaea630-1bbb-4f25-b8e4-3370d9950347.csv',
+                                group: 'runAllProofs', numBuilds: '200',
+                                propertiesSeries: [
+                                        [file: 'key/key.core.test/testresults/runallproofs/Overall time (ms).sum.properties', label: ''],
+                                        [file:'key/key.core.test/testresults/runallproofs/Automode time (ms).sum.properties', label: '']],
+                                style: 'line',
+                                title: '4 Overall time',
+                                useDescr: true, yaxis: 'time in ms'
+
+
+                        plot csvFileName: 'plot-4acea630-1bbb-4f25-b8e4-3370d9950347.csv',
+                                group: 'runAllProofs', numBuilds: '200',
+                                propertiesSeries: [
+                                        [file: 'key/key.core.test/testresults/runallproofs/Time per step (ms).avg.properties', label: '']],
+                                style: 'line',
+                                title: '6 Time per step',
+                                useDescr: true, yaxis: 'time in ms'
+
+                        plot csvFileName: 'plot-4aceaa242323423630-1bbb-4f25-b8e4-3370d9950347.csv',
+                                group: 'runAllProofs', numBuilds: '200',
+                                propertiesSeries: [
+                                        [file: 'key/key.core.test/testresults/runallproofs/Total Runtime Memory (kB).avg.properties', label: '']],
+                                style: 'line',
+                                title: '7 avg. memory consumption (after proof finished and GC)',
+                                useDescr: true, yaxis: 'kB'
+
+
+
                     }
                 }
             }
