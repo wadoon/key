@@ -27,10 +27,9 @@ pipeline {
 
         stage("Run Tests") {
             parallel {
-                stage('Test: JUnit') {
+                stage('Test: JUnit + Sonarqube') {
                     steps {
-                        sh 'echo 1'
-                        //sh 'cd key && ./gradlew --continue test'
+                        sh 'cd key && gradle --build-cache --continue -Dsonar.qualitygate.wait=true -DjacocoEnabled=true test sonarqube'
                     }
                 }
 
