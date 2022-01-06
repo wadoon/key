@@ -51,7 +51,7 @@ pipeline {
                                 style: 'line', title: '1 Number of considered examples', useDescr: true,
                                 yaxis: '# of key files'
 
-                        plot csvFileName: 'plot-4acea630-1baa-4f25-b8e4-3370d9950347.csv',
+                        plot csvFileName: 'plot-2525234234-1baa-4f25-b8e4-3370d9950347.csv',
                                 group: 'runAllProofs', numBuilds: '200',
                                 propertiesSeries: [
                                         [file: 'key/key.core.test/testresults/runallproofs/Total rule apps.sum.properties', label: 'Total rule apps.sum'],
