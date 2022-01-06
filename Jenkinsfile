@@ -29,7 +29,9 @@ pipeline {
             parallel {
                 stage('Test: JUnit + Sonarqube') {
                     steps {
-                        sh 'cd key && gradle --build-cache --continue -Dsonar.qualitygate.wait=true -DjacocoEnabled=true test sonarqube'
+                        withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'SONAR_TOKEN')]) {
+                            sh 'cd key && gradle --build-cache --continue -Dsonar.qualitygate.wait=true -DjacocoEnabled=true test sonarqube'
+                        }
                     }
                 }
 
