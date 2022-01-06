@@ -160,19 +160,19 @@ public class LIGNew {
 		}
 		System.out.println(" of size " + allDepPreds.size() + " plus " + allCompPreds.size());
 //		
-//		PredicateListCompressionNew plcNew = new PredicateListCompressionNew(services, currentGoal.sequent(), allPreds, false);
-//
-//		allPreds = plcNew.compression();
-//		System.out.println("LOOP INVARIANT is: ");
-//		int invSize = allPreds.size();
-//		for (Term term : allPreds) {
-//			invSize--;
-//			if(invSize!=0)
-//				System.out.println(term + " & ");
-//			else
-//				System.out.println(term);
-//		}
-//		System.out.println(" of size " + allPreds.size());
+		PredicateListCompressionNew plcDep = new PredicateListCompressionNew(services, currentGoal.sequent(), allDepPreds, false);
+		allDepPreds = plcDep.compression();
+		
+		System.out.println("DD LOOP INVARIANT is: ");
+		int invSize = allDepPreds.size();
+		for (Term term : allDepPreds) {
+			invSize--;
+			if(invSize!=0)
+				System.out.println(term + " & ");
+			else
+				System.out.println(term);
+		}
+		System.out.println(" of size " + allDepPreds.size());
 	}
 
 	private Goal abstractGoal(Goal currentGoal) {

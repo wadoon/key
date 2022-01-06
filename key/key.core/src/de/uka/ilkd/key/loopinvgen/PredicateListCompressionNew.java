@@ -44,7 +44,7 @@ public class PredicateListCompressionNew {
 		CompOps.add(gt);
 		geq = intLDT.getGreaterOrEquals();
 		CompOps.add(geq);
-		sProof = new SideProof(services, seq, 500);
+		sProof = new SideProof(services, seq, 75000);
 		ailias = ailiasing;
 		allPreds = preds;
 		locSetLDT = new LocSetLDT(services);

@@ -1606,8 +1606,10 @@ public class LogicPrinter {
         mark(MarkType.MARK_END_UPDATE);
         layouter.brk(0);
 
+        layouter.print("(");
         maybeParens(t.sub(1), ass3);
-
+        layouter.print(")");
+        
         layouter.end();
     }
 

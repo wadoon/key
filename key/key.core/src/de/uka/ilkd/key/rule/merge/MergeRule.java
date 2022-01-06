@@ -45,7 +45,6 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.EventUpdate;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -176,7 +175,7 @@ public class MergeRule implements BuiltInRule {
         final Node currentNode = newGoal.node();
         final ImmutableList<MergePartner> mergePartners = mergeRuleApp
                 .getMergePartners();
-
+        
         final SymbolicExecutionStateWithProgCnt thisSEState = mergeRuleApp
                 .getMergeSEState();
 
@@ -480,26 +479,31 @@ public class MergeRule implements BuiltInRule {
 
         } // end for (LocationVariable v : progVars)
 
-        // TODO: This here is WRONG, we need to merge the eventupdates from state1 and state2
         LinkedList<Term> eventUpdatesState1 = MergeRuleUtils.getEventUpdates(state1.first);
         LinkedList<Term> eventUpdatesState2 = MergeRuleUtils.getEventUpdates(state2.first);
-		
-        
+	
+        boolean switched = false;
         if (eventUpdatesState1.size() < eventUpdatesState2.size()) {
-//        	System.out.println("merge events");
+       // 	System.out.println("merge events");
         	LinkedList<Term> tmp = eventUpdatesState2;
         	eventUpdatesState2 = eventUpdatesState1;
-        	eventUpdatesState1 = tmp;		
+        	eventUpdatesState1 = tmp;
+        	switched = true;
         }
         
-        for (int i = 0; i<=eventUpdatesState1.size();i++) {
+        while (!eventUpdatesState1.isEmpty()) {
         	final Term evUpd1 = eventUpdatesState1.pop();
         	
+        	//        	
         	final Term kind2;
-        	final Term locset2;
+        	final Term locset2; 
         	final Term timestamp2;
-        	if (eventUpdatesState2.size() > i) {        	
+        	if (!eventUpdatesState2.isEmpty()) {        	 		
         		final Term evUpd2 = eventUpdatesState2.pop();
+        		if (evUpd1.equals(evUpd2)) {
+                	newElementaryUpdates = newElementaryUpdates.append(evUpd1);
+                	continue;
+        		}
         		kind2 = evUpd2.sub(0);
         		locset2 = evUpd2.sub(1);
         		timestamp2 = evUpd2.sub(2);
@@ -510,19 +514,17 @@ public class MergeRule implements BuiltInRule {
 				timestamp2 = tb.zero();
         	}
      
-   
         	final Term kind = MergeByIfThenElse.createIfThenElseTerm(state1, state2, evUpd1.sub(0), 
-            			kind2, distinguishingFormula, services);
+            			kind2, switched ? tb.not(distinguishingFormula) : distinguishingFormula, services);
         	final Term locset = MergeByIfThenElse.createIfThenElseTerm(state1, state2, evUpd1.sub(1), 
-        			locset2, distinguishingFormula, services);
+        			locset2, switched ? tb.not(distinguishingFormula) : distinguishingFormula, services);
         	final Term timestamp = MergeByIfThenElse.createIfThenElseTerm(state1, state2, evUpd1.sub(2), 
-        			timestamp2, distinguishingFormula, services);
-        	newElementaryUpdates = newElementaryUpdates.append(tb.eventUpdate(kind, locset, timestamp));
+        			timestamp2, switched ? tb.not(distinguishingFormula) : distinguishingFormula, services);
+        	
+        	newElementaryUpdates = newElementaryUpdates.append(tb.eventUpdate(kind, locset, timestamp));        	
+        	
         }
-        
-        
-        //newElementaryUpdates = newElementaryUpdates.append(eventUpdatesState1);
-        
+                
         // Construct weakened symbolic state        
         Term newSymbolicState = tb.parallel(newElementaryUpdates);
 

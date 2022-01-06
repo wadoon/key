@@ -417,10 +417,10 @@ public class TestPredicateConstruction {
 			
 			formula = parse("{i:=0}\\<{while (i<=a.length-1) {"
 							+ "				if(i> (a.length-1)/2){"
-							+ "					a[i] = 1;"
+							+ "					a[i] = a[i+1];"
 							+ "				}\n"
 							+ "				else {"
-							+ " 				a[i] = a[i+1];"
+							+ " 				a[i] = 1;"
 							+ "				}"
 							+ "				; // this is just a comment, the semicolon is replaced by a merge_point(i);\n"
 							+ "        //@ merge_proc \"MergeByIfThenElseAntecedent\";\n"
@@ -614,7 +614,7 @@ public class TestPredicateConstruction {
 	public static void main(String[] args) {
 		TestPredicateConstruction tpc = new TestPredicateConstruction();
 		long start = System.currentTimeMillis();
-		tpc.shiftArrayToLeft();
+		tpc.conditionDifferentNumberOfEvents();
 		long end = System.currentTimeMillis();
 		System.out.println("Loop Invariant Generation and Pretty Printing took " + (end - start) + " ms");
 	}

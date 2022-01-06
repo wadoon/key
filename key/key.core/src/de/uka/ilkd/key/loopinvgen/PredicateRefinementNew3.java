@@ -1,6 +1,8 @@
 package de.uka.ilkd.key.loopinvgen;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 
@@ -61,34 +63,62 @@ public class PredicateRefinementNew3 {
 			weakenedDepPreds.addAll(weakeningDependencePredicates(un));
 		}
 
+		
 		for (Term w : weakenedDepPreds) {
-			if (sequentImpliesPredicate(w)) {
+			for(Term dp : depPredicates) {
+				if(predicateImpliedBypredicate(w, dp)) {
+					System.out.println("IMPLIED " + w + " by " + dp);
+				}
+				break;
+			}
+			
+			if (!depPredicates.contains(w) && sequentImpliesPredicate(w)) {
 				depPredicates.add(w);
 			}
 		}
 		// -------------------------------------
-			Set<Term> unProvenCompPreds = new HashSet<>();
-			for (Term pred : compPredicates) {
-				System.out.println("Proving Comp Pred: " + pred);
-				if (!sequentImpliesPredicate(pred)) {
-					unProvenCompPreds.add(pred);
-				}
+		Set<Term> unProvenCompPreds = new HashSet<>();
+		for (Term pred : compPredicates) {
+			System.out.println("Proving Comp Pred: " + pred);
+			if (!sequentImpliesPredicate(pred)) {
+				unProvenCompPreds.add(pred);
 			}
-			compPredicates.removeAll(unProvenCompPreds);
-			Set<Term> weakenedCompPreds = new HashSet<>();
-			for (Term un : unProvenCompPreds) {
-				weakenedCompPreds.addAll(weakeningComparisonPredicates(un));
-			}
+		}
+		compPredicates.removeAll(unProvenCompPreds);
+		Set<Term> weakenedCompPreds = new HashSet<>();
+		for (Term un : unProvenCompPreds) {
+			weakenedCompPreds.addAll(weakeningComparisonPredicates(un));
+	}
 
-			for (Term w : weakenedCompPreds) {
-				if (sequentImpliesPredicate(w)) {
-					compPredicates.add(w);
-				}
+		for (Term w : weakenedCompPreds) {
+			if (sequentImpliesPredicate(w)) {
+				compPredicates.add(w);
 			}
+		}
 		return new Pair<Set<Term>, Set<Term>>(depPredicates, compPredicates);
 	}
 
-
+	private boolean predicateImpliedBypredicate(Term dp1, Term dp2) {
+	 if(dp1.op() == dp2.op() && sProof.proofSubSet(dp1.sub(0), dp2.sub(0))) {
+		 return true;
+	 }	 
+	 else if (dp2.op().equals(depLDT.getNoR())) {
+		if (dp1.op().equals(depLDT.getNoRaW()) || dp1.op().equals(depLDT.getNoWaR())) {
+			if (sProof.proofSubSet(dp1.sub(0), dp2.sub(0))) {
+				return true;
+			}
+		}
+	}
+	 else if (dp2.op().equals(depLDT.getNoW())) {
+		if (dp1.op().equals(depLDT.getNoRaW()) || dp1.op().equals(depLDT.getNoWaR())
+					|| dp1.op().equals(depLDT.getNoWaW())) {
+			if (sProof.proofSubSet(dp1.sub(0), dp2.sub(0))) {
+					return true;
+				}
+			}
+	 }
+	 return false;
+ }
 	private boolean sequentImpliesPredicate(Term pred) {
 //		System.out.println("sequentImpliesPredicate is called for: "+pred);
 		Sequent sideSeq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(pred), false, true).sequent();

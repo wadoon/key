@@ -55,4 +55,9 @@ public class MergePartner {
     public void setPio(PosInOccurrence pio) {
         this.pio = pio;
     }
+    
+    public String toString() {
+    	return "PIO:"+pio+"\n"+"Goal:"+goal;
+    			
+    }
 }
