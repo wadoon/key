@@ -91,7 +91,7 @@ pipeline {
                                      file            : 'key/key.core.test/testresults/runallproofs/runStatistics.csv', inclusionFlag: 'INCLUDE_BY_STRING',
                                      url             : '']],
                         numBuilds: '200',
-                        group: 'runAllProofsDetails', style: 'bar'
+                        group: 'runAllProofsDetails1', style: 'bar'
                 plot csvFileName: 'plot-bbc01643-4fe5-453d-9183-71fecf398579.csv',
                         csvSeries: [[displayTableFlag: true,
                                      exclusionValues : 'Overall time (ms)',
@@ -99,14 +99,14 @@ pipeline {
                                      inclusionFlag   : 'INCLUDE_BY_STRING',
                                      url             : '']],
                         numBuilds: '200',
-                        group: 'runAllProofsDetails', style: 'bar'
+                        group: 'runAllProofsDetails2', style: 'bar'
                 plot csvFileName: 'plot-ccc01643-4fe5-453d-9183-71fecf398579.csv',
                         csvSeries: [[displayTableFlag: true,
                                      exclusionValues : 'Total rule apps',
                                      file            : 'key/key.core.test/testresults/runallproofs/runStatistics.csv', inclusionFlag: 'INCLUDE_BY_STRING',
                                      url             : '']],
                         numBuilds: '200',
-                        group: 'runAllProofsDetails', style: 'bar'
+                        group: 'runAllProofsDetails3', style: 'bar'
             }
         }
     }
