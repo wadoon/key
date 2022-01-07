@@ -48,7 +48,7 @@ public class LIGNew {
 	private final IntegerLDT intLDT;
 	public LIGNew(Services s, Sequent sequent) {
 		seq = sequent;
-		System.out.println(seq);
+//		System.out.println(seq);
 		ruleApp = new RuleApplication(s, seq);
 //		services = proof.getServices();// New service after unwind
 		services = ruleApp.services;
@@ -93,7 +93,7 @@ public class LIGNew {
 			allDepPreds.add(tb.noW(tb.arrayRange(arr, low, high)));
 		}
 
-		System.out.println("Initial comp Predicate Set: " + allCompPreds);
+//		System.out.println("Initial comp Predicate Set: " + allCompPreds);
 //		for (Term term : allPreds) {
 //			System.out.println(term);
 //		}
@@ -111,7 +111,7 @@ public class LIGNew {
 
 		do {
 			itrNumber++;
-			System.out.println("Iteration Number: " + itrNumber);
+//			System.out.println("Iteration Number: " + itrNumber);
 
 			oldDepPreds.removeAll(oldDepPreds);
 			oldCompPreds.removeAll(oldCompPreds);
@@ -121,16 +121,16 @@ public class LIGNew {
 
 			goalsAfterUnwind = ruleApp.applyUnwindRule(goalsAfterShift);
 //			System.out.println("UNWIND");
-			System.out.println("Number of goals after unwind: " + goalsAfterUnwind.size());
+//			System.out.println("Number of goals after unwind: " + goalsAfterUnwind.size());
 //			System.out.println("Goals After Unwind:" + goalsAfterUnwind);
 //			System.out.println(goalsAfterUnwind);
 			goalsAfterShift = ruleApp.applyShiftUpdateRule(goalsAfterUnwind);
 //			System.out.println("SHIFT");
-			System.out.println("Number of goals after shift: " + goalsAfterShift.size());
-			System.out.println("Goals After Shift:" + goalsAfterShift);
+//			System.out.println("Number of goals after shift: " + goalsAfterShift.size());
+//			System.out.println("Goals After Shift:" + goalsAfterShift);
 
 			currentGoal = ruleApp.findLoopUnwindTacletGoal(goalsAfterShift);
-			System.out.println("Current Goal: " + currentGoal);
+//			System.out.println("Current Goal: " + currentGoal);
 
 //			currentIndexFormula = currentIndexEq(currentGoal.sequent(), index);
 //			System.out.println("Before refinement: " + currentGoal.sequent());
@@ -145,34 +145,37 @@ public class LIGNew {
 				g = abstractGoal(g);
 			}
 
-			System.out.println("Dep Preds: " + allDepPreds);
+//			System.out.println("Dep Preds: " + allDepPreds);
 		} while (!allCompPreds.equals(oldCompPreds) || !allDepPreds.equals(oldDepPreds)
 				|| itrNumber < 2);
 
-		System.out.println("===========Terminated===========");
-		System.out.println("Number of iterations at the end: " + itrNumber);
-		System.out.println("LIG is the conjunction of: ");
-		for (Term term : allDepPreds) {
-			System.out.println(term);
-		}
-		for (Term term : allCompPreds) {
-			System.out.println(term);
-		}
-		System.out.println(" of size " + allDepPreds.size() + " plus " + allCompPreds.size());
-//		
+//		System.out.println("===========Terminated===========");
+//		System.out.println("Number of iterations at the end: " + itrNumber);
+//		System.out.println("LIG is the conjunction of: ");
+//		for (Term term : allDepPreds) {
+//			System.out.println(term);
+//		}
+//		for (Term term : allCompPreds) {
+//			System.out.println(term);
+//		}
+//		System.out.println(" of size " + allDepPreds.size() + " plus " + allCompPreds.size());
+		
+		allDepPreds.addAll(allCompPreds);
+		
+//		System.out.println("Without compression, the DD LOOP INVARIANT is the conjunction of: ");
+//		for (Term term : allDepPreds) {
+//			System.out.println(term);
+//		}
+		
+		
 		PredicateListCompressionNew plcDep = new PredicateListCompressionNew(services, currentGoal.sequent(), allDepPreds, false);
 		allDepPreds = plcDep.compression();
 		
-		System.out.println("DD LOOP INVARIANT is: ");
-		int invSize = allDepPreds.size();
+		System.out.println("After compression, the DD LOOP INVARIANT is the conjunction of: ");
 		for (Term term : allDepPreds) {
-			invSize--;
-			if(invSize!=0)
-				System.out.println(term + " & ");
-			else
 				System.out.println(term);
 		}
-		System.out.println(" of size " + allDepPreds.size());
+		System.out.println("after " + itrNumber + " iterations of the LIG algorithm");
 	}
 
 	private Goal abstractGoal(Goal currentGoal) {

@@ -24,7 +24,7 @@ import de.uka.ilkd.key.util.SideProofUtil;
 public class RuleApplication {
 
 	private static final int TIME_OUT = -1;
-	private static final int MAX_RULE_APP = 75000;
+	private static final int MAX_RULE_APP = 20000;
 	private final Sequent seq;
 	final Services services;
 	private ProofStarter ps;
