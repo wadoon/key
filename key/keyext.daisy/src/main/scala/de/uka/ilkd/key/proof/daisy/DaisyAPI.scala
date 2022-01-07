@@ -71,9 +71,12 @@ object DaisyAPI {
       val varName = termDetails.asScala.filter(p => !p.asInstanceOf[Term].isRigid).toList.head.asInstanceOf[Term].op().name().asInstanceOf[ProgramElementName].getProgramName
       val literal = termDetails.asScala.filter(p => p.asInstanceOf[Term].isRigid).toList.head.asInstanceOf[Term]
 
-      val fl: Float = floatLDT.translateTerm(literal, new ExtList, services).asInstanceOf[FloatLiteral].getValue.toFloat
+      val f: Float =
+        if (literal.op().equals(floatLDT.getJavaUnaryMinus))
+          (-1.0f) * floatLDT.translateTerm(literal.sub(0), new ExtList, services).asInstanceOf[FloatLiteral].getValue.toFloat
+        else  floatLDT.translateTerm(literal, new ExtList, services).asInstanceOf[FloatLiteral].getValue.toFloat
 
-      updatePreCondsMap(varName, fl)
+      updatePreCondsMap(varName, f)
     }
 
     for (item <- preConds) {
@@ -115,7 +118,10 @@ object DaisyAPI {
       val varName = termDetails.asScala.filter(p => !p.asInstanceOf[Term].isRigid).toList.head.asInstanceOf[Term].op().name().asInstanceOf[ProgramElementName].getProgramName
       val literal = termDetails.asScala.filter(p => p.asInstanceOf[Term].isRigid).toList.head.asInstanceOf[Term]
 
-      val d: Double = doubleLTD.translateTerm(literal, new ExtList, services).asInstanceOf[de.uka.ilkd.key.java.expression.literal.DoubleLiteral].getValue.toDouble
+      val d: Double =
+        if (literal.op().equals(doubleLTD.getJavaUnaryMinus))
+          (-1.0d) * doubleLTD.translateTerm(literal.sub(0), new ExtList, services).asInstanceOf[de.uka.ilkd.key.java.expression.literal.DoubleLiteral].getValue.toDouble
+        else  doubleLTD.translateTerm(literal, new ExtList, services).asInstanceOf[de.uka.ilkd.key.java.expression.literal.DoubleLiteral].getValue.toDouble
 
       updatePreCondsMap(varName, d)
     }
