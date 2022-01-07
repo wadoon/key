@@ -58,7 +58,7 @@ public class DaisyBoundsBuiltinRule implements BuiltInRule {
         Operator op0 = t.sub(0).op(), op1 = t.sub(1).op();
         Function literalSymbol = ldt.getLiteralSymbol();
         Function javaUnaryMinus = ldt.getJavaUnaryMinus();
-        return (op0 == literalSymbol || op0 == javaUnaryMinus || op1 == literalSymbol || op1 == javaUnaryMinus);
+        return (op0 == literalSymbol || op0 == javaUnaryMinus || op1 == literalSymbol || op1 == javaUnaryMinus) && (t.sub(0).subs().size() == 0 || t.sub(1).subs().size() == 0);
     }
 
     private boolean isCmp(Operator op, IFloatingPointLDT ldt) {
