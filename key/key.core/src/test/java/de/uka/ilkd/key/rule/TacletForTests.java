@@ -11,9 +11,6 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-/**
- * this class is used to parse in Taclet from a file that are used by tests
- */
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.java.JavaInfo;
@@ -41,17 +38,17 @@ import org.junit.Assert;
 import org.key_project.util.collection.ImmutableSLList;
 
 import java.io.File;
-import java.io.StringReader;
 
 import static de.uka.ilkd.key.proof.io.RuleSource.ldtFile;
 
+/**
+ * this class is used to parse in Taclet from a file that are used by tests
+ */
 public class TacletForTests {
-
     private TacletForTests() {
     }
 
-    public static final String testRules = HelperClassForTests.TESTCASE_DIRECTORY +
-            File.separator + "testrules.key";
+    public static final String testRules = HelperClassForTests.TESTCASE_DIRECTORY + File.separator + "testrules.key";
     public static String standardFile = testRules;
 
     public static AbbrevMap scm = new AbbrevMap();
@@ -70,7 +67,7 @@ public class TacletForTests {
         public RuleCollection getStandardRules() {
             return new RuleCollection(
                     RuleSourceFactory.fromDefaultLocation(ldtFile),
-                    ImmutableSLList.<BuiltInRule>nil());
+                    ImmutableSLList.nil());
         }
     };
 
@@ -193,8 +190,6 @@ public class TacletForTests {
 
     public static Term parseTerm(String termstr, Services services) {
         if (termstr.equals("")) return null;
-
-        StringReader br = null;
         try {
             KeyIO io = new KeyIO(services, nss);
             //TacletForTests.getAbbrevs()
@@ -203,8 +198,6 @@ public class TacletForTests {
             e.printStackTrace();
             Assert.fail("Exception occurred while parsing of " + termstr);
             return null;
-        } finally {
-            if (br != null) br.close();
         }
 
     }

@@ -1,0 +1,20 @@
+\empty + \empty  =====> empty
+l1 + l2 =====> union(l1,l2)
+l1 + \empty =====> l1
+\empty + l2  =====> l2
+l1 - \empty  =====> l1
+l1 - l2 =====> setMinus(l1,l2)
+\empty - l1 =====> empty
+(l1 - l2) + l1 =====> union(setMinus(l1,l2),l1)
+l1 - l2 + l1 =====> union(setMinus(l1,l2),l1)
+l1 + l1 =====> union(l1,l1)
+l1 & l1 =====> intersect(l1,l1)
+l1 | l1 =====> union(l1,l1)
+s1 + s2 =====> seqConcat(s1,s2)
+s1 + \seq_empty =====> s1
+l1 < l2 =====> subset(l1,l2)
+l1 <= l2 =====> and(subset(l1,l2),equals(l1,l2))
+l1 > l2 =====> subset(l2,l1)
+l1 >= l2 =====> and(subset(l2,l1),equals(l1,l2))
+
+

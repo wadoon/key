@@ -35,12 +35,10 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import static de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JmlOperator.*;
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 
@@ -413,8 +411,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
                         tb.convertToFormula(result.getTerm())));
             }
         }
-        assert result != null;
-        return result;
+        return Objects.requireNonNull(result);
     }
 
     @Override
@@ -465,16 +462,13 @@ class Translator extends JmlParserBaseVisitor<Object> {
         SLExpression result = seq.get(0);
         for (int i = 1; i < seq.size(); i++) {
             SLExpression expr = seq.get(i);
-            if (intHelper.isIntegerTerm(result)) {
-                try {
-                    result = intHelper.buildPromotedOrExpression(result, expr);
-                } catch (SLTranslationException e) {
-                    raiseError(ctx, e);
-                }
-            } else {
-                result = new SLExpression(
-                        tb.or(tb.convertToFormula(result.getTerm()),
-                                tb.convertToFormula(expr.getTerm())));
+            try {
+                result = Objects.requireNonNull(termFactory.bor(result, expr));
+            } catch (NullPointerException e) {
+                raiseError(ctx, "Could not translate the given operation '%s | %s' into a term. " +
+                                "No suitable overloading was found.",
+                        result.getTerm().sort(),
+                        expr.getTerm().sort());
             }
         }
         return result;
@@ -488,17 +482,13 @@ class Translator extends JmlParserBaseVisitor<Object> {
         SLExpression result = exprs.get(0);
         for (int i = 1; i < exprs.size(); i++) {
             SLExpression expr = exprs.get(i);
-            if (intHelper.isIntegerTerm(result)) {
-                try {
-                    result = intHelper.buildPromotedXorExpression(result, expr);
-                } catch (SLTranslationException e) {
-                    raiseError(ctx, e);
-                }
-            } else {
-                Term resultFormula = tb.convertToFormula(result.getTerm());
-                Term exprFormula = tb.convertToFormula(expr.getTerm());
-                result = new SLExpression(tb.or(tb.and(resultFormula, tb.not(exprFormula)),
-                        tb.and(tb.not(resultFormula), exprFormula)));
+            try {
+                result = Objects.requireNonNull(termFactory.bxor(result, expr));
+            } catch (NullPointerException e) {
+                raiseError(ctx, "Could not translate the given operation '%s ^ %s' into a term. " +
+                                "No suitable overloading was found.",
+                        result.getTerm().sort(),
+                        expr.getTerm().sort());
             }
         }
         return result;
@@ -513,16 +503,13 @@ class Translator extends JmlParserBaseVisitor<Object> {
         SLExpression result = exprs.get(0);
         for (int i = 1; i < exprs.size(); i++) {
             SLExpression expr = exprs.get(i);
-            if (intHelper.isIntegerTerm(result)) {
-                try {
-                    result = intHelper.buildPromotedAndExpression(result, expr);
-                } catch (SLTranslationException e) {
-                    raiseError(ctx, e);
-
-                }
-            } else {
-                result = new SLExpression(tb.and(tb.convertToFormula(result.getTerm()),
-                        tb.convertToFormula(expr.getTerm())));
+            try {
+                result = Objects.requireNonNull(termFactory.band(result, expr));
+            } catch (NullPointerException e) {
+                raiseError(ctx, "Could not translate the given operation '%s & %s' into a term. " +
+                                "No suitable overloading was found.",
+                        result.getTerm().sort(),
+                        expr.getTerm().sort());
             }
         }
         return result;
@@ -616,20 +603,20 @@ class Translator extends JmlParserBaseVisitor<Object> {
         List<SLExpression> expressions = mapOf(ctx.shiftexpr());
         SLExpression result = null;
         for (int i = 1; i < expressions.size(); i++) {
-            Function f = null;
+            OverloadedOperatorHandler.JmlOperator jop = null;
             Token op = ctx.op.get(i - 1);
             switch (op.getType()) {
                 case JmlLexer.LT:
-                    f = intLDT.getLessThan();
+                    jop = OverloadedOperatorHandler.JmlOperator.LT;
                     break;
                 case JmlLexer.GT:
-                    f = intLDT.getGreaterThan();
+                    jop = GT;
                     break;
                 case JmlLexer.GEQ:
-                    f = intLDT.getGreaterOrEquals();
+                    jop = GTE;
                     break;
                 case JmlLexer.LEQ:
-                    f = intLDT.getLessOrEquals();
+                    jop = LTE;
                     break;
                 default:
                     raiseError(ctx, "Unexpected syntax case.");
@@ -637,15 +624,29 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
             SLExpression left = expressions.get(i - 1);
             SLExpression right = expressions.get(i);
-            SLExpression rel = new SLExpression(tb.func(f, left.getTerm(), right.getTerm()));
-            if (result == null) {
-                result = rel;
-            } else {
-                result = new SLExpression(tb.and(result.getTerm(), rel.getTerm()));
+            try {
+                SLExpression rel = Objects.requireNonNull(termFactory.binary(jop, left, right));
+                //SLExpression rel = new SLExpression(tb.func(func, left.getTerm(), right.getTerm()));
+                if (result == null) {
+                    result = rel;
+                } else {
+                    result = new SLExpression(tb.and(result.getTerm(), rel.getTerm()));
+                }
+            } catch (NullPointerException e) {
+                raiseError(op, e, "Could not translate the given operation '%s %s %s' into a term. " +
+                                "No suitable overloading was found.",
+                        left.getTerm().sort(),
+                        op.getText(),
+                        left.getTerm().sort());
+            } catch (SLTranslationException e) {
+                raiseError(op, e, "Could not translate the given operation '%s %s %s' into a term. " +
+                                "A suitable overloading was found, but the term failed to build.",
+                        left.getTerm().sort(),
+                        op.getText(),
+                        left.getTerm().sort());
             }
         }
-        assert result != null;
-        return result;
+        return Objects.requireNonNull(result);
     }
 
 
@@ -678,12 +679,21 @@ class Translator extends JmlParserBaseVisitor<Object> {
         List<SLExpression> e = mapOf(ctx.multexpr());
         SLExpression result = e.get(0);
         for (int i = 1; i < e.size(); i++) {
-            String op = ctx.op.get(i - 1).getText();
+            final var tok = ctx.op.get(i - 1);
+            String op = tok.getText();
             SLExpression expr = e.get(i);
-            if (op.equals("+"))
-                result = termFactory.add(result, expr);
-            else
-                result = termFactory.substract(result, expr);
+            try {
+                if (op.equals("+"))
+                    result = Objects.requireNonNull(termFactory.add(result, expr));
+                else
+                    result = Objects.requireNonNull(termFactory.substract(result, expr));
+            } catch (NullPointerException npe) {
+                raiseError(tok, npe, "Could not translate the given operation '%s %s %s' into a term. " +
+                                "No suitable overloading was found.",
+                        result.getTerm().sort(),
+                        op,
+                        expr.getTerm().sort());
+            }
         }
         return result;
     }
@@ -2401,6 +2411,14 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     public static void raiseError(ParserRuleContext ctx, String message, Object... args) {
         throw new BuildingException(ctx, format(message, args));
+    }
+
+    public static void raiseError(Token ctx, String message, Object... args) {
+        throw new BuildingException(ctx, format(message, args), null);
+    }
+
+    public static void raiseError(Token ctx, Throwable cause, String message, Object... args) {
+        throw new BuildingException(ctx, format(message, args), cause);
     }
 
 

@@ -4,20 +4,20 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMethodDecl;
 import de.uka.ilkd.key.util.HelperClassForTests;
-import org.antlr.v4.runtime.Token;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.key_project.util.collection.ImmutableList;
 
 import java.io.File;
-import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @author Alexander Weigl
@@ -42,9 +42,13 @@ public class NJmlTranslatorTests {
         jmlIO = new JmlIO().services(services).classType(testClassType);
     }
 
+    @Before
+    public void before() {
+        jmlIO.clearWarnings();
+    }
+
     @Test
     public void testIgnoreOpenJML() {
-        jmlIO.clearWarnings();
         String contract = "/*+KEY@ invariant x == 4; */ /*+OPENJML@ invariant x == 54; */";
         ImmutableList<TextualJMLConstruct> result =
                 jmlIO.parseClassLevel(contract, "Test.java", new Position(0, 0));
@@ -83,7 +87,6 @@ public class NJmlTranslatorTests {
 
     @Test
     public void testWarnRequires() {
-        jmlIO.clearWarnings();
         String contract = "/*@ requires true; ensures true; requires true;";
         ImmutableList<TextualJMLConstruct> result =
                 jmlIO.parseClassLevel(contract, "Test.java", new Position(5, 5));

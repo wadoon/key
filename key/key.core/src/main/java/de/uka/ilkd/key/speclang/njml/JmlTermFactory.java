@@ -77,6 +77,8 @@ public final class JmlTermFactory {
         jml2jdl = Collections.unmodifiableMap(tmp);
     }
 
+    private final OverloadedOperatorHandler overloadedFunctionHandler;
+
 
     public JmlTermFactory(SLExceptionFactory exc,
                           Services services,
@@ -86,6 +88,7 @@ public final class JmlTermFactory {
         this.services = services;
         this.tb = services.getTermBuilder();
         this.intHelper = intHelper;
+        overloadedFunctionHandler = new OverloadedOperatorHandler(services, exc);
     }
 
     //region reach
@@ -437,6 +440,12 @@ public final class JmlTermFactory {
         return null;
     }
 
+    @Nullable
+    public SLExpression binary(OverloadedOperatorHandler.JmlOperator jmlOperator, SLExpression left, SLExpression right)
+            throws SLTranslationException {
+        return overloadedFunctionHandler.build(jmlOperator, left, right);
+    }
+
 
     private interface UnboundedNumericalQuantifier {
         Term apply(KeYJavaType declsType, boolean nullable, ImmutableList<QuantifiableVariable> qvs, Term range, Term body);
@@ -621,22 +630,24 @@ public final class JmlTermFactory {
 
     //region binary operators
 
-    public SLExpression shiftRight(SLExpression a, SLExpression e) {
-        checkNotBigint(a);
-        checkNotBigint(e);
+    public SLExpression shiftRight(SLExpression left, SLExpression right) {
+        checkNotBigint(left);
+        checkNotBigint(right);
         try {
-            return intHelper.buildRightShiftExpression(a, e);
+            return overloadedFunctionHandler.build(OverloadedOperatorHandler.JmlOperator.SHR, left, right);
+            //return intHelper.buildRightShiftExpression(left, right);
         } catch (SLTranslationException slTranslationException) {
             throw new RuntimeException(slTranslationException);
         }
     }
 
 
-    public SLExpression shiftLeft(SLExpression result, SLExpression e) {
-        checkNotBigint(result);
-        checkNotBigint(e);
+    public SLExpression shiftLeft(SLExpression left, SLExpression right) {
+        checkNotBigint(left);
+        checkNotBigint(right);
         try {
-            return intHelper.buildLeftShiftExpression(result, e);
+            return overloadedFunctionHandler.build(OverloadedOperatorHandler.JmlOperator.SHL, left, right);
+            //return intHelper.buildLeftShiftExpression(left, right);
         } catch (SLTranslationException slTranslationException) {
             throw new RuntimeException(slTranslationException);
         }
@@ -646,7 +657,8 @@ public final class JmlTermFactory {
         checkNotBigint(left);
         checkNotBigint(right);
         try {
-            return intHelper.buildUnsignedRightShiftExpression(left, right);
+            //return intHelper.buildUnsignedRightShiftExpression(left, right);
+            return overloadedFunctionHandler.build(OverloadedOperatorHandler.JmlOperator.USHR, left, right);
         } catch (SLTranslationException e1) {
             throw new RuntimeException(e1);
         }
@@ -655,18 +667,48 @@ public final class JmlTermFactory {
     //endregion
 
     //region arithmetic operations
+    @Nullable
     public SLExpression add(SLExpression left, SLExpression right) {
         try {
-            return intHelper.buildAddExpression(left, right);
+            return overloadedFunctionHandler.build(OverloadedOperatorHandler.JmlOperator.ADD, left, right);
+            //return intHelper.buildAddExpression(left, right);
         } catch (SLTranslationException e) {
             throw new RuntimeException(e);
         }
     }
 
+    @Nullable
+    public SLExpression band(SLExpression left, SLExpression right) {
+        try {
+            return overloadedFunctionHandler.build(OverloadedOperatorHandler.JmlOperator.BIT_AND, left, right);
+        } catch (SLTranslationException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
+    @Nullable
+    public SLExpression bor(SLExpression left, SLExpression right) {
+        try {
+            return overloadedFunctionHandler.build(OverloadedOperatorHandler.JmlOperator.BIT_OR, left, right);
+        } catch (SLTranslationException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Nullable
+    public SLExpression bxor(SLExpression left, SLExpression right) {
+        try {
+            return overloadedFunctionHandler.build(OverloadedOperatorHandler.JmlOperator.BIT_OR, left, right);
+        } catch (SLTranslationException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Nullable
     public SLExpression substract(SLExpression left, SLExpression right) {
         try {
-            return intHelper.buildSubExpression(left, right);
+            return overloadedFunctionHandler.build(OverloadedOperatorHandler.JmlOperator.SUBTRACT, left, right);
+            //return intHelper.buildSubExpression(left, right);
         } catch (SLTranslationException e) {
             throw new RuntimeException(e);
         }
@@ -807,9 +849,9 @@ public final class JmlTermFactory {
             } else if (expr.getTerm().sort().extendsTrans(objectSort)) {
                 t = tb.and(t,
                         tb.equals(tb.select(tc.getBooleanLDT().targetSort(),
-                                atPres.get(baseHeap),
-                                expr.getTerm(),
-                                tb.func(tc.getHeapLDT().getCreated())),
+                                        atPres.get(baseHeap),
+                                        expr.getTerm(),
+                                        tb.func(tc.getHeapLDT().getCreated())),
                                 tb.FALSE()));
                 // add non-nullness (bug #1364)
                 t = tb.and(t, tb.not(tb.equals(expr.getTerm(), tb.NULL())));

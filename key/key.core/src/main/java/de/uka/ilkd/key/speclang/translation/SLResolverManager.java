@@ -98,7 +98,11 @@ public abstract class SLResolverManager {
             ParsableVariable localVar = (ParsableVariable) ns.lookup(n);
             if (localVar != null) {
                 Term varTerm = tb.var(localVar);
-                return new SLExpression(varTerm, kjts.get(localVar));
+                var kjt = kjts.get(localVar);
+                if(kjt!=null)
+                    return new SLExpression(varTerm, kjt);
+                else
+                    return new SLExpression(varTerm);
             }
         }
 
