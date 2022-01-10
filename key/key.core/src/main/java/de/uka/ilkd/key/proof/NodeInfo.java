@@ -445,9 +445,9 @@ public class NodeInfo {
             this.relevantFiles = this.relevantFiles.union(relevantFiles);
         }
 
-        if (oldRelevantFiles != this.relevantFiles) {
+        if (!oldRelevantFiles.equals(this.relevantFiles)) {
             node.childrenIterator().forEachRemaining(
-                c -> c.getNodeInfo().addRelevantFiles(this.relevantFiles));
+                    c -> c.getNodeInfo().addRelevantFiles(this.relevantFiles));
         }
     }
 
