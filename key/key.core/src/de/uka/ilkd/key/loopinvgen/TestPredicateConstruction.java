@@ -584,7 +584,7 @@ public class TestPredicateConstruction {
 	public static void main(String[] args) {
 		TestPredicateConstruction tpc = new TestPredicateConstruction();
 		long start = System.currentTimeMillis();
-		tpc.shiftArrayToLeft();
+		tpc.conditionDifferentNumberOfEvents();
 		long end = System.currentTimeMillis();
 		System.out.println("Loop Invariant Generation took " + (end - start) + " ms");
 	}
