@@ -3,7 +3,6 @@ package de.uka.ilkd.key.speclang.njml;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.speclang.translation.JavaIntegerSemanticsHelper;
@@ -118,7 +117,7 @@ public class OverloadedOperatorHandler {
         }
     }
 
-    private class BinaryBooleanHandler implements Handler {
+    private static class BinaryBooleanHandler implements Handler {
         private final Sort sortBoolean;
         private final TermBuilder tb;
 
@@ -130,7 +129,8 @@ public class OverloadedOperatorHandler {
         @Nullable
         @Override
         public SLExpression build(JmlOperator op, SLExpression left, SLExpression right) throws SLTranslationException {
-            if (left.getTerm().sort() == sortBoolean && right.getTerm().sort() == sortBoolean) {
+            if ((left.getTerm().sort() == sortBoolean || left.getTerm().sort() == Sort.FORMULA)
+                    && (right.getTerm().sort() == sortBoolean || right.getTerm().sort() == Sort.FORMULA)) {
                 final var t1 = tb.convertToFormula(left.getTerm());
                 final var t2 = tb.convertToFormula(right.getTerm());
                 switch (op) {
@@ -139,12 +139,7 @@ public class OverloadedOperatorHandler {
                     case BIT_OR:
                         return new SLExpression(tb.or(t1, t2));
                     case BIT_XOR:
-                        return new SLExpression(tb.not(tb.equals(t1, t2)));
-                        /*
-                        Term resultFormula = tb.convertToFormula(result.getTerm());
-                        Term exprFormula = tb.convertToFormula(expr.getTerm());
-                        result = new SLExpression(tb.or(tb.and(resultFormula, tb.not(exprFormula)),
-                        tb.and(tb.not(resultFormula), exprFormula)));*/
+                        return new SLExpression(tb.or(tb.and(t1, tb.not(t2)), tb.and(tb.not(t1), t2)));
                 }
             }
             return null;
