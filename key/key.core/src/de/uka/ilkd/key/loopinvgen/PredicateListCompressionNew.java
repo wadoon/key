@@ -64,7 +64,8 @@ public class PredicateListCompressionNew {
 			} else if (term.op().equals(lt) || term.op().equals(leq) || term.op().equals(gt) || term.op().equals(geq)
 					|| term.op().equals(Equality.EQUALS)) {
 				compPredsList.add(term);
-			}
+			} else
+				result.add(term);
 		}
 		result.addAll(finalCompPredListCompression(compPredsList));
 //		result.addAll(compPredsList);
@@ -172,22 +173,18 @@ public class PredicateListCompressionNew {
 					if (compPred1.op().equals(geq) && compPred2.op().equals(gt)) {
 						if (!toDelete.contains(compPred1)) {
 							toDelete.add(compPred2);
-							System.out.println("d25");
 						}
 					} else if (compPred1.op().equals(leq) && compPred2.op().equals(lt)) {
 						if (!toDelete.contains(compPred1)) {
 							toDelete.add(compPred2);
-							System.out.println("d24");
 						}
 					} else if (compPred1.op().equals(Equality.EQUALS) && compPred2.op().equals(geq)) {
 						if (!toDelete.contains(compPred2)) {
 							toDelete.add(compPred1);
-							System.out.println("d23");
 						}
 					} else if (compPred1.op().equals(Equality.EQUALS) && compPred2.op().equals(leq)) {
 						if (!toDelete.contains(compPred2)) {
 							toDelete.add(compPred1);
-							System.out.println("d22");
 						}
 					}
 //					else if (compPred1.op().equals(gt) && compPred2.op().equals(lt)) { //There should not be such a case because this means the inv is wrong
@@ -198,7 +195,6 @@ public class PredicateListCompressionNew {
 						toDelete.add(compPred1);
 						toDelete.add(compPred2);
 						toAdd.add(tb.equals(compPred1.sub(0), compPred1.sub(1)));
-						System.out.println("11111111111");
 					}
 
 				} else if (sProof.proofEquality(compPred1.sub(0), compPred2.sub(1))
@@ -212,32 +208,26 @@ public class PredicateListCompressionNew {
 					if (compPred1.op().equals(gt) && compPred2.op().equals(lt)) {
 						if (!toDelete.contains(compPred2)) {
 							toDelete.add(compPred1);
-							System.out.println("d21");
 						}
 					} else if (compPred1.op().equals(geq) && compPred2.op().equals(lt)) {
 						if (!toDelete.contains(compPred1)) {
 							toDelete.add(compPred2);
-							System.out.println("d20");
 						}
 					} else if (compPred1.op().equals(leq) && compPred2.op().equals(gt)) {
 						if (!toDelete.contains(compPred1)) {
 							toDelete.add(compPred2);
-							System.out.println("d19");
 						}
 					} else if (compPred1.op().equals(geq) && compPred2.op().equals(leq)) {
 						if (!toDelete.contains(compPred2)) {
 						toDelete.add(compPred1);
-						System.out.println("ddddddddddddd");
 						}
 					} else if (compPred1.op().equals(Equality.EQUALS) && compPred2.op().equals(geq)) {
 						if (!toDelete.contains(compPred2)) {
 							toDelete.add(compPred1);
-							System.out.println("d18");
 						}
 					} else if (compPred1.op().equals(Equality.EQUALS) && compPred2.op().equals(leq)) {
 						if (!toDelete.contains(compPred2)) {
 							toDelete.add(compPred1);
-							System.out.println("d17");
 						}
 					}
 				} else if (sProof.proofEquality(compPred1.sub(0), compPred2.sub(0))
@@ -247,12 +237,10 @@ public class PredicateListCompressionNew {
 						if (sProof.proofLT(compPred1.sub(1), compPred2.sub(1))) {
 							if (!toDelete.contains(compPred2)) {
 								toDelete.add(compPred1);
-								System.out.println("d16");
 							}
 						} else {
 							if (!toDelete.contains(compPred1)) {
 								toDelete.add(compPred2);
-								System.out.println("d15");
 							}
 						}
 					} else if ((compPred1.op() == gt && compPred2.op() == gt)
@@ -260,12 +248,10 @@ public class PredicateListCompressionNew {
 						if (sProof.proofLT(compPred1.sub(1), compPred2.sub(1))) {
 							if (!toDelete.contains(compPred1)) {
 								toDelete.add(compPred2);
-								System.out.println("d14");
 							}
 						} else {
 							if (!toDelete.contains(compPred2)) {
 								toDelete.add(compPred1);
-								System.out.println("d13");
 							}
 						}
 					} else if ((compPred1.op() == leq && compPred2.op() == leq)
@@ -273,12 +259,10 @@ public class PredicateListCompressionNew {
 						if (sProof.proofLT(compPred1.sub(1), compPred2.sub(1))) {
 							if (!toDelete.contains(compPred2)) {
 								toDelete.add(compPred1);
-								System.out.println("d12");
 							}
 						} else {
 							if (!toDelete.contains(compPred1)) {
 								toDelete.add(compPred2);
-								System.out.println("d11");
 							}
 						}
 					}
@@ -287,12 +271,10 @@ public class PredicateListCompressionNew {
 					if (sProof.proofLT(compPred1.sub(1), compPred2.sub(1))) {
 						if (!toDelete.contains(compPred1)) {
 							toDelete.add(compPred2);
-							System.out.println("d10");
 						}
 					} else {
 						if (!toDelete.contains(compPred2)) {
 							toDelete.add(compPred1);
-							System.out.println("d9");
 						}
 					}
 
@@ -302,48 +284,40 @@ public class PredicateListCompressionNew {
 						if (sProof.proofLT(compPred1.sub(0), compPred2.sub(0))) {
 							if (!toDelete.contains(compPred2)) {
 								toDelete.add(compPred1);
-								System.out.println("d8");
 							}
 						} else {
 							if (!toDelete.contains(compPred1)) {
 								toDelete.add(compPred2);
-								System.out.println("d7");
 							}
 						}
 					} else if (compPred1.op() == gt) {
 						if (sProof.proofLT(compPred1.sub(0), compPred2.sub(0))) {
 							if (!toDelete.contains(compPred1)) {
 								toDelete.add(compPred2);
-								System.out.println("d6");
 							}
 						} else {
 							if (!toDelete.contains(compPred2)) {
 								toDelete.add(compPred1);
-								System.out.println("d5");
 							}
 						}
 					} else if (compPred1.op() == leq) {
 						if (sProof.proofLT(compPred1.sub(0), compPred2.sub(0))) {
 							if (!toDelete.contains(compPred2)) {
 								toDelete.add(compPred1);
-								System.out.println("d4");
 							}
 						} else {
 							if (!toDelete.contains(compPred1)) {
 								toDelete.add(compPred2);
-								System.out.println("d3");
 							}
 						}
 					} else if (compPred1.op() == geq) {
 						if (sProof.proofLT(compPred1.sub(0), compPred2.sub(0))) {
 							if (!toDelete.contains(compPred1)) {
 								toDelete.add(compPred2);
-								System.out.println("d2");
 							}
 						} else {
 							if (!toDelete.contains(compPred2)) {
 								toDelete.add(compPred1);
-								System.out.println("d1");
 							}
 						}
 					}

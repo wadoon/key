@@ -15,6 +15,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.util.Pair;
 
 public class PredicateRefinementNew3 {
@@ -52,7 +53,7 @@ public class PredicateRefinementNew3 {
 	public Pair<Set<Term>, Set<Term>> predicateCheckAndRefine() {
 		Set<Term> unProvenDepPreds = new HashSet<>();
 		for (Term pred : depPredicates) {
-//			System.out.println("Proving Dep Pred: " + pred);
+			System.out.println("Proving Dep Pred: " + pred);
 			if (!sequentImpliesPredicate(pred)) {
 				unProvenDepPreds.add(pred);
 			}
@@ -67,7 +68,7 @@ public class PredicateRefinementNew3 {
 		for (Term w : weakenedDepPreds) {
 			for(Term dp : depPredicates) {
 				if(predicateImpliedBypredicate(w, dp)) {
-//					System.out.println("IMPLIED " + w + " by " + dp);
+					System.out.println("IMPLIED " + w + " by " + dp);
 				}
 				break;
 			}
@@ -142,11 +143,11 @@ public class PredicateRefinementNew3 {
 //		else if (provable && pred.op() == services.getTypeConverter().getDependenciesLDT().getNoR()) {
 //			System.out.println("Check: " + ProofSaver.printAnything(sideSeq, services));
 //		}
-//		System.out.println("Proof " + pred + ":  "+ provable);// + " in the following seq:");
+		System.out.println("Proof " + pred + ":  "+ provable);// + " in the following seq:");
 //		System.out.println(sideSeq);
 //		System.out.println("---------------------------------------------------------------");
-//		if (provable && pred.op() == services.getTypeConverter().getDependenciesLDT().getNoWaR()) {
-//			System.out.println("We have a Problem: \\n" + ProofSaver.printAnything(sideSeq, services));
+//		if (!provable && pred.op() == services.getTypeConverter().getDependenciesLDT().getNoWaW()) {
+//			System.out.println("We have a Problem" );
 //		}
 		
 		return provable;

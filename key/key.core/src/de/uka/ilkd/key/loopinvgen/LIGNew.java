@@ -111,7 +111,7 @@ public class LIGNew {
 
 		do {
 			itrNumber++;
-//			System.out.println("Iteration Number: " + itrNumber);
+			System.out.println("Iteration Number: " + itrNumber);
 
 			oldDepPreds.removeAll(oldDepPreds);
 			oldCompPreds.removeAll(oldCompPreds);
@@ -146,8 +146,7 @@ public class LIGNew {
 			}
 
 //			System.out.println("Dep Preds: " + allDepPreds);
-		} while (!allCompPreds.equals(oldCompPreds) || !allDepPreds.equals(oldDepPreds)
-				|| itrNumber < 2);
+		} while ((!allCompPreds.equals(oldCompPreds) || !allDepPreds.equals(oldDepPreds)) || allDepPreds.size() < 2 || itrNumber < 2);
 
 //		System.out.println("===========Terminated===========");
 //		System.out.println("Number of iterations at the end: " + itrNumber);
