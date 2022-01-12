@@ -148,7 +148,7 @@ public class TestPredicateConstruction {
 
 
 	
-	public void shiftArrayToLeftWithFunc() {
+	public void withFunc() {
 
 		Term succFormula;
 
@@ -198,6 +198,57 @@ public class TestPredicateConstruction {
 		cur.mainAlg();
 	}
 //
+	public void withoutFunc() {
+
+		Term succFormula;
+
+		try {
+			succFormula = parse("{i:=0}\\<{" + "			while (i<a.length-1) {a[i] = a[i];" + "			i++;}"
+					+ "		}\\>true");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			System.out.println(e.getMessage());
+			if (e.getCause() != null) {
+				System.out.println(e.getCause().getMessage());
+			}
+			e.printStackTrace();
+			return;
+		}
+		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(succFormula), false, true).sequent();
+
+		String[] arrLeft = { "noW(arrayRange(a,0,a.length))","noR(arrayRange(a,0,a.length))", "a.length > 10" };
+		String[] arrRight = { "a=null" };
+		try {
+			for (String fml : arrLeft) {
+				seq = seq.addFormula(new SequentFormula(parse(fml)), true, true).sequent();
+			}
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			if (e.getCause() != null) {
+				System.out.println(e.getCause().getMessage());
+			}
+			e.printStackTrace();
+			return;
+		}
+		
+		try {
+			for (String fml : arrRight) {
+				seq = seq.addFormula(new SequentFormula(parse(fml)), false, false).sequent();
+			}
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			if (e.getCause() != null) {
+				System.out.println(e.getCause().getMessage());
+			}
+			e.printStackTrace();
+			return;
+		}
+
+		LIGNew cur = new LIGNew(services, seq);
+		cur.mainAlg();
+	}
+
+//	
 	public void stencil() {
 
 		Term succFormula;
@@ -315,7 +366,7 @@ public class TestPredicateConstruction {
 //	}
 //
 //	
-	public void condition() { //Done
+	public void condition() {
 		Term formula;
 		Recoder2KeY r2k = new Recoder2KeY(services, nss);
 		
@@ -358,7 +409,7 @@ public class TestPredicateConstruction {
 //		System.out.println("Formula with merge point: "+ProofSaver.printAnything(formula, services));
 
 		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(formula), false, true).sequent();
-		String[] arrLeft = {"noR(arrayRange(a,0,a.length))", "noW(arrayRange(a,0,a.length))","a!=null", "a.length>10" };
+		String[] arrLeft = {"noR(arrayRange(a,0,a.length))", "noW(arrayRange(a,0,a.length))", "a.length>10" };
 		String[] arrRight = {"a=null"};
 		try {
 			for (String fml : arrLeft) {
@@ -584,7 +635,7 @@ public class TestPredicateConstruction {
 	public static void main(String[] args) {
 		TestPredicateConstruction tpc = new TestPredicateConstruction();
 		long start = System.currentTimeMillis();
-		tpc.conditionDifferentNumberOfEvents();
+		tpc.withFunc();
 		long end = System.currentTimeMillis();
 		System.out.println("Loop Invariant Generation took " + (end - start) + " ms");
 	}

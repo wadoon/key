@@ -53,7 +53,7 @@ public class PredicateRefinementNew3 {
 	public Pair<Set<Term>, Set<Term>> predicateCheckAndRefine() {
 		Set<Term> unProvenDepPreds = new HashSet<>();
 		for (Term pred : depPredicates) {
-			System.out.println("Proving Dep Pred: " + pred);
+//			System.out.println("Proving Dep Pred: " + pred);
 			if (!sequentImpliesPredicate(pred)) {
 				unProvenDepPreds.add(pred);
 			}
@@ -68,7 +68,7 @@ public class PredicateRefinementNew3 {
 		for (Term w : weakenedDepPreds) {
 			for(Term dp : depPredicates) {
 				if(predicateImpliedBypredicate(w, dp)) {
-					System.out.println("IMPLIED " + w + " by " + dp);
+//					System.out.println("IMPLIED " + w + " by " + dp);
 				}
 				break;
 			}
@@ -143,7 +143,7 @@ public class PredicateRefinementNew3 {
 //		else if (provable && pred.op() == services.getTypeConverter().getDependenciesLDT().getNoR()) {
 //			System.out.println("Check: " + ProofSaver.printAnything(sideSeq, services));
 //		}
-		System.out.println("Proof " + pred + ":  "+ provable);// + " in the following seq:");
+//		System.out.println("Proof " + pred + ":  "+ provable);// + " in the following seq:");
 //		System.out.println(sideSeq);
 //		System.out.println("---------------------------------------------------------------");
 //		if (!provable && pred.op() == services.getTypeConverter().getDependenciesLDT().getNoWaW()) {

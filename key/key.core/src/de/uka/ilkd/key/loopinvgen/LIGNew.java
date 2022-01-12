@@ -111,7 +111,7 @@ public class LIGNew {
 
 		do {
 			itrNumber++;
-			System.out.println("Iteration Number: " + itrNumber);
+//			System.out.println("Iteration Number: " + itrNumber);
 
 			oldDepPreds.removeAll(oldDepPreds);
 			oldCompPreds.removeAll(oldCompPreds);
@@ -161,20 +161,20 @@ public class LIGNew {
 		
 		allDepPreds.addAll(allCompPreds);
 		
-//		System.out.println("Without compression, the DD LOOP INVARIANT is the conjunction of: ");
-//		for (Term term : allDepPreds) {
-//			System.out.println(term);
-//		}
-		
-		
-		PredicateListCompressionNew plcDep = new PredicateListCompressionNew(services, currentGoal.sequent(), allDepPreds, false);
-		allDepPreds = plcDep.compression();
-		
-		System.out.println("After compression, the DD LOOP INVARIANT is the conjunction of: ");
+		System.out.println("Without compression, the DD LOOP INVARIANT is the conjunction of: ");
 		for (Term term : allDepPreds) {
-				System.out.println(term);
+			System.out.println(term);
 		}
-		System.out.println("after " + itrNumber + " iterations of the LIG algorithm");
+		
+		
+//		PredicateListCompressionNew plcDep = new PredicateListCompressionNew(services, currentGoal.sequent(), allDepPreds, false);
+//		allDepPreds = plcDep.compression();
+//		
+//		System.out.println("After compression, the DD LOOP INVARIANT is the conjunction of: ");
+//		for (Term term : allDepPreds) {
+//				System.out.println(term);
+//		}
+//		System.out.println("after " + itrNumber + " iterations of the LIG algorithm");
 	}
 
 	private Goal abstractGoal(Goal currentGoal) {
