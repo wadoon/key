@@ -6,6 +6,9 @@ public class Test {
     //@ requires true;
     //@ ensures l1 <= l3;
     public void foo() {
+        int a = 1;
+        int b = 1;
+        int c = a-b;
         //@ set l1 = l3 - l2;
         //@ set l3 = l3 + l1 + l2;
         return;

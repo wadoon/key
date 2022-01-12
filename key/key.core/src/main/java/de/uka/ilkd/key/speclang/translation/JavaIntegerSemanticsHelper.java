@@ -26,7 +26,6 @@ import de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JmlOperator;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.nio.file.attribute.UserDefinedFileAttributeView;
 
 
 /**
@@ -428,31 +427,31 @@ public class JavaIntegerSemanticsHelper implements OverloadedOperatorHandler.Han
         if (left.getTerm().sort().equals(right.getTerm().sort())
                 && left.getTerm().sort() == integerLDT.targetSort()) {
             switch (op) {
-                case ADD: return buildAddExpression(left, right);
+                case ADDITION: return buildAddExpression(left, right);
                 case DIVISION: return buildDivExpression(left, right);
                 case MODULO: return buildModExpression(left, right);
-                case MULT: return buildMulExpression(left, right);
+                case MULTIPLICATION: return buildMulExpression(left, right);
                 case SUBTRACT: return buildSubExpression(left, right);
-                case SHL: return buildLeftShiftExpression(left, right);
-                case USHR: return buildUnsignedRightShiftExpression(left, right);
-                case SHR: return buildRightShiftExpression(left, right);
+                case SHIFT_LEFT: return buildLeftShiftExpression(left, right);
+                case UNSIGNED_SHIFT_RIGHT: return buildUnsignedRightShiftExpression(left, right);
+                case SHIFT_RIGHT: return buildRightShiftExpression(left, right);
                 case BIT_AND: return buildPromotedAndExpression(left,right);
                 case BIT_OR: return buildPromotedOrExpression(left,right);
-                case GT: return buildGreaterThanExpression(left,right);
-                case GTE: return buildGreaterThanOrEqualsExpression(left,right);
-                case LT: return buildLesserThanExpression(left,right);
-                case LTE: return buildLesserThanOrEqualsExpression(left,right);
+                case GREATER_THAN: return buildGreaterThanExpression(left,right);
+                case GREATER_THAN_EQUALS: return buildGreaterThanOrEqualsExpression(left,right);
+                case LESS_THAN: return buildLessThanExpression(left,right);
+                case LESS_THAN_EQUALS: return buildLessThanOrEqualsExpression(left,right);
             }
         }
         return null;
 
     }
 
-    private SLExpression buildLesserThanOrEqualsExpression(SLExpression left, SLExpression right) {
+    private SLExpression buildLessThanOrEqualsExpression(SLExpression left, SLExpression right) {
         return new SLExpression(tb.func(integerLDT.getLessOrEquals(), left.getTerm(), right.getTerm()));
     }
 
-    private SLExpression buildLesserThanExpression(SLExpression left, SLExpression right) {
+    private SLExpression buildLessThanExpression(SLExpression left, SLExpression right) {
         return new SLExpression(tb.func(integerLDT.getLessThan(), left.getTerm(), right.getTerm()));
     }
 

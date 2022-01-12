@@ -634,7 +634,7 @@ public final class JmlTermFactory {
         checkNotBigint(left);
         checkNotBigint(right);
         try {
-            return overloadedFunctionHandler.build(OverloadedOperatorHandler.JmlOperator.SHR, left, right);
+            return overloadedFunctionHandler.build(OverloadedOperatorHandler.JmlOperator.SHIFT_RIGHT, left, right);
             //return intHelper.buildRightShiftExpression(left, right);
         } catch (SLTranslationException slTranslationException) {
             throw new RuntimeException(slTranslationException);
@@ -646,7 +646,7 @@ public final class JmlTermFactory {
         checkNotBigint(left);
         checkNotBigint(right);
         try {
-            return overloadedFunctionHandler.build(OverloadedOperatorHandler.JmlOperator.SHL, left, right);
+            return overloadedFunctionHandler.build(OverloadedOperatorHandler.JmlOperator.SHIFT_LEFT, left, right);
             //return intHelper.buildLeftShiftExpression(left, right);
         } catch (SLTranslationException slTranslationException) {
             throw new RuntimeException(slTranslationException);
@@ -658,7 +658,7 @@ public final class JmlTermFactory {
         checkNotBigint(right);
         try {
             //return intHelper.buildUnsignedRightShiftExpression(left, right);
-            return overloadedFunctionHandler.build(OverloadedOperatorHandler.JmlOperator.USHR, left, right);
+            return overloadedFunctionHandler.build(OverloadedOperatorHandler.JmlOperator.UNSIGNED_SHIFT_RIGHT, left, right);
         } catch (SLTranslationException e1) {
             throw new RuntimeException(e1);
         }
@@ -670,7 +670,7 @@ public final class JmlTermFactory {
     @Nullable
     public SLExpression add(SLExpression left, SLExpression right) {
         try {
-            return overloadedFunctionHandler.build(OverloadedOperatorHandler.JmlOperator.ADD, left, right);
+            return overloadedFunctionHandler.build(OverloadedOperatorHandler.JmlOperator.ADDITION, left, right);
             //return intHelper.buildAddExpression(left, right);
         } catch (SLTranslationException e) {
             throw new RuntimeException(e);

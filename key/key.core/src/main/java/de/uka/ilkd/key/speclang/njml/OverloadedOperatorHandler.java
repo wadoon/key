@@ -15,23 +15,38 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * This class handles the operator during the JML translation {@link Translator}.
+ *
  * @author Alexander Weigl
  * @version 1 (1/9/22)
  */
 public class OverloadedOperatorHandler {
+    /**
+     * Enumeration of known operators, that are overloaded for JML types.
+     */
     public enum JmlOperator {
-        ADD, SUBTRACT, MULT, DIVISION, MODULO,
+        ADDITION, SUBTRACT, MULTIPLICATION, DIVISION, MODULO,
         BIT_AND, BIT_OR, BIT_XOR, BIT_NEGATE,
-        SHR, SHL, USHR,
-        LT, GT, GTE, LTE;
+        SHIFT_RIGHT, SHIFT_LEFT, UNSIGNED_SHIFT_RIGHT,
+        LESS_THAN, GREATER_THAN, GREATER_THAN_EQUALS, LESS_THAN_EQUALS;
     }
 
+    /**
+     * Implement this interface and register it to
+     * {@link OverloadedOperatorHandler#OverloadedOperatorHandler(Services, SLExceptionFactory)}
+     * to add new overloading to the operators.
+     */
     public interface Handler {
         /**
+         * Handling the construction of the binary, if this handler is applicable.
+         * Return null, if this handler is not applicable for the given types.
+         *
          * @param op    the JML operator
          * @param left  left side of the binary expression
          * @param right right side of the binary expression
-         * @return null if this handler is not able not suitable.
+         * @return null if this handler is not suitable for the given expression/types.
+         * @throws SLTranslationException if this handler supports the given expression,
+         *                                but something failed during the construction
          */
         @Nullable
         SLExpression build(JmlOperator op, SLExpression left, SLExpression right) throws SLTranslationException;
@@ -72,7 +87,7 @@ public class OverloadedOperatorHandler {
         public SLExpression build(JmlOperator op, SLExpression left, SLExpression right) throws SLTranslationException {
             if (left.getTerm().sort() == ldtSequence.targetSort() &&
                     right.getTerm().sort() == ldtSequence.targetSort()) {
-                if (op == JmlOperator.ADD) {
+                if (op == JmlOperator.ADDITION) {
                     return new SLExpression(tb.seqConcat(left.getTerm(), right.getTerm()));
                 }
             }
@@ -96,20 +111,20 @@ public class OverloadedOperatorHandler {
             final var r = right.getTerm();
             if (l.sort() == ldt.targetSort() && r.sort() == ldt.targetSort()) {
                 switch (op) {
-                    case ADD:
+                    case ADDITION:
                     case BIT_OR:
                         return new SLExpression(tb.union(l, r));
                     case SUBTRACT:
                         return new SLExpression(tb.setMinus(l, r));
                     case BIT_AND:
                         return new SLExpression(tb.intersect(l, r));
-                    case LT:
+                    case LESS_THAN:
                         return new SLExpression(tb.subset(l, r));
-                    case LTE:
+                    case LESS_THAN_EQUALS:
                         return new SLExpression(tb.and(tb.subset(l, r), tb.equals(l, r)));
-                    case GT:
+                    case GREATER_THAN:
                         return new SLExpression(tb.subset(r, l));
-                    case GTE:
+                    case GREATER_THAN_EQUALS:
                         return new SLExpression(tb.and(tb.subset(r, l), tb.equals(l, r)));
                 }
             }

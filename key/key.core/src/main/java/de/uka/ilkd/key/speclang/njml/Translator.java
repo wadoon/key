@@ -607,16 +607,16 @@ class Translator extends JmlParserBaseVisitor<Object> {
             Token op = ctx.op.get(i - 1);
             switch (op.getType()) {
                 case JmlLexer.LT:
-                    jop = OverloadedOperatorHandler.JmlOperator.LT;
+                    jop = OverloadedOperatorHandler.JmlOperator.LESS_THAN;
                     break;
                 case JmlLexer.GT:
-                    jop = GT;
+                    jop = GREATER_THAN;
                     break;
                 case JmlLexer.GEQ:
-                    jop = GTE;
+                    jop = GREATER_THAN_EQUALS;
                     break;
                 case JmlLexer.LEQ:
-                    jop = LTE;
+                    jop = LESS_THAN_EQUALS;
                     break;
                 default:
                     raiseError(ctx, "Unexpected syntax case.");
