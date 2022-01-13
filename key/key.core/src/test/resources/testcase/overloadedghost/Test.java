@@ -6,6 +6,7 @@ public class Test {
     //@ requires true;
     //@ ensures l1 <= l3;
     public void foo() {
+        //@ set l1 = \dl_setMinus(l3,  l2);
         int a = 1;
         int b = 1;
         int c = a-b;
