@@ -69,7 +69,7 @@ public class HTMLSyntaxHighlighter {
     ///////////////////////////////////////
 
     private final static String[] DYNAMIC_LOGIC_KEYWORDS = { "\\forall",
-            "\\exists", "TRUE", "FALSE", "\\if", "\\then", "\\else", "\\sum",
+            "\\exists", "TRUE", "FALSE", "\\ifEx", "\\if", "\\then", "\\else", "\\some", "\\sum",
             "bsum", "\\in", "exactInstance", "wellFormed", "measuredByEmpty",
             "<created>", "<inv>", "\\cup",
             ""+FORALL, ""+EXISTS, ""+IN, ""+EMPTY};

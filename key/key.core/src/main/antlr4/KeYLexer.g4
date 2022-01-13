@@ -190,6 +190,7 @@ IF   : '\\if';
 IFEX   : '\\ifEx';
 THEN : '\\then';
 ELSE : '\\else';
+SOME   : '\\some';
 
 // inclusion and stuff, things that (usually) come at the beginning
 // of the file

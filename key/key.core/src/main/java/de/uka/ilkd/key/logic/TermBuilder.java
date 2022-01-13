@@ -448,6 +448,15 @@ public class TermBuilder {
     }
 
     /**
+     * Construct a term with the \some operator.
+     */
+    public Term some(QuantifiableVariable qv, Term cond) {
+        return tf.createTerm(new Some(qv.sort()),
+            new ImmutableArray<>(cond),
+            new ImmutableArray<>(qv), null);
+    }
+
+    /**
      * Construct a term with the \ifEx operator.
      */
     public Term ifEx(QuantifiableVariable qv, Term cond, Term _then,

@@ -399,6 +399,7 @@ primitive_term:
     termParen
   | ifThenElseTerm
   | ifExThenElseTerm
+  | someTerm
   | abbreviation
   | accessterm
   | literals
@@ -431,6 +432,7 @@ term
   | updateterm                #termUpdate
   | ifThenElseTerm            #termIfThenElse
   | ifExThenElseTerm          #termIfExThenElse
+  | someTerm                  #termSome
   | NOT term                  #negation
   | MINUS term                #unaryMinus
   | term OR term              #disjunction_term
@@ -514,6 +516,12 @@ ifExThenElseTerm
   LPAREN condF = term RPAREN
   THEN LPAREN thenT = term RPAREN
   ELSE LPAREN elseT = term RPAREN
+;
+
+someTerm
+:
+  SOME exVars = bound_variables
+  condF = term
 ;
 
 locset_term
