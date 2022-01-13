@@ -82,6 +82,7 @@ public class PredicateRefinementNew3 {
 		for (Term pred : compPredicates) {
 //			System.out.println("Proving Comp Pred: " + pred);
 			if (!sequentImpliesPredicate(pred)) {
+//				System.out.println("not proved: "+pred);
 				unProvenCompPreds.add(pred);
 			}
 		}

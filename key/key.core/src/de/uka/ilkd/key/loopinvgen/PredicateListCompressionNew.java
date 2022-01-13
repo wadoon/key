@@ -115,24 +115,21 @@ public class PredicateListCompressionNew {
 		}
 		fDepPredList.addAll(toAdd);
 		fDepPredList.removeAll(toDelete);
-//		fDepPredList = refineAiliasing(fDepPredList, toDelete);
-
-		// fDepPredList = refineAiliasing(fDepPredList, toDelete);
-//		System.out.println("deleted by compression: " + toDelete);
-
-//		if (ailias) {
-//			for (Term depPred1 : fDepPredList) {
-//				for (Term depPred2 : fDepPredList) {
-//					if (depPred1.op().equals(depPred2.op()) && !depPred1.sub(0).sub(0).equals(depPred2.sub(0).sub(0))) {
-//						if (sProof.proofEquality(depPred1.sub(0), depPred2.sub(0))) {
-//							if (!toDelete.contains(depPred2)) {
-//								toDelete.add(depPred1);
-//							}
-//						}
-//					}
-//				}
-//			}
-//		}
+		
+		toDelete.removeAll(toDelete);
+		if (ailias) {
+			for (Term depPred1 : fDepPredList) {
+				for (Term depPred2 : fDepPredList) {
+					if (depPred1.op().equals(depPred2.op()) && depPred1.sub(0).sub(0) != depPred2.sub(0).sub(0)) {
+						if (sProof.proofEquality(depPred1.sub(0), depPred2.sub(0))) {
+							if (!toDelete.contains(depPred2)) {
+								toDelete.add(depPred1);
+							}
+						}
+					}
+				}
+			}
+		}
 
 		return fDepPredList;
 	}

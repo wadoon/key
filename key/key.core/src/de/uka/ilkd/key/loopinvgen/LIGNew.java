@@ -85,13 +85,21 @@ public class LIGNew {
 		Goal currentGoal = goalsAfterShift.head();// Number of goals after shift does not change
 
 		
-		
-		allCompPreds.add(tb.equals(index, low));// i>=l
-		allCompPreds.add(tb.leq(index, high));// i<=h
+		//Initial Predicate Sets for stencil & : 
+		allCompPreds.add(tb.geq(index, tb.subtract(low,tb.one())));//
+		allCompPreds.add(tb.leq(index, tb.add(high, tb.one())));//
 		for (Term arr : arrays) {
-			allDepPreds.add(tb.noR(tb.arrayRange(arr, low, high)));
-			allDepPreds.add(tb.noW(tb.arrayRange(arr, low, high)));
+			allDepPreds.add(tb.noR(tb.arrayRange(arr, tb.subtract(low,tb.one()), high)));
+			allDepPreds.add(tb.noW(tb.arrayRange(arr, tb.subtract(low,tb.one()), high)));
 		}
+		
+		//Initial Predicate Sets for withoutFunc, withFunc, conditionWithDifferentNumberOfEvent, condition, shiftArrayToLeft:
+//		allCompPreds.add(tb.equals(index, tb.subtract(low,tb.one())));//
+//		allCompPreds.add(tb.leq(index, tb.add(high, tb.one())));//
+//		for (Term arr : arrays) {
+//			allDepPreds.add(tb.noR(tb.arrayRange(arr, low, high)));
+//			allDepPreds.add(tb.noW(tb.arrayRange(arr, low, high)));
+//		}
 
 //		System.out.println("Initial comp Predicate Set: " + allCompPreds);
 //		for (Term term : allPreds) {
@@ -160,6 +168,9 @@ public class LIGNew {
 //		System.out.println(" of size " + allDepPreds.size() + " plus " + allCompPreds.size());
 		
 		allDepPreds.addAll(allCompPreds);
+		
+		
+
 		
 		System.out.println("Without compression, the DD LOOP INVARIANT is the conjunction of: ");
 		for (Term term : allDepPreds) {
