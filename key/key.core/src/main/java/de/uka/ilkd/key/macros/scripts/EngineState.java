@@ -70,7 +70,7 @@ public class EngineState {
 
     public void setGoal(Goal g) {
         goal = g;
-        lastSetGoalNode = Optional.ofNullable(g).map(Goal::node).orElse(null);
+        lastSetGoalNode = g == null ? null : g.node();
     }
 
     public Proof getProof() {
