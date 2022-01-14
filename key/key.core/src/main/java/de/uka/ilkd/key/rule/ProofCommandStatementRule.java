@@ -14,6 +14,9 @@ import org.key_project.util.collection.ImmutableList;
 import javax.annotation.Nullable;
 
 /**
+ * This should better be a taclet eventually which just treats the proof command
+ * statement as a NOP.
+ *
  * @author Alexander Weigl, Mattias Ulbrich
  * @version 1 (11/16/20)
  */

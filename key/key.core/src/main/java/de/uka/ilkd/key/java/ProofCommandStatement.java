@@ -2,6 +2,7 @@ package de.uka.ilkd.key.java;
 
 import de.uka.ilkd.key.java.statement.JavaStatement;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import org.key_project.util.ExtList;
 
 import java.io.IOException;
 
@@ -19,6 +20,11 @@ public class ProofCommandStatement extends JavaStatement {
     public ProofCommandStatement(String command, PositionInfo positionInfo) {
         super(positionInfo);
         this.command = command;
+    }
+
+    public ProofCommandStatement(ExtList changeList) {
+        super(changeList);
+        command = changeList.get(String.class);
     }
 
     @Override

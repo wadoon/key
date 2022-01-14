@@ -145,6 +145,17 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     }
 
     @Override
+    public void performActionOnProofCommand(ProofCommandStatement x) {
+        DefaultAction def = new DefaultAction(x) {
+            @Override
+            ProgramElement createNewElement(ExtList changeList) {
+                return new ProofCommandStatement(changeList);
+            }
+        };
+        def.doAction(x);
+    }
+
+    @Override
     public void performActionOnMergePointStatement(MergePointStatement x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
