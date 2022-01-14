@@ -85,9 +85,6 @@ subprojects {
     group = rootProject.group
     version = rootProject.version
 
-    sourceCompatibility = 17
-    targetCompatibility = 17
-
     repositories {
         mavenCentral()
         flatDir { dirs "lib", "$rootDir/key.core/lib", "$rootDir/key.ui/lib" }
@@ -102,8 +99,8 @@ subprojects {
     tasks.withType(JavaCompile) {
         // Setting UTF-8 as the java source encoding.
         options.encoding = "UTF-8"
-	// Setting the release to Java 11
-	options.release = 11
+        // Setting the release to Java 17
+        options.release = 17
     }
 
     tasks.withType(Javadoc) {
