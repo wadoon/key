@@ -83,7 +83,7 @@ public class HideCommand extends AbstractCommand<HideCommand.Parameters> {
 
     private SequentFormula find(SequentFormula sf, Semisequent semiseq) throws ScriptException {
         for (SequentFormula s : semiseq) {
-            if(s.formula().equalsModTermLabels(sf.formula())) {
+            if(s.formula().equalsModIrrelevantTermLabels(sf.formula())) {
                 return s;
             }
         }

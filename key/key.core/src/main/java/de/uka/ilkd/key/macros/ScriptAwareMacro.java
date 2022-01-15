@@ -29,7 +29,40 @@ package de.uka.ilkd.key.macros;
  *
  * @author mattias ulbrich
  */
-public class ScriptAwareMacro extends SequentialProofMacro {
+public class ScriptAwareMacro extends DoWhileFinallyMacro {
+
+    private static class LoopBody extends SequentialProofMacro {
+
+        private final ScriptAwareAutoMacro autoMacro = new ScriptAwareAutoMacro();
+        private final ApplyScriptsMacro applyMacro = new ApplyScriptsMacro(autoMacro.getDetectedCommands());
+
+        @Override
+        protected ProofMacro[] createProofMacroArray() {
+            return new ProofMacro[] { autoMacro, applyMacro };
+        }
+
+        @Override
+        public String getName() {
+            return null;
+        }
+
+        @Override
+        public String getCategory() {
+            return null;
+        }
+
+        @Override
+        public String getDescription() {
+            return null;
+        }
+    }
+
+    private static final LoopBody LOOPBODY = new LoopBody();
+
+    @Override
+    public String getScriptCommandName() {
+        return "script-auto";
+    }
 
     @Override
     public String getName() {
@@ -41,11 +74,6 @@ public class ScriptAwareMacro extends SequentialProofMacro {
         return "Auto Pilot";
     }
 
-    @Override
-    public String getScriptCommandName() {
-        return "script-auto";
-    }
-
 
     @Override
     public String getDescription() {
@@ -53,11 +81,17 @@ public class ScriptAwareMacro extends SequentialProofMacro {
     }
 
     @Override
-    protected ProofMacro[] createProofMacroArray() {
-        ScriptAwareAutoMacro autoMacro = new ScriptAwareAutoMacro();
-        return new ProofMacro[] {
-                autoMacro,
-                new ApplyScriptsMacro(autoMacro.getDetectedCommands())
-        };
+    protected ProofMacro getProofMacro() {
+        return LOOPBODY;
+    }
+
+    @Override
+    protected ProofMacro getAltProofMacro() {
+        return null;
+    }
+
+    @Override
+    protected boolean getCondition() {
+        return true;
     }
 }
