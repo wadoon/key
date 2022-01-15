@@ -68,7 +68,7 @@ import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.util.Pair;
-
+import org.key_project.util.collection.Immutables;
 
 
 /**
@@ -399,8 +399,17 @@ public class TacletGenerator {
         if (satisfiability)
             functionalRepresentsAddSatisfiabilityBranch(target, services, heapSVs,
                     selfSV, paramSVs, schemaRepresents, tacletBuilder);
-        tacletBuilder.setApplicationRestriction(RewriteTaclet.SAME_UPDATE_LEVEL);
-        result = result.add(tacletBuilder.getTaclet());        
+        tacletBuilder.setApplicationRestriction(RewriteTaclet.SAME_UPDATE_LEVEL | RewriteTaclet.SUCCEDENT_POLARITY);
+        result = result.add(tacletBuilder.getTaclet());
+
+        tacletBuilder.setTacletGoalTemplates(
+                ImmutableList.fromList(List.of(
+                new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
+                        ImmutableSLList.<Taclet>nil(),
+                        TB.and(limitedRhs, schemaLhs)))));
+        tacletBuilder.setApplicationRestriction(RewriteTaclet.SAME_UPDATE_LEVEL | RewriteTaclet.ANTECEDENT_POLARITY);
+        result = result.add(tacletBuilder.getTaclet());
+
         //return
         return result;
     }

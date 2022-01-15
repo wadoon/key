@@ -43,8 +43,13 @@ public class RewriteTacletBuilder<T extends RewriteTaclet> extends FindTacletBui
 	return this;
     }
 
+	public int getApplicationRestriction() {
+		return applicationRestriction;
+	}
 
-    /* for information flow purposes; TODO: find better solution */
+
+
+	/* for information flow purposes; TODO: find better solution */
     protected boolean surviveSmbExec;
     
     public void setSurviveSmbExec(boolean b) {
