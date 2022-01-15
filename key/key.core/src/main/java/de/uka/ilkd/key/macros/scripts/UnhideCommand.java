@@ -1,20 +1,33 @@
 package de.uka.ilkd.key.macros.scripts;
 
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.RuleAppIndex;
+import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
+import org.key_project.util.collection.ImmutableList;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class UnhideCommand extends AbstractCommand<UnhideCommand.Parameters> {
-    private static final Name HIDE_LEFT = new Name("hide_left");
-    private static final Name HIDE_RIGHT = new Name("hide_right");
+
+    public static final String INSERT_HIDDEN_PATTERN = "insert_hidden_taclet_[0-9]+";
+
+    private static final TacletFilter FILTER = new TacletFilter() {
+        @Override
+        protected boolean filter(Taclet taclet) {
+            return taclet.name().toString().matches(INSERT_HIDDEN_PATTERN);
+        }
+    };
 
     public UnhideCommand() {
         super(Parameters.class);
@@ -33,32 +46,35 @@ public class UnhideCommand extends AbstractCommand<UnhideCommand.Parameters> {
 
         Goal goal = state.getFirstOpenAutomaticGoal();
 
-        Taclet hideLeft = state.getProof().getEnv().getInitConfigForEnvironment()
-                .lookupActiveTaclet(HIDE_LEFT);
-        for (SequentFormula s : args.sequent.antecedent()) {
-            TacletApp app = NoPosTacletApp.createNoPosTacletApp(hideLeft);
-            SchemaVariable sv = app.uninstantiatedVars().iterator().next();
-            app = app.addCheckedInstantiation(sv, s.formula(), service, true);
-            goal.apply(app);
-        }
+        Set<Term> antes = new HashSet<>();
+        args.sequent.antecedent().forEach(sf -> antes.add(sf.formula()));
 
-        Taclet hideRight = state.getProof().getEnv().getInitConfigForEnvironment()
-                .lookupActiveTaclet(HIDE_RIGHT);
-        for (SequentFormula s : args.sequent.succedent()) {
-            TacletApp app = NoPosTacletApp.createNoPosTacletApp(hideRight);
-            SchemaVariable sv = app.uninstantiatedVars().iterator().next();
-            app = app.addCheckedInstantiation(sv, s.formula(), service, true);
-            goal.apply(app);
+        Set<Term> succs = new HashSet<>();
+        args.sequent.succedent().forEach(sf -> succs.add(sf.formula()));
+
+        RuleAppIndex index = goal.ruleAppIndex();
+        ImmutableList<NoPosTacletApp> apps = index.getNoFindTaclet(FILTER, service);
+
+        for (NoPosTacletApp app : apps) {
+            SchemaVariable b = app.instantiations().svIterator().next();
+            Object bInst = app.instantiations().getInstantiation(b);
+            boolean succApp = app.taclet().goalTemplates().head().sequent().antecedent().isEmpty();
+            if(succApp) {
+                if (succs.contains(bInst)) {
+                    goal.apply(app);
+                }
+            } else {
+                if(antes.contains(bInst)) {
+                    goal.apply(app);
+                }
+            }
         }
     }
-
-    @Override
     public String getName() {
-        return "hide";
+        return "unhide";
     }
 
     public class Parameters {
-        /** A formula defining the goal to select */
         @Option("#2")
         public Sequent sequent;
     }
