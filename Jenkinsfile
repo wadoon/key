@@ -30,7 +30,7 @@ pipeline {
                 withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'SONAR_TOKEN')]) {
                     //-Dsonar.qualitygate.wait=true
                     catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                        sh 'cd key && ./gradlew --build-cache --continue -DjacocoEnabled=true :key.util:test sonarqube'
+                        sh 'cd key && ./gradlew --info --stacktrace --build-cache --continue -DjacocoEnabled=true :key.util:test sonarqube'
                     }
                 }
             }
@@ -39,14 +39,14 @@ pipeline {
         stage('Test: testProveRules') {
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    sh 'cd key && ./gradlew --continue testProveRules'
+                    //sh 'cd key && ./gradlew --continue testProveRules'
                 }
             }
         }
 
         stage('Test: testRunAllProofs') {
             steps {
-                sh 'cd key && ./gradlew --continue testRunAllProofs'
+                //sh 'cd key && ./gradlew --continue testRunAllProofs'
 
                 plot csvFileName: 'plot-4acea630-1baa-4f25-b8e4-3370d9950347.csv',
                         group: 'runAllProofs', numBuilds: '200',
