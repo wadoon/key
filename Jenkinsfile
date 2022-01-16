@@ -17,7 +17,7 @@ pipeline {
         stage('Clean') {
             steps {
                 sh 'javac -version'
-                sh 'ls $HOME/.sdkman/candidates/'
+                sh 'tree'
                 sh 'key/scripts/jenkins/startupClean.sh'
                 sh 'rm -rf $SONAR_USER_HOME && mkdir -p $SONAR_USER_HOME'
             }
