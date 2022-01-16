@@ -31,7 +31,7 @@ pipeline {
 
         stage('Test: JUnit + Sonarqube') {
             when {
-                anyOnf {
+                anyOf {
                     changeset "key/*/src/**/**" // any file in a source folder changed
                     changeset "Jenkinsfile" // pipeline changed
                 }
@@ -50,7 +50,7 @@ pipeline {
 
         stage('Test: testProveRules') {
             when {
-                anyOnf {
+                anyOf {
                     changeset "key/*/src/**/**" // any file in a source folder changed
                     changeset "Jenkinsfile" // pipeline changed
                 }
@@ -65,7 +65,7 @@ pipeline {
 
         stage('Test: testRunAllProofs') {
             when {
-                anyOnf {
+                anyOf {
                     changeset "key/*/src/**/**" // any file in a source folder changed
                     changeset "Jenkinsfile" // pipeline changed
                 }
