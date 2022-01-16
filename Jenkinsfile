@@ -18,7 +18,8 @@ pipeline {
             steps {
                 sh 'javac -version'
                 sh 'printenv'
-                sh 'ls -lR /root/.sdkman'
+                sh 'id'
+                sh 'ls -lR /root/'
                 sh 'key/scripts/jenkins/startupClean.sh'
                 sh 'rm -rf $SONAR_USER_HOME && mkdir -p $SONAR_USER_HOME'
             }
