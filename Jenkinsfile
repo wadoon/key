@@ -17,7 +17,6 @@ pipeline {
         stage('Clean') {
             steps {
                 sh 'javac -version'
-                sh 'tree'
                 sh 'printenv'
                 sh 'ls -lR ${HOME}/.sdkman'
                 sh 'key/scripts/jenkins/startupClean.sh'
