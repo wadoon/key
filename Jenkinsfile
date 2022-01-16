@@ -9,14 +9,17 @@ pipeline {
 
     environment {
         GRADLE_OPTS = '-Dorg.gradle.daemon=false'
-        GRADLE      = '~/.sdkman/candidates/gradle/current/bin/gradle'
+        GRADLE      = '$HOME/.sdkman/candidates/gradle/current/bin/gradle'
+        SONAR_USER_HOME = "$HOME/sonar"
     }
 
     stages {
         stage('Clean') {
             steps {
                 sh 'javac -version'
+                sh 'ls $HOME/.sdkman/candidates/'
                 sh 'key/scripts/jenkins/startupClean.sh'
+                sh 'rm -rf $SONAR_USER_HOME && mkdir -p $SONAR_USER_HOME'
             }
         }
 
