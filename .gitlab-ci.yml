@@ -80,7 +80,27 @@ sonarqube:
       junit:
         - "**/**/build/test-results/*/TEST-*.xml"
 
+deploy-nightly:
+  stage: deploy
+  script:
+    - cd key
+    - BUILD_NUMBER=SNAPSHOT gradle deploy
+  only:
+    - stable
+
+deploy-release:
+  when: manual
+  stage: build
+  script:
+    - cd key
+    - gradle deploy
+  only:
+    - /^KeY-.*$/
+
+
 checkstyle:
+  only:
+    - xxx # disabled
   stage: primary
   image: wadoon/key-test-docker:jdk11
   allow_failure: true
