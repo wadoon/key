@@ -42,7 +42,7 @@ pipeline {
                 withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'SONAR_TOKEN')]) {
                     //-Dsonar.qualitygate.wait=true
                     catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                        sh 'cd key && $GRADLE --info --stacktrace --build-cache --continue -DjacocoEnabled=true :key.util:test sonarqube'
+                        sh 'cd key && $GRADLE --info --build-cache --continue -sonar.branch.name=${GIT_BRANCH} -DjacocoEnabled=true :key.util:test sonarqube'
                     }
                 }
             }
