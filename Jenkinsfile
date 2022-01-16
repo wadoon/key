@@ -9,8 +9,8 @@ pipeline {
 
     environment {
         GRADLE_OPTS = '-Dorg.gradle.daemon=false'
-        GRADLE      = '/root/.sdkman/candidates/gradle/current/bin/gradle'
-        SONAR_USER_HOME = "$HOME/sonar"
+        GRADLE = 'gradle'
+        SONAR_USER_HOME = "/tmp/sonar"
     }
 
     stages {
@@ -18,8 +18,6 @@ pipeline {
             steps {
                 sh 'javac -version'
                 sh 'printenv'
-                sh 'id'
-                sh 'ls -lR /root/'
                 sh 'key/scripts/jenkins/startupClean.sh'
                 sh 'rm -rf $SONAR_USER_HOME && mkdir -p $SONAR_USER_HOME'
             }
@@ -27,11 +25,19 @@ pipeline {
 
         stage('Compile') {
             steps {
-                sh 'cd key && $GRADLE --parallel clean compileTest :key.ui:shadowJar :key.ui:distZip'
+                sh 'cd key && $GRADLE --parallel clean compileTest'
             }
         }
 
         stage('Test: JUnit + Sonarqube') {
+            when {
+                anyOnf {
+                    changeset "key/*/src/**/**" // any file in a source folder changed
+                    changeset "Jenkinsfile" // pipeline changed
+                }
+            }
+
+
             steps {
                 withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'SONAR_TOKEN')]) {
                     //-Dsonar.qualitygate.wait=true
@@ -43,6 +49,13 @@ pipeline {
         }
 
         stage('Test: testProveRules') {
+            when {
+                anyOnf {
+                    changeset "key/*/src/**/**" // any file in a source folder changed
+                    changeset "Jenkinsfile" // pipeline changed
+                }
+            }
+
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                     //sh 'cd key && $GRADLE --continue testProveRules'
@@ -51,6 +64,13 @@ pipeline {
         }
 
         stage('Test: testRunAllProofs') {
+            when {
+                anyOnf {
+                    changeset "key/*/src/**/**" // any file in a source folder changed
+                    changeset "Jenkinsfile" // pipeline changed
+                }
+            }
+
             steps {
                 //sh 'cd key && $GRADLE --continue testRunAllProofs'
 
