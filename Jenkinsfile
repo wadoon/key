@@ -9,6 +9,7 @@ pipeline {
 
     environment {
         GRADLE_OPTS = '-Dorg.gradle.daemon=false'
+        GRADLE      = '~/.sdkman/candidates/gradle/current/bin/gradle'
     }
 
     stages {
@@ -21,7 +22,7 @@ pipeline {
 
         stage('Compile') {
             steps {
-                sh 'cd key && ./gradlew --parallel clean compileTest :key.ui:shadowJar :key.ui:distZip'
+                sh 'cd key && $GRADLE --parallel clean compileTest :key.ui:shadowJar :key.ui:distZip'
             }
         }
 
@@ -30,7 +31,7 @@ pipeline {
                 withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'SONAR_TOKEN')]) {
                     //-Dsonar.qualitygate.wait=true
                     catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                        sh 'cd key && ./gradlew --info --stacktrace --build-cache --continue -DjacocoEnabled=true :key.util:test sonarqube'
+                        sh 'cd key && $GRADLE --info --stacktrace --build-cache --continue -DjacocoEnabled=true :key.util:test sonarqube'
                     }
                 }
             }
@@ -39,14 +40,14 @@ pipeline {
         stage('Test: testProveRules') {
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    //sh 'cd key && ./gradlew --continue testProveRules'
+                    //sh 'cd key && $GRADLE --continue testProveRules'
                 }
             }
         }
 
         stage('Test: testRunAllProofs') {
             steps {
-                //sh 'cd key && ./gradlew --continue testRunAllProofs'
+                //sh 'cd key && $GRADLE --continue testRunAllProofs'
 
                 plot csvFileName: 'plot-4acea630-1baa-4f25-b8e4-3370d9950347.csv',
                         group: 'runAllProofs', numBuilds: '200',
