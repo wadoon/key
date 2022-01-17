@@ -31,6 +31,7 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.util.Pair;
 
 public class LIGNew {
@@ -74,10 +75,10 @@ public class LIGNew {
 		}
 
 		
-//		System.out.println("Goals before shift: "+services.getProof().openGoals());
+//		System.out.println("Goals before shift number -1: "+services.getProof().openGoals());
 		ImmutableList<Goal> goalsAfterShift = ruleApp.applyShiftUpdateRule(services.getProof().openGoals());
 //		System.out.println("SHIFTED");
-//		System.out.println("number of goals after shift -1: " + goalsAfterShift.size());// It is always one
+//		System.out.println("number of goals after shift number -1: " + goalsAfterShift.size());// It is always one
 //		System.out.println(
 //				"Goals after shift -1: " + ProofSaver.printAnything(goalsAfterShift.head().sequent(), services));
 		ImmutableList<Goal> goalsAfterUnwind = null;
@@ -85,7 +86,7 @@ public class LIGNew {
 		Goal currentGoal = goalsAfterShift.head();// Number of goals after shift does not change
 
 		
-		//Initial Predicate Sets for stencil & : 
+//		//Initial Predicate Sets for stencil: 
 		allCompPreds.add(tb.geq(index, tb.subtract(low,tb.one())));//
 		allCompPreds.add(tb.leq(index, tb.add(high, tb.one())));//
 		for (Term arr : arrays) {
@@ -93,13 +94,16 @@ public class LIGNew {
 			allDepPreds.add(tb.noW(tb.arrayRange(arr, tb.subtract(low,tb.one()), high)));
 		}
 		
-		//Initial Predicate Sets for withoutFunc, withFunc, conditionWithDifferentNumberOfEvent, condition, shiftArrayToLeft:
-//		allCompPreds.add(tb.equals(index, tb.subtract(low,tb.one())));//
-//		allCompPreds.add(tb.leq(index, tb.add(high, tb.one())));//
+		
+		//Initial Predicate Sets for shiftArrayToLeft, shiftArrayToLeftWithBreak, withoutFunc, withFunc, conditionWithDifferentNumberOfEvent, condition:
+//		allCompPreds.add(tb.geq(index, low));
+//		allCompPreds.add(tb.leq(index, tb.add(high,tb.one())));
 //		for (Term arr : arrays) {
 //			allDepPreds.add(tb.noR(tb.arrayRange(arr, low, high)));
 //			allDepPreds.add(tb.noW(tb.arrayRange(arr, low, high)));
 //		}
+		
+		
 
 //		System.out.println("Initial comp Predicate Set: " + allCompPreds);
 //		for (Term term : allPreds) {
@@ -172,20 +176,20 @@ public class LIGNew {
 		
 
 		
-		System.out.println("Without compression, the DD LOOP INVARIANT is the conjunction of: ");
-		for (Term term : allDepPreds) {
-			System.out.println(term);
-		}
-		
-		
-//		PredicateListCompressionNew plcDep = new PredicateListCompressionNew(services, currentGoal.sequent(), allDepPreds, false);
-//		allDepPreds = plcDep.compression();
-//		
-//		System.out.println("After compression, the DD LOOP INVARIANT is the conjunction of: ");
+//		System.out.println("Without compression, the DD LOOP INVARIANT is the conjunction of: ");
 //		for (Term term : allDepPreds) {
-//				System.out.println(term);
+//			System.out.println(term);
 //		}
-//		System.out.println("after " + itrNumber + " iterations of the LIG algorithm");
+		
+		
+		PredicateListCompressionNew plcDep = new PredicateListCompressionNew(services, currentGoal.sequent(), allDepPreds, false);
+		allDepPreds = plcDep.compression();
+		
+		System.out.println("After compression, the DD LOOP INVARIANT is the conjunction of: ");
+		for (Term term : allDepPreds) {
+				System.out.println(term);
+		}
+		System.out.println("after " + itrNumber + " iterations of the LIG algorithm");
 	}
 
 	private Goal abstractGoal(Goal currentGoal) {

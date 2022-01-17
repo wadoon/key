@@ -146,6 +146,59 @@ public class TestPredicateConstruction {
 		curNew.mainAlg();
 	}
 
+	public void shiftArrayToLeftWithBreak() {
+
+		Term succFormula;
+
+		try {
+			succFormula = parse("{i:=0}\\<{" + "			while (i<=a.length-1) {"
+					+ "if (i==a.length-1) break;"
+					+ "else {a[i] = a[i+1];"
+					+ "			i++;}}"
+					+ "		}\\>true");
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			if (e.getCause() != null) {
+				System.out.println(e.getCause().getMessage());
+			}
+			e.printStackTrace();
+			return;
+		}
+		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(succFormula), false, true).sequent();
+
+		String[] arrLeft = { "noW(arrayRange(a,0,a.length-1))","noR(arrayRange(a,0,a.length-1))", "a.length > 10" };
+		String[] arrRight = { "a=null" };
+		try {
+			for (String fml : arrLeft) {
+				seq = seq.addFormula(new SequentFormula(parse(fml)), true, true).sequent();
+			}
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			if (e.getCause() != null) {
+				System.out.println(e.getCause().getMessage());
+			}
+			e.printStackTrace();
+			return;
+		}
+		
+		try {
+			for (String fml : arrRight) {
+				seq = seq.addFormula(new SequentFormula(parse(fml)), false, false).sequent();
+			}
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			if (e.getCause() != null) {
+				System.out.println(e.getCause().getMessage());
+			}
+			e.printStackTrace();
+			return;
+		}
+
+		LIGNew curNew = new LIGNew(services, seq);
+		curNew.mainAlg();
+	}
+
+	
 	public void withFunc() {////////////////////DONE!
 
 		Term succFormula;
