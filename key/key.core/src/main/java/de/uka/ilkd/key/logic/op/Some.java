@@ -19,28 +19,26 @@ import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
-import java.util.Objects;
-
-
 /**
  * This singleton class implements a Hilbert's choice operator, often denoted by epsilon.
  * "\some iv; (phi)", where iv is a logic variable, phi is a formula.
  * The variable iv is bound in phi.
  */
 public final class Some extends AbstractOperator {
-    private final Sort sort;
+    public static final Some SOME = new Some();
 
-    public Some(Sort sort) {
+    private Some() {
 	    super(new Name("some"), 1, new Boolean[]{true}, true);
-        this.sort = sort;
     }
-    
-    
+
     @Override
     public Sort sort(ImmutableArray<Term> terms) {
-	    return sort;
+        // The sort of (\some ...) is always ANY, make sure to add a cast when creating
+        // terms with \some. This allows us to have only a single operator \some instead of one
+        // for each sort.
+        // TODO: At the moment, via manual cuts it is probably possible to prove false!
+        return Sort.ANY;
     }
-    
 
     @Override
     protected void additionalValidTopLevel(Term term) {
@@ -51,18 +49,5 @@ public final class Some extends AbstractOperator {
         if (s0 != Sort.FORMULA) {
             throw new TermCreationException(this, term);
         }
-    }
-
-    @Override
-    public int hashCode() {
-        return super.hashCode() + Objects.hash("some") + sort.hashCode() ;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof Some)) {
-            return false;
-        }
-        return (((Some) obj).sort == sort);
     }
 }
