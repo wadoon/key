@@ -24,6 +24,8 @@ import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 
+import java.util.List;
+
 
 /**
  * The objects of this class represent families of function symbols, where
@@ -49,7 +51,7 @@ public final class SortDependingFunction extends Function {
         super(instantiateName(template.kind, sortDependingOn),
                 instantiateResultSort(template, sortDependingOn),
                 instantiateArgSorts(template, sortDependingOn),
-                null,
+                template.whereToBind,
                 template.unique, false);
         this.template = template;
         this.sortDependingOn = sortDependingOn;
@@ -105,12 +107,14 @@ public final class SortDependingFunction extends Function {
             Name kind,
             Sort sort,
             Sort[] argSorts,
+            List<Boolean> whereToBind,
             boolean unique) {
         SortDependingFunctionTemplate template
                 = new SortDependingFunctionTemplate(sortDependingOn,
                 kind,
                 sort,
-                new ImmutableArray<Sort>(argSorts),
+                new ImmutableArray<>(argSorts),
+                whereToBind == null ? null : new ImmutableArray<>(whereToBind),
                 unique);
         return new SortDependingFunction(template, Sort.ANY);
     }
@@ -228,16 +232,19 @@ public final class SortDependingFunction extends Function {
         public final Sort sort;
         public final ImmutableArray<Sort> argSorts;
         public final boolean unique;
+        public final ImmutableArray<Boolean> whereToBind;
 
         public SortDependingFunctionTemplate(GenericSort sortDependingOn,
                 Name kind,
                 Sort sort,
                 ImmutableArray<Sort> argSorts,
+                ImmutableArray<Boolean> whereToBind,
                 boolean unique) {
             this.sortDependingOn = sortDependingOn;
             this.kind = kind;
             this.sort = sort;
             this.argSorts = argSorts;
+            this.whereToBind = whereToBind;
             this.unique = unique;
         }
     }

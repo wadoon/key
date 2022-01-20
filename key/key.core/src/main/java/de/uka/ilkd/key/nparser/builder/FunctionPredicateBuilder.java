@@ -67,6 +67,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
                         new Name(baseName),
                         Sort.FORMULA,
                         argSorts.toArray(new Sort[0]),
+                        whereToBind,
                         false);
             }
         }
@@ -91,7 +92,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
         boolean unique = ctx.UNIQUE() != null;
         Sort retSort = accept(ctx.sortId());
         String func_name = accept(ctx.funcpred_name());
-        List<Boolean[]> whereToBind = accept(ctx.where_to_bind());
+        List<Boolean> whereToBind = accept(ctx.where_to_bind());
         List<Sort> argSorts = accept(ctx.arg_sorts());
         assert argSorts != null;
 
@@ -112,6 +113,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
                         new Name(baseName),
                         retSort,
                         argSorts.toArray(new Sort[0]),
+                        whereToBind,
                         unique);
             }
         }
