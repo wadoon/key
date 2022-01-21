@@ -32,20 +32,19 @@ public final class Some extends AbstractOperator {
     }
 
     @Override
+    public Sort sort(Term term) {
+        return term.boundVars().get(0).sort();
+    }
+
+    @Override
     public Sort sort(ImmutableArray<Term> terms) {
-        // The sort of (\some ...) is always ANY, make sure to add a cast when creating
-        // terms with \some. This allows us to have only a single operator \some instead of one
-        // for each sort.
-        // TODO: At the moment, via manual cuts it is probably possible to prove false!
-        return Sort.ANY;
+        // TODO: might crash when called
+        return null;
     }
 
     @Override
     protected void additionalValidTopLevel(Term term) {
-
         final Sort s0 = term.sub(0).sort();
-        //final Sort s1 = term.sub(1).sort();
-
         if (s0 != Sort.FORMULA) {
             throw new TermCreationException(this, term);
         }

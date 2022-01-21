@@ -453,9 +453,9 @@ public class TermBuilder {
     public Term some(QuantifiableVariable qv, Term cond) {
         // The sort of (\some ...) is always ANY, therefore an additional cast is needed.
         // This allows us to have only a single operator \some instead of one for each sort.
-        return cast(qv.sort(), tf.createTerm(Some.SOME,
+        return tf.createTerm(Some.SOME,
             new ImmutableArray<>(cond),
-            new ImmutableArray<>(qv), null));
+            new ImmutableArray<>(qv), null);
     }
 
     /**

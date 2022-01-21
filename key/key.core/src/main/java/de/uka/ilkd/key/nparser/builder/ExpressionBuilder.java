@@ -947,17 +947,11 @@ public class ExpressionBuilder extends DefaultBuilder {
         ImmutableArray<QuantifiableVariable> exVarsArray
             = new ImmutableArray<>(exVars);
 
-        SortDependingFunction castSymbol = exVars.get(0).sort().getCastSymbol(getServices());
-
         Term result = getTermFactory().createTerm(
             Some.SOME/*new Some(exVars.get(0).sort())*/,
             new Term[]{condF},
             exVarsArray,
             null);
-
-        // The sort of (\some ...) is always ANY, therefore an additional cast is needed.
-        // This allows us to have only a single operator \some instead of one for each sort.
-        result = getTermFactory().createTerm(castSymbol, result);
 
         unbindVars(orig);
         return result;

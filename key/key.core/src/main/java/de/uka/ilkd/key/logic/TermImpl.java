@@ -213,7 +213,7 @@ public class TermImpl implements Term {
 
     @Override
     public Sort sort() {
-        return op.sort(subs);
+        return op.sort(this);
     }
 
 

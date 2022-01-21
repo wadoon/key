@@ -31,6 +31,9 @@ public interface Operator extends Named, SVSubstitute {
      */
     int arity();
 
+    default Sort sort(Term term) {
+        return sort(term.subs());
+    }
 
     /**
      * Determines the sort of the {@link Term} if it would be created using this
@@ -43,7 +46,6 @@ public interface Operator extends Named, SVSubstitute {
      * given substerms
      */
     Sort sort(ImmutableArray<Term> terms);
-
 
     /**
      * Tells whether the operator binds variables at the n-th subterm.
