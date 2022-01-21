@@ -87,21 +87,21 @@ public class LIGNew {
 
 		
 //		//Initial Predicate Sets for stencil: 
-		allCompPreds.add(tb.geq(index, tb.subtract(low,tb.one())));//
-		allCompPreds.add(tb.leq(index, tb.add(high, tb.one())));//
-		for (Term arr : arrays) {
-			allDepPreds.add(tb.noR(tb.arrayRange(arr, tb.subtract(low,tb.one()), high)));
-			allDepPreds.add(tb.noW(tb.arrayRange(arr, tb.subtract(low,tb.one()), high)));
-		}
+//		allCompPreds.add(tb.geq(index, tb.subtract(low,tb.one())));//
+//		allCompPreds.add(tb.leq(index, tb.add(high, tb.one())));//
+//		for (Term arr : arrays) {
+//			allDepPreds.add(tb.noR(tb.arrayRange(arr, tb.subtract(low,tb.one()), high)));
+//			allDepPreds.add(tb.noW(tb.arrayRange(arr, tb.subtract(low,tb.one()), high)));
+//		}
 		
 		
 		//Initial Predicate Sets for shiftArrayToLeft, shiftArrayToLeftWithBreak, withoutFunc, withFunc, conditionWithDifferentNumberOfEvent, condition:
-//		allCompPreds.add(tb.geq(index, low));
-//		allCompPreds.add(tb.leq(index, tb.add(high,tb.one())));
-//		for (Term arr : arrays) {
-//			allDepPreds.add(tb.noR(tb.arrayRange(arr, low, high)));
-//			allDepPreds.add(tb.noW(tb.arrayRange(arr, low, high)));
-//		}
+		allCompPreds.add(tb.geq(index, low));
+		allCompPreds.add(tb.leq(index, tb.add(high,tb.one())));
+		for (Term arr : arrays) {
+			allDepPreds.add(tb.noR(tb.arrayRange(arr, low, high)));
+			allDepPreds.add(tb.noW(tb.arrayRange(arr, low, high)));
+		}
 		
 		
 
@@ -158,7 +158,7 @@ public class LIGNew {
 			}
 
 //			System.out.println("Dep Preds: " + allDepPreds);
-		} while ((!allCompPreds.equals(oldCompPreds) || !allDepPreds.equals(oldDepPreds)) || allDepPreds.size() < 2 || itrNumber < 2);
+		} while ((!allCompPreds.equals(oldCompPreds) || !allDepPreds.equals(oldDepPreds)) || itrNumber < 2);
 
 //		System.out.println("===========Terminated===========");
 //		System.out.println("Number of iterations at the end: " + itrNumber);
@@ -175,7 +175,7 @@ public class LIGNew {
 		
 		
 
-		
+//		
 //		System.out.println("Without compression, the DD LOOP INVARIANT is the conjunction of: ");
 //		for (Term term : allDepPreds) {
 //			System.out.println(term);

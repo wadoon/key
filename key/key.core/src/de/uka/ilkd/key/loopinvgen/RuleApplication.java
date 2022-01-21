@@ -84,7 +84,8 @@ public class RuleApplication {
 			final ImmutableList<Goal> goals = currentGoal.apply(app);
 //			System.out.println("Number of Open Goals after applying Shift: " + currentGoal.proof().openGoals().size());
 //			System.out.println("seq:"+ProofSaver.printAnything(currentGoal.sequent(), services));
-//			ps.start(goals);
+			ps.start(goals);
+			
 //			try {		
 //				System.out.println("Number of Open Goals after simplification: " + ps.getProof().openGoals().size() + "+++" + (ps.getProof() == currentGoal.proof()));
 
