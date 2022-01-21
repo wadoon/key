@@ -53,7 +53,7 @@ public class PredicateRefinementNew3 {
 	public Pair<Set<Term>, Set<Term>> predicateCheckAndRefine() {
 		Set<Term> unProvenDepPreds = new HashSet<>();
 		for (Term pred : depPredicates) {
-//			System.out.println("Proving Dep Pred: " + pred);
+			System.out.println("Proving Dep Pred: " + pred);
 			if (!sequentImpliesPredicate(pred)) {
 				unProvenDepPreds.add(pred);
 			}
@@ -68,11 +68,10 @@ public class PredicateRefinementNew3 {
 		for (Term w : weakenedDepPreds) {
 			for(Term dp : depPredicates) {
 				if(predicateImpliedBypredicate(w, dp)) {
-//					System.out.println("IMPLIED " + w + " by " + dp);
+					System.out.println("IMPLIED " + w + " by " + dp);
+					break;
 				}
-				break;
 			}
-			
 			if (!depPredicates.contains(w) && sequentImpliesPredicate(w)) {
 				depPredicates.add(w);
 			}
@@ -156,7 +155,7 @@ public class PredicateRefinementNew3 {
 
 	private Set<Term> weakeningDependencePredicates(Term unProven) {
 		Set<Term> result = new HashSet<>();
-//		System.out.println("Weaken by Predicate Symbol for "+unProven);
+		System.out.println("Weaken"+unProven);
 		result.addAll(weakenByPredicateSymbol(unProven));
 
 //		System.out.println("Weaken by Index for "+unProven);
@@ -172,6 +171,7 @@ public class PredicateRefinementNew3 {
 //			result.addAll(weakenBySubSet(unProven)); // 0 or 3
 //		System.out.println("sequent added: ");
 //		result.addAll(weakenBySequent(unProven)); // 0 or 1
+		System.out.println(result);
 		return result;
 	}
 

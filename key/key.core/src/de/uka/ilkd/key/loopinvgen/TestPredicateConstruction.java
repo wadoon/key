@@ -782,6 +782,13 @@ public class TestPredicateConstruction {
 		TestPredicateConstruction tpc = new TestPredicateConstruction();
 		long start = System.currentTimeMillis();
 		tpc.shiftArrayToLeft();
+//		tpc.shiftArrayToLeftWithBreak();
+//		tpc.condition();
+//		tpc.conditionDifferentNumberOfEvents();
+//		tpc.conditionWithDifferentEvents();
+//		tpc.withFunc();
+//		tpc.withoutFunc();
+//		tpc.stencil(); //Change the s0 in LIGNew
 		long end = System.currentTimeMillis();
 		System.out.println("Loop Invariant Generation took " + (end - start) + " ms");
 	}

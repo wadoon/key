@@ -123,7 +123,7 @@ public class LIGNew {
 
 		do {
 			itrNumber++;
-//			System.out.println("Iteration Number: " + itrNumber);
+			System.out.println("Iteration Number: " + itrNumber);
 
 			oldDepPreds.removeAll(oldDepPreds);
 			oldCompPreds.removeAll(oldCompPreds);
