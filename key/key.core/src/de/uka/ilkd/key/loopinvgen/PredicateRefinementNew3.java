@@ -121,7 +121,7 @@ public class PredicateRefinementNew3 {
 	 return false;
  }
 	private boolean sequentImpliesPredicate(Term pred) {
-//		System.out.println("sequentImpliesPredicate is called for: "+pred);
+		System.out.println("sequentImpliesPredicate is called for: "+pred);
 		Sequent sideSeq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(pred), false, true).sequent();
 		for (SequentFormula sequentFormula : seq.antecedent()) {
 			sideSeq = sideSeq.addFormula(sequentFormula, true, false).sequent();
@@ -133,7 +133,7 @@ public class PredicateRefinementNew3 {
 			}
 		}
 
-//		System.out.println("is Provable called for: " +  pred);
+		System.out.println("is Provable called for: " +  pred);
 		final boolean provable = sProof.isProvable(sideSeq, services);
 //		if (!provable && (pred.op() == intLDT.getLessThan() || pred.op() == intLDT.getLessOrEquals()
 //				|| pred.op() == intLDT.getGreaterThan() || pred.op() == intLDT.getGreaterOrEquals()
@@ -205,7 +205,8 @@ public class PredicateRefinementNew3 {
 			final Term newLow = tb.add(low, tb.one());
 			final Term high = locSet.sub(2);
 			final Term newHigh = tb.subtract(high, tb.one());
-//			if (sProof.proofLT(low, high)) {
+	
+			if (sProof.proofLEQ(low, high)) {
 			lowSingleton = tb.singleton(array, tb.arr(low));
 			highSingleton = tb.singleton(array, tb.arr(high));
 			if (!sProof.proofEquality(newLow, newHigh))
@@ -234,7 +235,7 @@ public class PredicateRefinementNew3 {
 				result.add(tb.noWaW(lowSingleton));
 				result.add(tb.noWaW(highSingleton));
 			}
-//			}
+			}
 		}
 //		System.out.println(result);
 		return result;
