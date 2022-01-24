@@ -110,7 +110,8 @@ public class QueryExpandCost implements Feature {
             if(count > maxRepetitionsOnSameTerm) {
                 return TOP_COST;
             } else {
-                cost += count * 2000l;
+                cost += count > 4 ? (count - 4) * 2000l : 0;
+                System.out.println(count);
             }
         }
 
@@ -128,6 +129,7 @@ public class QueryExpandCost implements Feature {
         //String tStr = t.toString(); int maxLen = tStr.length()>50?50:tStr.length();
         //System.out.println("  cost="+cost + "    query:.."+tStr.substring(15, maxLen-1)+"..");
 
+        cost = cost - 10 * pos.depth();
         return NumberRuleAppCost.create(cost);
     }
 

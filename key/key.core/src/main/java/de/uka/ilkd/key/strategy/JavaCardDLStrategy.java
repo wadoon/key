@@ -152,7 +152,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                         .getProperty(StrategyProperties.QUERY_OPTIONS_KEY);
         final Feature queryF;
         if (queryProp.equals(StrategyProperties.QUERY_ON)) {
-            queryF = querySpecFeature(new QueryExpandCost(200, 1, 1, false));
+            queryF = querySpecFeature(new QueryExpandCost(-1000, 1, 1, false));
         } else if (queryProp.equals(StrategyProperties.QUERY_RESTRICTED)) {
             // All tests in the example directory pass with this strategy.
             // Hence, the old query_on strategy is obsolete.
@@ -1054,6 +1054,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                     new Feature[] {
                         not(TopLevelFindFeature.ANTEC_OR_SUCC_WITH_UPDATE),
                         AllowedCutPositionFeature.INSTANCE,
+                            applyTF(cutFormula,ifZero(ff.notContainsExecutable, longTermConst(0), inftyTermConst())),
                         ifZero(NotBelowQuantifierFeature.INSTANCE,
                                add(applyTF(cutFormula,
                                        add(ff.cutAllowed,
