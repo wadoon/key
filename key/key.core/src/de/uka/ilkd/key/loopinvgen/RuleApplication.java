@@ -24,7 +24,7 @@ import de.uka.ilkd.key.util.SideProofUtil;
 public class RuleApplication {
 
 	private static final int TIME_OUT = -1;
-	private static final int MAX_RULE_APP = 5000;
+	private static final int MAX_RULE_APP = 10000;
 	private final Sequent seq;
 	final Services services;
 	private ProofStarter ps;
@@ -149,9 +149,9 @@ public class RuleApplication {
 			
 			ApplyStrategyInfo info = ps.start(goals);
 
-//			System.out.println(info.getAppliedRuleApps() + ":" + info.toString());
-//			System.out.println("Number of Open Goals after applying unwind: " + currentGoal.proof().openGoals().size());
-//			System.out.println("Open Goals after applying unwind: " + currentGoal.proof().openGoals());
+			System.out.println(info.getAppliedRuleApps() + ":" + info.toString());
+			System.out.println("Number of Open Goals after applying unwind: " + currentGoal.proof().openGoals().size());
+			System.out.println("Open Goals after applying unwind: " + currentGoal.proof().openGoals());
 			return currentGoal.proof().openGoals();
 //			return services.getProof().openEnabledGoals();
 		}

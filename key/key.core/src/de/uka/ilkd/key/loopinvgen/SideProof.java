@@ -35,7 +35,7 @@ public class SideProof {
 	}
 
 	public SideProof(Services s, Sequent sequent) {
-		this(s, sequent, 5000);
+		this(s, sequent, 10000);
 	}
 
 	boolean proofEquality(Term loc1, Term loc2) {
@@ -427,7 +427,7 @@ public class SideProof {
 				e.printStackTrace();
 			}
 			COUNTER++;
-//		}
+////		}
 		System.out.println(closed);
 		return closed;
 	}

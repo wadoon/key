@@ -102,7 +102,7 @@ public class TestPredicateConstruction {
 		Term succFormula;
 
 		try {
-			succFormula = parse("{i:=0}\\<{" + "			while (i<a.length-1) {a[i] = a[i+1];" + "			i++;}"
+			succFormula = parse("{i:=0}\\<{" + "		while (i<a.length-1) {a[i] = a[i+1];" + "			i++;}"
 					+ "		}\\>true");
 		} catch (Exception e) {
 			System.out.println(e.getMessage());

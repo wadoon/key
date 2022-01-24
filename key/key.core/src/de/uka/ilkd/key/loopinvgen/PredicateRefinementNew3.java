@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.DependenciesLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -64,10 +63,9 @@ public class PredicateRefinementNew3 {
 			weakenedDepPreds.addAll(weakeningDependencePredicates(un));
 		}
 
-		
 		for (Term w : weakenedDepPreds) {
-			for(Term dp : depPredicates) {
-				if(predicateImpliedBypredicate(w, dp)) {
+			for (Term dp : depPredicates) {
+				if (predicateImpliedBypredicate(w, dp)) {
 					System.out.println("IMPLIED " + w + " by " + dp);
 					break;
 				}
@@ -89,7 +87,7 @@ public class PredicateRefinementNew3 {
 		Set<Term> weakenedCompPreds = new HashSet<>();
 		for (Term un : unProvenCompPreds) {
 			weakenedCompPreds.addAll(weakeningComparisonPredicates(un));
-	}
+		}
 
 		for (Term w : weakenedCompPreds) {
 			if (sequentImpliesPredicate(w)) {
@@ -100,28 +98,27 @@ public class PredicateRefinementNew3 {
 	}
 
 	private boolean predicateImpliedBypredicate(Term dp1, Term dp2) {
-	 if(dp1.op() == dp2.op() && sProof.proofSubSet(dp1.sub(0), dp2.sub(0))) {
-		 return true;
-	 }	 
-	 else if (dp2.op().equals(depLDT.getNoR())) {
-		if (dp1.op().equals(depLDT.getNoRaW()) || dp1.op().equals(depLDT.getNoWaR())) {
-			if (sProof.proofSubSet(dp1.sub(0), dp2.sub(0))) {
-				return true;
-			}
-		}
-	}
-	 else if (dp2.op().equals(depLDT.getNoW())) {
-		if (dp1.op().equals(depLDT.getNoRaW()) || dp1.op().equals(depLDT.getNoWaR())
-					|| dp1.op().equals(depLDT.getNoWaW())) {
-			if (sProof.proofSubSet(dp1.sub(0), dp2.sub(0))) {
+		if (dp1.op() == dp2.op() && sProof.proofSubSet(dp1.sub(0), dp2.sub(0))) {
+			return true;
+		} else if (dp2.op().equals(depLDT.getNoR())) {
+			if (dp1.op().equals(depLDT.getNoRaW()) || dp1.op().equals(depLDT.getNoWaR())) {
+				if (sProof.proofSubSet(dp1.sub(0), dp2.sub(0))) {
 					return true;
 				}
 			}
-	 }
-	 return false;
- }
+		} else if (dp2.op().equals(depLDT.getNoW())) {
+			if (dp1.op().equals(depLDT.getNoRaW()) || dp1.op().equals(depLDT.getNoWaR())
+					|| dp1.op().equals(depLDT.getNoWaW())) {
+				if (sProof.proofSubSet(dp1.sub(0), dp2.sub(0))) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	private boolean sequentImpliesPredicate(Term pred) {
-		System.out.println("sequentImpliesPredicate is called for: "+pred);
+//		System.out.println("sequentImpliesPredicate is called for: "+pred);
 		Sequent sideSeq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(pred), false, true).sequent();
 		for (SequentFormula sequentFormula : seq.antecedent()) {
 			sideSeq = sideSeq.addFormula(sequentFormula, true, false).sequent();
@@ -133,7 +130,7 @@ public class PredicateRefinementNew3 {
 			}
 		}
 
-		System.out.println("is Provable called for: " +  pred);
+//		System.out.println("is Provable called for: " +  pred);
 		final boolean provable = sProof.isProvable(sideSeq, services);
 //		if (!provable && (pred.op() == intLDT.getLessThan() || pred.op() == intLDT.getLessOrEquals()
 //				|| pred.op() == intLDT.getGreaterThan() || pred.op() == intLDT.getGreaterOrEquals()
@@ -149,13 +146,13 @@ public class PredicateRefinementNew3 {
 //		if (!provable && pred.op() == services.getTypeConverter().getDependenciesLDT().getNoWaW()) {
 //			System.out.println("We have a Problem" );
 //		}
-		
+
 		return provable;
 	}
 
 	private Set<Term> weakeningDependencePredicates(Term unProven) {
 		Set<Term> result = new HashSet<>();
-		System.out.println("Weaken"+unProven);
+//		System.out.println("Weaken"+unProven);
 		result.addAll(weakenByPredicateSymbol(unProven));
 
 //		System.out.println("Weaken by Index for "+unProven);
@@ -171,7 +168,7 @@ public class PredicateRefinementNew3 {
 //			result.addAll(weakenBySubSet(unProven)); // 0 or 3
 //		System.out.println("sequent added: ");
 //		result.addAll(weakenBySequent(unProven)); // 0 or 1
-		System.out.println(result);
+//		System.out.println(result);
 		return result;
 	}
 
@@ -191,6 +188,56 @@ public class PredicateRefinementNew3 {
 		return result;
 	}
 
+	private Set<Term> weakenBySubSetOLD(Term unProven) {
+		Set<Term> result = new HashSet<>();
+		final Term locSet = unProven.sub(0);
+		Term lowSingleton = null;
+		Term highSingleton = null;
+		Term subLoc = null;
+
+//		Term opOnSubLocs = null;
+		if (!locSet.equals(locsetLDT.getEmpty()) && locSet != null && locSet.op().equals(locsetLDT.getArrayRange())) {
+			final Term array = locSet.sub(0);
+			final Term low = locSet.sub(1);
+			final Term newLow = tb.add(low, tb.one());
+			final Term high = locSet.sub(2);
+			final Term newHigh = tb.subtract(high, tb.one());
+
+			if (sProof.proofLEQ(low, high)) {
+				lowSingleton = tb.singleton(array, tb.arr(low));
+				highSingleton = tb.singleton(array, tb.arr(high));
+				if (sProof.proofEquality(newLow, newHigh))
+					subLoc = tb.singleton(array, tb.arr(newLow));
+				else
+					subLoc = tb.arrayRange(array, newLow, newHigh);
+
+				if (unProven.op().equals(depLDT.getNoR())) {
+					result.add(tb.noR(subLoc));
+					result.add(tb.noR(lowSingleton));
+					result.add(tb.noR(highSingleton));
+				} else if (unProven.op().equals(depLDT.getNoW())) {
+					result.add(tb.noW(subLoc));
+					result.add(tb.noW(lowSingleton));
+					result.add(tb.noW(highSingleton));
+				} else if (unProven.op().equals(depLDT.getNoRaW())) {
+					result.add(tb.noRaW(subLoc));
+					result.add(tb.noRaW(lowSingleton));
+					result.add(tb.noRaW(highSingleton));
+				} else if (unProven.op().equals(depLDT.getNoWaR())) {
+					result.add(tb.noWaR(subLoc));
+					result.add(tb.noWaR(lowSingleton));
+					result.add(tb.noWaR(highSingleton));
+				} else if (unProven.op().equals(depLDT.getNoWaW())) {
+					result.add(tb.noWaW(subLoc));
+					result.add(tb.noWaW(lowSingleton));
+					result.add(tb.noWaW(highSingleton));
+				}
+			}
+		}
+//		System.out.println(result);
+		return result;
+	}
+
 	private Set<Term> weakenBySubSet(Term unProven) {
 		Set<Term> result = new HashSet<>();
 		final Term locSet = unProven.sub(0);
@@ -205,37 +252,40 @@ public class PredicateRefinementNew3 {
 			final Term newLow = tb.add(low, tb.one());
 			final Term high = locSet.sub(2);
 			final Term newHigh = tb.subtract(high, tb.one());
-	
-			if (sProof.proofLEQ(low, high)) {
+
+			if(!sProof.proofEquality(low, high)) {
 			lowSingleton = tb.singleton(array, tb.arr(low));
 			highSingleton = tb.singleton(array, tb.arr(high));
-			if (!sProof.proofEquality(newLow, newHigh))
-				subLoc = tb.arrayRange(array, newLow, newHigh);
-			else
-				subLoc = tb.singleton(array, tb.arr(newLow));
 
-			if (unProven.op().equals(depLDT.getNoR())) {
-				result.add(tb.noR(subLoc));
-				result.add(tb.noR(lowSingleton));
-				result.add(tb.noR(highSingleton));
-			} else if (unProven.op().equals(depLDT.getNoW())) {
-				result.add(tb.noW(subLoc));
-				result.add(tb.noW(lowSingleton));
-				result.add(tb.noW(highSingleton));
-			} else if (unProven.op().equals(depLDT.getNoRaW())) {
-				result.add(tb.noRaW(subLoc));
-				result.add(tb.noRaW(lowSingleton));
-				result.add(tb.noRaW(highSingleton));
-			} else if (unProven.op().equals(depLDT.getNoWaR())) {
-				result.add(tb.noWaR(subLoc));
-				result.add(tb.noWaR(lowSingleton));
-				result.add(tb.noWaR(highSingleton));
-			} else if (unProven.op().equals(depLDT.getNoWaW())) {
-				result.add(tb.noWaW(subLoc));
-				result.add(tb.noWaW(lowSingleton));
-				result.add(tb.noWaW(highSingleton));
+			if (sProof.proofLT(tb.zero(), newHigh)) {
+				if (sProof.proofLT(newLow, newHigh)) {
+					subLoc = tb.arrayRange(array, newLow, newHigh);
+				} else if (sProof.proofEquality(newLow, newHigh)) {
+					subLoc = tb.singleton(array, tb.arr(newLow));
+				}
+				if (unProven.op().equals(depLDT.getNoR())) {
+					result.add(tb.noR(subLoc));
+					result.add(tb.noR(lowSingleton));
+					result.add(tb.noR(highSingleton));
+				} else if (unProven.op().equals(depLDT.getNoW())) {
+					result.add(tb.noW(subLoc));
+					result.add(tb.noW(lowSingleton));
+					result.add(tb.noW(highSingleton));
+				} else if (unProven.op().equals(depLDT.getNoRaW())) {
+					result.add(tb.noRaW(subLoc));
+					result.add(tb.noRaW(lowSingleton));
+					result.add(tb.noRaW(highSingleton));
+				} else if (unProven.op().equals(depLDT.getNoWaR())) {
+					result.add(tb.noWaR(subLoc));
+					result.add(tb.noWaR(lowSingleton));
+					result.add(tb.noWaR(highSingleton));
+				} else if (unProven.op().equals(depLDT.getNoWaW())) {
+					result.add(tb.noWaW(subLoc));
+					result.add(tb.noWaW(lowSingleton));
+					result.add(tb.noWaW(highSingleton));
+				}
 			}
-			}
+		}
 		}
 //		System.out.println(result);
 		return result;
