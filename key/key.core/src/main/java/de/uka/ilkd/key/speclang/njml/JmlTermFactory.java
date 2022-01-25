@@ -275,13 +275,27 @@ public final class JmlTermFactory {
                                Iterable<LogicVariable> qvs,
                                @Nullable Term t1, Term t2,
                                KeYJavaType resultType) {
-        BoundedNumericalQuantifier bounded = tb::bsum;
-        UnboundedNumericalQuantifier unbounded = (declsType, n, vars, range, body) -> {
-            final Term tr = typerestrict(declsType, n, vars);
-            return tb.sum(vars, tb.andSC(tr, range), body);
-        };
-        return numeralQuantifier(javaType, nullable, qvs, t1, t2, resultType,
-                unbounded, bounded);
+        // always create a general sum here, can possibly be translated to bsum later via taclets
+        Iterator<LogicVariable> it = qvs.iterator();
+        LogicVariable lv = it.next();
+        ImmutableList<QuantifiableVariable> _qvs = ImmutableSLList.<QuantifiableVariable>nil().prepend(lv);
+        while (it.hasNext()) {
+            _qvs = _qvs.prepend(it.next());
+        }
+        final Term tr = typerestrict(javaType, nullable, _qvs);
+        final Term sum = tb.sum(_qvs, tb.andSC(tr, t1), t2);
+
+        if (resultType == null) {
+            resultType = services.getTypeConverter().getKeYJavaType(t2);
+        }
+
+        final JavaIntegerSemanticsHelper jish = new JavaIntegerSemanticsHelper(services, exc);
+        // cast to specific JML type (fixes bug #1347)
+        try {
+            return jish.buildCastExpression(resultType, new SLExpression(sum, resultType));
+        } catch (SLTranslationException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public SLExpression forall(Term preTerm,
