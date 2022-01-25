@@ -451,6 +451,13 @@ public class Node {
     }
 
     /**
+     * @return  an unmodifiable list of the children
+     */
+    public Collection<Node> children() {
+        return Collections.unmodifiableCollection(children);
+    }
+
+    /**
      * @return an iterator for all nodes in the subtree.
      */
     public Iterator<Node> subtreeIterator() {

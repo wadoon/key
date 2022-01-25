@@ -14,8 +14,7 @@
 package de.uka.ilkd.key.proof;
 
 import java.net.URI;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -437,17 +436,28 @@ public class NodeInfo {
      * @param relevantFiles the URIs of the files to add.
      */
     public void addRelevantFiles(ImmutableSet<URI> relevantFiles) {
-        ImmutableSet<URI> oldRelevantFiles = this.relevantFiles;
+        Set<Node> reached = new HashSet<>(512000);
+        ArrayDeque<Node> nodes = new ArrayDeque<>(8);
+        nodes.add(node);
 
+        //depth-first traversal
+        while(!nodes.isEmpty()) {
+            Node n = nodes.pollLast();
+            n.getNodeInfo().updateRelevantFiles(relevantFiles);
+            reached.add(n);
+            for (Node child : node.children()) {
+                if(!reached.contains(child))
+                    nodes.push(child);
+            }
+        }
+    }
+
+    private void updateRelevantFiles(ImmutableSet<URI> relevantFiles) {
+        ImmutableSet<URI> oldRelevantFiles = this.relevantFiles;
         if (this.relevantFiles.isEmpty() || this.relevantFiles.subset(relevantFiles)) {
             this.relevantFiles = relevantFiles;
         } else {
             this.relevantFiles = this.relevantFiles.union(relevantFiles);
-        }
-
-        if (!oldRelevantFiles.equals(this.relevantFiles)) {
-            node.childrenIterator().forEachRemaining(
-                    c -> c.getNodeInfo().addRelevantFiles(this.relevantFiles));
         }
     }
 
