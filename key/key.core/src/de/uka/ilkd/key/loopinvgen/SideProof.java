@@ -35,7 +35,7 @@ public class SideProof {
 	}
 
 	public SideProof(Services s, Sequent sequent) {
-		this(s, sequent, 10000);
+		this(s, sequent, 5000);
 	}
 
 	boolean proofEquality(Term loc1, Term loc2) {
@@ -162,10 +162,10 @@ public class SideProof {
 		} while (size != locSetVars.size());
 		boolean closed = isProvable(sideSeq, services);
 		// true: Holds, false: Unknown
-//		if (closed) {
+		if (!closed) {
 //			System.out.println("========================\n"+ProofSaver.printAnything(sideSeq, services));		
 //			System.out.println(loc1 + " is NOT subset of " + loc2);
-//		}
+		}
 		return closed;
 	}
 
@@ -419,7 +419,8 @@ public class SideProof {
 //			System.out.println(info.reason() + " CO" + COUNTER);
 //			System.out.println(" proof could not be closed for " + ps.getProof());
 //			System.out.println(" proof could not be closed for " + seq2prove.succedent());
-			try {
+//		**		
+		try {
 				new ProofSaver(ps.getProof(), new java.io.File("C:\\Users\\Asma\\testNoRaWFalse"+COUNTER+".key")).save();
 				System.out.println(COUNTER);
 			} catch (IOException e) {
@@ -427,7 +428,7 @@ public class SideProof {
 				e.printStackTrace();
 			}
 			COUNTER++;
-////		}
+//		}
 		System.out.println(closed);
 		return closed;
 	}

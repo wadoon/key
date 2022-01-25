@@ -72,13 +72,15 @@ public class ShiftUpdateImplNew {
 	 */
 	private void doShift(final Term renameUpdate, Goal g, PosInOccurrence pos, final Term loopFormula) {
 		ImmutableList<Term> updateList = ImmutableSLList.<Term>nil().prepend(UpdateApplication.getUpdate(loopFormula));
+		int countEvUp = 0;
 		while (!updateList.isEmpty()) {
 			final Term update = updateList.head();
 			updateList = updateList.tail();
 			if (update.op() instanceof ElementaryUpdate) {
 				shiftElementaryUpdate(update, renameUpdate);
 			} else if (update.op() instanceof EventUpdate) {
-				shiftEventUpdate(update);
+				shiftEventUpdate(update, countEvUp);
+				countEvUp++;
 			} else if (update.op() == UpdateJunctor.SKIP) {
 				// intentionally empty
 			} else if (update.op() == UpdateJunctor.PARALLEL_UPDATE) {
@@ -182,7 +184,7 @@ public class ShiftUpdateImplNew {
 	 * @param renamingUpdate the {@link Term} representing the renaming update
 	 */
 
-	private void shiftEventUpdate(Term eventUpdate) {
+	private void shiftEventUpdate(Term eventUpdate, int pos) {
 		Term updateTS = eventUpdate.sub(2);
 		Term locSet = eventUpdate.sub(1);
 		Term eventMarker = eventUpdate.sub(0);
@@ -198,12 +200,12 @@ public class ShiftUpdateImplNew {
 							tb.rPred(
 									tb.apply(inverseEvent, 
 											tb.apply(eventUpdate, locSet)),
-									eventUpdate.sub(2)),
+									tb.zTerm(pos)),
 				tb.ife(cond2,
 						tb.wPred(
 								tb.apply(inverseEvent,
 										tb.apply(eventUpdate, locSet)),
-								eventUpdate.sub(2)), tb.tt()));
+								tb.zTerm(pos)), tb.tt()));
 		// Applying the update rename on the rPred and wPred
 		goal.addFormula(new SequentFormula(tb.apply(keepParallelUpdateRenames, linkTerm4EventUpdate)), true, true);
 	}

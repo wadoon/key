@@ -52,6 +52,7 @@ public class PredicateRefinementNew3 {
 	public Pair<Set<Term>, Set<Term>> predicateCheckAndRefine() {
 		Set<Term> unProvenDepPreds = new HashSet<>();
 		for (Term pred : depPredicates) {
+//	**				
 			System.out.println("Proving Dep Pred: " + pred);
 			if (!sequentImpliesPredicate(pred)) {
 				unProvenDepPreds.add(pred);
@@ -66,12 +67,15 @@ public class PredicateRefinementNew3 {
 		for (Term w : weakenedDepPreds) {
 			for (Term dp : depPredicates) {
 				if (predicateImpliedBypredicate(w, dp)) {
+//					**		
 					System.out.println("IMPLIED " + w + " by " + dp);
 					break;
 				}
 			}
-			if (!depPredicates.contains(w) && sequentImpliesPredicate(w)) {
-				depPredicates.add(w);
+			if (!depPredicates.contains(w)) {
+				if (sequentImpliesPredicate(w)) {
+					depPredicates.add(w);
+				}
 			}
 		}
 		// -------------------------------------
@@ -118,7 +122,8 @@ public class PredicateRefinementNew3 {
 	}
 
 	private boolean sequentImpliesPredicate(Term pred) {
-//		System.out.println("sequentImpliesPredicate is called for: "+pred);
+//		**		
+		System.out.println("sequentImpliesPredicate is called for: "+pred);
 		Sequent sideSeq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(pred), false, true).sequent();
 		for (SequentFormula sequentFormula : seq.antecedent()) {
 			sideSeq = sideSeq.addFormula(sequentFormula, true, false).sequent();
@@ -146,13 +151,15 @@ public class PredicateRefinementNew3 {
 //		if (!provable && pred.op() == services.getTypeConverter().getDependenciesLDT().getNoWaW()) {
 //			System.out.println("We have a Problem" );
 //		}
-
+//		**	
+		System.out.println(provable);
 		return provable;
 	}
 
 	private Set<Term> weakeningDependencePredicates(Term unProven) {
 		Set<Term> result = new HashSet<>();
-//		System.out.println("Weaken"+unProven);
+//		**		
+		System.out.println("Weaken " + unProven + ": ");
 		result.addAll(weakenByPredicateSymbol(unProven));
 
 //		System.out.println("Weaken by Index for "+unProven);
@@ -168,7 +175,8 @@ public class PredicateRefinementNew3 {
 //			result.addAll(weakenBySubSet(unProven)); // 0 or 3
 //		System.out.println("sequent added: ");
 //		result.addAll(weakenBySequent(unProven)); // 0 or 1
-//		System.out.println(result);
+//		**		
+		System.out.println(result);
 		return result;
 	}
 
@@ -253,39 +261,39 @@ public class PredicateRefinementNew3 {
 			final Term high = locSet.sub(2);
 			final Term newHigh = tb.subtract(high, tb.one());
 
-			if(!sProof.proofEquality(low, high)) {
-			lowSingleton = tb.singleton(array, tb.arr(low));
-			highSingleton = tb.singleton(array, tb.arr(high));
+			if (!sProof.proofEquality(low, high)) {
+				lowSingleton = tb.singleton(array, tb.arr(low));
+				highSingleton = tb.singleton(array, tb.arr(high));
 
-			if (sProof.proofLT(tb.zero(), newHigh)) {
-				if (sProof.proofLT(newLow, newHigh)) {
-					subLoc = tb.arrayRange(array, newLow, newHigh);
-				} else if (sProof.proofEquality(newLow, newHigh)) {
-					subLoc = tb.singleton(array, tb.arr(newLow));
-				}
-				if (unProven.op().equals(depLDT.getNoR())) {
-					result.add(tb.noR(subLoc));
-					result.add(tb.noR(lowSingleton));
-					result.add(tb.noR(highSingleton));
-				} else if (unProven.op().equals(depLDT.getNoW())) {
-					result.add(tb.noW(subLoc));
-					result.add(tb.noW(lowSingleton));
-					result.add(tb.noW(highSingleton));
-				} else if (unProven.op().equals(depLDT.getNoRaW())) {
-					result.add(tb.noRaW(subLoc));
-					result.add(tb.noRaW(lowSingleton));
-					result.add(tb.noRaW(highSingleton));
-				} else if (unProven.op().equals(depLDT.getNoWaR())) {
-					result.add(tb.noWaR(subLoc));
-					result.add(tb.noWaR(lowSingleton));
-					result.add(tb.noWaR(highSingleton));
-				} else if (unProven.op().equals(depLDT.getNoWaW())) {
-					result.add(tb.noWaW(subLoc));
-					result.add(tb.noWaW(lowSingleton));
-					result.add(tb.noWaW(highSingleton));
+				if (sProof.proofLT(tb.zero(), newHigh)) {
+					if (sProof.proofLT(newLow, newHigh)) {
+						subLoc = tb.arrayRange(array, newLow, newHigh);
+					} else if (sProof.proofEquality(newLow, newHigh)) {
+						subLoc = tb.singleton(array, tb.arr(newLow));
+					}
+					if (unProven.op().equals(depLDT.getNoR())) {
+						result.add(tb.noR(subLoc));
+						result.add(tb.noR(lowSingleton));
+						result.add(tb.noR(highSingleton));
+					} else if (unProven.op().equals(depLDT.getNoW())) {
+						result.add(tb.noW(subLoc));
+						result.add(tb.noW(lowSingleton));
+						result.add(tb.noW(highSingleton));
+					} else if (unProven.op().equals(depLDT.getNoRaW())) {
+						result.add(tb.noRaW(subLoc));
+						result.add(tb.noRaW(lowSingleton));
+						result.add(tb.noRaW(highSingleton));
+					} else if (unProven.op().equals(depLDT.getNoWaR())) {
+						result.add(tb.noWaR(subLoc));
+						result.add(tb.noWaR(lowSingleton));
+						result.add(tb.noWaR(highSingleton));
+					} else if (unProven.op().equals(depLDT.getNoWaW())) {
+						result.add(tb.noWaW(subLoc));
+						result.add(tb.noWaW(lowSingleton));
+						result.add(tb.noWaW(highSingleton));
+					}
 				}
 			}
-		}
 		}
 //		System.out.println(result);
 		return result;
@@ -381,6 +389,10 @@ public class PredicateRefinementNew3 {
 
 					lowToI = tb.arrayRange(array, low, index);
 					iToHigh = tb.arrayRange(array, index, high);
+//					if(sProof.proofLT(low, tb.subtract(index, tb.one())) && sProof.proofLT(tb.add(index, tb.one()), high)) {
+//						lowToI = tb.arrayRange(array, low, tb.subtract(index, tb.one()));
+//						iToHigh = tb.arrayRange(array, tb.add(index, tb.one()), high);
+//					}
 				} else {
 					lowToI = tb.arrayRange(array, low, index);
 					iToHigh = tb.singleton(array, tb.arr(index));

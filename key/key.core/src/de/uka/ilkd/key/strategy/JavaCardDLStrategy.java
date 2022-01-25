@@ -1333,6 +1333,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 		
 		Feature depth = applyTF(FocusFormulaProjection.INSTANCE, rec(any(), longTermConst(1)));
 
+		bindRuleSet(d, "noEqApp", EqNonDuplicateAppFeature.INSTANCE);
 		bindRuleSet(d, "dep_pred_known", add(ScaleFeature.createScaled(depth, 1000), longConst(100)));
 		bindRuleSet(d, "dep_pred_known_2", add(noDoubleMinus,longConst(100)));
 		bindRuleSet(d, "dep_pred_known_3", add(noDoubleMinus,longConst(-500)));
