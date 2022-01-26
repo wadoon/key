@@ -421,13 +421,8 @@ public class NodeInfo {
      */
     public void addRelevantFile(URI relevantFile) {
         ImmutableSet<URI> oldRelevantFiles = this.relevantFiles;
-
         this.relevantFiles = this.relevantFiles.add(relevantFile);
-
-        if (oldRelevantFiles != this.relevantFiles) {
-            node.childrenIterator().forEachRemaining(
-                c -> c.getNodeInfo().addRelevantFiles(this.relevantFiles));
-        }
+        addRelevantFiles(this.relevantFiles);
     }
 
     /**
@@ -436,6 +431,10 @@ public class NodeInfo {
      * @param relevantFiles the URIs of the files to add.
      */
     public void addRelevantFiles(ImmutableSet<URI> relevantFiles) {
+        if(node.childrenCount()==0) {//fast track
+            updateRelevantFiles(relevantFiles);
+            return;
+        }
         Set<Node> reached = new HashSet<>(512000);
         ArrayDeque<Node> nodes = new ArrayDeque<>(8);
         nodes.add(node);
