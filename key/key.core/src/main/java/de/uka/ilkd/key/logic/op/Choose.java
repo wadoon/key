@@ -21,14 +21,13 @@ import org.key_project.util.collection.ImmutableArray;
 
 /**
  * This singleton class implements a Hilbert's choice operator, often denoted by epsilon.
- * "\some iv; (phi)", where iv is a logic variable, phi is a formula.
- * The variable iv is bound in phi.
+ * "\choose x; (phi)", where x is a logic variable, phi is a formula (x is bound in phi).
  */
-public final class Some extends AbstractOperator {
-    public static final Some SOME = new Some();
+public final class Choose extends AbstractOperator {
+    public static final Choose CHOOSE = new Choose();
 
-    private Some() {
-	    super(new Name("some"), 1, new Boolean[]{true}, true);
+    private Choose() {
+	    super(new Name("choose"), 1, new Boolean[]{true}, true);
     }
 
     @Override

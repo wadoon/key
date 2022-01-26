@@ -177,7 +177,7 @@ public class JavaDocument extends DefaultStyledDocument {
         "\\not_assigned", "\\not_modified", "\\not_specified", "\\nothing", "\\num_of",
         "\\old", "\\only_assigned", "\\only_called", "\\only_captured", "\\pre", "\\product",
         "\\reach", "\\reachLocs", "\\result", "\\same", "\\seq_contains", "\\space",
-        "\\static_constraint_for", "\\static_invariant_for", "\\strictly_nothing",
+        "\\static_constraint_for", "\\static_invariant_for", "\\strictly_nothing", "\\choose",
         "\\subset", "\\sum", "\\type", "\\typeof", "\\working_space", "\\values", "\\inv",
         // clause keywords:
         "accessible", "accessible_redundantly", "assert", "assert_redundantly", "assignable",

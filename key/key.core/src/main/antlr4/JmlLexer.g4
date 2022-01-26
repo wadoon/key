@@ -207,6 +207,7 @@ BEFORE: '\\before';  //KeY extension, not official JML
 BIGINT: '\\bigint';
 BSUM: '\\bsum';  //KeY extension, not official JML
 BY: '\\by';  //KeY extension, not official JML
+CHOOSE: '\\choose';  // (aka Hilbert choice operator/epsilon) not yet official JML, but will probably be
 DECLASSIFIES: '\\declassifies';  //KeY extension, not official JML
 DISJOINT: '\\disjoint';  //KeY extension, not official JML
 DOMAIN_IMPLIES_CREATED: '\\domain_implies_created';  //KeY extension, not official JML

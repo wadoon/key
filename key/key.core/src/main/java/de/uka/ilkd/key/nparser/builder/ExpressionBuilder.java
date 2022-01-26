@@ -932,23 +932,23 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     @Override
-    public Object visitSomeTerm(KeYParser.SomeTermContext ctx) {
+    public Object visitChooseTerm(KeYParser.ChooseTermContext ctx) {
         Namespace<QuantifiableVariable> orig = variables();
         List<QuantifiableVariable> exVars = accept(ctx.bound_variables());
         Term condF = accept(ctx.condF);
         if (condF.sort() != Sort.FORMULA) {
-            semanticError(ctx, "Condition of a \\some term has to be a formula.");
+            semanticError(ctx, "Condition of a \\choose term has to be a formula.");
         }
 
         if (exVars.size() != 1) {
-            semanticError(ctx, "\\some can only bind a single variable!");
+            semanticError(ctx, "\\choose can only bind a single variable!");
         }
 
         ImmutableArray<QuantifiableVariable> exVarsArray
             = new ImmutableArray<>(exVars);
 
         Term result = getTermFactory().createTerm(
-            Some.SOME/*new Some(exVars.get(0).sort())*/,
+            Choose.CHOOSE,
             new Term[]{condF},
             exVarsArray,
             null);

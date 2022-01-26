@@ -448,12 +448,10 @@ public class TermBuilder {
     }
 
     /**
-     * Construct a term with the \some operator.
+     * Construct a term with the \choose operator.
      */
-    public Term some(QuantifiableVariable qv, Term cond) {
-        // The sort of (\some ...) is always ANY, therefore an additional cast is needed.
-        // This allows us to have only a single operator \some instead of one for each sort.
-        return tf.createTerm(Some.SOME,
+    public Term choose(QuantifiableVariable qv, Term cond) {
+        return tf.createTerm(Choose.CHOOSE,
             new ImmutableArray<>(cond),
             new ImmutableArray<>(qv), null);
     }

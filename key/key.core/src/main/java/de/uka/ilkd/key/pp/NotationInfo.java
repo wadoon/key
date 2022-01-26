@@ -195,7 +195,7 @@ public final class NotationInfo {
 	tbl.put(Modality.TOUT_TRANSACTION,new Notation.ModalityNotation("\\throughout_transaction","\\endmodality", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
 	tbl.put(IfThenElse.IF_THEN_ELSE, new Notation.IfThenElse(PRIORITY_ATOM, "\\if"));
 	tbl.put(IfExThenElse.IF_EX_THEN_ELSE, new Notation.IfThenElse(PRIORITY_ATOM, "\\ifEx"));
-	tbl.put(Some.class, new Notation.IfThenElse(PRIORITY_ATOM, "\\some"));
+	tbl.put(Choose.class, new Notation.IfThenElse(PRIORITY_ATOM, "\\choose"));
 	tbl.put(WarySubstOp.SUBST,new Notation.Subst());
 	tbl.put(UpdateApplication.UPDATE_APPLICATION, new Notation.UpdateApplicationNotation());
 	tbl.put(UpdateJunctor.PARALLEL_UPDATE, new Notation.ParallelUpdateNotation());	
@@ -361,7 +361,7 @@ public final class NotationInfo {
      * If no notation is registered, a Function notation is returned.
      */
     Notation getNotation(Operator op) {
-        if (op instanceof Some) {
+        if (op instanceof Choose) {
             System.out.println();
         } else if (op instanceof IfExThenElse) {
             System.out.println();

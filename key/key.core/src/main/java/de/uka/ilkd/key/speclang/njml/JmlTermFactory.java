@@ -792,6 +792,17 @@ public final class JmlTermFactory {
         }
     }
 
+    public SLExpression choose(SLExpression t, KeYJavaType declsType,
+                               ImmutableList<LogicVariable> declVars) {
+        if (declVars.size() != 1) {
+            throw exc.createException0(
+                "The \\choose operator can only be used to bind a single variable!");
+        }
+        LogicVariable qv = declVars.head();
+        Term resultTerm = tb.choose(qv, t.getTerm());
+        return new SLExpression(resultTerm, declsType);
+    }
+
     public SLExpression fresh(ImmutableList<SLExpression> list, Map<LocationVariable, Term> atPres) {
         final LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
         if (atPres == null || atPres.get(baseHeap) == null) {

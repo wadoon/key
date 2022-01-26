@@ -308,6 +308,7 @@ jmlprimary
   | oldexpression                                                                     #pignore5
   | beforeexpression                                                                  #pignore6
   | transactionUpdated                                                                #pignore7
+  | chooseterm                                                                        #pignore8
   | BACKUP LPAREN expression RPAREN                                                   #primaryBackup
   | PERMISSION LPAREN expression RPAREN                                               #primaryPermission
   | NONNULLELEMENTS LPAREN expression RPAREN                                          #primaryNNE
@@ -379,6 +380,7 @@ specquantifiedexpression: LPAREN quantifier (boundvarmodifiers)? quantifiedvarde
 oldexpression: (PRE LPAREN expression RPAREN | OLD LPAREN expression (COMMA IDENT)? RPAREN);
 beforeexpression: (BEFORE LPAREN expression RPAREN);
 bsumterm: LPAREN BSUM quantifiedvardecls SEMI (expression SEMI expression SEMI expression) RPAREN;
+chooseterm: LPAREN CHOOSE quantifiedvardecls SEMI (expression) RPAREN;
 seqdefterm: LPAREN SEQDEF quantifiedvardecls SEMI (expression SEMI expression SEMI expression) RPAREN;
 quantifiedvardecls: typespec quantifiedvariabledeclarator (COMMA quantifiedvariabledeclarator)*;
 boundvarmodifiers: (NON_NULL | NULLABLE);

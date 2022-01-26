@@ -399,7 +399,7 @@ primitive_term:
     termParen
   | ifThenElseTerm
   | ifExThenElseTerm
-  | someTerm
+  | chooseTerm
   | abbreviation
   | accessterm
   | literals
@@ -432,7 +432,7 @@ term
   | updateterm                #termUpdate
   | ifThenElseTerm            #termIfThenElse
   | ifExThenElseTerm          #termIfExThenElse
-  | someTerm                  #termSome
+  | chooseTerm                #termChoose
   | NOT term                  #negation
   | MINUS term                #unaryMinus
   | term OR term              #disjunction_term
@@ -518,9 +518,9 @@ ifExThenElseTerm
   ELSE LPAREN elseT = term RPAREN
 ;
 
-someTerm
+chooseTerm
 :
-  SOME exVars = bound_variables
+  CHOOSE exVars = bound_variables
   condF = term
 ;
 

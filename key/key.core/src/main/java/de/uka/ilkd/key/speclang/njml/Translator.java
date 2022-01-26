@@ -1709,6 +1709,19 @@ class Translator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
+    public SLExpression visitChooseterm(JmlParser.ChoosetermContext ctx) {
+        @Nullable Pair<KeYJavaType, ImmutableList<LogicVariable>> decls = accept(ctx.quantifiedvardecls());
+        resolverManager.pushLocalVariablesNamespace();
+        assert decls != null;
+        resolverManager.putIntoTopLocalVariablesNamespace(decls.second, decls.first);
+        SLExpression t = accept(ctx.expression());
+        assert t != null;
+        SLExpression result = termFactory.choose(t, decls.first, decls.second);
+        resolverManager.popLocalVariablesNamespace();
+        return result;
+    }
+
+    @Override
     public Object visitSeqdefterm(JmlParser.SeqdeftermContext ctx) {
         @Nullable Pair<KeYJavaType, ImmutableList<LogicVariable>> decls = accept(ctx.quantifiedvardecls());
         resolverManager.pushLocalVariablesNamespace();
