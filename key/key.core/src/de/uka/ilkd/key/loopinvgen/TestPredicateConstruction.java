@@ -781,10 +781,10 @@ public class TestPredicateConstruction {
 	public static void main(String[] args) {
 		TestPredicateConstruction tpc = new TestPredicateConstruction();
 		long start = System.currentTimeMillis();
-		tpc.shiftArrayToLeft();
+//		tpc.shiftArrayToLeft();
 //		tpc.shiftArrayToLeftWithBreak();
 //		tpc.condition();
-//		tpc.conditionDifferentNumberOfEvents();
+		tpc.conditionDifferentNumberOfEvents();
 //		tpc.conditionWithDifferentEvents();
 //		tpc.withFunc();
 //		tpc.withoutFunc();

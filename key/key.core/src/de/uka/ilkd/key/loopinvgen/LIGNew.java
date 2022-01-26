@@ -86,7 +86,7 @@ public class LIGNew {
 		Goal currentGoal = goalsAfterShift.head();// Number of goals after shift does not change
 
 		
-//		//Initial Predicate Sets for stencil: 
+		// Initial Predicate Sets for stencil: 
 //		allCompPreds.add(tb.geq(index, tb.subtract(low,tb.one())));//
 //		allCompPreds.add(tb.leq(index, tb.add(high, tb.one())));//
 //		for (Term arr : arrays) {
@@ -95,7 +95,7 @@ public class LIGNew {
 //		}
 		
 		
-		//Initial Predicate Sets for shiftArrayToLeft, shiftArrayToLeftWithBreak, withoutFunc, withFunc, conditionWithDifferentNumberOfEvent, condition:
+//		//Initial Predicate Sets for shiftArrayToLeft, shiftArrayToLeftWithBreak, withoutFunc, withFunc, conditionWithDifferentNumberOfEvent, condition:
 		allCompPreds.add(tb.geq(index, low));
 		allCompPreds.add(tb.leq(index, tb.add(high,tb.one())));
 		for (Term arr : arrays) {

@@ -1334,11 +1334,13 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 		Feature depth = applyTF(FocusFormulaProjection.INSTANCE, rec(any(), longTermConst(1)));
 
 		bindRuleSet(d, "noEqApp", EqNonDuplicateAppFeature.INSTANCE);
-		bindRuleSet(d, "dep_pred_known", add(ScaleFeature.createScaled(depth, 1000), longConst(100)));
+		bindRuleSet(d, "dep_pred_unroll_fixed_bounds", longConst(0));
+		bindRuleSet(d, "dep_pred_known", add(ScaleFeature.createScaled(depth, 1500), longConst(100)));
 		bindRuleSet(d, "dep_pred_known_2", add(noDoubleMinus,longConst(100)));
+		bindRuleSet(d, "dep_pred_known_2b", add(noDoubleMinus,longConst(0)));
 		bindRuleSet(d, "dep_pred_known_3", add(noDoubleMinus,longConst(-500)));
-		bindRuleSet(d, "saturate_dep_locset_relations_def", add(noDoubleMinus,NonDuplicateAppModPositionFeature.INSTANCE,longConst(-500)));
-		bindRuleSet(d, "saturate_dep_locset_relations", add(noDoubleMinus,NonDuplicateAppModPositionFeature.INSTANCE,longConst(-1000)));
+		bindRuleSet(d, "saturate_dep_locset_relations_def", add(noDoubleMinus,NonDuplicateAppModPositionFeature.INSTANCE,longConst(-200), ScaleFeature.createScaled(depth, 1000), longConst(500)));
+		bindRuleSet(d, "saturate_dep_locset_relations", add(noDoubleMinus,NonDuplicateAppModPositionFeature.INSTANCE,longConst(-100)));
 
 	}
 	
