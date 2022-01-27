@@ -84,7 +84,7 @@ public class ShiftUpdateImplNew {
 			} else if (update.op() == UpdateJunctor.SKIP) {
 				// intentionally empty
 			} else if (update.op() == UpdateJunctor.PARALLEL_UPDATE) {
-				updateList = updateList.prepend(update.sub(1)).prepend(update.sub(0));
+				updateList = updateList.prepend(update.sub(0)).prepend(update.sub(1));
 			}
 		}
 	}
