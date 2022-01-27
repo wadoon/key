@@ -254,7 +254,7 @@ public class TestPredicateConstruction {
 		Term succFormula;
 
 		try {
-			succFormula = parse("{i:=0}\\<{" + "			while (i<=a.length-1) {a[i] = a[i];" + "			i++;}"
+			succFormula = parse("{i:=0}\\<{" + "			while (i<=a.length-1) {a[i] = a[i]+1;" + "			i++;}"
 					+ "		}\\>true");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -299,6 +299,7 @@ public class TestPredicateConstruction {
 		cur.mainAlg();
 	}
 
+	
 	public void stencil() {
 
 		Term succFormula;
@@ -784,10 +785,10 @@ public class TestPredicateConstruction {
 //		tpc.shiftArrayToLeft();
 //		tpc.shiftArrayToLeftWithBreak();
 //		tpc.condition();
-		tpc.conditionDifferentNumberOfEvents();
+//		tpc.conditionDifferentNumberOfEvents();
 //		tpc.conditionWithDifferentEvents();
 //		tpc.withFunc();
-//		tpc.withoutFunc();
+		tpc.withoutFunc();
 //		tpc.stencil(); //Change the s0 in LIGNew
 		long end = System.currentTimeMillis();
 		System.out.println("Loop Invariant Generation took " + (end - start) + " ms");

@@ -136,17 +136,17 @@ public class LIGNew {
 //			System.out.println("UNWIND");
 //			System.out.println("Number of goals after unwind: " + goalsAfterUnwind.size());
 //			System.out.println("Goals After Unwind:" + goalsAfterUnwind);
-			System.out.println(goalsAfterUnwind);
+//			System.out.println(goalsAfterUnwind);
 			goalsAfterShift = ruleApp.applyShiftUpdateRule(goalsAfterUnwind);
 //			System.out.println("SHIFT");
 //			System.out.println("Number of goals after shift: " + goalsAfterShift.size());
-			System.out.println("Goals After Shift:" + goalsAfterShift);
+//			System.out.println("Goals After Shift:" + goalsAfterShift);
 
 			currentGoal = ruleApp.findLoopUnwindTacletGoal(goalsAfterShift);
 //			System.out.println("Current Goal: " + currentGoal);
 
 //			currentIndexFormula = currentIndexEq(currentGoal.sequent(), index);
-			System.out.println("Before refinement: " + currentGoal.sequent());
+//			System.out.println("Before refinement: " + currentGoal.sequent());
 			PredicateRefinementNew3 pr = new PredicateRefinementNew3(services, currentGoal.sequent(), allDepPreds,
 					allCompPreds, index, itrNumber);
 			refinedPreds = pr.predicateCheckAndRefine();
@@ -158,7 +158,7 @@ public class LIGNew {
 				g = abstractGoal(g);
 			}
 
-			System.out.println("Dep Preds: " + allDepPreds);
+//			System.out.println("Dep Preds: " + allDepPreds);
 		} while ((!allCompPreds.equals(oldCompPreds) || !allDepPreds.equals(oldDepPreds)) || itrNumber < 2);
 
 //		System.out.println("===========Terminated===========");
@@ -213,7 +213,7 @@ public class LIGNew {
 			currentGoal.addFormula(new SequentFormula(cp), true, false);
 //			currentGoal.addFormula(new SequentFormula(cp), false, false);
 		}
-		System.out.println("Modified Goal: " + currentGoal);
+//		System.out.println("Modified Goal: " + currentGoal);
 		return currentGoal;
 	}
 

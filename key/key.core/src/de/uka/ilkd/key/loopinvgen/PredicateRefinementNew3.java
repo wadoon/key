@@ -159,7 +159,7 @@ public class PredicateRefinementNew3 {
 	private Set<Term> weakeningDependencePredicates(Term unProven) {
 		Set<Term> result = new HashSet<>();
 //		**		
-		System.out.println("Weaken " + unProven + ": ");
+//		System.out.println("Weaken " + unProven + ": ");
 		result.addAll(weakenByPredicateSymbol(unProven));
 
 //		System.out.println("Weaken by Index for "+unProven);
@@ -176,7 +176,7 @@ public class PredicateRefinementNew3 {
 //		System.out.println("sequent added: ");
 //		result.addAll(weakenBySequent(unProven)); // 0 or 1
 //		**		
-		System.out.println(result);
+//		System.out.println(result);
 		return result;
 	}
 
