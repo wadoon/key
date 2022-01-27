@@ -6,6 +6,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.DependenciesLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
@@ -16,11 +17,11 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.EventUpdate;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.io.ProofSaver;
 
 public class ShiftUpdateImplNew {
 	private final Goal goal;
@@ -72,15 +73,23 @@ public class ShiftUpdateImplNew {
 	 */
 	private void doShift(final Term renameUpdate, Goal g, PosInOccurrence pos, final Term loopFormula) {
 		ImmutableList<Term> updateList = ImmutableSLList.<Term>nil().prepend(UpdateApplication.getUpdate(loopFormula));
-		int countEvUp = 0;
+		DependenciesLDT depLDT = services.getTypeConverter().getDependenciesLDT();
+		Term counter = services.getTermBuilder().zTerm(-1);
 		while (!updateList.isEmpty()) {
 			final Term update = updateList.head();
 			updateList = updateList.tail();
 			if (update.op() instanceof ElementaryUpdate) {
 				shiftElementaryUpdate(update, renameUpdate);
 			} else if (update.op() instanceof EventUpdate) {
-				shiftEventUpdate(update, countEvUp);
-				countEvUp++;
+				Operator kind = update.sub(0).op();
+				final Function readMarker = depLDT.getReadMarker();
+				final Function writeMarker = depLDT.getWriteMarker();
+				counter = kind == readMarker || kind == writeMarker ?
+						tb.add(counter, tb.one()) :
+							tb.ife(tb.or(tb.equals(update.sub(0), tb.func(readMarker)),
+									     tb.equals(update.sub(0), tb.func(writeMarker))),
+									     tb.add(counter, tb.one()), counter);
+				shiftEventUpdate(update, counter);
 			} else if (update.op() == UpdateJunctor.SKIP) {
 				// intentionally empty
 			} else if (update.op() == UpdateJunctor.PARALLEL_UPDATE) {
@@ -184,7 +193,7 @@ public class ShiftUpdateImplNew {
 	 * @param renamingUpdate the {@link Term} representing the renaming update
 	 */
 
-	private void shiftEventUpdate(Term eventUpdate, int pos) {
+	private void shiftEventUpdate(Term eventUpdate, Term counter) {
 		Term updateTS = eventUpdate.sub(2);
 		Term locSet = eventUpdate.sub(1);
 		Term eventMarker = eventUpdate.sub(0);
@@ -200,12 +209,12 @@ public class ShiftUpdateImplNew {
 							tb.rPred(
 									tb.apply(inverseEvent, 
 											tb.apply(eventUpdate, locSet)),
-									tb.zTerm(pos)),
+									counter),
 				tb.ife(cond2,
 						tb.wPred(
 								tb.apply(inverseEvent,
 										tb.apply(eventUpdate, locSet)),
-								tb.zTerm(pos)), tb.tt()));
+								counter), tb.tt()));
 		// Applying the update rename on the rPred and wPred
 		goal.addFormula(new SequentFormula(tb.apply(keepParallelUpdateRenames, linkTerm4EventUpdate)), true, true);
 	}

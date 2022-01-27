@@ -784,11 +784,11 @@ public class TestPredicateConstruction {
 		long start = System.currentTimeMillis();
 //		tpc.shiftArrayToLeft();
 //		tpc.shiftArrayToLeftWithBreak();
-//		tpc.condition();
-//		tpc.conditionDifferentNumberOfEvents();
+//		tpc.condition();//nowaw missing
+		tpc.conditionDifferentNumberOfEvents();//nowaw missing
 //		tpc.conditionWithDifferentEvents();
 //		tpc.withFunc();
-		tpc.withoutFunc();
+//		tpc.withoutFunc();
 //		tpc.stencil(); //Change the s0 in LIGNew
 		long end = System.currentTimeMillis();
 		System.out.println("Loop Invariant Generation took " + (end - start) + " ms");

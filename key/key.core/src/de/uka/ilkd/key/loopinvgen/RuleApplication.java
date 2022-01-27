@@ -9,8 +9,10 @@ import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
@@ -24,7 +26,7 @@ import de.uka.ilkd.key.util.SideProofUtil;
 public class RuleApplication {
 
 	private static final int TIME_OUT = -1;
-	private static final int MAX_RULE_APP = 3500;
+	private static final int MAX_RULE_APP = 20000;
 	private final Sequent seq;
 	final Services services;
 	private ProofStarter ps;
@@ -67,9 +69,11 @@ public class RuleApplication {
 
 	ImmutableList<Goal> applyShiftUpdateRule(ImmutableList<Goal> openGoals) {
 		Goal currentGoal = findShiftUpdateTacletGoal(openGoals);
-
+		
 		if (currentGoal == null) {
+//			System.out.println("OPEN GOALE: " + openGoals);
 			throw new IllegalStateException("Goal for applying Shift rule is null.");
+
 		}
 
 		IBuiltInRuleApp app = null;
@@ -81,9 +85,20 @@ public class RuleApplication {
 			}
 		}
 		if (app != null) {		
+			Node subtreeRoot = currentGoal.node();
+			
 			final ImmutableList<Goal> goals = currentGoal.apply(app);
+			
+			
 //			System.out.println("Number of Open Goals after applying Shift: " + currentGoal.proof().openGoals().size());
-//			System.out.println("seq:"+ProofSaver.printAnything(currentGoal.sequent(), services));
+//			System.out.println("SHIFT:"+ProofSaver.printAnything(currentGoal.sequent(), services));
+//			try {		
+//			System.out.println("Number of Open Goals after simplification: " + ps.getProof().openGoals().size() + "+++" + (ps.getProof() == currentGoal.proof()));
+//
+//			new ProofSaver(ps.getProof(), new File("C:\\Users\\Asma\\testAfterSEAfterShift.key")).save();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 			ps.start(goals);
 			
 //			try {		
@@ -94,7 +109,7 @@ public class RuleApplication {
 				// TODO Auto-generated catch block
 //				e.printStackTrace();
 //			}
-			return goals;
+			return ps.getProof().getSubtreeGoals(subtreeRoot);
 			//			return currentGoal.proof().openGoals();
 //			return services.getProof().openEnabledGoals();
 		}
