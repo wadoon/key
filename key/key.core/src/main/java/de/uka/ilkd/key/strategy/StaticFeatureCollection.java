@@ -161,6 +161,8 @@ public abstract class StaticFeatureCollection {
         return countOccurrencesInSeq;
     }
 
+
+
     protected static Feature termSmallerThan(String smaller, String bigger) {
         return TermSmallerThanFeature.create(instOf(smaller), instOf(bigger));
     }

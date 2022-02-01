@@ -1,14 +1,6 @@
 package de.uka.ilkd.key.strategy;
 
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IfThenElse;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
-import de.uka.ilkd.key.logic.op.Quantifier;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.strategy.termfeature.AtomTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.ContainsExecutableCodeTermFeature;
@@ -54,6 +46,7 @@ class FormulaTermFeatures extends StaticFeatureCollection {
         elemUpdate = OperatorClassTF.create(ElementaryUpdate.class);
         update = OperatorClassTF.create(UpdateApplication.class);
         program = OperatorClassTF.create(Modality.class);
+        query = OperatorClassTF.create(ProgramMethod.class);
         modalOperator = or(update, program);
 
         // directCutAllowed = add ( atom, not ( modalOperator ) );
@@ -61,6 +54,9 @@ class FormulaTermFeatures extends StaticFeatureCollection {
 
         notContainsExecutable
                 = not(ContainsExecutableCodeTermFeature.PROGRAMS);
+
+        notContainsExecutableOrQueries
+                = not(ContainsExecutableCodeTermFeature.PROGRAMS_OR_QUERIES);
 
         cutAllowed
                 = add(notContainsExecutable,
@@ -91,6 +87,8 @@ class FormulaTermFeatures extends StaticFeatureCollection {
     final TermFeature ifThenElse;
     final TermFeature notExecutable;
     final TermFeature notContainsExecutable;
+    final TermFeature notContainsExecutableOrQueries;
+    final TermFeature query;
 
     final TermFeature quantifiedFor;
     final TermFeature quantifiedOr;

@@ -1014,6 +1014,16 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     // //////////////////////////////////////////////////////////////////////////
     // //////////////////////////////////////////////////////////////////////////
 
+    protected Feature countOccurrencesOfQueries() {
+        TermBuffer sf = new TermBuffer();
+        TermBuffer sub = new TermBuffer();
+
+        Feature countOccurrencesInSeq = sum(sf, SequentFormulasGenerator.sequent(),
+                sum(sub, SubtermGenerator.leftTraverse(sf, ifZero(ff.quantifiedFor, inftyTermConst(), longTermConst(0))),
+                        ifZero(applyTF(sub, ff.query), longConst(1), longConst(0))));
+        return countOccurrencesInSeq;
+    }
+
     private void setupSplitting(RuleSetDispatchFeature d) {
         final TermBuffer subFor = new TermBuffer();
         final Feature noCutsAllowed =
@@ -1046,6 +1056,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         ProjectionToTerm cutFormula = instOf("cutFormula");
         Feature countOccurrencesInSeq =
                 ScaleFeature.createAffine(countOccurrences(cutFormula), -10, 10);
+        Feature countQueriesInSeq =
+                ScaleFeature.createAffine(countOccurrencesOfQueries(), 1000, 10);
         bindRuleSet(
             d,
             "cut_direct",
@@ -1054,8 +1066,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                     new Feature[] {
                         not(TopLevelFindFeature.ANTEC_OR_SUCC_WITH_UPDATE),
                         AllowedCutPositionFeature.INSTANCE,
-                            applyTF(cutFormula,ifZero(ff.notContainsExecutable, longTermConst(0), inftyTermConst())),
-                        ifZero(NotBelowQuantifierFeature.INSTANCE,
+                            applyTF(cutFormula,ifZero(ff.notContainsExecutableOrQueries, longTermConst(0), inftyTermConst())),
+                        countQueriesInSeq,
+                            ifZero(NotBelowQuantifierFeature.INSTANCE,
                                add(applyTF(cutFormula,
                                        add(ff.cutAllowed,
                                            // do not cut over formulas containing
