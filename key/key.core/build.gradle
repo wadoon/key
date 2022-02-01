@@ -4,13 +4,13 @@ plugins {
 }
 
 dependencies {
-    compile project(':key.util')
-    compile name: 'recoderKey'
-    compile name: 'antlr-4.7.1-complete'
+    api project(':key.util')
+    api group: group, name: 'recoderKey', version: '1.0'
+    implementation name: 'antlr-4.7.1-complete'
 
-    compile group: 'net.java.dev.javacc', name:'javacc', version:'4.0'
-    compile group: 'org.antlr', name:'antlr-runtime', version:'3.5.2'
-    compile group: 'antlr', name: 'antlr', version: '2.7.7'
+    implementation group: 'net.java.dev.javacc', name:'javacc', version:'4.0'
+    implementation group: 'org.antlr', name:'antlr-runtime', version:'3.5.2'
+    implementation group: 'antlr', name: 'antlr', version: '2.7.7'
 
     javacc  group: 'net.java.dev.javacc', name:'javacc', version:'4.0'
     antlr   group: 'org.antlr', name:'antlr', version:'3.5.2'   // use ANTLR version 3

@@ -72,9 +72,9 @@ subprojects {
     }
 
     dependencies {
-        compile     'org.jetbrains:annotations:17.0.0'
-        testCompile 'junit:junit:4.12'
-        testCompile project(':key.util')
+        implementation     'org.jetbrains:annotations:17.0.0'
+        testImplementation 'junit:junit:4.12'
+        testImplementation project(':key.util')
     }
 
     // Setting UTF-8 as the java source encoding.

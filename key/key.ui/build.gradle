@@ -8,17 +8,17 @@ plugins {
 }
 
 dependencies {
-    compile project(":key.core")
-    compile project(":key.core:rifl")
+    implementation project(":key.core")
+    implementation project(":key.core:rifl")
 
-    compile project(":key.core.proof_references")
-    compile project(":key.core.symbolic_execution")
-    compile project(":key.core.testgen")
-    compile project(":key.removegenerics")
+    implementation project(":key.core.proof_references")
+    implementation project(":key.core.symbolic_execution")
+    implementation project(":key.core.testgen")
+    implementation project(":key.removegenerics")
 
-    compile 'com.miglayout:miglayout-swing:5.2'
+    implementation 'com.miglayout:miglayout-swing:5.2'
 
-    compile files('lib/docking-frames-common.jar',
+    implementation files('lib/docking-frames-common.jar',
                 'lib/docking-frames-core.jar')
 
     runtimeOnly project(":keyext.interactionlog")
