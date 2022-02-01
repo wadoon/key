@@ -15,7 +15,9 @@ package de.uka.ilkd.key.macros;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 
 import de.uka.ilkd.key.logic.Name;
@@ -83,20 +85,6 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
     }
 
     /*
-     * find a modality term in a node
-     */
-    private static boolean hasModality(Node node) {
-        Sequent sequent = node.sequent();
-        for (SequentFormula sequentFormula : sequent) {
-            if(hasModality(sequentFormula.formula())) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /*
      * recursively descent into the term to detect a modality.
      */
     private static boolean hasModality(Term term) {
@@ -135,6 +123,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
 
         private static final Name NAME = new Name("Autopilot filter strategy");
         private final Strategy delegate;
+        private final Map<SequentFormula, Boolean> hasModalityCache = new HashMap<>();
 
         public AutoPilotStrategy(Proof proof, PosInOccurrence posInOcc) {
             this.delegate = proof.getActiveStrategy();
@@ -159,6 +148,24 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
                    // isApprovedApp. Otherwise, in particular equalities may
                    // be applied on themselves.
                    delegate.isApprovedApp(app, pio, goal);
+        }
+
+        /*
+         * find a modality term in a node
+         */
+        private boolean hasModality(Node node) {
+            Sequent sequent = node.sequent();
+            for (SequentFormula sequentFormula : sequent) {
+                Boolean cached = hasModalityCache.get(sequentFormula);
+                if (cached != null) {
+                    return cached;
+                }
+                boolean result = AutoPilotPrepareProofMacro.hasModality(sequentFormula.formula());
+                hasModalityCache.put(sequentFormula, result);
+                return result;
+            }
+
+            return false;
         }
 
         @Override
