@@ -121,13 +121,13 @@ public class TacletBuilderManipulators {
         }
     };
 
-    public static final AbstractTacletBuilderCommand NEW_VAR = new AbstractTacletBuilderCommand("new", SV, SORT) {
+    public static final AbstractTacletBuilderCommand NEW_VAR = new AbstractTacletBuilderCommand("new", SV, SV) {
         @Override
         public void apply(TacletBuilder<?> tacletBuilder, Object[] arguments, List<String> parameters, boolean negated) {
             if (negated) throw new IllegalArgumentException("Negation is not supported");
-            SchemaVariable sv = (SchemaVariable) arguments[0];
-            Sort sort = (Sort) arguments[1];
-            //TODO weigl tacletBuilder.addVarsNew(sv, sort);
+            SchemaVariable sv1 = (SchemaVariable) arguments[0];
+            SchemaVariable sv2 = (SchemaVariable) arguments[1];
+            tacletBuilder.addVarsNew(sv1, sv2);
         }
     };
 
