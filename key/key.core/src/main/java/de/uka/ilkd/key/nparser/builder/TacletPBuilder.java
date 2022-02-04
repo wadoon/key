@@ -277,8 +277,10 @@ public class TacletPBuilder extends ExpressionBuilder {
         assert args.length == arguments.size();
         ArgumentType[] types = manipulator.getArgumentTypes();
 
-        if (types.length != arguments.size())
+        if (types.length != arguments.size()) {
             return false;
+        }
+
         try {
             for (int i = 0; i < arguments.size(); i++) {
                 args[i] = evaluateVarcondArgument(types[i], args[i], arguments.get(i));
@@ -286,6 +288,7 @@ public class TacletPBuilder extends ExpressionBuilder {
             manipulator.apply(peekTBuilder(), args, parameters, negated);
             return true;
         } catch (Throwable e) {
+            LOGGER.info("The manipulator {} did not succeed. Try next manipulator in list.", manipulator, e);
             return false;
         }
     }
