@@ -112,14 +112,14 @@ public class Graph {
               @ ensures pos >= oldPos && pos <= oldPos + 2;
               @*/
             {
-                if (startNode.equals(connectedNode)) {
+                if (dir && startNode.equals(connectedNode)) {
                     returnval[pos] = tempEdge;
                     pos++;
                 }
                 // merge_point
                 // merge_proc "MergeByIfThenElse";
                 ;
-                if (endNode.equals(connectedNode)) {
+                if (!dir && endNode.equals(connectedNode)) {
                     returnval[pos] = tempEdge;
                     pos++;
                 }
@@ -249,11 +249,11 @@ public class Graph {
         Edge e1 = new Edge(n1,n2, 1);
         Edge e2 = new Edge(n2,n3, 2);
         Edge e3 = new Edge(n1,n4, 3);
-        Edge e4 = new Edge(n4,n2, 3);
+        Edge e4 = new Edge(n4,n2, 4);
 
-        Graph g = new Graph(new Edge[]{e0,e1,e2,e3,e4});
+        Graph g = new Graph(new Edge[]{e0,e3,e1,e4,e2});
 
-        System.out.println(g.getPath(e0,e3));
+        System.out.println(g.getPath(e0,e2));
 
 
     }
