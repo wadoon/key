@@ -3,6 +3,15 @@ package eplan.simple.graph;
 public final class Edge {
 
 
+    @Override
+    public String toString() {
+        return "Edge{" +
+                "id=" + id +
+                ", start=" + start +
+                ", end=" + end +
+                '}';
+    }
+
     /*@ public invariant \invariant_for(start) && \invariant_for(end); @*/
     //@ accessible \inv: start, end;
     final private /*@ spec_public @*/ int id;

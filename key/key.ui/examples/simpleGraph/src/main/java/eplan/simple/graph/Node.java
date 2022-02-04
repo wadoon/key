@@ -37,4 +37,11 @@ public final class Node {
     public boolean equals(/*@ nullable @*/Object o) {
         return (o instanceof Node) && ((Node)o).id == id;
     }
+
+    @Override
+    public String toString() {
+        return "Node{" +
+                "id=" + id +
+                '}';
+    }
 }

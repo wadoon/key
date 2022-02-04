@@ -1,5 +1,9 @@
 package eplan.simple.graph;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class Graph {
 
     /*@ public invariant (\forall int i;(\forall int j; 0<=i && i<=j && j<edges.length && edges[i] == edges[j]; i == j));@*/
@@ -86,6 +90,11 @@ public class Graph {
           @*/
         for (int i = 0; i < edges.length; i++) {
             Edge tempEdge = edges[i];
+
+            if (tempEdge == e) {
+                continue;
+            }
+
             Node startNode = tempEdge.getStart();
             Node endNode = tempEdge.getEnd();
 
@@ -203,7 +212,49 @@ public class Graph {
         return returnval;
     }
 
+    /**
+     * returns a path where the first element is the start edge and the start node of each edge within the path is
+     * end node of the previous edge. The last entry is the end edge.
+     * returns null if no such path exists, otherwise the above specified path
+     */
+    public List getPath(Edge start, Edge end) {
+        List path = new ArrayList();
+        path.add(start);
+
+        if (start == end) {
+            return path;
+        }
+
+        Edge[] allConnectedEdges = getNeighborEdges(start,true);
+        List pathSection = null;
+        for (int i = 0; i<allConnectedEdges.length && allConnectedEdges[i] != null && pathSection == null; i++) {
+            pathSection = getPath(allConnectedEdges[i], end);
+        }
+        if (pathSection == null) {
+            return null;
+        }
+
+        path.addAll(pathSection);
+        return path;
+    }
+
     public static void main(String[] args) {
+        Node n0 = new Node(0);
+        Node n1 = new Node(1);
+        Node n2 = new Node(2);
+        Node n3 = new Node(3);
+        Node n4 = new Node(4);
+
+        Edge e0 = new Edge(n0,n1,0);
+        Edge e1 = new Edge(n1,n2, 1);
+        Edge e2 = new Edge(n2,n3, 2);
+        Edge e3 = new Edge(n1,n4, 3);
+        Edge e4 = new Edge(n4,n2, 3);
+
+        Graph g = new Graph(new Edge[]{e0,e1,e2,e3,e4});
+
+        System.out.println(g.getPath(e0,e3));
+
 
     }
 
