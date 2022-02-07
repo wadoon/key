@@ -52,11 +52,14 @@ object DaisyAPI {
     var preConds = Map[String, (Option[Float], Option[Float])]()
     val floatLDT = new FloatLDT(services)
 
-    def updatePreCondsMap(key: String, fl: Float): Unit = {
+    def updatePreCondsMap(key: String, fl: Float, op: Operator): Unit = {
 
-      if (!preConds.isDefinedAt(key))
-        preConds += key -> (Some(fl), None)
-      else {
+      if (!preConds.isDefinedAt(key)) {
+        if (op.name().toString == "javaEqFloat") {
+          preConds += key -> (Some(fl), Some(fl))
+        }
+        else preConds += key -> (Some(fl), None)
+      } else {
         val intervalBounds = preConds(key)
         if (intervalBounds._1.get < fl)
           preConds += key -> (intervalBounds._1, Some(fl))
@@ -67,6 +70,7 @@ object DaisyAPI {
 
     for (expr <- floatPreconditions.asScala) {
 
+      val op = expr.op()
       val termDetails = expr.asInstanceOf[Term].subs()
       val varName = termDetails.asScala.filter(p => !p.asInstanceOf[Term].isRigid).toList.head.asInstanceOf[Term].op().name().asInstanceOf[ProgramElementName].getProgramName
       val literal = termDetails.asScala.filter(p => p.asInstanceOf[Term].isRigid).toList.head.asInstanceOf[Term]
@@ -76,7 +80,7 @@ object DaisyAPI {
           (-1.0f) * floatLDT.translateTerm(literal.sub(0), new ExtList, services).asInstanceOf[FloatLiteral].getValue.toFloat
         else  floatLDT.translateTerm(literal, new ExtList, services).asInstanceOf[FloatLiteral].getValue.toFloat
 
-      updatePreCondsMap(varName, f)
+      updatePreCondsMap(varName, f, op)
     }
 
     for (item <- preConds) {
@@ -87,7 +91,6 @@ object DaisyAPI {
       if (varUpperBound isDefined)
         daisyInputValMap += varId -> FloatInterval(varLowerBound.get, varUpperBound.get)
       else throw new IllegalArgumentException("Upper or lower bound not given")
-
     }
 
     daisyInputValMap
@@ -99,10 +102,13 @@ object DaisyAPI {
     var preConds = Map[String, (Option[Double], Option[Double])]()
     val doubleLTD = new DoubleLDT(services)
 
-    def updatePreCondsMap(key: String, d: Double): Unit = {
+    def updatePreCondsMap(key: String, d: Double, op: Operator): Unit = {
 
       if (!preConds.isDefinedAt(key))
-        preConds += key -> (Some(d), None)
+        if (op.name().toString == "javaEqDouble") {
+          preConds += key -> (Some(d), Some(d))
+        }
+        else preConds += key -> (Some(d), None)
       else {
         val intervalBounds = preConds(key)
         if (intervalBounds._1.get < d)
@@ -114,6 +120,7 @@ object DaisyAPI {
 
     for (expr <- doublePreconditions.asScala) {
 
+      val op = expr.op()
       val termDetails = expr.asInstanceOf[Term].subs()
       val varName = termDetails.asScala.filter(p => !p.asInstanceOf[Term].isRigid).toList.head.asInstanceOf[Term].op().name().asInstanceOf[ProgramElementName].getProgramName
       val literal = termDetails.asScala.filter(p => p.asInstanceOf[Term].isRigid).toList.head.asInstanceOf[Term]
@@ -123,7 +130,7 @@ object DaisyAPI {
           (-1.0d) * doubleLTD.translateTerm(literal.sub(0), new ExtList, services).asInstanceOf[de.uka.ilkd.key.java.expression.literal.DoubleLiteral].getValue.toDouble
         else  doubleLTD.translateTerm(literal, new ExtList, services).asInstanceOf[de.uka.ilkd.key.java.expression.literal.DoubleLiteral].getValue.toDouble
 
-      updatePreCondsMap(varName, d)
+      updatePreCondsMap(varName, d, op)
     }
 
     for (item <- preConds) {

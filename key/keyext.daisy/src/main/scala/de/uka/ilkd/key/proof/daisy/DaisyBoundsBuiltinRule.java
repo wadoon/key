@@ -65,7 +65,8 @@ public class DaisyBoundsBuiltinRule implements BuiltInRule {
         return op == ldt.getGreaterThan()
                 || op == ldt.getGreaterOrEquals()
                 || op == ldt.getLessThan()
-                || op == ldt.getLessOrEquals();
+                || op == ldt.getLessOrEquals()
+                || op == ldt.getEquals();
     }
 
     private List<Term> gatherLetExprs(Sequent sequent, IFloatingPointLDT ldt) {
