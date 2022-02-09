@@ -42,6 +42,92 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
     private Map<String,ContractInfo> contractMap = new HashMap<>();
     private ContractInfo currentContractInfo;
 	public String output = "";
+	
+
+    private LinkedList<String> merge(final LinkedList<LinkedList<String>> toMerge) {
+        LinkedList<String> linearization = new LinkedList<>();
+
+        while (!toMerge.isEmpty()) {
+            boolean candidateFound = false;
+            String candidate = null;
+            // Try to find a candidate by inspecting the head of all lists
+            Iterator<LinkedList<String>> it = toMerge.iterator();
+            while (it.hasNext()) {
+                LinkedList<String> baseList = it.next();
+                candidate = baseList.getLast();
+                boolean appearsOnlyAtHead = true;
+                // Check if the candidate appears only at the head of all lists, if it appears
+                for (LinkedList<String> list2 : toMerge) {
+                    int candidatePos = list2.indexOf(candidate);
+                    if (candidatePos != -1 && candidatePos < list2.size() - 1) {
+                        appearsOnlyAtHead = false;
+                        break;
+                    }
+                }
+                if (appearsOnlyAtHead) {
+                    candidateFound = true;
+                    break;
+                }
+            }
+            if (candidateFound) {
+                // Add the candidate to the linearization, and remove it from all lists.
+                linearization.addFirst(candidate);
+                it = toMerge.iterator();
+                while (it.hasNext()) {
+                    LinkedList<String> baseList = it.next();
+                    baseList.remove(candidate);
+                    if (baseList.isEmpty())
+                        it.remove();
+                }
+            } else {
+                error("Cannot linearize; no suitable candidate found during the linearization step.");
+            }
+        }
+        return linearization;
+    }
+
+    private HashMap<String, LinkedList<String>> makeC3Linearizations() {
+        // Maps contract names to their C3 linearizations.
+        HashMap<String, LinkedList<String>> linearizations = new HashMap<>();
+        // Construct the C3 linearization for each defined contract, in the order of their definitions.
+        for (String contract : contractMap.keySet()) {
+            ContractInfo contractInfo = contractMap.get(contract);
+            // If the inheritance list is empty, the linearization is just the contract itself.
+            if (contractInfo.is.isEmpty()) {
+                linearizations.put(contract, new LinkedList<String>(Collections.singleton(contract)));
+            } else {
+                // Construct the list of lists that is to be sent to the 'merge' function.
+                // It contains the linearizations of all contracts in the inheritance list + the inheritance list itself.
+                LinkedList<LinkedList<String>> baseLinearizations = new LinkedList<>();
+                for (String base : contractInfo.is) {
+                    if (base.equals(contract)) {
+                        error("A contract may not inherit from itself.");
+                    }
+                    LinkedList<String> baseLinearization = linearizations.get(base);
+                    if (baseLinearization == null) {
+                        error("The contract inherits from something not defined yet");
+                    }
+                    // Create a copy so that, when 'baseLinearizations' is mutated by merge(), 'linearizations' is not mutated.
+                    LinkedList<String> baseLinearizationCopy = new LinkedList<>(baseLinearization);
+                    baseLinearizations.addFirst(baseLinearizationCopy);
+                }
+                // Copy the inheritance list, put the contract at the end of it, and put it in the merge input list
+                LinkedList<String> inheritanceList = new LinkedList<>(contractInfo.is);
+                inheritanceList.addLast(contract);
+                baseLinearizations.addLast(inheritanceList);
+                // Perform the 'merge' operation to get the actual linearization.
+                LinkedList<LinkedList<String>> toMerge = new LinkedList<>(baseLinearizations);
+                LinkedList<String> linearization = merge(toMerge);
+                if (linearization == null) {
+                    error("Linearization failed.");
+                }
+                linearizations.put(contract, linearization);
+            }
+        }
+        return linearizations;
+    }
+	
+	
 	/**
 	 * {@inheritDoc}
 	 *
