@@ -32,6 +32,10 @@ public class FloatRemainderHandler implements SMTHandler {
     public final static String PREFIX = "float_";
     private static final String MAP_KEY = "UNKNOWN_FLOAT_THINGS";
 
+    // older versions of Z3 do not understand Float32 and Float64
+    private static final String FLOAT32 = "(_ FloatingPoint  8  24)";
+    private static final String FLOAT64 = "(_ FloatingPoint  11  53)";
+
     // TODO This flag does not seem to be 100% what it is supposed to. Refactor. MU
     private boolean enableQuantifiers;
     private Sort floatSort;
@@ -78,10 +82,10 @@ public class FloatRemainderHandler implements SMTHandler {
         String smtType;
         if(term.sort() == floatSort) {
             type = FloatHandler.FLOAT;
-            smtType = "Float32";
+            smtType = FLOAT32;
         } else {
             type = FloatHandler.DOUBLE;
-            smtType = "Float64";
+            smtType = FLOAT64;
         }
 
         String name;
