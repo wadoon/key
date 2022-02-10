@@ -111,7 +111,6 @@ public class QueryExpandCost implements Feature {
                 return TOP_COST;
             } else {
                 cost += count > 4 ? (count - 4) * 2000l : 0;
-                System.out.println(count);
             }
         }
 
