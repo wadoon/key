@@ -226,10 +226,12 @@ public class Graph {
         }
 
         Edge[] allConnectedEdges = getNeighborEdges(start,true);
+
         List pathSection = null;
         for (int i = 0; i<allConnectedEdges.length && allConnectedEdges[i] != null && pathSection == null; i++) {
             pathSection = getPath(allConnectedEdges[i], end);
         }
+
         if (pathSection == null) {
             return null;
         }
