@@ -461,4 +461,8 @@ public abstract class StaticFeatureCollection {
         return ImplicitCastNecessary.create(s1);
     }
 
+    protected static Feature size(ProjectionToTerm t) {
+        return applyTF(t, rec(any(), longTermConst(1)));
+    }
+
 }

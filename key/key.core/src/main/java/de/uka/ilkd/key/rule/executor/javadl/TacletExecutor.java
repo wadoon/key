@@ -94,7 +94,8 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
                         taclet,
                         ruleApp,
                         services);
-        term.execPostOrder(srVisitor);
+
+            term.execPostOrder(srVisitor);
         return srVisitor.getTerm();
     }
 

@@ -235,6 +235,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         // final Feature smtF = smtFeature(inftyConst());
 
+
         return SumFeature.createSum(
                 AutomatedRuleFeature.INSTANCE,
                 NonDuplicateAppFeature.INSTANCE,
@@ -661,6 +662,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                             longConst(0), inftyConst()));
         }
 
+        setupPullOutGeneral(d);
+
         return d;
     }
 
@@ -725,6 +728,61 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 add(applyTF("auxiliarySK",
                         IsSelectSkolemConstantTermFeature.INSTANCE),
                         longConst(-500)));
+    }
+
+    private void setupPullOutGeneral(RuleSetDispatchFeature d) {
+
+        /*
+           iterate through sequent and identify
+             * nested queries
+             * common heaps
+         */
+
+        ProjectionToTerm focusTerm = FocusProjection.INSTANCE;
+        // Pulling out heaps
+        // Termfeature checking for heap sort
+        TermFeature heapSortF = extendsTrans(getServices().getTypeConverter().getHeapLDT().targetSort());
+
+        // counts occurrences of the same heap in the sequent
+        Feature heapOccurrences = ifZero(applyTF(focusTerm, heapSortF),
+                ifZero(add(not(applyTF(FocusProjection.create(1), heapSortF)),
+                        not(applyTF(FocusProjection.create(1), tf.eqF))),
+                    countOccurrences(focusTerm)));
+
+        // approximates complexity of heap, might need to be more precise as
+        // heaps with a large int get large too even if they have only one store
+        Feature heapComplexity = size(focusTerm);
+
+        final Feature costForHeapPullout = ifZero(leq(longConst(3), heapOccurrences),
+                ifZero(leq(longConst(2), heapComplexity),
+                        ScaleFeature.createAffine(heapOccurrences, -10, 1000),
+                        inftyConst()
+                ),
+                inftyConst()
+        );
+
+        // pulling out nested queries
+        final TermBuffer superF = new TermBuffer();
+        // number of upward queries
+        Feature countNestedQueryDepth =
+                ifZero(applyTF(focusTerm, ff.query),
+                        // walk upwards whether query occurs as argument of another query
+                        sum(superF, SuperTermGenerator.upwards(any(), getServices()),
+                                ifZero(applyTF(superF, ff.query),longConst(1),longConst(0))),
+                        longConst(0)
+                );
+
+        Feature costForNestedQuery =
+                ifZero(leq(longConst(1), countNestedQueryDepth),
+                        longConst(-1100), inftyConst());
+
+
+        ////
+
+        Feature min = ifZero(leq(costForHeapPullout, costForNestedQuery),
+                costForHeapPullout, costForNestedQuery);
+
+        bindRuleSet(d, "pullOutSome", min);
     }
 
     private void setUpStringNormalisation(RuleSetDispatchFeature d) {

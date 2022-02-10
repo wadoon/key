@@ -445,10 +445,10 @@ public class NodeInfo {
             this.relevantFiles = this.relevantFiles.union(relevantFiles);
         }
 
-        if (oldRelevantFiles != this.relevantFiles) {
-            node.childrenIterator().forEachRemaining(
-                c -> c.getNodeInfo().addRelevantFiles(this.relevantFiles));
-        }
+//        if (oldRelevantFiles != this.relevantFiles) {
+//            node.childrenIterator().forEachRemaining(
+//                c -> c.getNodeInfo().addRelevantFiles(this.relevantFiles));
+//        }
     }
 
     /** Add user-provided plain-text annotations.
