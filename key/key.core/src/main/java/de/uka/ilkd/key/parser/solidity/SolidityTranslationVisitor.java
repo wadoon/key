@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.parser.solidity;
 
+import org.abego.treelayout.internal.util.Contract;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 import de.uka.ilkd.key.parser.solidity.SolidityParser.ConstructorDefinitionContext;
@@ -11,15 +12,33 @@ import java.util.*;
 public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 	// Generated from key.core/src/main/antlr/de/uka/ilkd/key/parser/Solidity.g4 by ANTLR 4.7.1
 
+	private enum ContractVisibility {
+		EXTERNAL, PUBLIC, INTERNAL, PRIVATE
+	}
+
+	private class FunctionInfo {
+		public ContractVisibility visibility;
+		public boolean isVirtual;
+		public boolean overrides;
+		public boolean isStatic;
+		public String name;
+		public String header;
+		public String body; // includes the outermost {}
+
+		public String getOutput() {
+			return header + body;
+		}
+	}
+
     private class ContractInfo {
         // contract types
-        public static final int UNDEFINED = 1;
+        public static final int UNDEFINED = 0;
         public static final int CONTRACT = 1;
         public static final int INTERFACE = 2;
         public static final int LIBRARY = 3;
 
         // maps are { identifier => output string}
-        Map<String,String> functionHeaders = new HashMap<>();
+		Map<String,FunctionInfo> functions = new HashMap<>();
         Map<String,String> variables = new HashMap<>();
         Map<String,String> enums = new HashMap<>();
 
@@ -27,7 +46,9 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
         List<String> is = new LinkedList<>();
         int type;
         String name;
+		boolean isAbstract; // TODO
 
+		/*
         public String toString() {
             return constructorHeaders + "\n" +
             functionHeaders + "\n" +
@@ -37,97 +58,123 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
             name + "\n" + 
             type + "\n";
         }
+
+		 */
     }
 
     private Map<String,ContractInfo> contractMap = new HashMap<>();
     private ContractInfo currentContractInfo;
+	private String currentFunction; // The function currently being visited, or the last one.
+	private HashMap<String, LinkedList<String>> c3Linearizations = new HashMap<>();
 	public String output = "";
-	
 
-    private LinkedList<String> merge(final LinkedList<LinkedList<String>> toMerge) {
-        LinkedList<String> linearization = new LinkedList<>();
+	/**
+	 * Replaces a super call -- super.fun -- with a call 'C.fun', where C is a concrete contract.
+	 * The call takes place inside of function 'outsideFunction', and the function called is 'functionCalled'.
+	 * 'originalContract' is the contract implementing 'outsideFunction'. However, this is a flattened contract,
+	 * and 'parentContract' is the parent contract originally implementing the function.
+	 * @param originalContract
+	 * @param parentContract
+	 * @param outsideFunction
+	 * @param functionCalled
+	 * @return The identifier of the function as it exists inside of 'originalContract', e.g., __C__fun.
+	 */
+	private String replaceSuperCall(String originalContract, String parentContract, String outsideFunction, String functionCalled) {
+		ContractInfo contractInfo = contractMap.get(originalContract);
+		if (contractInfo == null)
+			error("Fatal: cannot find original contract when replacing super call.");
 
-        while (!toMerge.isEmpty()) {
-            boolean candidateFound = false;
-            String candidate = null;
-            // Try to find a candidate by inspecting the head of all lists
-            Iterator<LinkedList<String>> it = toMerge.iterator();
-            while (it.hasNext()) {
-                LinkedList<String> baseList = it.next();
-                candidate = baseList.getLast();
-                boolean appearsOnlyAtHead = true;
-                // Check if the candidate appears only at the head of all lists, if it appears
-                for (LinkedList<String> list2 : toMerge) {
-                    int candidatePos = list2.indexOf(candidate);
-                    if (candidatePos != -1 && candidatePos < list2.size() - 1) {
-                        appearsOnlyAtHead = false;
-                        break;
-                    }
-                }
-                if (appearsOnlyAtHead) {
-                    candidateFound = true;
-                    break;
-                }
-            }
-            if (candidateFound) {
-                // Add the candidate to the linearization, and remove it from all lists.
-                linearization.addFirst(candidate);
-                it = toMerge.iterator();
-                while (it.hasNext()) {
-                    LinkedList<String> baseList = it.next();
-                    baseList.remove(candidate);
-                    if (baseList.isEmpty())
-                        it.remove();
-                }
-            } else {
-                error("Cannot linearize; no suitable candidate found during the linearization step.");
-            }
-        }
-        return linearization;
-    }
+		LinkedList<String> linearization = c3Linearizations.get(originalContract);
+		if (linearization == null)
+			error("Fatal: the currently inspected contract does not have a linearization.");
 
-    private HashMap<String, LinkedList<String>> makeC3Linearizations() {
-        // Maps contract names to their C3 linearizations.
-        HashMap<String, LinkedList<String>> linearizations = new HashMap<>();
-        // Construct the C3 linearization for each defined contract, in the order of their definitions.
-        for (String contract : contractMap.keySet()) {
-            ContractInfo contractInfo = contractMap.get(contract);
-            // If the inheritance list is empty, the linearization is just the contract itself.
-            if (contractInfo.is.isEmpty()) {
-                linearizations.put(contract, new LinkedList<String>(Collections.singleton(contract)));
-            } else {
-                // Construct the list of lists that is to be sent to the 'merge' function.
-                // It contains the linearizations of all contracts in the inheritance list + the inheritance list itself.
-                LinkedList<LinkedList<String>> baseLinearizations = new LinkedList<>();
-                for (String base : contractInfo.is) {
-                    if (base.equals(contract)) {
-                        error("A contract may not inherit from itself.");
-                    }
-                    LinkedList<String> baseLinearization = linearizations.get(base);
-                    if (baseLinearization == null) {
-                        error("The contract inherits from something not defined yet");
-                    }
-                    // Create a copy so that, when 'baseLinearizations' is mutated by merge(), 'linearizations' is not mutated.
-                    LinkedList<String> baseLinearizationCopy = new LinkedList<>(baseLinearization);
-                    baseLinearizations.addFirst(baseLinearizationCopy);
-                }
-                // Copy the inheritance list, put the contract at the end of it, and put it in the merge input list
-                LinkedList<String> inheritanceList = new LinkedList<>(contractInfo.is);
-                inheritanceList.addLast(contract);
-                baseLinearizations.addLast(inheritanceList);
-                // Perform the 'merge' operation to get the actual linearization.
-                LinkedList<LinkedList<String>> toMerge = new LinkedList<>(baseLinearizations);
-                LinkedList<String> linearization = merge(toMerge);
-                if (linearization == null) {
-                    error("Linearization failed.");
-                }
-                linearizations.put(contract, linearization);
-            }
-        }
-        return linearizations;
-    }
-	
-	
+		// Find the most derived parent in the contract's linearization list that contains the function ('functionCalled')
+		// The parent has to be less derived than 'parentContract', for that is the contract that originally implemented the contract,
+		// before the contract flattening took place.
+		Iterator<String> it = linearization.descendingIterator();
+		it.next(); // Skip the last element (it is the contract itself)
+		boolean functionFound = false;
+		boolean parentContractFound = false;
+		String baseContractWithFunction = null;
+		while (it.hasNext()) {
+			String baseContract = it.next();
+			if (!parentContractFound) {
+				if (baseContract.equals(parentContract))
+					parentContractFound = true;
+				continue;
+			}
+			ContractInfo baseContractInfo = contractMap.get(baseContract);
+			boolean hasFunction = baseContractInfo.functions.get(functionCalled) != null;
+			if (hasFunction) {
+				functionFound = true;
+				baseContractWithFunction = baseContract;
+				break;
+			}
+		}
+		if (!parentContractFound) {
+			error("Could not replace super call to " + functionCalled + " inside of " +
+					originalContract + "." + outsideFunction + "; original implementer of " +
+					functionCalled + " could not be found.");
+		}
+		if (functionFound) {
+			return "__" + baseContractWithFunction + "__" + functionCalled;
+		} else {
+			error("Contract " + originalContract + " contains function " + outsideFunction +
+					" with a super call to " + functionCalled + ", but no parent of " + originalContract +
+					" implements function " + functionCalled + ".");
+		}
+		return null;
+	}
+
+
+	private String addInheritedFunctionsToContractOutput(String contract) {
+		class ContractFunctionPair {
+			public String contract;
+			public String function;
+			ContractFunctionPair(String contract, String function) {
+				this.contract = contract;
+				this.function = function;
+			}
+		}
+
+		// TODO: only do this for functions containing super calls?
+		// TODO: Skip unimplemented functions from interfaces/abstract classes.
+		final StringBuffer inheritedContractsOutputBuffer = new StringBuffer();
+		final LinkedList<ContractFunctionPair> inheritedFunctions = new LinkedList<>();
+		LinkedList<String> c3Linearization = c3Linearizations.get(contract);
+		Iterator<String> it = c3Linearization.descendingIterator();
+		it.next(); // Skip the last contract; it is the contract itself
+		while (it.hasNext()) {
+			String baseContract = it.next();
+			ContractInfo baseContractInfo = contractMap.get(baseContract);
+			if (baseContractInfo == null) {
+				error("Fatal: could not find the base contract " + baseContract +
+						" in the linearization for contract " + contract);
+			}
+			Map<String, FunctionInfo> baseFunctions = baseContractInfo.functions;
+			for (String function : baseFunctions.keySet()) {
+				inheritedFunctions.add(new ContractFunctionPair(baseContract, function));
+				String functionOutput = baseFunctions.get(function).getOutput();
+				inheritedContractsOutputBuffer.append(functionOutput);
+			}
+		}
+
+		String inheritedContractsOutput = inheritedContractsOutputBuffer.toString();
+
+		// Rename all inherited functions, and change all calls to those functions accordingly.
+		// Functions are renamed to contain the prefix __c__, where 'c' is the parent name.
+		for (ContractFunctionPair contractFunctionPair : inheritedFunctions) {
+			// Replace the function name with a new one, and replace all calls to the functions with the new name.
+			// TODO: do a more robust replace, since other functions could have that function name as a substring.
+			String newFunctionName = "__" + contractFunctionPair.contract + "__" + contractFunctionPair.function;
+			inheritedContractsOutput = inheritedContractsOutput.replaceAll(
+					contractFunctionPair.function, newFunctionName);
+		}
+
+		return inheritedContractsOutput;
+	}
+
+
 	/**
 	 * {@inheritDoc}
 	 *
@@ -205,16 +252,20 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 	@Override public String visitContractDefinition(SolidityParser.ContractDefinitionContext ctx) { 
         currentContractInfo = new ContractInfo();
         currentContractInfo.name = ctx.identifier().getText();
+		String contractName = currentContractInfo.name;
         // TODO parse type
-        currentContractInfo.type = ContractInfo.CONTRACT;
+        currentContractInfo.type = ContractInfo.UNDEFINED;
 		if (ctx.ContractKeyword() != null) {
             currentContractInfo.type = ContractInfo.CONTRACT;
         } else if (ctx.InterfaceKeyword() != null) {
             currentContractInfo.type = ContractInfo.INTERFACE;
         } else if (ctx.LibraryKeyword() != null) {
             currentContractInfo.type = ContractInfo.LIBRARY;
-        }
-        contractMap.put(ctx.identifier().getText(), currentContractInfo);
+        } else {
+			error("No valid contract type found for contract " + contractName);
+		}
+        contractMap.put(contractName, currentContractInfo);
+
 		StringBuffer inheritanceList = new StringBuffer();
 
 		for (InheritanceSpecifierContext ictx : ctx.inheritanceSpecifier()) {
@@ -226,33 +277,129 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 			inheritanceList.setCharAt(inheritanceList.length()-1,' ');
 		}
 
+		// Construct the C3 linearization for the contract.
+		// NOTE: this should be done before the children of the contract definition are visited,
+		// because they may make use of the linearization.
+		LinkedList<String> c3Linearization = constructC3Linearization(contractName);
+		if (c3Linearization == null)
+			error("Could not construct the C3 linearization for contract " + contractName);
+		c3Linearizations.put(contractName, c3Linearization);
+
         final StringBuffer contract = new StringBuffer();
         if (currentContractInfo.type == ContractInfo.CONTRACT) {
-            contract.append("class " + ctx.identifier().getText() + "Impl extends " + ctx.identifier().getText() + "Base {\n"); 
+            contract.append("class " + contractName + "Impl extends Address implements " + contractName + " {\n");
    		    ctx.contractPart().stream().forEach(part -> contract.append(visit(part) + "\n"));
-    
         } else if (currentContractInfo.type == ContractInfo.INTERFACE) {
-            contract.append("interface " + ctx.identifier().getText());
+            contract.append("interface " + contractName);
             if (currentContractInfo.is.size() > 0) {
+				contract.append(" extends");
                 currentContractInfo.is.forEach(c -> contract.append(" " + c + ","));
                 contract.setCharAt(contract.length()-1,' ');
             }
             contract.append(" {\n");
    		    ctx.contractPart().stream().forEach(part -> contract.append(visit(part) + ";\n"));
         } else if (currentContractInfo.type == ContractInfo.LIBRARY) {
-            contract.append("class " + ctx.identifier().getText() + " {\n"); 
+            contract.append("class " + contractName + " {\n");
    		    ctx.contractPart().stream().forEach(part -> contract.append(visit(part) + "\n"));
         }
 
+		// Put all implemented functions from the contract's parents inside this one.
+		String inheritedContractsOutput = addInheritedFunctionsToContractOutput(contractName);
+
+		// TODO: Replace all super calls with calls to explicit functions
+
+		contract.append(inheritedContractsOutput);
+
+		// TODO: put all constructors from the contract's parents inside this one, as private functions.
+
         if (currentContractInfo.type == ContractInfo.CONTRACT) {
             output += makeInterface();
-            output += makeBaseClass();
         } 
         output += contract.append("}\n").toString();
+
+		// TODO: Replace all calls to all inherited contracts with the new names, within all of the contract's functions
+
 		return getOutput();
 	}
 
-    private String makeBaseClass() {
+	private LinkedList<String> merge(final LinkedList<LinkedList<String>> toMerge) {
+		LinkedList<String> linearization = new LinkedList<>();
+
+		while (!toMerge.isEmpty()) {
+			boolean candidateFound = false;
+			String candidate = null;
+			// Try to find a candidate by inspecting the head of all lists
+			Iterator<LinkedList<String>> it = toMerge.iterator();
+			while (it.hasNext()) {
+				LinkedList<String> baseList = it.next();
+				candidate = baseList.getLast();
+				boolean appearsOnlyAtHead = true;
+				// Check if the candidate appears only at the head of all lists, if it appears
+				for (LinkedList<String> list2 : toMerge) {
+					int candidatePos = list2.indexOf(candidate);
+					if (candidatePos != -1 && candidatePos < list2.size() - 1) {
+						appearsOnlyAtHead = false;
+						break;
+					}
+				}
+				if (appearsOnlyAtHead) {
+					candidateFound = true;
+					break;
+				}
+			}
+			if (candidateFound) {
+				// Add the candidate to the linearization, and remove it from all lists.
+				linearization.addFirst(candidate);
+				it = toMerge.iterator();
+				while (it.hasNext()) {
+					LinkedList<String> baseList = it.next();
+					baseList.remove(candidate);
+					if (baseList.isEmpty())
+						it.remove();
+				}
+			} else {
+				error("Cannot linearize; no suitable candidate found during the linearization step.");
+			}
+		}
+		return linearization;
+	}
+
+	private LinkedList<String> constructC3Linearization(String contract) {
+		ContractInfo contractInfo = contractMap.get(contract);
+		// If the inheritance list is empty, the linearization is just the contract itself.
+		if (contractInfo.is.isEmpty()) {
+			return new LinkedList<String>(Collections.singleton(contract));
+		} else {
+			// Construct the list of lists that is to be sent to the 'merge' function.
+			// It contains the linearizations of all contracts in the inheritance list + the inheritance list itself.
+			LinkedList<LinkedList<String>> baseLinearizations = new LinkedList<>();
+			for (String base : contractInfo.is) {
+				if (base.equals(contract)) {
+					error("A contract may not inherit from itself.");
+				}
+				LinkedList<String> baseLinearization = c3Linearizations.get(base);
+				if (baseLinearization == null) {
+					error("The contract inherits from something not defined yet");
+				}
+				// Create a copy so that, when 'baseLinearizations' is mutated by merge(), 'linearizations' is not mutated.
+				baseLinearizations.addFirst(new LinkedList<>(baseLinearization));
+			}
+			// Copy the inheritance list, put the contract at the end of it, and put it in the merge input list
+			LinkedList<String> inheritanceList = new LinkedList<>(contractInfo.is);
+			inheritanceList.addLast(contract);
+			baseLinearizations.addLast(inheritanceList);
+			// Perform the 'merge' operation to get the actual linearization.
+			LinkedList<LinkedList<String>> toMerge = new LinkedList<>(baseLinearizations);
+			LinkedList<String> linearization = merge(toMerge);
+			if (linearization == null) {
+				error("Linearization failed.");
+			}
+			return linearization;
+		}
+	}
+
+	/*
+	private String makeBaseClass() {
         StringBuilder sb = new StringBuilder();
         sb.append("abstract class " + currentContractInfo.name + "Base extends Address implements " + currentContractInfo.name + " {\n");
 
@@ -285,12 +432,13 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
         sb.append("}\n");
         return sb.toString();
     }
+	 */
 
     private String makeInterface() {
         StringBuilder sb = new StringBuilder();
         sb.append("interface " + currentContractInfo.name);
 
-        // build extends list
+        // build 'extends' list
         if (currentContractInfo.is.size() > 0) {
             sb.append(" extends");
             currentContractInfo.is.forEach(c -> {
@@ -300,15 +448,11 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
         }
         sb.append(" {\n");
 
-        // add own functions
-        currentContractInfo.functionHeaders.forEach((func,str) -> sb.append(str + ";\n"));
-
-        // add inherited functions
-        if (currentContractInfo.is.size() > 0) {
-            currentContractInfo.is.forEach(c -> {
-                contractMap.get(c).functionHeaders.forEach((func,str) -> sb.append(str + ";\n"));
-            });
-        }
+        // add own functions, but only if they were introduced in this contract (they don't override)
+		for (FunctionInfo functionInfo : currentContractInfo.functions.values()) {
+			if (!functionInfo.overrides)
+				sb.append(functionInfo.header + ";\n");
+		}
 
         sb.append("}\n");
         return sb.toString();
@@ -500,7 +644,44 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 		if (!ctx.modifierList().PublicKeyword().isEmpty()) {
 			modifier = "public";
 		} else if (!ctx.modifierList().PrivateKeyword().isEmpty()) {
-			modifier = "private";			
+			modifier = "private";
+		}
+
+		currentFunction = fctName;
+
+		FunctionInfo functionInfo = new FunctionInfo();
+		functionInfo.isVirtual = !ctx.modifierList().VirtualKeyword().isEmpty();
+		functionInfo.overrides = !ctx.modifierList().OverrideKeyword().isEmpty();
+		if (!ctx.modifierList().PublicKeyword().isEmpty()) {
+			functionInfo.visibility = ContractVisibility.PUBLIC;
+		} else if (!ctx.modifierList().ExternalKeyword().isEmpty()) {
+			functionInfo.visibility = ContractVisibility.EXTERNAL;
+		} else if (!ctx.modifierList().InternalKeyword().isEmpty()) {
+			functionInfo.visibility = ContractVisibility.INTERNAL;
+		} else if (!ctx.modifierList().PrivateKeyword().isEmpty()) {
+			functionInfo.visibility = ContractVisibility.PRIVATE;
+		} else {
+			error("No visibility specifier found for function " + fctName +
+					" in contract " + currentContractInfo.name);
+		}
+
+		// If the function overrides, make sure that there is a virtual function in the contract's inheritance tree.
+		if (functionInfo.overrides) {
+			boolean baseFunctionFound = false;
+			LinkedList<String> linearization = c3Linearizations.get(currentContractInfo.name);
+			for (String baseClass : linearization) {
+				if (baseClass.equals(currentContractInfo.name))
+					continue;
+				FunctionInfo baseClassFunctionInfo = contractMap.get(baseClass).functions.get(fctName);
+				if (baseClassFunctionInfo != null && baseClassFunctionInfo.isVirtual) {
+					baseFunctionFound = true;
+					break;
+				}
+			}
+			if (!baseFunctionFound) {
+				error("Contract " + currentContractInfo.name +
+						" overrides non-existent function " + fctName);
+			}
 		}
 
 		// TODO user defined modifiers
@@ -515,7 +696,7 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 		}
 		
 		ctx.parameterList().parameter().stream().forEach(param -> 
-		parameters.append(visit(param) + ","));
+			parameters.append(visit(param) + ","));
 
 		if (parameters.length() > 0) parameters.deleteCharAt(parameters.length() - 1);
 
@@ -537,8 +718,12 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
         }
 
         String fctHeader = modifier + (currentContractInfo.type == ContractInfo.LIBRARY ? " static " : " ") 
-            + returnType + " " + fctName + "(" + parameters + ")"; 
-        currentContractInfo.functionHeaders.put(fctName, fctHeader);
+            + returnType + " " + fctName + "(" + parameters + ")";
+
+		functionInfo.header = fctHeader;
+		functionInfo.body = body.toString();
+		currentContractInfo.functions.put(fctName, functionInfo);
+
 		return fctHeader + " " + body;
 	}
 	/**
@@ -996,11 +1181,18 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 		String fctName = visit(ctx.expression());
         String comparableName = fctName;
 
-        // handle calls to member functions
+        // handle calls to member functions, and super calls
+		boolean isSuperCall = false;
         int dotPos = fctName.lastIndexOf('.');
         if (dotPos != -1) {
             comparableName = fctName.substring(dotPos+1);
+			if (fctName.substring(0, dotPos).equals("super"))
+				isSuperCall = true;
         }
+		if (isSuperCall) {
+			// Replace the super call with a call to an explicit function
+			//fctName = replaceSuperCall(currentContractInfo.name, currentContractInfo.name, currentFunction, comparableName);
+		}
 
 		StringBuffer arguments;
         boolean skip = false;
