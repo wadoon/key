@@ -255,7 +255,31 @@ public class Graph {
 
         Graph g = new Graph(new Edge[]{e0,e3,e1,e4,e2});
 
-        System.out.println(g.getPath(e0,e2));
+        //System.out.println(g.getPath(e0,e2));
+        NodeList nl = new NodeList();
+        nl.add(n0);
+        nl.add(n1);
+        nl.add(n2);
+        System.out.println(nl);
+        System.out.println(nl.size());
+        System.out.println(nl.get(2));
+        System.out.println(nl.contains(n1));
+        System.out.println(nl.contains(n4));
+        nl.remove(1);
+        System.out.println(nl);
+        System.out.println(nl.size());
+        System.out.println(nl.getIndex(n2));
+        nl.add(n0);
+        nl.add(n1);
+        nl.add(n2);
+        nl.add(n0);
+        nl.add(n1);
+        nl.add(n2);
+        nl.add(n0);
+        nl.add(n1);
+        nl.add(n2);
+        System.out.println(nl);
+        System.out.println(nl.size());
 
 
     }
