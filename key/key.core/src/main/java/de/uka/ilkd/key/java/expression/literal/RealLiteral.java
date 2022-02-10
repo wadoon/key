@@ -13,8 +13,6 @@
 
 package de.uka.ilkd.key.java.expression.literal;
 
-import org.key_project.util.ExtList;
-
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
@@ -26,100 +24,105 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.ldt.RealLDT;
 import de.uka.ilkd.key.logic.Name;
 
+import java.io.IOException;
+import java.math.BigDecimal;
+
 /**
- *  JML \real literal.
- *  @author bruns
+ *  JML \real literal. ... An extension to the Java ASTs
+ *
+ *  @author bruns, Rosa Abbasi, Mattias Ulbrich
  */
 
 public class RealLiteral extends Literal {
 
-    /**
- *      Textual representation of the value.
-     */
-
-    protected final String value;
+    public static final String REAL_SUFFIX = "r";
 
     /**
- *      Double literal.
+     * Textual representation of the literal.
      */
+    private final String string;
+
+    /**
+     * Value representation of the literal.
+     */
+    private final BigDecimal value;
 
     public RealLiteral() {
-        this.value="0.0";
+        this(0);
     }
 
     public RealLiteral (int value){
-        this(""+value+".0");
+        this(value + REAL_SUFFIX);
     }
+
     public RealLiteral(double value) {
-        this.value="" + value;
+        this(value + REAL_SUFFIX);
     }
 
     public RealLiteral(java.math.BigDecimal value) {
-        this.value = ""+value;
+        this(value + REAL_SUFFIX);
     }
 
-    public RealLiteral(ExtList children, String value) {
-	super(children);
-        this.value=value;
-    }
+    public RealLiteral(String string) {
+        if (!string.toLowerCase().endsWith("r")) {
+            throw new NumberFormatException(string);
+        }
 
-    public RealLiteral(ExtList children){
-        super(children);
-        value = "0.0";
+        try {
+            this.value = new BigDecimal(string.substring(0, string.length()-1)).stripTrailingZeros();
+        } catch (NumberFormatException e) {
+            throw (NumberFormatException)
+                    new NumberFormatException("BigDecimal has a limited range " +
+                            "for the exponent. Perhaps the implementation needs " +
+                            "to be adapted.").initCause(e);
+        }
+        this.string = string;
     }
 
     /**
- *      Double literal.
- *      @param value a string.
+     * tests if this is semantically equal to another element
      */
-
-    public RealLiteral(String value) {
-        this.value=value;
-    }
-
-    /** tests if equals
-     */
-    public boolean equalsModRenaming(	SourceElement o,
-										NameAbstractionTable nat) {
-		if (!(o instanceof RealLiteral)) {
-		    return false;
-		}
-		return ((RealLiteral)o).getValue().equals(getValue());
+    public boolean equalsModRenaming(SourceElement o,
+                                     NameAbstractionTable nat) {
+        if (!(o instanceof RealLiteral)) {
+            return false;
+        }
+        return ((RealLiteral)o).getValue().equals(getValue());
     }
 
     @Override
     public int computeHashCode() {
-        return 17 * super.computeHashCode() + getValue().hashCode();
+        return 17 * super.computeHashCode() + getString().hashCode();
     }
 
-    /**
- *      Get value.
- *      @return the string.
-     */
-
-    public String getValue() {
+    public BigDecimal getValue() {
         return value;
+    }
+
+    public String getString() {
+        return string;
     }
 
     /** calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
      * @param v the Visitor
      */
+    @Override
     public void visit(Visitor v) {
-//	v.performActionOnDoubleLiteral(this);
+        v.performActionOnRealLiteral(this);
     }
 
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-//        p.printDoubleLiteral(this);
+    @Override
+    protected void prettyPrintMain(PrettyPrinter w) throws IOException {
+        w.printRealLiteral(this);
     }
 
     public KeYJavaType getKeYJavaType(Services javaServ) {
-	return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_REAL);
+        return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_REAL);
     }
-    
+
     @Override
     public Name getLDTName() {
         return RealLDT.NAME;
     }
-
 }

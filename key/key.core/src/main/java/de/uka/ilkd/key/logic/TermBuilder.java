@@ -38,6 +38,8 @@ import de.uka.ilkd.key.util.Pair;
 import org.key_project.util.collection.*;
 
 import java.io.StringReader;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -1276,6 +1278,29 @@ public class TermBuilder {
         return func(services.getTypeConverter().getDoubleLDT().getDoubleSymbol(),
                 numberTerm);
     }
+
+    /**
+     * Create a real literal value from a big decimal.
+     *
+     * The same value (say 50) can be represented as R(5(#), 1(#)) or as
+     * R(0(5(#)), 0(#)). For normalised {@link BigDecimal}s
+     * ({@link BigDecimal#stripTrailingZeros()}), it is unique.
+     *
+     * @param value a non-null value
+     * @return a term representing the value
+     */
+    public Term rTerm(BigDecimal value) {
+        BigInteger mantissa = value.unscaledValue();
+        int exponent = -value.scale();
+
+        Term mTerm = numberTerm(mantissa.toString());
+        Term eTerm = numberTerm(Integer.toString(exponent));
+        return func(services.getTypeConverter().getRealLDT().getRealSymbol(),
+                mTerm, eTerm);
+    }
+
+
+
 
     public Term add(Term t1, Term t2) {
         final IntegerLDT integerLDT = services.getTypeConverter()

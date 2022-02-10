@@ -19,6 +19,8 @@ import org.key_project.util.java.StringUtil;
 
 import java.util.Comparator;
 
+import static org.key_project.util.java.StringUtil.formatExponential;
+import static org.key_project.util.java.StringUtil.formatNumber;
 import static org.key_project.util.java.StringUtil.trim;
 
 /**
@@ -295,5 +297,34 @@ public class StringUtilTest extends TestCase {
         assertEquals("", trim("   \n\t\fa234231hsdafhvnyxcksdaökfhsdaöfhsahövcln231847231 42310897423187sdfsdafbc\n",
                 it -> true));
         assertEquals("", trim("", 'c'));
+    }
+
+    /*
+     <li>1234, 3 becomes 1234000</li>
+     <li>1234, 0 becomes 1234</li>
+     <li>1234, -3 becomes 1.234</li>
+     <li>1234, -4 becomes .1234</li>
+     <li>1234, -6 becomes .001234</li>
+     */
+    public void testFormatNumber() {
+        assertEquals("1234000", formatNumber("1234", 3));
+        assertEquals("1234", formatNumber("1234", 0));
+        assertEquals("123.4", formatNumber("1234", -1));
+        assertEquals("1.234", formatNumber("1234", -3));
+        assertEquals(".1234", formatNumber("1234", -4));
+        assertEquals(".001234", formatNumber("1234", -6));
+        assertEquals("0", formatNumber("0", 0));
+    }
+
+    public void testFormatExponential() {
+        assertEquals("1.234e6", formatExponential("1234", 3));
+        assertEquals("1.234e3", formatExponential("1234", 0));
+        assertEquals("1.234e2", formatExponential("1234", -1));
+        assertEquals("1.234", formatExponential("1234", -3));
+        assertEquals("1.234e-1", formatExponential("1234", -4));
+        assertEquals("1.234e-3", formatExponential("1234", -6));
+        assertEquals("2e2", formatExponential("2", 2));
+        assertEquals("2e-2", formatExponential("2", -2));
+        assertEquals("0", formatExponential("0", 0));
     }
 }

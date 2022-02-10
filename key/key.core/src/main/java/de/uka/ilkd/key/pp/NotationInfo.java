@@ -230,6 +230,7 @@ public final class NotationInfo {
 		= services.getTypeConverter().getIntegerLDT();	
 	tbl.put(integerLDT.getNumberSymbol(), new Notation.NumLiteral());
 	tbl.put(integerLDT.getCharSymbol(), new Notation.CharLiteral());
+	tbl.put(services.getTypeConverter().getRealLDT().getRealSymbol(), new Notation.RealLiteral());
 	tbl.put(integerLDT.getLessThan(), new Notation.Infix("<", PRIORITY_COMPARISON, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
 	tbl.put(integerLDT.getGreaterThan(), new Notation.Infix("> ", PRIORITY_COMPARISON, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
 	tbl.put(integerLDT.getLessOrEquals(), new Notation.Infix("<=", PRIORITY_COMPARISON, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));

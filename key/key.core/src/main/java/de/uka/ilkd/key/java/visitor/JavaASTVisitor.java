@@ -700,6 +700,11 @@ public abstract class JavaASTVisitor extends JavaASTWalker
     }
 
     @Override
+    public void performActionOnRealLiteral(RealLiteral x) {
+        doDefaultAction(x);
+    }
+
+    @Override
     public void performActionOnReturn(Return x) {
         doDefaultAction(x);
     }

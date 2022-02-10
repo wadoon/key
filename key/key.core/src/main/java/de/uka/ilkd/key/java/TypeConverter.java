@@ -97,6 +97,10 @@ public final class TypeConverter {
         return (DoubleLDT) getLDT(DoubleLDT.NAME);
     }
 
+    public RealLDT getRealLDT() {
+        return (RealLDT) getLDT(RealLDT.NAME);
+    }
+
     public BooleanLDT getBooleanLDT() {
         return (BooleanLDT) getLDT(BooleanLDT.NAME);
     }
@@ -407,7 +411,6 @@ public final class TypeConverter {
     }
 
 
-    // TODO Adapt for @Reals
     /**
      * performs binary numeric promotion on the argument types
      */

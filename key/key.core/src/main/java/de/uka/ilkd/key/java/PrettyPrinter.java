@@ -955,6 +955,13 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
+    public void printRealLiteral(RealLiteral x) throws java.io.IOException {
+        printHeader(x);
+        writeInternalIndentation(x);
+        write(x.getString());
+        printFooter(x);
+    }
+
     public void printBooleanLiteral(BooleanLiteral x) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);

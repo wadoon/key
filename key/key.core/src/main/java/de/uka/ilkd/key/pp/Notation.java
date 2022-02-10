@@ -20,9 +20,9 @@ import de.uka.ilkd.key.ldt.DoubleLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
 import de.uka.ilkd.key.util.Debug;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.java.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -767,6 +767,32 @@ public abstract class Notation {
         }
     }
   
+    /**
+     * The standard concrete syntax for the real literal indicator `R'.
+     */
+    static final class RealLiteral extends Notation {
+        public RealLiteral() {
+            super(1000);
+        }
+        private static int THRESHOLD = 5;
+
+        public void print(Term t, LogicPrinter sp) throws IOException {
+            String mantissa = NumLiteral.printNumberTerm(t.sub(0));
+            String exponent = NumLiteral.printNumberTerm(t.sub(1));
+            if(exponent.length() < 9) {
+                // This covers most of the integer range and probably all use cases
+                int exp = Integer.parseInt(exponent);
+                int len = mantissa.length() + exp;
+                if(-THRESHOLD <= len && len <= THRESHOLD) {
+                    sp.printConstant(StringUtil.formatNumber(mantissa, exp) + "r");
+                } else {
+                    sp.printConstant(StringUtil.formatExponential(mantissa, exp) + "r");
+                }
+            } else {
+                sp.printConstant(mantissa + "e" + exponent + "r");
+            }
+        }
+    }
 
     /**
      * The standard concrete syntax for sequence singletons.

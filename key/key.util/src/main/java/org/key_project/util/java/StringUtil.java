@@ -434,4 +434,62 @@ public final class StringUtil {
    public static String trim(String text, String chars) {
       return trim(text, it -> chars.indexOf(it) >= 0);
    }
+
+   /**
+    * Print a number string (of the format [1-9][0-9]* or 0) in a given explicit decimal
+    * shift. The value to be printed is number * 10^exp
+    *
+    * Examples:
+    * <ul>
+    *     <li>1234, 3 becomes 1234000</li>
+    *     <li>1234, -3 becomes 1.234</li>
+    *     <li>1234, -4 becomes .1234</li>
+    *     <li>1234, -6 becomes .001234</li>
+    * </ul>
+    *
+    */
+    public static String formatNumber(String number, int exp) {
+       if(exp >= 0) {
+          return number + repeat("0", exp);
+       }
+
+       int extra = number.length() + exp;
+       if(extra > 0) {
+          return number.substring(0, extra) + "." +
+                  number.substring(extra);
+       }
+
+       return "." + repeat("0", -extra) + number;
+    }
+
+   /**
+    * Print a number string (of the format [1-9][0-9]*) in a given explicit decimal
+    * shift. The value to be printed is number * 10^exp
+    *
+    * Examples:
+    * <ul>
+    *     <li>1234, 3 becomes 1.234e6</li>
+    *     <li>1234, -3 becomes 1.234</li>
+    *     <li>1234, -4 becomes 1.234e-1</li>
+    *     <li>1234, -6 becomes 1.234e-3</li>
+    * </ul>
+    *
+    */
+   public static String formatExponential(String number, int exp) {
+      int len = number.length();
+      int elen = exp + len - 1;
+      if(len < 2) {
+         if (elen == 0) {
+            return number;
+         } else {
+            return number + "e" + exp;
+         }
+      } else {
+         if(elen == 0) {
+            return number.charAt(0) + "." + number.substring(1);
+         } else {
+            return number.charAt(0) + "." + number.substring(1) + "e" + elen;
+         }
+      }
+   }
 }
