@@ -766,7 +766,6 @@ public abstract class Taclet implements Rule, Named {
       
        /**
         * Constructor.
-        * @param tacletOperation The currently performed operation.
         * @param term The optional replace {@link Term} of the taclet.
         */
        public TacletLabelHint(Term term) {

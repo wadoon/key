@@ -202,8 +202,8 @@ public class Sequent implements Iterable<SequentFormula> {
             ImmutableList<SequentFormula> insertions, PosInOccurrence p) {
         final Semisequent seq = getSemisequent(p);
 
-        final SemisequentChangeInfo semiCI = seq.insert(
-                seq.indexOf(p.sequentFormula()), insertions);
+        final int idx = seq.indexOf(p.sequentFormula());
+        final SemisequentChangeInfo semiCI = seq.insert(idx, insertions);
 
         return SequentChangeInfo.createSequentChangeInfo(p.isInAntec(), semiCI,
                 composeSequent(p.isInAntec(), semiCI.semisequent()), this);

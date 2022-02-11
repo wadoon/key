@@ -142,7 +142,7 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet> extends Fin
             currentSequent.combine(currentSequent.sequent().changeFormula(cf, posOfFind));
         } else {
             // Then there was no replacewith...
-            // This is strange in a RewriteTaclet, but who knows...
+            // This happens rarely in a RewriteTaclet, one example is for instance onlyCreatedObjectsAreReferenced
             // However, term label refactorings have to be performed.
             final Term oldFormula = posOfFind.sequentFormula().formula();
             final Term newFormula = TermLabelManager.refactorSequentFormula(termLabelState,

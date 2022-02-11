@@ -322,7 +322,7 @@ public class Semisequent implements Iterable<SequentFormula> {
     /**
      * creates a semisequent out of the semisequent change info (semiCI)
      * object and hands it over to semiCI
-     * @deprecated Use {@link de.uka.ilkd.key.logic.SemisequentChangeInfo#complete(de.uka.ilkd.key.logic.Semisequent)} instead
+     * @deprecated Use {@link SemisequentChangeInfo#semisequent()} instead
      */
     @Deprecated
     private SemisequentChangeInfo complete(SemisequentChangeInfo semiCI)

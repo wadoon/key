@@ -2,15 +2,10 @@ package de.uka.ilkd.key.rule.executor.javadl;
 
 import java.util.Iterator;
 
+import de.uka.ilkd.key.logic.*;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.FormulaChangeInfo;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
@@ -177,7 +172,7 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet> extends 
             SequentChangeInfo currentSequent) {
         PosInOccurrence result = tacletApp.posInOccurrence();
 
-        if (result != null && gt.replaceWithExpressionAsObject() != null) {
+        if (result != null) {
             final boolean inAntec = result.isInAntec();
             final ImmutableList<FormulaChangeInfo> modifiedFormulas =
                     currentSequent.modifiedFormulas(inAntec);
@@ -186,11 +181,11 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet> extends 
                 final FormulaChangeInfo head = modifiedFormulas.head();
                 result = new PosInOccurrence(head.getNewFormula(),
                         PosInTerm.getTopLevel(), inAntec);
-            } else {
+            } /* else {
                 // just add it
                 result = null;
-            }
+            }*/
         }
-        return result;
+        return result == null ? null : result.topLevel();
     }
 }
