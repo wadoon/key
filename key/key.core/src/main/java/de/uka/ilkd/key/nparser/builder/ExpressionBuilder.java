@@ -33,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import recoder.service.KeYCrossReferenceSourceInfo;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -1470,7 +1471,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         String txt = ctx.getText(); // full text of node incl. unary minus.
         char lastChar = txt.charAt(txt.length() - 1);
         assert lastChar == 'R' || lastChar == 'r';
-        throw new Error("not yet implemented");
+        return toRNotation(txt.substring(0, txt.length() - 1));
     }
 
     @Override
@@ -1502,6 +1503,17 @@ public class ExpressionBuilder extends DefaultBuilder {
                 functions().lookup(new Name("DFP")),
                 toNum(decBitString)
         ); // toNum("0")); // soon to disappear
+    }
+
+    private Term toRNotation(String number) {
+        try {
+            BigDecimal bd = new BigDecimal(number);
+            return services.getTermBuilder().rTerm(bd);
+        } catch(NumberFormatException ex) {
+            throw (NumberFormatException)new NumberFormatException("Currently real literals must " +
+                    "fit into a BigDecimal. Change the implementation " +
+                    "if that is a restriction").initCause(ex);
+        }
     }
 
     private Term toNum(String number) {

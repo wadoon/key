@@ -3,11 +3,14 @@ package de.uka.ilkd.key.smt.newsmt2;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.RealLDT;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.*;
 
 public class RealHandler implements SMTHandler {
@@ -17,19 +20,23 @@ public class RealHandler implements SMTHandler {
 
     private final Map<Operator, String> supportedOperators = new HashMap<>();
     private final Set<Operator> predicateOperators = new HashSet<>();
+    private Function realSymbol;
+    private Services services;
 
     @Override
     public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets) throws IOException {
+        this.services = services;
 
-        supportedOperators.clear();
         RealLDT realLDT = services.getTypeConverter().getRealLDT();
 
+        supportedOperators.clear();
         supportedOperators.put(realLDT.getAdd(), "+");
         supportedOperators.put(realLDT.getMul(), "*");
         supportedOperators.put(realLDT.getSub(), "-");
         supportedOperators.put(realLDT.getDiv(), "/");
         supportedOperators.put(realLDT.getNegation(), "-");
-        supportedOperators.put(realLDT.getRealSymbol(), "");
+        realSymbol = realLDT.getRealSymbol();
+        supportedOperators.put(realSymbol, "");
 
         supportedOperators.put(realLDT.getLessOrEquals(), "<=");
         predicateOperators.add(realLDT.getLessOrEquals());
@@ -53,11 +60,15 @@ public class RealHandler implements SMTHandler {
 
     @Override
     public SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException {
-        List<SExpr> children = trans.translate(term.subs(), RealHandler.REAL);
         Operator op = term.op();
         String smtOp = supportedOperators.get(op);
         assert smtOp != null;
 
+        if(op == realSymbol) {
+            return handleLiteral(term);
+        }
+
+        List<SExpr> children = trans.translate(term.subs(), RealHandler.REAL);
         SExpr.Type resultType;
         if (predicateOperators.contains(op)) {
             resultType = Type.BOOL;
@@ -66,5 +77,47 @@ public class RealHandler implements SMTHandler {
         }
 
         return new SExpr(smtOp, resultType, children);
+    }
+
+    private SExpr handleLiteral(Term term) {
+        Term mantTerm = term.sub(0);
+        Term expTerm = term.sub(1);
+
+        BigInteger mant = new BigInteger(convertToDecimalString(mantTerm));
+        int exp = Integer.parseInt(convertToDecimalString(expTerm));
+
+        SExpr s1;
+        if(mant.signum() >= 0) {
+            s1 = new SExpr(mant.toString(), REAL);
+        } else {
+            s1 = new SExpr("-", REAL, mant.negate().toString());
+        }
+
+        if (exp == 0) {
+            return s1;
+        } else if (exp > 0) {
+            return new SExpr("*", REAL, s1, new SExpr("1" + "0".repeat(exp)));
+        } else {
+            return new SExpr("/", REAL, s1, new SExpr("1" + "0".repeat(-exp)));
+        }
+    }
+
+    private static String convertToDecimalString(Term term) {
+        StringBuilder result = new StringBuilder();
+        char symb = term.op().toString().charAt(0);
+        if(symb == '-') {
+            result.append("-");
+            term = term.sub(0);
+            symb = term.op().toString().charAt(0);
+        }
+        while ('0' <= symb && symb <= '9') {
+            result.append(symb);
+            term = term.sub(0);
+            symb = term.op().toString().charAt(0);
+        }
+        if (symb != '#') {
+            throw new RuntimeException("unexpected real constant");
+        }
+        return result.toString();
     }
 }

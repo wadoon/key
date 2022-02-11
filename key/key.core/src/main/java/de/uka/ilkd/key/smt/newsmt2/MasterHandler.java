@@ -21,6 +21,8 @@ import de.uka.ilkd.key.smt.SMTSettings;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 import de.uka.ilkd.key.smt.newsmt2.SMTHandler.Capability;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Instances of this class are the controlling units of the translation. They
@@ -37,6 +39,8 @@ import de.uka.ilkd.key.smt.newsmt2.SMTHandler.Capability;
  * @author Jonas Schiffl
  */
 public class MasterHandler {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MasterHandler.class);
 
     /** the services object associated with this particular translation */
     private final Services services;
@@ -176,6 +180,7 @@ public class MasterHandler {
 
             return handleAsUnknownValue(problem);
         } catch(Exception ex) {
+            LOGGER.error("Error in SMT translation", ex);
             exceptions.add(ex);
             return handleAsUnknownValue(problem);
         }
