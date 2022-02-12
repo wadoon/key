@@ -42,6 +42,7 @@ import recoder.java.reference.*;
 import recoder.java.statement.*;
 import recoder.io.*;
 
+import de.uka.ilkd.key.java.recoderext.expression.literal.RealLiteral;
 import de.uka.ilkd.key.java.recoderext.*;
 import de.uka.ilkd.key.java.recoderext.adt.*;
 import recoder.abstraction.TypeArgument.WildcardMode;
@@ -530,10 +531,10 @@ TOKEN :
   < #OCTAL_LITERAL: "0" (["0"-"7"])* >
 |
   < FLOATING_POINT_LITERAL:
-        (["0"-"9"])+ "." (["0"-"9"])* (<EXPONENT>)? (["f","F","d","D"])?
-      | "." (["0"-"9"])+ (<EXPONENT>)? (["f","F","d","D"])?
-      | (["0"-"9"])+ <EXPONENT> (["f","F","d","D"])?
-      | (["0"-"9"])+ (<EXPONENT>)? ["f","F","d","D"]
+        (["0"-"9"])+ "." (["0"-"9"])* (<EXPONENT>)? (["f","F","d","D","r","R"])?
+      | "." (["0"-"9"])+ (<EXPONENT>)? (["f","F","d","D","r","R"])?
+      | (["0"-"9"])+ <EXPONENT> (["f","F","d","D","r","R"])?
+      | (["0"-"9"])+ (<EXPONENT>)? ["f","F","d","D","r","R"]
   >
 |
   < #EXPONENT: ["e","E"] (["+","-"])? (["0"-"9"])+ >
@@ -3401,6 +3402,8 @@ Literal Literal() :
   {
       if (token.image.endsWith("F") || token.image.endsWith("f")) {
           result = factory.createFloatLiteral(token.image);
+      } else if (token.image.endsWith("R") || token.image.endsWith("r")) {
+          result = new RealLiteral(token.image);
       } else {
           result = factory.createDoubleLiteral(token.image);
       }
