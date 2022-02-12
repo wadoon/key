@@ -23,6 +23,7 @@ import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.ldt.RealLDT;
 import de.uka.ilkd.key.logic.Name;
+import org.key_project.util.ExtList;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -64,6 +65,13 @@ public class RealLiteral extends Literal {
     }
 
     public RealLiteral(String string) {
+        this(new ExtList(), string);
+    }
+
+
+    public RealLiteral(ExtList extList, String string) {
+        super(extList);
+
         if (!string.toLowerCase().endsWith("r")) {
             throw new NumberFormatException(string);
         }

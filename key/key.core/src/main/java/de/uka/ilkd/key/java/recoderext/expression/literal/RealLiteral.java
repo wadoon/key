@@ -36,7 +36,7 @@ public final class RealLiteral extends Literal implements KeYRecoderExtension {
     private final String value;
 
     public RealLiteral (int value){
-        this(""+value+".0");
+        this(value+"r");
     }
 
     public RealLiteral(String value){
@@ -44,11 +44,11 @@ public final class RealLiteral extends Literal implements KeYRecoderExtension {
     }
 
     public RealLiteral(BigDecimal value){
-        this(value.toString());
+        this(value.toString() + "r");
     }
 
     public RealLiteral(){
-        this("0.0");
+        this("0r");
     }
 
     public RealLiteral(ExtList el) {

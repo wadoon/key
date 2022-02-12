@@ -104,7 +104,7 @@ public class OverloadedOperatorHandler {
         handlers.add(new IntegerHandler(services));
         handlers.add(new FloatHandler(services));
         handlers.add(new DoubleHandler(services));
-        // handlers.add(new RealHandler(services));
+        handlers.add(new RealHandler(services));
     }
 
     @Nullable

@@ -12,6 +12,7 @@ import de.uka.ilkd.key.java.expression.literal.DoubleLiteral;
 import de.uka.ilkd.key.java.expression.literal.FloatLiteral;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.expression.literal.LongLiteral;
+import de.uka.ilkd.key.java.expression.literal.RealLiteral;
 import de.uka.ilkd.key.java.expression.literal.StringLiteral;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.ldt.*;
@@ -1045,7 +1046,8 @@ class Translator extends JmlParserBaseVisitor<Object> {
                 Term doubleLit = services.getTypeConverter().getDoubleLDT().translateLiteral(new DoubleLiteral(text), services);
                 result = new SLExpression(doubleLit, javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_DOUBLE));
             } else if (ctx.REAL_LITERAL() != null) {
-                throw new Error("not yet implemented; needed real ldt");
+                Term realLit = services.getTypeConverter().getRealLDT().translateLiteral(new RealLiteral(text), services);
+                result = new SLExpression(realLit, javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_REAL));
             } else {
                 raiseError(ctx, "Unexpected literal %s", text);
             }

@@ -867,6 +867,13 @@ public class Recoder2KeYConverter {
         return new FloatLiteral(collectComments(floatLit), floatLit.getValue());
     }
 
+    /** convert a recoder RealLiteral to a KeY RealLiteral */
+    public RealLiteral convert(
+            de.uka.ilkd.key.java.recoderext.expression.literal.RealLiteral realLit) {
+
+        return new RealLiteral(collectComments(realLit), realLit.getValue());
+    }
+
     /** convert a recoder LongLiteral to a KeY LongLiteral
      * @param longLit the LongLiteral from recoder
      * @return a KeY LongLiteral (immutable)*/
