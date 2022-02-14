@@ -69,10 +69,24 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 	private HashMap<String, LinkedList<String>> c3Linearizations = new HashMap<>();
 	public String output = "";
 
+	/* A super call, e.g., super.foo() */
 	private Pattern superCallPattern = Pattern.compile("[\\{\\};][\s\t\n]*super\\.");
-	private Pattern javaInsideFunctionCallPattern = Pattern.compile("[^\\w_]*[\\w_]\\.\\(");
+	/* A function call to an internally defined function, e.g., foo() */
+	private Pattern javaInternalFunctionCallPattern = Pattern.compile("[^\\w_\\.][\\w_]+\\(");
+	/* A function call to an externally defined function, e.g., contractA.foo() */
+	private Pattern javaExternalFunctionCallPattern = Pattern.compile("[^\\w_\\.][\\w_]+\\.[\\w_]+\\(");
 
-	private String replaceSuperCallsInFunction(String originalContract, String baseContract, String output) {
+	/**
+	 * Replaces all super calls -- super.foo() -- with calls '__C__foo()', where C is a concrete, parent contract
+	 * to 'derivingContract'. 'derivingContract' is the contract implementing the contract containing within 'output'.
+	 * However, 'originalContract' may have inherited this contract', and 'baseContract'
+	 * is then the parent contract originally implementing the function.
+	 * @param derivingContract The deriving contract.
+	 * @param baseContract The base contract implementing the functions that are to be treated.
+	 * @param output The original function output.
+	 * @return The identifier of the function as it will exist inside 'derivingContract', e.g., __C__foo.
+	 */
+	private String replaceSuperCallsInFunction(String derivingContract, String baseContract, String output) {
 		// Find super calls
 		Matcher superCallMatcher = superCallPattern.matcher(output);
 		int matcherStartIndex = 0;
@@ -82,7 +96,7 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 			int functionEndIndex = output.indexOf('(', superEndIndex);
 			String function = output.substring(superEndIndex, functionEndIndex);
 			// Construct the explicit call. The output will be __C__function, where C is some parent contract
-			String explicitCall = replaceSuperCall(originalContract, baseContract, function);
+			String explicitCall = replaceSuperCall(derivingContract, baseContract, function);
 			// Replace the super call with the explicit call.
 			output = output.substring(0, superEndIndex - 6 /* 6 == length of "super." */) +
 					explicitCall + output.substring(functionEndIndex);
@@ -92,13 +106,14 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 	}
 
 	/**
-	 * Replaces a super call -- super.function -- with a call '__C__function', where C is a concrete, parent contract.
-	 * 'derivingContract' is the contract implementing 'outsideFunction'. However, this is a flattened contract,
-	 * and 'parentContract' is the parent contract originally implementing the function.
-	 * @param derivingContract
-	 * @param baseContract
-	 * @param function
-	 * @return The identifier of the function as it will exist inside 'derivingContract', e.g., __C__fun.
+	 * Replaces a super call -- super.foo() -- with a call '__C__foo()', where C is a concrete, parent contract
+	 * to 'derivingContract'. 'derivingContract' is the contract implementing 'outsideFunction'.
+	 * However, this is a flattened contract, and 'parentContract' is the parent contract originally
+	 * implementing the function.
+	 * @param derivingContract The contract in which the super call takes place.
+	 * @param baseContract The contract that originally implemented the function, that 'derivingContract' inherited.
+	 * @param function The function identifier.
+	 * @return The identifier of the function as it will exist inside 'derivingContract', e.g., __C__foo.
 	 */
 	private String replaceSuperCall(String derivingContract, String baseContract, String function) {
 		ContractInfo contractInfo = contractMap.get(derivingContract);
@@ -110,7 +125,7 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 			error("Fatal: the currently inspected contract does not have a linearization.");
 
 		// Find the most derived parent in the contract's linearization list that contains the function ('functionCalled')
-		// The parent has to be at least as derived as 'parentContract', which is the contract that originally implemented the contract,
+		// The parent has to be more derived than 'parentContract', as this is the original owner of the inherited function,
 		// before the contract flattening took place.
 		Iterator<String> it = linearization.descendingIterator();
 		it.next(); // Skip the last element (it is the contract itself)
@@ -123,10 +138,10 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 		while (it.hasNext()) {
 			String parentContract = it.next();
 			if (!baseContractFound) {
-				if (baseContract.equals(parentContract))
+				if (baseContract.equals(parentContract)) {
 					baseContractFound = true;
-				else
-					continue;
+				}
+				continue;
 			}
 			ContractInfo parentContractInfo = contractMap.get(parentContract);
 			boolean hasFunction = parentContractInfo.functions.get(function) != null;
@@ -151,31 +166,65 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 		return null;
 	}
 
-
+	/**
+	 * Construct a mangled name for inherited functions.
+	 * @param baseContract The contract that the function was inherited from.
+	 * @param function The function identifier.
+	 * @return A mangled function identifier.
+	 */
 	private String constructMangledInheritedFunctionName(String baseContract, String function) {
 		return "__" + baseContract + "__" + function;
 	}
 
-
+	/**
+	 * In contract 'originalContract', replaces all internal and external calls to inherited functions
+	 * with their mangled versions, within the function whose output is in 'functionOutput'.
+	 * @param originalContract The contract inheriting the function whose output is 'functionOutput'.
+	 * @param baseContract The contract originally implementing the function whose output is 'functionOutput'.
+	 * @param functionOutput The old function output.
+	 * @return
+	 */
 	private String renameInheritedFunctions(String originalContract, String baseContract, String functionOutput) {
-		return "";
+		// Replace all internal calls, such as "foo()", with explicit calls "__C__foo()",
+		// where C is 'baseContract' which 'originalContract' inherited the function from.
+		Matcher internalCallMatcher = javaInternalFunctionCallPattern.matcher(functionOutput);
+		while (internalCallMatcher.find()) {
+			int funNameStartPos = internalCallMatcher.start() + 1;
+			int funNameEndPos = internalCallMatcher.end() - 1;
+			String funName = functionOutput.substring(funNameStartPos, funNameEndPos);
+			String newName = constructMangledInheritedFunctionName(baseContract, funName);
+			functionOutput = functionOutput.replaceFirst(funName, newName);
+		}
+		// Replace all external calls, such as "C.foo()", which new, explicit calls "__C__foo()".
+		// If 'C' is 'super', replace it with a concrete contract.
+		Matcher externalCallMatcher = javaExternalFunctionCallPattern.matcher(functionOutput);
+		while (externalCallMatcher.find()) {
+			int fullFunCallStartPos = externalCallMatcher.start() + 1;
+			int fullFunCallEndPos = externalCallMatcher.end() - 1;
+			int dotPos = functionOutput.indexOf('.', fullFunCallStartPos);
+			String fullFunCall = functionOutput.substring(fullFunCallStartPos, fullFunCallEndPos);
+			String contractName = functionOutput.substring(fullFunCallStartPos, dotPos);
+			String funName = functionOutput.substring(dotPos + 1, fullFunCallEndPos);
+
+			String newFunCall;
+			if (contractName.equals("super"))
+				newFunCall = replaceSuperCall(originalContract, baseContract, funName);
+			else
+				newFunCall = constructMangledInheritedFunctionName(baseContract, funName);
+			functionOutput = functionOutput.replaceFirst(fullFunCall, newFunCall);
+		}
+		return functionOutput;
 	}
 
-
+	/**
+	 * Perform 'flattening'; add all functions from 'contract''s parents into 'contract' itself.
+	 * Super calls are also replaced with explicit calls.
+	 * @param contract
+	 * @return The new output for 'contract', but with inherit functions added.
+	 */
 	private String addInheritedFunctionsToContractOutput(String contract) {
-		class ContractFunctionPair {
-			public String contract;
-			public String function;
-			ContractFunctionPair(String contract, String function) {
-				this.contract = contract;
-				this.function = function;
-			}
-		}
-
-		// TODO: only do this for functions containing super calls?
 		// TODO: Skip unimplemented functions from interfaces/abstract classes.
 		final StringBuffer inheritedContractsOutputBuffer = new StringBuffer();
-		final LinkedList<ContractFunctionPair> inheritedFunctions = new LinkedList<>();
 		LinkedList<String> c3Linearization = c3Linearizations.get(contract);
 		Iterator<String> it = c3Linearization.descendingIterator();
 		it.next(); // Skip the last contract; it is the contract itself
@@ -189,32 +238,141 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 			// Add all inherited functions from contract 'baseContract'
 			Map<String, FunctionInfo> baseFunctions = baseContractInfo.functions;
 			for (String function : baseFunctions.keySet()) {
-				inheritedFunctions.add(new ContractFunctionPair(baseContract, function));
-				// Copy the function output (header + body), but replace all super calls inside it.
-				String functionOutput = String.valueOf(baseFunctions.get(function).getOutputWithSuperCalls());
-				functionOutput = replaceSuperCallsInFunction(contract, baseContract, functionOutput);
-				//functionOutput = renameInheritedFunctions(contract, baseContract, functionOutput);
-				inheritedContractsOutputBuffer.append(functionOutput);
+				// Construct a new function header, containing a mangled function name
+				FunctionInfo functionInfo = baseFunctions.get(function);
+				String newFunctionName = constructMangledInheritedFunctionName(baseContract, function);
+				String newHeader = functionInfo.header.replaceFirst(function, newFunctionName);
+				// In the body, replace all super calls with explicit calls, and non-super calls with calls to mangled functions.
+				String newBody = String.valueOf(functionInfo.bodyWithSuperCalls);
+				newBody = renameInheritedFunctions(contract, baseContract, newBody);
+				// Add to the output.
+				inheritedContractsOutputBuffer.append(newHeader + newBody + '\n');
 			}
 		}
 
 		String inheritedContractsOutput = inheritedContractsOutputBuffer.toString();
 
-		// Rename all inherited functions, and change all calls to those functions accordingly.
-		// Functions are renamed to contain the prefix __c__, where 'c' is the parent name.
-		/*
-		for (ContractFunctionPair contractFunctionPair : inheritedFunctions) {
-			// Replace the function name with a new one, and replace all calls to the functions with the new name.
-			// TODO: do a more robust replace using regex, since other functions could have that function name as a substring.
-			String newFunctionName = constructMangledInheritedFunctionName(
-				contractFunctionPair.contract, contractFunctionPair.function);
-			inheritedContractsOutput = inheritedContractsOutput.replaceAll(
-					contractFunctionPair.function, newFunctionName);
+		return inheritedContractsOutput;
+	}
+
+	/**
+	 * See the function 'constructC3Linearization'.
+	 * Performs the 'merge' step for the list of inheritance lists 'toMerge', as part of the C3 linearization.
+	 * @param toMerge A list of inheritance lists for a contract, created from its inheritance tree.
+	 * @return A C3 linearization for the contract corresponding to what is in 'toMerge'.
+	 */
+	private LinkedList<String> merge(final LinkedList<LinkedList<String>> toMerge) {
+		LinkedList<String> linearization = new LinkedList<>();
+
+		while (!toMerge.isEmpty()) {
+			boolean candidateFound = false;
+			String candidate = null;
+			// Try to find a candidate by inspecting the head of all lists
+			Iterator<LinkedList<String>> it = toMerge.iterator();
+			while (it.hasNext()) {
+				LinkedList<String> baseList = it.next();
+				candidate = baseList.getLast();
+				boolean appearsOnlyAtHead = true;
+				// Check if the candidate appears only at the head of all lists, if it appears
+				for (LinkedList<String> list2 : toMerge) {
+					int candidatePos = list2.indexOf(candidate);
+					if (candidatePos != -1 && candidatePos < list2.size() - 1) {
+						appearsOnlyAtHead = false;
+						break;
+					}
+				}
+				if (appearsOnlyAtHead) {
+					candidateFound = true;
+					break;
+				}
+			}
+			if (candidateFound) {
+				// Add the candidate to the linearization, and remove it from all lists.
+				linearization.addFirst(candidate);
+				it = toMerge.iterator();
+				while (it.hasNext()) {
+					LinkedList<String> baseList = it.next();
+					baseList.remove(candidate);
+					if (baseList.isEmpty())
+						it.remove();
+				}
+			} else {
+				error("Cannot linearize; no suitable candidate found during the linearization step.");
+			}
+		}
+		return linearization;
+	}
+
+	/**
+	 * Constructs the C3 linearization for 'contract', which is a list of contracts that the contract
+	 * inherits from, from least derived to most derived, including the contract itself at the end.
+	 * In other words, it is a flattening of the contract's inheritance tree structure.
+	 * @param contract
+	 * @return The contract's C3 linearization as a list of contracts, from least derived to most derived.
+	 */
+	private LinkedList<String> constructC3Linearization(String contract) {
+		ContractInfo contractInfo = contractMap.get(contract);
+		// If the inheritance list is empty, the linearization is just the contract itself.
+		if (contractInfo.is.isEmpty()) {
+			return new LinkedList<String>(Collections.singleton(contract));
+		} else {
+			// Construct the list of lists that is to be sent to the 'merge' function.
+			// It contains the linearizations of all contracts in the inheritance list + the inheritance list itself.
+			LinkedList<LinkedList<String>> baseLinearizations = new LinkedList<>();
+			for (String base : contractInfo.is) {
+				if (base.equals(contract)) {
+					error("A contract may not inherit from itself.");
+				}
+				LinkedList<String> baseLinearization = c3Linearizations.get(base);
+				if (baseLinearization == null) {
+					error("The contract inherits from something not defined yet");
+				}
+				// Create a copy so that, when 'baseLinearizations' is mutated by merge(), 'linearizations' is not mutated.
+				baseLinearizations.addFirst(new LinkedList<>(baseLinearization));
+			}
+			// Copy the inheritance list, put the contract at the end of it, and put it in the merge input list
+			LinkedList<String> inheritanceList = new LinkedList<>(contractInfo.is);
+			inheritanceList.addLast(contract);
+			baseLinearizations.addLast(inheritanceList);
+			// Perform the 'merge' operation to get the actual linearization.
+			LinkedList<LinkedList<String>> toMerge = new LinkedList<>(baseLinearizations);
+			LinkedList<String> linearization = merge(toMerge);
+			if (linearization == null) {
+				error("Linearization failed.");
+			}
+			return linearization;
+		}
+	}
+
+	/**
+	 * Constructs a Java interface for the contract that is currently being visited.
+	 * This interface contains declarations for all functions that the contract introduces (not overrides),
+	 * and the resulting Java class for the contract shall 'implement' this interface.
+	 * The interface 'extends' all the corresponding interfaces for the contracts in the contract's inheritance list.
+	 * @return
+	 */
+	private String makeInterface() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("interface " + currentContractInfo.name);
+
+		// build 'extends' list
+		if (currentContractInfo.is.size() > 0) {
+			sb.append(" extends");
+			currentContractInfo.is.forEach(c -> {
+				sb.append(" " + c + ",");
+			});
+			sb.deleteCharAt(sb.length()-1);
+		}
+		sb.append(" {\n");
+
+		// add own functions, but only if they were introduced in this contract (they don't override)
+		for (FunctionInfo functionInfo : currentContractInfo.functions.values()) {
+			if (!functionInfo.overrides)
+				sb.append(functionInfo.header + ";\n");
 		}
 
-		 */
-
-		return inheritedContractsOutput;
+		sb.append("}\n");
+		return sb.toString();
 	}
 
 
@@ -360,146 +518,8 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
         } 
         output += contract.append("}\n").toString();
 
-		// TODO: Replace all calls to all inherited contracts with the new names, within all of the contract's functions
-
 		return getOutput();
 	}
-
-	private LinkedList<String> merge(final LinkedList<LinkedList<String>> toMerge) {
-		LinkedList<String> linearization = new LinkedList<>();
-
-		while (!toMerge.isEmpty()) {
-			boolean candidateFound = false;
-			String candidate = null;
-			// Try to find a candidate by inspecting the head of all lists
-			Iterator<LinkedList<String>> it = toMerge.iterator();
-			while (it.hasNext()) {
-				LinkedList<String> baseList = it.next();
-				candidate = baseList.getLast();
-				boolean appearsOnlyAtHead = true;
-				// Check if the candidate appears only at the head of all lists, if it appears
-				for (LinkedList<String> list2 : toMerge) {
-					int candidatePos = list2.indexOf(candidate);
-					if (candidatePos != -1 && candidatePos < list2.size() - 1) {
-						appearsOnlyAtHead = false;
-						break;
-					}
-				}
-				if (appearsOnlyAtHead) {
-					candidateFound = true;
-					break;
-				}
-			}
-			if (candidateFound) {
-				// Add the candidate to the linearization, and remove it from all lists.
-				linearization.addFirst(candidate);
-				it = toMerge.iterator();
-				while (it.hasNext()) {
-					LinkedList<String> baseList = it.next();
-					baseList.remove(candidate);
-					if (baseList.isEmpty())
-						it.remove();
-				}
-			} else {
-				error("Cannot linearize; no suitable candidate found during the linearization step.");
-			}
-		}
-		return linearization;
-	}
-
-	private LinkedList<String> constructC3Linearization(String contract) {
-		ContractInfo contractInfo = contractMap.get(contract);
-		// If the inheritance list is empty, the linearization is just the contract itself.
-		if (contractInfo.is.isEmpty()) {
-			return new LinkedList<String>(Collections.singleton(contract));
-		} else {
-			// Construct the list of lists that is to be sent to the 'merge' function.
-			// It contains the linearizations of all contracts in the inheritance list + the inheritance list itself.
-			LinkedList<LinkedList<String>> baseLinearizations = new LinkedList<>();
-			for (String base : contractInfo.is) {
-				if (base.equals(contract)) {
-					error("A contract may not inherit from itself.");
-				}
-				LinkedList<String> baseLinearization = c3Linearizations.get(base);
-				if (baseLinearization == null) {
-					error("The contract inherits from something not defined yet");
-				}
-				// Create a copy so that, when 'baseLinearizations' is mutated by merge(), 'linearizations' is not mutated.
-				baseLinearizations.addFirst(new LinkedList<>(baseLinearization));
-			}
-			// Copy the inheritance list, put the contract at the end of it, and put it in the merge input list
-			LinkedList<String> inheritanceList = new LinkedList<>(contractInfo.is);
-			inheritanceList.addLast(contract);
-			baseLinearizations.addLast(inheritanceList);
-			// Perform the 'merge' operation to get the actual linearization.
-			LinkedList<LinkedList<String>> toMerge = new LinkedList<>(baseLinearizations);
-			LinkedList<String> linearization = merge(toMerge);
-			if (linearization == null) {
-				error("Linearization failed.");
-			}
-			return linearization;
-		}
-	}
-
-	/*
-	private String makeBaseClass() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("abstract class " + currentContractInfo.name + "Base extends Address implements " + currentContractInfo.name + " {\n");
-
-        Map<String,String> collisions = new HashMap<>();
-        // add state variables and functions of all derived contracts
-        currentContractInfo.is.forEach(c -> {
-            ContractInfo ci = contractMap.get(c);
-            if (ci.type == ContractInfo.CONTRACT) {
-                ci.variables.forEach((var,str) -> sb.append(str + ";\n"));
-                ci.enums.forEach((e,str) -> sb.append(str + "\n"));
-                ci.functionHeaders.forEach((func,str) -> {
-                    for (String d : currentContractInfo.is) {
-                        if (!d.equals(c) && 
-                                contractMap.get(d).functionHeaders.containsKey(func)) {
-                            // we have colliding methods
-                            collisions.put(func,str); // ok to do several times, last one will be fine
-                            str = str.replaceFirst(func, "__" + c + "__" + func);
-                        }
-                    }
-                    sb.append(str + " {}\n");
-                });
-                ci.constructorHeaders.forEach(cHeader -> sb.append(cHeader + "{}\n"));
-            }
-        });
-
-        collisions.forEach((func,body) -> {
-            sb.append(body + " {}\n");
-        });
-
-        sb.append("}\n");
-        return sb.toString();
-    }
-	 */
-
-    private String makeInterface() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("interface " + currentContractInfo.name);
-
-        // build 'extends' list
-        if (currentContractInfo.is.size() > 0) {
-            sb.append(" extends");
-            currentContractInfo.is.forEach(c -> {
-                sb.append(" " + c + ",");
-            });
-            sb.deleteCharAt(sb.length()-1);
-        }
-        sb.append(" {\n");
-
-        // add own functions, but only if they were introduced in this contract (they don't override)
-		for (FunctionInfo functionInfo : currentContractInfo.functions.values()) {
-			if (!functionInfo.overrides)
-				sb.append(functionInfo.header + ";\n");
-		}
-
-        sb.append("}\n");
-        return sb.toString();
-    }
 
 	private String error(String string) throws RuntimeException {
 		throw new RuntimeException(string);
@@ -771,6 +791,7 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 
 		String bodyWithoutSuperCalls = replaceSuperCallsInFunction(
 				currentContractInfo.name, currentContractInfo.name, String.valueOf(functionInfo.bodyWithSuperCalls));
+
 		return fctHeader + " " + bodyWithoutSuperCalls;
 	}
 	/**
