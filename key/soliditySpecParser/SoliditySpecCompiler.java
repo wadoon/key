@@ -276,7 +276,7 @@ public class SoliditySpecCompiler {
     public static void main(String[] args) throws IOException {
         SoliditySpecCompiler ssc = new SoliditySpecCompiler(args[1], args[2]);
         ssc.collectProofObligations(args[0]);
-        System.out.println(ssc.makeKeYFileString());
+        System.out.println(ssc.makeKeYFileString().replace(" this"," self"));
     }
 
 }
