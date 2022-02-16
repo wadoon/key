@@ -13,11 +13,6 @@
 
 package de.uka.ilkd.key.rule.merge;
 
-import java.io.File;
-import java.util.Iterator;
-
-import org.junit.Test;
-
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -34,18 +29,23 @@ import de.uka.ilkd.key.rule.merge.procedures.MergeIfThenElseAntecedent;
 import de.uka.ilkd.key.rule.merge.procedures.MergeTotalWeakening;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import de.uka.ilkd.key.util.ProofStarter;
-import junit.framework.TestCase;
-import org.junit.Test;
-
 import java.io.File;
 import java.util.Iterator;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import javax.annotation.Nonnull;
+import java.io.File;
+import java.util.Iterator;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Test suite for the {@link MergeRule}.
  *
  * @author Dominic Scheurer
  */
-public class MergeRuleTests extends TestCase {
+public class MergeRuleTests {
 
     private static final File TEST_RESOURCES_DIR_PREFIX = new File(HelperClassForTests.TESTCASE_DIRECTORY, "merge/");
 
@@ -109,7 +109,7 @@ public class MergeRuleTests extends TestCase {
             }
         }
 
-        assertEquals("There should be two merge apps.", 2, mergeAppsCnt);
+        Assertions.assertEquals(2, mergeAppsCnt, "There should be two merge apps.");
     }
 
     /**
@@ -131,7 +131,7 @@ public class MergeRuleTests extends TestCase {
             }
         }
 
-        assertEquals("There should be two merge apps.", 2, mergeAppsCnt);
+        Assertions.assertEquals(2, mergeAppsCnt, "There should be two merge apps.");
     }
 
     /**
@@ -154,7 +154,7 @@ public class MergeRuleTests extends TestCase {
             }
         }
 
-        assertEquals("There should be one merge app.", 1, mergeAppsCnt);
+        Assertions.assertEquals(1, mergeAppsCnt, "There should be one merge app.");
     }
 
     /**
@@ -218,7 +218,7 @@ public class MergeRuleTests extends TestCase {
 
         try {
             mergeFirstGoal(proof, MergeIfThenElseAntecedent.instance());
-            fail("The merge operation should not be applicable.");
+            Assertions.fail("The merge operation should not be applicable.");
         } catch (IncompleteRuleAppException e) {
         }
     }
@@ -234,7 +234,7 @@ public class MergeRuleTests extends TestCase {
 
         try {
             mergeFirstGoal(proof, MergeIfThenElseAntecedent.instance());
-            fail("The merge operation should not be applicable.");
+            Assertions.fail("The merge operation should not be applicable.");
         } catch (IncompleteRuleAppException e) {
         }
     }
@@ -252,7 +252,7 @@ public class MergeRuleTests extends TestCase {
         startAutomaticStrategy(proof);
 
         assertTrue(proof.closed());
-        assertEquals(1, proof.getStatistics().mergeRuleApps);
+        Assertions.assertEquals(1, proof.getStatistics().mergeRuleApps);
     }
 
     /**
@@ -317,7 +317,7 @@ public class MergeRuleTests extends TestCase {
         try {
             macro.applyTo(null, node, null, null);
         } catch (Exception e) {
-            fail("Could not apply macro.");
+            Assertions.fail("Could not apply macro.");
         }
     }
 
@@ -333,28 +333,26 @@ public class MergeRuleTests extends TestCase {
      * @param proofFileName The file name of the proof file to load.
      * @return The loaded proof.
      */
+    @Nonnull
     public static Proof loadProof(File directory, String proofFileName) {
         File proofFile = new File(directory, proofFileName);
-        assertTrue("Proof file: " + proofFile.getAbsolutePath() + " could not be found!",
-                proofFile.exists());
+        assertTrue(proofFile.exists(), "Proof file: " + proofFile.getAbsolutePath() + " could not be found!");
 
         try {
             KeYEnvironment<?> environment = KeYEnvironment.load(
                     JavaProfile.getDefaultInstance(), proofFile, null, null,
                     null, true);
             Proof proof = environment.getLoadedProof();
-            assertNotNull(proof);
+            Assertions.assertNotNull(proof);
 
             return proof;
         } catch (ProblemLoaderException e) {
             e.printStackTrace();
-            fail("Proof could not be loaded:\n" + e.getMessage());
+            Assertions.fail("Proof could not be loaded:\n" + e.getMessage());
             return null;
         }
     }
 
-    private class IncompleteRuleAppException extends RuntimeException {
-        private static final long serialVersionUID = 774109478701810300L;
+    private static class IncompleteRuleAppException extends RuntimeException {
     }
-
 }
