@@ -181,10 +181,7 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet> extends 
                 final FormulaChangeInfo head = modifiedFormulas.head();
                 result = new PosInOccurrence(head.getNewFormula(),
                         PosInTerm.getTopLevel(), inAntec);
-            } /* else {
-                // just add it
-                result = null;
-            }*/
+            }
         }
         return result == null ? null : result.topLevel();
     }
