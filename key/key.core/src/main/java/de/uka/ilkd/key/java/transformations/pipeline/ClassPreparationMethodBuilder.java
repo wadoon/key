@@ -142,7 +142,7 @@ public class ClassPreparationMethodBuilder extends JavaTransformer {
      *
      * @param td the TypeDeclaration
      */
-    protected void apply(TypeDeclaration<?> td) {
+    public void apply(TypeDeclaration<?> td) {
         td.addMember(createPrepareMethod(td));
     }
 }

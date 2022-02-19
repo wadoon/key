@@ -22,6 +22,8 @@ import de.uka.ilkd.key.java.ast.visitor.Visitor;
 import de.uka.ilkd.key.rule.MatchConditions;
 
 public class TransactionStatement extends JavaStatement {
+    public static final int BEGIN = 1;
+    public static final int FINISH = 2;
     private final KeyTransactionStatement.TransactionType type;
 
     public TransactionStatement(int type) {

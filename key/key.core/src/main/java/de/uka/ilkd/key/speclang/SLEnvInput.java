@@ -119,7 +119,7 @@ public final class SLEnvInput extends AbstractEnvInput {
                 if (file.isFile()) {
                     rs = RuleSourceFactory.initRuleFile(file);
                 } else {
-                    URL url = KeYResourceManager.getManager().getResourceFile(Recoder2KeY.class, filePath);
+                    URL url = null;//weigl TODO  KeYResourceManager.getManager().getResourceFile(Recoder2KeY.class, filePath);
                     if (url != null) {
                         rs = RuleSourceFactory.initRuleFile(url);
                     }

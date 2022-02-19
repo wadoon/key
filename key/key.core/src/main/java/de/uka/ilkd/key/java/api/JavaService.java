@@ -66,6 +66,10 @@ public class JavaService {
         return new JavaSymbolSolver(typeResolver);
     }
 
+    public void setClassPath(File bootClassPath, List<File> classPath) {
+        //TODO weigl
+    }
+
 
     public static class KeyNodeMetadata {
         NodeList<Comment> attachedComments = new NodeList<>();

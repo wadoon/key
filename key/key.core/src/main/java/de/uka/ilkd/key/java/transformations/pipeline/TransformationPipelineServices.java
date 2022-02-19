@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.java.transformations.pipeline;
 
+import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.Node;
@@ -310,6 +311,11 @@ public class TransformationPipelineServices {
 
         return null;
     }
+
+    public JavaParser getParser() {
+        return new JavaParser();
+    }
+
 
     /**
      * Cache of important data. This is done mainly for performance reasons.

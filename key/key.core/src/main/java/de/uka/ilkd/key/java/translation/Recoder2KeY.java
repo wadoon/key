@@ -32,6 +32,7 @@ import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.api.JavaService;
 import de.uka.ilkd.key.java.ast.CompilationUnit;
+import de.uka.ilkd.key.java.ast.ModelElement;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.transformations.KeyJavaPipeline;
@@ -967,4 +968,7 @@ public class Recoder2KeY implements JavaReader {
         return null;
     }
 
+    public ProgramElement toKeY(Type t) {
+        return null;
+    }
 }

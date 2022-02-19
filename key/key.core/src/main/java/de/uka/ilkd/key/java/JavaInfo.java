@@ -1411,7 +1411,7 @@ public final class JavaInfo {
         return length;
     }
 
-    private Recoder2KeY rec2key() {
+    public Recoder2KeY rec2key() {
         return kpmi.rec2key();
     }
 

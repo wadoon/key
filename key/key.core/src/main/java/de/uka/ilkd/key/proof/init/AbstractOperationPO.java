@@ -1001,26 +1001,18 @@ public abstract class AbstractOperationPO extends AbstractPO {
                 sb2 = new StatementBlock(
                             transaction ?
                                     new Statement[] {
-                                        new TransactionStatement(
-                                            de.uka.ilkd.key.java.recoderext
-                                                .TransactionStatement.BEGIN),
+                                        new TransactionStatement(TransactionStatement.BEGIN),
                                         nullStat, tryStat,
-                                        new TransactionStatement(
-                                            de.uka.ilkd.key.java.recoderext
-                                                .TransactionStatement.FINISH)
+                                        new TransactionStatement(TransactionStatement.FINISH)
                                     }
                                     : new Statement[] { nullStat, tryStat });
             } else {
                 sb2 = new StatementBlock(
                             transaction ?
                                     new Statement[] {
-                                        new TransactionStatement(
-                                            de.uka.ilkd.key.java.recoderext
-                                                .TransactionStatement.BEGIN),
+                                        new TransactionStatement(TransactionStatement.BEGIN),
                                         nullStat, beforeTry, tryStat,
-                                        new TransactionStatement(
-                                            de.uka.ilkd.key.java.recoderext
-                                                .TransactionStatement.FINISH)
+                                        new TransactionStatement(TransactionStatement.FINISH)
                                     }
                                     : new Statement[] { nullStat, beforeTry, tryStat });
             }

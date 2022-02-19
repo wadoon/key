@@ -36,19 +36,15 @@ import de.uka.ilkd.key.java.ast.declaration.modifier.Public;
 import de.uka.ilkd.key.java.ast.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.java.ast.reference.TypeReference;
-import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.sort.ArraySort;
+import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.util.Debug;
 import org.key_project.util.ExtList;
-import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -113,7 +109,7 @@ public class Recoder2KeYTypeConverter {
     }
 
     private void storeInCache(Type t, KeYJavaType kjt) {
-        recoder2key.put(t, kjt);
+        //recoder2key.put(t, kjt);
     }
 
 
@@ -132,8 +128,9 @@ public class Recoder2KeYTypeConverter {
      * @see #getKeYJavaType(Type)
      */
     public KeYJavaType getKeYJavaType(String typeName) {
-        resolver.recoder.abstraction.Type ty = ni.getType(typeName);
-        return getKeYJavaType(ty);
+        //resolver.recoder.abstraction.Type ty = ni.getType(typeName);
+        //return getKeYJavaType(ty);
+        return null;
     }
 
     /**
@@ -148,34 +145,36 @@ public class Recoder2KeYTypeConverter {
         if (t == null)
             throw new NullPointerException("null cannot be converted into a KJT");
         getKeYJavaType(t.resolve());
+        return null;
     }
 
-    private void getKeYJavaType(ResolvedType resolve) {
-        KeYJavaType kjt = lookupInCache(t);
-        if (kjt != null) {
-            return kjt;
-        }
-
-        KeYJavaType result;
-        if (t.isPrimitiveType()) {
-            result = getKeYJavaType(t.asPrimitiveType());
-        } else if (t.isClassOrInterfaceType()) {
-            result = getKeYJavaType(t.asClassOrInterfaceType());
-        } else if (t.isArrayType()) {
-            result = getKeYJavaType(t.asArrayType());
-        } else if (t.isKeyTypeSV()) {
-            result = getKeYJavaType(t.asKeyTypeSV());
-        } else if (t.isKeyMetaConstructType()) {
-            result = getKeYJavaType(t.asKeyMetaConstructType());
-        } else if (t.isUnknownType()) {
-            result = getKeYJavaType(t.asUnknownType());
-        } else if (t.isVarType()) {
-            result = getKeYJavaType(t.asVarType());
-        } else {
-            throw new IllegalArgumentException();
-        }
-
-        return result;
+    private void getKeYJavaType(ResolvedType t) {
+//        KeYJavaType kjt = lookupInCache(t);
+//        if (kjt != null) {
+//            return kjt;
+//        }
+//
+//        KeYJavaType result;
+//        if (t.isPrimitive()) {
+//            result = getKeYJavaType(t.asPrimitive());
+//        } else if (t.isReferenceType()) {
+//            result = getKeYJavaType(t.asReferenceType());
+//        } else if (t.isArray()) {
+//            result = getKeYJavaType(t.asArrayType());
+//        } else if (t.is()) {
+//            result = getKeYJavaType(t.asKeyTypeSV());
+//        } else if (t.isKeyMetaConstructType()) {
+//            result = getKeYJavaType(t.asKeyMetaConstructType());
+//        } else if (t.isUnknownType()) {
+//            result = getKeYJavaType(t.asUnknownType());
+//        } else if (t.isVarType()) {
+//            result = getKeYJavaType(t.asVarType());
+//        } else {
+//            throw new IllegalArgumentException();
+//        }
+//
+//        return result;
+//
     }
 
 
@@ -188,45 +187,48 @@ public class Recoder2KeYTypeConverter {
             throw new RuntimeException("Cannot assign " + t.getFullName() + " a primitive sort.");
         }
         addKeYJavaType(t, s);
+        return null;
     }
 
     public KeYJavaType getKeYJavaType(NullType t) {
-        s = namespaces.sorts().lookup(NullSort.NAME);
+        Object s = namespaces.sorts().lookup(NullSort.NAME);
         if (s == null) {
             Sort objectSort = namespaces.sorts().lookup(new Name("java.lang.Object"));
             assert objectSort != null;
             s = new NullSort(objectSort);
         }
-        addKeYJavaType(t, s);
+        //addKeYJavaType(t, s);
+        return null;
     }
 
     public KeYJavaType getKeYJavaType(TypeParameter t) {
-        recoder.abstraction.ParameterizedType pt = (recoder.abstraction.ParameterizedType) t;
-        return getKeYJavaType(pt.getGenericType());
+        //recoder.abstraction.ParameterizedType pt = (recoder.abstraction.ParameterizedType) t;
+        //return getKeYJavaType(pt.getGenericType());
+        return null;
     }
 
     public KeYJavaType getKeYJavaType(ClassOrInterfaceType t) {
-        s = namespaces.sorts().lookup(new Name(t.getFullName()));
-        if (s == null) {
-            ClassOrInterfaceDeclaration ct = (ClassOrInterfaceDeclaration) t;
-            if (ct.isInterface()) {
-                KeYJavaType objectType = getKeYJavaType("java.lang.Object");
-                if (objectType == null) {
-                    throw new RuntimeException(
-                            "Missing core class: java.lang.Object must always be present");
-                }
-                s = createObjectSort(ct, directSuperSorts(ct).add(
-                        objectType.getSort()));
-            } else {
-                s = createObjectSort(ct, directSuperSorts(ct));
-            }
-        }
+//        var s = namespaces.sorts().lookup(new Name(t.getFullName()));
+//        if (s == null) {
+//            ClassOrInterfaceDeclaration ct = (ClassOrInterfaceDeclaration) t;
+//            if (ct.isInterface()) {
+//                KeYJavaType objectType = getKeYJavaType("java.lang.Object");
+//                if (objectType == null) {
+//                    throw new RuntimeException(
+//                            "Missing core class: java.lang.Object must always be present");
+//                }
+//                //s = createObjectSort(ct, directSuperSorts(ct).add(
+//                //objectType.getSort();));
+//            } else {
+//                //s = createObjectSort(ct, directSuperSorts(ct));
+//            }
+//        }
 
 
-        addKeYJavaType(t, s);
+        //addKeYJavaType(t, s);
 
         // the unknown classtype has no modelinfo so surround with null check
-        if (t.getProgramModelInfo() != null) {
+        /*if (t.getProgramModelInfo() != null) {
             List<? extends recoder.abstraction.Constructor> cl = t.getProgramModelInfo().getConstructors(
                     (ClassOrInterfaceDeclaration) t);
             if (cl.size() == 1
@@ -234,12 +236,13 @@ public class Recoder2KeYTypeConverter {
                 getRecoder2KeYConverter().processDefaultConstructor(
                         (recoder.abstraction.DefaultConstructor) cl.get(0));
             }
-        }
+        }*/
+        return null;
     }
 
     public KeYJavaType getKeYJavaType(ArrayType t) {
-        recoder.abstraction.Type bt = ((recoder.abstraction.ArrayType) t).getBaseType();
-        kjt = getKeYJavaType(bt);
+        //recoder.abstraction.Type bt = ((recoder.abstraction.ArrayType) t).getBaseType();
+        //kjt = getKeYJavaType(bt);
         KeYJavaType objectType = getKeYJavaType("java.lang.Object");
         KeYJavaType cloneableType = getKeYJavaType("java.lang.Cloneable");
         KeYJavaType serializableType = getKeYJavaType("java.io.Serializable");
@@ -251,64 +254,65 @@ public class Recoder2KeYTypeConverter {
         }
 
         // I may not use JavaInfo here because the classes may not yet be cached!
-        de.uka.ilkd.key.java.abstraction.Type elemType = kjt.getJavaType();
-        s = ArraySort.getArraySort(kjt.getSort(),
-                elemType,
-                objectType.getSort(),
-                cloneableType.getSort(),
-                serializableType.getSort());
-        addKeYJavaType(t, s);
+        //de.uka.ilkd.key.java.abstraction.Type elemType = kjt.getJavaType();
+        //s = ArraySort.getArraySort(kjt.getSort(),
+        //        elemType,
+        //        objectType.getSort(),
+        //        cloneableType.getSort(),
+        //        serializableType.getSort());
+        //addKeYJavaType(t, s);
+        return objectType;
     }
 
     private void addKeYJavaType(Type t, Sort s) {
-        KeYJavaType result = null;
-        if (!(t instanceof recoder.java.declaration.TypeDeclaration)) {
-            de.uka.ilkd.key.java.abstraction.Type type;
-            if (t instanceof recoder.abstraction.PrimitiveType) {
-                type = PrimitiveType.getPrimitiveType(t.getFullName());
-                result = typeConverter.getKeYJavaType(type);
-                if (result == null) {
-                    Debug.out("create new KeYJavaType for primitive type "
-                            + t + ". This should not happen");
-                    result = new KeYJavaType(type, s);
-                }
-            } else if (t instanceof recoder.abstraction.NullType) {
-                type = NullType.JAVA_NULL;
-                result = new KeYJavaType(type, s);
-                if (namespaces.sorts().lookup(s.name()) == null) {
-                    namespaces.sorts().add(s);
-                }
-            } else if (t instanceof recoder.abstraction.ArrayType) {
-                result = new KeYJavaType(s);
-                if (namespaces.sorts().lookup(s.name()) == null) {
-                    namespaces.sorts().add(s);
-                }
-            } else if (t == recoder2key.getServiceConfiguration().
-                    getNameInfo().getUnknownClassType()) {
-//              result = makeSimpleKeYType((ClassType)t,s);
-//              //TEMP!
-//              assert result.getJavaType() != null;
-            } else {
-                Debug.out("recoder2key: unknown type", t);
-                Debug.out("Unknown type: " + t.getClass() + " "
-                        + t.getFullName());
-                Debug.fail();
-            }
-        } else {
-            if (namespaces.sorts().lookup(s.name()) == null) {
-                namespaces.sorts().add(s);
-            }
-            result = new KeYJavaType(s);
-        }
-        storeInCache(t, result);
-
-        // delayed creation of virtual array declarations
-        // to avoid cycles
-        if (t instanceof recoder.abstraction.ArrayType) {
-            result.setJavaType(createArrayType(
-                    getKeYJavaType(((recoder.abstraction.ArrayType) t)
-                            .getBaseType()), lookupInCache(t)));
-        }
+//        KeYJavaType result = null;
+//        if (!(t instanceof recoder.java.declaration.TypeDeclaration)) {
+//            de.uka.ilkd.key.java.abstraction.Type type;
+//            if (t instanceof recoder.abstraction.PrimitiveType) {
+//                type = PrimitiveType.getPrimitiveType(t.getFullName());
+//                result = typeConverter.getKeYJavaType(type);
+//                if (result == null) {
+//                    Debug.out("create new KeYJavaType for primitive type "
+//                            + t + ". This should not happen");
+//                    result = new KeYJavaType(type, s);
+//                }
+//            } else if (t instanceof recoder.abstraction.NullType) {
+//                type = NullType.JAVA_NULL;
+//                result = new KeYJavaType(type, s);
+//                if (namespaces.sorts().lookup(s.name()) == null) {
+//                    namespaces.sorts().add(s);
+//                }
+//            } else if (t instanceof recoder.abstraction.ArrayType) {
+//                result = new KeYJavaType(s);
+//                if (namespaces.sorts().lookup(s.name()) == null) {
+//                    namespaces.sorts().add(s);
+//                }
+//            } else if (t == recoder2key.getServiceConfiguration().
+//                    getNameInfo().getUnknownClassType()) {
+////              result = makeSimpleKeYType((ClassType)t,s);
+////              //TEMP!
+////              assert result.getJavaType() != null;
+//            } else {
+//                Debug.out("recoder2key: unknown type", t);
+//                Debug.out("Unknown type: " + t.getClass() + " "
+//                        + t.getFullName());
+//                Debug.fail();
+//            }
+//        } else {
+//            if (namespaces.sorts().lookup(s.name()) == null) {
+//                namespaces.sorts().add(s);
+//            }
+//            result = new KeYJavaType(s);
+//        }
+//        storeInCache(t, result);
+//
+//        // delayed creation of virtual array declarations
+//        // to avoid cycles
+//        if (t instanceof recoder.abstraction.ArrayType) {
+//            result.setJavaType(createArrayType(
+//                    getKeYJavaType(((recoder.abstraction.ArrayType) t)
+//                            .getBaseType()), lookupInCache(t)));
+//        }
 
         // return was never used, so it is removed and method changed to void (mu)
         // return (KeYJavaType) lookupInCache(t); // usually this equals result,
@@ -325,20 +329,22 @@ public class Recoder2KeYTypeConverter {
      */
     private ImmutableSet<Sort> directSuperSorts(ClassOrInterfaceType classType) {
         var ct = classType.resolve();
-        return directSuperSorts(ct);
+        //return directSuperSorts(ct);
+        return null;
     }
 
     private ImmutableSet<Sort> directSuperSorts(ResolvedReferenceType ct) {
-        var supers = ct.getAllClassesAncestors();
-        ImmutableSet<Sort> ss = DefaultImmutableSet.nil();
-        for (var aSuper : supers) {
-            ss = ss.add(getKeYJavaType(aSuper).getSort());
-        }
-
-        if (ss.isEmpty() && !isObject(classType)) {
-            ss = ss.add(javaInfo.objectSort());
-        }
-        return ss;
+//        var supers = ct.getAllClassesAncestors();
+//        ImmutableSet<Sort> ss = DefaultImmutableSet.nil();
+//        for (var aSuper : supers) {
+//            ss = ss.add(getKeYJavaType(aSuper).getSort());
+//        }
+//
+//        if (ss.isEmpty() && !isObject(classType)) {
+//            ss = ss.add(javaInfo.objectSort());
+//        }
+//        return ss;
+        return null;
     }
 
     /**
@@ -361,10 +367,11 @@ public class Recoder2KeYTypeConverter {
      * @return a freshly created Sort object
      */
     private Sort createObjectSort(ClassOrInterfaceDeclaration ct, ImmutableSet<Sort> supers) {
-        final boolean abstractOrInterface = ct.isAbstract() || ct.isInterface();
-        final Name name = new Name(Recoder2KeYConverter.makeAdmissibleName(ct.getFullName()));
-        Sort result = new SortImpl(name, supers, abstractOrInterface);
-        return result;
+//        final boolean abstractOrInterface = ct.isAbstract() || ct.isInterface();
+//        final Name name = new Name(Recoder2KeYConverter.makeAdmissibleName(ct.getFullName()));
+//        Sort result = new SortImpl(name, supers, abstractOrInterface);
+//        return result;
+        return null;
     }
 
     /**
@@ -409,7 +416,7 @@ public class Recoder2KeYTypeConverter {
         KeYJavaType integerType = getKeYJavaType(PrimitiveType.JAVA_INT);
 
         final KeYJavaType superArrayType = new KeYJavaType();
-        recoder2key.setSuperArrayType(superArrayType);
+        //recoder2key.setSuperArrayType(superArrayType);
 
         FieldSpecification specLength = new FieldSpecification(
                 new LocationVariable(new ProgramElementName("length"),
@@ -436,9 +443,9 @@ public class Recoder2KeYTypeConverter {
                                          KeYJavaType baseType, ProgramVariable len) {
 
         de.uka.ilkd.key.java.abstraction.Type base = baseType.getJavaType();
-        int dimension = base instanceof ArrayType ? ((ArrayType) base).getDimension() + 1 : 1;
-        TypeRef parentReference = new TypeRef(new ProgramElementName(""
-                + parent.getSort().name()), dimension, null, parent);
+        //int dimension = base instanceof ArrayType ? ((ArrayType) base).getDimension() + 1 : 1;
+        //TypeRef parentReference = new TypeRef(new ProgramElementName(""
+        //        + parent.getSort().name()), dimension, null, parent);
 
         // add methods
         // the only situation where base can be null is in case of a
@@ -454,17 +461,17 @@ public class Recoder2KeYTypeConverter {
             initArrayMethodBuilder();
         }
 
-        final IProgramMethod prepare =
-                arrayMethodBuilder.getPrepareArrayMethod(parentReference, length,
-                        defaultValue, fields);
-
-        members.add(arrayMethodBuilder
-                .getArrayInstanceAllocatorMethod(parentReference));
-        members.add(prepare);
-        members.add(arrayMethodBuilder.getCreateArrayHelperMethod(
-                parentReference, length, fields));
-        members.add(arrayMethodBuilder.getCreateArrayMethod(parentReference,
-                prepare, fields));
+//        final IProgramMethod prepare =
+//                arrayMethodBuilder.getPrepareArrayMethod(parentReference, length,
+//                        defaultValue, fields);
+//
+//        members.add(arrayMethodBuilder
+//                .getArrayInstanceAllocatorMethod(parentReference));
+//        members.add(prepare);
+//        members.add(arrayMethodBuilder.getCreateArrayHelperMethod(
+//                parentReference, length, fields));
+//        members.add(arrayMethodBuilder.getCreateArrayMethod(parentReference,
+//                prepare, fields));
     }
 
     /**
@@ -476,12 +483,13 @@ public class Recoder2KeYTypeConverter {
      * field declaration of the given list
      */
     private ImmutableList<Field> filterField(FieldDeclaration field) {
-        ImmutableList<Field> result = ImmutableSLList.nil();
-        ImmutableArray<FieldSpecification> spec = field.getFieldSpecifications();
-        for (int i = spec.size() - 1; i >= 0; i--) {
-            result = result.prepend(spec.get(i));
-        }
-        return result;
+        //ImmutableList<Field> result = ImmutableSLList.nil();
+        //ImmutableArray<FieldSpecification> spec = field.getFieldSpecifications();
+        //for (int i = spec.size() - 1; i >= 0; i--) {
+        //    result = result.prepend(spec.get(i));
+        //}
+        //return result;
+        return null;
     }
 
     /**
@@ -493,30 +501,31 @@ public class Recoder2KeYTypeConverter {
      * field declaration of the given list
      */
     private ImmutableList<Field> filterField(ExtList list) {
-        ImmutableList<Field> result = ImmutableSLList.nil();
+        /*ImmutableList<Field> result = ImmutableSLList.nil();
         for (Object aList : list) {
             Object pe = aList;
             if (pe instanceof FieldDeclaration) {
                 result = result.prepend(filterField((FieldDeclaration) pe));
             }
         }
-        return result;
+        return result;*/
+        return null;
     }
 
     private void initArrayMethodBuilder() {
-        final KeYJavaType integerType = getKeYJavaType(getServiceConfiguration()
-                .getNameInfo().getIntType());
-        final KeYJavaType objectType = javaInfo.getJavaLangObject();
-        final HeapLDT heapLDT = typeConverter.getHeapLDT();
-        Sort heapSort = heapLDT == null
-                ? Sort.ANY
-                : heapLDT.targetSort();
-        int heapCount = (heapLDT == null) ? 1 : (heapLDT.getAllHeaps().size() - 1);
-        arrayMethodBuilder
-                = new CreateArrayMethodBuilder(integerType,
-                objectType,
-                heapSort,
-                heapCount);
+//        final KeYJavaType integerType = getKeYJavaType(getServiceConfiguration()
+//                .getNameInfo().getIntType());
+//        final KeYJavaType objectType = javaInfo.getJavaLangObject();
+//        final HeapLDT heapLDT = typeConverter.getHeapLDT();
+//        Sort heapSort = heapLDT == null
+//                ? Sort.ANY
+//                : heapLDT.targetSort();
+//        int heapCount = (heapLDT == null) ? 1 : (heapLDT.getAllHeaps().size() - 1);
+//        arrayMethodBuilder
+//                = new CreateArrayMethodBuilder(integerType,
+//                objectType,
+//                heapSort,
+//                heapCount);
     }
 
     public TypeConverter getTypeConverter() {

@@ -538,22 +538,22 @@ public class JavaParser2Key implements GenericVisitor<JavaProgramElement, Void> 
     }
 
     @Override
-    public JavaProgramElement visit(KeYCcatchBreak n, Void arg) {
+    public JavaProgramElement visit(KeyCcatchBreak n, Void arg) {
         return null;
     }
 
     @Override
-    public JavaProgramElement visit(KeYCcatchContinue n, Void arg) {
+    public JavaProgramElement visit(KeyCcatchContinue n, Void arg) {
         return null;
     }
 
     @Override
-    public JavaProgramElement visit(KeYCcatchParameter n, Void arg) {
+    public JavaProgramElement visit(KeyCcatchParameter n, Void arg) {
         return null;
     }
 
     @Override
-    public JavaProgramElement visit(KeYCcatchReturn n, Void arg) {
+    public JavaProgramElement visit(KeyCcatchReturn n, Void arg) {
         return null;
     }
 

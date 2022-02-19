@@ -13,22 +13,10 @@
 
 package de.uka.ilkd.key.util.rifl;
 
-import java.util.AbstractMap;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
 import de.uka.ilkd.key.util.rifl.SpecificationEntity.Type;
-import     ClassOrInterfaceDeclaration;
-import recoder.java.*;
-import recoder.java.declaration.*;
-import recoder.list.generic.ASTArrayList;
-import recoder.list.generic.ASTList;
-import recoder.service.SourceInfo;
+
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * Writes JML* translation of RIFL specifications to Java files. This is a

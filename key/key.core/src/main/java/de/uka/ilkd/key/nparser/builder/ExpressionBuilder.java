@@ -514,6 +514,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         try {
             try {
                 if (javaSchemaModeAllowed) {//TEST
+
                     SchemaJavaReader jr = new SchemaRecoder2KeY(services, nss);
                     jr.setSVNamespace(schemaVariables());
                     try {

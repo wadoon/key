@@ -36,13 +36,12 @@ import de.uka.ilkd.key.util.CommandLine;
 import de.uka.ilkd.key.util.CommandLineException;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYConstants;
-import de.uka.ilkd.key.util.rifl.RIFLTransformer;
+//import de.uka.ilkd.key.util.rifl.RIFLTransformer;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.reflection.ClassLoaderUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
-import recoder.ParserException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.awt.*;

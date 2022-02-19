@@ -454,7 +454,6 @@ public final class ProblemInitializer {
         // which is done on branch "hentschelJavaCCInstanceNotStatic". But recoder still uses static methods and
         // the synchronized statement can not be avoided for this reason.
 
-        synchronized (SchemaJavaParser.class) {
             // It is required to work with a copy to make this method thread save required by the Eclipse plug-ins.
             InitConfig currentBaseConfig = baseConfig != null ? baseConfig.copy() : null;
             progressStarted(this);
@@ -480,7 +479,7 @@ public final class ProblemInitializer {
             InitConfig ic = prepare(envInput, currentBaseConfig);
             if (Debug.ENABLE_DEBUG) print(ic);
             return ic;
-        }
+
     }
 
     private void print(Proof firstProof) {

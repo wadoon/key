@@ -54,7 +54,7 @@ public class ConstantStringExpressionEvaluator extends JavaTransformer {
     }
 
     @Override
-    protected void apply(TypeDeclaration<?> td) {
+    public void apply(TypeDeclaration<?> td) {
         evaluateConstantStringExpressions(td);
     }
 }

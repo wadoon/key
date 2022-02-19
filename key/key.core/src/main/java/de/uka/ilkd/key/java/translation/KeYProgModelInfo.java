@@ -15,8 +15,8 @@ package de.uka.ilkd.key.java.translation;
 
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import com.github.javaparser.ast.nodeTypes.NodeWithModifiers;
 import com.github.javaparser.resolution.MethodUsage;
-import com.github.javaparser.resolution.declarations.ResolvedFieldDeclaration;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.ast.declaration.*;
@@ -126,48 +126,48 @@ public class KeYProgModelInfo {
 
     //@SuppressWarnings("unchecked")
     public KeYJavaType resolveType(String shortName, KeYJavaType context) {
-        var rt = (com.github.javaparser.ast.body.TypeDeclaration<?>) rec2key().toRecoder(context);
-        if (rt instanceof ClassOrInterfaceDeclaration) {
-            // check for inner types
-            var result = searchType(shortName, ((ClassOrInterfaceDeclaration) rt).getTypes());
-
-            if (result != null) {
-                return (KeYJavaType) rec2key().toKeY(result);
-            }
-
-            // check for imported types
-            var cunit = rt.findCompilationUnit().get();
-
-            for (var i : cunit.getImports()) {
-                final List<? extends ClassOrInterfaceDeclaration> types;
-                if (i.getPackageReference() != null) {
-                    types = sc.getCrossReferenceSourceInfo().getPackage(i.getPackageReference()).getTypes();
-                } else {
-                    if (i.isMultiImport()) {
-                        ClassOrInterfaceDeclaration type = (ClassOrInterfaceDeclaration) sc.getCrossReferenceSourceInfo().getType(i.getTypeReference());
-                        types = type.getTypes();
-                    } else {
-                        types = new LinkedList<>();
-                        ((LinkedList<ClassOrInterfaceDeclaration>) types).add((ClassOrInterfaceDeclaration) sc.getCrossReferenceSourceInfo().getType(i.getTypeReference()));
-                    }
-                }
-                result = searchType(shortName, types);
-                if (result != null) {
-                    return (KeYJavaType) rec2key().toKeY(result);
-                }
-
-            }
-        }
+//        var rt = (com.github.javaparser.ast.body.TypeDeclaration<?>) rec2key().toRecoder(context);
+//        if (rt instanceof ClassOrInterfaceDeclaration) {
+//            // check for inner types
+//            var result = searchType(shortName, ((ClassOrInterfaceDeclaration) rt).getTypes());
+//
+//            if (result != null) {
+//                return (KeYJavaType) rec2key().toKeY(result);
+//            }
+//
+//            // check for imported types
+//            var cunit = rt.findCompilationUnit().get();
+//
+//            for (var i : cunit.getImports()) {
+//                final List<? extends ClassOrInterfaceDeclaration> types;
+//                if (i.getPackageReference() != null) {
+//                    types = sc.getCrossReferenceSourceInfo().getPackage(i.getPackageReference()).getTypes();
+//                } else {
+//                    if (i.isMultiImport()) {
+//                        ClassOrInterfaceDeclaration type = (ClassOrInterfaceDeclaration) sc.getCrossReferenceSourceInfo().getType(i.getTypeReference());
+//                        types = type.getTypes();
+//                    } else {
+//                        types = new LinkedList<>();
+//                        ((LinkedList<ClassOrInterfaceDeclaration>) types).add((ClassOrInterfaceDeclaration) sc.getCrossReferenceSourceInfo().getType(i.getTypeReference()));
+//                    }
+//                }
+//                result = searchType(shortName, types);
+//                if (result != null) {
+//                    return (KeYJavaType) rec2key().toKeY(result);
+//                }
+//
+//            }
+//        }
         return null;
 
     }
 
     private ClassOrInterfaceDeclaration searchType(String shortName, final List<? extends ClassType> types) {
-        for (var type : types) {
-            if (type.getName().equals(shortName)) {
-                return type;
-            }
-        }
+//        for (var type : types) {
+//            if (type.getName().equals(shortName)) {
+//                return type;
+//            }
+//        }
         return null;
     }
 
@@ -179,7 +179,7 @@ public class KeYProgModelInfo {
 
     public String getFullName(KeYJavaType t) {
         var rt = (com.github.javaparser.ast.type.Type) rec2key().toRecoder(t);
-        return rt.asClassOrInterfaceType().resolve().getQualifiedName();
+        return rt.asClassOrInterfaceType().resolve().asReferenceType().getQualifiedName();
     }
 
     public com.github.javaparser.ast.type.Type getType(TypeReference tr) {
@@ -189,16 +189,17 @@ public class KeYProgModelInfo {
                     rec2key().toRecoder(tr.getKeYJavaType());
             return result;
         }
-        result = getType(rec2key().toRecoder(tr));
-        return result;
+        //result = getType(rec2key().toRecoder(tr));
+        return null;//result;
     }
 
 
     public boolean isFinal(KeYJavaType kjt) {
         var recoderType = (com.github.javaparser.ast.type.Type) rec2key().toRecoder(kjt);
         if (recoderType.isClassOrInterfaceType()) {
-            var ref = recoderType.asClassOrInterfaceType().resolve();
-            var td = (com.github.javaparser.ast.body.TypeDeclaration) ref.getTypeDeclaration().get().asClass().toAst().get();
+            var ref =
+                    recoderType.asClassOrInterfaceType().resolve().asReferenceType().getTypeDeclaration();
+            var td = (NodeWithModifiers<?>) ref.get().asClass().toAst().get();
             return td.hasModifier(Modifier.Keyword.FINAL);
         } else // array or primitive type
             return false;
@@ -219,26 +220,27 @@ public class KeYProgModelInfo {
 
     private boolean isSubtype(com.github.javaparser.ast.type.Type subType,
                               com.github.javaparser.ast.type.Type superType) {
-        if (subType.isClassOrInterfaceType() && superType.isClassOrInterfaceType()) {
-            return isSubtype(subType.asClassOrInterfaceType(),
-                    superType.asClassOrInterfaceType());
-        } else if (superType.isArrayType() &&
-                subType.isArrayType()) {
-            return isAssignmentCompatible(subType.asArrayType(), superType.asArrayType());
-        } else if (subType instanceof com.github.javaparser.ast.type.ArrayType &&
-                superType instanceof ClassOrInterfaceDeclaration) {
-            return "java.lang.Object".equals(superType.getFullName())
-                    || "Object".equals(superType.getName());
-        }
-        // should not occur
-        throw new RuntimeException("Method isSubtype in class KeYProgModelInfo " +
-                "currently only supports two class types or two " +
-                "array type but no mixture!");
+//        if (subType.isClassOrInterfaceType() && superType.isClassOrInterfaceType()) {
+//            return isSubtype(subType.asClassOrInterfaceType(),
+//                    superType.asClassOrInterfaceType());
+//        } else if (superType.isArrayType() &&
+//                subType.isArrayType()) {
+//            return isAssignmentCompatible(subType.asArrayType(), superType.asArrayType());
+//        } else if (subType instanceof com.github.javaparser.ast.type.ArrayType &&
+//                superType instanceof ClassOrInterfaceDeclaration) {
+//            return "java.lang.Object".equals(superType.getFullName())
+//                    || "Object".equals(superType.getName());
+//        }
+//        // should not occur
+//        throw new RuntimeException("Method isSubtype in class KeYProgModelInfo " +
+//                "currently only supports two class types or two " +
+//                "array type but no mixture!");
+        return false;
     }
 
     private boolean isSubtype(ClassOrInterfaceDeclaration classSubType,
                               ClassOrInterfaceDeclaration classType) {
-        boolean isSub = getServConf().getSourceInfo().
+      /*  boolean isSub = getServConf().getSourceInfo().
                 isSubtype(classSubType, classType);
         if (!isSub) {
             boolean result = getServConf().getByteCodeInfo().
@@ -246,7 +248,8 @@ public class KeYProgModelInfo {
             return result;
         } else {
             return true;
-        }
+        }*/
+        return false;
     }
 
     /**
@@ -256,7 +259,7 @@ public class KeYProgModelInfo {
      * @return true iff name refers to a package
      */
     public boolean isPackage(String name) {
-        return ((recoder.service.DefaultNameInfo) sc.getNameInfo()).isPackage(name);
+        return false;//((recoder.service.DefaultNameInfo) sc.getNameInfo()).isPackage(name);
     }
 
     /**
@@ -265,56 +268,56 @@ public class KeYProgModelInfo {
      */
     private boolean isAssignmentCompatible(com.github.javaparser.ast.type.ArrayType subType,
                                            com.github.javaparser.ast.type.ArrayType type) {
-        com.github.javaparser.ast.type.Type bt1 = subType.getBaseType();
-        com.github.javaparser.ast.type.Type bt2 = type.getBaseType();
-        if (bt1 instanceof recoder.abstraction.PrimitiveType &&
-                bt2 instanceof recoder.abstraction.PrimitiveType) {
-            return bt1.getFullName().equals(bt2.getFullName());
-        }
-        if (bt1 instanceof ClassOrInterfaceDeclaration &&
-                bt2 instanceof ClassOrInterfaceDeclaration)
-            return isSubtype((ClassOrInterfaceDeclaration) bt1,
-                    (ClassOrInterfaceDeclaration) bt2);
-        if (bt1 instanceof com.github.javaparser.ast.type.ArrayType &&
-                bt2 instanceof com.github.javaparser.ast.type.ArrayType)
-            return isAssignmentCompatible((com.github.javaparser.ast.type.ArrayType) bt1,
-                    (com.github.javaparser.ast.type.ArrayType) bt2);
-        if (bt1 instanceof ClassOrInterfaceDeclaration &&
-                bt2 instanceof com.github.javaparser.ast.type.ArrayType)
-            return false;
-        if (bt1 instanceof com.github.javaparser.ast.type.ArrayType &&
-                bt2 instanceof ClassOrInterfaceDeclaration) {
-            if (((ClassOrInterfaceDeclaration) bt2).isInterface()) {
-                return bt2.
-                        getFullName().equals("java.lang.Cloneable") ||
-                        bt2.
-                                getFullName().equals("java.lang.Serializable")
-                        ;
-            } else {
-                return bt2.
-                        getFullName().equals("java.lang.Object");
-            }
-        }
+//        com.github.javaparser.ast.type.Type bt1 = subType.getBaseType();
+//        com.github.javaparser.ast.type.Type bt2 = type.getBaseType();
+//        if (bt1 instanceof recoder.abstraction.PrimitiveType &&
+//                bt2 instanceof recoder.abstraction.PrimitiveType) {
+//            return bt1.getFullName().equals(bt2.getFullName());
+//        }
+//        if (bt1 instanceof ClassOrInterfaceDeclaration &&
+//                bt2 instanceof ClassOrInterfaceDeclaration)
+//            return isSubtype((ClassOrInterfaceDeclaration) bt1,
+//                    (ClassOrInterfaceDeclaration) bt2);
+//        if (bt1 instanceof com.github.javaparser.ast.type.ArrayType &&
+//                bt2 instanceof com.github.javaparser.ast.type.ArrayType)
+//            return isAssignmentCompatible((com.github.javaparser.ast.type.ArrayType) bt1,
+//                    (com.github.javaparser.ast.type.ArrayType) bt2);
+//        if (bt1 instanceof ClassOrInterfaceDeclaration &&
+//                bt2 instanceof com.github.javaparser.ast.type.ArrayType)
+//            return false;
+//        if (bt1 instanceof com.github.javaparser.ast.type.ArrayType &&
+//                bt2 instanceof ClassOrInterfaceDeclaration) {
+//            if (((ClassOrInterfaceDeclaration) bt2).isInterface()) {
+//                return bt2.
+//                        getFullName().equals("java.lang.Cloneable") ||
+//                        bt2.
+//                                getFullName().equals("java.lang.Serializable")
+//                        ;
+//            } else {
+//                return bt2.
+//                        getFullName().equals("java.lang.Object");
+//            }
+//        }
         return false;
     }
 
     private List<com.github.javaparser.ast.body.MethodDeclaration> getRecoderMethods(KeYJavaType kjt) {
-        if (kjt.getJavaType() instanceof TypeDeclaration) {
-            Object o = rec2key().toRecoder(kjt);
-            if (o instanceof ClassOrInterfaceDeclaration) {
-                ClassOrInterfaceDeclaration rct
-                        = (ClassOrInterfaceDeclaration) o;
-                return rct.getProgramModelInfo().getMethods(rct);
-            }
-        }
+//        if (kjt.getJavaType() instanceof TypeDeclaration) {
+//            Object o = rec2key().toRecoder(kjt);
+//            if (o instanceof ClassOrInterfaceDeclaration) {
+//                ClassOrInterfaceDeclaration rct
+//                        = (ClassOrInterfaceDeclaration) o;
+//                return rct.getProgramModelInfo().getMethods(rct);
+//            }
+//        }
         return new ArrayList<>();
     }
 
-    private List<? extends com.github.javaparser.ast.body.ConstructorDeclaration > getRecoderConstructors(KeYJavaType ct) {
-        
+    private List<? extends com.github.javaparser.ast.body.ConstructorDeclaration> getRecoderConstructors(KeYJavaType ct) {
+
         ClassOrInterfaceDeclaration rct
                 = (ClassOrInterfaceDeclaration) rec2key().toRecoder(ct);
-        return rct.getProgramModelInfo().getConstructors(rct);
+        return null;//rct.getProgramModelInfo().getConstructors(rct);
     }
 
     private List<com.github.javaparser.ast.body.MethodDeclaration> getRecoderMethods(
@@ -322,10 +325,10 @@ public class KeYProgModelInfo {
         var rct = (ClassOrInterfaceDeclaration) rec2key().toRecoder(ct);
         var rcontext = rec2key().toRecoder(context);
 
-        return rct.getProgramModelInfo().getMethods(rct, m,
+        return null;/*rct.getProgramModelInfo().getMethods(rct, m,
                 getRecoderTypes(signature),
                 null,  // no generic type variables yet
-                rcontext);
+                rcontext);*/
     }
 
 
@@ -357,8 +360,8 @@ public class KeYProgModelInfo {
         var rml = getRecoderMethods(ct, m, signature, context);
         ImmutableList<Method> result = ImmutableSLList.nil();
         for (com.github.javaparser.ast.body.MethodDeclaration rm : rml) {
-            Method method = (Method) rec2key().toKeY(rm);
-            result = result.prepend(method);
+            //    Method method = (Method) rec2key().toKeY(rm);
+            //  result = result.prepend(method);
         }
         return result;
     }
@@ -375,10 +378,10 @@ public class KeYProgModelInfo {
         var rml = getRecoderMethods(ct);
         ImmutableList<Method> result = ImmutableSLList.nil();
         for (var rm : rml) {
-            if (!(rm instanceof recoder.bytecode.MethodInfo)) {
-                Method m = ((IProgramMethod) rec2key().toKeY(rm)).getMethodDeclaration();
-                result = result.prepend(m);
-            }
+            //if (!(rm instanceof recoder.bytecode.MethodInfo)) {
+            //    Method m = ((IProgramMethod) rec2key().toKeY(rm)).getMethodDeclaration();
+            //    result = result.prepend(m);
+            //}
         }
         return result;
     }
@@ -395,9 +398,9 @@ public class KeYProgModelInfo {
         ImmutableList<ProgramMethod> result = ImmutableSLList.nil();
         for (int i = rml.size() - 1; i >= 0; i--) {
             com.github.javaparser.ast.body.MethodDeclaration rm = rml.get(i);
-            if (!(rm instanceof recoder.bytecode.MethodInfo)) {
-                result = result.prepend((ProgramMethod) rec2key().toKeY(rm));
-            }
+            //if (!(rm instanceof recoder.bytecode.MethodInfo)) {
+            //    result = result.prepend((ProgramMethod) rec2key().toKeY(rm));
+            //}
         }
         return result;
     }
@@ -411,16 +414,16 @@ public class KeYProgModelInfo {
      */
 
     public ImmutableList<IProgramMethod> getConstructors(KeYJavaType ct) {
-        List<? extends Constructor> rcl = getRecoderConstructors(ct);
-        ImmutableList<IProgramMethod> result = ImmutableSLList.nil();
-        for (int i = rcl.size() - 1; i >= 0; i--) {
-            com.github.javaparser.ast.body.MethodDeclaration rm = rcl.get(i);
-            IProgramMethod m = (IProgramMethod) rec2key().toKeY(rm);
-            if (m != null) {
-                result = result.prepend(m);
-            }
-        }
-        return result;
+        //List<? extends Constructor> rcl = getRecoderConstructors(ct);
+        //ImmutableList<IProgramMethod> result = ImmutableSLList.nil();
+        //for (int i = rcl.size() - 1; i >= 0; i--) {
+        //    com.github.javaparser.ast.body.MethodDeclaration rm = rcl.get(i);
+        //    IProgramMethod m = (IProgramMethod) rec2key().toKeY(rm);
+        //    if (m != null) {
+        //        result = result.prepend(m);
+        //    }
+        //}
+        return null;// result;
     }
 
     /**
@@ -433,10 +436,10 @@ public class KeYProgModelInfo {
      */
     public IProgramMethod getConstructor(KeYJavaType ct,
                                          ImmutableList<KeYJavaType> signature) {
-        List<? extends com.github.javaparser.ast.body.ConstructorDeclaration > constructors =
+        List<? extends com.github.javaparser.ast.body.ConstructorDeclaration> constructors =
                 getRecoderConstructors(ct, signature);
         if (constructors.size() == 1) {
-            return (IProgramMethod) rec2key().toKeY(constructors.get(0));
+            //return (IProgramMethod) rec2key().toKeY(constructors.get(0));
         }
         if (constructors.size() == 0) {
             Debug.out("javainfo: Constructor not found: ", ct);
@@ -496,7 +499,7 @@ public class KeYProgModelInfo {
                 getRecoderMethods(ct, m, signature, context);
 
         if (methodlist.size() == 1) {
-            return (IProgramMethod) rec2key().toKeY(methodlist.get(0));
+            //return (IProgramMethod) rec2key().toKeY(methodlist.get(0));
         } else if (methodlist.size() == 0) {
             Debug.out("javainfo: Program Method not found: ", m);
             return null;
@@ -504,6 +507,7 @@ public class KeYProgModelInfo {
             Debug.fail();
             return null;
         }
+        return null;
     }
 
 
@@ -523,14 +527,14 @@ public class KeYProgModelInfo {
         }
         for (int i = rfl.size() - 1; i >= 0; i--) {
             com.github.javaparser.ast.body.FieldDeclaration rf = rfl.get(i);
-            Field f = (Field) rec2key().toKeY(rf);
+            /*Field f = (Field) rec2key().toKeY(rf);
             if (f != null) {
                 result = result.prepend(f);
             } else {
                 Debug.out("Field has no KeY equivalent (recoder field):", rf.getFullName());
                 Debug.out("This happens currently as classes only available in byte code " +
                         "are only partially converted ");
-            }
+            }*/
         }
         return result;
     }
@@ -549,7 +553,7 @@ public class KeYProgModelInfo {
         }
         ClassOrInterfaceDeclaration rct = (ClassOrInterfaceDeclaration) rec2key().toRecoder(ct);
 
-        return asKeYFields(rct.getProgramModelInfo().getFields(rct));
+        return null;//return asKeYFields(rct.getProgramModelInfo().getFields(rct));
     }
 
 
@@ -565,7 +569,7 @@ public class KeYProgModelInfo {
      * @return the list of field members of the given type.
      */
     public ImmutableList<Field> getAllVisibleFields(KeYJavaType ct) {
-        if (ct.getJavaType() instanceof ArrayDeclaration) {
+       /* if (ct.getJavaType() instanceof ArrayDeclaration) {
             return getVisibleArrayFields(ct);
         }
 
@@ -574,7 +578,8 @@ public class KeYProgModelInfo {
         List<com.github.javaparser.ast.body.FieldDeclaration> rfl =
                 rct.getProgramModelInfo().getAllFields(rct);
 
-        return asKeYFields(rfl);
+        return asKeYFields(rfl);*/
+        return null;
     }
 
     /**
@@ -601,18 +606,18 @@ public class KeYProgModelInfo {
         }
 
         //      fields of java.lang.Object visible in an array
-        final ImmutableList<Field> javaLangObjectField =
-                getAllVisibleFields((KeYJavaType) rec2key().
-                        toKeY(sc.getNameInfo().getJavaLangObject()));
-
-        for (Field aJavaLangObjectField : javaLangObjectField) {
-            final Field f = aJavaLangObjectField;
-
-            if (!((com.github.javaparser.ast.body.FieldDeclaration)
-                    rec2key().toRecoder(f)).isPrivate()) {
-                result = result.append(f);
-            }
-        }
+//        final ImmutableList<Field> javaLangObjectField =
+//                getAllVisibleFields((KeYJavaType) rec2key().
+//                        toKeY(sc.getNameInfo().getJavaLangObject()));
+//
+//        for (Field aJavaLangObjectField : javaLangObjectField) {
+//            final Field f = aJavaLangObjectField;
+//
+//            if (!((com.github.javaparser.ast.body.FieldDeclaration)
+//                    rec2key().toRecoder(f)).isPrivate()) {
+//                result = result.append(f);
+//            }
+//        }
         return result;
     }
 
@@ -620,8 +625,9 @@ public class KeYProgModelInfo {
      * returns all proper subtypes of class <code>ct</code> (i.e. without <code>ct</code> itself)
      */
     private List<ClassOrInterfaceDeclaration> getAllRecoderSubtypes(KeYJavaType ct) {
-        return sc.getCrossReferenceSourceInfo().
-                getAllSubtypes((ClassOrInterfaceDeclaration) rec2key().toRecoder(ct));
+        //return sc.getCrossReferenceSourceInfo().
+        //        getAllSubtypes((ClassOrInterfaceDeclaration) rec2key().toRecoder(ct));
+        return null;
     }
 
     /**
@@ -629,8 +635,9 @@ public class KeYProgModelInfo {
      * first element
      */
     private List<ClassOrInterfaceDeclaration> getAllRecoderSupertypes(KeYJavaType ct) {
-        return sc.getCrossReferenceSourceInfo().
-                getAllSupertypes((ClassOrInterfaceDeclaration) rec2key().toRecoder(ct));
+        //return sc.getCrossReferenceSourceInfo().
+        //        getAllSupertypes((ClassOrInterfaceDeclaration) rec2key().toRecoder(ct));
+        return null;
     }
 
 
@@ -646,10 +653,10 @@ public class KeYProgModelInfo {
         ImmutableList<KeYJavaType> result = ImmutableSLList.nil();
         for (int i = rctl.size() - 1; i >= 0; i--) {
             final ClassOrInterfaceDeclaration rct = rctl.get(i);
-            final KeYJavaType kct = (KeYJavaType) rec2key().toKeY(rct);
-            if (kct != null) {
-                result = result.prepend(kct);
-            }
+            //final KeYJavaType kct = (KeYJavaType) rec2key().toKeY(rct);
+            //if (kct != null) {
+            //    result = result.prepend(kct);
+            //}
         }
         return result;
     }
@@ -676,7 +683,8 @@ public class KeYProgModelInfo {
     }
 
     private Recoder2KeY createRecoder2KeY(NamespaceSet nss) {
-        return new Recoder2KeY(services, sc, rec2key(), nss, typeConverter, cp);
+        //return new Recoder2KeY(services, sc, rec2key(), nss, typeConverter, cp);
+        return null;
     }
 
     /**
@@ -690,9 +698,10 @@ public class KeYProgModelInfo {
      */
     public JavaBlock readBlock(String block, ClassDeclaration cd,
                                NamespaceSet nss) {
-        return createRecoder2KeY(nss).readBlock(block, new Context
-                (sc, (recoder.java.declaration.ClassDeclaration)
-                        rec2key().toRecoder(cd)));
+        //return createRecoder2KeY(nss).readBlock(block, new Context
+        //        (sc, (recoder.java.declaration.ClassDeclaration)
+        //                rec2key().toRecoder(cd)));
+        return null;
     }
 
 
@@ -711,8 +720,8 @@ public class KeYProgModelInfo {
             (Type ct, String name, ImmutableList<KeYJavaType> signature) {
 
         // set up recoder inputs
-        ClassOrInterfaceDeclaration rct =
-                (ClassOrInterfaceDeclaration) rec2key().toRecoder(ct);
+        //ClassOrInterfaceDeclaration rct =
+        //        (ClassOrInterfaceDeclaration) rec2key().toRecoder(ct);
         // transform the signature up to recoder conventions
         ArrayList<com.github.javaparser.ast.type.Type> rsignature =
                 new ArrayList<>(signature.size());
@@ -727,34 +736,35 @@ public class KeYProgModelInfo {
         // If ct is an interface, but does not declare the method, we
         // need to start the search "upstairs"
 
-        while (rct.isInterface() && !isDeclaringInterface(rct, name, rsignature)) {
-            rct = rct.getAllSupertypes().get(1);
-        }
+        //while (rct.isInterface() && !isDeclaringInterface(rct, name, rsignature)) {
+        //    rct = rct.getAllSupertypes().get(1);
+       // }
 
+//
+//        ImmutableList<KeYJavaType> classList = ImmutableSLList.nil();
+//        classList = recFindImplementations(rct, name, rsignature, classList);
+//
+//
+//        if (!declaresApplicableMethods(rct, name, rsignature)) {
+//            // ct has no implementation, go up
+//            List<ClassOrInterfaceDeclaration> superTypes = rct.getAllSupertypes();
+//            int k = 0;
+//            while (k < superTypes.size() &&
+//                    !declaresApplicableMethods(superTypes.get(k),
+//                            name, rsignature)) k++;
+//            if (k < superTypes.size()) {
+//                rct = superTypes.get(k);
+//                KeYJavaType r = (KeYJavaType) mapping.toKeY(rct);
+//                if (r == null) {
+//                    System.out.println("Type " + rct.getName());
+//                } else {
+//                    classList = classList.append(r);
+//                }
+//            } // no implementation is needed if classes above are abstract
+//        }
 
-        ImmutableList<KeYJavaType> classList = ImmutableSLList.nil();
-        classList = recFindImplementations(rct, name, rsignature, classList);
-
-
-        if (!declaresApplicableMethods(rct, name, rsignature)) {
-            // ct has no implementation, go up
-            List<ClassOrInterfaceDeclaration> superTypes = rct.getAllSupertypes();
-            int k = 0;
-            while (k < superTypes.size() &&
-                    !declaresApplicableMethods(superTypes.get(k),
-                            name, rsignature)) k++;
-            if (k < superTypes.size()) {
-                rct = superTypes.get(k);
-                KeYJavaType r = (KeYJavaType) mapping.toKeY(rct);
-                if (r == null) {
-                    System.out.println("Type " + rct.getName());
-                } else {
-                    classList = classList.append(r);
-                }
-            } // no implementation is needed if classes above are abstract
-        }
-
-        return classList;
+//        return classList;
+        return signature;
     }
 
 
@@ -763,32 +773,33 @@ public class KeYProgModelInfo {
             String name,
             List<com.github.javaparser.ast.type.Type> signature,
             ImmutableList<KeYJavaType> result) {
-        recoder.service.CrossReferenceSourceInfo si
-                = getServConf().getCrossReferenceSourceInfo();
-
-        if (declaresApplicableMethods(ct, name, signature)) {
-            KeYJavaType r = (KeYJavaType) mapping.toKeY(ct);
-            if (r == null) {
-                System.out.println("Type " + ct.getFullName() + ":" + name + " not found");
-            } else if (!result.contains(r)) {
-                result = result.prepend(r);
-            }
-        }
-
-        List<ClassOrInterfaceDeclaration> classes = si.getSubtypes(ct);
-
-        //alpha sorting to make order deterministic
-        ClassOrInterfaceDeclaration[] classesArray =
-                classes.toArray(new ClassOrInterfaceDeclaration[classes.size()]);
-        java.util.Arrays.sort(classesArray, new java.util.Comparator<>() {
-            public int compare(ClassOrInterfaceDeclaration o1, ClassOrInterfaceDeclaration o2) {
-                return o2.getFullName().compareTo(o1.getFullName());
-            }
-        });
-
-        for (ClassOrInterfaceDeclaration c : classesArray) {
-            result = recFindImplementations(c, name, signature, result);
-        }
+//        recoder.service.CrossReferenceSourceInfo si
+//                = getServConf().getCrossReferenceSourceInfo();
+//
+//        if (declaresApplicableMethods(ct, name, signature)) {
+//            KeYJavaType r = (KeYJavaType) mapping.toKeY(ct);
+//            if (r == null) {
+//                System.out.println("Type " + ct.getFullName() + ":" + name + " not found");
+//            } else if (!result.contains(r)) {
+//                result = result.prepend(r);
+//            }
+//        }
+//
+//        List<ClassOrInterfaceDeclaration> classes = si.getSubtypes(ct);
+//
+//        //alpha sorting to make order deterministic
+//        ClassOrInterfaceDeclaration[] classesArray =
+//                classes.toArray(new ClassOrInterfaceDeclaration[classes.size()]);
+//        java.util.Arrays.sort(classesArray, new java.util.Comparator<>() {
+//            public int compare(ClassOrInterfaceDeclaration o1, ClassOrInterfaceDeclaration o2) {
+//                return o2.getFullName().compareTo(o1.getFullName());
+//            }
+//        });
+//
+//        for (ClassOrInterfaceDeclaration c : classesArray) {
+//            result = recFindImplementations(c, name, signature, result);
+//        }
+//        return result;
         return result;
     }
 
@@ -796,7 +807,7 @@ public class KeYProgModelInfo {
     private boolean declaresApplicableMethods(ClassOrInterfaceDeclaration ct,
                                               String name,
                                               List<com.github.javaparser.ast.type.Type> signature) {
-        recoder.service.CrossReferenceSourceInfo si
+      /*  recoder.service.CrossReferenceSourceInfo si
                 = getServConf().getCrossReferenceSourceInfo();
 
         List<com.github.javaparser.ast.body.MethodDeclaration> list = si.getMethods(ct);
@@ -810,6 +821,7 @@ public class KeYProgModelInfo {
                     && !m.isAbstract()) return true;
             else i++;
         }
+        return false;*/
         return false;
     }
 
@@ -822,11 +834,11 @@ public class KeYProgModelInfo {
         int s = list.size();
         int i = 0;
         while (i < s) {
-            com.github.javaparser.ast.body.MethodDeclaration m = list.get(i);
-            if (name.equals(m.getName())
-                    && si.isCompatibleSignature(signature, m.getSignature())
-                    && si.isVisibleFor(m, ct)) return true;
-            else i++;
+//            com.github.javaparser.ast.body.MethodDeclaration m = list.get(i);
+//            if (name.equals(m.getName())
+//                    && si.isCompatibleSignature(signature, m.getSignature())
+//                    && si.isVisibleFor(m, ct)) return true;
+//            else i++;
         }
         return false;
     }
