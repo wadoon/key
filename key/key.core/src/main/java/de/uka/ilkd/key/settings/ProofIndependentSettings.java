@@ -79,7 +79,7 @@ public class ProofIndependentSettings {
             File testFile = new File(filename);
             if(testFile.exists()) {
                 if(Boolean.getBoolean(PathConfig.DISREGARD_SETTINGS_PROPERTY)) {
-                    LOGGER.info("The settings in {} are *not* read due to flag '{}'", filename,
+                    LOGGER.warn("The settings in {} are *not* read due to flag '{}'", filename,
                             PathConfig.DISREGARD_SETTINGS_PROPERTY);
                 } else {
                     load(testFile);

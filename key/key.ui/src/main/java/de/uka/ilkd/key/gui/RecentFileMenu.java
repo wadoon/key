@@ -162,17 +162,17 @@ public class RecentFileMenu {
     public void addRecentFile(final String name) {
         //Add the name to the recentFileList:
         //check whether this name is already there
-        Debug.out("recentfilemenu: add file: ", name);
-        Debug.out("recentfilemenu: at menu count:", menu.getItemCount());
+        LOGGER.debug("recentfilemenu: add file: {}", name);
+        LOGGER.debug("recentfilemenu: at menu count: {}", menu.getItemCount());
         int index = -1;
         JMenuItem item = null;
         for (int i = 0; i < menu.getItemCount(); i++) {
             if (menu.getItem(i) == null) {
                 continue;
             }
-            Debug.out("", i);
-            Debug.out("item is ", menu.getItem(i));
-            Debug.out("name is ", menu.getItem(i).getText());
+            LOGGER.debug("{}", i);
+            LOGGER.debug("item is {}", menu.getItem(i));
+            LOGGER.debug("name is {}", menu.getItem(i).getText());
             if (recentFiles.
                     get(menu.getItem(i)).getAbsolutePath().equals(name)) {
                 //this name has to be put at the first position
@@ -261,10 +261,10 @@ public class RecentFileMenu {
                     addRecentFile(p.getProperty(s));
             }
         } catch (FileNotFoundException ex) {
-            Debug.out("Could not read RecentFileList. Did not find file ",
+            LOGGER.debug("Could not read RecentFileList. Did not find file {}",
                     filename);
         } catch (IOException ioe) {
-            Debug.out("Could not read RecentFileList. Some IO Error occured ",
+            LOGGER.debug("Could not read RecentFileList. Some IO Error occured ",
                     ioe);
         } finally {
             try {

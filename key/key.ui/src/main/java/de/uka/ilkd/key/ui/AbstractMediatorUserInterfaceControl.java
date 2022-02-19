@@ -117,7 +117,7 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
       assert macroChosen();
       final ProofMacro macro = getMacro();
       if (macro.canApplyTo(getMediator().getSelectedNode(), null)) {
-          Debug.out("[ APPLY " + getMacro().getClass().getSimpleName() + " ]");
+          LOGGER.debug("[ APPLY " + getMacro().getClass().getSimpleName() + " ]");
           Proof proof = getMediator().getSelectedProof();
           ProofMacroFinishedInfo info = ProofMacroFinishedInfo.getDefaultInfo(macro, proof);
           ProverTaskListener ptl = this;
@@ -130,11 +130,9 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
                   info = macro.applyTo(this, getMediator().getSelectedNode(), null, ptl);
               }
           } catch(InterruptedException ex) {
-              Debug.out("Proof macro has been interrupted:");
-              Debug.out(ex);
+              LOGGER.debug("Proof macro has been interrupted:", ex);
           } catch (Exception e) {
-              Debug.out("Exception occurred during macro application:");
-              Debug.out(e);
+              LOGGER.debug("Exception occurred during macro application:", e);
           } finally {
               ptl.taskFinished(info);
               getMediator().setInteractive(true);

@@ -12,7 +12,7 @@ import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
-import de.uka.ilkd.key.Services;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
@@ -23,12 +23,12 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.ui.MediatorProofControl;
 import net.miginfocom.layout.CC;
 import net.miginfocom.swing.MigLayout;
-import javax.annotation.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -41,6 +41,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
+ * TODO Add documentation!
+ *
  * @author Alexander Weigl
  * @version 1 (28.05.19)
  */
@@ -299,18 +301,16 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
             };
             try {
                 ImmutableList<NoPosTacletApp> t = lastGoal.ruleAppIndex().getFindTaclet(
-                        filter, pos.getPosInOccurrence(), services
-                );
+                        filter, pos.getPosInOccurrence(), services);
                 t.forEach(taclets::add);
-            }catch(NullPointerException e) {
-                //	at de.uka.ilkd.key.proof.TacletAppIndex.getIndex(TacletAppIndex.java:215)
-                e.printStackTrace();
+            } catch (NullPointerException e) {
+                LOGGER.debug("NPE", e);
             }
         } else {
             taclets = lastGoal.getAllBuiltInRuleApps();
             taclets.addAll(lastGoal.getAllTacletApps(services));
         }
-        System.out.format("Found %d taclets\n", taclets.size());
+        LOGGER.debug("Found {} taclets\n", taclets.size());
 
         if (actionOnlyCompleteTaclets.isSelected()) {
             taclets = taclets.stream().filter(RuleApp::complete)
@@ -319,30 +319,12 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
 
         KeyboardTacletModel newModel = new KeyboardTacletModel(taclets);
         setModel(newModel);
-        LOGGER.debug("Took: %d ms%n", System.currentTimeMillis() - time);
+        LOGGER.debug("Took: {} ms", System.currentTimeMillis() - time);
     }
 
     public boolean isActive() {
         return actionActivate.isSelected();
     }
-
-    /*public void processKeyPressed(KeyEvent e) {
-        if (model != null) {
-            model.processChar(e.getKeyChar());
-            if (isDirectMode()) {
-                Optional<RuleApp> app = model.getSelectedTacletsApp();
-                app.ifPresent(ruleApp -> {
-                    ruleApp.execute(lastGoal, services);
-                });
-            }
-
-            if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                Optional<RuleApp> app = model.getFirstMatchingTacletApp();
-                app.ifPresent(ruleApp -> ruleApp.execute(lastGoal, services));
-            }
-        }
-    }
-    */
 
     public boolean isDirectMode() {
         return actionDirectMode.isSelected();
@@ -437,8 +419,9 @@ class KeyboardTacletModel {
         int i = 0;
         for (; i < Math.min(a.length(), b.length()) &&
                 (a.charAt(i) == b.charAt(i) || !charValid(a.charAt(i)) || !charValid(b.charAt(i)))
-                ; i++)
+                ; i++) {
             ;//empty
+        }
         return i;
     }
 

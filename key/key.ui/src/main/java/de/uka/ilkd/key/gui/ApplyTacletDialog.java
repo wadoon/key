@@ -14,28 +14,6 @@
 package de.uka.ilkd.key.gui;
 
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Frame;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Insets;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.Collection;
-
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.border.TitledBorder;
-
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -45,8 +23,19 @@ import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.pp.StringBackend;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
+import java.awt.*;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.util.Collection;
 
 /** common superclass of TacletIfSelectionDialog and TacletMatchCompletionDialog */
 public abstract class ApplyTacletDialog extends JDialog {
@@ -56,6 +45,8 @@ public abstract class ApplyTacletDialog extends JDialog {
      * 
      */
     private static final long serialVersionUID = -411398660828882035L;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ApplyTacletDialog.class);
+
     // buttons
     protected JButton cancelButton;
     protected JButton applyButton;
@@ -114,7 +105,7 @@ public abstract class ApplyTacletDialog extends JDialog {
 	panel.setBorder(new TitledBorder("Sequent program variables"));       
 	JScrollPane scroll = new JScrollPane();
 	JTextArea text;
-	if (vars.size()>0) {
+	if (!vars.isEmpty()) {
 	    text = new JTextArea(vars.toString(),2,40);
 	} else {
 	    text = new JTextArea("none",1,40);
@@ -127,17 +118,15 @@ public abstract class ApplyTacletDialog extends JDialog {
 
     protected JPanel createTacletDisplay()  {
         JPanel panel = new JPanel(new BorderLayout());	
-        panel.setBorder
-        (new TitledBorder("Selected Taclet - "+model[0].taclet().name()));
-        Debug.log4jDebug("TacletApp: "+model[0].taclet(), ApplyTacletDialog.class.getName());
+        panel.setBorder(new TitledBorder("Selected Taclet - "+model[0].taclet().name()));
+        LOGGER.debug("TacletApp: {}", model[0].taclet());
         
         Taclet taclet = model[0].taclet();
         StringBackend backend = new StringBackend(68);
         StringBuilder tacletSB = new StringBuilder();
         
         Writer w = new StringWriter();
-        //WriterBackend backend = new WriterBackend(w, 68);
-        
+
         SequentViewLogicPrinter tp = new SequentViewLogicPrinter(new ProgramPrinter(w), 
                 new NotationInfo(), backend, mediator.getServices(), true,
                 MainWindow.getInstance().getVisibleTermLabels());
@@ -153,7 +142,6 @@ public abstract class ApplyTacletDialog extends JDialog {
         JScrollPane scroll = new JScrollPane();
         int nolines=countLines(model[0].taclet().toString())+1;
         if (nolines>10) nolines=11;
-        //JTextArea text=new JTextArea(model[0].taclet().toString(),nolines,40);
         JTextArea text=new JTextArea(tacletSB.toString(), nolines, 68);
         text.setEditable(false);
         scroll.setViewportView(text);

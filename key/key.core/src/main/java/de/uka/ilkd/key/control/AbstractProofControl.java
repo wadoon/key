@@ -125,7 +125,7 @@ public abstract class AbstractProofControl implements ProofControl {
     @Override
    public ImmutableList<TacletApp> getFindTaclet(Goal focusedGoal, PosInOccurrence pos) {
         if (pos != null && focusedGoal != null) {
-            Debug.out("NoPosTacletApp: Looking for applicables rule at node",
+            LOGGER.debug("NoPosTacletApp: Looking for applicables rule at node {}",
                     focusedGoal.node().serialNr());
             return filterTaclet(focusedGoal, focusedGoal.ruleAppIndex().
                     getFindTaclet(TacletFilter.TRUE,
@@ -252,8 +252,9 @@ public abstract class AbstractProofControl implements ProofControl {
     @Override
     public void applyInteractive(RuleApp app, Goal goal) {
         goal.node().getNodeInfo().setInteractiveRuleApplication(true);
+        var node = goal.node();
         goal.apply(app);
-        emitInteractiveRuleApplication(goal, app);
+        emitInteractiveRuleApplication(node, app);
     }
 
 
@@ -284,10 +285,8 @@ public abstract class AbstractProofControl implements ProofControl {
         interactionListeners.forEach((l) -> l.runPrune(node));
     }
 
-    protected void emitInteractiveRuleApplication(Goal goal, RuleApp app) {
-        interactionListeners.forEach((l) -> {
-            l.runRule(goal, app);
-        });
+    protected void emitInteractiveRuleApplication(Node node, RuleApp app) {
+        interactionListeners.forEach((l) -> l.runRule(node, app));
     }
 
     /**
@@ -399,7 +398,7 @@ public abstract class AbstractProofControl implements ProofControl {
     }
 
     @Override
-    public void selectedBuiltInRule(Goal goal, BuiltInRule rule, PosInOccurrence pos, boolean forced) {
+    public void selectedBuiltInRule(Goal goal, BuiltInRule rule, PosInOccurrence pos, boolean forced, boolean interactive) {
       assert goal != null;
 
       ImmutableSet<IBuiltInRuleApp> set = getBuiltInRuleApp(goal, rule, pos);
@@ -416,7 +415,12 @@ public abstract class AbstractProofControl implements ProofControl {
       }
 
       if (app != null && app.rule() == rule) {
-         goal.apply(app);
+         if (interactive) {
+             applyInteractive(app, goal);
+         } else {
+             goal.apply(app);
+         }
+
          return;
       }
     }

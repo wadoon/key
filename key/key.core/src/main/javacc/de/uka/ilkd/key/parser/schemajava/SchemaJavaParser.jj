@@ -3200,7 +3200,6 @@ PrimaryPrefixReturnValue PrimaryPrefix() :
 //  	NonWildcardTypeArguments() "this" /* Arguments() is a mandatory suffix here!*/
 //      {
 //        prefix.type = prefix.THIS;
-//        System.err.println("Ignoring NonWildcardTypeArguments!");
 //      }
 //|
       "this"

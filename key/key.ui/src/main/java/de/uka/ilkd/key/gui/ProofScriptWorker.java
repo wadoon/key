@@ -34,12 +34,12 @@ import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.macros.scripts.ScriptException;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
 import de.uka.ilkd.key.util.Debug;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ProofScriptWorker extends SwingWorker<Object, Object> implements InterruptListener {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofScriptWorker.class);
 
     private final KeYMediator mediator;
@@ -100,8 +100,7 @@ public class ProofScriptWorker extends SwingWorker<Object, Object> implements In
             engine.setCommandMonitor(observer);
             engine.execute(mediator.getUI(), mediator.getSelectedProof());
         } catch (InterruptedException ex) {
-            Debug.out("Proof macro has been interrupted:");
-            Debug.out(ex);
+            LOGGER.debug("Proof macro has been interrupted:", ex);
         }
         return null;
     }
@@ -179,7 +178,7 @@ public class ProofScriptWorker extends SwingWorker<Object, Object> implements In
         } catch (CancellationException ex) {
             LOGGER.info("Scripting was cancelled.", ex);
         } catch (Throwable ex) {
-            ExceptionDialog.showDialog(MainWindow.getInstance(), ex);
+            IssueDialog.showExceptionDialog(MainWindow.getInstance(), ex);
         }
 
         mediator.removeInterruptedListener(this);

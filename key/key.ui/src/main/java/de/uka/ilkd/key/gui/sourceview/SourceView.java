@@ -3,6 +3,7 @@ package de.uka.ilkd.key.gui.sourceview;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.TaskTree;
 import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
@@ -24,13 +25,15 @@ import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofJavaSourceCollection;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.Pair;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.IOUtil.LineInformation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
@@ -68,6 +71,7 @@ import java.util.*;
  * @author Wolfram Pfeifer, lanzinger
  */
 public final class SourceView extends JComponent {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TaskTree.class);
 
     private static final long serialVersionUID = -94424677425561025L;
 
@@ -433,7 +437,7 @@ public final class SourceView extends JComponent {
         for (URI fileURI : fileURIs) {
             if (addFile(fileURI)) {
                 updateNecessary = true;
-                mainWindow.getMediator().getSelectedNode().getNodeInfo().addRelevantFile(fileURI);
+                mainWindow.getMediator().getSelectedProof().lookup(ProofJavaSourceCollection.class).addRelevantFile(fileURI);
             }
         }
 
@@ -455,7 +459,7 @@ public final class SourceView extends JComponent {
         try {
             text = doc.getText(0, doc.getLength());
         } catch (BadLocationException e) {
-            Debug.out(e);
+            LOGGER.debug("Caught exception!", e);
         }
 
         // find line end
@@ -526,7 +530,7 @@ public final class SourceView extends JComponent {
      */
     private void addFiles() throws IOException {
         ImmutableSet<URI> fileURIs =
-                mainWindow.getMediator().getSelectedNode().getNodeInfo().getRelevantFiles();
+                mainWindow.getMediator().getSelectedProof().lookup(ProofJavaSourceCollection.class).getRelevantFiles();
 
         Iterator<URI> it = tabs.keySet().iterator();
 
@@ -563,13 +567,6 @@ public final class SourceView extends JComponent {
 
             try (InputStream is = repo.getInputStream(fileURI.toURL())) {
                 if (is != null) {
-                    // fileName and file.getAbsolutePath() should be equal here,
-                    // but because of a bug somewhere in Recoder2KeY, on Windows, fileName
-                    // is of the (illegal!) form "/C:/path/to/file/" which the File constructor
-                    // silently converts to the correct form "C:\path\to\file".
-                    // Using file.getAbsolutePath() instead of fileName makes the SourceView
-                    // behave weirdly on Windows systems.
-
                     Tab tab = new Tab(fileURI, is);
                     tabs.put(fileURI, tab);
                     // filename as tab title, complete file URI as tooltip
@@ -614,7 +611,7 @@ public final class SourceView extends JComponent {
             try {
                 addFiles();
             } catch (IOException e) {
-                Debug.out(e);
+                LOGGER.debug("Caught exception!", e);
             }
         }
 
@@ -655,7 +652,7 @@ public final class SourceView extends JComponent {
                 && !pos.equals(PositionInfo.UNDEFINED) && pos.startEndValid()
                 && pos.getURI() != null) {
             list.addLast(new Pair<>(node, pos));
-            node.getNodeInfo().addRelevantFile(pos.getURI());
+            node.proof().lookup(ProofJavaSourceCollection.class).addRelevantFile(pos.getURI());
         }
     }
 
@@ -728,7 +725,13 @@ public final class SourceView extends JComponent {
                                             }
                                         }
                                         if (posInf != null && posInf.getURI() != null) {
-                                            node.getNodeInfo().addRelevantFile(posInf.getURI());
+                                            // sometimes the useful file info is only stored in
+                                            // parentClassURI for some reason ...
+                                            if (!posInf.getURI().equals(PositionInfo.UNKNOWN_URI)) {
+                                                node.proof().lookup(ProofJavaSourceCollection.class).addRelevantFile(posInf.getURI());
+                                            } else if (!posInf.getParentClassURI().equals(PositionInfo.UNKNOWN_URI)) {
+                                                node.proof().lookup(ProofJavaSourceCollection.class).addRelevantFile(posInf.getParentClassURI());
+                                            }
                                         }
                                     }
                                 }
@@ -894,7 +897,7 @@ public final class SourceView extends JComponent {
                 }
             } catch (IOException e) {
                 source = "[SOURCE COULD NOT BE LOADED]";
-                Debug.out("Unknown IOException!", e);
+                LOGGER.debug("Unknown IOException!", e);
             }
 
             initLineInfo();
@@ -931,7 +934,7 @@ public final class SourceView extends JComponent {
                 InputStream inStream = new ByteArrayInputStream(source.getBytes());
                 lineInformation = IOUtil.computeLineInformation(inStream);
             } catch (IOException e) {
-                Debug.out("Error while computing line information from " + absoluteFileName, e);
+                LOGGER.debug("Error while computing line information from " + absoluteFileName, e);
             }
         }
 
@@ -1036,7 +1039,7 @@ public final class SourceView extends JComponent {
                         CurrentGoalView.DEFAULT_HIGHLIGHT_COLOR.get(),
                         Integer.MAX_VALUE - 1);
             } catch (BadLocationException | IOException e) {
-                Debug.out(e);
+                LOGGER.debug("Caught exception!", e);
             }
         }
 
@@ -1123,7 +1126,7 @@ public final class SourceView extends JComponent {
                     }
                 }
             } catch (BadLocationException | IOException e) {
-                Debug.out(e);
+                LOGGER.debug("Caught exception!", e);
             }
         }
 
@@ -1137,7 +1140,7 @@ public final class SourceView extends JComponent {
                 int line = posToLine(textPane.viewToModel(p));
                 changeHighlight(highlight, line);
             } catch (BadLocationException e) {
-                Debug.out(e);
+                LOGGER.debug("Caught exception!", e);
             }
         }
 
@@ -1233,10 +1236,7 @@ public final class SourceView extends JComponent {
             if (level != other.level) {
                 return false;
             }
-            if (line != other.line) {
-                return false;
-            }
-            return true;
+            return line == other.line;
         }
 
         @Override

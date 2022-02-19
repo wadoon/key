@@ -26,7 +26,6 @@ import org.slf4j.LoggerFactory;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -39,22 +38,22 @@ import java.util.stream.Collectors;
  * Dialog to display error messages.
  *
  * @author refactored by mattias
+ * @deprecated 10/20/21, use new {@link de.uka.ilkd.key.gui.IssueDialog} instead
  */
+@Deprecated
 public class ExceptionDialog extends JDialog {
-
-    public final static Font MESSAGE_FONT = new Font(Font.MONOSPACED, Font.PLAIN, 12);
-    private static final long serialVersionUID = -4532724315711726522L;
+    public static final Font MESSAGE_FONT = new Font(Font.MONOSPACED, Font.PLAIN, 12);
     private static final Logger LOGGER = LoggerFactory.getLogger(ExceptionDialog.class);
 
     private JScrollPane stScroll;
     private JTextArea stTextArea;
 
     private Location location;
-    private Throwable exception;
+    private final Throwable exception;
 
     public static void showDialog(Window parent, Throwable exception) {
         ExceptionDialog dlg = new ExceptionDialog(parent, exception);
-        if(parent!=null) {
+        if (parent != null) {
             dlg.setLocationRelativeTo(parent);
         }
         dlg.setVisible(true);
@@ -64,39 +63,32 @@ public class ExceptionDialog extends JDialog {
     private ExceptionDialog(Window parent, Throwable exception) {
         super(parent, "Parser Messages", Dialog.ModalityType.DOCUMENT_MODAL);
         this.exception = exception;
-        try {
-            location = ExceptionTools.getLocation(exception);
-        } catch (MalformedURLException e) {
-            // We must not suppress the dialog here -> catch and print only to error stream
-            location = null;
-            LOGGER.warn("Creating a Location failed for ", e);
+        if (exception != null) {
+            try {
+                location = ExceptionTools.getLocation(exception);
+            } catch (MalformedURLException e) {
+                // We must not suppress the dialog here -> catch and print only to error stream
+                location = null;
+                LOGGER.error("Creating a Location failed for {}", exception, e);
+            }
         }
         init();
     }
 
     private JPanel createButtonPanel() {
-        ActionListener closeListener = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                setVisible(false);
-            }
-        };
+        ActionListener closeListener = e -> setVisible(false);
 
-        ItemListener detailsBoxListener = new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                Container contentPane = getContentPane();
-                if (e.getStateChange() == ItemEvent.SELECTED){
-                    contentPane.add(stScroll, new GridBagConstraints(0, 3, 1, 1, 1., 10.,
-                            GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
-                                    0, 0, 0, 0), 0, 0));
-                } else {
-                    contentPane.remove(stScroll);
-                }
-                pack();
-                // setLocationRelativeTo(null);
-                contentPane.repaint();
+        ItemListener detailsBoxListener = e -> {
+            Container contentPane = getContentPane();
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                contentPane.add(stScroll, new GridBagConstraints(0, 3, 1, 1, 1., 10.,
+                        GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
+                        0, 0, 0, 0), 0, 0));
+            } else {
+                contentPane.remove(stScroll);
             }
+            pack();
+            contentPane.repaint();
         };
 
         JButton reloadButton = new JButton("Reload");
@@ -107,7 +99,7 @@ public class ExceptionDialog extends JDialog {
         closeButton.addActionListener(closeListener);
         getRootPane().setDefaultButton(closeButton);
 
-        JCheckBox detailsBox  = new JCheckBox("Show Details");
+        JCheckBox detailsBox = new JCheckBox("Show Details");
         detailsBox.setSelected(false);
         detailsBox.addItemListener(detailsBoxListener);
 
@@ -120,7 +112,7 @@ public class ExceptionDialog extends JDialog {
         JButton editSourceFileButton = new JButton("Edit Source File");
         EditSourceFileAction action = new EditSourceFileAction(this, exception);
         editSourceFileButton.addActionListener(action);
-        if(!Location.isValidLocation(location)) {
+        if (!Location.isValidLocation(location)) {
             editSourceFileButton.setEnabled(false);
         }
         bPanel.add(editSourceFileButton);
@@ -148,7 +140,6 @@ public class ExceptionDialog extends JDialog {
 
     private void setStackTraceText() {
         StringWriter sw = new StringWriter();
-        // sw.append("(").append(exc.getClass().toString()).append(")\n");
         PrintWriter pw = new PrintWriter(sw);
         exception.printStackTrace(pw);
         stTextArea.setText(sw.toString());
@@ -174,18 +165,18 @@ public class ExceptionDialog extends JDialog {
                  BufferedReader br = new BufferedReader(isr)) {
 
                 List<String> list = br.lines()
-                    // optimization: read only as far as necessary
-                    .limit(location.getLine())
-                    .collect(Collectors.toList());
+                        // optimization: read only as far as necessary
+                        .limit(location.getLine())
+                        .collect(Collectors.toList());
                 String line = list.get(location.getLine() - 1);
                 String pointLine = StringUtil.repeat(" ", location.getColumn() - 1) + "^";
                 message.append(StringUtil.NEW_LINE).
-                    append(StringUtil.NEW_LINE).
-                    append(line).
-                    append(StringUtil.NEW_LINE).
-                    append(pointLine);
+                        append(StringUtil.NEW_LINE).
+                        append(line).
+                        append(StringUtil.NEW_LINE).
+                        append(pointLine);
             } catch (IOException e) {
-            LOGGER.warn("Creating an error line did not work {}", location, e);
+                LOGGER.error("Creating an error line did not work for {}", location, e);
             }
         }
 
@@ -242,24 +233,23 @@ public class ExceptionDialog extends JDialog {
         cp.setLayout(new GridBagLayout());
 
         cp.add(createExcTextAreaScroll(),
-                    new GridBagConstraints(0, 0, 1, 1, 1., 1e-10,
-                    GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
-                            0, 0, 0, 0), 0, 0));
+                new GridBagConstraints(0, 0, 1, 1, 1., 1e-10,
+                        GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
+                        0, 0, 0, 0), 0, 0));
 
         JPanel locationPanel = createLocationPanel();
 
-        if(locationPanel != null) {
+        if (locationPanel != null) {
             cp.add(locationPanel, new GridBagConstraints(0, 1, 1, 1, 1., 0.,
                     GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
-                            0, 0, 0, 0), 0, 0));
+                    0, 0, 0, 0), 0, 0));
         }
 
         JPanel buttonPanel = createButtonPanel();
         cp.add(buttonPanel, new GridBagConstraints(0, 2, 1, 1, 1., 0.,
                 GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
-                        0, 0, 0, 0), 0, 0));
+                0, 0, 0, 0), 0, 0));
 
-        // not displayed, only created;
         stTextArea = createStacktraceTextArea();
         stScroll = createStacktraceTextAreaScroll();
         setStackTraceText();
@@ -268,69 +258,4 @@ public class ExceptionDialog extends JDialog {
         pack();
         setLocationRelativeTo(getParent());
     }
-
-// in earlier versions, KeY supported several exceptions.
-
-//    private JScrollPane createJListScroll(final List<Throwable> exceptions) {
-//         Vector<String> excMessages = new Vector<String>();
-//         int i = 1;
-//         for (Throwable throwable : exceptions) {
-//            Location location = ExceptionTools.getLocation(throwable);
-//            if(location != null) {
-//                excMessages.add(i + ") Location: " +  location + "\n" + throwable.getMessage());
-//            } else {
-//                excMessages.add(i + ") " + throwable.getMessage());
-//            }
-//            i ++;
-//         }
-//
-//         final JList list = new JList(excMessages);
-//         list.setCellRenderer(new TextAreaRenderer());
-//         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-//         list.setSelectedIndex(0);
-//
-//         JScrollPane elistScroll =
-//             new JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-//                     ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-//         elistScroll.getViewport().setView(list);
-//         elistScroll.setBorder(new TitledBorder("Exceptions/Errors"));
-//         elistScroll.setPreferredSize(new Dimension(500, 300));
-//         ListSelectionListener listListener = new ListSelectionListener() {
-//             public void valueChanged(ListSelectionEvent e) {
-//                 Throwable exc = exceptions.get(list.getSelectedIndex());
-//                 setStackTraceText(exc);
-//             }
-//         };
-//
-//         list.addListSelectionListener(listListener);
-//         return elistScroll;
-//
-//    }
-//
-//    private static class TextAreaRenderer
-//      extends JTextArea implements ListCellRenderer<String> {
-//        /**
-//         *
-//         */
-//        private static final long serialVersionUID = -1151786934514170956L;
-//
-//        public TextAreaRenderer()
-//        {
-//            setLineWrap(true);
-//	    setWrapStyleWord(true);
-//	    // setRows(10);
-//        }
-//
-//        public Component getListCellRendererComponent(JList<? extends String> list, String value,
-//            int index, boolean isSelected, boolean cellHasFocus)
-//        {
-//            // if (index==0) setFont(getFont().deriveFont(Font.BOLD, 12)); else
-//	    setFont(getFont().deriveFont(Font.PLAIN, 12));
-//            setText(value.toString());
-//            setBackground(isSelected ? list.getSelectionBackground() : null);
-//            setForeground(isSelected ? list.getSelectionForeground() : null);
-//            return this;
-//        }
-//    }
-
 }

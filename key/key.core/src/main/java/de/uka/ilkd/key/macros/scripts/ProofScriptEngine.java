@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 public class ProofScriptEngine {
     private static final String SYSTEM_COMMAND_PREFIX = "@";
     private static final int MAX_CHARS_PER_COMMAND = 80;
-    private static final Map<String, ProofScriptCommand> COMMANDS = loadCommands();
+    private static final Map<String, ProofScriptCommand<?>> COMMANDS = loadCommands();
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofScriptEngine.class);
 
 
@@ -66,10 +66,9 @@ public class ProofScriptEngine {
         this.initiallySelectedGoal = initiallySelectedGoal;
     }
 
-    private static Map<String, ProofScriptCommand> loadCommands() {
-        Map<String, ProofScriptCommand> result = new HashMap<String, ProofScriptCommand>();
-        ServiceLoader<ProofScriptCommand> loader = ServiceLoader
-                .load(ProofScriptCommand.class);
+    private static Map<String, ProofScriptCommand<?>> loadCommands() {
+        Map<String, ProofScriptCommand<?>> result = new HashMap<>();
+        ServiceLoader<ProofScriptCommand> loader = ServiceLoader.load(ProofScriptCommand.class);
 
         for (ProofScriptCommand<?> cmd : loader) {
             result.put(cmd.getName(), cmd);
@@ -135,7 +134,7 @@ public class ProofScriptEngine {
                     throw new ScriptException("No command");
                 }
 
-                ProofScriptCommand<Object> command = COMMANDS.get(name);
+                ProofScriptCommand<Object> command = (ProofScriptCommand<Object>) COMMANDS.get(name);
                 if (command == null) {
                     throw new ScriptException("Unknown command " + name);
                 }
@@ -159,8 +158,8 @@ public class ProofScriptEngine {
                                     argMap.get(ScriptLineParser.LITERAL_KEY), mlp.getLine()),
                             initialLocation.getFileURL(), mlp.getLine(), mlp.getColumn(), e);
                 } else {
-                    System.out.format(
-                            "Proof already closed at command \"%s\" at line %d, terminating.\n",
+                    LOGGER.info(
+                            "Proof already closed at command \"{}\" at line %d, terminating in line {}",
                             argMap.get(ScriptLineParser.LITERAL_KEY), mlp.getLine());
                     break;
                 }
@@ -168,7 +167,7 @@ public class ProofScriptEngine {
                 LOGGER.debug("GOALS: {}", proof.getSubtreeGoals(proof.root()).size());
                 proof.getSubtreeGoals(stateMap.getProof().root()).forEach(g -> LOGGER.debug("{}", g.sequent()));
                 throw new ScriptException(
-                        String.format("Error while executing script: '%s' on command: '%s'",
+                        String.format("Error while executing script: %s\n\nCommand: %s",
                                 e.getMessage(), argMap.get(ScriptLineParser.LITERAL_KEY)),
                         initialLocation.getFileURL(), mlp.getLine(),
                         mlp.getColumn(), e);
@@ -189,5 +188,9 @@ public class ProofScriptEngine {
      */
     public void setCommandMonitor(Observer monitor) {
         this.commandMonitor = monitor;
+    }
+
+    public static ProofScriptCommand getCommand(String commandName) {
+        return COMMANDS.get(commandName);
     }
 }

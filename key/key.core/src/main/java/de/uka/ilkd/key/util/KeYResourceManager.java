@@ -161,7 +161,7 @@ public class KeYResourceManager {
                         String targetLocation, boolean overwrite) {
         URL resourceURL = cl.getResource(resourcename);
 
-        Debug.out("Load Resource:" + resourcename + " of class " + cl);
+        LOGGER.debug("Load Resource:" + resourcename + " of class " + cl);
 
         if (resourceURL == null && cl.getSuperclass() != null) {
             return copy(cl.getSuperclass(),
