@@ -86,7 +86,7 @@ public class LIGNew {
 		Goal currentGoal = goalsAfterShift.head();// Number of goals after shift does not change
 
 		
-		// Initial Predicate Sets for stencil: 
+//		// Initial Predicate Sets for stencil and conditionalWithDifferentEvents: 
 //		allCompPreds.add(tb.geq(index, tb.subtract(low,tb.one())));//
 //		allCompPreds.add(tb.leq(index, tb.add(high, tb.one())));//
 //		for (Term arr : arrays) {
@@ -125,6 +125,7 @@ public class LIGNew {
 			itrNumber++;
 //			**		
 			System.out.println("Iteration Number: " + itrNumber);
+//			System.out.println("i = " + index);
 
 			oldDepPreds.removeAll(oldDepPreds);
 			oldCompPreds.removeAll(oldCompPreds);
@@ -185,7 +186,6 @@ public class LIGNew {
 		
 		PredicateListCompressionNew plcDep = new PredicateListCompressionNew(services, currentGoal.sequent(), allDepPreds, false);
 		allDepPreds = plcDep.compression();
-		
 		System.out.println("After compression, the DD LOOP INVARIANT is the conjunction of: ");
 		for (Term term : allDepPreds) {
 				System.out.println(term);

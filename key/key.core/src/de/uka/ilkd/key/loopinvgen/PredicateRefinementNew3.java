@@ -78,7 +78,7 @@ public class PredicateRefinementNew3 {
 				}
 			}
 		}
-		System.out.println("DEP PREDS: " + depPredicates);
+//		System.out.println("DEP PREDS: " + depPredicates);
 		// -------------------------------------
 		Set<Term> unProvenCompPreds = new HashSet<>();
 		for (Term pred : compPredicates) {

@@ -3857,7 +3857,9 @@ varexp[TacletBuilder b]
     | varcond_simplifyIfThenElseUpdate[b]
     | varcond_differentFields[b]
     | varcond_onlyEventUpdates[b]
+    | varcond_onlyInverseEventUpdates[b]
     | varcond_noEventUpdate[b]
+    | varcond_noInverseEventUpdate[b]
     | varcond_applyEventOnRigid[b]
     | varcond_applyAnonEventOnRigid[b]
     | varcond_noDependenceLDT[b]
@@ -4306,6 +4308,17 @@ varcond_noEventUpdate [TacletBuilder b]
    }
 ;
 
+varcond_noInverseEventUpdate [TacletBuilder b]
+:
+   NO_INVERSE_EVENT_UPDATE
+   LPAREN
+     x = varId
+   RPAREN
+   {
+            b.addVariableCondition(new NoInverseEventUpdate((SchemaVariable)x));
+   }
+;
+
 varcond_onlyEventUpdates [TacletBuilder b]
 :
    ONLY_EVENT_UPDATES
@@ -4314,6 +4327,17 @@ varcond_onlyEventUpdates [TacletBuilder b]
    RPAREN
    {
             b.addVariableCondition(new OnlyEventUpdates((SchemaVariable)x));
+   }
+;
+
+varcond_onlyInverseEventUpdates [TacletBuilder b]
+:
+   ONLY_INVERSE_EVENT_UPDATES
+   LPAREN
+     x = varId
+   RPAREN
+   {
+            b.addVariableCondition(new OnlyInverseEventUpdates((SchemaVariable)x));
    }
 ;
 

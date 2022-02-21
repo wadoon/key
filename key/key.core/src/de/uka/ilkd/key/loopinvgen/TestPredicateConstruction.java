@@ -782,14 +782,14 @@ public class TestPredicateConstruction {
 	public static void main(String[] args) {
 		TestPredicateConstruction tpc = new TestPredicateConstruction();
 		long start = System.currentTimeMillis();
-//		tpc.shiftArrayToLeft();
-//		tpc.shiftArrayToLeftWithBreak();
-//		tpc.condition();//nowaw missing
-		tpc.conditionDifferentNumberOfEvents();//nowaw missing
-//		tpc.conditionWithDifferentEvents();
+//		tpc.shiftArrayToLeft();//Precise Result
+//		tpc.shiftArrayToLeftWithBreak();//Precise Result
+//		tpc.condition();//Precise Result
+//		tpc.conditionDifferentNumberOfEvents();//Precise Result
+//		tpc.conditionWithDifferentEvents(); //Change the s0 in LIGNew. Precise Result
 //		tpc.withFunc();
-//		tpc.withoutFunc();
-//		tpc.stencil(); //Change the s0 in LIGNew
+		tpc.withoutFunc();
+//		tpc.stencil(); //Change the s0 in LIGNew. Precise Result
 		long end = System.currentTimeMillis();
 		System.out.println("Loop Invariant Generation took " + (end - start) + " ms");
 	}
