@@ -110,6 +110,7 @@ public final class RealLDT extends LDT {
             case "mul": return getMul();
             case "add": return getAdd();
             case "sub": return getSub();
+            case "neg": return getNegation();
         }
         return null;
     }
