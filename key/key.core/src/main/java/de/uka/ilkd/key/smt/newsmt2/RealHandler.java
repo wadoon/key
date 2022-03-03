@@ -2,6 +2,7 @@ package de.uka.ilkd.key.smt.newsmt2;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.RealLDT;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Function;
@@ -17,6 +18,7 @@ public class RealHandler implements SMTHandler {
 
     /** to indicate that an expression holds a value of type Int. */
     public static final SExpr.Type REAL = new SExpr.Type("Real", "r2u", "u2r");
+    private static final Name NEGLIT = new Name("neglit");
 
     private final Map<Operator, String> supportedOperators = new HashMap<>();
     private final Set<Operator> predicateOperators = new HashSet<>();
@@ -104,12 +106,13 @@ public class RealHandler implements SMTHandler {
 
     private static String convertToDecimalString(Term term) {
         StringBuilder result = new StringBuilder();
-        char symb = term.op().toString().charAt(0);
-        if(symb == '-') {
+        
+        if(term.op().name().equals(NEGLIT)) {
             result.append("-");
             term = term.sub(0);
-            symb = term.op().toString().charAt(0);
         }
+
+        char symb = term.op().toString().charAt(0);
         while ('0' <= symb && symb <= '9') {
             result.append(symb);
             term = term.sub(0);
