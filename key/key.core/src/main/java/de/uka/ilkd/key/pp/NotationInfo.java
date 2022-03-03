@@ -23,6 +23,7 @@ import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.CharListLDT;
 import de.uka.ilkd.key.ldt.DoubleLDT;
 import de.uka.ilkd.key.ldt.FloatLDT;
+import de.uka.ilkd.key.ldt.RealLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -230,7 +231,6 @@ public final class NotationInfo {
 		= services.getTypeConverter().getIntegerLDT();	
 	tbl.put(integerLDT.getNumberSymbol(), new Notation.NumLiteral());
 	tbl.put(integerLDT.getCharSymbol(), new Notation.CharLiteral());
-	tbl.put(services.getTypeConverter().getRealLDT().getRealSymbol(), new Notation.RealLiteral());
 	tbl.put(integerLDT.getLessThan(), new Notation.Infix("<", PRIORITY_COMPARISON, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
 	tbl.put(integerLDT.getGreaterThan(), new Notation.Infix("> ", PRIORITY_COMPARISON, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
 	tbl.put(integerLDT.getLessOrEquals(), new Notation.Infix("<=", PRIORITY_COMPARISON, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
@@ -269,8 +269,19 @@ public final class NotationInfo {
         tbl.put(doubleLDT.getDiv(), new Notation.Infix("/", PRIORITY_ARITH_STRONG, PRIORITY_ARITH_STRONG, PRIORITY_BELOW_ARITH_STRONG));
         tbl.put(doubleLDT.getNeg(),new Notation.Prefix("-", PRIORITY_BOTTOM, PRIORITY_ATOM));
 
-        	
-	//heap operators
+        final RealLDT realLDT = services.getTypeConverter().getRealLDT();
+        tbl.put(realLDT.getRealSymbol(), new Notation.RealLiteral());
+        tbl.put(realLDT.getLessThan(), new Notation.Infix("<", PRIORITY_COMPARISON, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
+        tbl.put(realLDT.getGreaterThan(), new Notation.Infix(">", PRIORITY_COMPARISON, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
+        tbl.put(realLDT.getLessOrEquals(), new Notation.Infix("<=", PRIORITY_COMPARISON, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
+        tbl.put(realLDT.getGreaterOrEquals(), new Notation.Infix(">=", PRIORITY_COMPARISON, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
+        tbl.put(realLDT.getSub(), new Notation.Infix("-", PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK, PRIORITY_BELOW_ARITH_WEAK));
+        tbl.put(realLDT.getAdd(), new Notation.Infix("+", PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK, PRIORITY_BELOW_ARITH_WEAK));
+        tbl.put(realLDT.getMul(), new Notation.Infix("*", PRIORITY_ARITH_STRONG, PRIORITY_ARITH_STRONG, PRIORITY_BELOW_ARITH_STRONG));
+        tbl.put(realLDT.getDiv(), new Notation.Infix("/", PRIORITY_ARITH_STRONG, PRIORITY_ARITH_STRONG, PRIORITY_BELOW_ARITH_STRONG));
+        tbl.put(realLDT.getNegation(), new Notation.Prefix("-", PRIORITY_BOTTOM, PRIORITY_ATOM));
+
+        //heap operators
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	tbl.put(HeapLDT.SELECT_NAME, new Notation.SelectNotation());
 	tbl.put(heapLDT.getStore(), new Notation.StoreNotation());
