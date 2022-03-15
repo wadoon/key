@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 
+import de.uka.ilkd.key.logic.op.*;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -32,12 +33,6 @@ import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.JavaModel;
 import de.uka.ilkd.key.proof.Proof;
@@ -372,6 +367,12 @@ public abstract class AbstractPO implements IPersistablePO {
                 getSCCForNode(node, axioms, proofConfig);
             }
             ImmutableList<Pair<Sort, IObserverFunction>> scc = allSCCs.get(node);
+
+            // call subclass-defined filter to omit the axiom if necessary
+            if (filterClassAxiom(axiom)) {
+                continue;
+            }
+
             for (Taclet axiomTaclet :
                 axiom.getTaclets(DefaultImmutableSet.fromImmutableList(scc == null ?
                         ImmutableSLList.<Pair<Sort, IObserverFunction>>nil() : scc),
@@ -389,6 +390,18 @@ public abstract class AbstractPO implements IPersistablePO {
         stack.clear();
         vertices.clear();
         allSCCs.clear();
+    }
+
+    /**
+     * To stay sound, some axioms must be filtered out for specific proof obligations. For example,
+     * model method contract axioms must not be used in their own proof. This method serves as an
+     * extension point of the {@link #registerClassAxiomTaclets(KeYJavaType, InitConfig)}, such that
+     * the subclasses can define their filters if necessary. By default, all axiom pass the filter.
+     * @param axiom the axiom to check
+     * @return true iff the given axiom has to be filtered out
+     */
+    protected boolean filterClassAxiom(ClassAxiom axiom) {
+        return false;
     }
 
     /**

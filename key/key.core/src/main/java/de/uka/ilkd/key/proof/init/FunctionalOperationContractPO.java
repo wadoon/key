@@ -23,6 +23,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
+import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.speclang.*;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -41,16 +43,10 @@ import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.ConstructorCall;
 import de.uka.ilkd.key.rule.metaconstruct.CreateObject;
 import de.uka.ilkd.key.rule.metaconstruct.PostWork;
-import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 
 /**
  * <p>
@@ -426,5 +422,22 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
     @Override
     public KeYJavaType getContainerType() {
        return getContract().getKJT();
+    }
+
+    @Override
+    protected boolean filterClassAxiom(ClassAxiom axiom) {
+
+        // Model method contract axioms must not be used in their own proof:
+        if (axiom.getTarget() instanceof ProgramMethod) {
+            ProgramMethod pm = (ProgramMethod) axiom.getTarget();
+            if (pm.isModel()) {
+                IProgramMethod targetPM = getContract().getTarget();
+                if (targetPM.equals(pm)) {
+                    // only contract axioms are filtered, definition axioms are allowed ("inlining")
+                    return axiom instanceof ContractAxiom;
+                }
+            }
+        }
+        return false;
     }
 }
