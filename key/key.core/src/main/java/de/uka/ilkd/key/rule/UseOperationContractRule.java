@@ -618,6 +618,11 @@ public final class UseOperationContractRule implements BuiltInRule {
             return false;
         }
 
+        // Do not apply this builtin rule to a model method in a set statement.
+        if (inst.pm.isModel()) {
+            return false;
+        }
+
         // there must be applicable contracts for the operation
         final ImmutableSet<FunctionalOperationContract> contracts = getApplicableContracts(
                 goal.proof().getServices(),

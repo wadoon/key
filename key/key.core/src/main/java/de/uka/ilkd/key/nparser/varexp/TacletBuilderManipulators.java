@@ -200,6 +200,8 @@ public class TacletBuilderManipulators {
             = new ConstructorBasedBuilder("mayExpandMethod", MayExpandMethodCondition.class, SV, SV, SV);
     public static final AbstractConditionBuilder STATIC_METHOD
             = new ConstructorBasedBuilder("staticMethodReference", StaticMethodCondition.class, SV, SV, SV);
+    public static final AbstractConditionBuilder MODEL_METHOD
+            = new ConstructorBasedBuilder("modelMethodReference", ModelMethodCondition.class, SV, SV, SV);
     public static final AbstractConditionBuilder THIS_REFERENCE
             = new ConstructorBasedBuilder("isThisReference", IsThisReference.class, SV);
     public static final AbstractConditionBuilder REFERENCE
@@ -218,6 +220,8 @@ public class TacletBuilderManipulators {
             = new ConstructorBasedBuilder("fieldType", FieldTypeToSortCondition.class, SV, SORT);
     public static final AbstractConditionBuilder STATIC_REFERENCE
             = new ConstructorBasedBuilder("static", StaticReferenceCondition.class, SV);
+    public static final AbstractConditionBuilder MODEL_FIELD
+            = new ConstructorBasedBuilder("model", ModelReferenceCondition.class, SV);
     public static final TacletBuilderCommand DIFFERENT_FIELDS
             = new ConstructorBasedBuilder("differentFields", DifferentFields.class, SV, SV);
     public static final AbstractConditionBuilder SAME_OBSERVER
@@ -314,7 +318,8 @@ public class TacletBuilderManipulators {
                 STRICT, DISJOINT_MODULO_NULL, NEW_JAVATYPE, NEW_VAR,
                 FREE_1, FREE_2, FREE_3, FREE_4, FREE_5, NEW_TYPE_OF, NEW_DEPENDING_ON,
                 FREE_LABEL_IN_VARIABLE, DIFFERENT, FINAL, ENUM_CONST,
-                LOCAL_VARIABLE, ARRAY_LENGTH, ARRAY, REFERENCE_ARRAY, MAY_EXPAND_METHOD_2,
+                LOCAL_VARIABLE, ARRAY_LENGTH, ARRAY, REFERENCE_ARRAY,
+                MODEL_FIELD, MODEL_METHOD, MAY_EXPAND_METHOD_2,
                 MAY_EXPAND_METHOD_3, STATIC_METHOD, THIS_REFERENCE, REFERENCE,
                 ENUM_TYPE, CONTAINS_ASSIGNMENT, FIELD_TYPE, STATIC_REFERENCE, DIFFERENT_FIELDS,
                 SAME_OBSERVER, applyUpdateOnRigid, DROP_EFFECTLESS_ELEMENTARIES, SIMPLIFY_ITE_UPDATE,

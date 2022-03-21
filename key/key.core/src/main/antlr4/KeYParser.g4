@@ -642,6 +642,7 @@ varexpId: // weigl, 2021-03-12: This will be later just an arbitrary identifier.
   | ISENUMTYPE
   | ISTHISREFERENCE
   | STATICMETHODREFERENCE
+  | MODELMETHODREFERENCE
   | ISREFERENCEARRAY
   | ISARRAY
   | ISARRAYLENGTH
@@ -649,6 +650,7 @@ varexpId: // weigl, 2021-03-12: This will be later just an arbitrary identifier.
   | ENUM_CONST
   | FINAL
   | STATIC
+  | MODEL
   | ISLOCALVARIABLE
   | ISOBSERVER
   | DIFFERENT
