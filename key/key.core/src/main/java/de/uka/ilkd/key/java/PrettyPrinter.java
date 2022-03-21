@@ -3247,4 +3247,34 @@ public class PrettyPrinter {
         // Mark statement end ...
         markEnd(0, proofCommand);
     }
+
+    /**
+     * Prints the JML assert statement.
+     *
+     * @param jmlAssert the statement to print
+     * @exception IOException occasionally thrown.
+     */
+    public void printJmlAssert(JmlAssert jmlAssert) throws IOException {
+        printHeader(jmlAssert);
+        writeInternalIndentation(jmlAssert);
+
+        final String kind = jmlAssert.getKind().name();
+
+        markStart(0, jmlAssert);
+
+        markKeywordStart();
+        write("@");
+        write(kind);
+        markKeywordEnd();
+        write(" ");
+
+        write(jmlAssert.getConditionText());
+
+        write(";");
+
+        output();
+        markEnd(0, jmlAssert);
+
+        printFooter(jmlAssert);
+    }
 }
