@@ -117,7 +117,7 @@ public abstract class AbstractProfile implements Profile {
             var enableInProfiles = factory.type().getAnnotation(EnableInProfiles.class);
             if (enableInProfiles != null) {
                 for (var enableInProfile : enableInProfiles.value()) {
-                    if (enableInProfile.value() == getClass()) {
+                    if (enableInProfile.value().getName().equals(getClass().getName())) {
                         builtInRules = builtInRules.prepend(factory.get());
                         LOGGER.info("Add BuiltInRule {} to profile {}", factory.getClass(), getClass());
                     }
