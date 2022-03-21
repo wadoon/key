@@ -30,9 +30,12 @@ import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.nodeviews.TacletInfoToggle;
 import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
 import de.uka.ilkd.key.util.Debug;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
@@ -49,6 +52,7 @@ import java.util.*;
 import static de.uka.ilkd.key.gui.prooftree.Style.*;
 
 public class ProofTreeView extends JPanel implements TabPanel {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProofTreeView.class);
 
     public static final ColorSettings.ColorProperty GRAY_COLOR =
             ColorSettings.define("[proofTree]gray", "", Color.DARK_GRAY);
@@ -98,7 +102,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
      */
     private KeYMediator mediator;
 
-    private WeakHashMap<Proof, GUIProofTreeModel> models = new WeakHashMap<>(20);
+    private final WeakHashMap<Proof, GUIProofTreeModel> models = new WeakHashMap<>(20);
 
     /**
      * the proof this view shows
@@ -291,8 +295,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
             delegateView.setFont(myFont);
         } else {
-            Debug.out("KEY-PROOF_TREE_FONT not available, " +
-                    "use standard font.");
+            LOGGER.debug("KEY-PROOF_TREE_FONT not available, use standard font.");
             delegateView.setRowHeight(rowHeight);
         }
     }
@@ -679,7 +682,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
          */
         @Override
         public void selectedProofChanged(KeYSelectionEvent e) {
-            Debug.out("ProofTreeView: initialize with new proof");
+            LOGGER.debug("ProofTreeView: initialize with new proof");
             lastGoalNode = null;
             setProof(e.getSource().getSelectedProof());
             delegateView.validate();
@@ -693,7 +696,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
             modifiedSubtrees = ImmutableSLList.<Node>nil();
             modifiedSubtreesCache = new LinkedHashSet<Node>();
             if (delegateModel == null) {
-                Debug.out("delegateModel is null");
+                LOGGER.debug("delegateModel is null");
                 return;
             }
             if (delegateModel.isAttentive()) {
@@ -851,27 +854,34 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 if (!node.getNode().leaf() || node instanceof GUIBranchNode) return;
                 Node leaf = node.getNode();
                 Goal goal = proof.getGoal(leaf);
+                String toolTipText;
+                final String notes = leaf.getNodeInfo().getNotes();
+
                 if (goal == null || leaf.isClosed()) {
                     style.setAndSeal(KEY_COLOR_FOREGROUND, DARK_GREEN_COLOR.get());
                     style.set(KEY_ICON, IconFactory.keyHoleClosed(iconHeight));
                     ProofTreeView.this.setToolTipText("Closed Goal");
-                    style.set(KEY_TOOLTIP, "A closed goal");
+                    toolTipText = "A closed goal";
                 } else if (goal.isLinked()) {
                     style.set(KEY_COLOR_FOREGROUND, PINK_COLOR.get());
                     style.set(KEY_ICON, IconFactory.keyHoleLinked(20, 20));
                     ProofTreeView.this.setToolTipText("Linked Goal");
-                    style.set(KEY_TOOLTIP, "Linked goal - no automatic rule application");
+                    toolTipText = "Linked goal - no automatic rule application";
                 } else if (!goal.isAutomatic()) {
                     style.set(KEY_COLOR_FOREGROUND, ORANGE_COLOR.get());
                     style.set(KEY_ICON, IconFactory.keyHoleInteractive(20, 20));
                     ProofTreeView.this.setToolTipText("Disabled Goal");
-                    style.set(KEY_TOOLTIP, "Interactive goal - no automatic rule application");
+                    toolTipText = "Interactive goal - no automatic rule application";
                 } else {
                     style.setAndSeal(KEY_COLOR_FOREGROUND, DARK_RED_COLOR.get());
                     style.set(KEY_ICON, IconFactory.keyHole(20, 20));
                     ProofTreeView.this.setToolTipText("Open Goal");
-                    style.set(KEY_TOOLTIP, "An open goal");
+                    toolTipText = "An open goal";
                 }
+                if (notes != null) {
+                    toolTipText += ".\nNotes: " + notes;
+                }
+                style.set(KEY_TOOLTIP, toolTipText);
             } catch (ClassCastException ignored) {
             }
         }

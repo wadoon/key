@@ -219,7 +219,6 @@ public class Proof implements Named {
 
     private Proof(String name, Sequent problem, TacletIndex rules,
             BuiltInRuleIndex builtInRules, InitConfig initConfig) {
-
         this ( new Name ( name ), initConfig );
 
         if (!ProofIndependentSettings.DEFAULT_INSTANCE
@@ -227,26 +226,26 @@ public class Proof implements Named {
             problem = OriginTermLabel.removeOriginLabels(problem, getServices()).sequent();
         }
 
-        Node rootNode = new Node(this, problem);
-
-        NodeInfo info = rootNode.getNodeInfo();
+        register(new ProofJavaSourceCollection(), ProofJavaSourceCollection.class);
+        var rootNode = new Node(this, problem);
+        var sources = lookup(ProofJavaSourceCollection.class);
 
         rootNode.sequent().forEach(formula -> {
             OriginTermLabel originLabel = (OriginTermLabel)
                     formula.formula().getLabel(OriginTermLabel.NAME);
             if (originLabel != null) {
                 if (originLabel.getOrigin() instanceof FileOrigin) {
-                    info.addRelevantFile(((FileOrigin) originLabel.getOrigin()).fileName);
+                    sources.addRelevantFile(((FileOrigin) originLabel.getOrigin()).fileName);
                 }
 
                 originLabel.getSubtermOrigins().stream()
                     .filter(o -> o instanceof FileOrigin)
                     .map(o -> (FileOrigin) o)
-                    .forEach(o -> info.addRelevantFile(o.fileName));
+                    .forEach(o -> sources.addRelevantFile(o.fileName));
             }
         });
 
-        Goal firstGoal = new Goal(rootNode,
+        var firstGoal = new Goal(rootNode,
                 new RuleAppIndex(new TacletAppIndex(rules, getServices()),
                         new BuiltInRuleAppIndex(builtInRules), getServices())
                 );
@@ -465,11 +464,32 @@ public class Proof implements Named {
     }
 
     /**
-     * returns the list of open goals
+     * Returns the list of open goals.
      * @return list with the open goals
      */
     public ImmutableList<Goal> openGoals() {
         return openGoals;
+    }
+
+    /**
+     * Returns the list of closed goals, needed to make pruning in closed branches
+     * possible. If the list needs too much memory, pruning can be disabled via the
+     * command line option "--no-pruning-closed". In this case the list will not be filled.
+     * @return list with the closed goals
+     */
+    public ImmutableList<Goal> closedGoals() {
+        return closedGoals;
+    }
+    
+    /**
+     * Returns the list of all, open and closed, goals.
+     * @return list with all goals.
+     * 
+     * @see #openGoals()
+     * @see #closedGoals()
+     */
+    public ImmutableList<Goal> allGoals() {
+        return openGoals.size() < closedGoals.size() ? closedGoals.prepend(openGoals) : openGoals.prepend(closedGoals);
     }
 
     /**

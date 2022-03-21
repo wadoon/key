@@ -3,7 +3,6 @@ package de.uka.ilkd.key.gui;
 import de.uka.ilkd.key.gui.actions.EditSourceFileAction;
 import de.uka.ilkd.key.gui.actions.SendFeedbackAction;
 import de.uka.ilkd.key.gui.configuration.Config;
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.sourceview.JavaDocument;
 import de.uka.ilkd.key.gui.sourceview.TextLineNumber;
 import de.uka.ilkd.key.gui.utilities.SquigglyUnderlinePainter;
@@ -14,10 +13,10 @@ import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExceptionTools;
-import de.uka.ilkd.key.util.parsing.LocatableException;
-import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.IOUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -32,7 +31,6 @@ import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -63,6 +61,8 @@ import java.util.stream.Collectors;
  * @version 2 (11/15/21)
  */
 public final class IssueDialog extends JDialog {
+    private static final Logger LOGGER = LoggerFactory.getLogger(IssueDialog.class);
+
     /** regex to find web urls in string messages */
     private static final Pattern HTTP_REGEX = Pattern.compile("https?://[^\\s]+");
 
@@ -85,8 +85,7 @@ public final class IssueDialog extends JDialog {
 
     private final JList<PositionedIssueString> listWarnings;
 
-    // replaced by the possibility to click links directly
-    private final JButton btnOpenFile = new JButton();
+    private final JButton btnEditFile = new JButton();
     private final JCheckBox chkIgnoreWarnings = new JCheckBox("Ignore these warnings for the current session");
     private final JCheckBox chkDetails = new JCheckBox("Show Details");
     private final JSplitPane splitCenter = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true);
@@ -187,7 +186,7 @@ public final class IssueDialog extends JDialog {
         //       scrPreview: nowrap: txtSource
         //       pSouth
         //         chkIgnoreWarnings
-        //         pButtons: btnOK btnFurtherInformation btnOpenFile chkDetails
+        //         pButtons: btnOK btnEditFile chkDetails
         // ----splitBottom
         //   stacktracePanel
         //     stTextArea
@@ -275,7 +274,7 @@ public final class IssueDialog extends JDialog {
         listWarnings.addListSelectionListener(e -> updateStackTrace(listWarnings.getSelectedValue()));
         // enable/disable "open file" and "show details"
         listWarnings.addListSelectionListener(e ->
-            btnOpenFile.setEnabled(listWarnings.getSelectedValue().hasFilename()));
+            btnEditFile.setEnabled(listWarnings.getSelectedValue().hasFilename()));
         listWarnings.addListSelectionListener(e -> {
             if (listWarnings.getSelectedValue().additionalInfo.isEmpty()) {
                 chkDetails.setSelected(false);
@@ -380,6 +379,7 @@ public final class IssueDialog extends JDialog {
         listWarnings.setSelectedIndex(0);
         listWarnings.setEnabled(true);
         listWarnings.setFocusable(true);
+        listWarnings.setFont(font);
 
         JScrollPane scrWarnings;
         if (this.warnings.size() == 1) {
@@ -387,6 +387,8 @@ public final class IssueDialog extends JDialog {
             // list. Note that for simplicity, the list is still initialized.
             JTextPane issueTextPane = new JTextPane();
             issueTextPane.setEditable(false);
+            // this is needed to have the font settings respected when using html content type:
+            issueTextPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
             issueTextPane.setFont(font);
             issueTextPane.setContentType("text/html");
             issueTextPane.addHyperlinkListener(hle -> {
@@ -446,27 +448,26 @@ public final class IssueDialog extends JDialog {
 
         final JButton btnOK = new JButton("OK");
         btnOK.addActionListener(e -> accept());
-        Dimension buttonDim = new Dimension(100, 27);
+        Dimension buttonDim = new Dimension(100, 29);
         btnOK.setPreferredSize(buttonDim);
         btnOK.setMinimumSize(buttonDim);
-        btnOK.setMaximumSize(new Dimension(Integer.MAX_VALUE, 27));
-
         final JButton btnSendFeedback = new JButton(new SendFeedbackAction(this, throwable));
-        Dimension feedbackBtnDim = new Dimension(130, buttonDim.height);
+        Dimension feedbackBtnDim = new Dimension(btnSendFeedback.getPreferredSize().width,
+            buttonDim.height);
         btnSendFeedback.setMinimumSize(feedbackBtnDim);
         btnSendFeedback.setPreferredSize(feedbackBtnDim);
 
         Box pSouth = new Box(BoxLayout.Y_AXIS);
         JPanel pButtons = new JPanel(new FlowLayout(FlowLayout.CENTER));
         pButtons.add(btnOK);
-        pButtons.add(btnOpenFile);
+        pButtons.add(btnEditFile);
         pButtons.add(btnSendFeedback);
         pButtons.add(chkDetails);
 
         chkDetails.addItemListener(detailsBoxListener);
 
         EditSourceFileAction action = new EditSourceFileAction(this, throwable);
-        btnOpenFile.setAction(action);
+        btnEditFile.setAction(action);
 
         btnOK.registerKeyboardAction(
             event -> {
@@ -546,22 +547,31 @@ public final class IssueDialog extends JDialog {
      * @return a new PositionedIssueString created from the data
      */
     private static PositionedIssueString extractMessage(Throwable exception) {
-        try (StringWriter sw = new StringWriter()) {
-            PrintWriter pw = new PrintWriter(sw);
-            Location location = ExceptionTools.getLocation(exception);
+        try (StringWriter sw = new StringWriter();
+             PrintWriter pw = new PrintWriter(sw)) {
             exception.printStackTrace(pw);
             String message = exception.getMessage();
             String info = sw.toString();
-            String filename = "";
-            Position pos = Position.UNDEFINED;
-            if (Location.isValidLocation(location)) {
-                 filename = new File(location.getFileURL().toURI()).toString();
-                 pos = new Position(location.getLine(), location.getColumn());
+
+            // also add message of the cause to the string if available
+            if (exception.getCause() != null) {
+                String causeMessage = exception.getCause().getMessage();
+                message = message == null ? causeMessage :
+                    String.format("%s%n%nCaused by: %s", message, exception.getCause().toString());
             }
-            return new PositionedIssueString(message, filename, pos, info);
-        } catch (URISyntaxException | IOException e) {
+
+            String resourceLocation = "";
+            Position pos = Position.UNDEFINED;
+            Location location = ExceptionTools.getLocation(exception);
+            if (Location.isValidLocation(location)) {
+                resourceLocation = location.getFileURL().toString();
+                pos = new Position(location.getLine(), location.getColumn());
+            }
+            return new PositionedIssueString(
+                    message == null ? exception.toString() : message, resourceLocation, pos, info);
+        } catch (IOException e) {
             // We must not suppress the dialog here -> catch and print only to debug stream
-            Debug.out("Creating a Location failed for " + exception, e);
+            LOGGER.debug("Creating a Location failed for " + exception, e);
         }
         return new PositionedIssueString("Constructing the error message failed!");
     }
@@ -621,21 +631,21 @@ public final class IssueDialog extends JDialog {
     private void updatePreview(PositionedIssueString issue) {
         // update text fields with position information
         if (!issue.fileName.isEmpty()) {
-            fTextField.setText("File: " + issue.fileName);
+            fTextField.setText("URL: " + issue.fileName);
         } else {
             fTextField.setText("");
         }
         cTextField.setText("Column: " + issue.pos.getColumn());
         lTextField.setText("Line: " + issue.pos.getLine());
 
-        btnOpenFile.setEnabled(issue.pos != Position.UNDEFINED);
+        btnEditFile.setEnabled(issue.pos != Position.UNDEFINED);
 
         try {
             String source = fileContentsCache.computeIfAbsent(issue.fileName, fn -> {
                 try (InputStream stream = IOUtil.openStream(issue.fileName)) {
                     return IOUtil.readFrom(stream);
                 } catch (IOException e) {
-                    Debug.out("Unknown IOException!", e);
+                    LOGGER.debug("Unknown IOException!", e);
                     return "[SOURCE COULD NOT BE LOADED]\n" + e.getMessage();
                 }
             });
@@ -650,7 +660,7 @@ public final class IssueDialog extends JDialog {
             addHighlights(dh, issue.fileName);
 
             // ensure that the currently selected problem is shown in view
-            int offset = getOffsetFromLineColumn(source, issue.pos);
+            int offset = issue.pos.isNegative() ? 0 : getOffsetFromLineColumn(source, issue.pos);
             txtSource.setCaretPosition(offset);
         } catch (Exception e) {
             e.printStackTrace();
@@ -679,6 +689,10 @@ public final class IssueDialog extends JDialog {
     }
 
     private void addHighlights(DefaultHighlighter dh, PositionedString ps) {
+        // if we have no position there is no highlight
+        if (ps.pos.isNegative()) {
+            return;
+        }
         String source = txtSource.getText();
         int offset = getOffsetFromLineColumn(source, ps.pos);
         int end = offset;
@@ -767,6 +781,8 @@ public final class IssueDialog extends JDialog {
 
             textPane.setEnabled(true);
             textPane.setEditable(false);
+            // this is needed to have the font settings respected when using html content type:
+            textPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
             textPane.setFont(list.getFont());
             return textPane;
         }

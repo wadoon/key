@@ -365,6 +365,18 @@ public class KeYMediator {
     }
 
     /**
+     * adds a listener to the KeYSelectionModel, so that the listener will be
+     * informed if the proof or node the user has selected changed
+     *
+     * adds the listener only if it not already registered
+     *
+     * @param listener the KeYSelectionListener to add
+     */
+    public void addKeYSelectionListenerChecked(KeYSelectionListener listener) {
+        keySelectionModel.addKeYSelectionListenerChecked(listener);
+    }
+
+    /**
      * removes a listener from the KeYSelectionModel
      *
      * @param listener the KeYSelectionListener to be removed
@@ -691,6 +703,7 @@ public class KeYMediator {
                     }
                 }
             });
+            OneStepSimplifier.refreshOSS(e.getSource());
             pruningInProcess = false;
         }
 
