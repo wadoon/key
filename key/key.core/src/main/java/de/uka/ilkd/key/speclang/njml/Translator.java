@@ -25,6 +25,7 @@ import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.translation.JMLResolverManager;
+import de.uka.ilkd.key.speclang.njml.JmlParser.AtexpressionContext;
 import de.uka.ilkd.key.speclang.njml.JmlParser.PrimaryFloatingPointContext;
 import de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator;
 import de.uka.ilkd.key.speclang.translation.*;
@@ -1729,6 +1730,15 @@ class Translator extends JmlParserBaseVisitor<Object> {
             result = new SLExpression(convertToBefore(result.getTerm()));
         }
         return result;
+    }
+
+    @Override
+    public Object visitAtexpression(AtexpressionContext ctx) {
+        SLExpression label = accept(ctx.label);
+        SLExpression exp = accept(ctx.exp);
+        Term upd = tb.elementary(getBaseHeap(), label.getTerm());
+        Term inner = exp.getTerm();
+        return new SLExpression(tb.apply(upd, inner), exp.getType());
     }
 
     @Override
