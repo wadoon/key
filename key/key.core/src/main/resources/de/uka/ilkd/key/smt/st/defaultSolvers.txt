@@ -7,3 +7,5 @@ CVC4_legacy.props
 CVC5.props
 MathSAT.props
 Princess.props
+veriT.props
+vampire.props

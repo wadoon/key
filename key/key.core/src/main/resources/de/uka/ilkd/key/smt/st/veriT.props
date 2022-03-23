@@ -2,8 +2,11 @@ name=veriT
 info=veriT solver, unstable experimental build.
 minVersion=This is veriT, version 2021.06-37-g41d2ba2-rmx
 command=veriT
+pipe=BUFFERED_PIPE
+sendTriggers=(check-sat),(get-proof),(get-model)
 params=--input=smtlib2 --output=smtlib2
 version=--version
+preamble=veriT_preamble.smt2
 handlers=de.uka.ilkd.key.smt.newsmt2.BooleanConnectiveHandler,\
 de.uka.ilkd.key.smt.newsmt2.PolymorphicHandler,\
 de.uka.ilkd.key.smt.newsmt2.QuantifierHandler,\

@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.smt.communication;
 
+import de.uka.ilkd.key.smt.st.SolverType;
 import org.key_project.util.java.IOUtil;
 
 import javax.annotation.Nonnull;
@@ -36,11 +37,8 @@ public class ExternalProcessLauncher {
     private final @Nonnull
     SolverCommunication session;
 
-    /**
-     * the delimiters which separate the messages
-     */
     private final @Nonnull
-    String[] messageDelimiters;
+    SolverType type;
 
     /**
      * the external process
@@ -50,7 +48,7 @@ public class ExternalProcessLauncher {
     /**
      * the pipe for sending and receiving to/from the process
      */
-    private SimplePipe pipe;
+    private Pipe pipe;
 
     /**
      * Creates the external process launcher.
@@ -59,9 +57,9 @@ public class ExternalProcessLauncher {
      * @param messageDelimiters delimiters which separate the messages
      */
     public ExternalProcessLauncher(@Nonnull SolverCommunication session,
-                                   @Nonnull String[] messageDelimiters) {
+                                   @Nonnull SolverType type) {
         this.session = session;
-        this.messageDelimiters = messageDelimiters;
+        this.type = type;
     }
 
     /**
@@ -78,7 +76,7 @@ public class ExternalProcessLauncher {
             process = builder.start();
             InputStream input = process.getInputStream();
             OutputStream output = process.getOutputStream();
-            pipe = new SimplePipe(input, messageDelimiters, output, session, process);
+            pipe = type.getPipeFactory().createPipe(command, session, type, process, input, output);
         } catch (IOException ex) {
             stop();
             throw ex;

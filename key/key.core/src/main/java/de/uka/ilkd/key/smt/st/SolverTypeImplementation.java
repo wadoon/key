@@ -2,6 +2,7 @@ package de.uka.ilkd.key.smt.st;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.smt.*;
+import de.uka.ilkd.key.smt.communication.PipeFactory;
 import de.uka.ilkd.key.smt.communication.SolverSocket;
 import de.uka.ilkd.key.smt.communication.ExternalProcessLauncher;
 import de.uka.ilkd.key.smt.communication.SolverCommunication;
@@ -59,6 +60,12 @@ public final class SolverTypeImplementation implements SolverType {
      * the {@link SolverSocket} created with {@link #getSocket(ModelExtractor)}.
      */
     private final SolverSocket.MessageHandler MSG_HANDLER;
+
+    private final PipeFactory pipeFactory;
+    private final boolean lineFeedback;
+    private final String[] sendTriggers;
+
+
     /**
      * The class of the {@link SMTTranslator} to be created with {@link #createTranslator(Services)}.
      */
@@ -113,7 +120,8 @@ public final class SolverTypeImplementation implements SolverType {
                                     String version, String minimumSupportedVersion,
                                     long defaultTimeout, String[] delimiters,
                                     Class<?> translatorClass, String[] handlerNames, String[] handlerOptions,
-                                    SolverSocket.MessageHandler messageHandler, String preamble) {
+                                    SolverSocket.MessageHandler messageHandler, String preamble,
+                                    PipeFactory pipeFactory, String[] sendTriggers, boolean lineFeedback) {
         NAME = name;
         INFO = info;
         DEFAULT_PARAMS = defaultParams;
@@ -131,6 +139,9 @@ public final class SolverTypeImplementation implements SolverType {
         this.handlerOptions = Arrays.copyOf(handlerOptions, handlerOptions.length);
         MSG_HANDLER = messageHandler;
         this.preamble = preamble;
+        this.pipeFactory = pipeFactory;
+        this.lineFeedback = lineFeedback;
+        this.sendTriggers = sendTriggers;
     }
 
     @Override
@@ -321,9 +332,19 @@ public final class SolverTypeImplementation implements SolverType {
 
     @Nonnull
     @Override
-    public ExternalProcessLauncher getLauncher(SolverCommunication communication) {
-        // TODO Make this modifiable? (similar to SMTTranslator)
-        return new ExternalProcessLauncher(communication, getDelimiters());
+    public PipeFactory getPipeFactory() {
+        return pipeFactory;
+    }
+
+    @Nonnull
+    @Override
+    public String[] getSendTriggers() {
+        return sendTriggers;
+    }
+
+    @Override
+    public boolean lineFeedback() {
+        return lineFeedback;
     }
 
 }

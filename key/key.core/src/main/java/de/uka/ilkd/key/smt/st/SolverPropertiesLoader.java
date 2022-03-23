@@ -3,6 +3,7 @@ package de.uka.ilkd.key.smt.st;
 import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.settings.SettingsConverter;
 import de.uka.ilkd.key.smt.AbstractSMTTranslator;
+import de.uka.ilkd.key.smt.communication.PipeFactory;
 import de.uka.ilkd.key.smt.communication.SolverSocket;
 import de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator;
 import org.key_project.util.reflection.ClassLoaderUtil;
@@ -40,6 +41,9 @@ public class SolverPropertiesLoader {
     private static String INFO = "info";
     private static String TIMEOUT = "timeout";
     private static String MINIMUM_VERSION = "minVersion";
+    private static String LINE_FEEDBACK = "lineFeedback";
+    private static String SEND_TRIGGERS = "sendTriggers";
+    private static String PIPE = "pipe";
     private static String LEGACY = "legacy";
     private static String SOCKET_MESSAGEHANDLER = "messageHandler";
     private static String SMTLIB_TRANSLATOR= "translatorClass";
@@ -50,6 +54,7 @@ public class SolverPropertiesLoader {
     private static String PREAMBLE_FILE = "preamble";
     private static String[] DEFAULT_DELIMITERS = new String[] {"\n", "\r"};
     private static long DEFAULT_TIMEOUT = -1;
+    private static String DEFAULT_PIPE = "SIMPLE_PIPE";
 
     /**
      * If a props file does not contain a solver name or two files have the same name,
@@ -110,8 +115,10 @@ public class SolverPropertiesLoader {
         String name, command, params, version, info, messageHandler, preamble, minVersion;
         long timeout;
         SolverSocket.MessageHandler handler;
+        PipeFactory pipe;
         Class<?> translatorClass;
-        String[] handlerNames, handlerOptions, delimiters;
+        String[] handlerNames, handlerOptions, delimiters, sendTriggers;
+        boolean lineFeedback;
 
         // Read props file to create a SolverTypeImplementation object:
 
@@ -152,9 +159,16 @@ public class SolverPropertiesLoader {
 
         // the solver specific preamble, may be null
         preamble = SettingsConverter.readFile(props, PREAMBLE_FILE, null);
+
+
+        pipe = PipeFactory.valueOf(SettingsConverter.readRawString(props, PIPE, DEFAULT_PIPE));
+        sendTriggers = SettingsConverter.readRawStringList(props, SEND_TRIGGERS, SPLIT, new String[0]);
+        lineFeedback = SettingsConverter.read(props, LINE_FEEDBACK, true);
+
+
         return new SolverTypeImplementation(name, info, params, command, version,
                 minVersion, timeout, delimiters, translatorClass,
-                handlerNames, handlerOptions, handler, preamble);
+                handlerNames, handlerOptions, handler, preamble, pipe, sendTriggers, lineFeedback);
     }
 
     /**

@@ -16,6 +16,7 @@ package de.uka.ilkd.key.smt.st;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.smt.communication.ExternalProcessLauncher;
+import de.uka.ilkd.key.smt.communication.PipeFactory;
 import de.uka.ilkd.key.smt.communication.SolverSocket;
 import de.uka.ilkd.key.smt.communication.SolverCommunication;
 
@@ -151,6 +152,11 @@ public interface SolverType {
     SolverSocket getSocket(ModelExtractor query);
 
     @Nonnull
-    ExternalProcessLauncher getLauncher(SolverCommunication communication);
+    PipeFactory getPipeFactory();
+
+    @Nonnull
+    String[] getSendTriggers();
+
+    boolean lineFeedback();
 }
 

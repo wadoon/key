@@ -2,6 +2,9 @@ name=vampire
 command=vampire
 params=--input_syntax smtlib2
 minVersion=Vampire 4.4.0
+pipe=BUFFERED_PIPE
+sendTriggers=(check-sat)
+lineFeedback=false
 version=--version
 handlers=de.uka.ilkd.key.smt.newsmt2.BooleanConnectiveHandler,\
 de.uka.ilkd.key.smt.newsmt2.PolymorphicHandler,\

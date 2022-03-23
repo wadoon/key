@@ -93,6 +93,7 @@ public class SolverSocket {
             @Override
             public void messageIncoming(@Nonnull Pipe pipe, @Nonnull String msg, @Nonnull SolverSocket socket) throws IOException {
                 SolverCommunication sc = pipe.getSolverCommunication();
+                msg = msg.trim();
                 if (msg.startsWith("(error")) {
                     sc.addMessage(msg, SolverCommunication.MessageType.ERROR);
                     if (msg.contains("WARNING:")) {
