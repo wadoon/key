@@ -25,10 +25,15 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
 /**
- * ensures that the given instantiation for the schemavariable denotes a
- * model field
+ * This variable condition checks if the instantiation of a schemavariable (of
+ * type Field) refers to a Java field declared as "model".
  *
- * This is a direct clone from {@link StaticReferenceCondition}.
+ * The negated condition is true if the instantiation refers to a Java
+ * or ghost field.
+ *
+ * @author Mattias Ulbrich
+ *
+ * @see StaticReferenceCondition
  */
 public final class ModelReferenceCondition extends VariableConditionAdapter {
 
@@ -36,23 +41,21 @@ public final class ModelReferenceCondition extends VariableConditionAdapter {
     private final boolean negation;
 
     /**
-     * the static reference condition checks if a suggested
-     * instantiation for a schema variable denotes a static
-     * reference. The flag negation allows to reuse this condition for
-     * ensuring non static references.
+     * the model reference condition checks if a suggested instantiation for a schema variable
+     * denotes a model reference. The flag negation allows to reuse this condition for ensuring
+     * non-model references.
+     *
+     * @param reference the schema variable holding the attribute reference
+     * @param negation true iff the condition is negated
      */
-    public ModelReferenceCondition(SchemaVariable reference,
-                                   boolean negation) {
+    public ModelReferenceCondition(SchemaVariable reference, boolean negation) {
         this.reference = reference;
-        this.negation  = negation;
+        this.negation = negation;
     }
 
-
     @Override
-    public boolean check(SchemaVariable var,
-                         SVSubstitute subst,
-                         SVInstantiations svInst,
-                         Services services) {
+    public boolean check(SchemaVariable var, SVSubstitute subst,
+                         SVInstantiations svInst, Services services) {
         if (var == reference) {
             ProgramVariable attribute;
             if (subst instanceof FieldReference) {
@@ -68,9 +71,8 @@ public final class ModelReferenceCondition extends VariableConditionAdapter {
         return true;
     }
 
-
     @Override
     public String toString () {
-        return (negation ? " \\not " : "" ) + "\\static(" + reference + ")";
+        return (negation ? " \\not " : "" ) + "\\model(" + reference + ")";
     }
 }

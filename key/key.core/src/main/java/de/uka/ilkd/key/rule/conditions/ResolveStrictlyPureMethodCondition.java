@@ -41,8 +41,15 @@ import java.util.List;
 
 
 /**
+ * This variable condition stores a pure method invocation into a schema variable.
  *
- * @author MU 2022
+ * \strictlyPureMethodCall(#rp, #mn, #selist, result)
+ *
+ * stores the resolved term "#rp.#mn(#selist)" into result. Quite a bit of translation involved.
+ *
+ * Negation is not supported.
+ *
+ * @author Mattias Ulbrich
  */
 public final class ResolveStrictlyPureMethodCondition implements VariableCondition {
 
@@ -51,11 +58,6 @@ public final class ResolveStrictlyPureMethodCondition implements VariableConditi
     private final SchemaVariable args;
     private final SchemaVariable target;
 
-    /**
-     * the static reference condition checks if a suggested instantiation for a
-     * schema variable denotes a static method call. The flag negation allows to
-     * reuse this condition for ensuring non static references.
-     */
     public ResolveStrictlyPureMethodCondition(SchemaVariable caller, SchemaVariable methname,
                                               SchemaVariable args, SchemaVariable target) {
         this.caller = caller;
@@ -69,7 +71,7 @@ public final class ResolveStrictlyPureMethodCondition implements VariableConditi
         for (int i = 0; i < a.size(); i++) {
             result[i] = (Expression) a.get(i);
         }
-        return new ImmutableArray<Expression>(result);
+        return new ImmutableArray<>(result);
     }
 
     @SuppressWarnings("unchecked")
@@ -179,6 +181,5 @@ public final class ResolveStrictlyPureMethodCondition implements VariableConditi
         return String.format("\\strictlyPureMethodCall(%s, %s, %s, %s)",
                 caller, methname, args, target);
     }
-
 
 }

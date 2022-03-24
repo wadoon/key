@@ -28,6 +28,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+/**
+ * This meta construct resolves a model field reference to a call of the corresponding observer.
+ *
+ * @author Mattias Ulbrich
+ */
 public final class ResolveModelField extends AbstractTermTransformer {
 
     public ResolveModelField() {
@@ -48,7 +53,7 @@ public final class ResolveModelField extends AbstractTermTransformer {
         } else {
             observer = heapLDT.getFieldSymbolForPV((LocationVariable) op, services);
         }
-        
+
         List<Term> args = new ArrayList<>();
         args.add(services.getTermBuilder().var(heapLDT.getHeap()));
         if (observer.argSorts().size() == 2) {

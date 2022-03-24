@@ -33,13 +33,13 @@ import org.key_project.util.collection.ImmutableArray;
 
 
 /**
- * ensures that the given instantiation for the schemavariable denotes
- * a model method. For determining the method the callee and the
- * arguments of the method are needed as arguments.
+ * ensures that the given instantiation for the schemavariable denotes a model method. For
+ * determining the method the callee and the arguments of the method are needed as arguments.
  *
- * This is a blunt copy of {@link StaticMethodCondition}.
+ * This is a pretty direct adaptation of {@link StaticMethodCondition}.
  *
- * @author MU 2022
+ * @see StaticMethodCondition
+ * @author Mattias Ulbrich 2022
  */
 public final class ModelMethodCondition extends VariableConditionAdapter {
 
@@ -49,10 +49,12 @@ public final class ModelMethodCondition extends VariableConditionAdapter {
     private final SchemaVariable args;
 
     /**
-     * the static reference condition checks if a suggested
-     * instantiation for a schema variable denotes a static method
-     * call. The flag negation allows to reuse this condition for
-     * ensuring non model references.
+     * Create a new instance of the variable condition.
+     *
+     * @param caller the receiver of the method call
+     * @param methname name of the method
+     * @param args arguments
+     * @param negation iff the condition is to be negated
      */
     public ModelMethodCondition(SchemaVariable caller, SchemaVariable methname, SchemaVariable args, boolean negation) {
         this.negation = negation;
@@ -62,10 +64,11 @@ public final class ModelMethodCondition extends VariableConditionAdapter {
     }
 
     /**
-     * the static reference condition checks if a suggested
-     * instantiation for a schema variable denotes a static method
-     * call. The flag negation allows to reuse this condition for
-     * ensuring non model references.
+     * Create a new instance of the variable condition. Without explicit receiver.
+     *
+     * @param methname name of the method
+     * @param args arguments
+     * @param negation iff the condition is to be negated
      */
     public ModelMethodCondition(SchemaVariable methname, SchemaVariable args, boolean negation) {
         this.negation = negation;
@@ -79,16 +82,14 @@ public final class ModelMethodCondition extends VariableConditionAdapter {
         for (int i=0; i<a.size(); i++) {
             result[i]=(Expression)a.get(i);
         }
-        return new ImmutableArray<Expression>(result);
+        return new ImmutableArray<>(result);
     }
 
 
     @SuppressWarnings("unchecked")
     @Override
-    public boolean check(SchemaVariable var,
-                         SVSubstitute subst,
-                         SVInstantiations svInst,
-                         Services services) {
+    public boolean check(SchemaVariable var, SVSubstitute subst,
+                         SVInstantiations svInst, Services services) {
 
         ReferencePrefix rp = (ReferencePrefix) svInst.getInstantiation(caller);
         MethodName mn = (MethodName) svInst.getInstantiation(methname);
