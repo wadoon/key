@@ -591,7 +591,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     public Term visitMetaTerm(KeYParser.MetaTermContext ctx) {
         Operator metaId = accept(ctx.metaId());
         List<Term> t = mapOf(ctx.term());
-        return capsulateTf(ctx, () -> getTermFactory().createTerm(metaId, t));
+        return capsulateTf(ctx, () -> getTermFactory().createLeftAssocTerm(metaId, t));
     }
 
     public Term createAttributeTerm(Term prefix, Operator attribute, ParserRuleContext ctx) {

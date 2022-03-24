@@ -103,6 +103,10 @@ public final class TermFactory {
         return createTerm(op, subs, null, null);
     }
 
+    public Term createTerm(Operator op, List<Term> subs) {
+        return createTerm(op, new ImmutableArray<>(subs), null, null);
+    }
+
     public Term createTerm(Operator op,
                            Term[] subs,
                            ImmutableArray<QuantifiableVariable> boundVars,
@@ -179,14 +183,14 @@ public final class TermFactory {
     }
 
     /**
-     * Reduce the given list of terms into a one term by using the operator.
+     * Reduce the given list of terms into one term by using the given binary operator.
      * The reduction is left-associative. e.g., the result is
-     * {@code ((a op b) op c) op d }.
+     * {@code ((a op b) op c) op d } for argument (a,b,c,d).
      *
-     * @param junctor the left-associative operator to combine the terms together
-     * @param terms a list of non-null temrs
+     * @param junctor the left-associative binary operator to combine the terms
+     * @param terms a non-null list of non-null terms
      */
-    public @Nonnull Term createTerm(@Nonnull  Operator junctor, @Nonnull List<Term> terms) {
+    public @Nonnull Term createLeftAssocTerm(@Nonnull  Operator junctor, @Nonnull List<Term> terms) {
         if(terms.size()==1)
             return terms.get(0);
         else if (terms.size() == 2)

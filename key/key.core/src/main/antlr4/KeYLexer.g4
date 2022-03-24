@@ -180,6 +180,7 @@ STATIC : '\\static';
 MODEL : '\\model';
 STATICMETHODREFERENCE : '\\staticMethodReference';
 MODELMETHODREFERENCE: '\\modelMethodReference';
+STRICTLYPUREMETHODCALL: '\\strictlyPureMethodCall';
 MAXEXPANDMETHOD : '\\mayExpandMethod';
 STRICT    : '\\strict';
 TYPEOF : '\\typeof';

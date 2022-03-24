@@ -21,6 +21,7 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.MethodName;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
@@ -51,73 +52,88 @@ public final class ModelMethodCondition extends VariableConditionAdapter {
      * the static reference condition checks if a suggested
      * instantiation for a schema variable denotes a static method
      * call. The flag negation allows to reuse this condition for
-     * ensuring non static references.
+     * ensuring non model references.
      */
-	public ModelMethodCondition(SchemaVariable caller, SchemaVariable methname, SchemaVariable args, boolean negation) {
-		this.negation = negation;
-		this.caller = caller;
-		this.methname = methname;
-		this.args = args;
+    public ModelMethodCondition(SchemaVariable caller, SchemaVariable methname, SchemaVariable args, boolean negation) {
+        this.negation = negation;
+        this.caller = caller;
+        this.methname = methname;
+        this.args = args;
+    }
+
+    /**
+     * the static reference condition checks if a suggested
+     * instantiation for a schema variable denotes a static method
+     * call. The flag negation allows to reuse this condition for
+     * ensuring non model references.
+     */
+    public ModelMethodCondition(SchemaVariable methname, SchemaVariable args, boolean negation) {
+        this.negation = negation;
+        this.caller = null;
+        this.methname = methname;
+        this.args = args;
     }
 
     private static ImmutableArray<Expression> toExpArray(ImmutableArray<? extends ProgramElement> a) {
-	Expression[] result = new Expression[a.size()];
-	for (int i=0; i<a.size(); i++) {
-	    result[i]=(Expression)a.get(i);
-	}
-	return new ImmutableArray<Expression>(result);
+        Expression[] result = new Expression[a.size()];
+        for (int i=0; i<a.size(); i++) {
+            result[i]=(Expression)a.get(i);
+        }
+        return new ImmutableArray<Expression>(result);
     }
 
 
     @SuppressWarnings("unchecked")
     @Override
     public boolean check(SchemaVariable var,
-			 SVSubstitute subst,
-			 SVInstantiations svInst,
-			 Services services) {
+                         SVSubstitute subst,
+                         SVInstantiations svInst,
+                         Services services) {
 
-	ReferencePrefix rp = (ReferencePrefix) svInst.getInstantiation(caller);
-	MethodName mn = (MethodName) svInst.getInstantiation(methname);
-	ImmutableArray<ProgramElement> ape =
-	    (ImmutableArray<ProgramElement>) svInst.getInstantiation(args);
+        ReferencePrefix rp = (ReferencePrefix) svInst.getInstantiation(caller);
+        MethodName mn = (MethodName) svInst.getInstantiation(methname);
+        ImmutableArray<ProgramElement> ape =
+                (ImmutableArray<ProgramElement>) svInst.getInstantiation(args);
 
-	if (rp != null && mn != null && ape != null) {
-	    ImmutableArray<Expression> ar
-		= toExpArray((ImmutableArray<ProgramElement>)svInst.getInstantiation(args));
-	    if (var == args) {
-		ar = toExpArray((ImmutableArray<? extends ProgramElement>)subst);
-	    }
-	    ExecutionContext ec
-		= svInst.getContextInstantiation().activeStatementContext();
-	    MethodReference mr =new MethodReference(ar, mn, rp);
-	    IProgramMethod method = null;
-	    KeYJavaType prefixType = services.getTypeConverter().
-		getKeYJavaType((Expression) rp, ec);
-	    if((rp instanceof LocationVariable) &&
-	       (((LocationVariable) rp).sort() instanceof NullSort)){
-		return true;
-	    }
-	    if (ec!=null) {
-		method = mr.method(services, prefixType, ec);
-		// we are only interested in the signature. The method
-		// must be declared in the static context.
-	    } else { //no execution context
-		method = mr.method (services, prefixType,
-		        mr.getMethodSignature(services, ec),
-		        prefixType);
-	    }
-	    if (method == null) {
-		return false;
-	    }
-	    return negation ^ method.isModel();
-	}
-	return true;
+        if (rp != null && mn != null && ape != null) {
+            ImmutableArray<Expression> ar
+                    = toExpArray((ImmutableArray<ProgramElement>)svInst.getInstantiation(args));
+            if (var == args) {
+                ar = toExpArray((ImmutableArray<? extends ProgramElement>)subst);
+            }
+            ExecutionContext ec
+                    = svInst.getContextInstantiation().activeStatementContext();
+            MethodReference mr =new MethodReference(ar, mn, rp);
+            KeYJavaType prefixType;
+            // static vs. instance method
+            if (rp instanceof Expression) {
+                prefixType = services.getTypeConverter().getKeYJavaType((Expression) rp, ec);
+            } else {
+                assert rp instanceof TypeRef;
+                prefixType = ((TypeRef)rp).getKeYJavaType();
+            }
+            IProgramMethod method;
+            if (ec!=null) {
+                method = mr.method(services, prefixType, ec);
+                // we are only interested in the signature. The method
+                // must be declared in the static context.
+            } else { //no execution context
+                method = mr.method (services, prefixType,
+                        mr.getMethodSignature(services, ec),
+                        prefixType);
+            }
+            if (method == null) {
+                return false;
+            }
+            return negation ^ method.isModel();
+        }
+        return true;
     }
 
 
     @Override
     public String toString () {
-	return (negation ? "\\not " : "") + "\\modelMethodReference(" + caller
-	       + ", " + methname + ", " + args + ")";
+        return (negation ? "\\not " : "") + "\\modelMethodReference(" + caller
+                + ", " + methname + ", " + args + ")";
     }
 }

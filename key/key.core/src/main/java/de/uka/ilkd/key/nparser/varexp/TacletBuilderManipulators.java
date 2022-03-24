@@ -200,8 +200,17 @@ public class TacletBuilderManipulators {
             = new ConstructorBasedBuilder("mayExpandMethod", MayExpandMethodCondition.class, SV, SV, SV);
     public static final AbstractConditionBuilder STATIC_METHOD
             = new ConstructorBasedBuilder("staticMethodReference", StaticMethodCondition.class, SV, SV, SV);
-    public static final AbstractConditionBuilder MODEL_METHOD
+    public static final AbstractConditionBuilder MODEL_METHOD_2
+            = new ConstructorBasedBuilder("modelMethodReference", ModelMethodCondition.class, SV, SV);
+    public static final AbstractConditionBuilder MODEL_METHOD_3
             = new ConstructorBasedBuilder("modelMethodReference", ModelMethodCondition.class, SV, SV, SV);
+    public static final AbstractConditionBuilder RESOLVE_STRICTLY_PURE
+            = new ConstructorBasedBuilder("strictlyPureMethodCall", ResolveStrictlyPureMethodCondition.class, SV, SV, SV, SV) {
+        @Override
+        public VariableCondition build(Object[] arguments, List<String> parameters, boolean negated) {
+            return super.build(arguments, parameters, negated);
+        }
+    };
     public static final AbstractConditionBuilder THIS_REFERENCE
             = new ConstructorBasedBuilder("isThisReference", IsThisReference.class, SV);
     public static final AbstractConditionBuilder REFERENCE
@@ -319,7 +328,7 @@ public class TacletBuilderManipulators {
                 FREE_1, FREE_2, FREE_3, FREE_4, FREE_5, NEW_TYPE_OF, NEW_DEPENDING_ON,
                 FREE_LABEL_IN_VARIABLE, DIFFERENT, FINAL, ENUM_CONST,
                 LOCAL_VARIABLE, ARRAY_LENGTH, ARRAY, REFERENCE_ARRAY,
-                MODEL_FIELD, MODEL_METHOD, MAY_EXPAND_METHOD_2,
+                MODEL_FIELD, MODEL_METHOD_2, MODEL_METHOD_3, MAY_EXPAND_METHOD_2, RESOLVE_STRICTLY_PURE,
                 MAY_EXPAND_METHOD_3, STATIC_METHOD, THIS_REFERENCE, REFERENCE,
                 ENUM_TYPE, CONTAINS_ASSIGNMENT, FIELD_TYPE, STATIC_REFERENCE, DIFFERENT_FIELDS,
                 SAME_OBSERVER, applyUpdateOnRigid, DROP_EFFECTLESS_ELEMENTARIES, SIMPLIFY_ITE_UPDATE,

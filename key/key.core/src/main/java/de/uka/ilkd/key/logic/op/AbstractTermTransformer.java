@@ -22,6 +22,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
+import de.uka.ilkd.key.rule.conditions.ResolveStrictlyPureMethodCondition;
 import de.uka.ilkd.key.rule.metaconstruct.*;
 import de.uka.ilkd.key.rule.metaconstruct.arith.*;
 import de.uka.ilkd.key.util.Debug;
@@ -96,6 +97,8 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
     public static final AbstractTermTransformer CREATE_WELLFORMED_COND = new CreateWellformedCond();
 
     public static final AbstractTermTransformer MEMBER_PV_TO_FIELD = new MemberPVToField();
+
+    public static final AbstractTermTransformer RESOLVE_MODEL_FIELD = new ResolveModelField();
 
     /** The add-cast term transformer **/
     public static final AbstractTermTransformer ADD_CAST = new AddCast();
