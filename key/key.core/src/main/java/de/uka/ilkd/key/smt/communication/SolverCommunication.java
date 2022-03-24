@@ -101,8 +101,7 @@ public class SolverCommunication {
         return messages.stream()
             .sequential()
             .filter(m -> m.getType() == type)
-            // ACTIVATE WHEN Java 11: // .collect(Collectors.toUnmodifiableList());
-            .collect(Collectors.toList());
+            .collect(Collectors.toUnmodifiableList());
     }
 
     /**

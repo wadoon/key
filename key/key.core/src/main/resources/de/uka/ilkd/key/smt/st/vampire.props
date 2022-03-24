@@ -1,6 +1,6 @@
 name=vampire
 command=vampire
-params=--input_syntax smtlib2
+params=--input_syntax smtlib2 --output_mode smtcomp
 minVersion=Vampire 4.4.0
 pipe=BUFFERED_PIPE
 sendTriggers=(check-sat)

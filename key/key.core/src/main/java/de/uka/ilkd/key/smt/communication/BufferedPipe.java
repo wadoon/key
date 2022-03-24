@@ -6,6 +6,8 @@ import java.util.*;
 
 public class BufferedPipe implements Pipe {
 
+    private static String EXIT = "(exit)";
+
     private Process process;
     private boolean closed;
     private BufferedWriter writer;
@@ -27,7 +29,6 @@ public class BufferedPipe implements Pipe {
         this.sendTriggers = Arrays.asList(sendTriggers);
         this.readLines = new LinkedList<>();
         this.readIterator = new Iterator<String>() {
-
             private int readIndex = 0;
 
             @Override
@@ -54,23 +55,17 @@ public class BufferedPipe implements Pipe {
         process = builder.start();
     }
 
-    @Override
-    public void sendMessage(String message) throws IOException {
-        if (closed) {
-            throw new IOException("Pipe has been closed.");
-        }
-        // Add the message to the sent message buffer as it will have to be used again for further communication.
-        sentMessages.add(message);
-        boolean shouldSend = sendTriggers.stream().anyMatch(s -> message.trim().endsWith(s));
-        if (!shouldSend && !sendTriggers.isEmpty()) {
-            return;
-        }
+    private void write() throws IOException {
         for (String msg: sentMessages) {
-            writer.write(msg);
+            session.addMessage(msg, SolverCommunication.MessageType.INPUT);
+            writer.write(msg + System.lineSeparator());
             writer.flush();
         }
         // Close the writer so that the process answers.
         writer.close();
+    }
+
+    private void read() throws IOException {
         // Read the answer and add it to the puffer of read messages.
         String msg = reader.readLine();
         int counter = 0;
@@ -83,6 +78,22 @@ public class BufferedPipe implements Pipe {
             msg = reader.readLine();
         }
         reader.close();
+    }
+
+
+    @Override
+    public void sendMessage(String message) throws IOException {
+        if (closed) {
+            throw new IOException("Pipe has been closed.");
+        }
+        // Add the message to the sent message buffer as it will have to be used again for further communication.
+        sentMessages.add(message);
+        boolean shouldSend = sendTriggers.stream().anyMatch(s -> message.trim().endsWith(s));
+        if (!shouldSend && !sendTriggers.isEmpty()) {
+            return;
+        }
+        write();
+        read();
         // End the process and create it anew for further communication.
         process.destroy();
         buildProcess();
@@ -115,7 +126,12 @@ public class BufferedPipe implements Pipe {
 
     @Override
     public void sendEOF() {
-
+        try {
+            write();
+            read();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }
