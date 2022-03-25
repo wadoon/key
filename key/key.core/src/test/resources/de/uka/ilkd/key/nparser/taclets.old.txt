@@ -1,5 +1,5 @@
 # This files contains representation of taclets, which are accepted and revised.
-# Date: Thu Jan 06 21:38:59 CET 2022
+# Date: Fri Mar 25 17:24:20 CET 2022
 
 == abortJavaCardTransactionAPI (abortJavaCardTransactionAPI) =========================================
 abortJavaCardTransactionAPI {
@@ -30,6 +30,20 @@ accDefinition {
 \replacewith(and(and(not(equals(o,null)),not(equals(o2,null))),exists{fv (variable)}(and(elementOf(o,fv,s),equals(deltaObject::select(h,o,fv),o2))))) 
 \heuristics(simplify)
 Choices: {reach:on}}
+-----------------------------------------------------
+== acosIsNaN (acosIsNaN) =========================================
+acosIsNaN {
+\find(acosDouble(arg))
+\add [imp(or(or(doubleIsNaN(arg),ltDouble(arg,negDouble(DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#))))))))))))))))))))))),gtDouble(arg,DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#)))))))))))))))))))))),doubleIsNaN(acosDouble(arg)))]==>[] 
+\heuristics(userTaclets1)
+Choices: {}}
+-----------------------------------------------------
+== acosRange (acosRange) =========================================
+acosRange {
+\find(acosDouble(arg))
+\add [imp(and(geqDouble(arg,negDouble(DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#)))))))))))))))))))))),leqDouble(arg,DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#)))))))))))))))))))))),and(geqDouble(acosDouble(arg),DFP(0(#))),leqDouble(acosDouble(arg),DFP(8(4(8(5(4(0(2(5(5(6(5(6(6(5(2(4(1(6(4(#)))))))))))))))))))))))]==>[] 
+\heuristics(userTaclets1)
+Choices: {}}
 -----------------------------------------------------
 == activeUseAddition (activeUse) =========================================
 activeUseAddition {
@@ -992,6 +1006,27 @@ array_store_known_dynamic_array_type {
 \heuristics(simplify)
 Choices: {programRules:Java}}
 -----------------------------------------------------
+== asinIsNaN (asinIsNaN) =========================================
+asinIsNaN {
+\find(asinDouble(arg))
+\add [imp(or(or(doubleIsNaN(arg),ltDouble(arg,negDouble(DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#))))))))))))))))))))))),gtDouble(arg,DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#)))))))))))))))))))))),doubleIsNaN(asinDouble(arg)))]==>[] 
+\heuristics(userTaclets1)
+Choices: {}}
+-----------------------------------------------------
+== asineIsZero (asineIsZero) =========================================
+asineIsZero {
+\find(asinDouble(arg))
+\add [imp(equals(arg,DFP(0(#))),equals(asinDouble(arg),DFP(0(#))))]==>[] 
+\heuristics(userTaclets1)
+Choices: {}}
+-----------------------------------------------------
+== asineRange (asineRange) =========================================
+asineRange {
+\find(asinDouble(arg))
+\add [imp(and(geqDouble(arg,negDouble(DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#)))))))))))))))))))))),leqDouble(arg,DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#)))))))))))))))))))))),and(geqDouble(asinDouble(arg),negDouble(DFP(2(5(3(5(7(6(4(2(9(6(5(0(3(5(7(9(0(6(4(#)))))))))))))))))))))),leqDouble(asinDouble(arg),DFP(2(5(3(5(7(6(4(2(9(6(5(0(3(5(7(9(0(6(4(#)))))))))))))))))))))))]==>[] 
+\heuristics(userTaclets1)
+Choices: {}}
+-----------------------------------------------------
 == assertSafe (assert) =========================================
 assertSafe {
 \find(==>#allmodal ( (modal operator))\[{ .. assert #e1; ... }\] (b))
@@ -1041,6 +1076,38 @@ assignmentAdditionBigint2 {
 \replacewith(update-application(elem-update(#loc (program Variable))(add(#seAny,#seBigint)),#allmodal(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: {bigint:on,programRules:Java}}
+-----------------------------------------------------
+== assignmentAdditionDouble (addition) =========================================
+assignmentAdditionDouble {
+\find(#normalassign ( (modal operator))\[{ .. #loc=#seDouble0+#seDouble1; ... }\] (post))
+\varcond(\not\isStrictFp, )
+\replacewith(update-application(elem-update(#loc (program Variable))(javaAddDouble(#seDouble0,#seDouble1)),#normalassign(post))) 
+\heuristics(executeFloatAssignment)
+Choices: {programRules:Java}}
+-----------------------------------------------------
+== assignmentAdditionDoubleStrictFP (addition) =========================================
+assignmentAdditionDoubleStrictFP {
+\find(#normalassign ( (modal operator))\[{ .. #loc=#seDouble0+#seDouble1; ... }\] (post))
+\varcond(\isStrictFp, )
+\replacewith(update-application(elem-update(#loc (program Variable))(addDouble(#seDouble0,#seDouble1)),#normalassign(post))) 
+\heuristics(executeDoubleAssignment)
+Choices: {programRules:Java}}
+-----------------------------------------------------
+== assignmentAdditionFloat (addition) =========================================
+assignmentAdditionFloat {
+\find(#normalassign ( (modal operator))\[{ .. #loc=#seFloat0+#seFloat1; ... }\] (post))
+\varcond(\not\isStrictFp, )
+\replacewith(update-application(elem-update(#loc (program Variable))(javaAddFloat(#seFloat0,#seFloat1)),#normalassign(post))) 
+\heuristics(executeFloatAssignment)
+Choices: {programRules:Java}}
+-----------------------------------------------------
+== assignmentAdditionFloatStrictFP (addition) =========================================
+assignmentAdditionFloatStrictFP {
+\find(#normalassign ( (modal operator))\[{ .. #loc=#seFloat0+#seFloat1; ... }\] (post))
+\varcond(\isStrictFp, )
+\replacewith(update-application(elem-update(#loc (program Variable))(addFloat(#seFloat0,#seFloat1)),#normalassign(post))) 
+\heuristics(executeFloatAssignment)
+Choices: {programRules:Java}}
 -----------------------------------------------------
 == assignmentAdditionInt (addition) =========================================
 assignmentAdditionInt {
@@ -1170,6 +1237,38 @@ assignmentDivisionBigint2 {
 \heuristics(executeIntegerAssignment)
 Choices: {bigint:on,programRules:Java,runtimeExceptions:ban}}
 -----------------------------------------------------
+== assignmentDivisionDouble (division) =========================================
+assignmentDivisionDouble {
+\find(#normalassign ( (modal operator))\[{ .. #loc=#seDouble0/#seDouble1; ... }\] (post))
+\varcond(\not\isStrictFp, )
+\replacewith(update-application(elem-update(#loc (program Variable))(javaDivDouble(#seDouble0,#seDouble1)),#normalassign(post))) 
+\heuristics(executeFloatAssignment)
+Choices: {programRules:Java}}
+-----------------------------------------------------
+== assignmentDivisionDoubleStrictFP (division) =========================================
+assignmentDivisionDoubleStrictFP {
+\find(#normalassign ( (modal operator))\[{ .. #loc=#seDouble0/#seDouble1; ... }\] (post))
+\varcond(\isStrictFp, )
+\replacewith(update-application(elem-update(#loc (program Variable))(divDouble(#seDouble0,#seDouble1)),#normalassign(post))) 
+\heuristics(executeDoubleAssignment)
+Choices: {programRules:Java}}
+-----------------------------------------------------
+== assignmentDivisionFloat (division) =========================================
+assignmentDivisionFloat {
+\find(#normalassign ( (modal operator))\[{ .. #loc=#seFloat0/#seFloat1; ... }\] (post))
+\varcond(\not\isStrictFp, )
+\replacewith(update-application(elem-update(#loc (program Variable))(javaDivFloat(#seFloat0,#seFloat1)),#normalassign(post))) 
+\heuristics(executeFloatAssignment)
+Choices: {programRules:Java}}
+-----------------------------------------------------
+== assignmentDivisionFloatStrictFP (division) =========================================
+assignmentDivisionFloatStrictFP {
+\find(#normalassign ( (modal operator))\[{ .. #loc=#seFloat0/#seFloat1; ... }\] (post))
+\varcond(\isStrictFp, )
+\replacewith(update-application(elem-update(#loc (program Variable))(divFloat(#seFloat0,#seFloat1)),#normalassign(post))) 
+\heuristics(executeFloatAssignment)
+Choices: {programRules:Java}}
+-----------------------------------------------------
 == assignmentDivisionInt (division) =========================================
 assignmentDivisionInt {
 \find(==>#normalassign ( (modal operator))\[{ .. #loc=#seCharByteShortInt0/#seCharByteShortInt1; ... }\] (post))
@@ -1193,6 +1292,20 @@ assignmentDivisionLong2 {
 \replacewith([]==>[update-application(elem-update(#loc (program Variable))(javaDivLong(#seLong,#seCharByteShortInt)),#normalassign(post))]) 
 \heuristics(executeIntegerAssignment)
 Choices: {programRules:Java,runtimeExceptions:ban}}
+-----------------------------------------------------
+== assignmentModDouble (mod) =========================================
+assignmentModDouble {
+\find(#normalassign ( (modal operator))\[{ .. #loc=#seDouble0%#seDouble1; ... }\] (post))
+\replacewith(update-application(elem-update(#loc (program Variable))(javaModDouble(#seDouble0,#seDouble1)),#normalassign(post))) 
+\heuristics(executeFloatAssignment)
+Choices: {programRules:Java}}
+-----------------------------------------------------
+== assignmentModFloat (mod) =========================================
+assignmentModFloat {
+\find(#normalassign ( (modal operator))\[{ .. #loc=#seFloat0%#seFloat1; ... }\] (post))
+\replacewith(update-application(elem-update(#loc (program Variable))(javaModFloat(#seFloat0,#seFloat1)),#normalassign(post))) 
+\heuristics(executeFloatAssignment)
+Choices: {programRules:Java}}
 -----------------------------------------------------
 == assignmentModulo (modulo) =========================================
 assignmentModulo {
@@ -1231,6 +1344,38 @@ assignmentMultiplicationBigint2 {
 \replacewith(update-application(elem-update(#loc (program Variable))(mul(#seAny,#seBigint)),#allmodal(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: {bigint:on,programRules:Java}}
+-----------------------------------------------------
+== assignmentMultiplicationDouble (multiplication) =========================================
+assignmentMultiplicationDouble {
+\find(#normalassign ( (modal operator))\[{ .. #loc=#seDouble0*#seDouble1; ... }\] (post))
+\varcond(\not\isStrictFp, )
+\replacewith(update-application(elem-update(#loc (program Variable))(javaMulDouble(#seDouble0,#seDouble1)),#normalassign(post))) 
+\heuristics(executeFloatAssignment)
+Choices: {programRules:Java}}
+-----------------------------------------------------
+== assignmentMultiplicationDoubleStrictFP (multiplication) =========================================
+assignmentMultiplicationDoubleStrictFP {
+\find(#normalassign ( (modal operator))\[{ .. #loc=#seDouble0*#seDouble1; ... }\] (post))
+\varcond(\isStrictFp, )
+\replacewith(update-application(elem-update(#loc (program Variable))(mulDouble(#seDouble0,#seDouble1)),#normalassign(post))) 
+\heuristics(executeDoubleAssignment)
+Choices: {programRules:Java}}
+-----------------------------------------------------
+== assignmentMultiplicationFloat (multiplication) =========================================
+assignmentMultiplicationFloat {
+\find(#normalassign ( (modal operator))\[{ .. #loc=#seFloat0*#seFloat1; ... }\] (post))
+\varcond(\not\isStrictFp, )
+\replacewith(update-application(elem-update(#loc (program Variable))(javaMulFloat(#seFloat0,#seFloat1)),#normalassign(post))) 
+\heuristics(executeFloatAssignment)
+Choices: {programRules:Java}}
+-----------------------------------------------------
+== assignmentMultiplicationFloatStrictFP (multiplication) =========================================
+assignmentMultiplicationFloatStrictFP {
+\find(#normalassign ( (modal operator))\[{ .. #loc=#seFloat0*#seFloat1; ... }\] (post))
+\varcond(\isStrictFp, )
+\replacewith(update-application(elem-update(#loc (program Variable))(mulFloat(#seFloat0,#seFloat1)),#normalassign(post))) 
+\heuristics(executeFloatAssignment)
+Choices: {programRules:Java}}
 -----------------------------------------------------
 == assignmentMultiplicationInt (multiplication) =========================================
 assignmentMultiplicationInt {
@@ -1302,6 +1447,38 @@ assignmentSubtractionBigint2 {
 \heuristics(executeIntegerAssignment)
 Choices: {bigint:on,programRules:Java}}
 -----------------------------------------------------
+== assignmentSubtractionDouble (subtraction) =========================================
+assignmentSubtractionDouble {
+\find(#normalassign ( (modal operator))\[{ .. #loc=#seDouble0-#seDouble1; ... }\] (post))
+\varcond(\not\isStrictFp, )
+\replacewith(update-application(elem-update(#loc (program Variable))(javaSubDouble(#seDouble0,#seDouble1)),#normalassign(post))) 
+\heuristics(executeFloatAssignment)
+Choices: {programRules:Java}}
+-----------------------------------------------------
+== assignmentSubtractionDoubleStrictFP (subtraction) =========================================
+assignmentSubtractionDoubleStrictFP {
+\find(#normalassign ( (modal operator))\[{ .. #loc=#seDouble0-#seDouble1; ... }\] (post))
+\varcond(\isStrictFp, )
+\replacewith(update-application(elem-update(#loc (program Variable))(subDouble(#seDouble0,#seDouble1)),#normalassign(post))) 
+\heuristics(executeDoubleAssignment)
+Choices: {programRules:Java}}
+-----------------------------------------------------
+== assignmentSubtractionFloat (subtraction) =========================================
+assignmentSubtractionFloat {
+\find(#normalassign ( (modal operator))\[{ .. #loc=#seFloat0-#seFloat1; ... }\] (post))
+\varcond(\not\isStrictFp, )
+\replacewith(update-application(elem-update(#loc (program Variable))(javaSubFloat(#seFloat0,#seFloat1)),#normalassign(post))) 
+\heuristics(executeFloatAssignment)
+Choices: {programRules:Java}}
+-----------------------------------------------------
+== assignmentSubtractionFloatStrictFP (subtraction) =========================================
+assignmentSubtractionFloatStrictFP {
+\find(#normalassign ( (modal operator))\[{ .. #loc=#seFloat0-#seFloat1; ... }\] (post))
+\varcond(\isStrictFp, )
+\replacewith(update-application(elem-update(#loc (program Variable))(subFloat(#seFloat0,#seFloat1)),#normalassign(post))) 
+\heuristics(executeFloatAssignment)
+Choices: {programRules:Java}}
+-----------------------------------------------------
 == assignmentSubtractionInt (subtraction) =========================================
 assignmentSubtractionInt {
 \find(#normalassign ( (modal operator))\[{ .. #loc=#seCharByteShortInt0-#seCharByteShortInt1; ... }\] (post))
@@ -1357,7 +1534,7 @@ Choices: {programRules:Java,runtimeExceptions:ban}}
 == assignment_read_attribute (assignment_read_attribute) =========================================
 assignment_read_attribute {
 \find(==>#allmodal ( (modal operator))\[{ .. #v0=#v.#a; ... }\] (post))
-\varcond( \not \static(#a (program Variable)),  \not \isArrayLength(#a (program Variable)), \hasSort(#a (program Variable), G), \not\isThisReference (#v (program Variable)), )
+\varcond( \not \static(#a (program Variable)),  \not \model(#a (program Variable)),  \not \isArrayLength(#a (program Variable)), \hasSort(#a (program Variable), G), \not\isThisReference (#v (program Variable)), )
 \add [equals(#v,null)]==>[] \replacewith([]==>[false]) ;
 \replacewith([]==>[update-application(elem-update(#v0 (program Variable))(G::select(heap,#v,#memberPVToField(#a))),#allmodal(post))]) 
 \heuristics(simplify_prog_subset, simplify_prog)
@@ -1366,7 +1543,7 @@ Choices: {programRules:Java,runtimeExceptions:ban}}
 == assignment_read_attribute_this (assignment_read_attribute_this) =========================================
 assignment_read_attribute_this {
 \find(==>#allmodal ( (modal operator))\[{ .. #v0=#v.#a; ... }\] (post))
-\varcond( \not \static(#a (program Variable)),  \not \isArrayLength(#a (program Variable)), \hasSort(#a (program Variable), G), \isThisReference (#v (program Variable)), )
+\varcond( \not \static(#a (program Variable)),  \not \model(#a (program Variable)),  \not \isArrayLength(#a (program Variable)), \hasSort(#a (program Variable), G), \isThisReference (#v (program Variable)), )
 \replacewith([]==>[update-application(elem-update(#v0 (program Variable))(G::select(heap,#v,#memberPVToField(#a))),#allmodal(post))]) 
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: {programRules:Java,runtimeExceptions:ban}}
@@ -1388,10 +1565,27 @@ assignment_read_length_this {
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: {programRules:Java}}
 -----------------------------------------------------
+== assignment_read_model_attribute (assignment_read_model_attribute) =========================================
+assignment_read_model_attribute {
+\find(==>#allmodal ( (modal operator))\[{ .. #v0=#v.#a; ... }\] (post))
+\varcond(\model(#a (program Variable)), \hasSort(#a (program Variable), G), \not\isThisReference (#v (program Variable)), )
+\add [equals(#v,null)]==>[] \replacewith([]==>[false]) ;
+\replacewith([]==>[update-application(elem-update(#v0 (program Variable))(#resolveModelField(#v,#a)),#allmodal(post))]) 
+\heuristics(simplify_prog_subset, simplify_prog)
+Choices: {programRules:Java}}
+-----------------------------------------------------
+== assignment_read_model_attribute_this (assignment_read_model_attribute_this) =========================================
+assignment_read_model_attribute_this {
+\find(==>#allmodal ( (modal operator))\[{ .. #v0=#v.#a; ... }\] (post))
+\varcond( \not \static(#a (program Variable)), \model(#a (program Variable)), \hasSort(#a (program Variable), G), \isThisReference (#v (program Variable)), )
+\replacewith([]==>[update-application(elem-update(#v0 (program Variable))(#resolveModelField(#v,#a)),#allmodal(post))]) 
+\heuristics(simplify_prog_subset, simplify_prog)
+Choices: {programRules:Java}}
+-----------------------------------------------------
 == assignment_read_static_attribute (assignment_read_static_attribute) =========================================
 assignment_read_static_attribute {
 \find(#allmodal ( (modal operator))\[{ .. #v0=@(#sv); ... }\] (post))
-\sameUpdateLevel\varcond(\hasSort(#sv (program StaticVariable), G), )
+\sameUpdateLevel\varcond(\hasSort(#sv (program StaticVariable), G),  \not \model(#sv (program StaticVariable)), )
 \replacewith(update-application(elem-update(#v0 (program Variable))(G::select(heap,null,#memberPVToField(#sv))),#allmodal(post))) 
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: {programRules:Java}}
@@ -1399,9 +1593,17 @@ Choices: {programRules:Java}}
 == assignment_read_static_attribute_with_variable_prefix (assignment) =========================================
 assignment_read_static_attribute_with_variable_prefix {
 \find(#allmodal ( (modal operator))\[{ .. #loc=@(#v.#sv); ... }\] (post))
-\varcond(\hasSort(#sv (program StaticVariable), G), )
+\varcond(\hasSort(#sv (program StaticVariable), G),  \not \model(#sv (program StaticVariable)), )
 \replacewith(update-application(elem-update(#loc (program Variable))(G::select(heap,#v,#memberPVToField(#sv))),#allmodal(post))) 
 \heuristics(simplify_prog)
+Choices: {programRules:Java}}
+-----------------------------------------------------
+== assignment_read_static_model_attribute (assignment_read_static_model_attribute) =========================================
+assignment_read_static_model_attribute {
+\find(==>#allmodal ( (modal operator))\[{ .. #v0=@(#sv); ... }\] (post))
+\varcond(\model(#sv (program StaticVariable)), \hasSort(#sv (program StaticVariable), G), )
+\replacewith([]==>[update-application(elem-update(#v0 (program Variable))(#resolveModelField(#sv,#sv)),#allmodal(post))]) 
+\heuristics(simplify_prog_subset, simplify_prog)
 Choices: {programRules:Java}}
 -----------------------------------------------------
 == assignment_to_primitive_array_component (assignment_to_primitive_array_component) =========================================
@@ -1497,6 +1699,41 @@ associativeLawUnion {
 \replacewith(union(union(s1,s2),s3)) 
 \heuristics(conjNormalForm)
 Choices: {programRules:Java}}
+-----------------------------------------------------
+== atan2IsNaN (atan2IsNaN) =========================================
+atan2IsNaN {
+\find(atan2Double(arg1,arg2))
+\add [imp(or(doubleIsNaN(arg1),doubleIsNaN(arg2)),doubleIsNaN(atan2Double(arg1,arg2)))]==>[] 
+\heuristics(userTaclets1)
+Choices: {}}
+-----------------------------------------------------
+== atan2Range (atan2Range) =========================================
+atan2Range {
+\find(atan2Double(arg1,arg2))
+\add [imp(and(not(doubleIsNaN(arg1)),not(doubleIsNaN(arg2))),and(geqDouble(atan2Double(arg1,arg2),negDouble(DFP(8(4(8(5(4(0(2(5(5(6(5(6(6(5(2(4(1(6(4(#)))))))))))))))))))))),leqDouble(atan2Double(arg1,arg2),DFP(8(4(8(5(4(0(2(5(5(6(5(6(6(5(2(4(1(6(4(#)))))))))))))))))))))))]==>[] 
+
+Choices: {}}
+-----------------------------------------------------
+== atanIsNaN (atanIsNaN) =========================================
+atanIsNaN {
+\find(atanDouble(arg))
+\add [imp(doubleIsNaN(arg),doubleIsNaN(atanDouble(arg)))]==>[] 
+\heuristics(userTaclets1)
+Choices: {}}
+-----------------------------------------------------
+== atanIsZero (atanIsZero) =========================================
+atanIsZero {
+\find(atanDouble(arg))
+\add [imp(equals(arg,DFP(0(#))),equals(atanDouble(arg),DFP(0(#))))]==>[] 
+\heuristics(userTaclets1)
+Choices: {}}
+-----------------------------------------------------
+== atanRange (atanRange) =========================================
+atanRange {
+\find(atanDouble(arg))
+\add [imp(not(doubleIsNaN(arg)),and(geqDouble(atanDouble(arg),negDouble(DFP(2(5(3(5(7(6(4(2(9(6(5(0(3(5(7(9(0(6(4(#)))))))))))))))))))))),leqDouble(atanDouble(arg),DFP(2(5(3(5(7(6(4(2(9(6(5(0(3(5(7(9(0(6(4(#)))))))))))))))))))))))]==>[] 
+\heuristics(userTaclets1)
+Choices: {}}
 -----------------------------------------------------
 == autoInductGEQ_Lemma_1 (auto_induction_lemma) =========================================
 autoInductGEQ_Lemma_1 {
@@ -2667,6 +2904,13 @@ castDel2 {
 
 Choices: {}}
 -----------------------------------------------------
+== castLongToFloatAddition2 (float addition) =========================================
+castLongToFloatAddition2 {
+\find(#normalassign ( (modal operator))\[{ .. #loc=#seFloat+#seLong; ... }\] (post))
+\replacewith(update-application(elem-update(#loc (program Variable))(javaAddFloat(#seFloat,float::cast(#seLong))),#normalassign(post))) 
+\heuristics(executeFloatAssignment)
+Choices: {programRules:Java}}
+-----------------------------------------------------
 == castToBoolean (castToBoolean) =========================================
 castToBoolean {
 \find(#allmodal ( (modal operator))\[{ .. #lhs=(boolean)#exBool; ... }\] (post))
@@ -3341,6 +3585,14 @@ compound_division_2 {
 \heuristics(simplify_prog)
 Choices: {programRules:Java}}
 -----------------------------------------------------
+== compound_double_cast_expression (cast) =========================================
+compound_double_cast_expression {
+\find(#normalassign ( (modal operator))\[{ .. #loc=(double)#nse; ... }\] (post))
+\varcond(\new(#v (program Variable), \typeof(#nse (program NonSimpleExpression))))
+\replacewith(#normalassign ( (modal operator))\[{ .. #typeof(#nse) #v = #nse;#loc=(double)#v; ... }\] (post)) 
+\heuristics(simplify_prog)
+Choices: {programRules:Java}}
+-----------------------------------------------------
 == compound_equality_comparison_1 (equality) =========================================
 compound_equality_comparison_1 {
 \find(#allmodal ( (modal operator))\[{ .. #lhs=#nse0==#se; ... }\] (post))
@@ -3354,6 +3606,14 @@ compound_equality_comparison_2 {
 \find(#allmodal ( (modal operator))\[{ .. #lhs=#e==#nse0; ... }\] (post))
 \varcond(\new(#v1 (program Variable), \typeof(#nse0 (program NonSimpleExpression))), \new(#v0 (program Variable), \typeof(#e (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ .. #typeof(#e) #v0 = #e;#typeof(#nse0) #v1 = #nse0;#lhs=#v0==#v1; ... }\] (post)) 
+\heuristics(simplify_prog)
+Choices: {programRules:Java}}
+-----------------------------------------------------
+== compound_float_cast_expression (cast) =========================================
+compound_float_cast_expression {
+\find(#normalassign ( (modal operator))\[{ .. #loc=(float)#nse; ... }\] (post))
+\varcond(\new(#v (program Variable), \typeof(#nse (program NonSimpleExpression))))
+\replacewith(#normalassign ( (modal operator))\[{ .. #typeof(#nse) #v = #nse;#loc=(float)#v; ... }\] (post)) 
 \heuristics(simplify_prog)
 Choices: {programRules:Java}}
 -----------------------------------------------------
@@ -3785,6 +4045,48 @@ containsAxiomSucc {
 \replacewith([]==>[exists{iv (variable)}(and(and(geq(iv,Z(0(#))),leq(add(iv,seqLen(searchString)),seqLen(textString))),equals(seqSub(textString,iv,add(iv,seqLen(searchString))),searchString)))]) 
 \heuristics(stringsExpandDefNormalOp)
 Choices: {Strings:on}}
+-----------------------------------------------------
+== cosIsNaN (cosIsNaN) =========================================
+cosIsNaN {
+\find(cosDouble(arg))
+\add [imp(or(doubleIsNaN(arg),doubleIsInfinite(arg)),doubleIsNaN(cosDouble(arg)))]==>[] 
+\heuristics(userTaclets1)
+Choices: {}}
+-----------------------------------------------------
+== cosIsNaNAlt (cosIsNaNAlt) =========================================
+cosIsNaNAlt {
+\find(doubleIsNaN(cosDouble(arg)))
+\replacewith(or(doubleIsNaN(arg),doubleIsInfinite(arg))) 
+\heuristics(simplify)
+Choices: {}}
+-----------------------------------------------------
+== cosIsNotNaN (cosIsNotNaN) =========================================
+cosIsNotNaN {
+\find(cosDouble(arg))
+\add [imp(and(not(doubleIsNaN(arg)),not(doubleIsInfinite(arg))),not(doubleIsNaN(cosDouble(arg))))]==>[] 
+\heuristics(userTaclets1)
+Choices: {}}
+-----------------------------------------------------
+== cosRange (cosRange) =========================================
+cosRange {
+\find(cosDouble(arg))
+\add [or(and(geqDouble(cosDouble(arg),DFP(0(#))),leqDouble(cosDouble(arg),DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#)))))))))))))))))))))),doubleIsNaN(cosDouble(arg)))]==>[] 
+\heuristics(userTaclets1)
+Choices: {}}
+-----------------------------------------------------
+== cosRange2 (cosRange2) =========================================
+cosRange2 {
+\find(cosDouble(arg))
+\add [imp(and(not(doubleIsNaN(arg)),not(doubleIsInfinite(arg))),and(geqDouble(cosDouble(arg),DFP(0(#))),leqDouble(cosDouble(arg),DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#)))))))))))))))))))))))]==>[] 
+\heuristics(userTaclets1)
+Choices: {}}
+-----------------------------------------------------
+== cosRangeAlt (cosRangeAlt) =========================================
+cosRangeAlt {
+\find(==>doubleIsNaN(cosDouble(arg)))
+\add [and(geqDouble(cosDouble(arg),DFP(0(#))),leqDouble(cosDouble(arg),DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#))))))))))))))))))))))]==>[] 
+\heuristics(userTaclets1)
+Choices: {}}
 -----------------------------------------------------
 == createdInHeapToElementOf (createdInHeapToElementOf) =========================================
 createdInHeapToElementOf {
@@ -5837,6 +6139,13 @@ equalityToSeqGetAndSeqLenRight {
 \heuristics(simplify_enlarging)
 Choices: {sequences:on}}
 -----------------------------------------------------
+== equality_comparison_double (equality comparison) =========================================
+equality_comparison_double {
+\find(#allmodal ( (modal operator))\[{ .. #lhs=#seDouble0==#seDouble1; ... }\] (post))
+\replacewith(update-application(elem-update(#lhs (program LeftHandSide))(if-then-else(eqDouble(#seDouble0,#seDouble1),TRUE,FALSE)),#allmodal(post))) 
+\heuristics(simplify_prog)
+Choices: {programRules:Java}}
+-----------------------------------------------------
 == equality_comparison_new (equality comparison) =========================================
 equality_comparison_new {
 \find(#allmodal ( (modal operator))\[{ .. #lhs=#se0==#se1; ... }\] (post))
@@ -5847,7 +6156,14 @@ Choices: {programRules:Java}}
 == equality_comparison_simple (equality comparison) =========================================
 equality_comparison_simple {
 \find(#allmodal ( (modal operator))\[{ .. #lhs=#senf0==#senf1; ... }\] (post))
-\replacewith(update-application(elem-update(#lhs (program LeftHandSide))(if-then-else(equals(#senf0,#senf1),TRUE,FALSE)),#allmodal(post)))
+\replacewith(update-application(elem-update(#lhs (program LeftHandSide))(if-then-else(equals(#senf0,#senf1),TRUE,FALSE)),#allmodal(post))) 
+\heuristics(simplify_prog)
+Choices: {programRules:Java}}
+-----------------------------------------------------
+== equality_comparison_simple_float (equality comparison) =========================================
+equality_comparison_simple_float {
+\find(#allmodal ( (modal operator))\[{ .. #lhs=#seFloat0==#seFloat1; ... }\] (post))
+\replacewith(update-application(elem-update(#lhs (program LeftHandSide))(if-then-else(eqFloat(#seFloat0,#seFloat1),TRUE,FALSE)),#allmodal(post))) 
 \heuristics(simplify_prog)
 Choices: {programRules:Java}}
 -----------------------------------------------------
@@ -7191,6 +7507,27 @@ execThrowEliminateReturnVal {
 \heuristics(simplify_prog)
 Choices: {programRules:Java}}
 -----------------------------------------------------
+== expIsInfinite (expIsInfinite) =========================================
+expIsInfinite {
+\find(expDouble(arg))
+\add [imp(and(doubleIsInfinite(arg),gtDouble(arg,DFP(0(#)))),and(doubleIsInfinite(expDouble(arg)),gtDouble(expDouble(arg),DFP(0(#)))))]==>[] 
+\heuristics(userTaclets1)
+Choices: {}}
+-----------------------------------------------------
+== expIsNaN (expIsNaN) =========================================
+expIsNaN {
+\find(expDouble(arg))
+\add [imp(doubleIsNaN(arg),doubleIsNaN(expDouble(arg)))]==>[] 
+\heuristics(userTaclets1)
+Choices: {}}
+-----------------------------------------------------
+== expIsZero (expIsZero) =========================================
+expIsZero {
+\find(expDouble(arg))
+\add [imp(and(doubleIsInfinite(arg),ltDouble(arg,DFP(0(#)))),equals(expDouble(arg),DFP(0(#))))]==>[] 
+\heuristics(userTaclets1)
+Choices: {}}
+-----------------------------------------------------
 == expand_addJint (expand_addJint) =========================================
 expand_addJint {
 \find(addJint(i,i1))
@@ -7598,7 +7935,21 @@ Choices: {programRules:Java}}
 == greater_equal_than_comparison_simple (greater-or-equal than distinction) =========================================
 greater_equal_than_comparison_simple {
 \find(#allmodal ( (modal operator))\[{ .. #lhs=#senf0>=#senf1; ... }\] (post))
-\replacewith(update-application(elem-update(#lhs (program LeftHandSide))(if-then-else(geq(#senf0,#senf1),TRUE,FALSE)),#allmodal(post)))
+\replacewith(update-application(elem-update(#lhs (program LeftHandSide))(if-then-else(geq(#senf0,#senf1),TRUE,FALSE)),#allmodal(post))) 
+\heuristics(simplify_prog)
+Choices: {programRules:Java}}
+-----------------------------------------------------
+== greater_equal_than_comparison_simple_double (greater-or-equal than distinction) =========================================
+greater_equal_than_comparison_simple_double {
+\find(#allmodal ( (modal operator))\[{ .. #lhs=#seDouble0>=#seDouble1; ... }\] (post))
+\replacewith(update-application(elem-update(#lhs (program LeftHandSide))(if-then-else(geqDouble(#seDouble0,#seDouble1),TRUE,FALSE)),#allmodal(post))) 
+\heuristics(simplify_prog)
+Choices: {programRules:Java}}
+-----------------------------------------------------
+== greater_equal_than_comparison_simple_float (greater-or-equal than distinction) =========================================
+greater_equal_than_comparison_simple_float {
+\find(#allmodal ( (modal operator))\[{ .. #lhs=#seFloat0>=#seFloat1; ... }\] (post))
+\replacewith(update-application(elem-update(#lhs (program LeftHandSide))(if-then-else(geqFloat(#seFloat0,#seFloat1),TRUE,FALSE)),#allmodal(post))) 
 \heuristics(simplify_prog)
 Choices: {programRules:Java}}
 -----------------------------------------------------
@@ -7619,7 +7970,21 @@ Choices: {programRules:Java}}
 == greater_than_comparison_simple (greater than distinction) =========================================
 greater_than_comparison_simple {
 \find(#allmodal ( (modal operator))\[{ .. #lhs=#senf0>#senf1; ... }\] (post))
-\replacewith(update-application(elem-update(#lhs (program LeftHandSide))(if-then-else(gt(#senf0,#senf1),TRUE,FALSE)),#allmodal(post)))
+\replacewith(update-application(elem-update(#lhs (program LeftHandSide))(if-then-else(gt(#senf0,#senf1),TRUE,FALSE)),#allmodal(post))) 
+\heuristics(simplify_prog)
+Choices: {programRules:Java}}
+-----------------------------------------------------
+== greater_than_comparison_simple_double (greater than distinction) =========================================
+greater_than_comparison_simple_double {
+\find(#allmodal ( (modal operator))\[{ .. #lhs=#seDouble0>#seDouble1; ... }\] (post))
+\replacewith(update-application(elem-update(#lhs (program LeftHandSide))(if-then-else(gtDouble(#seDouble0,#seDouble1),TRUE,FALSE)),#allmodal(post))) 
+\heuristics(simplify_prog)
+Choices: {programRules:Java}}
+-----------------------------------------------------
+== greater_than_comparison_simple_float (greater than distinction) =========================================
+greater_than_comparison_simple_float {
+\find(#allmodal ( (modal operator))\[{ .. #lhs=#seFloat0>#seFloat1; ... }\] (post))
+\replacewith(update-application(elem-update(#lhs (program LeftHandSide))(if-then-else(gtFloat(#seFloat0,#seFloat1),TRUE,FALSE)),#allmodal(post))) 
 \heuristics(simplify_prog)
 Choices: {programRules:Java}}
 -----------------------------------------------------
@@ -7703,6 +8068,20 @@ i_minus_i_is_zero {
 \replacewith(Z(0(#))) 
 \heuristics(simplify_int)
 Choices: {}}
+-----------------------------------------------------
+== identityCastDouble (identity cast) =========================================
+identityCastDouble {
+\find(#normalassign ( (modal operator))\[{ .. #loc=(double)#seDouble; ... }\] (post))
+\replacewith(#normalassign ( (modal operator))\[{ .. #loc=#seDouble; ... }\] (post)) 
+\heuristics(simplify_expression)
+Choices: {programRules:Java}}
+-----------------------------------------------------
+== identityCastFloat (identity cast) =========================================
+identityCastFloat {
+\find(#normalassign ( (modal operator))\[{ .. #loc=(float)#seFloat; ... }\] (post))
+\replacewith(#normalassign ( (modal operator))\[{ .. #loc=#seFloat; ... }\] (post)) 
+\heuristics(simplify_expression)
+Choices: {programRules:Java}}
 -----------------------------------------------------
 == if (ifElse) =========================================
 if {
@@ -8953,7 +9332,21 @@ Choices: {programRules:Java}}
 == inequality_comparison_simple (inequality comparison) =========================================
 inequality_comparison_simple {
 \find(#allmodal ( (modal operator))\[{ .. #lhs=#senf0!=#senf1; ... }\] (post))
-\replacewith(update-application(elem-update(#lhs (program LeftHandSide))(if-then-else(equals(#senf0,#senf1),FALSE,TRUE)),#allmodal(post)))
+\replacewith(update-application(elem-update(#lhs (program LeftHandSide))(if-then-else(equals(#senf0,#senf1),FALSE,TRUE)),#allmodal(post))) 
+\heuristics(simplify_prog)
+Choices: {programRules:Java}}
+-----------------------------------------------------
+== inequality_comparison_simple_double (inequality comparison) =========================================
+inequality_comparison_simple_double {
+\find(#allmodal ( (modal operator))\[{ .. #lhs=#seDouble0!=#seDouble1; ... }\] (post))
+\replacewith(update-application(elem-update(#lhs (program LeftHandSide))(if-then-else(eqDouble(#seDouble0,#seDouble1),FALSE,TRUE)),#allmodal(post))) 
+\heuristics(simplify_prog)
+Choices: {programRules:Java}}
+-----------------------------------------------------
+== inequality_comparison_simple_float (inequality comparison) =========================================
+inequality_comparison_simple_float {
+\find(#allmodal ( (modal operator))\[{ .. #lhs=#seFloat0!=#seFloat1; ... }\] (post))
+\replacewith(update-application(elem-update(#lhs (program LeftHandSide))(if-then-else(eqFloat(#seFloat0,#seFloat1),FALSE,TRUE)),#allmodal(post))) 
 \heuristics(simplify_prog)
 Choices: {programRules:Java}}
 -----------------------------------------------------
@@ -9171,6 +9564,20 @@ intDivRem {
 \add [imp(not(equals(divDenom,Z(0(#)))),equals(divNum,add(mul(jdiv(divNum,divDenom),divDenom),jmod(divNum,divDenom))))]==>[] 
 
 Choices: {}}
+-----------------------------------------------------
+== intLongToFloatAddition1 (float addition) =========================================
+intLongToFloatAddition1 {
+\find(#normalassign ( (modal operator))\[{ .. #loc=#seLong+#seFloat; ... }\] (post))
+\replacewith(update-application(elem-update(#loc (program Variable))(javaAddFloat(float::cast(#seLong),#seFloat)),#normalassign(post))) 
+\heuristics(executeFloatAssignment)
+Choices: {programRules:Java}}
+-----------------------------------------------------
+== intToFloatAddition (float addition) =========================================
+intToFloatAddition {
+\find(#normalassign ( (modal operator))\[{ .. #loc=#seCharByteShortInt+#seFloat; ... }\] (post))
+\replacewith(update-application(elem-update(#loc (program Variable))(javaAddFloat(float::cast(#seCharByteShortInt),#seFloat)),#normalassign(post))) 
+\heuristics(executeFloatAssignment)
+Choices: {programRules:Java}}
 -----------------------------------------------------
 == int_diff_minus_eq (int_diff_minus_eq) =========================================
 int_diff_minus_eq {
@@ -9897,7 +10304,21 @@ Choices: {programRules:Java}}
 == less_equal_than_comparison_simple (less-or-equal than distinction) =========================================
 less_equal_than_comparison_simple {
 \find(#allmodal ( (modal operator))\[{ .. #lhs=#senf0<=#senf1; ... }\] (post))
-\replacewith(update-application(elem-update(#lhs (program LeftHandSide))(if-then-else(leq(#senf0,#senf1),TRUE,FALSE)),#allmodal(post)))
+\replacewith(update-application(elem-update(#lhs (program LeftHandSide))(if-then-else(leq(#senf0,#senf1),TRUE,FALSE)),#allmodal(post))) 
+\heuristics(simplify_prog)
+Choices: {programRules:Java}}
+-----------------------------------------------------
+== less_equal_than_comparison_simple_double (less-or-equal than distinction) =========================================
+less_equal_than_comparison_simple_double {
+\find(#allmodal ( (modal operator))\[{ .. #lhs=#seDouble0<=#seDouble1; ... }\] (post))
+\replacewith(update-application(elem-update(#lhs (program LeftHandSide))(if-then-else(leqDouble(#seDouble0,#seDouble1),TRUE,FALSE)),#allmodal(post))) 
+\heuristics(simplify_prog)
+Choices: {programRules:Java}}
+-----------------------------------------------------
+== less_equal_than_comparison_simple_float (less-or-equal than distinction) =========================================
+less_equal_than_comparison_simple_float {
+\find(#allmodal ( (modal operator))\[{ .. #lhs=#seFloat0<=#seFloat1; ... }\] (post))
+\replacewith(update-application(elem-update(#lhs (program LeftHandSide))(if-then-else(leqFloat(#seFloat0,#seFloat1),TRUE,FALSE)),#allmodal(post))) 
 \heuristics(simplify_prog)
 Choices: {programRules:Java}}
 -----------------------------------------------------
@@ -9975,7 +10396,21 @@ Choices: {programRules:Java}}
 == less_than_comparison_simple (lesser than distinction) =========================================
 less_than_comparison_simple {
 \find(#allmodal ( (modal operator))\[{ .. #lhs=#senf0<#senf1; ... }\] (post))
-\replacewith(update-application(elem-update(#lhs (program LeftHandSide))(if-then-else(lt(#senf0,#senf1),TRUE,FALSE)),#allmodal(post)))
+\replacewith(update-application(elem-update(#lhs (program LeftHandSide))(if-then-else(lt(#senf0,#senf1),TRUE,FALSE)),#allmodal(post))) 
+\heuristics(simplify_prog)
+Choices: {programRules:Java}}
+-----------------------------------------------------
+== less_than_comparison_simple_double (lesser than distinction) =========================================
+less_than_comparison_simple_double {
+\find(#allmodal ( (modal operator))\[{ .. #lhs=#seDouble0<#seDouble1; ... }\] (post))
+\replacewith(update-application(elem-update(#lhs (program LeftHandSide))(if-then-else(ltDouble(#seDouble0,#seDouble1),TRUE,FALSE)),#allmodal(post))) 
+\heuristics(simplify_prog)
+Choices: {programRules:Java}}
+-----------------------------------------------------
+== less_than_comparison_simple_float (lesser than distinction) =========================================
+less_than_comparison_simple_float {
+\find(#allmodal ( (modal operator))\[{ .. #lhs=#seFloat0<#seFloat1; ... }\] (post))
+\replacewith(update-application(elem-update(#lhs (program LeftHandSide))(if-then-else(ltFloat(#seFloat0,#seFloat1),TRUE,FALSE)),#allmodal(post))) 
 \heuristics(simplify_prog)
 Choices: {programRules:Java}}
 -----------------------------------------------------
@@ -10286,7 +10721,7 @@ Choices: {programRules:Java}}
 == methodCall (methodCall) =========================================
 methodCall {
 \find(==>#allmodal ( (modal operator))\[{ .. #se.#mn(#selist); ... }\] (post))
-\varcond(\not \staticMethodReference(#se (program SimpleExpression), #mn (program MethodName), #selist (program SimpleExpression)), \mayExpandMethod(#se (program SimpleExpression), #mn (program MethodName), #selist (program SimpleExpression)), )
+\varcond(\not \staticMethodReference(#se (program SimpleExpression), #mn (program MethodName), #selist (program SimpleExpression)), \not \modelMethodReference(#se (program SimpleExpression), #mn (program MethodName), #selist (program SimpleExpression)), \mayExpandMethod(#se (program SimpleExpression), #mn (program MethodName), #selist (program SimpleExpression)), )
 \add [equals(#se,null)]==>[] \replacewith([]==>[false]) ;
 \replacewith([]==>[#allmodal ( (modal operator))\[{ .. method-call(#se.#mn(#selist);) ... }\] (post)]) 
 \heuristics(method_expand)
@@ -10393,7 +10828,7 @@ Choices: {programRules:Java}}
 == methodCallWithAssignment (methodCallWithAssignment) =========================================
 methodCallWithAssignment {
 \find(==>#allmodal ( (modal operator))\[{ .. #lhs=#se.#mn(#selist); ... }\] (post))
-\varcond(\new(#v0 (program Variable), \typeof(#lhs (program LeftHandSide))), \not \staticMethodReference(#se (program SimpleExpression), #mn (program MethodName), #selist (program SimpleExpression)), \mayExpandMethod(#se (program SimpleExpression), #mn (program MethodName), #selist (program SimpleExpression)), )
+\varcond(\new(#v0 (program Variable), \typeof(#lhs (program LeftHandSide))), \not \staticMethodReference(#se (program SimpleExpression), #mn (program MethodName), #selist (program SimpleExpression)), \not \modelMethodReference(#se (program SimpleExpression), #mn (program MethodName), #selist (program SimpleExpression)), \mayExpandMethod(#se (program SimpleExpression), #mn (program MethodName), #selist (program SimpleExpression)), )
 \add [equals(#se,null)]==>[] \replacewith([]==>[false]) ;
 \replacewith([]==>[#allmodal ( (modal operator))\[{ .. #typeof(#lhs) #v0;method-call(#se.#mn(#selist);)#lhs=#v0; ... }\] (post)]) 
 \heuristics(method_expand)
@@ -10433,7 +10868,7 @@ Choices: {initialisation:disableStaticInitialisation,programRules:Java}}
 == methodCallWithinClass (methodCall) =========================================
 methodCallWithinClass {
 \find(#allmodal ( (modal operator))\[{ .. #mn(#elist); ... }\] (post))
-\varcond(\mayExpandMethod(null, #mn (program MethodName), #elist (program Expression)), )
+\varcond(\mayExpandMethod(null, #mn (program MethodName), #elist (program Expression)), \not \modelMethodReference(null, #mn (program MethodName), #elist (program Expression)), )
 \replacewith(#allmodal ( (modal operator))\[{ .. method-call(#mn(#elist);) ... }\] (post)) 
 \heuristics(method_expand)
 Choices: {initialisation:disableStaticInitialisation,programRules:Java}}
@@ -10728,6 +11163,20 @@ narrowingByteCastShort {
 \heuristics(executeIntegerAssignment)
 Choices: {programRules:Java}}
 -----------------------------------------------------
+== narrowingCastFloatToInt (cast) =========================================
+narrowingCastFloatToInt {
+\find(#normalassign ( (modal operator))\[{ .. #loc=(int)#seFloat; ... }\] (post))
+\replacewith(update-application(elem-update(#loc (program Variable))(int::cast(#seFloat)),#normalassign(post))) 
+\heuristics(executeFloatAssignment)
+Choices: {programRules:Java}}
+-----------------------------------------------------
+== narrowingCastFloatToLong (cast) =========================================
+narrowingCastFloatToLong {
+\find(#normalassign ( (modal operator))\[{ .. #loc=(long)#seFloat; ... }\] (post))
+\replacewith(update-application(elem-update(#loc (program Variable))(int::cast(#seFloat)),#normalassign(post))) 
+\heuristics(executeFloatAssignment)
+Choices: {programRules:Java}}
+-----------------------------------------------------
 == narrowingCharCastBigint (cast) =========================================
 narrowingCharCastBigint {
 \find(#allmodal ( (modal operator))\[{ .. #loc=(char)#seBigint; ... }\] (post))
@@ -10874,6 +11323,20 @@ newSym_eq {
 \add [equals(newSymLeft,add(l,newSymDef))]==>[] 
 \heuristics(polySimp_newSmallSym, polySimp_newSym, polySimp_leftNonUnit)
 Choices: {integerSimplificationRules:full}}
+-----------------------------------------------------
+== niceDouble (niceDouble) =========================================
+niceDouble {
+\find(doubleIsNice(arg))
+\replacewith(and(not(doubleIsNaN(arg)),not(doubleIsInfinite(arg)))) 
+\heuristics(simplify)
+Choices: {}}
+-----------------------------------------------------
+== niceFloat (niceFloat) =========================================
+niceFloat {
+\find(floatIsNice(arg))
+\replacewith(and(not(floatIsNaN(arg)),not(floatIsInfinite(arg)))) 
+\heuristics(simplify)
+Choices: {}}
 -----------------------------------------------------
 == nnf_ex2all (nnf_ex2all) =========================================
 nnf_ex2all {
@@ -11510,11 +11973,88 @@ powDef {
 
 Choices: {}}
 -----------------------------------------------------
+== powIsInfinite1 (powIsInfinite1) =========================================
+powIsInfinite1 {
+\find(powDouble(arg1,arg2))
+\add [imp(or(and(and(or(geqDouble(arg1,DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#))))))))))))))))))))),leqDouble(arg1,negDouble(DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#))))))))))))))))))))))),doubleIsInfinite(arg2)),gtDouble(arg2,DFP(0(#)))),and(and(and(ltDouble(arg1,DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#))))))))))))))))))))),gtDouble(arg1,negDouble(DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#))))))))))))))))))))))),doubleIsInfinite(arg2)),ltDouble(arg2,DFP(0(#))))),and(doubleIsInfinite(powDouble(arg1,arg2)),gtDouble(powDouble(arg1,arg2),DFP(0(#)))))]==>[] 
+\heuristics(userTaclets1)
+Choices: {}}
+-----------------------------------------------------
+== powIsInfinite2 (powIsInfinite2) =========================================
+powIsInfinite2 {
+\find(powDouble(arg1,arg2))
+\add [imp(or(and(eqDouble(arg1,DFP(0(#))),ltDouble(arg2,DFP(0(#)))),and(and(doubleIsInfinite(arg1),gtDouble(arg1,DFP(0(#)))),gtDouble(arg2,DFP(0(#))))),and(doubleIsInfinite(powDouble(arg1,arg2)),gtDouble(powDouble(arg1,arg2),DFP(0(#)))))]==>[] 
+\heuristics(userTaclets1)
+Choices: {}}
+-----------------------------------------------------
+== powIsNaN1 (powIsNaN1) =========================================
+powIsNaN1 {
+\find(powDouble(arg1,arg2))
+\add [imp(doubleIsNaN(arg2),doubleIsNaN(powDouble(arg1,arg2)))]==>[] 
+\heuristics(userTaclets1)
+Choices: {}}
+-----------------------------------------------------
+== powIsNaN2 (powIsNaN2) =========================================
+powIsNaN2 {
+\find(powDouble(arg1,arg2))
+\add [imp(and(doubleIsNaN(arg1),not(equals(arg2,DFP(0(#))))),doubleIsNaN(powDouble(arg1,arg2)))]==>[] 
+\heuristics(userTaclets1)
+Choices: {}}
+-----------------------------------------------------
+== powIsNaN3 (powIsNaN3) =========================================
+powIsNaN3 {
+\find(powDouble(arg1,arg2))
+\add [imp(and(or(geqDouble(arg1,DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#))))))))))))))))))))),leqDouble(arg1,negDouble(DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#))))))))))))))))))))))),doubleIsInfinite(arg2)),doubleIsNaN(powDouble(arg1,arg2)))]==>[] 
+\heuristics(userTaclets1)
+Choices: {}}
+-----------------------------------------------------
+== powIsNotNaN (powIsNotNaN) =========================================
+powIsNotNaN {
+\find(powDouble(arg1,arg2))
+\add [imp(and(not(doubleIsNaN(arg1)),equals(arg2,DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#)))))))))))))))))))))),equals(powDouble(arg1,arg2),arg1))]==>[] 
+\heuristics(userTaclets1)
+Choices: {}}
+-----------------------------------------------------
+== powIsOne (powIsOne) =========================================
+powIsOne {
+\find(powDouble(arg1,arg2))
+\add [imp(equals(arg2,DFP(0(#))),equals(powDouble(arg1,arg2),DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#))))))))))))))))))))))]==>[] 
+\heuristics(userTaclets1)
+Choices: {}}
+-----------------------------------------------------
+== powIsZero1 (powIsZero1) =========================================
+powIsZero1 {
+\find(powDouble(arg1,arg2))
+\add [imp(or(and(and(or(geqDouble(arg1,DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#))))))))))))))))))))),leqDouble(arg1,negDouble(DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#))))))))))))))))))))))),doubleIsInfinite(arg2)),ltDouble(arg2,DFP(0(#)))),and(and(and(ltDouble(arg1,DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#))))))))))))))))))))),gtDouble(arg1,negDouble(DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#))))))))))))))))))))))),doubleIsInfinite(arg2)),gtDouble(arg2,DFP(0(#))))),equals(powDouble(arg1,arg2),DFP(0(#))))]==>[] 
+\heuristics(userTaclets1)
+Choices: {}}
+-----------------------------------------------------
+== powIsZero2 (powIsZero2) =========================================
+powIsZero2 {
+\find(powDouble(arg1,arg2))
+\add [imp(or(and(eqDouble(arg1,DFP(0(#))),gtDouble(arg2,DFP(0(#)))),and(and(doubleIsInfinite(arg1),gtDouble(arg1,DFP(0(#)))),ltDouble(arg2,DFP(0(#))))),equals(powDouble(arg1,arg2),DFP(0(#))))]==>[] 
+\heuristics(userTaclets1)
+Choices: {}}
+-----------------------------------------------------
 == pow_literals (pow_literals) =========================================
 pow_literals {
 \find(pow(Z(iz),Z(jz)))
 \replacewith(#pow(Z(iz),Z(jz))) 
 \heuristics(simplify_literals)
+Choices: {}}
+-----------------------------------------------------
+== precOfDouble (precOfDouble) =========================================
+precOfDouble {
+\find(prec(d1,d2))
+\replacewith(ltDouble(d1,d2)) 
+\heuristics(simplify)
+Choices: {}}
+-----------------------------------------------------
+== precOfFloat (precOfFloat) =========================================
+precOfFloat {
+\find(prec(f1,f2))
+\replacewith(ltFloat(f1,f2)) 
+\heuristics(simplify)
 Choices: {}}
 -----------------------------------------------------
 == precOfInt (precOfInt) =========================================
@@ -12999,6 +13539,62 @@ simplifyUpdate3 {
 \heuristics(update_elim)
 Choices: {}}
 -----------------------------------------------------
+== sinIsNaN (sinIsNaN) =========================================
+sinIsNaN {
+\find(sinDouble(arg))
+\add [imp(or(doubleIsNaN(arg),doubleIsInfinite(arg)),doubleIsNaN(sinDouble(arg)))]==>[] 
+\heuristics(userTaclets1)
+Choices: {}}
+-----------------------------------------------------
+== sinIsNotNaN (sinIsNotNaN) =========================================
+sinIsNotNaN {
+\find(sinDouble(arg))
+\add [imp(and(not(doubleIsNaN(arg)),not(doubleIsInfinite(arg))),not(doubleIsNaN(sinDouble(arg))))]==>[] 
+\heuristics(userTaclets1)
+Choices: {}}
+-----------------------------------------------------
+== sinRange2 (sinRange2) =========================================
+sinRange2 {
+\find(sinDouble(arg))
+\add [imp(and(not(doubleIsNaN(arg)),not(doubleIsInfinite(arg))),and(geqDouble(sinDouble(arg),negDouble(DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#)))))))))))))))))))))),leqDouble(sinDouble(arg),DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#)))))))))))))))))))))))]==>[] 
+\heuristics(userTaclets1)
+Choices: {}}
+-----------------------------------------------------
+== sinRange3 (sinRange3) =========================================
+sinRange3 {
+\find(sinDouble(arg))
+\add [imp(and(not(doubleIsNaN(arg)),not(doubleIsInfinite(arg))),and(geqDouble(mulDouble(sinDouble(arg),sinDouble(arg)),DFP(0(#))),leqDouble(mulDouble(sinDouble(arg),sinDouble(arg)),DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#)))))))))))))))))))))))]==>[] 
+\heuristics(userTaclets1)
+Choices: {}}
+-----------------------------------------------------
+== sineIsNaNAlt (sineIsNaNAlt) =========================================
+sineIsNaNAlt {
+\find(doubleIsNaN(sinDouble(arg)))
+\replacewith(or(doubleIsNaN(arg),doubleIsInfinite(arg))) 
+\heuristics(simplify)
+Choices: {}}
+-----------------------------------------------------
+== sineIsZero (sineIsZero) =========================================
+sineIsZero {
+\find(sinDouble(arg))
+\add [imp(equals(arg,DFP(0(#))),equals(sinDouble(arg),DFP(0(#))))]==>[] 
+\heuristics(userTaclets1)
+Choices: {}}
+-----------------------------------------------------
+== sineRange (sineRange) =========================================
+sineRange {
+\find(sinDouble(arg))
+\add [or(and(geqDouble(sinDouble(arg),negDouble(DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#)))))))))))))))))))))),leqDouble(sinDouble(arg),DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#)))))))))))))))))))))),doubleIsNaN(sinDouble(arg)))]==>[] 
+\heuristics(userTaclets1)
+Choices: {}}
+-----------------------------------------------------
+== sineRangeAlt (sineRangeAlt) =========================================
+sineRangeAlt {
+\find(==>doubleIsNaN(sinDouble(arg)))
+\add [and(geqDouble(sinDouble(arg),negDouble(DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#)))))))))))))))))))))),leqDouble(sinDouble(arg),DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#))))))))))))))))))))))]==>[] 
+\heuristics(userTaclets1)
+Choices: {}}
+-----------------------------------------------------
 == singletonAssignment (singletonAssignment) =========================================
 singletonAssignment {
 \find(#allmodal ( (modal operator))\[{ .. #v=\singleton(#seObj.#a); ... }\] (post))
@@ -13110,6 +13706,41 @@ split_or_strong {
 
 Choices: {}}
 -----------------------------------------------------
+== sqrtIsInfinite (sqrtIsInfinite) =========================================
+sqrtIsInfinite {
+\find(sqrtDouble(arg))
+\add [imp(and(doubleIsInfinite(arg),gtDouble(arg,DFP(0(#)))),and(doubleIsInfinite(sqrtDouble(arg)),gtDouble(sqrtDouble(arg),DFP(0(#)))))]==>[] 
+\heuristics(userTaclets1)
+Choices: {}}
+-----------------------------------------------------
+== sqrtIsNaN (sqrtIsNaN) =========================================
+sqrtIsNaN {
+\find(sqrtDouble(arg))
+\add [imp(or(doubleIsNaN(arg),ltDouble(arg,DFP(0(#)))),doubleIsNaN(sqrtDouble(arg)))]==>[] 
+\heuristics(userTaclets1)
+Choices: {}}
+-----------------------------------------------------
+== sqrtIsNotNaN (sqrtIsNotNaN) =========================================
+sqrtIsNotNaN {
+\find(sqrtDouble(arg))
+\add [imp(and(not(doubleIsNaN(arg)),geqDouble(arg,DFP(0(#)))),not(doubleIsNaN(sqrtDouble(arg))))]==>[] 
+\heuristics(userTaclets1)
+Choices: {}}
+-----------------------------------------------------
+== sqrtIsSmaller (sqrtIsSmaller) =========================================
+sqrtIsSmaller {
+\find(sqrtDouble(arg))
+\add [imp(and(not(doubleIsInfinite(arg)),gtDouble(arg,DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#)))))))))))))))))))))),ltDouble(sqrtDouble(arg),arg))]==>[] 
+\heuristics(userTaclets1)
+Choices: {}}
+-----------------------------------------------------
+== sqrtIsZero (sqrtIsZero) =========================================
+sqrtIsZero {
+\find(sqrtDouble(arg))
+\add [imp(equals(arg,DFP(0(#))),equals(sqrtDouble(arg),DFP(0(#))))]==>[] 
+\heuristics(userTaclets1)
+Choices: {}}
+-----------------------------------------------------
 == square_nonneg (square_nonneg) =========================================
 square_nonneg {
 \find(leq(Z(0(#)),mul(i0,i0)))
@@ -13127,7 +13758,7 @@ Choices: {Strings:on}}
 == staticMethodCall (methodCall) =========================================
 staticMethodCall {
 \find(#allmodal ( (modal operator))\[{ .. #se.#mn(#elist); ... }\] (post))
-\varcond(\staticMethodReference(#se (program SimpleExpression), #mn (program MethodName), #elist (program Expression)), )
+\varcond(\staticMethodReference(#se (program SimpleExpression), #mn (program MethodName), #elist (program Expression)), \not \modelMethodReference(#se (program SimpleExpression), #mn (program MethodName), #selist (program SimpleExpression)), )
 \replacewith(#allmodal ( (modal operator))\[{ .. method-call(#se.#mn(#elist);) ... }\] (post)) 
 \heuristics(method_expand)
 Choices: {initialisation:disableStaticInitialisation,programRules:Java}}
@@ -13135,6 +13766,7 @@ Choices: {initialisation:disableStaticInitialisation,programRules:Java}}
 == staticMethodCallStaticViaTypereference (methodCall) =========================================
 staticMethodCallStaticViaTypereference {
 \find(#allmodal ( (modal operator))\[{ .. #t.#mn(#elist); ... }\] (post))
+\varcond(\not \modelMethodReference(#t (program Type), #mn (program MethodName), #elist (program Expression)), )
 \replacewith(#allmodal ( (modal operator))\[{ .. method-call(#t.#mn(#elist);) ... }\] (post)) 
 \heuristics(method_expand)
 Choices: {initialisation:disableStaticInitialisation,programRules:Java}}
@@ -13142,7 +13774,7 @@ Choices: {initialisation:disableStaticInitialisation,programRules:Java}}
 == staticMethodCallStaticWithAssignmentViaTypereference (methodCall) =========================================
 staticMethodCallStaticWithAssignmentViaTypereference {
 \find(#allmodal ( (modal operator))\[{ .. #lhs=#t.#mn(#elist); ... }\] (post))
-\varcond(\new(#v0 (program Variable), \typeof(#lhs (program LeftHandSide))))
+\varcond(\new(#v0 (program Variable), \typeof(#lhs (program LeftHandSide))), \not \modelMethodReference(#t (program Type), #mn (program MethodName), #elist (program Expression)), )
 \replacewith(#allmodal ( (modal operator))\[{ .. #typeof(#lhs) #v0;method-call(#t.#mn(#elist);)#lhs=#v0; ... }\] (post)) 
 \heuristics(method_expand)
 Choices: {initialisation:disableStaticInitialisation,programRules:Java}}
@@ -13150,10 +13782,27 @@ Choices: {initialisation:disableStaticInitialisation,programRules:Java}}
 == staticMethodCallWithAssignment (methodCall) =========================================
 staticMethodCallWithAssignment {
 \find(#allmodal ( (modal operator))\[{ .. #lhs=#se.#mn(#elist); ... }\] (post))
-\varcond(\new(#v0 (program Variable), \typeof(#lhs (program LeftHandSide))), \staticMethodReference(#se (program SimpleExpression), #mn (program MethodName), #elist (program Expression)), )
+\varcond(\new(#v0 (program Variable), \typeof(#lhs (program LeftHandSide))), \staticMethodReference(#se (program SimpleExpression), #mn (program MethodName), #elist (program Expression)), \not \modelMethodReference(#se (program SimpleExpression), #mn (program MethodName), #elist (program Expression)), )
 \replacewith(#allmodal ( (modal operator))\[{ .. #typeof(#lhs) #v0;method-call(#se.#mn(#elist);)#lhs=#v0; ... }\] (post)) 
 \heuristics(method_expand)
 Choices: {initialisation:disableStaticInitialisation,programRules:Java}}
+-----------------------------------------------------
+== staticStrictlyPureMethodCallWithAssignment (staticStrictlyPureMethodCallWithAssignment) =========================================
+staticStrictlyPureMethodCallWithAssignment {
+\find(==>#allmodal ( (modal operator))\[{ .. #lhs=#t.#mn(#selist); ... }\] (post))
+\varcond(\strictlyPureMethodCall(#t (program Type), #mn (program MethodName), #selist (program SimpleExpression), result (any term)), )
+\replacewith([]==>[update-application(elem-update(#lhs (program LeftHandSide))(result),#allmodal(post))]) 
+
+Choices: {programRules:Java}}
+-----------------------------------------------------
+== strictlyPureMethodCallWithAssignment (strictlyPureMethodCallWithAssignment) =========================================
+strictlyPureMethodCallWithAssignment {
+\find(==>#allmodal ( (modal operator))\[{ .. #lhs=#se.#mn(#selist); ... }\] (post))
+\varcond(\strictlyPureMethodCall(#se (program SimpleExpression), #mn (program MethodName), #selist (program SimpleExpression), result (any term)), )
+\add [equals(#se,null)]==>[] \replacewith([]==>[false]) ;
+\replacewith([]==>[update-application(elem-update(#lhs (program LeftHandSide))(result),#allmodal(post))]) 
+\heuristics(simplify_prog)
+Choices: {programRules:Java}}
 -----------------------------------------------------
 == stringAssignment (stringAssignment) =========================================
 stringAssignment {
@@ -13669,6 +14318,20 @@ synchronizedBlockEvalSync {
 \replacewith(#allmodal ( (modal operator))\[{ .. #typeof(#nsencr) #loc = #nsencr;synchronized(#loc) {#slist} ... }\] (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: {programRules:Java}}
+-----------------------------------------------------
+== tanIsNaN (tanIsNaN) =========================================
+tanIsNaN {
+\find(tanDouble(arg))
+\add [imp(or(doubleIsNaN(arg),doubleIsInfinite(arg)),doubleIsNaN(tanDouble(arg)))]==>[] 
+\heuristics(userTaclets1)
+Choices: {}}
+-----------------------------------------------------
+== tanIsZero (tanIsZero) =========================================
+tanIsZero {
+\find(tanDouble(arg))
+\add [imp(equals(arg,DFP(0(#))),equals(tanDouble(arg),DFP(0(#))))]==>[] 
+\heuristics(userTaclets1)
+Choices: {}}
 -----------------------------------------------------
 == theorem_of_archimedes (theorem_of_archimedes) =========================================
 theorem_of_archimedes {
@@ -14298,6 +14961,20 @@ unaryMinusBigint {
 \heuristics(executeIntegerAssignment)
 Choices: {bigint:on,programRules:Java}}
 -----------------------------------------------------
+== unaryMinusDouble (unaryMinus) =========================================
+unaryMinusDouble {
+\find(#normalassign ( (modal operator))\[{ .. #loc=-#seDouble; ... }\] (post))
+\replacewith(update-application(elem-update(#loc (program Variable))(javaUnaryMinusDouble(#seDouble)),#normalassign(post))) 
+\heuristics(executeFloatAssignment)
+Choices: {programRules:Java}}
+-----------------------------------------------------
+== unaryMinusFloat (unaryMinus) =========================================
+unaryMinusFloat {
+\find(#normalassign ( (modal operator))\[{ .. #loc=-#seFloat; ... }\] (post))
+\replacewith(update-application(elem-update(#loc (program Variable))(javaUnaryMinusFloat(#seFloat)),#normalassign(post))) 
+\heuristics(executeFloatAssignment)
+Choices: {programRules:Java}}
+-----------------------------------------------------
 == unaryMinusInt (unaryMinus) =========================================
 unaryMinusInt {
 \find(#normalassign ( (modal operator))\[{ .. #loc=-#seCharByteShortInt; ... }\] (post))
@@ -14603,6 +15280,20 @@ wellFormedStorePrimitiveEQ {
 \sameUpdateLevel\succedentPolarity\varcond(\not\sub(beta, java.lang.Object), \not\sub(beta, LocSet), )
 \replacewith(wellFormed(h)) 
 \heuristics(concrete)
+Choices: {programRules:Java}}
+-----------------------------------------------------
+== wideningCastIntToFloat (cast) =========================================
+wideningCastIntToFloat {
+\find(#normalassign ( (modal operator))\[{ .. #loc=(float)#seCharByteShortInt; ... }\] (post))
+\replacewith(update-application(elem-update(#loc (program Variable))(float::cast(#seCharByteShortInt)),#normalassign(post))) 
+\heuristics(executeFloatAssignment)
+Choices: {programRules:Java}}
+-----------------------------------------------------
+== wideningCastLongToFloat (cast) =========================================
+wideningCastLongToFloat {
+\find(#normalassign ( (modal operator))\[{ .. #loc=(float)#seLong; ... }\] (post))
+\replacewith(update-application(elem-update(#loc (program Variable))(float::cast(#seLong)),#normalassign(post))) 
+\heuristics(executeFloatAssignment)
 Choices: {programRules:Java}}
 -----------------------------------------------------
 == widening_identity_cast_1 (cast) =========================================

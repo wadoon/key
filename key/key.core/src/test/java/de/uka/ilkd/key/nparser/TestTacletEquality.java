@@ -12,6 +12,7 @@ import de.uka.ilkd.key.util.HelperClassForTests;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -91,6 +92,7 @@ public class TestTacletEquality {
         }
     }
 
+    // @Test
     public void createNewOracle() {
         var path = Paths.get("src/test/resources/de/uka/ilkd/key/nparser/taclets.new.txt");
         var taclets = new ArrayList<>(initConfig.activatedTaclets());
