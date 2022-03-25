@@ -9,3 +9,4 @@ MathSAT.props
 Princess.props
 veriT.props
 vampire.props
+AltErgo.props
