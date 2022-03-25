@@ -190,7 +190,7 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SoliditySpecVisitor
         if (type != null) { // identifier is function parameter
             return new SMLExpr(type, ident);
         } else if (ident.equals("this")) {
-            return new SMLExpr("","this");
+            return new SMLExpr("","self");
         } else {
             if (env.enums.contains(ident) || env.enums.contains(env.vars.get(ident))) {
                 type = contractNameInPOs + "." + (env.enums.contains(ident) ? ident : env.vars.get(ident));
