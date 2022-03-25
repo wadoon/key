@@ -91,12 +91,15 @@ public final class ModelMethodCondition extends VariableConditionAdapter {
     public boolean check(SchemaVariable var, SVSubstitute subst,
                          SVInstantiations svInst, Services services) {
 
-        ReferencePrefix rp = (ReferencePrefix) svInst.getInstantiation(caller);
+        ReferencePrefix rp = null;
+        if(caller != null) {
+           rp = (ReferencePrefix) svInst.getInstantiation(caller);
+        }
         MethodName mn = (MethodName) svInst.getInstantiation(methname);
         ImmutableArray<ProgramElement> ape =
                 (ImmutableArray<ProgramElement>) svInst.getInstantiation(args);
 
-        if (rp != null && mn != null && ape != null) {
+        if ((caller == null || rp != null) && mn != null && ape != null) {
             ImmutableArray<Expression> ar
                     = toExpArray((ImmutableArray<ProgramElement>)svInst.getInstantiation(args));
             if (var == args) {
@@ -104,17 +107,19 @@ public final class ModelMethodCondition extends VariableConditionAdapter {
             }
             ExecutionContext ec
                     = svInst.getContextInstantiation().activeStatementContext();
-            MethodReference mr =new MethodReference(ar, mn, rp);
+            MethodReference mr = new MethodReference(ar, mn, rp);
             KeYJavaType prefixType;
             // static vs. instance method
             if (rp instanceof Expression) {
                 prefixType = services.getTypeConverter().getKeYJavaType((Expression) rp, ec);
-            } else {
-                assert rp instanceof TypeRef;
+            } else if(rp instanceof TypeRef) {
                 prefixType = ((TypeRef)rp).getKeYJavaType();
+            } else {
+                assert ec != null;
+                prefixType = ec.getTypeReference().getKeYJavaType();
             }
             IProgramMethod method;
-            if (ec!=null) {
+            if (ec != null) {
                 method = mr.method(services, prefixType, ec);
                 // we are only interested in the signature. The method
                 // must be declared in the static context.
