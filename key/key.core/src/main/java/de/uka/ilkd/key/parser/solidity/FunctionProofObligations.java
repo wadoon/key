@@ -1,3 +1,5 @@
+package de.uka.ilkd.key.parser.solidity;
+
 import java.util.*;
 
 class FunctionProofObligations {

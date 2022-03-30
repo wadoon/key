@@ -1,8 +1,8 @@
-import java.util.*;
-import java.io.File;
+package de.uka.ilkd.key.parser.solidity;
+
+import de.uka.ilkd.key.parser.solidity.Solidity;
+
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -21,7 +21,6 @@ public class SpecCompilerUtils {
     public static final String VARCOND_PLACEHOLDER = "__varcond_placeholder__";
     public static final String HEAP_UPDATE_PLACEHOLDER = "__heap_update_placeholder__";
 
-
     public enum HeapType {
         HEAP("heap"), OLD_HEAP("savedHeap"), HEAP_H("h");
 
@@ -30,30 +29,10 @@ public class SpecCompilerUtils {
         public String toString() {return str;}
     };
 
-    public static String solidityToJavaType(String solType) {
-        String ret;
-        switch (solType) {
-            case "uint":
-            case "uint256":
-                ret = "int";
-                break;
-            case "bool":
-                ret = "boolean";
-                break;
-            case "address":
-                ret = "Address";
-                break;
-            default:
-                ret = solType;
-                break;
-        }
-        return ret;
-    }
-
-    public static String loadTemplate(Environment.UnitType type) {
-        String fileName = type == Environment.UnitType.CONTRACT ? 
+    public static String loadTemplate(Solidity.ContractType type) {
+        String fileName = type == Solidity.ContractType.CONTRACT ?
             CONTRACT_TEMPLATE_FILE :
-            (type == Environment.UnitType.LIBRARY ? 
+            (type == Solidity.ContractType.LIBRARY ?
                 LIBRARY_TEMPLATE_FILE : 
                 null);
         try {
@@ -67,5 +46,4 @@ public class SpecCompilerUtils {
     public static String injectHeap(HeapType heap, String str) {
         return str.replaceAll(SpecCompilerUtils.HEAP_PLACEHOLDER_STRING,heap.toString());
     }
-
 }

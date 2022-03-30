@@ -1,7 +1,5 @@
-// Generated from /chalmers/users/niklon/key/key/key.core/src/main/antlr/de/uka/ilkd/key/parser/Solidity.g4 by ANTLR 4.9
-
+// Generated from Solidity.g4 by ANTLR 4.9.3
 package de.uka.ilkd.key.parser.solidity;
-
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**
@@ -249,6 +247,100 @@ public interface SolidityListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitEnumDefinition(SolidityParser.EnumDefinitionContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link SolidityParser#specDefinition}.
+	 * @param ctx the parse tree
+	 */
+	void enterSpecDefinition(SolidityParser.SpecDefinitionContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link SolidityParser#specDefinition}.
+	 * @param ctx the parse tree
+	 */
+	void exitSpecDefinition(SolidityParser.SpecDefinitionContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code specOnlyIf}
+	 * labeled alternative in {@link SolidityParser#specExpression}.
+	 * @param ctx the parse tree
+	 */
+	void enterSpecOnlyIf(SolidityParser.SpecOnlyIfContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code specOnlyIf}
+	 * labeled alternative in {@link SolidityParser#specExpression}.
+	 * @param ctx the parse tree
+	 */
+	void exitSpecOnlyIf(SolidityParser.SpecOnlyIfContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code specAssumes}
+	 * labeled alternative in {@link SolidityParser#specExpression}.
+	 * @param ctx the parse tree
+	 */
+	void enterSpecAssumes(SolidityParser.SpecAssumesContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code specAssumes}
+	 * labeled alternative in {@link SolidityParser#specExpression}.
+	 * @param ctx the parse tree
+	 */
+	void exitSpecAssumes(SolidityParser.SpecAssumesContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code specOnSuccess}
+	 * labeled alternative in {@link SolidityParser#specExpression}.
+	 * @param ctx the parse tree
+	 */
+	void enterSpecOnSuccess(SolidityParser.SpecOnSuccessContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code specOnSuccess}
+	 * labeled alternative in {@link SolidityParser#specExpression}.
+	 * @param ctx the parse tree
+	 */
+	void exitSpecOnSuccess(SolidityParser.SpecOnSuccessContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code specContractInvariant}
+	 * labeled alternative in {@link SolidityParser#specExpression}.
+	 * @param ctx the parse tree
+	 */
+	void enterSpecContractInvariant(SolidityParser.SpecContractInvariantContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code specContractInvariant}
+	 * labeled alternative in {@link SolidityParser#specExpression}.
+	 * @param ctx the parse tree
+	 */
+	void exitSpecContractInvariant(SolidityParser.SpecContractInvariantContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code specLibraryInvariant}
+	 * labeled alternative in {@link SolidityParser#specExpression}.
+	 * @param ctx the parse tree
+	 */
+	void enterSpecLibraryInvariant(SolidityParser.SpecLibraryInvariantContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code specLibraryInvariant}
+	 * labeled alternative in {@link SolidityParser#specExpression}.
+	 * @param ctx the parse tree
+	 */
+	void exitSpecLibraryInvariant(SolidityParser.SpecLibraryInvariantContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code specAssignable}
+	 * labeled alternative in {@link SolidityParser#specExpression}.
+	 * @param ctx the parse tree
+	 */
+	void enterSpecAssignable(SolidityParser.SpecAssignableContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code specAssignable}
+	 * labeled alternative in {@link SolidityParser#specExpression}.
+	 * @param ctx the parse tree
+	 */
+	void exitSpecAssignable(SolidityParser.SpecAssignableContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code specObservesInvariantFor}
+	 * labeled alternative in {@link SolidityParser#specExpression}.
+	 * @param ctx the parse tree
+	 */
+	void enterSpecObservesInvariantFor(SolidityParser.SpecObservesInvariantForContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code specObservesInvariantFor}
+	 * labeled alternative in {@link SolidityParser#specExpression}.
+	 * @param ctx the parse tree
+	 */
+	void exitSpecObservesInvariantFor(SolidityParser.SpecObservesInvariantForContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link SolidityParser#parameterList}.
 	 * @param ctx the parse tree
@@ -570,6 +662,30 @@ public interface SolidityListener extends ParseTreeListener {
 	 */
 	void exitElementaryTypeName(SolidityParser.ElementaryTypeNameContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code equivalenceExpression}
+	 * labeled alternative in {@link SolidityParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void enterEquivalenceExpression(SolidityParser.EquivalenceExpressionContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code equivalenceExpression}
+	 * labeled alternative in {@link SolidityParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void exitEquivalenceExpression(SolidityParser.EquivalenceExpressionContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code netExpression}
+	 * labeled alternative in {@link SolidityParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void enterNetExpression(SolidityParser.NetExpressionContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code netExpression}
+	 * labeled alternative in {@link SolidityParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void exitNetExpression(SolidityParser.NetExpressionContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code additiveExpression}
 	 * labeled alternative in {@link SolidityParser#expression}.
 	 * @param ctx the parse tree
@@ -677,6 +793,30 @@ public interface SolidityListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitCompExpression(SolidityParser.CompExpressionContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code forallExpression}
+	 * labeled alternative in {@link SolidityParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void enterForallExpression(SolidityParser.ForallExpressionContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code forallExpression}
+	 * labeled alternative in {@link SolidityParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void exitForallExpression(SolidityParser.ForallExpressionContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code existsExpression}
+	 * labeled alternative in {@link SolidityParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void enterExistsExpression(SolidityParser.ExistsExpressionContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code existsExpression}
+	 * labeled alternative in {@link SolidityParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void exitExistsExpression(SolidityParser.ExistsExpressionContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code bitwiseAndExpression}
 	 * labeled alternative in {@link SolidityParser#expression}.
@@ -810,6 +950,18 @@ public interface SolidityListener extends ParseTreeListener {
 	 */
 	void exitPowerExpression(SolidityParser.PowerExpressionContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code grossFromExpression}
+	 * labeled alternative in {@link SolidityParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void enterGrossFromExpression(SolidityParser.GrossFromExpressionContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code grossFromExpression}
+	 * labeled alternative in {@link SolidityParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void exitGrossFromExpression(SolidityParser.GrossFromExpressionContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code bitwiseOrExpression}
 	 * labeled alternative in {@link SolidityParser#expression}.
 	 * @param ctx the parse tree
@@ -857,6 +1009,66 @@ public interface SolidityListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitEqualityExpression(SolidityParser.EqualityExpressionContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code grossToExpression}
+	 * labeled alternative in {@link SolidityParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void enterGrossToExpression(SolidityParser.GrossToExpressionContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code grossToExpression}
+	 * labeled alternative in {@link SolidityParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void exitGrossToExpression(SolidityParser.GrossToExpressionContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code implicationExpression}
+	 * labeled alternative in {@link SolidityParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void enterImplicationExpression(SolidityParser.ImplicationExpressionContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code implicationExpression}
+	 * labeled alternative in {@link SolidityParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void exitImplicationExpression(SolidityParser.ImplicationExpressionContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code oldExpression}
+	 * labeled alternative in {@link SolidityParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void enterOldExpression(SolidityParser.OldExpressionContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code oldExpression}
+	 * labeled alternative in {@link SolidityParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void exitOldExpression(SolidityParser.OldExpressionContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code onlyIfExpression}
+	 * labeled alternative in {@link SolidityParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void enterOnlyIfExpression(SolidityParser.OnlyIfExpressionContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code onlyIfExpression}
+	 * labeled alternative in {@link SolidityParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void exitOnlyIfExpression(SolidityParser.OnlyIfExpressionContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code resultExpression}
+	 * labeled alternative in {@link SolidityParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void enterResultExpression(SolidityParser.ResultExpressionContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code resultExpression}
+	 * labeled alternative in {@link SolidityParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void exitResultExpression(SolidityParser.ResultExpressionContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code ternaryExpression}
 	 * labeled alternative in {@link SolidityParser#expression}.

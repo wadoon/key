@@ -97,7 +97,8 @@ returnParameters
 
 modifierList
   : ( modifierInvocation | stateMutability | ExternalKeyword
-    | PublicKeyword | InternalKeyword | PrivateKeyword )* ;
+    | PublicKeyword | InternalKeyword | PrivateKeyword
+	| VirtualKeyword | OverrideKeyword )* ;
 
 eventDefinition
   : 'event' identifier eventParameterList AnonymousKeyword? ';' ;
@@ -115,7 +116,7 @@ specExpression
   : 'only_if' expressionStatement		#specOnlyIf
   | 'assumes' expressionStatement		#specAssumes
   | 'on_success' expressionStatement		#specOnSuccess
-  | 'class_invariant' expressionStatement	#specClassInvariant
+  | 'contract_invariant' expressionStatement	#specContractInvariant
   | 'invariant_for' typeName Identifier ';'
     expressionStatement	                    #specLibraryInvariant
   | 'assignable' expression (',' expression)*     #specAssignable
@@ -463,6 +464,8 @@ PrivateKeyword : 'private' ;
 PublicKeyword : 'public' ;
 PureKeyword : 'pure' ;
 ViewKeyword : 'view' ;
+VirtualKeyword : 'virtual' ;
+OverrideKeyword : 'override' ;
 
 
 Identifier

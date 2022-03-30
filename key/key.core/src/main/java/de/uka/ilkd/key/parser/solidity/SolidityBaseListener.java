@@ -1,7 +1,5 @@
-// Generated from /chalmers/users/niklon/key/key/key.core/src/main/antlr/de/uka/ilkd/key/parser/Solidity.g4 by ANTLR 4.9
-
+// Generated from Solidity.g4 by ANTLR 4.9.3
 package de.uka.ilkd.key.parser.solidity;
-
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
@@ -301,6 +299,102 @@ public class SolidityBaseListener implements SolidityListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitEnumDefinition(SolidityParser.EnumDefinitionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterSpecDefinition(SolidityParser.SpecDefinitionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitSpecDefinition(SolidityParser.SpecDefinitionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterSpecOnlyIf(SolidityParser.SpecOnlyIfContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitSpecOnlyIf(SolidityParser.SpecOnlyIfContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterSpecAssumes(SolidityParser.SpecAssumesContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitSpecAssumes(SolidityParser.SpecAssumesContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterSpecOnSuccess(SolidityParser.SpecOnSuccessContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitSpecOnSuccess(SolidityParser.SpecOnSuccessContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterSpecContractInvariant(SolidityParser.SpecContractInvariantContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitSpecContractInvariant(SolidityParser.SpecContractInvariantContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterSpecLibraryInvariant(SolidityParser.SpecLibraryInvariantContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitSpecLibraryInvariant(SolidityParser.SpecLibraryInvariantContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterSpecAssignable(SolidityParser.SpecAssignableContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitSpecAssignable(SolidityParser.SpecAssignableContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterSpecObservesInvariantFor(SolidityParser.SpecObservesInvariantForContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitSpecObservesInvariantFor(SolidityParser.SpecObservesInvariantForContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -690,6 +784,30 @@ public class SolidityBaseListener implements SolidityListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterEquivalenceExpression(SolidityParser.EquivalenceExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitEquivalenceExpression(SolidityParser.EquivalenceExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterNetExpression(SolidityParser.NetExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitNetExpression(SolidityParser.NetExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterAdditiveExpression(SolidityParser.AdditiveExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -793,6 +911,30 @@ public class SolidityBaseListener implements SolidityListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitCompExpression(SolidityParser.CompExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterForallExpression(SolidityParser.ForallExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitForallExpression(SolidityParser.ForallExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterExistsExpression(SolidityParser.ExistsExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitExistsExpression(SolidityParser.ExistsExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -930,6 +1072,18 @@ public class SolidityBaseListener implements SolidityListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterGrossFromExpression(SolidityParser.GrossFromExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitGrossFromExpression(SolidityParser.GrossFromExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterBitwiseOrExpression(SolidityParser.BitwiseOrExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -973,6 +1127,66 @@ public class SolidityBaseListener implements SolidityListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitEqualityExpression(SolidityParser.EqualityExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterGrossToExpression(SolidityParser.GrossToExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitGrossToExpression(SolidityParser.GrossToExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterImplicationExpression(SolidityParser.ImplicationExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitImplicationExpression(SolidityParser.ImplicationExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterOldExpression(SolidityParser.OldExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitOldExpression(SolidityParser.OldExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterOnlyIfExpression(SolidityParser.OnlyIfExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitOnlyIfExpression(SolidityParser.OnlyIfExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterResultExpression(SolidityParser.ResultExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitResultExpression(SolidityParser.ResultExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

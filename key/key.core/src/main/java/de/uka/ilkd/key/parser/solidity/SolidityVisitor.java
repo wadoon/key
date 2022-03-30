@@ -1,7 +1,5 @@
-// Generated from /chalmers/users/niklon/key/key/key.core/src/main/antlr/de/uka/ilkd/key/parser/Solidity.g4 by ANTLR 4.9
-
+// Generated from Solidity.g4 by ANTLR 4.9.3
 package de.uka.ilkd.key.parser.solidity;
-
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
 /**
@@ -156,6 +154,61 @@ public interface SolidityVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitEnumDefinition(SolidityParser.EnumDefinitionContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link SolidityParser#specDefinition}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSpecDefinition(SolidityParser.SpecDefinitionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code specOnlyIf}
+	 * labeled alternative in {@link SolidityParser#specExpression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSpecOnlyIf(SolidityParser.SpecOnlyIfContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code specAssumes}
+	 * labeled alternative in {@link SolidityParser#specExpression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSpecAssumes(SolidityParser.SpecAssumesContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code specOnSuccess}
+	 * labeled alternative in {@link SolidityParser#specExpression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSpecOnSuccess(SolidityParser.SpecOnSuccessContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code specContractInvariant}
+	 * labeled alternative in {@link SolidityParser#specExpression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSpecContractInvariant(SolidityParser.SpecContractInvariantContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code specLibraryInvariant}
+	 * labeled alternative in {@link SolidityParser#specExpression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSpecLibraryInvariant(SolidityParser.SpecLibraryInvariantContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code specAssignable}
+	 * labeled alternative in {@link SolidityParser#specExpression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSpecAssignable(SolidityParser.SpecAssignableContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code specObservesInvariantFor}
+	 * labeled alternative in {@link SolidityParser#specExpression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSpecObservesInvariantFor(SolidityParser.SpecObservesInvariantForContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link SolidityParser#parameterList}.
 	 * @param ctx the parse tree
@@ -349,6 +402,20 @@ public interface SolidityVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitElementaryTypeName(SolidityParser.ElementaryTypeNameContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code equivalenceExpression}
+	 * labeled alternative in {@link SolidityParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitEquivalenceExpression(SolidityParser.EquivalenceExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code netExpression}
+	 * labeled alternative in {@link SolidityParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitNetExpression(SolidityParser.NetExpressionContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code additiveExpression}
 	 * labeled alternative in {@link SolidityParser#expression}.
 	 * @param ctx the parse tree
@@ -411,6 +478,20 @@ public interface SolidityVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitCompExpression(SolidityParser.CompExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code forallExpression}
+	 * labeled alternative in {@link SolidityParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitForallExpression(SolidityParser.ForallExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code existsExpression}
+	 * labeled alternative in {@link SolidityParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExistsExpression(SolidityParser.ExistsExpressionContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code bitwiseAndExpression}
 	 * labeled alternative in {@link SolidityParser#expression}.
@@ -489,6 +570,13 @@ public interface SolidityVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitPowerExpression(SolidityParser.PowerExpressionContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code grossFromExpression}
+	 * labeled alternative in {@link SolidityParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitGrossFromExpression(SolidityParser.GrossFromExpressionContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code bitwiseOrExpression}
 	 * labeled alternative in {@link SolidityParser#expression}.
 	 * @param ctx the parse tree
@@ -516,6 +604,41 @@ public interface SolidityVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitEqualityExpression(SolidityParser.EqualityExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code grossToExpression}
+	 * labeled alternative in {@link SolidityParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitGrossToExpression(SolidityParser.GrossToExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code implicationExpression}
+	 * labeled alternative in {@link SolidityParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitImplicationExpression(SolidityParser.ImplicationExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code oldExpression}
+	 * labeled alternative in {@link SolidityParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitOldExpression(SolidityParser.OldExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code onlyIfExpression}
+	 * labeled alternative in {@link SolidityParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitOnlyIfExpression(SolidityParser.OnlyIfExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code resultExpression}
+	 * labeled alternative in {@link SolidityParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitResultExpression(SolidityParser.ResultExpressionContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code ternaryExpression}
 	 * labeled alternative in {@link SolidityParser#expression}.
