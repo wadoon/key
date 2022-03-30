@@ -2,8 +2,7 @@ package org.stressinduktion.keycasl;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.stressinduktion.keycasl.main.Main;
-import org.stressinduktion.keycasl.main.Util;
+import de.uka.ilkd.key.casl.main.Util;
 
 import java.io.IOException;
 import java.net.URISyntaxException;

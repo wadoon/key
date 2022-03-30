@@ -1,4 +1,4 @@
-package org.stressinduktion.keycasl.parser;
+package de.uka.ilkd.key.casl.parser;
 
 import java.util.IdentityHashMap;
 import java.util.Objects;

@@ -1,8 +1,6 @@
-package org.stressinduktion.keycasl.transform;
+package de.uka.ilkd.key.casl.transform;
 
-import org.stressinduktion.keycasl.parser.CASLParser;
-import org.stressinduktion.keycasl.parser.CaslError;
-import org.stressinduktion.keycasl.parser.CaslVisitor;
+import de.uka.ilkd.key.casl.parser.*;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -12,7 +10,6 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -21,9 +18,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.stressinduktion.keycasl.parser.CaslVisitor.*;
-
-import javax.xml.validation.Schema;
+import de.uka.ilkd.key.casl.parser.CaslVisitor.*;
 
 public final class Transform {
 

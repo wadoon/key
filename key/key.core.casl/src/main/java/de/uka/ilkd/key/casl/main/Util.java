@@ -1,4 +1,4 @@
-package org.stressinduktion.keycasl.main;
+package de.uka.ilkd.key.casl.main;
 
 import java.io.IOException;
 import java.nio.file.FileVisitResult;

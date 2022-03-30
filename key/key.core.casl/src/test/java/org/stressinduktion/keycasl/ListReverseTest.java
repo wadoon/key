@@ -3,12 +3,12 @@ package org.stressinduktion.keycasl;
 import de.uka.ilkd.key.nparser.KeyIO;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.stressinduktion.keycasl.main.Util;
+import de.uka.ilkd.key.casl.main.Util;
 import org.stressinduktion.keycasl.parser.CASLParser;
-import org.stressinduktion.keycasl.parser.CaslParser;
-import org.stressinduktion.keycasl.parser.CaslVisitor;
-import org.stressinduktion.keycasl.taclet.Taclet;
-import org.stressinduktion.keycasl.transform.Transform;
+import de.uka.ilkd.key.casl.parser.CaslParser;
+import de.uka.ilkd.key.casl.parser.CaslVisitor;
+import de.uka.ilkd.key.casl.taclet.Taclet;
+import de.uka.ilkd.key.casl.transform.Transform;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -18,7 +18,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.logging.Logger;
 
-import static org.stressinduktion.keycasl.parser.CaslVisitor.*;
+import static de.uka.ilkd.key.casl.parser.CaslVisitor.*;
 
 public class ListReverseTest {
     private static final Logger LOGGER = Util.getLogger(ListReverseTest.class);

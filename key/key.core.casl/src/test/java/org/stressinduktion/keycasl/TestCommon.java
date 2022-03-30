@@ -2,7 +2,7 @@ package org.stressinduktion.keycasl;
 
 import de.uka.ilkd.key.nparser.KeyIO;
 import org.junit.jupiter.api.Assertions;
-import org.stressinduktion.keycasl.main.Main;
+import de.uka.ilkd.key.casl.main.Main;
 
 import java.io.IOException;
 import java.nio.file.Files;

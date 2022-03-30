@@ -1,7 +1,7 @@
-package org.stressinduktion.keycasl.parser;
+package de.uka.ilkd.key.casl.parser;
 
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.stressinduktion.keycasl.main.Util;
+import de.uka.ilkd.key.casl.main.Util;
 
 import java.util.logging.Logger;
 

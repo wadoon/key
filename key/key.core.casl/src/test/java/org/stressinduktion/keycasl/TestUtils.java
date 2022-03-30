@@ -3,7 +3,7 @@ package org.stressinduktion.keycasl;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.junit.jupiter.api.Assertions;
-import org.stressinduktion.keycasl.parser.CaslParser;
+import de.uka.ilkd.key.casl.parser.CaslParser;
 
 public class TestUtils {
     public static void testParser(ParseTree tree) {

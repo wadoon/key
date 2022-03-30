@@ -1,16 +1,12 @@
-package org.stressinduktion.keycasl.main;
+package de.uka.ilkd.key.casl.main;
 
-import de.uka.ilkd.key.nparser.KeyIO;
-import org.stressinduktion.keycasl.parser.CASLParser;
-import org.stressinduktion.keycasl.parser.CaslParser;
-import org.stressinduktion.keycasl.parser.CaslVisitor;
-import org.stressinduktion.keycasl.taclet.Taclet;
-import org.stressinduktion.keycasl.transform.Transform;
+import de.uka.ilkd.key.casl.taclet.Taclet;
+import de.uka.ilkd.key.casl.parser.*;
+import de.uka.ilkd.key.casl.transform.Transform;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

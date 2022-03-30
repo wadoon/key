@@ -1,4 +1,4 @@
-package org.stressinduktion.keycasl.parser;
+package de.uka.ilkd.key.casl.parser;
 
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Disabled;

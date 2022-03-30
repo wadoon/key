@@ -1,7 +1,7 @@
-package org.stressinduktion.keycasl.taclet;
+package de.uka.ilkd.key.casl.taclet;
 
-import org.stressinduktion.keycasl.main.Util;
-import org.stressinduktion.keycasl.transform.Transform;
+import de.uka.ilkd.key.casl.main.Util;
+import de.uka.ilkd.key.casl.transform.Transform;
 import org.stringtemplate.v4.Interpreter;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
