@@ -1,0 +1,27 @@
+spec NatList =
+    free type Nat ::= Nat(arg : int) %key(defaultValue=Nat(0))% %key(extends=java.lang.Object)%
+
+    free type NatList ::= nil | cons(first : Nat; rest : NatList) %key(defaultValue=nil)%
+
+    ops
+        append : NatList * NatList -> NatList;
+        reverse: NatList -> NatList;
+        len: NatList -> int;
+        get: NatList * int -> Nat;
+        remove: NatList * int -> NatList;
+
+    forall l : NatList . append(nil,l) = l
+    forall l1,l2 : NatList; e : Nat . append(cons(e, l1), l2) = cons(e, append(l1,l2))
+
+    . reverse(nil) = nil %key(heuristic=simpl)%
+    forall e : Nat; l : NatList . reverse(cons(e,l)) = append(reverse(l), cons(e, nil))
+
+    . len(nil) = 0 %key(heuristic=simpl)%
+    forall e : Nat; L : NatList . len(cons(e,l)) = 1 + len(l)
+
+    forall e : Nat; L : NatList . get(cons(e,l), 0) = e
+    forall e : Nat; L : NatList; i : int . get(cons(e,l), i) = get(l, i-1)
+
+    forall e : Nat; l : NatList . remove(cons(e,l), 0) = l
+    forall e : Nat; l : NatList; j : int . remove(cons(e,l),j) = cons(e,remove(l, j-1))
+end

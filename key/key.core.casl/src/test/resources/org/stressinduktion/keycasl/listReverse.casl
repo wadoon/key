@@ -1,0 +1,14 @@
+spec NatList =
+    free type NatList ::= nil | cons(first : ? Nat; rest : ? NatList) %key(defaultValue=nil)%
+
+    ops
+        append : NatList * NatList -> NatList;
+        reverse: NatList -> NatList;
+        head: NatList -> Nat;
+        tail: NatList -> NatList;
+        size: NatList -> int;
+
+    . reverse(nil) = nil
+    forall L: NatList . reverse(L) = append(reverse(tail(L)), cons(head(L), nil))
+
+end

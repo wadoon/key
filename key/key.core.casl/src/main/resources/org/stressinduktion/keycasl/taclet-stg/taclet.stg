@@ -1,0 +1,145 @@
+sort(s) ::= <<
+<s.name>
+>>
+
+func(f) ::= <<
+<if(f.unique)>\unique <endif><sort(f.retSort)> <f.name><if(f.args)>(<f.args:sort(); separator=", ">)<endif>;
+>>
+
+schemaType(it) ::= <<
+\\<it.schemaType.tacletString>
+>>
+
+expr(s) ::= <<
+<if(s.name)><\\>
+<s.name><if(s.args)>(<s.args:{it|<expr(it)>}; separator=", ">)<endif><\\>
+<elseif(s.left)><\\>
+<s.left:expr()> <s.separator> <s.right:expr()><\\>
+<endif><\\>
+>>
+
+schemaVar(var, postfix="") ::= <<
+\schemaVar <schemaType(var)> <sort(var.sort)> <var.name><postfix>;
+>>
+
+foralls(case) ::= <<
+<case.schemaVars:{it|\forall <it.name>; }>
+>>
+
+case(c) ::= <<
+<c.name><if(c.schemaVars)>(<c.schemaVars:{it|<it.name>}; separator=", ">)<endif>
+>>
+
+induction(ind) ::= <<
+<ind.name> {
+    \schemaVar \formula phi;
+    <schemaVar(ind.base)>
+    <ind.schemaVars:schemaVar(); separator="\n">
+
+    \find( ==> \forall <ind.base.name>; phi )
+    <ind.schemaVars:{it|\varcond( \notFreeIn(<it.name>,phi) )}; separator="\n">
+
+    <first(ind.cases):{it|"base case": \replacewith( ==> <foralls(it)> {\subst <ind.base.name>; <case(it)>\} phi );}; separator="\n">
+    <rest(ind.cases):{it|"<i>. case": \replacewith( ==> <foralls(it)> ( phi -> {\subst <ind.base.name>; <case(it)>\} phi ) )}; separator=";\n">
+};
+>>
+
+splitCall(name, args) ::= <<
+<name><if(args)>(<args:{it|<it.name>}; separator=", ">)<endif>
+>>
+
+oneSplit(base, alt, args) ::= <<
+\replacewith(<splitCall(alt,args)>) \add(<base> = <splitCall(alt, args)> ==>)
+>>
+
+splitVarcond(spt) ::= <<
+<spt.allSchemaVars:{it|\new(<it.name>, \dependingOn(<spt.base.name>))}; separator=", ">
+>>
+
+split(spt) ::= <<
+<spt.name> {
+    <schemaVar(spt.base)>
+    <spt.alts:{alt|<spt.alts.(alt):schemaVar(); separator="\n">}; separator="\n">
+    \find(<spt.base.name>) \sameUpdateLevel
+    <if(spt.numVarConds)>
+    \varcond(<splitVarcond(spt)>)
+    <endif>
+    <spt.alts:{alt|<oneSplit(spt.base.name, alt, spt.alts.(alt))>}; separator=";\n">
+};
+>>
+
+axiom(ax) ::= <<
+<ax.name> {
+    <ax.schemaVars:schemaVar(); separator="\n">
+    \find( <expr(ax.focus)> )
+    \replacewith( <expr(ax.replacement)> )
+    <if(ax.heuristic)>\heuristics( <ax.heuristic> )<endif>
+};
+>>
+
+sortDecl(s, defaultValues) ::= <<
+<if(defaultValues.(s.name))><\\>
+/*! @defaultValue(<defaultValues.(s.name).name>) */
+<endif>
+<s.name><if(s.extend)> \extends <s.extend><endif>;
+>>
+
+equality_side(eql) ::= <<
+>>
+
+equalityLeft(eql) ::= <<
+<eql.name>Left {
+    <eql.schemaVars:schemaVar("_l"); separator="\n">
+    <eql.schemaVars:schemaVar("_r"); separator="\n">
+    \find( ==> <eql.opName>(<eql.schemaVars:{it|<it.name>_l}; separator=", ">) = <eql.opName>(<eql.schemaVars:{it|<it.name>_r}; separator=", ">) )
+    \add( ==> <eql.schemaVars:{it|<it.name>_l = <it.name>_r}; separator=" & "> )
+};
+>>
+
+
+equalityRight(eql) ::= <<
+<eql.name>Right {
+    <eql.schemaVars:schemaVar("_l"); separator="\n">
+    <eql.schemaVars:schemaVar("_r"); separator="\n">
+    \find( <eql.opName>(<eql.schemaVars:{it|<it.name>_l}; separator=", ">) = <eql.opName>(<eql.schemaVars:{it|<it.name>_r}; separator=", ">) ==> )
+    \add( <eql.schemaVars:{it|<it.name>_l = <it.name>_r}; separator=" & "> ==> )
+};
+>>
+
+taclet(sorts, defaultValues, functions, axioms, rules, inductions, splits, equalities, problem) ::=
+<<
+<if(sorts)>
+\sorts {
+    <sorts:sortDecl(defaultValues); separator="\n">
+}
+<endif>
+<if(functions)>
+\functions {
+    <functions:func(); separator="\n">
+}
+<endif>
+<if(axioms || inductions || splits)>
+\axioms {
+    <if(inductions)><inductions:induction(); separator="\n"><endif>
+    <if(splits)><splits:split(); separator="\n"><endif>
+    <if(axioms)><axioms:axiom(); separator="\n"><endif>
+    <if(equalities)>
+    <equalities:equalityLeft(); separator="\n">
+    <equalities:equalityRight(); separator="\n">
+    <endif>
+}
+<endif>
+<if(rules)>
+\rules {
+    <rules>
+}
+<endif>
+<if(problem)>
+\problem {
+    <problem>
+}
+<else>
+\javaSource ".";
+\chooseContract
+<endif>
+>>
