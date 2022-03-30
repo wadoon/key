@@ -55,6 +55,7 @@ application {
 
 run {
     systemProperties["key.examples.dir"] = "$projectDir/examples"
+    jvmArgs = ["--enable-preview"]
     //systemProperties["KeyDebugFlag"] = "on"
     //args "--experimental"
 

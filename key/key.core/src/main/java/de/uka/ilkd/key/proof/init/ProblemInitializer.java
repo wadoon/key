@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.proof.init;
 
+import de.uka.ilkd.key.casl.main.CaslFacade;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -53,6 +54,9 @@ import recoder.io.PathList;
 import recoder.io.ProjectSettings;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 
@@ -169,9 +173,12 @@ public final class ProblemInitializer {
         int i = 0;
         reportStatus("Read LDT Includes", in.getIncludes().size());
         for (String name : in.getLDTIncludes()) {
-
-            keyFile[i] = new KeYFile(name, in.get(name), progMon, initConfig.getProfile(),
-                    fileRepo);
+            if (name.endsWith(".casl") || name.equals(".key.adt")) {
+                System.out.println("ProblemInitializer.readLDTIncludes " + name);
+                keyFile[i] = new KeYFile(name, in.get(name), progMon, initConfig.getProfile(), fileRepo);
+            } else {
+                keyFile[i] = new KeYFile(name, in.get(name), progMon, initConfig.getProfile(), fileRepo);
+            }
             i++;
             setProgress(i);
         }
@@ -202,11 +209,39 @@ public final class ProblemInitializer {
         reportStatus("Read Includes", in.getIncludes().size());
         int i = 0;
         for (String fileName : in.getIncludes()) {
-            KeYFile keyFile = new KeYFile(fileName, in.get(fileName), progMon,
-                    envInput.getProfile(), fileRepo);
+            var ruleSource = in.get(fileName);
+            if (fileName.endsWith(".casl")) {
+                ruleSource = translateCaslToKey(ruleSource);
+            }
+            KeYFile keyFile = new KeYFile(fileName, ruleSource, progMon, envInput.getProfile(), fileRepo);
             readEnvInput(keyFile, initConfig);
             setProgress(++i);
         }
+    }
+
+    private RuleSource translateCaslToKey(RuleSource ruleSource) {
+        Path caslFile = ruleSource.file().toPath();
+        var keyFile = Paths.get(caslFile + ".key");
+        try {
+            //if (!Files.isWritable(keyFile)) {
+            //    keyFile = Files.createTempFile(caslFile.getFileName().toString(), ".key");
+            //}
+
+            if (Files.exists(keyFile) &&
+                    Files.getLastModifiedTime(caslFile).compareTo(Files.getLastModifiedTime(keyFile)) <= 0) {
+                LOGGER.info("CASL file {} not translated, a newer KeY file exists {}", caslFile, keyFile);
+            } else {
+                LOGGER.info("Translate CASL file {} to KeY file {}", caslFile, keyFile);
+                var ret = CaslFacade.process(caslFile, null);
+                Files.writeString(keyFile, ret);
+            }
+            return RuleSourceFactory.initRuleFile(keyFile.toFile(), false);
+        } catch (IOException e) {
+            LOGGER.error("Could not translate CASL file {}", caslFile, e);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return ruleSource;
     }
 
     /**
@@ -274,9 +309,12 @@ public final class ProblemInitializer {
 
         // weigl: 2021-01, Early including the includes of the KeYUserProblemFile,
         //                 this allows to use included symbols inside JML.
-        for (var fileName : includes.getRuleSets()) {
-            KeYFile keyFile = new KeYFile(fileName.file().getName(), fileName, progMon,
-                    envInput.getProfile(), fileRepo);
+        for (var ruleSource : includes.getRuleSets()) {
+            final var name = ruleSource.file().getName();
+            if (name.endsWith(".casl")) {
+                ruleSource = translateCaslToKey(ruleSource);
+            }
+            KeYFile keyFile = new KeYFile(name, ruleSource, progMon, envInput.getProfile(), fileRepo);
             readEnvInput(keyFile, initConfig);
         }
 
@@ -574,7 +612,7 @@ public final class ProblemInitializer {
                 }
                 for (ProgramMethod pm
                         : javaInfo.getAllProgramMethodsLocallyDeclared(kjt)) {
-                    if(pm == null) continue; //weigl 2021-11-10
+                    if (pm == null) continue; //weigl 2021-11-10
                     if (!(pm.isVoid() || pm.isConstructor())) {
                         functions.add(pm);
                     }

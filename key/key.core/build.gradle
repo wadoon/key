@@ -20,7 +20,8 @@ dependencies {
 
     antlr4 "org.antlr:antlr4:4.9.3"
     api "org.antlr:antlr4-runtime:4.9.3"
-    //implementation group: 'com.google.guava', name: 'guava', version: '28.1-jre'
+
+    implementation project(':key.core.casl')
 }
 
 // The target directory for JavaCC (parser generation)
