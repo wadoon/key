@@ -3,13 +3,22 @@ package eplan.simple.graph;
 public class NodeList {
 
     /*@ public model \seq list; @*/
+    /*@ public model \locset footprint; @*/
 
     /*@ public invariant array.length > firstFreeIndex; @*/
+    /*@ public invariant list.length == firstFreeIndex; @*/
+    /*@ public invariant array != null; @*/
+    /*@ public invariant (\forall int i; i >= 0 && i < firstFreeIndex; array[i] != null); @*/
+    /*@ public invariant \typeof(array) == \type(Node[]); @*/
 
-    private Node[] array;
+    private /*@ nullable @*/ Node[] array;
     private int firstFreeIndex = 0;
 
-    /*@ private represents list = (\seq_def int i; 0; firstFreeIndex; array[i]); @*/
+    /* public represents list = (\seq_def int i; 0; firstFreeIndex; array[i]); @*/
+    /*@ public represents list = \dl_array2seq(array)[0..firstFreeIndex]; @*/
+    /*@ public represents footprint = array, array[*], firstFreeIndex; @*/
+    //@ accessible list:footprint;
+    //@ accessible footprint:footprint;
 
 
     /*@ public normal_behavior
@@ -34,7 +43,7 @@ public class NodeList {
     /*@ public normal_behavior
       @ requires \invariant_for(n);
       @ ensures list == \seq_concat(\old(list), \seq_singleton(n));
-      @ assignable list;
+      @ assignable footprint;
       @*/
     public void add (Node n) {
         if(array.length > firstFreeIndex + 1) {
@@ -84,7 +93,7 @@ public class NodeList {
 
     /*@ public normal_behavior
       @ requires \invariant_for(n);
-      @ ensures \result == (\exists int i; i >= 0 && i < list.length; list[i] == n) ? i : -1;
+      @ ensures (\exists int i; i >= 0 && i < list.length; list[i] == n) ? \result >= 0 && \result < list.length && list[\result] == n : \result == -1;
       @ assignable \strictly_nothing;
       @*/
     public /*@ strictly_pure @*/ int getIndex (Node n) {
@@ -105,16 +114,17 @@ public class NodeList {
 
     /*@ public normal_behavior
       @ requires i >= 0 && i < list.length;
-      @ ensures list == \seq_concat(\old(list[0..i-1]), \old(list[i+1..list.length]));
-      @ assignable list;
+      @ ensures list == \seq_concat(\old(list[0..i]), \old(list[i+1..list.length]));
+      @ assignable array[*], firstFreeIndex;
       @*/
     public void remove (int i) {
         /*@ loop_invariant
-          @ j >= i && j <= array.length &&
+          @ j >= i && j <= array.length - 1 &&
           @ (\forall int k; 0 <= k && k < i; array[k] == \old(array[k])) &&
-          @ (\forall int l; i <= l && l < j; array[l] == \old(array[l+1]));
+          @ (\forall int l; i <= l && l < j; array[l] == \old(array[l+1])) &&
+          @ (\forall int k; j <= k && k < array.length; array[k] == \old(array[k]));
           @ assignable array[*];
-          @ decreases array.length - i - j;
+          @ decreases array.length - j;
           @*/
         for (int j = i; j < array.length - 1; j++) {
             array[j] = array[j+1];
