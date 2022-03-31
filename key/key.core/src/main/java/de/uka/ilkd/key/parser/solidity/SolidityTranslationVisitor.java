@@ -214,6 +214,16 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 		if (firstDotPos == -1) {
 			String retType = Solidity.reservedFreeFunctions.get(name);
 			return retType == null ? Optional.empty() : Optional.of(retType);
+			/*
+			if (retType != null) {
+				return Optional.of(retType);
+			}
+			if (Solidity.typeIsElementary(name)) {
+				return Optional.of(name);
+			}
+			return Optional.empty();
+
+			 */
 		}
 		String beforeFirstDot = name.substring(0, firstDotPos);
 		String afterFirstDot = name.substring(firstDotPos + 1);
@@ -478,17 +488,23 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 			this					this.foo()		================== Same as internal ==================
 			super					super.foo()		currentContract			the contract before currentOwnerContract
 			constructor				C()				does not apply			does not apply
+			cast					type()
 			 */
 		// TODO: we may not call an external function unless 'this' is used. Currently, this is not checked,
 		//  and could lead to function overload resolution being wrong in very specific situations (?)
 
+		// Check if we have a type cast
 		String fctName = ctx.expression().getText();
-		if (Solidity.typeIsElementary(fctName) || Solidity.typeIsArray(fctName)) {
-			// We have a cast such as "address(0)"
-			// TODO: properly translate this for all types. Doing "new Address(0)" means that we cannot perform
-			//  comparisons such as "someAddr != address(0)"
-			String displayName = "new " + Solidity.solidityToJavaType(fctName);
-			return new CallableOverloadResolutionResult(displayName, null, null, fctName, FunctionCallReferenceType.INTERNAL);
+		if (Solidity.typeIsElementary(fctName)) {
+			// type(...) => (type)(...)
+			String displayedName = "(" + Solidity.solidityToJavaType(fctName) + ")";
+			return new CallableOverloadResolutionResult(displayedName, null, null, fctName, FunctionCallReferenceType.INTERNAL);
+		}
+
+		// If the function name is reserved, we output it as in (no renaming).
+		Optional<String> reservedFunctionType = getReservedFunctionReturnTypeContractContext(fctName, currentOwnerContract, true);
+		if (reservedFunctionType.isPresent()) {
+			return new CallableOverloadResolutionResult(fctName, null, null, reservedFunctionType.get(), FunctionCallReferenceType.INTERNAL);
 		}
 
 		String objectName = fctName;
@@ -499,7 +515,7 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 		int firstDotPos = fctName.indexOf('.');
 		if (firstDotPos == -1) {
 			referenceType = FunctionCallReferenceType.INTERNAL;
-			// TODO: Currently, calls such as "new A()" gets turned into a function call to "newA". Fix?
+			// TODO: Currently, calls such as "new A()" gets turned into a function call to "newA" (ctx.expression). Fix?
 			// Currently, Solidity allows one to use "new" only on contract types and arrays.
 			isConstructorCall = fctName.startsWith("new") &&
 					(nameIsAContract(fctName.substring("new".length())) || Solidity.typeIsArray(fctName.substring("new".length())));
@@ -2081,28 +2097,22 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
 	@Override public String visitFunctionCallExpression(SolidityParser.FunctionCallExpressionContext ctx) {
-		String fctName = visit(ctx.expression());
-		String displayedName = fctName;
-		Solidity.Callable resolvedCallable = null;
-		FunctionCallReferenceType resolvedReferenceType = null;
-		boolean functionIsAGetter = false; // a function call can "disguise" itself as a call to a getter for a field
-		// If the function name is reserved, we output it as in (no renaming).
-		Optional<String> reservedFunctionType = getReservedFunctionReturnTypeContractContext(fctName, currentOwnerContract, true);
-		if (reservedFunctionType.isEmpty()) {
-			CallableOverloadResolutionResult overload = resolveFunctionCall(ctx);
-			resolvedCallable = overload.callable;
-			functionIsAGetter = overload.field != null;
-			displayedName = overload.displayedName;
-			resolvedReferenceType = overload.referenceType;
-		}
+		String fctName = ctx.expression().getText();
+
+		CallableOverloadResolutionResult overload = resolveFunctionCall(ctx);
+		Solidity.Callable resolvedCallable = overload.callable;
+		boolean functionIsAGetter = overload.field != null; // a function call can "disguise" itself as a call to a getter for a field
+		String displayedName = overload.displayedName;
+		FunctionCallReferenceType resolvedReferenceType = overload.referenceType;
+		String reservedFunctionType = overload.reservedCallType;
 
 		if (functionIsAGetter) {
 			return displayedName;
 		}
 
 		StringBuffer arguments;
-		// Do not append the "msg" argument if the call is made to a built-in Solidity function.
-		boolean skipMsgArg = reservedFunctionType.isPresent();
+		// Do not append the "msg" argument if the call is made to a built-in Solidity function (or cast).
+		boolean skipMsgArg = reservedFunctionType != null;
 
 		// TODO: explain what "require2" and "require3" is.
 		String beginArg;
@@ -2602,10 +2612,6 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 
 		@Override public String visitFunctionCallExpression(SolidityParser.FunctionCallExpressionContext ctx) {
 			String fctName = ctx.expression().getText();
-			Optional<String> reservedFunctionType = getReservedFunctionReturnTypeContractContext(fctName, currentOwnerContract, true);
-			if (reservedFunctionType.isPresent()) {
-				return reservedFunctionType.get();
-			}
 			SolidityTranslationVisitor.CallableOverloadResolutionResult result = resolveFunctionCall(ctx);
 			if (result.callable != null) {
 				return result.callable.returnType;
