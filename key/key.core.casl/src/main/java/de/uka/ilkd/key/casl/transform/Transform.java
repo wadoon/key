@@ -170,7 +170,15 @@ public final class Transform {
         }
     }
 
-    public record InductionCase(String name, List<SchemaVar> schemaVars) {}
+    public record InductionCase(String name, List<SchemaVar> schemaVars, List<SchemaVar> inductionVar) {
+        public boolean getRecursive() {
+            return !inductionVar.isEmpty();
+        }
+
+        public boolean getBase() {
+            return inductionVar.size() == 1;
+        }
+    }
 
     public record Induction(String name, Sort sort, SchemaVar base, Collection<SchemaVar> schemaVars, List<InductionCase> cases) {}
 
@@ -182,12 +190,12 @@ public final class Transform {
         if (!dt.flags().contains(DataTypeFlag.GENERATED) && !dt.flags().contains(DataTypeFlag.FREE))
             return Optional.empty();
 
-        String inductionName = String.format("%s_induction", dt.sort().name().toLowerCase());
-        Sort sort = new Sort(dt.sort().name());
-        SchemaVar base = new SchemaVar(SchemaVarType.variable, "base", sort);
-        List<InductionCase> cases = new LinkedList<>();
+        final String inductionName = String.format("%s_induction", dt.sort().name().toLowerCase());
+        final Sort sort = new Sort(dt.sort().name());
+        final SchemaVar base = new SchemaVar(SchemaVarType.variable, "base", sort);
+        final List<InductionCase> cases = new LinkedList<>();
         for (var alt : dt.alternatives()) {
-            List<SchemaVar> schemaVars = new LinkedList<>();
+            final List<SchemaVar> schemaVars = new LinkedList<>();
             for (var op : alt.components()) {
                 if (op instanceof OpComponent opc) {
                     Sort argSort = new Sort(opc.sort().name());
@@ -197,18 +205,13 @@ public final class Transform {
                 }
             }
 
-            boolean found = false;
-            for (int i = 0; i < schemaVars.size(); i++) {
-                if (schemaVars.get(i).sort.equals(sort)) {
-                    List<SchemaVar> s = new LinkedList<>(schemaVars);
-                    s.set(i, base);
-                    cases.add(new InductionCase(alt.opName(), Collections.unmodifiableList(s)));
-                    found = true;
+            var indVars = schemaVars.stream().filter(v -> v.sort.equals(sort)).toList();
+            if (indVars.size() == 1) {
+                var vid = indVars.get(0);
+                schemaVars.replaceAll(v -> v == vid ? base : v);
+                indVars = Collections.singletonList(base);
                 }
-            }
-            if (!found) {
-                cases.add(new InductionCase(alt.opName(), Collections.unmodifiableList(schemaVars)));
-            }
+            cases.add(new InductionCase(alt.opName(), Collections.unmodifiableList(schemaVars), indVars));
         }
 
         Collection<SchemaVar> schemaVars = cases.stream()
@@ -244,26 +247,25 @@ public final class Transform {
     private Optional<Axiom> collectOneAxiom(FormulaEnv formula) {
         Formula form = formula.f();
         String heuristic = formula.heuristic() != null ? formula.heuristic().heuristic() : null;
-        if (form instanceof EqTerm t) {
             List<Var> vars = formula.vars();
-            String name = form.tacletName();
-
             List<SchemaVar> schemaVars = vars.stream().map(v ->
                     new SchemaVar(SchemaVarType.term, v.name().toLowerCase(), new Sort(v.sort().name()))).toList();
-
-
-            return Optional.of(new Axiom(name, schemaVars, transformTerm(t.t1()),
-                    transformTerm(t.t2()), heuristic));
-        } if (form instanceof EqFormula eqFormula) {
+        String name = form.tacletName();
+        if (form instanceof EqTerm t) {
+            return Optional.of(new Axiom(name, schemaVars, transformTerms(t.t1()),
+                    transformTerms(t.t2()), heuristic));
+        } else if (form instanceof EqFormula eqFormula) {
             Formula f1 = eqFormula.f1();
             Formula f2 = eqFormula.f2();
-            String name = form.tacletName();
-
-
-            List<SchemaVar> vars = formula.vars().stream().map(v ->
-                    new SchemaVar(SchemaVarType.term, v.name().toLowerCase(), new Sort(v.sort().name()))).toList();
-
-            return Optional.of(new Axiom(name, vars, transformFormula(f1), transformFormula(f2), heuristic));
+            return Optional.of(new Axiom(name, schemaVars, transformFormula(f1), transformFormula(f2), heuristic));
+        } else if (form instanceof ConjFormula conj) {
+            Formula f1 = conj.f1();
+            Formula f2 = conj.f2();
+            return Optional.of(new Axiom(name, schemaVars, transformFormula(f1), transformFormula(f2), heuristic));
+        } else if (form instanceof DisjFormula disj) {
+            Formula f1 = disj.f1();
+            Formula f2 = disj.f2();
+            return Optional.of(new Axiom(name, schemaVars, transformFormula(f1), transformFormula(f2), heuristic));
         } else {
             return Optional.empty();
         }
@@ -272,8 +274,9 @@ public final class Transform {
     Expression transformFormula(Formula f) {
         Expression expr = switch (f) {
             case EqFormula eqf -> simplify(new EqExpression(transformFormula(eqf.f1()), transformFormula(eqf.f2())));
-            case EqTerm eqt -> simplify(new EqExpression(transformTerm(eqt.t1()), transformTerm(eqt.t2())));
-            case DisjFormula eqd -> new DisjExpression(transformFormula(eqd.f1()), transformFormula(eqd.f2()));
+            case EqTerm eqt -> simplify(new EqExpression(transformTerms(eqt.t1()), transformTerms(eqt.t2())));
+            case ConjFormula conj -> new ConjExpression(transformFormula(conj.f1()), transformFormula(conj.f2()));
+            case DisjFormula disj -> new DisjExpression(transformFormula(disj.f1()), transformFormula(disj.f2()));
             default -> throw new IllegalArgumentException(String.format("%s not yet supported", f.getClass()));
         };
         return expr;
@@ -282,6 +285,14 @@ public final class Transform {
     private Expression simplify(EqExpression eqExpression) {
         Expression left = eqExpression.left();
         Expression right = eqExpression.right();
+
+        if (left instanceof Expressions exprs && exprs.exprs().size() == 1) {
+            left = exprs.exprs().get(0);
+        }
+
+        if (right instanceof Expressions exprs && exprs.exprs().size() == 1) {
+            right = exprs.exprs().get(0);
+        }
 
         if (left instanceof Literal lit) {
             if (lit.name().equals("true")) {
@@ -298,12 +309,16 @@ public final class Transform {
         return eqExpression;
     }
 
+    private Expression transformTerms(Terms terms) {
+        return new Expressions(terms.terms().stream().map(t -> transformTerm(t)).toList(), terms.pars());
+    }
+
     private Expression transformTerm(CaslVisitor.Term term) {
         return switch (term) {
             case FuncTerm ft -> new FuncCall(ft.name(), ft.args().stream().map(this::transformTerm).toList());
             case IdTerm id -> new Id(id.name());
             case LiteralTerm l -> new Literal(l.literal());
-
+            case Terms ts -> transformTerms(ts);
         };
     }
 
@@ -403,7 +418,7 @@ public final class Transform {
 
     public record SchemaVar(SchemaVarType schemaType, String name, Sort sort) {}
 
-    sealed interface Expression permits FuncCall, Id, Literal, EqExpression, DisjExpression {
+    sealed interface Expression permits FuncCall, Id, Literal, EqExpression, DisjExpression, ConjExpression, Expressions {
         default String getSeparator() {
             throw new IllegalStateException();
         }
@@ -423,9 +438,17 @@ public final class Transform {
             return "|";
         }
     }
+    public record ConjExpression(Expression left, Expression right) implements Expression {
+        @Override
+        public String getSeparator() {
+            return "&";
+        }
+    }
+    public record Expressions(List<Expression> exprs, boolean par) implements Expression {
+        public String getSeparator() { return ""; }
+    }
 
     public record Equality(String name, Sort sort, String opName, List<SchemaVar> schemaVars) {}
-
 
     public record Axiom(String name, List<SchemaVar> schemaVars, Expression focus, Expression replacement,
                         String heuristic) {}

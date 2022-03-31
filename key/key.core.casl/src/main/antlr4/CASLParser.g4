@@ -110,8 +110,8 @@ formula
     | 'true' # formulaTrue
     | 'false' # formulaFalse
     | 'def' term # formulaDefTerm // substitution?
-    | term '=e=' term # formulaExistEqTerm
-    | term '=' term # formulaEqTerm // in beide richtungen
+    | terms '=e=' terms # formulaExistEqTerm
+    | terms '=' terms # formulaEqTerm // in beide richtungen
     | '(' formula ')' # formulaP
     | qual_pred_name terms? # formulaQualPredName
     | term 'in' sort # formulaUnsupported  // subsorting
@@ -123,21 +123,25 @@ quantifier
     | 'exists!'
     ;
 
+terml : term+
+    ;
+
 terms
-    : term (',' term)*
+    : a+=terml (',' terml)*
     ;
 
 // mixfix notation and context sensitive parsing is not yet done here - see CASL Reference Manual
 term
-    : literal # termLiteral
+    : id '(' terms ')' # termFunc
+    | '(' terms ')' # termP
     | qual_var_name # termQualVarName
     | qual_op_name '(' terms ')' # termQualOpName
     | term ':' sort # termSort
     | term 'as' sort # termAs
-    | term 'when' formula 'else' term # termWhen
-    | '(' term ')' # termP
-    | id '(' terms ')' # termFunc
+    | term 'when' formula 'else' terms # termWhen
     | id # termId
+    | token # termToken
+    | literal # termLiteral
     // continue casl reference pp. 96
     ;
 
@@ -201,7 +205,7 @@ simple_id
     ;
 
 id
-    : mix_token+
+    : WORDS+
     ;
 
 mix_token

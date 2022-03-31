@@ -1,12 +1,18 @@
 package de.uka.ilkd.key.casl.parser;
 
+import de.uka.ilkd.key.casl.parser.CASLParserBaseVisitor;
 import org.antlr.v4.runtime.BufferedTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 
-import java.util.*;
+import javax.xml.crypto.Data;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -38,6 +44,8 @@ public final class CaslVisitor extends CASLParserBaseVisitor<Object> {
         return (T) arguments.getArg(clazz);
     }
 
+    private <T> T getArgNull(Class<T> clazz) { return (T) arguments.getArgNull(clazz); }
+
     private <T> void forwardOneArg(Class<T> clazz) {
         T obj = Objects.requireNonNull(getArg(clazz));
         putArg(clazz, obj);
@@ -51,6 +59,39 @@ public final class CaslVisitor extends CASLParserBaseVisitor<Object> {
 
     /* parser */
 
+    /*@Override
+    public Term visitTerml(CaslParser.TermlContext ctx) {
+        if (ctx.term().size() > 1) {
+            return new Terms(ctx.term().stream().map(t -> (Term) $(t)).toList());
+        } else {
+            return $(ctx.term(0));
+        }
+    }*/
+
+    static record Parentheses() {}
+
+    @Override
+    public Term visitTermP(CASLParser.TermPContext ctx) {
+        putArg(Parentheses.class, new Parentheses());
+        return $(ctx.terms());
+    }
+
+    @Override
+    public Term visitTerms(CASLParser.TermsContext ctx) {
+        Parentheses arg = getArgNull(Parentheses.class);
+        return new Terms(ctx.a.stream().map(t -> (Term) $(t)).toList(), arg != null);
+    }
+
+    @Override
+    public LiteralTerm visitLiteral(CASLParser.LiteralContext ctx) {
+        return new LiteralTerm(ctx.getText());
+    }
+
+    @Override
+    public LiteralTerm visitTermToken(CASLParser.TermTokenContext ctx) {
+        return new LiteralTerm(ctx.getText());
+    }
+
     @Override
     public IdTerm visitTermId(CASLParser.TermIdContext ctx) {
         return new IdTerm(ctx.id().getText());
@@ -58,7 +99,7 @@ public final class CaslVisitor extends CASLParserBaseVisitor<Object> {
 
     @Override
     public FuncTerm visitTermFunc(CASLParser.TermFuncContext ctx) {
-        List<Term> args = ctx.terms().term().stream().map(t -> (Term) $(t)).toList();
+        List<Term> args = ctx.terms().terml().stream().map(t -> (Term) $(t)).toList();
         return new FuncTerm(ctx.id().getText(), args);
     }
 
@@ -76,8 +117,8 @@ public final class CaslVisitor extends CASLParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitFormulaEqTerm(CASLParser.FormulaEqTermContext ctx) {
-        return new EqTerm($(ctx.term(0)), $(ctx.term(1)));
+    public EqTerm visitFormulaEqTerm(CASLParser.FormulaEqTermContext ctx) {
+        return new EqTerm($(ctx.terms(0)), $(ctx.terms(1)));
     }
 
     @Override
@@ -455,7 +496,7 @@ public final class CaslVisitor extends CASLParserBaseVisitor<Object> {
     public record ConjFormula(Formula f1, Formula f2) implements Formula {
         @Override
         public String tacletName() {
-            return String.format("%s_%s", f1.tacletName(), f2.tacletName());
+            return String.format("%s_and_%s", f1.tacletName(), f2.tacletName());
         }
     }
     public record DisjFormula(Formula f1, Formula f2) implements Formula {
@@ -500,26 +541,27 @@ public final class CaslVisitor extends CASLParserBaseVisitor<Object> {
             return String.format("false_%d", this.hashCode());
         }
     }
-    public record DefTerm(Term t) implements Formula {
+    public record DefTerm(Terms t) implements Formula {
         @Override
         public String tacletName() {
             return t.tacletName();
         }
     }
-    public record ExistEqTerm(Term t1, Term t2) implements Formula {
+    public record ExistEqTerm(Terms t1, Terms t2) implements Formula {
         @Override
         public String tacletName() {
             return String.format("%s_%s", t1.tacletName(), t2.tacletName());
         }
     }
-    public record EqTerm(Term t1, Term t2) implements Formula {
+    public record EqTerm(Terms t1, Terms t2) implements Formula {
         @Override
         public String tacletName() {
             return t1.tacletName();
         }
     }
 
-    public sealed interface Term permits FuncTerm, IdTerm, LiteralTerm {
+
+    public sealed interface Term permits FuncTerm, IdTerm, LiteralTerm, Terms {
         default String tacletName() {
             return String.format("taclet_%d", this.hashCode());
         }
@@ -542,7 +584,24 @@ public final class CaslVisitor extends CASLParserBaseVisitor<Object> {
     public record LiteralTerm(String literal) implements Term {
         @Override
         public String tacletName() {
-            return String.format("\"%s\"", literal);
+            return literal;
+        }
+    }
+
+    public record Terms(List<Term> terms, boolean pars) implements Term {
+        public Terms(Term t) {
+            this(List.of(t), false);
+        }
+        public Terms(List<Term> t) {
+            this(t, false);
+        }
+
+        @Override
+        public String tacletName() {
+            String name = terms.stream().map(t -> t.tacletName()).collect(Collectors.joining("_"));
+            return name.replace(">=", "ge").replace("<=", "le")
+                    .replace(">", "gt").replace("<", "lt")
+                    .replace("&", "and");
         }
     }
 

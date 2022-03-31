@@ -5,6 +5,7 @@ import java.util.Objects;
 import java.util.Stack;
 
 public final class ArgumentManager {
+
     private static final class Scope extends IdentityHashMap<Class<?>, Object> {
     }
 
@@ -19,6 +20,12 @@ public final class ArgumentManager {
     <T> T getArg(Class<T> clazz) {
         return Objects.requireNonNull((T) scopes.peek().get(clazz));
     }
+
+    @SuppressWarnings("unchecked")
+    public <T> T getArgNull(Class<T> clazz) {
+        return (T) scopes.peek().get(clazz);
+    }
+
 
     void pushScope() {
         scopes.push(Objects.requireNonNull(newScope));
