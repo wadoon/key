@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.casl.parser;
 
+import de.uka.ilkd.key.casl.TestUtils;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
-import org.stressinduktion.keycasl.TestUtils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;

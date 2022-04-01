@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.casl.transform;
 
-import de.uka.ilkd.key.casl.parser.*;
+import de.uka.ilkd.key.casl.parser.CaslVisitor;
+import de.uka.ilkd.key.casl.parser.CaslVisitor.*;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -10,6 +11,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -18,7 +20,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import de.uka.ilkd.key.casl.parser.CaslVisitor.*;
 
 public final class Transform {
 
@@ -210,7 +211,7 @@ public final class Transform {
                 var vid = indVars.get(0);
                 schemaVars.replaceAll(v -> v == vid ? base : v);
                 indVars = Collections.singletonList(base);
-                }
+            }
             cases.add(new InductionCase(alt.opName(), Collections.unmodifiableList(schemaVars), indVars));
         }
 
@@ -247,9 +248,9 @@ public final class Transform {
     private Optional<Axiom> collectOneAxiom(FormulaEnv formula) {
         Formula form = formula.f();
         String heuristic = formula.heuristic() != null ? formula.heuristic().heuristic() : null;
-            List<Var> vars = formula.vars();
-            List<SchemaVar> schemaVars = vars.stream().map(v ->
-                    new SchemaVar(SchemaVarType.term, v.name().toLowerCase(), new Sort(v.sort().name()))).toList();
+        List<Var> vars = formula.vars();
+        List<SchemaVar> schemaVars = vars.stream().map(v ->
+                new SchemaVar(SchemaVarType.term, v.name().toLowerCase(), new Sort(v.sort().name()))).toList();
         String name = form.tacletName();
         if (form instanceof EqTerm t) {
             return Optional.of(new Axiom(name, schemaVars, transformTerms(t.t1()),

@@ -15,7 +15,7 @@ public class Util {
     }
 
     public static void enableLogging(Level level) {
-        Logger.getLogger("org.stressinduktion.keycasl").setLevel(level);
+        Logger.getLogger("de.uka.ilkd.key.casl").setLevel(level);
     }
 
     public static void rmRF(Path p) throws IOException {

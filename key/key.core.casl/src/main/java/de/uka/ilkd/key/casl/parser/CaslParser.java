@@ -53,7 +53,7 @@ public class CaslParser {
     public static class ErrorListener extends CASLParserBaseListener {
         private static final Logger LOGGER = Logger.getLogger(ErrorListener.class.getName());
         static {
-            Logger.getLogger("org.stressinduktion.keycasl").setLevel(Level.ALL);
+            Logger.getLogger("de.uka.ilkd.key.casl").setLevel(Level.ALL);
         }
 
         public final List<ErrorNode> errorList = new LinkedList<>();

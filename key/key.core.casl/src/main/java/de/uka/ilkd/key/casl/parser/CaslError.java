@@ -1,7 +1,8 @@
 package de.uka.ilkd.key.casl.parser;
 
-import org.antlr.v4.runtime.ParserRuleContext;
 import de.uka.ilkd.key.casl.main.Util;
+import org.antlr.v4.runtime.ParserRuleContext;
+
 
 import java.util.logging.Logger;
 

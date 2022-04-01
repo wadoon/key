@@ -1,11 +1,11 @@
 package de.uka.ilkd.key.casl.parser;
 
-import de.uka.ilkd.key.casl.parser.CASLParserBaseVisitor;
 import org.antlr.v4.runtime.BufferedTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
+
 
 import javax.xml.crypto.Data;
 import java.util.Collections;
@@ -59,14 +59,14 @@ public final class CaslVisitor extends CASLParserBaseVisitor<Object> {
 
     /* parser */
 
-    /*@Override
-    public Term visitTerml(CaslParser.TermlContext ctx) {
+    @Override
+    public Term visitTerml(CASLParser.TermlContext ctx) {
         if (ctx.term().size() > 1) {
             return new Terms(ctx.term().stream().map(t -> (Term) $(t)).toList());
         } else {
             return $(ctx.term(0));
         }
-    }*/
+    }
 
     static record Parentheses() {}
 

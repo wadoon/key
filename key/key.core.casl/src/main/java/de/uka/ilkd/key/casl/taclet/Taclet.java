@@ -17,7 +17,7 @@ import java.util.logging.Logger;
 public final class Taclet {
     private static final Logger LOGGER = Util.getLogger(Taclet.class);
 
-    private static final STGroup STG = new STGroupFile("org/stressinduktion/keycasl/taclet-stg/taclet.stg");
+    private static final STGroup STG = new STGroupFile("de/uka/ilkd/key/casl/taclet-stg/taclet.stg");
     static {
         STG.registerModelAdaptor(Record.class, new STRecordAdapter());
     }
