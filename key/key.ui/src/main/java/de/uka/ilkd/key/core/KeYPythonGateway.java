@@ -25,13 +25,15 @@ public class KeYPythonGateway {
             System.out.println("File: " + fileName);
             System.out.println(file_content);
 
-            final ConsoleUserInterfaceControl ui = new ConsoleUserInterfaceControl(Verbosity.HIGH, false);
+            final ConsoleUserInterfaceControl ui = new ConsoleUserInterfaceControl(Verbosity.DEBUG, false);
             final SuccessListener successListener = new SuccessListener();
             ui.addProverTaskListener(successListener);
             final File file = new File(fileName);
             ui.loadProblem(file);
 
-            return ui.allProofsSuccessful ? "Success" : successListener.numOpenGoals + " open goals";
+            final String result = ui.allProofsSuccessful ? "Success" : successListener.numOpenGoals + " open goals";
+            System.out.println("Result: " + result);
+            return result;
         } catch (Exception e) {
             final String msg = "Exception (" + e.getClass().getName() + "): " + e.getMessage();
             System.out.println(msg);
