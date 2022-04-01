@@ -61,9 +61,9 @@ public class ShiftUpdateImplNew {
 	 * elementary update <code>lhs:=rhs</code> the equation
 	 * <code>lhs == {renamingUpdate}{lhs:=rhs}lhs</code> and for each event update
 	 * <code>\event(kind,ls,ts)</code> the formula
-	 * <code>{renamingUpdate}'kindPred'({\invEvent(kind,ls,ts)}{\event(kind, ls , ts)}ls,t)</code> where <code>kindPred</code> is
-	 * the corresponding dependence predicate for the kind (read or write) of the
-	 * event update
+	 * <code>{renamingUpdate}'kindPred'({\invEvent(kind,ls,ts)}{\event(kind, ls , ts)}ls,t)</code>
+	 * where <code>kindPred</code> is the corresponding dependence predicate for the
+	 * kind (read or write) of the event update
 	 * 
 	 * @param renameUpdate the {@link Term} representing the renaming update
 	 * @param g            the current {@link Goal}
@@ -84,11 +84,11 @@ public class ShiftUpdateImplNew {
 				Operator kind = update.sub(0).op();
 				final Function readMarker = depLDT.getReadMarker();
 				final Function writeMarker = depLDT.getWriteMarker();
-				counter = kind == readMarker || kind == writeMarker ?
-						tb.add(counter, tb.one()) :
-							tb.ife(tb.or(tb.equals(update.sub(0), tb.func(readMarker)),
-									     tb.equals(update.sub(0), tb.func(writeMarker))),
-									     tb.add(counter, tb.one()), counter);
+				counter = kind == readMarker || kind == writeMarker ? tb.add(counter, tb.one())
+						: tb.ife(
+								tb.or(tb.equals(update.sub(0), tb.func(readMarker)),
+										tb.equals(update.sub(0), tb.func(writeMarker))),
+								tb.add(counter, tb.one()), counter);
 				shiftEventUpdate(update, counter);
 			} else if (update.op() == UpdateJunctor.SKIP) {
 				// intentionally empty
@@ -105,8 +105,9 @@ public class ShiftUpdateImplNew {
 	 * renames each left-hand side of the elementary update <code>li:=ri</code>
 	 * 
 	 * @param loopFormula the {@link Term} with formula containing the loop
-	 * @return a parallel update <code>{l1:=l1'|| ... || ln:=ln'}{\event(kind,l1,ts),\event(kind,l1',ts),...}</code> that
-	 *         renames each left hand side of the original update
+	 * @return a parallel update
+	 *         <code>{l1:=l1'|| ... || ln:=ln'}{\event(kind,l1,ts),\event(kind,l1',ts),...}</code>
+	 *         that renames each left hand side of the original update
 	 */
 	private Term generateRenameUpdate(Term loopFormula) {
 		ImmutableList<Term> updateList = ImmutableSLList.<Term>nil().prepend(UpdateApplication.getUpdate(loopFormula));
@@ -122,7 +123,8 @@ public class ShiftUpdateImplNew {
 			if (update.op() instanceof ElementaryUpdate) {
 				updatedLocations.add(((ElementaryUpdate) update.op()).lhs());
 			} else if (update.op() instanceof EventUpdate) {
-				inverseEventUpdates = inverseEventUpdates.append(tb.inverseEventUpdate(update.sub(0), update.sub(1), update.sub(2)));
+				inverseEventUpdates = inverseEventUpdates
+						.append(tb.inverseEventUpdate(update.sub(0), update.sub(1), update.sub(2)));
 			} else if (update.op() == UpdateJunctor.PARALLEL_UPDATE) {
 				updateList = updateList.prepend(update.sub(1)).prepend(update.sub(0));
 			}
@@ -185,9 +187,9 @@ public class ShiftUpdateImplNew {
 
 	/**
 	 * adds for one event update <code>\event(kind,ls,ts)</code> the formula
-	 * <code>{renamingUpdate}'kindPred'({\invEvent(kind,ls,ts)}{\event(kind,ls,ts)}ls,t)</code> where <code>kindPred</code> is
-	 * the corresponding dependence predicate for the kind (read or write) of the
-	 * event update
+	 * <code>{renamingUpdate}'kindPred'({\invEvent(kind,ls,ts)}{\event(kind,ls,ts)}ls,t)</code>
+	 * where <code>kindPred</code> is the corresponding dependence predicate for the
+	 * kind (read or write) of the event update
 	 * 
 	 * @param eventUpdate    the {@link Term} with an event update at top level
 	 * @param renamingUpdate the {@link Term} representing the renaming update
@@ -202,19 +204,21 @@ public class ShiftUpdateImplNew {
 		Term cond1 = tb.equals(eventMarker, readMarker);
 		Term writeMarker = tb.func(services.getTypeConverter().getDependenciesLDT().getWriteMarker());
 		Term cond2 = tb.equals(eventMarker, writeMarker);
-		
+
 		// Generating rPred and wPred
-		final Term linkTerm4EventUpdate = 
-				tb.ife(cond1, 
-							tb.rPred(
-									tb.apply(inverseEvent, 
-											tb.apply(eventUpdate, locSet)),
-									counter),
-				tb.ife(cond2,
-						tb.wPred(
-								tb.apply(inverseEvent,
-										tb.apply(eventUpdate, locSet)),
-								counter), tb.tt()));
+//		final Term linkTerm4EventUpdate = 
+//				tb.ife(cond1, 
+//							tb.rPred(
+//									tb.apply(inverseEvent, 
+//											tb.apply(eventUpdate, locSet)),
+//									counter),
+//				tb.ife(cond2,
+//						tb.wPred(
+//								tb.apply(inverseEvent,
+//										tb.apply(eventUpdate, locSet)),
+//								counter), tb.tt()));
+		final Term linkTerm4EventUpdate = tb.ife(cond1, tb.rPred(locSet, counter),
+				tb.ife(cond2, tb.wPred(locSet, counter), tb.tt()));
 		// Applying the update rename on the rPred and wPred
 		goal.addFormula(new SequentFormula(tb.apply(keepParallelUpdateRenames, linkTerm4EventUpdate)), true, true);
 	}
