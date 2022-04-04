@@ -1256,6 +1256,11 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 		} else {
 			error("Unrecognized contract type for contract " + contractName + " encountered.");
 		}
+		
+		if (!contract.hasNonDefaultConstructor()) {
+			// In this case, the constructor will have not been visited above, as it is not part of the AST
+			classOutput.append("public " + contract.constructor.getDisplayName(contract) + "(Message msg){\n}\n");
+		}
 
 		/* Import all inherited functions, fields, modifiers, and constructors from the contract's parents.
 		   This is not done for interfaces or libraries.
