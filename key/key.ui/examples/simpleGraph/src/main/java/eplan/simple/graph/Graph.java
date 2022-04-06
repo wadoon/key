@@ -33,24 +33,22 @@ public class Graph {
 
     /*@ public normal_behavior
       @ assignable \nothing;
-      @ ensures (\forall Edge e;(\exists int i; i>=0 & i<edges.length; edges[i]==e);
-      @                 (\exists int j; j>=0 & j<\result.length; \result[j] == e.start));
-      @ ensures (\forall Edge e;(\exists int i; i>=0 & i<edges.length; edges[i]==e);
-      @                 (\exists int j; j>=0 & j<\result.length; \result[j] == e.end));
+      @ ensures (\forall int j; j>=0 && j<edges.length; \result.contains(edges[j].start) && \result.contains(edges[j].end));
       @*/
-    public Node[] getAllNodes() {
+    public NodeList getAllNodes() {
 
-        Node[] res = new Node[2* edges.length];
+        NodeList res = new NodeList();
 
         /*@ loop_invariant
           @  k>=0 && k<=edges.length &&
-          @  (\forall int j; j>=0 && j<k; res[2*j] == edges[j].start && res[2*j + 1] == edges[j].end);
-          @ assignable res[*];
+          @  (\forall int j; j>=0 && j<k; res.contains(edges[j].start) && res.contains(edges[j].end)) &&
+          @  \invariant_for(res);
+          @ assignable res.footprint;
           @ decreases edges.length - k;
           @*/
         for(int k = 0; k<edges.length; k++) {
-            res[2*k] = edges[k].getStart();
-            res[2*k + 1] = edges[k].getEnd();
+            res.add(edges[k].getStart());
+            res.add(edges[k].getEnd());
         }
 
         return res;

@@ -1,6 +1,6 @@
 package eplan.simple.graph;
 
-public class NodeList {
+public class EdgeList {
 
     /*@ public model \seq list; @*/
     /*@ public model \locset footprint; @*/
@@ -9,9 +9,9 @@ public class NodeList {
     /*@ public invariant list.length == firstFreeIndex; @*/
     /*@ public invariant array != null; @*/
     /*@ public invariant (\forall int i; i >= 0 && i < firstFreeIndex; array[i] != null); @*/
-    /*@ public invariant \typeof(array) == \type(Node[]); @*/
+    /*@ public invariant \typeof(array) == \type(Edge[]); @*/
 
-    private /*@ nullable @*/ Node[] array;
+    private /*@ nullable @*/ Edge[] array;
     private int firstFreeIndex = 0;
 
     /* public represents list = (\seq_def int i; 0; firstFreeIndex; array[i]); @*/
@@ -26,8 +26,8 @@ public class NodeList {
       @ assignable \nothing;
       @ ensures firstFreeIndex == 0;
       @*/
-    public NodeList() {
-        array = new Node[10];
+    public EdgeList() {
+        array = new Edge[10];
         firstFreeIndex = 0;
     }
 
@@ -46,13 +46,13 @@ public class NodeList {
       @ ensures list == \seq_concat(\old(list), \seq_singleton(n));
       @ assignable footprint;
       @*/
-    public void add (Node n) {
+    public void add (Edge n) {
         if(array.length > firstFreeIndex + 1) {
             array[firstFreeIndex] = n;
         }
         else {
             int newLength = array.length + 10;
-            Node[] newArray = new Node[newLength];
+            Edge[] newArray = new Edge[newLength];
             /*@ loop_invariant
               @ i >= 0 && i <= array.length &&
               @ (\forall int j; 0 <= j && j < i; newArray[j] == \old(array[j]));
@@ -74,17 +74,17 @@ public class NodeList {
       @ ensures \result == list[i];
       @ assignable \strictly_nothing;
       @*/
-    public /*@ strictly_pure @*/ Node get (int i) {
+    public /*@ strictly_pure @*/ Edge get (int i) {
         return array[i];
     }
 
 
     /*@ public normal_behavior
       @ requires \invariant_for(n);
-      @ ensures \result == (\exists int i; i >= 0 && i < list.length; ((Node) list[i]).equals(n));
+      @ ensures \result == (\exists int i; i >= 0 && i < list.length; ((Edge) list[i]).equals(n));
       @ assignable \strictly_nothing;
       @*/
-    public /*@ strictly_pure @*/ boolean contains (Node n) {
+    public /*@ strictly_pure @*/ boolean contains (Edge n) {
         if(getIndex(n) >= 0) {
             return true;
         }
@@ -94,10 +94,10 @@ public class NodeList {
 
     /*@ public normal_behavior
       @ requires \invariant_for(n);
-      @ ensures (\exists int i; i >= 0 && i < list.length; ((Node) list[i]).equals(n)) ? \result >= 0 && \result < list.length && ((Node) list[\result]).equals(n) : \result == -1;
+      @ ensures (\exists int i; i >= 0 && i < list.length; ((Edge) list[i]).equals(n)) ? \result >= 0 && \result < list.length && ((Edge) list[\result]).equals(n) : \result == -1;
       @ assignable \strictly_nothing;
       @*/
-    public /*@ strictly_pure @*/ int getIndex (Node n) {
+    public /*@ strictly_pure @*/ int getIndex (Edge n) {
         /*@ loop_invariant
           @ i >= 0 && i <= firstFreeIndex &&
           @ (\forall int j; 0 <= j && j < i; !array[j].equals(n));
