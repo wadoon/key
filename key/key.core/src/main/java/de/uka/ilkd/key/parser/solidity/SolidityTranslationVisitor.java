@@ -366,7 +366,7 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 	 * Checks whether we are currently visiting a function/field/constructor/modifier that was inherited.
 	 * @return The result of currentContract != currentOwnerContract.
 	 */
-	private boolean currentlyVisitingInheritedMember() { return currentContract != currentOwnerContract; }
+	private boolean currentlyVisitingInheritedContractMember() { return currentContract != currentOwnerContract; }
 
 	private String removeOuterBracesFromCallableBodyOutput(String callableBodyOutput) {
 		int openIndex = callableBodyOutput.indexOf('{');
@@ -468,6 +468,13 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 			}
 		}
 		return invCtxs;
+	}
+
+	private String getDefaultConstructorOutput(Solidity.Constructor constructor) {
+		StringBuilder output = new StringBuilder("public " + constructor.owner.getDisplayName() + "(Message msg) {\n");
+		output.append(getParentConstructorInvocationsOutput(constructor, new LinkedList<>()));
+		output.append("}\n");
+		return output.toString();
 	}
 
 	/**
@@ -1262,6 +1269,11 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 			classOutput.append("class " + contract.getDisplayName() +
 					" extends Address implements " + contractName + " {\n");
 			ctx.contractPart().stream().forEach(part -> classOutput.append(visit(part) + '\n'));
+			// If the contract does not define a constructor, a default one needs to be inserted.
+			if (contract.hasDefaultConstructor()) {
+				// The ctx cannot be visited, as it is null.
+				classOutput.append(getDefaultConstructorOutput(contract.constructor));
+			}
 		} else if (contract.type == Solidity.ContractType.INTERFACE) {
 			// interfaceOutput is appended to manually when we see a func decl, struct def, etc.
 			ctx.contractPart().stream().forEach(part -> visit(part));
@@ -1298,9 +1310,13 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 					}
 				});
 
-				// Import constructors (as functions). Each base class can have at most one constructor.
-				if (parent.hasNonDefaultConstructor())
+				// Import constructors (as functions). Each base class has one constructor.
+				if (parent.hasDefaultConstructor()) {
+					// Cannot visit the ctx, as it is null
+					classOutput.append(getDefaultConstructorOutput(parent.constructor));
+				} else {
 					classOutput.append(visit(parent.constructor.ctx) + '\n');
+				}
 			}
 		}
 
@@ -1423,6 +1439,60 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 		}
 	}
 
+	private String getParentConstructorInvocationsOutput(Solidity.Constructor constructor,
+														 List<SolidityParser.ModifierInvocationContext> explicitParentConstructorInvokations) {
+		StringBuilder output = new StringBuilder();
+
+		// Inherited constructors shall not contain calls to parent constructors; given the current contract,
+		//  all parent constructors are invoked directly from the current contract's constructor.
+		if (!currentlyVisitingInheritedContractMember()) {
+			// Collect all constructors invoked by the parent constructors
+			for (Solidity.Contract parent : constructor.owner.c3Linearization) {
+				Solidity.Constructor parentConstructor = parent.constructor;
+				List<SolidityParser.ModifierInvocationContext> parentConstructorInvocations =
+						getAllParentConstructorInvocations(parentConstructor);
+				// Merge the two lists
+				explicitParentConstructorInvokations = Stream.of(explicitParentConstructorInvokations, parentConstructorInvocations)
+						.flatMap(Collection::stream)
+						.collect(Collectors.toList());
+			}
+
+			// Go through all the parents of the current contract and locate the corresponding constructor invocations.
+			// Add to the constructor body output an invocation of the constructors with the found arguments.
+			// If an invocation can not be found, simply add "CImpl(msg);", where C is the name of the parent, to the output,
+			// if the constructor of C is parameter-free. Otherwise, throw an error.
+			for (Solidity.Contract parent : constructor.owner.c3Linearization) {
+				if (parent.equals(constructor.owner))
+					continue;
+				// Locate the invocation of the parent constructor.
+				// If there are two invocations, this is undefined behaviour (Solidity program would not compile)
+				boolean invFound = false;
+				for (SolidityParser.ModifierInvocationContext invCtx : explicitParentConstructorInvokations) {
+					if (invCtx.identifier().getText().equals(parent.name)) {
+						output.append(parent.getDisplayName() + "(msg,");
+						if (invCtx.expressionList() != null && !invCtx.expressionList().expression().isEmpty()) {
+							invCtx.expressionList().expression().forEach(expr ->
+									output.append(visit(expr) + ','));
+						}
+						output.deleteCharAt(output.length() - 1);
+						output.append(");\n");
+						invFound = true;
+						break;
+					}
+				}
+				if (!invFound) {
+					if (parent.constructor.params.isEmpty()) {
+						output.append(parent.getDisplayName() + "(msg);\n");
+					} else {
+						error("The constructor for contract " + currentOwnerContract.name +
+								" does not invoke parent constructor " + parent.name);
+					}
+				}
+			}
+		}
+		return output.toString();
+	}
+
 	/**
 	 * {@inheritDoc}
 	 *
@@ -1440,7 +1510,7 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 
 		String visibility;
 		String returnType;
-		if (currentlyVisitingInheritedMember()) {
+		if (currentlyVisitingInheritedContractMember()) {
 			// "Inherit" the constructor by constructing a new private function representing its body and modifiers.
 			visibility = "private";
 			returnType = "void";
@@ -1472,7 +1542,7 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 
 		StringBuilder braceFreeBodyOutput = new StringBuilder(removeOuterBracesFromCallableBodyOutput(visitCallableBody(constructor)));
 
-		if (currentlyVisitingInheritedMember() && ctx.modifierList() == null) {
+		if (currentlyVisitingInheritedContractMember() && ctx.modifierList() == null) {
 			return headerOutput + "{\n" + braceFreeBodyOutput + "\n}\n";
 		} else {
 			structureStack.push(ContractStructure.CALLABLE_HEADER);
@@ -1495,65 +1565,19 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 					boolean isConstructorInvocation = linearizationPos != currentOwnerContract.c3Linearization.size();
 					if (!isConstructorInvocation) {
 						modCalls.add(mod);
-					} else if (!currentlyVisitingInheritedMember()) {
+					} else if (!currentlyVisitingInheritedContractMember()) {
 						constructorCalls.add(mod);
 					}
 				}
 			}
 			structureStack.pop();
 
-			StringBuilder parentConstructorCallsOutput = new StringBuilder();
-
-			if (!currentlyVisitingInheritedMember()) {
-				// Collect all constructors invoked by the parent constructors
-				for (Solidity.Contract parent : currentContract.c3Linearization) {
-					Solidity.Constructor parentConstructor = parent.constructor;
-					List<SolidityParser.ModifierInvocationContext> parentConstructorInvocations =
-							getAllParentConstructorInvocations(parentConstructor);
-					// Merge the two lists
-					constructorCalls = Stream.of(constructorCalls, parentConstructorInvocations)
-							.flatMap(Collection::stream)
-							.collect(Collectors.toList());
-				}
-
-				// Go through all the parents of the current contract and locate the corresponding constructor invocations.
-				// Add to the constructor body output an invocation of the constructors with the found arguments.
-				// If an invocation can not be found, simply add "CImpl(msg);", where C is the name of the parent, to the output,
-				// if the constructor of C is parameter-free. Otherwise, throw an error.
-				for (Solidity.Contract parent : currentContract.c3Linearization) {
-					if (parent.equals(currentContract))
-						continue;
-					// Locate the invocation of the parent constructor.
-					// If there are two invocations, this is undefined behaviour (Solidity program would not compile)
-					boolean invFound = false;
-					for (SolidityParser.ModifierInvocationContext invCtx : constructorCalls) {
-						if (invCtx.identifier().getText().equals(parent.name)) {
-							parentConstructorCallsOutput.append(parent.getDisplayName() + "(msg,");
-							if (invCtx.expressionList() != null && !invCtx.expressionList().expression().isEmpty()) {
-								invCtx.expressionList().expression().forEach(expr ->
-										parentConstructorCallsOutput.append(visit(expr) + ','));
-							}
-							parentConstructorCallsOutput.deleteCharAt(parentConstructorCallsOutput.length() - 1);
-							parentConstructorCallsOutput.append(");\n");
-							invFound = true;
-							break;
-						}
-					}
-					if (!invFound) {
-						if (parent.constructor.params.isEmpty()) {
-							parentConstructorCallsOutput.append(parent.getDisplayName() + "(msg);\n");
-						} else {
-							error("The constructor for contract " + currentOwnerContract.name +
-									" does not invoke parent constructor " + parent.name);
-						}
-					}
-				}
-			}
+			String parentConstructorCallsOutput = getParentConstructorInvocationsOutput(constructor, constructorCalls);
 
 			CallableFlatteningResult result = createFlattenedCallable(
 					constructor,
 					braceFreeBodyOutput.toString(),
-					parentConstructorCallsOutput.toString(),
+					parentConstructorCallsOutput,
 					modCalls
 			);
 			return headerOutput + result.mainBodyOutput + result.externalMethodsOutput;
@@ -1623,7 +1647,7 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 		   and only added to the interface if its visibility is either public or package-protected.
 		   This is because Java interfaces cannot have private/protected methods.
 		 */
-		if (!currentlyVisitingInheritedMember() && !function.overrides && visibility.equals("public")) {
+		if (!currentlyVisitingInheritedContractMember() && !function.overrides && visibility.equals("public")) {
 			interfaceOutput.append(fctHeader + ";\n");
 		}
 

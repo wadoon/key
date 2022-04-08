@@ -230,7 +230,7 @@ public class SoliditySpecCompiler {
                 currentCallableLineNo = function.inputFileStartLine;
             }
         }
-        if (specContract.hasNonDefaultConstructor()) {
+        if (!specContract.hasDefaultConstructor()) {
             if (specContract.constructor.inputFileStartLine > line &&
                     (currentCallableLineNo == line || specContract.constructor.inputFileStartLine < currentCallableLineNo)) {
                 currentCallable = specContract.constructor;
@@ -250,7 +250,7 @@ public class SoliditySpecCompiler {
                 maxLine = function.inputFileStartLine;
             }
         }
-        if (specContract.hasNonDefaultConstructor() && specContract.constructor.inputFileStartLine > maxLine) {
+        if (!specContract.hasDefaultConstructor() && specContract.constructor.inputFileStartLine > maxLine) {
             maxLine = specContract.constructor.inputFileStartLine;
         }
         return startLine >= specContract.inputFileStartLine && startLine <= maxLine;

@@ -114,9 +114,9 @@ public class SolidityPreVisitor extends SolidityBaseVisitor<Environment> {
 
         // If a constructor was not defined, make a default one.
         if (contract.constructor == null) {
-            contract.constructor = new Solidity.Constructor(contract.name, contract);
-            contract.constructor.returnType = contract.name;
+            contract.constructor = new Solidity.Constructor(contract);
             contract.constructor.params = new LinkedList<>();
+            // TODO: construct a new SolidityParser.ConstructorDefinitionContext, and add to the constructor?
         }
 
         currentlyVisitingContract = false;
@@ -227,12 +227,12 @@ public class SolidityPreVisitor extends SolidityBaseVisitor<Environment> {
 
     @Override
     public Environment visitConstructorDefinition(SolidityParser.ConstructorDefinitionContext ctx) {
-        if (currentContract.hasNonDefaultConstructor())
+        if (currentContract.constructor != null) {
             error("Cannot define more than one constructor for contract " + currentContract.name);
-        Solidity.Constructor constructor = new Solidity.Constructor(currentContract.name, currentContract);
+        }
+        Solidity.Constructor constructor = new Solidity.Constructor(currentContract);
         currentCallable = currentContract.constructor = constructor;
         constructor.ctx = ctx;
-        constructor.returnType = currentContract.name;
         constructor.inputFileStartLine = ctx.start.getLine();
         ctx.modifierList().stateMutability().forEach(term -> {
             if (term.PayableKeyword() != null) {

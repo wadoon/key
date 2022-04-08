@@ -248,7 +248,10 @@ public class Solidity {
     public static class Constructor extends Callable {
         public SolidityParser.ConstructorDefinitionContext ctx;
 
-        public Constructor(String name, Contract owner) { super(name, owner); }
+        public Constructor(Contract owner) {
+            super(owner.name, owner);
+            returnType = owner.name;
+        }
 
         @Override public String getDisplayName(Contract callingContract) { return getContractDisplayName(owner.name); }
 
@@ -633,8 +636,8 @@ public class Solidity {
             return null;
         }
 
-        public boolean hasNonDefaultConstructor() {
-            return this.constructor != null && !this.constructor.isDefaultConstructor();
+        public boolean hasDefaultConstructor() {
+            return this.constructor.isDefaultConstructor();
         }
 
         public String getDisplayName() { return getContractDisplayName(name); }
