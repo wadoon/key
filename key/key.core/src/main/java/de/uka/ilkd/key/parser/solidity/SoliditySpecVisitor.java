@@ -159,10 +159,10 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SoliditySpecVisitor
         //dont forget implicit this/self
         SMLExpr r1 = visit(ctx.expression(0));
         SMLExpr r2 = visit(ctx.expression(1));
-        String underlyingArrayType = Solidity.solidityToJavaType(r1.type);
+        String underlyingArrayType = Solidity.solidityToJavaType(r1.type, env);
         underlyingArrayType = underlyingArrayType.substring(0, underlyingArrayType.length() - 2);
         String intCast = !("int").equals(r2.type) ? "(int)" : "";
-        String res = "(" + Solidity.solidityToJavaType(underlyingArrayType) +
+        String res = "(" + Solidity.solidityToJavaType(underlyingArrayType, env) +
             "::select(" + SpecCompilerUtils.HEAP_PLACEHOLDER_STRING + "," + r1.output + ", arr(" + intCast +  r2.output + ")))"; 
         return new SMLExpr(underlyingArrayType,res);
     }
@@ -195,15 +195,15 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SoliditySpecVisitor
         Solidity.Enum enum_ = null;
         Solidity.Struct struct = null;
         Solidity.Variable variable = null;
-        if ((enum_ = contract.lookupEnum(ident, env.contracts)) != null) {
-            type = enum_.toString();
-        } else if ((struct = contract.lookupStruct(ident, env.contracts)) != null) {
-            type = struct.toString();
+        if ((enum_ = contract.lookupEnum(ident, env)) != null) {
+            type = enum_.getDisplayName();
+        } else if ((struct = contract.lookupStruct(ident, env)) != null) {
+            type = struct.getDisplayName();
         } else if ((variable = contract.lookupField(ident)) != null) {
-            if ((enum_ = contract.lookupEnum(variable.typename, env.contracts)) != null) {
-                type = enum_.toString();
-            } else if ((struct = contract.lookupStruct(variable.typename, env.contracts)) != null) {
-                type = struct.toString();
+            if ((enum_ = contract.lookupEnum(variable.typename, env)) != null) {
+                type = enum_.getDisplayName();
+            } else if ((struct = contract.lookupStruct(variable.typename, env)) != null) {
+                type = struct.getDisplayName();
             } else {
                 type = variable.typename;
             }
@@ -220,7 +220,7 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SoliditySpecVisitor
         }
         boolean logicalVar = variable != null && variable instanceof Solidity.LogicalVariable;
         String access = logicalVar ? ident :
-                "(" + Solidity.solidityToJavaType(type) + "::select(" +
+                "(" + Solidity.solidityToJavaType(type, env) + "::select(" +
                         SpecCompilerUtils.HEAP_PLACEHOLDER_STRING + ",self," + injectFieldPrefix(ident) + "))";
         return new SMLExpr(type, access);
 
@@ -262,7 +262,7 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SoliditySpecVisitor
         env.addLogicalVar(logicalVarName, logicalVarType);
         SMLExpr r = visit(ctx.expression());
         SMLExpr ret = new SMLExpr(r.type, "(\\forall " +
-                __QUANT_TYPE_START__ + Solidity.solidityToJavaType(logicalVarType) + " " + __QUANT_TYPE_END__ +
+                __QUANT_TYPE_START__ + Solidity.solidityToJavaType(logicalVarType, env) + " " + __QUANT_TYPE_END__ +
                 logicalVarName + "; " +
                 r.output + ")");
         env.removeLogicalVar(logicalVarName);
@@ -275,7 +275,7 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SoliditySpecVisitor
         env.addLogicalVar(logicalVarName, logicalVarType);
         SMLExpr r = visit(ctx.expression());
         SMLExpr ret = new SMLExpr(r.type, "(\\exists " +
-            __QUANT_TYPE_START__ + Solidity.solidityToJavaType(logicalVarType) + " " + __QUANT_TYPE_END__ +
+            __QUANT_TYPE_START__ + Solidity.solidityToJavaType(logicalVarType, env) + " " + __QUANT_TYPE_END__ +
                 logicalVarName + "; " +
             r.output + ")");
         env.removeLogicalVar(logicalVarName);
@@ -323,9 +323,9 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SoliditySpecVisitor
         String ident = ctx.identifier().Identifier().getText();
         String type = null;
         String output = null;
-        Solidity.Enum enum_ = contract.lookupEnum(r.type, env.contracts);
+        Solidity.Enum enum_ = contract.lookupEnum(r.type, env);
         if (enum_ != null) {
-            type = enum_.toString();
+            type = enum_.getDisplayName();
             output = enum_ + "::select(" + SpecCompilerUtils.HEAP_PLACEHOLDER_STRING +
                     ",null," + enum_ + "::$" + ident + ")";
         } else if (ident.equals("length") || ident.equals("arr_length")) {
@@ -334,16 +334,16 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SoliditySpecVisitor
             output = "(" + "int" + "::select(" + SpecCompilerUtils.HEAP_PLACEHOLDER_STRING + "," + r.output + "," + ident + "))";
         } else if (r.type.equals("Message")) {    // assuming either msg.sender or msg.value
             type = ident.equals("sender") ? "Address" : "int";
-            output = "(" + Solidity.solidityToJavaType(type) + "::select(" + SpecCompilerUtils.HEAP_PLACEHOLDER_STRING +
+            output = "(" + Solidity.solidityToJavaType(type, env) + "::select(" + SpecCompilerUtils.HEAP_PLACEHOLDER_STRING +
                     ",msg,java.lang.Message::$" + ident + "))";
         } else if (r.output.equals("this") && ident.equals("balance")) {
             type = contract.lookupField(ident).typename;
-            output = "(" + Solidity.solidityToJavaType(type) + "::select(" + SpecCompilerUtils.HEAP_PLACEHOLDER_STRING +
+            output = "(" + Solidity.solidityToJavaType(type, env) + "::select(" + SpecCompilerUtils.HEAP_PLACEHOLDER_STRING +
                     ",self,java.lang.Address::$" + ident + "))";
         } else {
-            Solidity.Struct struct = contract.lookupStruct(r.type, env.contracts);
+            Solidity.Struct struct = contract.lookupStruct(r.type, env);
             if (struct == null) {
-                struct = contract.lookupStruct(ident, env.contracts);
+                struct = contract.lookupStruct(ident, env);
                 if (struct == null) {
                     error("unsupported expression in dot expression");
                 }
@@ -353,8 +353,8 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SoliditySpecVisitor
                 error("unsupported expression in dot expression");
             }
             type = structMember.typename;
-            output = "(" + Solidity.solidityToJavaType(type) + "::select(" + SpecCompilerUtils.HEAP_PLACEHOLDER_STRING +
-                    "," + r.output + ","  + Solidity.solidityToJavaType(r.type) + "::$" + ident + "))";
+            output = "(" + Solidity.solidityToJavaType(type, env) + "::select(" + SpecCompilerUtils.HEAP_PLACEHOLDER_STRING +
+                    "," + r.output + ","  + Solidity.solidityToJavaType(r.type, env) + "::$" + ident + "))";
         }
 
         return new SMLExpr(type, output);

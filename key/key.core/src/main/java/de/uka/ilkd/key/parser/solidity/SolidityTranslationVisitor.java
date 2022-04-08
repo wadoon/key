@@ -12,7 +12,7 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 	private final StringBuilder output = new StringBuilder();
 	private final VariableScopeStack varStack = new VariableScopeStack();
 	private final Stack<ContractStructure> structureStack = new Stack<>();
-	private Map<String, Solidity.Contract> contracts = new HashMap<>(); // Contract name => contract
+	private Environment env = new Environment();
 	private Solidity.Contract currentContract; // The contract that we are currently visiting/building
 	private Solidity.Contract currentOwnerContract; // If we are visiting e.g. an inherited function, then this will be the owner
 	private StringBuilder interfaceOutput = new StringBuilder();
@@ -103,6 +103,18 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 		public String getTypeofIdentifier(String identifier) {
 			Solidity.Variable var = getVariableFromIdentifier(identifier);
 			return var == null ? null : var.typename;
+		}
+
+		public boolean hasLocalVariableWithNameOrRenamedName(String identifier) {
+			for (List<Solidity.Variable> scope : deque) {
+				for (Solidity.Variable var : scope) {
+					if (!(var instanceof Solidity.Field) &&
+							(var.name.equals(identifier) || var.renamedName.equals(identifier))) {
+						return true;
+					}
+				}
+			}
+			return false;
 		}
 
 		@Override public String toString() {
@@ -196,7 +208,7 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 	}
 
 	private boolean nameIsAContract(String name) {
-		return contracts.get(name) != null;
+		return env.contracts.get(name) != null;
 	}
 
 	/**
@@ -231,9 +243,9 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 			Solidity.Variable var = varStack.getVariableFromIdentifier(beforeFirstDot);
 			if (var != null) {
 				if (nameIsAContract(var.typename)) {
-					return getReservedFunctionReturnTypeContractContext(afterFirstDot, contracts.get(var.typename), false);
+					return getReservedFunctionReturnTypeContractContext(afterFirstDot, env.contracts.get(var.typename), false);
 				}
-				Solidity.Struct struct = containingContract.lookupStruct(var.typename, contracts);
+				Solidity.Struct struct = containingContract.lookupStruct(var.typename, env);
 				if (struct != null) {
 					return getReservedFunctionReturnTypeStructContext(afterFirstDot, struct);
 				}
@@ -243,16 +255,16 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 		Solidity.Field field = containingContract.lookupField(beforeFirstDot);
 		if (field != null) {
 			if (nameIsAContract(field.typename)) {
-				return getReservedFunctionReturnTypeContractContext(afterFirstDot, contracts.get(field.typename), false);
+				return getReservedFunctionReturnTypeContractContext(afterFirstDot, env.contracts.get(field.typename), false);
 			}
-			Solidity.Struct struct = containingContract.lookupStruct(field.typename, contracts);
+			Solidity.Struct struct = containingContract.lookupStruct(field.typename, env);
 			if (struct != null) {
 				return getReservedFunctionReturnTypeStructContext(afterFirstDot, struct);
 			}
 			return getReservedFunctionReturnTypeElementaryTypeContext(afterFirstDot, field.typename);
 		}
 		if (nameIsAContract(beforeFirstDot))
-			return getReservedFunctionReturnTypeContractContext(afterFirstDot, contracts.get(beforeFirstDot), false);
+			return getReservedFunctionReturnTypeContractContext(afterFirstDot, env.contracts.get(beforeFirstDot), false);
 		if (beforeFirstDot.equals("this"))
 			return getReservedFunctionReturnTypeContractContext(afterFirstDot, containingContract, false);
 		if (beforeFirstDot.equals("msg")) {
@@ -341,8 +353,8 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 		for (Solidity.Variable var : containingStruct.fields) {
 			if (var.name.equals(beforeFirstDot)) {
 				if (nameIsAContract(var.typename))
-					return getReservedFunctionReturnTypeContractContext(afterFirstDot, contracts.get(var.typename), false);
-				Solidity.Struct struct = containingStruct.owner.lookupStruct(var.typename, contracts);
+					return getReservedFunctionReturnTypeContractContext(afterFirstDot, env.contracts.get(var.typename), false);
+				Solidity.Struct struct = containingStruct.owner.lookupStruct(var.typename, env);
 				if (struct != null)
 					return getReservedFunctionReturnTypeStructContext(afterFirstDot, struct);
 				return getReservedFunctionReturnTypeElementaryTypeContext(afterFirstDot, var.typename);
@@ -371,12 +383,12 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 			return "";
 		}
 		else if (function.returnVars.isEmpty()) {
-			return Solidity.solidityToJavaType(function.returnType) + " " + defaultReturnVariableName +
+			return Solidity.solidityToJavaType(function.returnType, env) + " " + defaultReturnVariableName +
 					" = " + defaultValueOfType(function.returnType) + ";\n";
 		} else {
 			StringBuilder output = new StringBuilder();
 			function.returnVars.forEach(var -> output.append(
-					Solidity.solidityToJavaType(var.typename) + " " + var.name + " = " +
+					Solidity.solidityToJavaType(var.typename, env) + " " + var.name + " = " +
 							defaultValueOfType(var.typename) + ";\n"));
 			return output.toString();
 		}
@@ -390,7 +402,9 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 				return "return " + defaultReturnVariableName + ";\n";
 			} else {
 				// TODO: for now, we return only the first return variable. In the future, return tuples of some kind.
-				return "return " + function.returnVars.get(0).name + ";\n";
+				Solidity.Variable firstReturnVar = function.returnVars.get(0);
+				varStack.pushVar(firstReturnVar);
+				return "return " + firstReturnVar.name + ";\n";
 			}
 		}
 	}
@@ -419,17 +433,17 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 		// TODO: for int[], the default value should be "new int[n]" (Solidity default initialization),
 		//  where n is the size, but we don't know the size.
 		if (nameIsAContract(type)) {
-			return "new " + contracts.get(type).getDisplayName() + "()";
+			return "new " + env.contracts.get(type).getDisplayName() + "()";
 		}
 		Solidity.Struct struct = currentOwnerContract.getStruct(type);
 		if (struct != null) {
-			return "new " + struct + "()";
+			return "new " + struct.getDisplayName() + "()";
 		}
-		return switch (Solidity.solidityToJavaType(type)) {
+		return switch (Solidity.solidityToJavaType(type, env)) {
 			case "int" -> "0";
 			case "boolean" -> "false";
 			case "String" -> "\"\"";
-			case "Address" -> "new Address()";
+			case "Address" -> "(Address)(0)";
 			default -> "null";
 		};
 	}
@@ -497,7 +511,7 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 		String fctName = ctx.expression().getText();
 		if (Solidity.typeIsElementary(fctName)) {
 			// type(...) => (type)(...)
-			String displayedName = "(" + Solidity.solidityToJavaType(fctName) + ")";
+			String displayedName = "(" + Solidity.solidityToJavaType(fctName, env) + ")";
 			return new CallableOverloadResolutionResult(displayedName, null, null, fctName, FunctionCallReferenceType.INTERNAL);
 		}
 
@@ -527,7 +541,7 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 			} else if (objectName.equals("super")) {
 				referenceType = FunctionCallReferenceType.SUPER;
 			} else if (nameIsAContract(objectName)) {
-				if (contracts.get(objectName).type == Solidity.ContractType.LIBRARY)
+				if (env.contracts.get(objectName).type == Solidity.ContractType.LIBRARY)
 					referenceType = FunctionCallReferenceType.LIBRARY;
 				else
 					referenceType = FunctionCallReferenceType.CONTRACT;
@@ -545,13 +559,13 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 			String type = fctName.substring("new".length());
 			if (nameIsAContract(type)) {
 				String ownerContractName = fctName.substring("new".length());
-				Solidity.Contract ownerContract = contracts.get(ownerContractName);
+				Solidity.Contract ownerContract = env.contracts.get(ownerContractName);
 				if (ownerContract == null)
 					error("Could not locate contract " + ownerContractName);
 				String displayName = "new " + ownerContract.getDisplayName();
 				return new CallableOverloadResolutionResult(displayName, ownerContract.constructor, null,null, referenceType);
 			} else if (Solidity.typeIsElementary(type) || Solidity.typeIsArray(type)) {
-				String displayName = "new " + Solidity.solidityToJavaType(type);
+				String displayName = "new " + Solidity.solidityToJavaType(type, env);
 				return new CallableOverloadResolutionResult(displayName, null, null, type, referenceType);
 			} else {
 				error("Could not resolve constructor call " + fctName + " in contract " + currentOwnerContract.name);
@@ -572,8 +586,8 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 		// If a library function was called (directly, without the 'Using For' construct, and from outside the library),
 		//  lookup the function there
 		if (referenceType == FunctionCallReferenceType.LIBRARY) {
-			Solidity.Contract library = contracts.get(objectName);
-			Solidity.Function libFun = library.getFunction(comparableName, resolvedArgs, currentOwnerContract, true);
+			Solidity.Contract library = env.contracts.get(objectName);
+			Solidity.Function libFun = library.getFunction(comparableName, resolvedArgs, currentOwnerContract, env, true);
 			if (libFun == null) {
 				error("Could not find function " + comparableName + " in library " + library.name);
 			} else {
@@ -599,7 +613,7 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 		for (Solidity.Function libFun : currentOwnerContract.getAttachedLibraryFunctionsForType(typeOfThis)) {
 			if (libFun.name.equals(comparableName) &&
 					Solidity.argTypesMatchesFunctionParams(resolvedArgsPrependedWithThis, libFun.getParamTypeNames(),
-							libFun, currentOwnerContract, true)) {
+							libFun, currentOwnerContract, env, true)) {
 				String displayedName = libFun.owner.name + "." + libFun.name;
 				return new CallableOverloadResolutionResult(displayedName, libFun, null, null, referenceType);
 			}
@@ -616,7 +630,7 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 		if (referenceType == FunctionCallReferenceType.OBJECT) {
 			String typeName = varStack.getTypeofIdentifier(objectName);
 			if (nameIsAContract(typeName)) {
-				caller = contracts.get(typeName);
+				caller = env.contracts.get(typeName);
 			} else {
 				// linearization walking will not be performed
 				error("Could not resolve function call " + fctName + " in contract " + currentOwnerContract.name);
@@ -656,7 +670,7 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 				}
 			}
 			// Check if the parent has the function
-			Solidity.Function fun = parent.getFunction(comparableName, resolvedArgs, currentOwnerContract, true);
+			Solidity.Function fun = parent.getFunction(comparableName, resolvedArgs, currentOwnerContract, env, true);
 			if (fun != null) {
 				boolean funIsVisible = fun.visibility != Solidity.FunctionVisibility.PRIVATE ||
 						(referenceType == FunctionCallReferenceType.OBJECT && caller.name.equals(currentOwnerContract.name)) ||
@@ -727,7 +741,7 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 
 		Solidity.Modifier mod;
 		if (isDirectCall) {
-			Solidity.Contract parent = contracts.get(contractName);
+			Solidity.Contract parent = env.contracts.get(contractName);
 			if (parent == null) {
 				error("Contract " + currentOwnerContract.name + " calls modifier " + modName +
 						", but contract " + contractName + " does not exist.");
@@ -875,10 +889,10 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 		if (mode == ModifierFlatteningMode.INLINE_MODS_CALL_FUNCTION) {
 			// Create an additional private Java method, corresponding to the modifier-free callable.
 			StringBuilder externalOutput = new StringBuilder("private ");
-			externalOutput.append(callable instanceof Solidity.Function ? Solidity.solidityToJavaType(callable.returnType) : "void");
+			externalOutput.append(callable instanceof Solidity.Function ? Solidity.solidityToJavaType(callable.returnType, env) : "void");
 			externalOutput.append(" ");
 			externalOutput.append(ModifierFlattening.mainCallable.getModFreeDisplayName(currentContract));
-			externalOutput.append(callable.buildParamListWithParen());
+			externalOutput.append(callable.buildParamListWithParen(env));
 			externalOutput.append("{\n");
 			// Declare return variables at the top of the function body, and return at the end.
 			// This may produce a Java program that does not compile (unreachable code), but we don't care.
@@ -991,12 +1005,12 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 		if (callable instanceof Solidity.Constructor) {
 			returnType = "void";
 		} else if (callable instanceof Solidity.Function) {
-			returnType = Solidity.solidityToJavaType(callable.returnType);
+			returnType = Solidity.solidityToJavaType(callable.returnType, env);
 		} else {
 			error("Illegitimate Solidity.Callable type given to flattenCallableWithModCalling().");
 		}
 		externalOutput.append("private " + returnType + " " + callable.getModFreeDisplayName(currentContract));
-		externalOutput.append(callable.buildParamListWithParen());
+		externalOutput.append(callable.buildParamListWithParen(env));
 		externalOutput.append("{\n");
 		// Declare return variables at the top of the function body, and return at the end.
 		// This may produce a Java program that does not compile (unreachable code), but we don't care.
@@ -1070,7 +1084,7 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 			// Add to the output a method for the modifier.
 			externalOutput.append("private ");
 			if (callable instanceof Solidity.Function) {
-				externalOutput.append(Solidity.solidityToJavaType(callable.returnType) + " ");
+				externalOutput.append(Solidity.solidityToJavaType(callable.returnType, env) + " ");
 			} else {
 				externalOutput.append("void ");
 			}
@@ -1078,10 +1092,10 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 					numberOfTimesVisited.get(mod), numberOfOccurrences.get(mod));
 			externalOutput.append(shownModifierName);
 			externalOutput.append('(');
-			externalOutput.append(mod.buildParamList());
+			externalOutput.append(mod.buildParamList(env));
 			externalOutput.append(',');
 			callable.params.forEach(param ->
-					externalOutput.append(Solidity.solidityToJavaType(param.typename) + " " +
+					externalOutput.append(Solidity.solidityToJavaType(param.typename, env) + " " +
 							ModifierFlattening.getDisplayNameOfCallableParamInModifier(param.name) + ","));
 			externalOutput.deleteCharAt(externalOutput.length() - 1);
 			externalOutput.append("){\n");
@@ -1091,7 +1105,7 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 			boolean declareModReturnVar = callable instanceof Solidity.Function && !callable.returnType.equals("void");
 
 			if (declareModReturnVar) {
-				externalOutput.append(Solidity.solidityToJavaType(callable.returnType) + " " +
+				externalOutput.append(Solidity.solidityToJavaType(callable.returnType, env) + " " +
 						defaultReturnVariableName + " = " + defaultValueOfType(callable.returnType) + ";");
 			}
 
@@ -1146,7 +1160,7 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 		 * This is done so that, if we encounter an instance of a contract type where the contract has not been defined
 		 * yet, we know that the contract exists (and all of its functions, fields, etc.). */
 		SolidityPreVisitor preVisitor = new SolidityPreVisitor();
-		this.contracts = preVisitor.visit(ctx);
+		env = preVisitor.visit(ctx);
 		return visitChildren(ctx);
 	}
 
@@ -1218,7 +1232,7 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 		structureStack.push(ContractStructure.CONTRACT_DEF);
 
 		String contractName = ctx.identifier().getText();
-		Solidity.Contract contract = contracts.get(contractName);
+		Solidity.Contract contract = env.contracts.get(contractName);
 		if (contract == null) {
 			error("Could not locate the already visited contract " + contractName + ".");
 		}
@@ -1235,7 +1249,7 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 		interfaceOutput.append("interface " + contractName);
 		if (contract.inheritanceList.size() > 0) {
 			interfaceOutput.append(" extends");
-			contract.inheritanceList.forEach(c -> interfaceOutput.append(" " + c + ","));
+			contract.inheritanceList.forEach(c -> interfaceOutput.append(" " + c.name + ","));
 			interfaceOutput.deleteCharAt(interfaceOutput.length()-1);
 		}
 		interfaceOutput.append(" {\n");
@@ -1255,11 +1269,6 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 			ctx.contractPart().stream().forEach(part -> classOutput.append(visit(part) + '\n'));
 		} else {
 			error("Unrecognized contract type for contract " + contractName + " encountered.");
-		}
-		
-		if (!contract.hasNonDefaultConstructor()) {
-			// In this case, the constructor will have not been visited above, as it is not part of the AST
-			classOutput.append("public " + contract.constructor.getDisplayName(contract) + "(Message msg){\n}\n");
 		}
 
 		/* Import all inherited functions, fields, modifiers, and constructors from the contract's parents.
@@ -1355,11 +1364,11 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 		}
 
 		String displayName = field.getDisplayName(currentContract);
-		String shownTypename = Solidity.solidityToJavaType(field.typename);
-		if (nameIsAContract(field.typename))
-			shownTypename = contracts.get(field.typename).getDisplayName();
+		String shownTypename = Solidity.solidityToJavaType(field.typename, env);
+		Solidity.DataLocation dataLocation = Solidity.DataLocation.STORAGE;
+		String dataLocationAnnotation = Solidity.getDataLocationAnnotation(dataLocation);
 
-		output.append(" " + shownTypename + " " + displayName);
+		output.append(" " + shownTypename + " " + dataLocationAnnotation + " " + displayName);
 
 		structureStack.pop();
 		structureStack.push(ContractStructure.FIELD_DECL_RIGHT);
@@ -1390,6 +1399,10 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 	 */
 	@Override public String visitStructDefinition(SolidityParser.StructDefinitionContext ctx) {
 		structureStack.push(ContractStructure.STRUCT);
+		Solidity.Struct struct = currentOwnerContract.lookupStruct(ctx.identifier().getText(), env);
+		if (struct == null) {
+			error("Could not locate struct " + ctx.identifier().getText() + " in contract " + currentOwnerContract.name);
+		}
 		StringBuffer output = new StringBuffer("static class " + visit(ctx.identifier()) + "{\n");
 		ctx.variableDeclaration().stream().forEach(v -> output.append(visit(v)).append(";\n"));
 		output.append("}\n");
@@ -1424,7 +1437,7 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 			returnType = "";
 		}
 
-		String parameters = constructor.buildParamListWithParen();
+		String parameters = constructor.buildParamListWithParen(env);
 		String headerOutput = visibility + " " + returnType + " " +
 				constructor.getDisplayName(currentContract) + parameters;
 
@@ -1567,7 +1580,7 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 		String funName = ctx.identifier().getText();
 		LinkedList<String> argTypes = new LinkedList<>();
 		ctx.parameterList().parameter().forEach(parameter -> argTypes.add(visit(parameter.typeName())));
-		Solidity.Function function = currentOwnerContract.getFunction(funName, argTypes, currentOwnerContract, false);
+		Solidity.Function function = currentOwnerContract.getFunction(funName, argTypes, currentOwnerContract, env, false);
 		if (function == null) {
 			error("Could not locate function " + funName + " in contract " + currentOwnerContract.name);
 		}
@@ -1586,10 +1599,11 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 		}
 
 		String shownFunName = function.getDisplayName(currentContract);
-		String parameters = function.buildParamListWithParen();
-		String returnType = Solidity.solidityToJavaType(function.returnType);
+		String parameters = function.buildParamListWithParen(env);
+		String returnType = Solidity.solidityToJavaType(function.returnType, env);
 		String fctHeader = visibility + (currentContract.type == Solidity.ContractType.LIBRARY ? " static " : " ") +
 				(function.isAbstract ? "abstract " : "") +
+				Solidity.getDataLocationAnnotation(function.returnVarDataLocation) + " " +
 				returnType + " " + shownFunName + parameters;
 
 		/* The function declaration is added to an interface accompanying the output class, unless the function was
@@ -1747,14 +1761,37 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 		// We also don't want visitIdentifier() to rename it if we are in a modifier, and we are shadowing a modifier var.
 		String identifier = ctx.identifier().getText();
 		String typename = visit(ctx.typeName());
-
-		String shownTypename = Solidity.solidityToJavaType(typename);
-		if (nameIsAContract(typename)) // If it is a contract type
-			shownTypename = contracts.get(typename).getDisplayName();
+		String shownTypename = Solidity.solidityToJavaType(typename, env);
 
 		Solidity.Variable var = new Solidity.Variable(identifier, typename);
+
+		// If the variable is shadowing a local variable (or function parameter), rename it
+		boolean localVarExists = varStack.hasLocalVariableWithNameOrRenamedName(identifier);
+		if (localVarExists) {
+			int counter = 0;
+			String suggestedName;
+			do {
+				suggestedName = identifier + "_" + counter++;
+			} while (varStack.hasLocalVariableWithNameOrRenamedName(suggestedName));
+			var.renamedName = suggestedName;
+		}
+
 		varStack.pushVar(var);
-		return shownTypename + " " + identifier;
+
+		if (ctx.storageLocation() == null) {
+			if (structureStack.peek() == ContractStructure.STRUCT) {
+				var.dataLocation = Solidity.DataLocation.STORAGE;
+			} else { // Local variable
+				// The data location must be specified for reference types. For value types, it is irrelevant, and can be omitted.
+				var.dataLocation = Solidity.DataLocation.UNSPECIFIED;
+			}
+		} else {
+			var.dataLocation = Solidity.DataLocation.stringToLocation(visit(ctx.storageLocation()));
+		}
+		String dataLocationAnnotation = Solidity.getDataLocationAnnotation(var.dataLocation);
+
+		return shownTypename + (dataLocationAnnotation.equals("") ? " " : " " + dataLocationAnnotation + " ") +
+				(localVarExists ? var.renamedName : identifier);
 	}
 	/**
 	 * {@inheritDoc}
@@ -1792,7 +1829,10 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public String visitStorageLocation(SolidityParser.StorageLocationContext ctx) { return visitChildren(ctx); }
+	@Override public String visitStorageLocation(SolidityParser.StorageLocationContext ctx) {
+		return ctx.getText();
+	}
+
 	/**
 	 * {@inheritDoc}
 	 *
@@ -2566,6 +2606,9 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 						var.getDisplayName(currentContract);
 				default -> identifier;
 			};
+		} else if (var instanceof Solidity.Variable) { // local variable or parameter
+			// The variable may be renamed (from shadowing). If not, we have var.renamedName.equals(var.name)
+			identifier = var.renamedName;
 		}
 		return identifier;
 	}
@@ -2709,12 +2752,12 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 		 * must be a function call.
 		 */
 		private String lookupTypeForDotExpressionContractContext(String exp, Solidity.Contract containingContract, boolean checkLocalVars) {
-			Solidity.Enum enum_ = containingContract.lookupEnum(exp, contracts);
+			Solidity.Enum enum_ = containingContract.lookupEnum(exp, env);
 			if (enum_ != null)
-				return enum_.toString();
-			Solidity.Struct struct = containingContract.lookupStruct(exp, contracts);
+				return enum_.getDisplayName();
+			Solidity.Struct struct = containingContract.lookupStruct(exp, env);
 			if (struct != null)
-				return struct.toString();
+				return struct.getDisplayName();
 			int firstDotPos = exp.indexOf(".");
 			if (firstDotPos == -1) {
 				if (checkLocalVars) {
@@ -2725,7 +2768,7 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 				Solidity.Field field = containingContract.lookupField(exp);
 				if (field != null)
 					return field.typename;
-				Solidity.Contract contract = contracts.get(exp);
+				Solidity.Contract contract = env.contracts.get(exp);
 				if (contract != null)
 					return contract.name;
 				// * If the input Solidity function compiled, the expression must have been a function/constructor call.
@@ -2738,15 +2781,15 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 				if (beforeFirstDot.equals("msg")) {
 					return lookupTypeForDotExpressionMsgContext(afterFirstDot);
 				} else if (nameIsAContract(beforeFirstDot)) {
-					return lookupTypeForDotExpressionContractContext(afterFirstDot, contracts.get(beforeFirstDot), false);
+					return lookupTypeForDotExpressionContractContext(afterFirstDot, env.contracts.get(beforeFirstDot), false);
 				} else {
 					if (checkLocalVars) {
 						Solidity.Variable var = varStack.getVariableFromIdentifier(beforeFirstDot);
 						if (var != null) {
 							if (nameIsAContract(var.typename)) {
-								return lookupTypeForDotExpressionContractContext(afterFirstDot, contracts.get(var.typename), false);
+								return lookupTypeForDotExpressionContractContext(afterFirstDot, env.contracts.get(var.typename), false);
 							}
-							Solidity.Struct struct_ = containingContract.lookupStruct(var.typename, contracts);
+							Solidity.Struct struct_ = containingContract.lookupStruct(var.typename, env);
 							if (struct_ != null) {
 								return lookupTypeForDotExpressionStructContext(afterFirstDot, struct_);
 							}
@@ -2756,16 +2799,16 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 					Solidity.Field field = containingContract.lookupField(beforeFirstDot);
 					if (field != null) {
 						if (nameIsAContract(field.typename)) {
-							return lookupTypeForDotExpressionContractContext(afterFirstDot, contracts.get(field.typename), false);
+							return lookupTypeForDotExpressionContractContext(afterFirstDot, env.contracts.get(field.typename), false);
 						}
-						Solidity.Struct struct_ = containingContract.lookupStruct(field.typename, contracts);
+						Solidity.Struct struct_ = containingContract.lookupStruct(field.typename, env);
 						if (struct_ != null) {
 							return lookupTypeForDotExpressionStructContext(afterFirstDot, struct_);
 						}
 						return lookupTypeForDotExpressionElementaryTypeContext(afterFirstDot, field.typename);
 					}
 					if (nameIsAContract(beforeFirstDot))
-						return lookupTypeForDotExpressionContractContext(afterFirstDot, contracts.get(beforeFirstDot), false);
+						return lookupTypeForDotExpressionContractContext(afterFirstDot, env.contracts.get(beforeFirstDot), false);
 					if (beforeFirstDot.equals("this"))
 						return lookupTypeForDotExpressionContractContext(afterFirstDot, containingContract, false);
 					if (beforeFirstDot.equals("super")) // Only parent functions can be accessed in this way. // See comment *
@@ -2802,13 +2845,13 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 				return type;
 			}
 			if (nameIsAContract(type))
-				return lookupTypeForDotExpressionContractContext(afterFirstDot, contracts.get(type), false);
-			Solidity.Struct struct = containingStruct.owner.lookupStruct(type, contracts);
+				return lookupTypeForDotExpressionContractContext(afterFirstDot, env.contracts.get(type), false);
+			Solidity.Struct struct = containingStruct.owner.lookupStruct(type, env);
 			if (struct != null)
 				return lookupTypeForDotExpressionStructContext(afterFirstDot, struct);
-			Solidity.Enum enum_ = containingStruct.owner.lookupEnum(type, contracts);
+			Solidity.Enum enum_ = containingStruct.owner.lookupEnum(type, env);
 			if (enum_ != null)
-				return enum_.toString();
+				return enum_.getDisplayName();
 			return lookupTypeForDotExpressionElementaryTypeContext(afterFirstDot, type);
 		}
 

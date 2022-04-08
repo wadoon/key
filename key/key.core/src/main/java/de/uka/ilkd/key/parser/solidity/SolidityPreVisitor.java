@@ -14,8 +14,8 @@ import java.util.*;
    that function can know that the latter function exists.
    In addition, we also construct C3 linearizations of the inheritance hierarchy within the input file.
 */
-public class SolidityPreVisitor extends SolidityBaseVisitor<Map<String, Solidity.Contract>> {
-    private final Map<String, Solidity.Contract> contracts = new HashMap<>();
+public class SolidityPreVisitor extends SolidityBaseVisitor<Environment> {
+    private final Environment env = new Environment();
     private Solidity.Contract currentContract;
     private Solidity.Callable currentCallable;
 
@@ -24,15 +24,15 @@ public class SolidityPreVisitor extends SolidityBaseVisitor<Map<String, Solidity
     }
     
     @Override
-    public Map<String, Solidity.Contract> visitSourceUnit(SolidityParser.SourceUnitContext ctx) {
+    public Environment visitSourceUnit(SolidityParser.SourceUnitContext ctx) {
         // TODO: visit free functions, structs, etc.
         ctx.importDirective().forEach(this::visit);
         ctx.contractDefinition().forEach(this::visit);
-        return contracts;
+        return env;
     }
 
     @Override
-    public Map<String, Solidity.Contract> visitImportDirective(SolidityParser.ImportDirectiveContext ctx) {
+    public Environment visitImportDirective(SolidityParser.ImportDirectiveContext ctx) {
         // Open the file specified by the import directive. For now, the file path given should be absolute.
         // Parse the given file, and visit the AST to produce a list of contracts contained therein.
         // The textual output is not needed. Merge the imported contract list with the current one.
@@ -48,29 +48,30 @@ public class SolidityPreVisitor extends SolidityBaseVisitor<Map<String, Solidity
         SolidityParser parser = new SolidityParser(new CommonTokenStream(lexer));
         SolidityPreVisitor visitor = new SolidityPreVisitor();
         SolidityParser.SourceUnitContext solidityAST = parser.sourceUnit();
-        Map<String, Solidity.Contract> importedContracts = visitor.visit(solidityAST);
-        importedContracts.values().forEach(contract -> {
-            // If a contract shows up multiple times, this is due to circular imports. But Solidity allows this.
-            if (!contracts.containsKey(contract.name)) {
-                contracts.put(contract.name, contract);
+        Environment environment = visitor.visit(solidityAST);
+        // If a contract/function/etc shows up multiple times, this is due to circular imports. But Solidity allows this.
+        environment.contracts.values().forEach(contract -> {
+            if (!env.contracts.containsKey(contract.name)) {
+                env.contracts.put(contract.name, contract);
             }
         });
+        // TODO: import free functions, constants, and structs, from the new file
 
-        return contracts;
+        return env;
     }
 
     @Override
-    public Map<String, Solidity.Contract> visitContractDefinition(SolidityParser.ContractDefinitionContext ctx) {
+    public Environment visitContractDefinition(SolidityParser.ContractDefinitionContext ctx) {
         String contractName = ctx.identifier().getText();
-        if (contracts.containsKey(contractName)) {
+        if (env.contracts.containsKey(contractName)) {
             error("Contract redefinition; there exists multiple definitions of the contract " + contractName);
         }
         Solidity.Contract contract = new Solidity.Contract();
         currentContract = contract;
-        contracts.put(contractName, contract);
+        env.contracts.put(contractName, contract);
         contract.name = contractName;
         contract.inputFileStartLine = ctx.start.getLine();
-        contract.contractsInInputFile = contracts;
+        contract.contractsInInputFile = env.contracts;
         if (ctx.ContractKeyword() != null) {
             contract.type = Solidity.ContractType.CONTRACT;
         } else if (ctx.InterfaceKeyword() != null) {
@@ -83,7 +84,7 @@ public class SolidityPreVisitor extends SolidityBaseVisitor<Map<String, Solidity
 
         for (SolidityParser.InheritanceSpecifierContext ictx : ctx.inheritanceSpecifier()) {
             String parentName = ictx.getText();
-            Solidity.Contract parent = contracts.get(parentName);
+            Solidity.Contract parent = env.contracts.get(parentName);
             if (parent == null) {
                 error("Could not locate parent contract " + parentName + " as a parent to contract " +
                         contractName + "; maybe it has not been defined yet?");
@@ -115,11 +116,11 @@ public class SolidityPreVisitor extends SolidityBaseVisitor<Map<String, Solidity
         }
         contract.isAbstract = hasAbstractFunction;
 
-        return contracts;
+        return env;
     }
 
     @Override
-    public Map<String, Solidity.Contract> visitFunctionDefinition(SolidityParser.FunctionDefinitionContext ctx) {
+    public Environment visitFunctionDefinition(SolidityParser.FunctionDefinitionContext ctx) {
         Solidity.Function function = new Solidity.Function();
         currentContract.functions.add(function);
         currentCallable = function;
@@ -134,7 +135,10 @@ public class SolidityPreVisitor extends SolidityBaseVisitor<Map<String, Solidity
         function.returnType = ctx.getParent() instanceof SolidityParser.ConstructorDefinitionContext ? "" : "void";
         function.returnVars = new LinkedList<>();
         if (ctx.returnParameters() != null && !ctx.returnParameters().isEmpty()) {
-            function.returnType = ctx.returnParameters().parameterList().parameter(0).typeName().getText();
+            SolidityParser.ParameterContext firstParam = ctx.returnParameters().parameterList().parameter(0);
+            function.returnType = firstParam.typeName().getText();
+            function.returnVarDataLocation = firstParam.storageLocation() == null ? Solidity.DataLocation.UNSPECIFIED :
+                    Solidity.DataLocation.stringToLocation(firstParam.storageLocation().getText());
             ctx.returnParameters().parameterList().parameter().forEach(param -> {
                 // Add only named variables. TODO: add unnamed as well?
                 if (param.identifier() != null) {
@@ -171,11 +175,11 @@ public class SolidityPreVisitor extends SolidityBaseVisitor<Map<String, Solidity
         }
         ctx.parameterList().parameter().forEach(this::visit);
 
-        return contracts;
+        return env;
     }
 
     @Override
-    public Map<String, Solidity.Contract> visitModifierDefinition(SolidityParser.ModifierDefinitionContext ctx) {
+    public Environment visitModifierDefinition(SolidityParser.ModifierDefinitionContext ctx) {
         Solidity.Modifier modifier = new Solidity.Modifier();
         currentContract.modifiers.add(modifier);
         currentCallable = modifier;
@@ -188,14 +192,15 @@ public class SolidityPreVisitor extends SolidityBaseVisitor<Map<String, Solidity
             ctx.parameterList().parameter().forEach(this::visit);
         }
         // Note: modifiers' visibility cannot be specified (they are always private).
-        return contracts;
+        return env;
     }
 
     @Override
-    public Map<String, Solidity.Contract> visitStateVariableDeclaration(SolidityParser.StateVariableDeclarationContext ctx) {
+    public Environment visitStateVariableDeclaration(SolidityParser.StateVariableDeclarationContext ctx) {
         Solidity.Field field = new Solidity.Field(ctx.identifier().getText(), ctx.typeName().getText());
         field.ctx = ctx;
         field.owner = currentContract;
+        field.dataLocation = Solidity.DataLocation.STORAGE;
         currentContract.fields.add(field);
 
         if (!ctx.PublicKeyword().isEmpty()) {
@@ -209,11 +214,11 @@ public class SolidityPreVisitor extends SolidityBaseVisitor<Map<String, Solidity
         }
         field.isConstant = !ctx.ConstantKeyword().isEmpty();
 
-        return contracts;
+        return env;
     }
 
     @Override
-    public Map<String, Solidity.Contract> visitConstructorDefinition(SolidityParser.ConstructorDefinitionContext ctx) {
+    public Environment visitConstructorDefinition(SolidityParser.ConstructorDefinitionContext ctx) {
         if (currentContract.hasNonDefaultConstructor())
             error("Cannot define more than one constructor for contract " + currentContract.name);
         Solidity.Constructor constructor = new Solidity.Constructor();
@@ -230,45 +235,50 @@ public class SolidityPreVisitor extends SolidityBaseVisitor<Map<String, Solidity
         if (ctx.parameterList() != null && !ctx.parameterList().parameter().isEmpty()) {
             ctx.parameterList().parameter().forEach(this::visit);
         }
-        return contracts;
+        return env;
     }
 
     @Override
-    public Map<String, Solidity.Contract> visitParameter(SolidityParser.ParameterContext ctx) {
+    public Environment visitParameter(SolidityParser.ParameterContext ctx) {
         // Note: in Solidity, unnamed function parameters allowed.
         // For now, we disallow such parameters, for otherwise, the output Java program may become nonsensical.
         if (ctx.identifier() == null) {
             error("SolidiKeY disallows unnamed parameters. See callable '" + currentCallable.name + "';");
         }
         Solidity.Variable var = new Solidity.Variable(ctx.identifier().getText(), ctx.typeName().getText());
+        var.dataLocation = ctx.storageLocation() == null ? Solidity.DataLocation.UNSPECIFIED :
+                Solidity.DataLocation.stringToLocation(ctx.storageLocation().getText());
         currentCallable.params.add(var);
-        return contracts;
+        return env;
     }
 
     @Override
-    public Map<String, Solidity.Contract> visitEnumDefinition(SolidityParser.EnumDefinitionContext ctx) {
+    public Environment visitEnumDefinition(SolidityParser.EnumDefinitionContext ctx) {
         currentContract.enums.add(
                 new Solidity.Enum(ctx.identifier().getText(), currentContract));
-        return contracts;
+        return env;
     }
 
     @Override
-    public Map<String, Solidity.Contract> visitStructDefinition(SolidityParser.StructDefinitionContext ctx) {
+    public Environment visitStructDefinition(SolidityParser.StructDefinitionContext ctx) {
         Solidity.Struct struct = new Solidity.Struct(ctx.identifier().getText(), currentContract);
         if (ctx.variableDeclaration() != null) {
-            ctx.variableDeclaration().forEach(varCtx ->
-                    struct.fields.add(new Solidity.Variable(varCtx.identifier().getText(), varCtx.typeName().getText())));
+            ctx.variableDeclaration().forEach(varCtx -> {
+                Solidity.Variable var = new Solidity.Variable(varCtx.identifier().getText(), varCtx.typeName().getText());
+                var.dataLocation = Solidity.DataLocation.STORAGE;
+                struct.fields.add(var);
+            });
         }
         currentContract.structs.add(struct);
-        return contracts;
+        return env;
     }
 
     @Override
-    public Map<String, Solidity.Contract> visitUsingForDeclaration(SolidityParser.UsingForDeclarationContext ctx) {
+    public Environment visitUsingForDeclaration(SolidityParser.UsingForDeclarationContext ctx) {
         // Seemingly, this statement may only appear at contract scope. If it doesn't, the Solidity program
         // would not compile, and we take it as undefined behaviour.
         String libName = ctx.identifier().getText();
-        Solidity.Contract lib = contracts.get(libName);
+        Solidity.Contract lib = env.contracts.get(libName);
         if (ctx.typeName() == null) { // A '*'; means that all contracts/structs in the source file will attach the library functions
             currentContract.globalUsingForLibraries.add(lib);
         } else {
@@ -279,7 +289,7 @@ public class SolidityPreVisitor extends SolidityBaseVisitor<Map<String, Solidity
                 currentContract.typeLibAttachments.get(type).add(lib);
             }
         }
-        return contracts;
+        return env;
     }
 
     /**

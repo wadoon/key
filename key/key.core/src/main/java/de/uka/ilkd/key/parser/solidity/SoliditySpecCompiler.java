@@ -17,9 +17,9 @@ public class SoliditySpecCompiler {
 
     private final String specContractName;
     private final String specCallableName;
-    private final Environment env = new Environment();
     private final ProofObligations pos = new ProofObligations();
 
+    private Environment env = new Environment();
     private String contractNameInPOs;
     private Solidity.Contract specContract;
     private Solidity.Callable specCallable;
@@ -54,7 +54,7 @@ public class SoliditySpecCompiler {
             if (callable.returnType.equals("void")) {
                 resultVar = "";
             } else {
-                resultVar = Solidity.solidityToJavaType(callable.returnType) + " _result;\n";
+                resultVar = Solidity.solidityToJavaType(callable.returnType, env) + " _result;\n";
             }
         } else {
             resultVar = "";
@@ -64,7 +64,7 @@ public class SoliditySpecCompiler {
         } else {
             StringBuilder output = new StringBuilder(resultVar);
             for (Solidity.Variable var : callable.params) {
-                String javaType = Solidity.solidityToJavaType(var.typename);
+                String javaType = Solidity.solidityToJavaType(var.typename, env);
                 output.append(javaType + " " + var.name + ";\n");
                 output.append(javaType + " _" + var.name + ";\n");
             }
@@ -75,7 +75,7 @@ public class SoliditySpecCompiler {
     private String makeSchemaVariablesString(Solidity.Callable callable) {
         StringBuilder output = new StringBuilder();
         for(Map.Entry<String,Solidity.LogicalVariable> e : env.cumulativeLogicalVars.entrySet()) {
-            output.append("\\schemaVar \\variable " + Solidity.solidityToJavaType(e.getValue().typename) +
+            output.append("\\schemaVar \\variable " + Solidity.solidityToJavaType(e.getValue().typename, env) +
                     " " + e.getKey() + ";\n");
         }
         return output.toString();
@@ -122,7 +122,7 @@ public class SoliditySpecCompiler {
             // Assumptions for state variable values
             // This is very hard-coded. Sorry.
             for (Solidity.Field field : specContract.getAllVisibleInheritedFields()) {
-                String javaType = Solidity.solidityToJavaType(field.typename);
+                String javaType = Solidity.solidityToJavaType(field.typename, env);
                 if (javaType.equals("boolean[]")) {
                     output.append("&\n(\\forall int i; " + SELF_PLACEHOLDER + "." + field.name + "[i] = FALSE) ");
                 } else if (javaType.equals("int[]")) {
@@ -263,7 +263,7 @@ public class SoliditySpecCompiler {
             SolidityLexer lexer = new SolidityLexer(CharStreams.fromStream(new File(fileName).toURI().toURL().openStream()));
             SolidityParser parser = new SolidityParser(new CommonTokenStream(lexer));
             SolidityParser.SourceUnitContext solidityAST = parser.sourceUnit();
-            env.contracts = preVisitor.visitSourceUnit(solidityAST);
+            env = preVisitor.visitSourceUnit(solidityAST);
 
             specContract = env.contracts.get(specContractName);
             if (specContract == null) {

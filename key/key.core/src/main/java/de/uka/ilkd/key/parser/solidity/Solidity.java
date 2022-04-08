@@ -3,16 +3,29 @@ package de.uka.ilkd.key.parser.solidity;
 import java.util.*;
 
 public class Solidity {
-    public enum FunctionVisibility {
-        EXTERNAL, PUBLIC, INTERNAL, PRIVATE
+    public enum ContractType {
+        CONTRACT, INTERFACE, LIBRARY
     }
 
     public enum FieldVisibility {
         PUBLIC, INTERNAL, PRIVATE
     }
 
-    public enum ContractType {
-        CONTRACT, INTERFACE, LIBRARY
+    public enum FunctionVisibility {
+        EXTERNAL, PUBLIC, INTERNAL, PRIVATE
+    }
+
+    public enum DataLocation {
+        CALLDATA, MEMORY, STORAGE, UNSPECIFIED;
+
+        public static DataLocation stringToLocation(String loc) {
+            return switch (loc) {
+                case "calldata" -> DataLocation.CALLDATA;
+                case "memory" -> DataLocation.MEMORY;
+                case "storage" -> DataLocation.STORAGE;
+                default -> DataLocation.UNSPECIFIED;
+            };
+        }
     }
 
     // TODO: model abi, global vars 'block' and 'tx'.
@@ -107,13 +120,10 @@ public class Solidity {
         public String name;
         public Contract owner;
         public String returnType; // Solidity type
+        public DataLocation returnVarDataLocation = DataLocation.UNSPECIFIED;
         public boolean isPayable;
         public LinkedList<Variable> params = new LinkedList<>();
         public int inputFileStartLine;
-
-        @Override public String toString() {
-            return name + this.buildParamListWithParen();
-        }
 
         public LinkedList<String> getParamTypeNames() {
             LinkedList<String> typeNames = new LinkedList<>();
@@ -121,15 +131,15 @@ public class Solidity {
             return typeNames;
         }
 
-        public String buildParamList() {
+        public String buildParamList(Environment env) {
             StringBuilder output = new StringBuilder("Message msg,");
-            params.forEach(param -> output.append(param.toString() + ','));
+            params.forEach(param -> output.append(param.getJavaDeclaration(env) + ','));
             output.deleteCharAt(output.length() - 1);
             return output.toString();
         }
 
-        public String buildParamListWithParen() {
-            return "(" + buildParamList() + ")";
+        public String buildParamListWithParen(Environment env) {
+            return "(" + buildParamList(env) + ")";
         }
 
         public String buildArgList() {
@@ -187,11 +197,6 @@ public class Solidity {
         public List<Variable> returnVars = new LinkedList<>();
 
         @Override
-        public String toString() {
-            return solidityToJavaType(returnType) + " " + name + this.buildParamListWithParen();
-        }
-
-        @Override
         public String getDisplayName(Contract callingContract) {
             if (!this.owner.equals(callingContract) && this.hasOverride(callingContract)) {
                 return "__" + owner.name + "__" + name;
@@ -237,7 +242,7 @@ public class Solidity {
         public SolidityParser.ConstructorDefinitionContext ctx;
 
         @Override
-        public String getDisplayName(Contract callingContract) { return owner.name + "Impl"; }
+        public String getDisplayName(Contract callingContract) { return getContractDisplayName(owner.name); }
 
         @Override
         public String getModFreeDisplayName(Contract callingContract) {
@@ -315,13 +320,27 @@ public class Solidity {
 
     public static class Variable {
         public String name;
+        public String renamedName; // A local variable may be renamed if it is shadowing another local variable.
         public String typename;
+        public DataLocation dataLocation = DataLocation.UNSPECIFIED;
         public boolean isConstant;
 
-        public Variable(String name, String typename) { this.name = name; this.typename = typename; }
-        @Override public String toString() { return solidityToJavaType(typename) + " " + name; }
+        public Variable(String name, String typename) {
+            this.name = this.renamedName = name;
+            this.typename = typename;
+        }
 
-        public String getDisplayName(Contract callingContract) { return name; }
+        public String getJavaDeclaration(Environment env) {
+            return solidityToJavaType(typename, env) +
+                    (dataLocation == DataLocation.UNSPECIFIED ? " " : " " + getDataLocationAnnotation(dataLocation) + " ") +
+                    renamedName;
+        }
+
+        public String getDisplayName(Contract callingContract) { return renamedName; }
+
+        @Override public String toString() {
+            return typename + " " + renamedName;
+        }
     }
 
     public static class Field extends Variable {
@@ -368,8 +387,11 @@ public class Solidity {
             this.name = name; this.owner = owner;
         }
 
-        @Override
-        public String toString() {
+        @Override public String toString() {
+            return getDisplayName();
+        }
+
+        public String getDisplayName() {
             return owner.name + "." + name;
         }
     }
@@ -382,8 +404,11 @@ public class Solidity {
             this.name = name; this.owner = owner;
         }
 
-        @Override
-        public String toString() {
+        @Override public String toString() {
+            return getDisplayName();
+        }
+
+        public String getDisplayName() {
             return owner.name + "." + name;
         }
 
@@ -503,12 +528,13 @@ public class Solidity {
         public Function getFunction(String funName,
                                     List<String> argTypes,
                                     Contract callContainingContract,
+                                    Environment env,
                                     boolean allowConversions)
         {
             for (Function fun : functions) {
                 if (fun.name.equals(funName)) {
                     if (argTypesMatchesFunctionParams(argTypes, fun.getParamTypeNames(), fun,
-                            callContainingContract, allowConversions)) {
+                            callContainingContract, env, allowConversions)) {
                         return fun;
                     }
                 }
@@ -583,6 +609,7 @@ public class Solidity {
         public Function lookupFunction(String funName,
                                        List<String> argTypes,
                                        Contract callContainingContract,
+                                       Environment env,
                                        boolean allowConversions)
         {
             Iterator<Contract> it = c3Linearization.descendingIterator();
@@ -593,7 +620,7 @@ public class Solidity {
                             (fun.visibility != FunctionVisibility.PRIVATE || parent.name.equals(this.name)))
                     {
                         if (argTypesMatchesFunctionParams(argTypes, fun.getParamTypeNames(), fun,
-                                callContainingContract, allowConversions)) {
+                                callContainingContract, env, allowConversions)) {
                             return fun;
                         }
                     }
@@ -627,7 +654,7 @@ public class Solidity {
             return null;
         }
 
-        public Enum lookupEnum(String enumName, Map<String, Contract> contracts) {
+        public Enum lookupEnum(String enumName, Environment env) {
 			/*
 				contract A { enum E {e} }
 				contract B is A {
@@ -658,7 +685,7 @@ public class Solidity {
                     }
                 }
             } else {
-                Contract contract = contracts.get(enumName.substring(0, dotPos));
+                Contract contract = env.contracts.get(enumName.substring(0, dotPos));
                 if (contract == null) {
                     return null;
                 }
@@ -667,7 +694,7 @@ public class Solidity {
             return null;
         }
 
-        public Struct lookupStruct(String structName, Map<String, Contract> contracts) {
+        public Struct lookupStruct(String structName, Environment env) {
             // Similar rules as for enums
             int dotPos = structName.indexOf(".");
             if (dotPos == -1) {
@@ -680,7 +707,7 @@ public class Solidity {
                     }
                 }
             } else {
-                Contract contract = contracts.get(structName.substring(0, dotPos));
+                Contract contract = env.contracts.get(structName.substring(0, dotPos));
                 if (contract == null) {
                     return null;
                 }
@@ -711,12 +738,7 @@ public class Solidity {
             return this.constructor != null && !this.constructor.isDefaultConstructor();
         }
 
-        @Override
-        public String toString() {
-            return name;
-        }
-
-        public String getDisplayName() { return name + "Impl"; }
+        public String getDisplayName() { return getContractDisplayName(name); }
     }
 
     /**
@@ -724,10 +746,20 @@ public class Solidity {
      * @param solidityTypeName The name of the type in Solidity
      * @return The name of the type in Java (as it is translated).
      */
-    public static String solidityToJavaType(String solidityTypeName) {
-        String javaTypeName = solidityTypeName.replace(" ", "");
+    public static String solidityToJavaType(String solidityTypeName, Environment env) {
+        if (env != null && env.contracts != null && env.contracts.containsKey(solidityTypeName)) {
+            return getContractDisplayName(solidityTypeName);
+        }
+        if (typeIsInt(solidityTypeName)) {
+            return "int";
+        }
+        if ()
+        if (typeIsBytes(solidityTypeName)) {
+            return solidityTypeName.equals("bytes") ? "int[]" : "int";
+        }
+
         // TODO: do more thoroughly
-        javaTypeName = switch (solidityTypeName) {
+        return switch (solidityTypeName) {
             case "uint", "uint256", "bytes32" -> "int";
             case "bool" -> "boolean";
             case "string" -> "String";
@@ -750,8 +782,14 @@ public class Solidity {
             case "mapping(uint256=>string)" -> "String[]";
             default -> solidityTypeName;
         };
-        return javaTypeName;
     }
+
+    public static boolean isValueType(String type) {
+        // TODO
+        return true;
+    }
+
+    public static boolean isReferenceType(String type) { return !isValueType(type); }
 
     public static boolean implicitTypeConversionIsAllowed(String typeFrom, String typeTo) {
         // TODO: not complete
@@ -786,7 +824,7 @@ public class Solidity {
         return false;
     }
 
-    public static boolean typeIsElementary(String type) { return Solidity.elementarySolidityTypes.contains(type); }
+    public static boolean typeIsElementary(String type) { return elementarySolidityTypes.contains(type); }
 
     public static boolean typeIsArray(String type) {
         return type.endsWith("[]") || type.startsWith("bytes") || type.equals("string");
@@ -833,6 +871,7 @@ public class Solidity {
                                                         List<String> funParamTypes,
                                                         Callable callable,
                                                         Contract callContainingContract,
+                                                        Environment env,
                                                         boolean allowConversions)
     {
         if (funParamTypes.size() != callArgTypes.size())
@@ -841,7 +880,7 @@ public class Solidity {
         for (String argType : callArgTypes) {
             ++index;
             String paramType = funParamTypes.get(index);
-            if (!argTypeMatchesFunctionParam(argType, paramType, callable, callContainingContract, allowConversions)) {
+            if (!argTypeMatchesFunctionParam(argType, paramType, callable, callContainingContract, env, allowConversions)) {
                 return false;
             }
         }
@@ -859,6 +898,7 @@ public class Solidity {
                                                       String funParamType,
                                                       Callable callable,
                                                       Contract callContainingContract,
+                                                      Environment env,
                                                       boolean allowConversions)
     {
         if (callArgType.equals(funParamType)) {
@@ -867,8 +907,8 @@ public class Solidity {
         if (allowConversions && callContainingContract.contractsInInputFile.containsKey(callArgType) &&
                 callContainingContract.contractsInInputFile.containsKey(funParamType)) {
             // Allow for polymorphism; check for subtypes
-            Solidity.Contract contract = callContainingContract.contractsInInputFile.get(callArgType);
-            for (Solidity.Contract parent : contract.c3Linearization) {
+            Contract contract = callContainingContract.contractsInInputFile.get(callArgType);
+            for (Contract parent : contract.c3Linearization) {
                 if (parent.name.equals(funParamType)) {
                     return true;
                 }
@@ -876,16 +916,16 @@ public class Solidity {
             return false;
         }
         // Check if the types are enums
-        Solidity.Enum enum1 = callContainingContract.lookupEnum(callArgType, callContainingContract.contractsInInputFile);
-        Solidity.Enum enum2 = callable.owner.lookupEnum(funParamType, callContainingContract.contractsInInputFile);
+        Enum enum1 = callContainingContract.lookupEnum(callArgType, env);
+        Enum enum2 = callable.owner.lookupEnum(funParamType, env);
         if (enum1 != null && enum2 != null) {
             return enum1.name.equals(enum2.name) && enum1.owner.equals(enum2.owner);
         } else if (enum1 != null || enum2 != null) {
             return false;
         }
         // Check if the types are structs
-        Solidity.Struct struct1 = callContainingContract.lookupStruct(callArgType, callContainingContract.contractsInInputFile);
-        Solidity.Struct struct2 = callable.owner.lookupStruct(funParamType, callContainingContract.contractsInInputFile);
+        Struct struct1 = callContainingContract.lookupStruct(callArgType, env);
+        Struct struct2 = callable.owner.lookupStruct(funParamType, env);
         if (struct1 != null && struct2 != null) {
             return struct1.name.equals(struct2.name) && struct1.owner.equals(struct2.owner);
         } else if (struct1 != null || struct2 != null) {
@@ -893,8 +933,20 @@ public class Solidity {
         }
 
         if (allowConversions) {
-            return Solidity.implicitTypeConversionIsAllowed(callArgType, funParamType);
+            return implicitTypeConversionIsAllowed(callArgType, funParamType);
         }
         return false;
+    }
+
+    public static String getContractDisplayName(String contractName) {
+        return contractName + "Impl";
+    }
+
+    public static String getDataLocationAnnotation(DataLocation loc) {
+        return loc == DataLocation.UNSPECIFIED ? "" : "/*@" + loc.toString() + "@*/";
+    }
+
+    public static String getDataLocationAnnotation(String loc) {
+        return getDataLocationAnnotation(DataLocation.stringToLocation(loc));
     }
 }
