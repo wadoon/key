@@ -1,0 +1,12 @@
+spec NatSet =
+    free type Tree ::= Empty | Leaf(val : int) | Node(t1 : Tree; t2 : Tree) %key(defaultValue=Empty)%
+    ops
+        depth : Tree -> int;
+        tmax : int * int -> int;
+
+    . depth(Empty) = 0
+    forall val : int . depth(Leaf(val)) = 1
+    forall t1,t2 : Tree . depth(Node(t1,t2)) = tmax(depth(t1),depth(t2)) + 1
+
+    forall t1, t2, t3, t4 : Tree . (depth(t1) >= depth(t3)) & (depth(t2) >= depth(t4)) = depth(Node(t1,t2)) >= depth(Node(t3,t4))
+end

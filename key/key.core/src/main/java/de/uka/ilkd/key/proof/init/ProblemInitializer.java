@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.proof.init;
 
-import de.uka.ilkd.key.casl.main.CaslFacade;
+import de.uka.ilkd.key.casl.CaslFacade;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;

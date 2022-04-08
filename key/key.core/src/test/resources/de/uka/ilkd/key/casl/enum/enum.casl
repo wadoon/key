@@ -1,0 +1,3 @@
+spec E =
+  free type Enum ::= EA | EB | EC %key(defaultValue=EA)%
+end
