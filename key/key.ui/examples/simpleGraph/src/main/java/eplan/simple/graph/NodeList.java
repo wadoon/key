@@ -5,26 +5,33 @@ public class NodeList {
     /*@ public model \seq list; @*/
     /*@ public model \locset footprint; @*/
 
-    /*@ public invariant array.length > firstFreeIndex; @*/
-    /*@ public invariant list.length == firstFreeIndex; @*/
-    /*@ public invariant array != null; @*/
-    /*@ public invariant (\forall int i; i >= 0 && i < firstFreeIndex; array[i] != null); @*/
-    /*@ public invariant \typeof(array) == \type(Node[]); @*/
+    /*@ private invariant array.length > firstFreeIndex; @*/
+    /*@ private invariant list.length == firstFreeIndex; @*/
+    /*@ private invariant array != null; @*/
+    /*@ private invariant (\forall int i; i >= 0 && i < firstFreeIndex; array[i] != null); @*/
+    /*@ private invariant \typeof(array) == \type(Node[]); @*/
 
+    /*@ public invariant (\forall int i; i >= 0 && i < list.length; list[i] != null && list[i] instanceof Node); @*/
+    
+    
     private /*@ nullable @*/ Node[] array;
     private int firstFreeIndex = 0;
 
     /* public represents list = (\seq_def int i; 0; firstFreeIndex; array[i]); @*/
-    /*@ public represents list = \dl_array2seq(array)[0..firstFreeIndex]; @*/
-    /*@ public represents footprint = array, array[*], firstFreeIndex; @*/
+    /*@ private represents list = \dl_array2seq(array)[0..firstFreeIndex]; @*/
+    /*@ private represents footprint = array, array[*], firstFreeIndex; @*/
     //@ accessible list:footprint;
     //@ accessible footprint:footprint;
     //@ accessible \inv:footprint;
 
-
+    
     /*@ public normal_behavior
+      @ ensures list.length == 0  && \fresh(footprint);
       @ assignable \nothing;
-      @ ensures firstFreeIndex == 0;
+      @ also
+      @ private normal_behavior
+      @ assignable \nothing;
+      @ ensures firstFreeIndex == 0 && array.length == 10;
       @*/
     public NodeList() {
         array = new Node[10];
@@ -44,6 +51,7 @@ public class NodeList {
     /*@ public normal_behavior
       @ requires \invariant_for(n);
       @ ensures list == \seq_concat(\old(list), \seq_singleton(n));
+      @ ensures \new_elems_fresh(footprint);
       @ assignable footprint;
       @*/
     public void add (Node n) {
@@ -114,6 +122,11 @@ public class NodeList {
 
 
     /*@ public normal_behavior
+      @ requires i >= 0 && i < list.length;
+      @ ensures list == \seq_concat(\old(list[0..i]), \old(list[i+1..list.length]));
+      @ assignable footprint;
+      @ also
+      @ private normal_behavior
       @ requires i >= 0 && i < list.length;
       @ ensures list == \seq_concat(\old(list[0..i]), \old(list[i+1..list.length]));
       @ assignable array[*], firstFreeIndex;
