@@ -5,7 +5,7 @@
 # Jenkins runs are triggered from somewhere else.
 #
 
-image: wadoon/key-test-docker:jdk11
+image: wadoon/key-test-docker:jdk17
 
 cache:
   policy: pull-push
