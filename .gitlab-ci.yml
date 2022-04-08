@@ -32,7 +32,6 @@ stages:
 
 compile:classes:
   stage: primary
-  image: wadoon/key-test-docker:jdk11
   script:
     - javac -version
     - cd key
@@ -47,7 +46,6 @@ compile:classes:
 compile:testClasses:
   dependencies:  ["compile:classes"]
   stage: secondary
-  image: wadoon/key-test-docker:jdk11
   script:
     - javac -version
     - cd key
@@ -62,7 +60,6 @@ compile:testClasses:
 sonarqube:
   dependencies:  ["compile:testClasses"]
   stage: ternary
-  image: wadoon/key-test-docker:jdk11
   allow_failure: true
   script:
     - cd key
@@ -84,7 +81,6 @@ sonarqube:
 
 checkstyle:
   stage: primary
-  image: wadoon/key-test-docker:jdk11
   allow_failure: true
   script:
     - (key/scripts/tools/checkstyle/runIncrementalCheckstyle.sh | tee report.txt) || true
