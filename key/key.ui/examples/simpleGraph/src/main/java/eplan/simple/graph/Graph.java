@@ -42,7 +42,7 @@ public class Graph {
         /*@ loop_invariant
           @  k>=0 && k<=edges.length &&
           @  (\forall int j; j>=0 && j<k; res.contains(edges[j].start) && res.contains(edges[j].end)) &&
-          @  \invariant_for(res);
+          @  \invariant_for(res) && \new_elems_fresh(res.footprint);// \disjoint(res.footprint, \set_union(this.edges, \set_union(this.edges[*],\reachLocs(this.edges, this))));
           @ assignable res.footprint;
           @ decreases edges.length - k;
           @*/
