@@ -1,5 +1,6 @@
 // Generated from Solidity.g4 by ANTLR 4.9.3
 package de.uka.ilkd.key.parser.solidity;
+
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**
@@ -482,6 +483,16 @@ public interface SolidityListener extends ParseTreeListener {
 	 */
 	void exitBlock(SolidityParser.BlockContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link SolidityParser#uncheckedBlock}.
+	 * @param ctx the parse tree
+	 */
+	void enterUncheckedBlock(SolidityParser.UncheckedBlockContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link SolidityParser#uncheckedBlock}.
+	 * @param ctx the parse tree
+	 */
+	void exitUncheckedBlock(SolidityParser.UncheckedBlockContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link SolidityParser#statement}.
 	 * @param ctx the parse tree
 	 */
@@ -842,6 +853,18 @@ public interface SolidityListener extends ParseTreeListener {
 	 */
 	void exitFunctionCallExpression(SolidityParser.FunctionCallExpressionContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code minMaxTypeExprExpression}
+	 * labeled alternative in {@link SolidityParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void enterMinMaxTypeExprExpression(SolidityParser.MinMaxTypeExprExpressionContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code minMaxTypeExprExpression}
+	 * labeled alternative in {@link SolidityParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void exitMinMaxTypeExprExpression(SolidityParser.MinMaxTypeExprExpressionContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code primaryExprExpression}
 	 * labeled alternative in {@link SolidityParser#expression}.
 	 * @param ctx the parse tree
@@ -1091,6 +1114,16 @@ public interface SolidityListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitPrimaryExpression(SolidityParser.PrimaryExpressionContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link SolidityParser#minMaxTypeExpression}.
+	 * @param ctx the parse tree
+	 */
+	void enterMinMaxTypeExpression(SolidityParser.MinMaxTypeExpressionContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link SolidityParser#minMaxTypeExpression}.
+	 * @param ctx the parse tree
+	 */
+	void exitMinMaxTypeExpression(SolidityParser.MinMaxTypeExpressionContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link SolidityParser#expressionList}.
 	 * @param ctx the parse tree

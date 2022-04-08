@@ -568,6 +568,18 @@ public class SolidityBaseListener implements SolidityListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterUncheckedBlock(SolidityParser.UncheckedBlockContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitUncheckedBlock(SolidityParser.UncheckedBlockContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterStatement(SolidityParser.StatementContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -964,6 +976,18 @@ public class SolidityBaseListener implements SolidityListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterMinMaxTypeExprExpression(SolidityParser.MinMaxTypeExprExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitMinMaxTypeExprExpression(SolidityParser.MinMaxTypeExprExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterPrimaryExprExpression(SolidityParser.PrimaryExprExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -1211,6 +1235,18 @@ public class SolidityBaseListener implements SolidityListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitPrimaryExpression(SolidityParser.PrimaryExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterMinMaxTypeExpression(SolidityParser.MinMaxTypeExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitMinMaxTypeExpression(SolidityParser.MinMaxTypeExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

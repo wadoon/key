@@ -1,5 +1,6 @@
 // Generated from Solidity.g4 by ANTLR 4.9.3
 package de.uka.ilkd.key.parser.solidity;
+
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
 /**
@@ -294,6 +295,12 @@ public interface SolidityVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitBlock(SolidityParser.BlockContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link SolidityParser#uncheckedBlock}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitUncheckedBlock(SolidityParser.UncheckedBlockContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link SolidityParser#statement}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -507,6 +514,13 @@ public interface SolidityVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitFunctionCallExpression(SolidityParser.FunctionCallExpressionContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code minMaxTypeExprExpression}
+	 * labeled alternative in {@link SolidityParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitMinMaxTypeExprExpression(SolidityParser.MinMaxTypeExprExpressionContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code primaryExprExpression}
 	 * labeled alternative in {@link SolidityParser#expression}.
 	 * @param ctx the parse tree
@@ -652,6 +666,12 @@ public interface SolidityVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitPrimaryExpression(SolidityParser.PrimaryExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link SolidityParser#minMaxTypeExpression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitMinMaxTypeExpression(SolidityParser.MinMaxTypeExpressionContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link SolidityParser#expressionList}.
 	 * @param ctx the parse tree

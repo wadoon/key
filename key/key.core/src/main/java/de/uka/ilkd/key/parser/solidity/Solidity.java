@@ -125,6 +125,11 @@ public class Solidity {
         public LinkedList<Variable> params = new LinkedList<>();
         public int inputFileStartLine;
 
+        public Callable(String name, Contract owner) {
+            this.name = name;
+            this.owner = owner;
+        }
+
         public LinkedList<String> getParamTypeNames() {
             LinkedList<String> typeNames = new LinkedList<>();
             params.forEach(param -> typeNames.add(param.typename));
@@ -196,6 +201,8 @@ public class Solidity {
         public boolean isLibraryFunction;
         public List<Variable> returnVars = new LinkedList<>();
 
+        public Function(String name, Contract owner) { super(name, owner); }
+
         @Override
         public String getDisplayName(Contract callingContract) {
             if (!this.owner.equals(callingContract) && this.hasOverride(callingContract)) {
@@ -241,19 +248,17 @@ public class Solidity {
     public static class Constructor extends Callable {
         public SolidityParser.ConstructorDefinitionContext ctx;
 
-        @Override
-        public String getDisplayName(Contract callingContract) { return getContractDisplayName(owner.name); }
+        public Constructor(String name, Contract owner) { super(name, owner); }
 
-        @Override
-        public String getModFreeDisplayName(Contract callingContract) {
+        @Override public String getDisplayName(Contract callingContract) { return getContractDisplayName(owner.name); }
+
+        @Override public String getModFreeDisplayName(Contract callingContract) {
             return "__unmod__" + getDisplayName(callingContract);
         }
 
-        @Override
-        public SolidityParser.BlockContext getBodyContext() { return ctx.block(); }
+        @Override public SolidityParser.BlockContext getBodyContext() { return ctx.block(); }
 
-        @Override
-        public boolean hasOverride(Contract callingContract) {
+        @Override public boolean hasOverride(Contract callingContract) {
             return false; // Constructors cannot be overridden
         }
 
@@ -262,9 +267,12 @@ public class Solidity {
 
     public static class Modifier extends Callable {
         public SolidityParser.ModifierDefinitionContext ctx;
+        public boolean isVirtual;
+        public boolean overrides;
 
-        @Override
-        public String getDisplayName(Contract callingContract) {
+        public Modifier(String name, Contract owner) { super(name, owner); }
+
+        @Override public String getDisplayName(Contract callingContract) {
             if (!this.owner.equals(callingContract) && this.hasOverride(callingContract)) {
                 return "__" + owner.name + "__" + name;
             } else {
@@ -272,8 +280,7 @@ public class Solidity {
             }
         }
 
-        @Override
-        public String getModFreeDisplayName(Contract callingContract) { return name; }
+        @Override public String getModFreeDisplayName(Contract callingContract) { return name; }
 
         public String getDisplayName(Contract callingContract, Callable mainCallable,
                                       int invocationIndex, int totalInvocations)
@@ -295,11 +302,9 @@ public class Solidity {
             return output.toString();
         }
 
-        @Override
-        public SolidityParser.BlockContext getBodyContext() { return ctx.block(); }
+        @Override public SolidityParser.BlockContext getBodyContext() { return ctx.block(); }
 
-        @Override
-        public boolean hasOverride(Contract callingContract) {
+        @Override public boolean hasOverride(Contract callingContract) {
             boolean modifierFound = false;
             for (Contract parent : callingContract.c3Linearization) {
                 for (Modifier parentModifier : parent.modifiers) {
@@ -323,7 +328,7 @@ public class Solidity {
         public String renamedName; // A local variable may be renamed if it is shadowing another local variable.
         public String typename;
         public DataLocation dataLocation = DataLocation.UNSPECIFIED;
-        public boolean isConstant;
+        public boolean isConstant; // comes from either 'constant' or 'immutable' keywords
 
         public Variable(String name, String typename) {
             this.name = this.renamedName = name;
@@ -381,10 +386,12 @@ public class Solidity {
     }
 
     public static class Enum {
-        public String name;
-        public Contract owner;
+        public final String name;
+        public final Contract owner;
+
         public Enum(String name, Contract owner) {
-            this.name = name; this.owner = owner;
+            this.name = name;
+            this.owner = owner;
         }
 
         @Override public String toString() {
@@ -397,11 +404,21 @@ public class Solidity {
     }
 
     public static class Struct {
-        public String name;
-        public Contract owner;
+        public final String name;
+        public final Contract owner;
+        public final boolean isFree;
         public List<Variable> fields = new LinkedList<>();
+
+        public Struct(String name) {
+            this.name = name;
+            this.owner = null;
+            this.isFree = true;
+        }
+
         public Struct(String name, Contract owner) {
-            this.name = name; this.owner = owner;
+            this.name = name;
+            this.owner = owner;
+            this.isFree = false;
         }
 
         @Override public String toString() {
@@ -409,7 +426,7 @@ public class Solidity {
         }
 
         public String getDisplayName() {
-            return owner.name + "." + name;
+            return this.isFree ? name : owner.name + "." + name;
         }
 
         public Variable getVariableWithName(String name) {
@@ -599,124 +616,6 @@ public class Solidity {
         }
 
         /**
-         * Given a function call with the supplied name and argument types, locate the corresponding function
-         * in the inheritance hierarchy (C3 linearization) of the contract given. Note: the corresponding
-         * 'getFunction' method only looks for the function in this contract.
-         * @param funName The name of the function in the function call.
-         * @param argTypes The types of the supplied arguments.
-         * @return If it was found, the function, otherwise null.
-         */
-        public Function lookupFunction(String funName,
-                                       List<String> argTypes,
-                                       Contract callContainingContract,
-                                       Environment env,
-                                       boolean allowConversions)
-        {
-            Iterator<Contract> it = c3Linearization.descendingIterator();
-            while (it.hasNext()) {
-                Contract parent = it.next();
-                for (Function fun : parent.functions) {
-                    if (fun.name.equals(funName) &&
-                            (fun.visibility != FunctionVisibility.PRIVATE || parent.name.equals(this.name)))
-                    {
-                        if (argTypesMatchesFunctionParams(argTypes, fun.getParamTypeNames(), fun,
-                                callContainingContract, env, allowConversions)) {
-                            return fun;
-                        }
-                    }
-                }
-            }
-            return null;
-        }
-
-        public Field lookupField(String fieldName) {
-            Iterator<Contract> it = c3Linearization.descendingIterator();
-            while (it.hasNext()) {
-                Contract parent = it.next();
-                for (Field field : parent.fields) {
-                    if (field.name.equals(fieldName))
-                        return field;
-                }
-            }
-            return null;
-        }
-
-        public Modifier lookupModifier(String modName) {
-            // Note: modifiers cannot be overloaded with different argument lists.
-            Iterator<Contract> it = c3Linearization.descendingIterator();
-            while (it.hasNext()) {
-                Contract parent = it.next();
-                for (Modifier mod : parent.modifiers) {
-                    if (mod.name.equals(modName))
-                        return mod;
-                }
-            }
-            return null;
-        }
-
-        public Enum lookupEnum(String enumName, Environment env) {
-			/*
-				contract A { enum E {e} }
-				contract B is A {
-					function foo() public {
-						A a = new A();
-						E e1 = E.e; // allowed
-						A.E e2 = A.E.e; // allowed
-						a.E e3 = A.E.e; // disallowed
-					}
-				}
-				contract C {
-					function foo() public {
-						A a = new A();
-						E e1 = E.e; // disallowed
-						A.E e2 = A.E.e; // allowed
-						B.E e3 = B.E.e; // disallowed
-					}
-				}
-			 */
-            int dotPos = enumName.indexOf(".");
-            if (dotPos == -1) {
-                Iterator<Contract> it = c3Linearization.descendingIterator();
-                while (it.hasNext()) {
-                    Contract parent = it.next();
-                    for (Enum enum_ : parent.enums) {
-                        if (enum_.name.equals(enumName))
-                            return enum_;
-                    }
-                }
-            } else {
-                Contract contract = env.contracts.get(enumName.substring(0, dotPos));
-                if (contract == null) {
-                    return null;
-                }
-                return contract.getEnum(enumName.substring(dotPos + 1));
-            }
-            return null;
-        }
-
-        public Struct lookupStruct(String structName, Environment env) {
-            // Similar rules as for enums
-            int dotPos = structName.indexOf(".");
-            if (dotPos == -1) {
-                Iterator<Contract> it = c3Linearization.descendingIterator();
-                while (it.hasNext()) {
-                    Contract parent = it.next();
-                    for (Struct struct : parent.structs) {
-                        if (struct.name.equals(structName))
-                            return struct;
-                    }
-                }
-            } else {
-                Contract contract = env.contracts.get(structName.substring(0, dotPos));
-                if (contract == null) {
-                    return null;
-                }
-                return contract.getStruct(structName.substring(dotPos + 1));
-            }
-            return null;
-        }
-
-        /**
          * Get the name of the contract before (less derived) the supplied contract in this contract's linearization list.
          * @param contractName The name of the contract that should be after the contract this is returned.
          * @return The contract before the one given by 'contractName', in the linearization list of this coontract.
@@ -753,7 +652,6 @@ public class Solidity {
         if (typeIsInt(solidityTypeName)) {
             return "int";
         }
-        if ()
         if (typeIsBytes(solidityTypeName)) {
             return solidityTypeName.equals("bytes") ? "int[]" : "int";
         }
@@ -916,16 +814,16 @@ public class Solidity {
             return false;
         }
         // Check if the types are enums
-        Enum enum1 = callContainingContract.lookupEnum(callArgType, env);
-        Enum enum2 = callable.owner.lookupEnum(funParamType, env);
+        Enum enum1 = env.lookupEnum(callArgType, callContainingContract);
+        Enum enum2 = env.lookupEnum(funParamType, callable.owner);
         if (enum1 != null && enum2 != null) {
             return enum1.name.equals(enum2.name) && enum1.owner.equals(enum2.owner);
         } else if (enum1 != null || enum2 != null) {
             return false;
         }
         // Check if the types are structs
-        Struct struct1 = callContainingContract.lookupStruct(callArgType, env);
-        Struct struct2 = callable.owner.lookupStruct(funParamType, env);
+        Struct struct1 = env.lookupStruct(callArgType, callContainingContract);
+        Struct struct2 = env.lookupStruct(funParamType, callable.owner);
         if (struct1 != null && struct2 != null) {
             return struct1.name.equals(struct2.name) && struct1.owner.equals(struct2.owner);
         } else if (struct1 != null || struct2 != null) {

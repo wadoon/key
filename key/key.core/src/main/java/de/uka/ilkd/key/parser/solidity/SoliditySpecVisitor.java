@@ -192,17 +192,17 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SoliditySpecVisitor
             return new SMLExpr(paramType, ident);
         }
         String type = null;
-        Solidity.Enum enum_ = null;
-        Solidity.Struct struct = null;
+        Solidity.Enum enum_;
+        Solidity.Struct struct;
         Solidity.Variable variable = null;
-        if ((enum_ = contract.lookupEnum(ident, env)) != null) {
+        if ((enum_ = env.lookupEnum(ident, contract)) != null) {
             type = enum_.getDisplayName();
-        } else if ((struct = contract.lookupStruct(ident, env)) != null) {
+        } else if ((struct = env.lookupStruct(ident, contract)) != null) {
             type = struct.getDisplayName();
-        } else if ((variable = contract.lookupField(ident)) != null) {
-            if ((enum_ = contract.lookupEnum(variable.typename, env)) != null) {
+        } else if ((variable = env.lookupField(ident, contract)) != null) {
+            if ((enum_ = env.lookupEnum(variable.typename, contract)) != null) {
                 type = enum_.getDisplayName();
-            } else if ((struct = contract.lookupStruct(variable.typename, env)) != null) {
+            } else if ((struct = env.lookupStruct(variable.typename, contract)) != null) {
                 type = struct.getDisplayName();
             } else {
                 type = variable.typename;
@@ -218,8 +218,8 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SoliditySpecVisitor
         if (type.equals(__VARIABLE_PLACEHOLDER__)) {
             return new SMLExpr(placeHolderType, __VARIABLE_PLACEHOLDER__);
         }
-        boolean logicalVar = variable != null && variable instanceof Solidity.LogicalVariable;
-        String access = logicalVar ? ident :
+        boolean isLogicalVar = variable instanceof Solidity.LogicalVariable;
+        String access = isLogicalVar ? ident :
                 "(" + Solidity.solidityToJavaType(type, env) + "::select(" +
                         SpecCompilerUtils.HEAP_PLACEHOLDER_STRING + ",self," + injectFieldPrefix(ident) + "))";
         return new SMLExpr(type, access);
@@ -321,9 +321,9 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SoliditySpecVisitor
         // TODO: this does not consider all possible dot expression that can exist
         SMLExpr r = visit(ctx.expression());
         String ident = ctx.identifier().Identifier().getText();
-        String type = null;
-        String output = null;
-        Solidity.Enum enum_ = contract.lookupEnum(r.type, env);
+        String type;
+        String output;
+        Solidity.Enum enum_ = env.lookupEnum(r.type, contract);
         if (enum_ != null) {
             type = enum_.getDisplayName();
             output = enum_ + "::select(" + SpecCompilerUtils.HEAP_PLACEHOLDER_STRING +
@@ -337,13 +337,13 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SoliditySpecVisitor
             output = "(" + Solidity.solidityToJavaType(type, env) + "::select(" + SpecCompilerUtils.HEAP_PLACEHOLDER_STRING +
                     ",msg,java.lang.Message::$" + ident + "))";
         } else if (r.output.equals("this") && ident.equals("balance")) {
-            type = contract.lookupField(ident).typename;
+            type = env.lookupField(ident, contract).typename;
             output = "(" + Solidity.solidityToJavaType(type, env) + "::select(" + SpecCompilerUtils.HEAP_PLACEHOLDER_STRING +
                     ",self,java.lang.Address::$" + ident + "))";
         } else {
-            Solidity.Struct struct = contract.lookupStruct(r.type, env);
+            Solidity.Struct struct = env.lookupStruct(r.type, contract);
             if (struct == null) {
-                struct = contract.lookupStruct(ident, env);
+                struct = env.lookupStruct(ident, contract);
                 if (struct == null) {
                     error("unsupported expression in dot expression");
                 }

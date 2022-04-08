@@ -16,6 +16,7 @@ import java.util.*;
 */
 public class SolidityPreVisitor extends SolidityBaseVisitor<Environment> {
     private final Environment env = new Environment();
+    private boolean currentlyVisitingContract = false;
     private Solidity.Contract currentContract;
     private Solidity.Callable currentCallable;
 
@@ -25,8 +26,8 @@ public class SolidityPreVisitor extends SolidityBaseVisitor<Environment> {
     
     @Override
     public Environment visitSourceUnit(SolidityParser.SourceUnitContext ctx) {
-        // TODO: visit free functions, structs, etc.
         ctx.importDirective().forEach(this::visit);
+        ctx.structDefinition().forEach(this::visit);
         ctx.contractDefinition().forEach(this::visit);
         return env;
     }
@@ -62,6 +63,8 @@ public class SolidityPreVisitor extends SolidityBaseVisitor<Environment> {
 
     @Override
     public Environment visitContractDefinition(SolidityParser.ContractDefinitionContext ctx) {
+        currentlyVisitingContract = true;
+
         String contractName = ctx.identifier().getText();
         if (env.contracts.containsKey(contractName)) {
             error("Contract redefinition; there exists multiple definitions of the contract " + contractName);
@@ -72,6 +75,7 @@ public class SolidityPreVisitor extends SolidityBaseVisitor<Environment> {
         contract.name = contractName;
         contract.inputFileStartLine = ctx.start.getLine();
         contract.contractsInInputFile = env.contracts;
+        contract.isAbstract = ctx.AbstractKeyword() != null;
         if (ctx.ContractKeyword() != null) {
             contract.type = Solidity.ContractType.CONTRACT;
         } else if (ctx.InterfaceKeyword() != null) {
@@ -99,35 +103,28 @@ public class SolidityPreVisitor extends SolidityBaseVisitor<Environment> {
 
         // If a constructor was not defined, make a default one.
         if (contract.constructor == null) {
-            Solidity.Constructor constructor = new Solidity.Constructor();
+            Solidity.Constructor constructor = new Solidity.Constructor(contract.name, contract);
             contract.constructor = constructor;
-            constructor.name = constructor.returnType = contract.name;
-            constructor.owner = contract;
+            constructor.returnType = contract.name;
             constructor.params = new LinkedList<>();
         }
 
-        // If any function was abstract, mark the class as abstract
-        boolean hasAbstractFunction = false;
-        for (Solidity.Function fun : contract.functions) {
-            if (fun.isAbstract) {
-                hasAbstractFunction = true;
-                break;
-            }
-        }
-        contract.isAbstract = hasAbstractFunction;
+        currentlyVisitingContract = false;
 
         return env;
     }
 
     @Override
     public Environment visitFunctionDefinition(SolidityParser.FunctionDefinitionContext ctx) {
-        Solidity.Function function = new Solidity.Function();
+        if (!currentlyVisitingContract) {
+            error("Free functions are not supported.");
+        }
+        String fctName = ctx.identifier() == null ? "fallback" : ctx.identifier().getText();
+        Solidity.Function function = new Solidity.Function(fctName, currentContract);
         currentContract.functions.add(function);
         currentCallable = function;
-        String fctName = ctx.identifier() == null ? "fallback" : ctx.identifier().getText();
         function.ctx = ctx;
         function.name = fctName;
-        function.owner = currentContract;
         function.inputFileStartLine = ctx.start.getLine();
 
         // TODO: currently, if the function has several return variables,
@@ -180,13 +177,14 @@ public class SolidityPreVisitor extends SolidityBaseVisitor<Environment> {
 
     @Override
     public Environment visitModifierDefinition(SolidityParser.ModifierDefinitionContext ctx) {
-        Solidity.Modifier modifier = new Solidity.Modifier();
+        String modName = ctx.identifier() == null ? "fallback" : ctx.identifier().getText();
+        Solidity.Modifier modifier = new Solidity.Modifier(modName, currentContract);
         currentContract.modifiers.add(modifier);
         currentCallable = modifier;
-        modifier.name = ctx.identifier() == null ? "fallback" : ctx.identifier().getText();
         modifier.ctx = ctx;
-        modifier.owner = currentContract;
         modifier.isPayable = false;
+        modifier.isVirtual = ctx.VirtualKeyword() != null;
+        modifier.overrides = ctx.OverrideKeyword() != null;
         modifier.inputFileStartLine = ctx.start.getLine();
         if (ctx.parameterList() != null && !ctx.parameterList().parameter().isEmpty()) {
             ctx.parameterList().parameter().forEach(this::visit);
@@ -201,6 +199,7 @@ public class SolidityPreVisitor extends SolidityBaseVisitor<Environment> {
         field.ctx = ctx;
         field.owner = currentContract;
         field.dataLocation = Solidity.DataLocation.STORAGE;
+        field.isConstant = ctx.ConstantKeyword().isEmpty() || ctx.ImmutableKeyword().isEmpty();
         currentContract.fields.add(field);
 
         if (!ctx.PublicKeyword().isEmpty()) {
@@ -212,7 +211,6 @@ public class SolidityPreVisitor extends SolidityBaseVisitor<Environment> {
         } else { // The default visibility is "internal"
             field.visibility = Solidity.FieldVisibility.INTERNAL;
         }
-        field.isConstant = !ctx.ConstantKeyword().isEmpty();
 
         return env;
     }
@@ -221,11 +219,10 @@ public class SolidityPreVisitor extends SolidityBaseVisitor<Environment> {
     public Environment visitConstructorDefinition(SolidityParser.ConstructorDefinitionContext ctx) {
         if (currentContract.hasNonDefaultConstructor())
             error("Cannot define more than one constructor for contract " + currentContract.name);
-        Solidity.Constructor constructor = new Solidity.Constructor();
+        Solidity.Constructor constructor = new Solidity.Constructor(currentContract.name, currentContract);
         currentCallable = currentContract.constructor = constructor;
         constructor.ctx = ctx;
-        constructor.name = constructor.returnType = currentContract.name;
-        constructor.owner = currentContract;
+        constructor.returnType = currentContract.name;
         constructor.inputFileStartLine = ctx.start.getLine();
         ctx.modifierList().stateMutability().forEach(term -> {
             if (term.PayableKeyword() != null) {
@@ -254,14 +251,24 @@ public class SolidityPreVisitor extends SolidityBaseVisitor<Environment> {
 
     @Override
     public Environment visitEnumDefinition(SolidityParser.EnumDefinitionContext ctx) {
-        currentContract.enums.add(
-                new Solidity.Enum(ctx.identifier().getText(), currentContract));
+        if (!currentlyVisitingContract) {
+            error("Free enums are not supported.");
+        }
+        Solidity.Enum enum_ = new Solidity.Enum(ctx.identifier().getText(), currentContract);
+        currentContract.enums.add(enum_);
         return env;
     }
 
     @Override
     public Environment visitStructDefinition(SolidityParser.StructDefinitionContext ctx) {
-        Solidity.Struct struct = new Solidity.Struct(ctx.identifier().getText(), currentContract);
+        Solidity.Struct struct;
+        if (currentlyVisitingContract) {
+            struct = new Solidity.Struct(ctx.identifier().getText(), currentContract);
+            currentContract.structs.add(struct);
+        } else {
+            struct = new Solidity.Struct(ctx.identifier().getText());
+            env.freeStructs.add(struct);
+        }
         if (ctx.variableDeclaration() != null) {
             ctx.variableDeclaration().forEach(varCtx -> {
                 Solidity.Variable var = new Solidity.Variable(varCtx.identifier().getText(), varCtx.typeName().getText());
@@ -269,7 +276,6 @@ public class SolidityPreVisitor extends SolidityBaseVisitor<Environment> {
                 struct.fields.add(var);
             });
         }
-        currentContract.structs.add(struct);
         return env;
     }
 

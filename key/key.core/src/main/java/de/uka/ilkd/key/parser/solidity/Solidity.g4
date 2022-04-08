@@ -21,7 +21,7 @@ grammar Solidity;
 //}
 
 sourceUnit
-  : (pragmaDirective | importDirective | contractDefinition)* EOF ;
+  : (pragmaDirective | importDirective | contractDefinition | structDefinition)* EOF ;
 
 pragmaDirective
   : 'pragma' pragmaName pragmaValue ';' ;
@@ -50,7 +50,7 @@ importDirective
   | 'import' '{' importDeclaration ( ',' importDeclaration )* '}' 'from' StringLiteral ';' ;
 
 contractDefinition
-  : (ContractKeyword | InterfaceKeyword | LibraryKeyword) identifier
+  : AbstractKeyword? (ContractKeyword | InterfaceKeyword | LibraryKeyword) identifier
     ( 'is' inheritanceSpecifier (',' inheritanceSpecifier )* )?
     '{' contractPart* '}' ;
 
@@ -70,7 +70,7 @@ contractPart
 
 stateVariableDeclaration
   : typeName
-    ( PublicKeyword | InternalKeyword | PrivateKeyword | ConstantKeyword )*
+    ( PublicKeyword | InternalKeyword | PrivateKeyword | ConstantKeyword | ImmutableKeyword )*
     identifier ('=' expression)? ';' ;
 
 usingForDeclaration
@@ -84,7 +84,7 @@ constructorDefinition
   : 'constructor' parameterList modifierList block ;
 
 modifierDefinition
-  : 'modifier' identifier parameterList? block ;
+  : 'modifier' identifier parameterList? (VirtualKeyword | OverrideKeyword)? block ;
 
 modifierInvocation
   : identifier ( '(' expressionList? ')' )? ;
@@ -141,8 +141,8 @@ functionTypeParameterList
 functionTypeParameter
   : typeName storageLocation? ;
 
-variableDeclaration
-  : typeName storageLocation? identifier ;
+variableDeclaration // storageLocation for local variables; constant keyword for free variables
+  : typeName (storageLocation | ConstantKeyword)? identifier ;
 
 typeName
   : elementaryTypeName      
@@ -172,11 +172,15 @@ stateMutability
 block
   : '{' statement* '}' ;
 
+uncheckedBlock
+  : 'unchecked' block ;
+
 statement
   : ifStatement
   | whileStatement
   | forStatement
   | block
+  | uncheckedBlock
   | inlineAssemblyStatement
   | doWhileStatement
   | continueStatement
@@ -283,6 +287,7 @@ expression
   | expression '->' expression				#implicationExpression
   | expression '<->' expression				#equivalenceExpression
   | expression '<-' expression				#onlyIfExpression
+  | minMaxTypeExpression                    #minMaxTypeExprExpression
   | '(' '\\forall' typeName Identifier ';' expression ')'	#forallExpression
   | '(' '\\exists' typeName Identifier ';' expression ')'	#existsExpression
   | 'net' '(' expression ')'                   #netExpression
@@ -300,6 +305,8 @@ primaryExpression
   | identifier
   | tupleExpression
   | elementaryTypeNameExpression ;
+
+minMaxTypeExpression : 'type' '(' typeName ')' '.' ('min' | 'max') ;
 
 expressionList
   : expression (',' expression)* ;
@@ -430,8 +437,7 @@ HexCharacter
   : [0-9A-Fa-f] ;
 
 ReservedKeyword
-  : 'abstract'
-  | 'after'
+  : 'after'
   | 'case'
   | 'catch'
   | 'default'
@@ -449,23 +455,25 @@ ReservedKeyword
   | 'type'
   | 'typeof' ;
 
+AbstractKeyword : 'abstract' ;
 AnonymousKeyword : 'anonymous' ;
 BreakKeyword : 'break' ;
 ConstantKeyword : 'constant' ;
 ContinueKeyword : 'continue' ;
 ContractKeyword : 'contract';
 ExternalKeyword : 'external' ;
+ImmutableKeyword : 'immutable' ;
 IndexedKeyword : 'indexed' ;
 InterfaceKeyword : 'interface'; 
 InternalKeyword : 'internal' ;
-LibraryKeyword : 'library'; 
+LibraryKeyword : 'library';
+OverrideKeyword : 'override' ;
 PayableKeyword : 'payable' ;
 PrivateKeyword : 'private' ;
 PublicKeyword : 'public' ;
 PureKeyword : 'pure' ;
 ViewKeyword : 'view' ;
 VirtualKeyword : 'virtual' ;
-OverrideKeyword : 'override' ;
 
 
 Identifier
