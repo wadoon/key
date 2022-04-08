@@ -27,7 +27,7 @@ public class SolidityPreVisitor extends SolidityBaseVisitor<Environment> {
     @Override
     public Environment visitSourceUnit(SolidityParser.SourceUnitContext ctx) {
         ctx.importDirective().forEach(this::visit);
-        ctx.structDefinition().forEach(this::visit);
+        ctx.structDefinition().forEach(this::visit); // free structs
         ctx.contractDefinition().forEach(this::visit);
         return env;
     }
@@ -56,8 +56,19 @@ public class SolidityPreVisitor extends SolidityBaseVisitor<Environment> {
                 env.contracts.put(contract.name, contract);
             }
         });
-        // TODO: import free functions, constants, and structs, from the new file
-
+        environment.freeStructs.forEach(newStruct -> {
+            // Again, we may run into duplicate structs, which is fine.
+            boolean structIsDuplicate = false;
+            for (Solidity.Struct struct : env.freeStructs) {
+                if (struct.name.equals(newStruct.name)) {
+                    structIsDuplicate = true;
+                    break;
+                }
+            }
+            if (!structIsDuplicate) {
+                env.freeStructs.add(newStruct);
+            }
+        });
         return env;
     }
 
@@ -103,10 +114,9 @@ public class SolidityPreVisitor extends SolidityBaseVisitor<Environment> {
 
         // If a constructor was not defined, make a default one.
         if (contract.constructor == null) {
-            Solidity.Constructor constructor = new Solidity.Constructor(contract.name, contract);
-            contract.constructor = constructor;
-            constructor.returnType = contract.name;
-            constructor.params = new LinkedList<>();
+            contract.constructor = new Solidity.Constructor(contract.name, contract);
+            contract.constructor.returnType = contract.name;
+            contract.constructor.params = new LinkedList<>();
         }
 
         currentlyVisitingContract = false;
