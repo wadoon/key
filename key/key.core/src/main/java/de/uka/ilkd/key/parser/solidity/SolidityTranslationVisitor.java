@@ -471,7 +471,14 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 	}
 
 	private String getDefaultConstructorOutput(Solidity.Constructor constructor) {
-		StringBuilder output = new StringBuilder("public " + constructor.owner.getDisplayName() + "(Message msg) {\n");
+		StringBuilder output = new StringBuilder();
+		if (currentlyVisitingInheritedContractMember()) {
+			output.append("private void "); // Import inherited contract constructor as a private method
+		} else {
+			output.append("public ");
+		}
+		output.append(constructor.owner.getDisplayName());
+		output.append("(Message msg) {\n");
 		output.append(getParentConstructorInvocationsOutput(constructor, new LinkedList<>()));
 		output.append("}\n");
 		return output.toString();
