@@ -903,6 +903,9 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 		if (mode == ModifierFlatteningMode.INLINE_MODS_CALL_FUNCTION) {
 			// Create an additional private Java method, corresponding to the modifier-free callable.
 			StringBuilder externalOutput = new StringBuilder("private ");
+			if (callable.owner.type == Solidity.ContractType.LIBRARY) {
+				externalOutput.append("static ");
+			}
 			externalOutput.append(callable instanceof Solidity.Function ? Solidity.solidityToJavaType(callable.returnType, env) : "void");
 			externalOutput.append(" ");
 			externalOutput.append(ModifierFlattening.mainCallable.getModFreeDisplayName(currentContract));
@@ -1023,7 +1026,11 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 		} else {
 			error("Illegitimate Solidity.Callable type given to flattenCallableWithModCalling().");
 		}
-		externalOutput.append("private " + returnType + " " + callable.getModFreeDisplayName(currentContract));
+		externalOutput.append("private ");
+		if (callable.owner.type == Solidity.ContractType.LIBRARY) {
+			externalOutput.append("static ");
+		}
+		externalOutput.append(returnType + " " + callable.getModFreeDisplayName(currentContract));
 		externalOutput.append(callable.buildParamListWithParen(env));
 		externalOutput.append("{\n");
 		// Declare return variables at the top of the function body, and return at the end.
@@ -1097,6 +1104,9 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 
 			// Add to the output a method for the modifier.
 			externalOutput.append("private ");
+			if (callable.owner.type == Solidity.ContractType.LIBRARY) {
+				externalOutput.append("static ");
+			}
 			if (callable instanceof Solidity.Function) {
 				externalOutput.append(Solidity.solidityToJavaType(callable.returnType, env) + " ");
 			} else {
