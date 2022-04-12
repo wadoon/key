@@ -34,3 +34,6 @@ bin/
 .settings
 .project
 .classpath
+
+
+/key.ui/examples/casladt/enum/enum.casl.key

@@ -1,5 +1,5 @@
 final class Reverse {
-    
+
     final Nat nat1 = new Nat(1);
     final Nat nat2 = new Nat(2);
     final Nat nat3 = new Nat(3);
@@ -11,7 +11,7 @@ final class Reverse {
       @ ensures \fresh(\result);
       @*/
     public INatList test() {
-	final INatList nl = new NatListImpl();
+        final INatList nl = new NatListImpl();
         nl.cons(nat3);
         nl.cons(nat2);
         nl.cons(nat1);
@@ -24,11 +24,11 @@ final class Reverse {
       @ ensures \dl_len(\result.nlist) == 2;
       @*/
     public INatList test_remove() {
-	final INatList nl = new NatListImpl();
+        final INatList nl = new NatListImpl();
         nl.cons(nat3);
         nl.cons(nat2);
         nl.cons(nat1);
-	nl.remove(0);
-	return nl;
+        nl.remove(0);
+        return nl;
     }
 }
