@@ -103,5 +103,6 @@ InformationFlow/BlockContracts/README.txt
 
 
 # Experimental
+casladt/enum/README.txt
 casladt/list/README.txt
 casladt/list/README_Java.txt
