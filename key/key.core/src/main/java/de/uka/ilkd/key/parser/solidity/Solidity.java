@@ -339,9 +339,7 @@ public class Solidity {
         }
 
         public String getJavaDeclaration(Environment env) {
-            return solidityToJavaType(typename, env) +
-                    (dataLocation == DataLocation.UNSPECIFIED ? " " : " " + getDataLocationAnnotation(dataLocation) + " ") +
-                    renamedName;
+            return solidityToJavaType(typename, env) + " " + renamedName;
         }
 
         public String getDisplayName(Contract callingContract) { return renamedName; }
@@ -841,13 +839,5 @@ public class Solidity {
 
     public static String getContractDisplayName(String contractName) {
         return contractName + "Impl";
-    }
-
-    public static String getDataLocationAnnotation(DataLocation loc) {
-        return loc == DataLocation.UNSPECIFIED ? "" : "/*@" + loc.toString() + "@*/";
-    }
-
-    public static String getDataLocationAnnotation(String loc) {
-        return getDataLocationAnnotation(DataLocation.stringToLocation(loc));
     }
 }

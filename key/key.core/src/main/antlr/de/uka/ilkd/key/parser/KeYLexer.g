@@ -256,6 +256,8 @@ lexer grammar KeYLexer;
 	ISREFERENCEARRAY:'\\isReferenceArray';
 	ISSTATICFIELD : '\\isStaticField';
 	ISSUBTYPE : '\\sub';
+	ISSTORAGE : '\\isStorage';
+	ISMEMORY : '\\isMemory';
 	EQUAL_UNIQUE : '\\equalUnique';
         NEW : '\\new';
         NEWLABEL : '\\newLabel';

@@ -13,7 +13,7 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 	private final VariableScopeStack varStack = new VariableScopeStack();
 	private final Stack<ContractStructure> structureStack = new Stack<>();
 	private Environment env = new Environment();
-	private Solidity.Contract currentContract; // The contract that we are currently visiting/building
+	private Solidity.Contract currentContract; // The contract that we are currently building the output for
 	private Solidity.Contract currentOwnerContract; // If we are visiting e.g. an inherited function, then this will be the owner
 	private StringBuilder interfaceOutput = new StringBuilder();
 	private String modifierUnderscoreReplacement; // What the statement '_;' is replaced with in a modifier body.
@@ -209,6 +209,22 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 
 	private boolean nameIsAContract(String name) {
 		return env.contracts.get(name) != null;
+	}
+
+	/**
+	 * Returns a string that is used to encode the data location of a local variable, function parameter, field, etc.,
+	 * in the Java AST. For now, the only thing that "annotated" are local storage variables, which are made "final".
+	 * @param var
+	 * @return
+	 */
+	private String getJavaEncodingForVariableDataLocation(Solidity.Variable var) {
+		if (var instanceof Solidity.Field) {
+			return "";
+		} else if (var instanceof Solidity.Variable) {
+			return var.dataLocation == Solidity.DataLocation.STORAGE ? "final" : "";
+		} else {
+			return "";
+		}
 	}
 
 	/**
@@ -1388,6 +1404,12 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 
 		StringBuilder output = new StringBuilder();
 
+		String dataLocationEncoding = getJavaEncodingForVariableDataLocation(field);
+		if (!dataLocationEncoding.equals("")) {
+			output.append(dataLocationEncoding);
+			output.append(" ");
+		}
+
 		output.append(switch (field.visibility) {
 			case PUBLIC -> "public";
 			case PRIVATE -> "private";
@@ -1400,10 +1422,8 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 
 		String displayName = field.getDisplayName(currentContract);
 		String shownTypename = Solidity.solidityToJavaType(field.typename, env);
-		Solidity.DataLocation dataLocation = Solidity.DataLocation.STORAGE;
-		String dataLocationAnnotation = Solidity.getDataLocationAnnotation(dataLocation);
 
-		output.append(" " + shownTypename + " " + dataLocationAnnotation + " " + displayName);
+		output.append(" " + shownTypename + " " + displayName);
 
 		structureStack.pop();
 		structureStack.push(ContractStructure.FIELD_DECL_RIGHT);
@@ -1655,9 +1675,7 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 		String parameters = function.buildParamListWithParen(env);
 		String returnType = Solidity.solidityToJavaType(function.returnType, env);
 		String fctHeader = visibility + (currentContract.type == Solidity.ContractType.LIBRARY ? " static " : " ") +
-				(function.isAbstract ? "abstract " : "") +
-				Solidity.getDataLocationAnnotation(function.returnVarDataLocation) + " " +
-				returnType + " " + shownFunName + parameters;
+				(function.isAbstract ? "abstract " : "") + " " +  returnType + " " + shownFunName + parameters;
 
 		/* The function declaration is added to an interface accompanying the output class, unless the function was
 		   inherited. With the function being abstract, it is added to the class as an abstract method,
@@ -1844,10 +1862,10 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 		} else {
 			var.dataLocation = Solidity.DataLocation.stringToLocation(visit(ctx.storageLocation()));
 		}
-		String dataLocationAnnotation = Solidity.getDataLocationAnnotation(var.dataLocation);
 
-		return shownTypename + (dataLocationAnnotation.equals("") ? " " : " " + dataLocationAnnotation + " ") +
-				(localVarAlreadyExists ? var.renamedName : identifier);
+		String dataLocationEncoding = getJavaEncodingForVariableDataLocation(var);
+		return (dataLocationEncoding.equals("") ? "" : dataLocationEncoding + " ") +
+				shownTypename + " " + (localVarAlreadyExists ? var.renamedName : identifier);
 	}
 	/**
 	 * {@inheritDoc}
@@ -1856,6 +1874,7 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
 	@Override public String visitTypeName(SolidityParser.TypeNameContext ctx) {
+		// We rely on this not converting to the Java type.
 		return ctx.getText();
 	}
 	/**

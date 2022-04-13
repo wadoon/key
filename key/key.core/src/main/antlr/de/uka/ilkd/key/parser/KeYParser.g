@@ -3864,6 +3864,8 @@ varexp[TacletBuilder b]
         | varcond_static_field[b, negated]
         | varcond_subFormulas[b, negated]
         | varcond_containsAssignment[b, negated]
+		| varcond_isStorage[b, negated]
+		| varcond_isMemory[b, negated]
       )
   )
 ;
@@ -4318,6 +4320,20 @@ varcond_subFormulas [TacletBuilder b, boolean negated]
         LPAREN x=varId RPAREN {
            b.addVariableCondition(new SubFormulaCondition((FormulaSV) x, negated ));
         }
+;
+
+varcond_isStorage [TacletBuilder b, boolean negated]
+:
+   ISSTORAGE LPAREN x=varId RPAREN {
+      b.addVariableCondition(new IsStorage((SchemaVariable) x, negated));     
+   }
+;
+
+varcond_isMemory [TacletBuilder b, boolean negated]
+:
+   ISMEMORY LPAREN x=varId RPAREN {
+      b.addVariableCondition(new IsMemory((SchemaVariable) x, negated));
+   }
 ;
 
 goalspecs[TacletBuilder b, boolean ruleWithFind] :

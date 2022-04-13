@@ -208,8 +208,8 @@ public class SolidityPreVisitor extends SolidityBaseVisitor<Environment> {
         Solidity.Field field = new Solidity.Field(ctx.identifier().getText(), ctx.typeName().getText());
         field.ctx = ctx;
         field.owner = currentContract;
+        field.isConstant = !ctx.ConstantKeyword().isEmpty() || !ctx.ImmutableKeyword().isEmpty();
         field.dataLocation = Solidity.DataLocation.STORAGE;
-        field.isConstant = ctx.ConstantKeyword().isEmpty() || ctx.ImmutableKeyword().isEmpty();
         currentContract.fields.add(field);
 
         if (!ctx.PublicKeyword().isEmpty()) {
