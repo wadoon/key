@@ -43,4 +43,5 @@ public interface FloatingPointLDT {
     public Function getMul();
     public Function getDiv();
     public Function getAbs();
+    public Function getLiteralSymbol();
 }

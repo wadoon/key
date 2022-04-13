@@ -399,4 +399,9 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
     public Function getAtanDouble() {
         return atanDouble;
     }
+
+    @Override
+    public Function getLiteralSymbol() {
+        return doubleLit;
+    }
 }

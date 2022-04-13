@@ -361,4 +361,8 @@ public final class FloatLDT extends LDT implements FloatingPointLDT {
         return negFloat;
     }
 
+    @Override
+    public Function getLiteralSymbol() {
+        return floatLit;
+    }
 }
