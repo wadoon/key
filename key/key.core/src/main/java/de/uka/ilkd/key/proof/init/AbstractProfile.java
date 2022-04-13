@@ -14,6 +14,8 @@
 package de.uka.ilkd.key.proof.init;
 
 import java.util.Iterator;
+import java.util.ServiceLoader;
+import java.util.stream.Collectors;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -33,6 +35,8 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.strategy.StrategyFactory;
+
+import static de.uka.ilkd.key.java.TypeConverter.LOGGER;
 
 public abstract class AbstractProfile implements Profile {
     /**
@@ -104,18 +108,19 @@ public abstract class AbstractProfile implements Profile {
 
     protected ImmutableList<BuiltInRule> initBuiltInRules() {
         ImmutableList<BuiltInRule> builtInRules = ImmutableSLList.<BuiltInRule>nil();
-
-	
-	//Collection<SMTRule> rules = SMTSettings.getInstance().getSMTRules();
-        
-	//for(SMTRule rule : rules){
-	  //  builtInRules = builtInRules.prepend(rule);  
-	//}     
-        
-     
-        
-        
-        
+        var loader = ServiceLoader.load(BuiltInRule.class);
+        var seq = loader.stream().collect(Collectors.toList());
+        for (var factory : seq) {
+            var enableInProfiles = factory.type().getAnnotation(EnableInProfiles.class);
+            if (enableInProfiles != null) {
+                for (var enableInProfile : enableInProfiles.value()) {
+                    if (enableInProfile.value().getName().equals(getClass().getName())) {
+                        builtInRules = builtInRules.prepend(factory.get());
+                        LOGGER.info("Add BuiltInRule {} to profile {}", factory.getClass(), getClass());
+                    }
+                }
+            }
+        }
         return builtInRules;
     }
 
