@@ -14,7 +14,6 @@ dependencies {
     implementation project(":key.core.proof_references")
     implementation project(":key.core.symbolic_execution")
     implementation project(":key.removegenerics")
-    implementation project(":keyext.daisy")
 
 
     api 'com.miglayout:miglayout-swing:11.0'
@@ -28,6 +27,7 @@ dependencies {
     runtimeOnly project(":keyext.ui.testgen")
 
     //runtimeOnly project(":keyext.script.ui")
+    runtimeOnly project(":keyext.daisy")
     runtimeOnly project(":keyext.exploration")
 }
 

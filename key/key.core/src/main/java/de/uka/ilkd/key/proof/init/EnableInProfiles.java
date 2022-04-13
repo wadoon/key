@@ -12,5 +12,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface EnableInProfiles {
-    EnableInProfile[] value();
+    Class<? extends Profile>[] value();
 }

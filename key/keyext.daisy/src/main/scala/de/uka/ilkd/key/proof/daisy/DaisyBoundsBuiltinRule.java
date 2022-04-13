@@ -8,6 +8,8 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.init.EnableInProfiles;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -17,6 +19,7 @@ import org.key_project.util.collection.ImmutableList;
 import java.util.ArrayList;
 import java.util.List;
 
+@EnableInProfiles(JavaProfile.class)
 public class DaisyBoundsBuiltinRule implements BuiltInRule {
     public static final DaisyBoundsBuiltinRule INSTANCE = new DaisyBoundsBuiltinRule();
     public static final Name NAME = new Name("Daisy Bounds Rule");
