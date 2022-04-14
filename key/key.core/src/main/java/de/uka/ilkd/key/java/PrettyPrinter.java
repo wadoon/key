@@ -1661,13 +1661,13 @@ public class PrettyPrinter {
 	throws java.io.IOException {
         printHeader(x);
 	// Mark statement start ...
-	markStart(0,x);
+	    markStart(0,x);
         int m = 0;
+        writeElement(0, x.getTypeReference());
         if (x.getModifiers() != null) {
             m = x.getModifiers().size();
             writeKeywordList(x.getModifiers());
         }
-        writeElement((m > 0) ? 1 : 0, x.getTypeReference());
 	write(" ");
         ImmutableArray<VariableSpecification> varSpecs = x.getVariables();
         boolean wasNoSemicolons = noSemicolons;
@@ -3110,7 +3110,11 @@ public class PrettyPrinter {
     public void printModifier(Modifier x) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);
-        write(x.getText());
+        if ("final".equals(x.getText())) {
+            write("storage");
+        } else {
+            write(x.getText());
+        }
         printFooter(x);
     }
 
