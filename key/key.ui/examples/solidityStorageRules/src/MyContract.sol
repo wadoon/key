@@ -7,7 +7,8 @@ contract MyContract {
   }
 
   function n() public {
-  	   uint storage localSt = this.f; 	   
+  	   uint storage test;
+  	   uint storage localSt = test; 	   
   }
 
 }

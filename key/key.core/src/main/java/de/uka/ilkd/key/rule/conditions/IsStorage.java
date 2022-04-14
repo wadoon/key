@@ -51,18 +51,17 @@ public final class IsStorage extends VariableConditionAdapter {
         if(var != this.var) {
           return true;
         }
-		
-		boolean isThisRef = instCandidate instanceof ThisReference;
-		if (isThisRef) {
-			return negated;
-		}
+
 		if (instCandidate instanceof ProgramVariable){
 			ProgramVariable programVariable = (ProgramVariable)instCandidate;
 			boolean isFinal = programVariable.isFinal();
+            System.out.println(programVariable + ":" +isFinal);
 			return isFinal != negated; // isFinal, negated => false;  isFinal, !negated => true;  !isFinal, negated => true;  !isFinal, !negated => false
 		} else if (instCandidate instanceof FieldReference) {
+            System.out.println("A");
 			return !negated;
 		} else {
+            System.out.println("B");
 			return negated;
 		}
     }
