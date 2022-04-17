@@ -1,7 +1,7 @@
 pipeline {
     agent {
         docker {
-            image 'wadoon/key-test-docker:jdk11'
+            image 'wadoon/key-test-docker:jdk17'
         }
     }
 
