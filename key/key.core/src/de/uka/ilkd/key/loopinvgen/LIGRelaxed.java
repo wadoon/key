@@ -34,7 +34,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.util.Pair;
 
-public class LIGNew {
+public class LIGRelaxed {
 
 	private final Sequent seq;
 	private final Services services;
@@ -47,7 +47,7 @@ public class LIGNew {
 	private Set<Term> oldCompPreds = new HashSet<>();
 	private Set<Term> allCompPreds = new HashSet<>();
 	private final IntegerLDT intLDT;
-	public LIGNew(Services s, Sequent sequent) {
+	public LIGRelaxed(Services s, Sequent sequent) {
 		seq = sequent;
 //		System.out.println(seq);
 		ruleApp = new RuleApplication(s, seq);
@@ -137,7 +137,7 @@ public class LIGNew {
 //			System.out.println("Number of goals after unwind: " + goalsAfterUnwind.size());
 //			System.out.println("Goals After Unwind:" + goalsAfterUnwind);
 //			System.out.println(goalsAfterUnwind);
-			goalsAfterShift = ruleApp.applyShiftUpdateRule(goalsAfterUnwind);
+			goalsAfterShift = ruleApp.applyRelaxedShiftUpdateRule(goalsAfterUnwind);
 //			System.out.println("SHIFT");
 //			System.out.println("Number of goals after shift: " + goalsAfterShift.size());
 //			System.out.println("Goals After Shift:" + goalsAfterShift);

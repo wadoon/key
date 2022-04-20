@@ -34,7 +34,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.util.Pair;
 
-public class LIGNew {
+public class LIGNested {
 
 	private final Sequent seq;
 	private final Services services;
@@ -47,7 +47,7 @@ public class LIGNew {
 	private Set<Term> oldCompPreds = new HashSet<>();
 	private Set<Term> allCompPreds = new HashSet<>();
 	private final IntegerLDT intLDT;
-	public LIGNew(Services s, Sequent sequent) {
+	public LIGNested(Services s, Sequent sequent) {
 		seq = sequent;
 //		System.out.println(seq);
 		ruleApp = new RuleApplication(s, seq);
@@ -87,21 +87,21 @@ public class LIGNew {
 
 		
 //		// Initial Predicate Sets for stencil and conditionalWithDifferentEvents: 
-//		allCompPreds.add(tb.geq(index, tb.subtract(low,tb.one())));//
-//		allCompPreds.add(tb.leq(index, tb.add(high, tb.one())));//
-//		for (Term arr : arrays) {
-//			allDepPreds.add(tb.noR(tb.arrayRange(arr, tb.subtract(low,tb.one()), high)));
-//			allDepPreds.add(tb.noW(tb.arrayRange(arr, tb.subtract(low,tb.one()), high)));
-//		}
+		allCompPreds.add(tb.geq(index, tb.subtract(low,tb.one())));//
+		allCompPreds.add(tb.leq(index, tb.add(high, tb.one())));//
+		for (Term arr : arrays) {
+			allDepPreds.add(tb.noR(tb.arrayRange(arr, tb.subtract(low,tb.one()), high)));
+			allDepPreds.add(tb.noW(tb.arrayRange(arr, tb.subtract(low,tb.one()), high)));
+		}
 		
 		
 //		//Initial Predicate Sets for shiftArrayToLeft, shiftArrayToLeftWithBreak, withoutFunc, withFunc, conditionWithDifferentNumberOfEvent, condition:
-		allCompPreds.add(tb.geq(index, low));
-		allCompPreds.add(tb.leq(index, tb.add(high,tb.one())));
-		for (Term arr : arrays) {
-			allDepPreds.add(tb.noR(tb.arrayRange(arr, low, high)));
-			allDepPreds.add(tb.noW(tb.arrayRange(arr, low, high)));
-		}
+//		allCompPreds.add(tb.geq(index, low));
+//		allCompPreds.add(tb.leq(index, tb.add(high,tb.one())));
+//		for (Term arr : arrays) {
+//			allDepPreds.add(tb.noR(tb.arrayRange(arr, low, high)));
+//			allDepPreds.add(tb.noW(tb.arrayRange(arr, low, high)));
+//		}
 		
 		
 

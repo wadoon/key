@@ -31,6 +31,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.loopinvgen.ShiftUpdateRule;
+import de.uka.ilkd.key.loopinvgen.RelaxedShiftUpdateRule;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
@@ -239,7 +240,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
 		final Feature oneStepSimplificationF = oneStepSimplificationFeature(longConst(-11000));
 		final Feature shiftUpdateF = shiftUpdateFeature();
-
+		final Feature relaxedShiftUpdateF = relaxedShiftUpdateFeature();
+		
 		final Feature mergeRuleF;
 		final String mpsProperty = strategyProperties.getProperty(StrategyProperties.MPS_OPTIONS_KEY);
 		if (mpsProperty.equals(StrategyProperties.MPS_MERGE)) {
@@ -253,7 +255,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 		return SumFeature.createSum(AutomatedRuleFeature.INSTANCE, NonDuplicateAppFeature.INSTANCE,
 				// splitF,
 				// strengthenConstraints,
-				AgeFeature.INSTANCE, oneStepSimplificationF, mergeRuleF, shiftUpdateF,
+				AgeFeature.INSTANCE, oneStepSimplificationF, mergeRuleF, shiftUpdateF, relaxedShiftUpdateF,
 				// smtF,
 				methodSpecF, queryF, depSpecF, loopInvF, blockFeature, loopBlockFeature, loopBlockApplyHeadFeature,
 				ifMatchedF, dispatcher);
@@ -269,6 +271,12 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 	private Feature shiftUpdateFeature() {
 		SetRuleFilter filter = new SetRuleFilter();
 		filter.addRuleToSet(ShiftUpdateRule.SHIFT_RULE);
+		return ConditionalFeature.createConditional(filter, inftyConst());
+	}
+	
+	private Feature relaxedShiftUpdateFeature() {
+		SetRuleFilter filter = new SetRuleFilter();
+		filter.addRuleToSet(RelaxedShiftUpdateRule.RELAXED_SHIFT_RULE);
 		return ConditionalFeature.createConditional(filter, inftyConst());
 	}
 
@@ -1335,11 +1343,13 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
 		bindRuleSet(d, "noEqApp", EqNonDuplicateAppFeature.INSTANCE);
 		bindRuleSet(d, "dep_pred_unroll_fixed_bounds", longConst(0));
-		bindRuleSet(d, "dep_pred_known", add(ScaleFeature.createScaled(depth, 1500), longConst(100)));
-		bindRuleSet(d, "dep_pred_known_2", add(noDoubleMinus,longConst(100)));
+		bindRuleSet(d, "dep_pred_known", add(ScaleFeature.createScaled(depth, 1500), longConst(100)));//+100
+		bindRuleSet(d, "dep_pred_known_2", add(noDoubleMinus,longConst(100)));//+100
 		bindRuleSet(d, "dep_pred_known_2b", add(noDoubleMinus,longConst(0)));
-		bindRuleSet(d, "dep_pred_known_3", add(noDoubleMinus,longConst(-500)));
-		bindRuleSet(d, "saturate_dep_locset_relations_def", add(noDoubleMinus,NonDuplicateAppModPositionFeature.INSTANCE,longConst(-200), ScaleFeature.createScaled(depth, 1000), longConst(500)));
+		bindRuleSet(d, "dep_pred_known_3", add(noDoubleMinus,longConst(-500)));//-500
+		bindRuleSet(d, "saturate_dep_locset_relations_def", add(noDoubleMinus,NonDuplicateAppModPositionFeature.INSTANCE, ScaleFeature.createScaled(depth, 1000), longConst(300)));
+		
+		//This one is not used anymore:
 		bindRuleSet(d, "saturate_dep_locset_relations", add(noDoubleMinus,NonDuplicateAppModPositionFeature.INSTANCE,longConst(-100)));
 
 	}
