@@ -81,11 +81,11 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
         this.storeTacletTranslationToFile = storeTacletTranslationToFile;
     }
 
-    public long getTimeout() {
+    public int getTimeout() {
         return timeout;
     }
 
-    public void setTimeout(long timeout) {
+    public void setTimeout(int timeout) {
         this.timeout = timeout;
     }
 
@@ -121,43 +121,43 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
         this.activeSolver = activeSolver;
     }
 
-    public long getIntBound() {
+    public int getIntBound() {
         return intBound;
     }
 
-    public void setIntBound(long intBound) {
+    public void setIntBound(int intBound) {
         this.intBound = intBound;
     }
 
-    public long getHeapBound() {
+    public int getHeapBound() {
         return heapBound;
     }
 
-    public void setHeapBound(long heapBound) {
+    public void setHeapBound(int heapBound) {
         this.heapBound = heapBound;
     }
 
-    public long getSeqBound() {
+    public int getSeqBound() {
         return seqBound;
     }
 
-    public void setSeqBound(long seqBound) {
+    public void setSeqBound(int seqBound) {
         this.seqBound = seqBound;
     }
 
-    public long getObjectBound() {
+    public int getObjectBound() {
         return objectBound;
     }
 
-    public void setObjectBound(long objectBound) {
+    public void setObjectBound(int objectBound) {
         this.objectBound = objectBound;
     }
 
-    public long getLocsetBound() {
+    public int getLocsetBound() {
         return locsetBound;
     }
 
-    public void setLocsetBound(long locsetBound) {
+    public void setLocsetBound(int locsetBound) {
         this.locsetBound = locsetBound;
     }
 
@@ -179,7 +179,7 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
     private boolean storeSMTTranslationToFile = false;
     private boolean storeTacletTranslationToFile = false;
 
-    private long timeout = 2000;
+    private int timeout = 2000;
     private int maxConcurrentProcesses = 2;
 
     private ProgressMode modeOfProgressDialog = ProgressMode.USER;
@@ -189,11 +189,11 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
     private String activeSolver = "";
 
 
-    private long intBound = DEFAULT_BIT_LENGTH_FOR_CE_GENERATION;
-    private long heapBound = DEFAULT_BIT_LENGTH_FOR_CE_GENERATION;
-    private long seqBound = DEFAULT_BIT_LENGTH_FOR_CE_GENERATION;
-    private long objectBound = DEFAULT_BIT_LENGTH_FOR_CE_GENERATION;
-    private long locsetBound = DEFAULT_BIT_LENGTH_FOR_CE_GENERATION;
+    private int intBound = DEFAULT_BIT_LENGTH_FOR_CE_GENERATION;
+    private int heapBound = DEFAULT_BIT_LENGTH_FOR_CE_GENERATION;
+    private int seqBound = DEFAULT_BIT_LENGTH_FOR_CE_GENERATION;
+    private int objectBound = DEFAULT_BIT_LENGTH_FOR_CE_GENERATION;
+    private int locsetBound = DEFAULT_BIT_LENGTH_FOR_CE_GENERATION;
 
     private Collection<SettingsListener> listeners = new LinkedHashSet<>();
 
