@@ -1,6 +1,6 @@
 package eplan.simple.graph;
 
-public class NodeList {
+public final class NodeList {
 
     /*@ public model \seq list; @*/
     /*@ public model \locset footprint; @*/

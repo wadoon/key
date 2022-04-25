@@ -11,6 +11,8 @@ public class Graph {
 
     /*@ public invariant (\forall int i;(\forall int j; 0<=i && i<=j && j<edges.length && edges[i].id == edges[j].id; i == j));@*/
 
+    /*@ accessible \inv:edges, edges[*], \infinite_union(int i; i >= 0 && i < edges.length; \set_union(edges[i].id, \set_union(edges[i].start, edges[i].end))); @*/
+
     /*
       1. aktuelle Loesung mit Schleifeninvariante wiederholt Teil der Objektinvariante (\forall int i; i>=0 && i<edges.length; \invariant_for(edges[i]))
       2. Globale ID Vergabe und Auslagerung der Eindeutigkeit der ID aus Edge (und Node)
@@ -42,7 +44,7 @@ public class Graph {
         /*@ loop_invariant
           @  k>=0 && k<=edges.length &&
           @  (\forall int j; j>=0 && j<k; res.contains(edges[j].start) && res.contains(edges[j].end)) &&
-          @  \invariant_for(res) && \new_elems_fresh(res.footprint);// \disjoint(res.footprint, \set_union(this.edges, \set_union(this.edges[*],\reachLocs(this.edges, this))));
+          @  \invariant_for(res) && \disjoint(res.footprint, \set_union(this.edges, \set_union(this.edges[*],\infinite_union(int i; i >= 0 && i < edges.length; \set_union(edges[i].id, \set_union(edges[i].start, edges[i].end))))));
           @ assignable res.footprint;
           @ decreases edges.length - k;
           @*/

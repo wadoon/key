@@ -2,17 +2,16 @@ package eplan.simple.graph;
 
 public final class Node {
 
-    /*@ model boolean mod_equals( nullable Object o) {return (o instanceof Node) && ((Node)o).id == id; }
+    /*@ model boolean mod_equals(nullable Object o) {return (o instanceof Node) && ((Node)o).id == id; } @*/
 
-      @*/
-
-
-    /* public invariant (\forall Node n; n.id == this.id; n == this); */
-    //@ accessible \inv: \nothing;
+    //@ public model \locset footprint;
+    //@ public accessible footprint: footprint;
+    //@ public accessible \inv: footprint;
     final private /*@ spec_public @*/ int id;
 
+    //@ private represents footprint = id;
+
     /*@ public normal_behavior
-      @ requires (\forall Node n; n.id != p_id);
       @ assignable \nothing;
       @ ensures this.id == p_id;
       @*/
