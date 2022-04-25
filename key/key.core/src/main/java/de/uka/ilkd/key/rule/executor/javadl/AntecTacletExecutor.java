@@ -9,6 +9,7 @@ import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.AntecTaclet;
 import de.uka.ilkd.key.rule.MatchConditions;
+import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
@@ -40,6 +41,13 @@ extends FindTacletExecutor<TacletKind> {
             Goal goal,
             RuleApp ruleApp,
             Services services) {
+        var ruleApplication = (PosTacletApp) ruleApp;
+        /*
+        for (var e : ruleApplication.taclet().getIfFindVariables()) {
+            System.out.println(e);
+            System.out.println(ruleApplication.instantiations().getInstantiation(e));
+        }
+         */
         if (gt instanceof AntecSuccTacletGoalTemplate) {
             final Sequent replWith = ((AntecSuccTacletGoalTemplate)gt).replaceWith();
             replaceAtPos(replWith.antecedent(), termLabelState, currentSequent,

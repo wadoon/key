@@ -70,14 +70,14 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
             boolean antec, Services services) {
         final IfFormulaInstantiationCache cache = services.getCaches().getIfFormulaInstantiationCache();
         final Semisequent semi = antec ? p_s.antecedent() : p_s.succedent();
-        
+
         ImmutableList<IfFormulaInstantiation> val = cache.get(antec, semi);
-        
+
         if (val == null) {
             val  = createListHelp(p_s, antec);
             cache.put(antec, semi, val);
         }
-        
+
         return val;
     }
 
@@ -119,7 +119,7 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
 
     public PosInOccurrence toPosInOccurrence () {
         if (pioCache == null) {
-            PosInOccurrence localPioCache = 
+            PosInOccurrence localPioCache =
                     new PosInOccurrence ( cf,
                             PosInTerm.getTopLevel(),
                             antec );

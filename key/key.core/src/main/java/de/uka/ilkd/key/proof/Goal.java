@@ -6,6 +6,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.NotationInfo;
+import de.uka.ilkd.key.proof.proofevent.NodeChangeAddFormula;
 import de.uka.ilkd.key.proof.proofevent.NodeChangeJournal;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
@@ -664,6 +665,31 @@ public final class Goal {
         final ImmutableList<Goal> goalList = ruleApp.execute(this, overlayServices);
 
         proof.getServices().saveNameRecorder(n);
+
+        System.out.println("Proof step inputs: " + ruleApp.rule().displayName());
+        System.out.println("find (in antec " + ruleApp.posInOccurrence().isInAntec() + ")");
+        System.out.println(ruleApp.posInOccurrence().sequentFormula());
+        if (ruleApp instanceof PosTacletApp) {
+            var posTacletApp = (PosTacletApp) ruleApp;
+            if (posTacletApp.ifFormulaInstantiations() != null) {
+                for (var x : posTacletApp.ifFormulaInstantiations()) {
+                    System.out.println("assume:");
+                    if (x instanceof IfFormulaInstSeq) {
+                        System.out.println("antedecent: " + ((IfFormulaInstSeq) x).inAntec());
+                    }
+                    System.out.println(x.getConstrainedFormula());
+                }
+            }
+        }
+        System.out.println("new stuff:");
+        var a = journal.getRuleAppInfo(ruleApp);
+        a.getReplacementNodes().forEachRemaining(b -> {
+            b.getNodeChanges().forEachRemaining(c -> {
+                if (c instanceof NodeChangeAddFormula) {
+                    System.out.println(c.getPos().sequentFormula() + " (antec: " + c.getPos().isInAntec() + ")");
+                }
+            });
+        });
 
         if (goalList != null) {
             if (goalList.isEmpty()) {
