@@ -564,7 +564,7 @@ public final class MainWindow extends JFrame {
 
         statusLine = new MainStatusLine("<html>" + PARA + KeYConstants.COPYRIGHT + PARA
                 + "KeY is free software and comes with ABSOLUTELY NO WARRANTY."
-                + " See About | License.", getFont());
+                + " See About | License.", getFont(), getContentPane());
         getContentPane().add(statusLine, BorderLayout.SOUTH);
 
         // load preferred sizes from system preferences

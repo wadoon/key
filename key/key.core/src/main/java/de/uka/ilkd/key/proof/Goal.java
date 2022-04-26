@@ -5,6 +5,7 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.proofevent.NodeChangeAddFormula;
 import de.uka.ilkd.key.proof.proofevent.NodeChangeJournal;
@@ -666,50 +667,76 @@ public final class Goal {
 
         proof.getServices().saveNameRecorder(n);
 
-        System.out.println("Proof step inputs: " + ruleApp.rule().displayName());
-        System.out.println("find (in antec " + ruleApp.posInOccurrence().isInAntec() + ")");
-        System.out.println(ruleApp.posInOccurrence().sequentFormula());
+        var inputs = new ArrayList<PosInOccurrence>();
+        var outputs = new ArrayList<PosInOccurrence>();
+        //System.out.println("Proof step inputs: " + ruleApp.rule().displayName());
+        //System.out.println("find (in antec " + ruleApp.posInOccurrence().isInAntec() + ")");
+        inputs.add(ruleApp.posInOccurrence().topLevel());
+        //System.out.println(ruleApp.posInOccurrence().sequentFormula());
         if (ruleApp instanceof PosTacletApp) {
             var posTacletApp = (PosTacletApp) ruleApp;
             if (posTacletApp.ifFormulaInstantiations() != null) {
                 for (var x : posTacletApp.ifFormulaInstantiations()) {
-                    System.out.println("assume:");
+                    //System.out.println("assume:");
                     if (x instanceof IfFormulaInstSeq) {
-                        System.out.println("antedecent: " + ((IfFormulaInstSeq) x).inAntec());
+                        var antec = ((IfFormulaInstSeq) x).inAntec();
+                        //System.out.println("antedecent: " + antec);
+                        inputs.add(new PosInOccurrence(x.getConstrainedFormula(), PosInTerm.getTopLevel(), antec));
                     }
-                    System.out.println(x.getConstrainedFormula());
+                    //System.out.println(x.getConstrainedFormula());
                 }
             }
         }
-        System.out.println("new stuff:");
+        //System.out.println("new stuff:");
         var a = journal.getRuleAppInfo(ruleApp);
         a.getReplacementNodes().forEachRemaining(b -> {
             b.getNodeChanges().forEachRemaining(c -> {
                 if (c instanceof NodeChangeAddFormula) {
-                    System.out.println(c.getPos().sequentFormula() + " (antec: " + c.getPos().isInAntec() + ")");
+                    outputs.add(c.getPos());
+                    //System.out.println(c.getPos().sequentFormula() + " (antec: " + c.getPos().isInAntec() + ")");
                 }
             });
         });
 
+        String seqArrow = "⟹";
+        var inputStrings = new ArrayList<>();
+        for (var in : inputs) {
+            String i = LogicPrinter.quickPrintTerm(in.sequentFormula().formula(), proof.getServices(), true, true).trim();
+            inputStrings.add(!in.isInAntec() ? (seqArrow + " " + i) : (i + " " + seqArrow));
+        }
+        var outputStrings = new ArrayList<>();
+        for (var out : outputs) {
+            String o = LogicPrinter.quickPrintTerm(out.sequentFormula().formula(), proof.getServices(), true, true).trim();
+            outputStrings.add(!out.isInAntec() ? (seqArrow + " " + o) : (o + " " + seqArrow));
+        }
         if (goalList != null) {
             if (goalList.isEmpty()) {
                 proof.closeGoal(this);
+                outputStrings.add("closed goal " + this.ruleAppIndex);
             } else {
                 proof.replace(this, goalList);
                 if (ruleApp instanceof TacletApp &&
-                        ((TacletApp) ruleApp).taclet().closeGoal())
+                        ((TacletApp) ruleApp).taclet().closeGoal()) {
                     // the first new goal is the one to be closed
                     proof.closeGoal(goalList.head());
+                    outputStrings.add("closed goal " + this.node.serialNr());
+                }
             }
         }
 
-        adaptNamespacesNewGoals(goalList);
-
-        final RuleAppInfo ruleAppInfo = journal.getRuleAppInfo(ruleApp);
+        for (var in : inputStrings) {
+            for (var out : outputStrings) {
+                System.out.println("\"" + in + "\" -> \"" + out + "\" [label=\"" + ruleApp.rule().displayName() + "\"]");
+            }
+        }
 
         if (goalList != null) {
+            adaptNamespacesNewGoals(goalList);
+
+            final RuleAppInfo ruleAppInfo = journal.getRuleAppInfo(ruleApp);
+
             proof.fireRuleApplied(new ProofEvent(proof, ruleAppInfo, goalList));
-        }
+        } // TODO: when is goalList null??
         return goalList;
     }
 

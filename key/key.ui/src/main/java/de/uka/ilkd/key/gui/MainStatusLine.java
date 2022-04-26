@@ -27,9 +27,12 @@ class MainStatusLine extends JPanel {
     private static final long serialVersionUID = 2278249652314818379L;
     private final JLabel lblStatusText = new JLabel();
     private final JProgressBar progressBar = new JProgressBar();
+    private final Component outerContainer;
     //private boolean phantomBoxAdded = false;
 
-    MainStatusLine(String initialText, Font font) {
+    MainStatusLine(String initialText, Font font, Component outerContainer) {
+        this.outerContainer = outerContainer;
+
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
         setBorder(new BevelBorder(BevelBorder.LOWERED));
@@ -56,12 +59,7 @@ class MainStatusLine extends JPanel {
         add(progressBar);
 
         add(Box.createHorizontalGlue());
-        JToolBar bar = new JToolBar();
-        bar.setFloatable(false);
-        bar.setRollover(false);
-        bar.setBorderPainted(false);
-        add(bar);
-        KeYGuiExtensionFacade.getStatusLineComponents().forEach(bar::add);
+        KeYGuiExtensionFacade.getStatusLineComponents().forEach(this::add);
     }
 
     /*
@@ -124,4 +122,13 @@ class MainStatusLine extends JPanel {
     public void setStatusText(String s) {
         lblStatusText.setText(s);
     }
+
+    /*
+    @Override
+    public Dimension getPreferredSize() {
+        Dimension it = super.getPreferredSize();
+        it.width = Integer.MAX_VALUE;
+        return it;
+    }
+     */
 }

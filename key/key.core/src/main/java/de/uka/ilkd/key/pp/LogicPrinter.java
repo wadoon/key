@@ -136,7 +136,7 @@ public class LogicPrinter {
         this.services = services;
         this.pure = purePrint;
         if (services != null) {
-            notationInfo.refresh(services);
+            notationInfo.refresh(services, notationInfo.isPrettySyntax(), notationInfo.isUnicodeEnabled());
         }
     }
 
