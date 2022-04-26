@@ -17,6 +17,7 @@ import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.QueueRuleApplicationManager;
 import de.uka.ilkd.key.strategy.Strategy;
+import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.properties.MapProperties;
 import de.uka.ilkd.key.util.properties.Properties;
 import de.uka.ilkd.key.util.properties.Properties.Property;
@@ -27,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * A proof is represented as a tree of nodes containing sequents. The initial
@@ -647,6 +649,8 @@ public final class Goal {
         localNamespaces = newNS.copyWithParent();
     }
 
+    private static Collection<Pair<String, Boolean>> producedFormulas = new ArrayList<>();
+
     public ImmutableList<Goal> apply(final RuleApp ruleApp) {
 
         final Proof proof = proof();
@@ -656,6 +660,8 @@ public final class Goal {
 
 
         final Node n = node;
+
+        //System.out.println(this.node.serialNr() + ": " + ruleApp.rule().displayName() + " " + n.branchLocation());
 
         /*
          * wrap the services object into an overlay such that any addition to
@@ -667,8 +673,31 @@ public final class Goal {
 
         proof.getServices().saveNameRecorder(n);
 
+        var outputStrings = new ArrayList<>();
+        if (goalList != null) {
+            if (goalList.isEmpty()) {
+                proof.closeGoal(this);
+                outputStrings.add("closed goal " + this.node.serialNr());
+            } else {
+                proof.replace(this, goalList);
+                if (ruleApp instanceof TacletApp &&
+                        ((TacletApp) ruleApp).taclet().closeGoal()) {
+                    // the first new goal is the one to be closed
+                    proof.closeGoal(goalList.head());
+                    outputStrings.add("closed goal " + this.node.serialNr());
+                }
+            }
+        }
+
+        adaptNamespacesNewGoals(goalList);
+
+        final RuleAppInfo ruleAppInfo = journal.getRuleAppInfo(ruleApp);
+
+        proof.fireRuleApplied(new ProofEvent(proof, ruleAppInfo, goalList));
+        // TODO: can goalList be null?
+
         var inputs = new ArrayList<PosInOccurrence>();
-        var outputs = new ArrayList<PosInOccurrence>();
+        var outputs = new ArrayList<Pair<PosInOccurrence, String>>();
         //System.out.println("Proof step inputs: " + ruleApp.rule().displayName());
         //System.out.println("find (in antec " + ruleApp.posInOccurrence().isInAntec() + ")");
         inputs.add(ruleApp.posInOccurrence().topLevel());
@@ -688,55 +717,47 @@ public final class Goal {
             }
         }
         //System.out.println("new stuff:");
-        var a = journal.getRuleAppInfo(ruleApp);
-        a.getReplacementNodes().forEachRemaining(b -> {
+        int sibling = ruleAppInfo.getReplacementNodesList().size() - 1;
+        for (var b : ruleAppInfo.getReplacementNodesList()) {
+            String id = ruleAppInfo.getReplacementNodesList().size() > 1 ? ("" + sibling) : "";
             b.getNodeChanges().forEachRemaining(c -> {
                 if (c instanceof NodeChangeAddFormula) {
-                    outputs.add(c.getPos());
+                    outputs.add(new Pair<>(c.getPos(), id));
                     //System.out.println(c.getPos().sequentFormula() + " (antec: " + c.getPos().isInAntec() + ")");
                 }
             });
-        });
+            sibling--;
+        }
 
         String seqArrow = "⟹";
         var inputStrings = new ArrayList<>();
         for (var in : inputs) {
-            String i = LogicPrinter.quickPrintTerm(in.sequentFormula().formula(), proof.getServices(), true, true).trim();
-            inputStrings.add(!in.isInAntec() ? (seqArrow + " " + i) : (i + " " + seqArrow));
-        }
-        var outputStrings = new ArrayList<>();
-        for (var out : outputs) {
-            String o = LogicPrinter.quickPrintTerm(out.sequentFormula().formula(), proof.getServices(), true, true).trim();
-            outputStrings.add(!out.isInAntec() ? (seqArrow + " " + o) : (o + " " + seqArrow));
-        }
-        if (goalList != null) {
-            if (goalList.isEmpty()) {
-                proof.closeGoal(this);
-                outputStrings.add("closed goal " + this.ruleAppIndex);
-            } else {
-                proof.replace(this, goalList);
-                if (ruleApp instanceof TacletApp &&
-                        ((TacletApp) ruleApp).taclet().closeGoal()) {
-                    // the first new goal is the one to be closed
-                    proof.closeGoal(goalList.head());
-                    outputStrings.add("closed goal " + this.node.serialNr());
+            String input = LogicPrinter.quickPrintTerm(in.sequentFormula().formula(), proof.getServices(), true, true).trim();
+            var loc = n.branchLocation();
+            var finalId = input;
+            for (int i = 0; i <= loc.size(); i++) {
+                finalId = input + loc.stream().limit(i).reduce("", String::concat);
+                if (producedFormulas.contains(new Pair<>(finalId, in.isInAntec()))) {
+                    break;
                 }
             }
+            inputStrings.add(!in.isInAntec() ? (seqArrow + " " + finalId) : (finalId + " " + seqArrow));
+        }
+        for (var out : outputs) {
+            String o = LogicPrinter.quickPrintTerm(out.first.sequentFormula().formula(), proof.getServices(), true, true).trim();
+            String id = o + n.branchLocation().stream().reduce("", String::concat);
+            if (!out.second.equals("")) {
+                id = id + "/" + n.serialNr() + "_" + out.second;
+            }
+            producedFormulas.add(new Pair<>(id, out.first.isInAntec()));
+            outputStrings.add(!out.first.isInAntec() ? (seqArrow + " " + id) : (id + " " + seqArrow));
         }
 
         for (var in : inputStrings) {
             for (var out : outputStrings) {
-                System.out.println("\"" + in + "\" -> \"" + out + "\" [label=\"" + ruleApp.rule().displayName() + "\"]");
+                System.out.println(("\"" + in + "\" -> \"" + out + "\" [label=\"" + ruleApp.rule().displayName() + "_" + n.serialNr() + "\"]").replace('\n', '\t'));
             }
         }
-
-        if (goalList != null) {
-            adaptNamespacesNewGoals(goalList);
-
-            final RuleAppInfo ruleAppInfo = journal.getRuleAppInfo(ruleApp);
-
-            proof.fireRuleApplied(new ProofEvent(proof, ruleAppInfo, goalList));
-        } // TODO: when is goalList null??
         return goalList;
     }
 

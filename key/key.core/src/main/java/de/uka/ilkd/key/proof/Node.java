@@ -788,4 +788,15 @@ public class Node implements Iterable<Node> {
         if(userData == null) userData = new Lookup();
         return userData;
     }
+
+    public List<String> branchLocation() {
+        if (parent == null) {
+            return new ArrayList<>();
+        }
+        var prev = parent.branchLocation();
+        if (nodeInfo.getBranchLabel() != null) {
+            prev.add("/" + parent.serialNr + "_" + siblingNr);
+        }
+        return prev;
+    }
 }

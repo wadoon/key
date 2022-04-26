@@ -21,13 +21,13 @@ public class RuleAppInfo {
 	originalNode = p_originalNode;
 	newNodes     = p_newNodes;
     }
-    
-    
+
+
     /**
      * RuleApp this event reports
      */
     RuleApp               app          = null;
-    
+
     /**
      * Node the rule has been applied on
      */
@@ -57,7 +57,11 @@ public class RuleAppInfo {
     public Iterator<NodeReplacement> getReplacementNodes () {
 	return newNodes.iterator ();
     }
-    
+
+    public ImmutableList<NodeReplacement> getReplacementNodesList() {
+        return newNodes;
+    }
+
 
     public String toString () {
 	return
