@@ -49,6 +49,7 @@ public class Node implements Iterable<Node> {
 
     /** The parent node. **/
     private Node parent = null;
+    private ImmutableList<String> branchLocation = null;
 
     private Sequent seq = Sequent.EMPTY_SEQUENT;
 
@@ -789,14 +790,14 @@ public class Node implements Iterable<Node> {
         return userData;
     }
 
-    public List<String> branchLocation() {
-        if (parent == null) {
-            return new ArrayList<>();
+    public ImmutableList<String> branchLocation() {
+        if (branchLocation == null) {
+            ImmutableList<String> prev = parent != null ? parent.branchLocation() : ImmutableSLList.nil();
+            if (nodeInfo.getBranchLabel() != null) {
+                prev = prev.append("/" + parent.serialNr + "_" + siblingNr);
+            }
+            this.branchLocation = prev;
         }
-        var prev = parent.branchLocation();
-        if (nodeInfo.getBranchLabel() != null) {
-            prev.add("/" + parent.serialNr + "_" + siblingNr);
-        }
-        return prev;
+        return branchLocation;
     }
 }
