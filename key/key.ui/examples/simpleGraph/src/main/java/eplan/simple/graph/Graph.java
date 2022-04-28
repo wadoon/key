@@ -6,12 +6,13 @@ import java.util.List;
 
 public class Graph {
 
-    /*@ public invariant (\forall int i;(\forall int j; 0<=i && i<=j && j<edges.length && edges[i] == edges[j]; i == j));@*/
+    /* public invariant (\forall int i;(\forall int j; 0<=i && i<=j && j<edges.length && edges[i] == edges[j]; i == j));@*/
     /*@ public invariant (\forall int i; i>=0 && i<edges.length; \invariant_for(edges[i])); @*/
 
     /*@ public invariant (\forall int i;(\forall int j; 0<=i && i<=j && j<edges.length && edges[i].id == edges[j].id; i == j));@*/
 
-    /*@ accessible \inv:edges, edges[*], \infinite_union(int i; i >= 0 && i < edges.length; \set_union(edges[i].id, \set_union(edges[i].start, edges[i].end))); @*/
+    /* accessible \inv:edges, edges[*], \infinite_union(int i; i >= 0 && i < edges.length; \set_union(edges[i].id, \set_union(edges[i].start, edges[i].end))); @*/
+    /*@ accessible \inv:edges, edges[*], \infinite_union(int i; i >= 0 && i < edges.length; edges[i].footprint); @*/
 
     /*
       1. aktuelle Loesung mit Schleifeninvariante wiederholt Teil der Objektinvariante (\forall int i; i>=0 && i<edges.length; \invariant_for(edges[i]))
@@ -32,6 +33,17 @@ public class Graph {
     public Graph(Edge[] edges) {
         this.edges = edges;
     }
+
+
+    /*@ public normal_behavior
+      @ requires \invariant_for(e) && \invariant_for(f);
+      @ requires e != f;
+      @ ensures \disjoint(e.footprint, f.footprint);
+      @*/
+    public void test(Edge e, Edge f) {
+
+    }
+
 
     /*@ public normal_behavior
       @ assignable \nothing;

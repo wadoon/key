@@ -9,7 +9,7 @@ public final class Node {
     //@ public accessible \inv: footprint;
     final private /*@ spec_public @*/ int id;
 
-    //@ private represents footprint = id;
+    //@ private represents footprint = \singleton(id);
 
     /*@ public normal_behavior
       @ assignable \nothing;
