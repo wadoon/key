@@ -2,7 +2,6 @@ package org.key_project.slicing;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
@@ -15,10 +14,11 @@ import de.uka.ilkd.key.util.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class DependencyTracker implements RuleAppListener {
     private Proof proof;
-    private final List<String> producedFormulas = new ArrayList<>();
+    private final List<TrackedFormula> formulas = new ArrayList<>();
 
     @Override
     public void ruleApplied(ProofEvent e) {
@@ -54,54 +54,45 @@ public class DependencyTracker implements RuleAppListener {
             sibling--;
         }
 
-        String seqArrow = "⟹";
-        var inputStrings = new ArrayList<String>();
-        for (var in : inputs) {
-            String input = LogicPrinter.quickPrintTerm(in.sequentFormula().formula(), proof.getServices(), true, true).trim();
-            var loc = n.branchLocation();
-            var finalId = input;
-            for (int i = 0; i <= loc.size(); i++) {
-                finalId = input + loc.stream().limit(i).reduce("", String::concat);
-                finalId = !in.isInAntec() ? (seqArrow + " " + finalId) : (finalId + " " + seqArrow);
-                if (producedFormulas.contains(finalId)) {
-                    break;
-                }
-            }
-            inputStrings.add(finalId);
-        }
-        var outputStrings = new ArrayList<String>();
-        if (goalList.isEmpty()) {
-            outputStrings.add("closed goal " + n.serialNr());
-        } else if (ruleApp instanceof TacletApp &&
-                    ((TacletApp) ruleApp).taclet().closeGoal()) {
-            // the first new goal is the one to be closed
-            outputStrings.add("closed goal " + n.serialNr());
-        }
-        for (var out : outputs) {
-            String o = LogicPrinter.quickPrintTerm(out.first.sequentFormula().formula(), proof.getServices(), true, true).trim();
-            String id = o + n.branchLocation().stream().reduce("", String::concat);
-            if (!out.second.equals("")) {
-                id = id + "/" + n.serialNr() + "_" + out.second;
-            }
-            String finalId = !out.first.isInAntec() ? (seqArrow + " " + id) : (id + " " + seqArrow);
-            /*
-            if (!producedFormulas.isEmpty()) {
-                String last = producedFormulas.get(producedFormulas.size() - 1);
-                System.out.println("\"" + last + "\" -> \"" + finalId + "\" [color=\"white\"]");
-            }
-             */
-            producedFormulas.add(finalId);
-            /*
-            if (id.indexOf('/') != -1) {
-                System.out.println("subgraph \"cluster_" + id.split("/", 2)[1] + "\" {");
-                System.out.println("\"" + finalId + "\"");
-                System.out.println("}");
-            }
-             */
-            outputStrings.add(finalId);
+        var closedGoals = new ArrayList<String>();
+        if (goalList.isEmpty() || (ruleApp instanceof TacletApp &&
+                ((TacletApp) ruleApp).taclet().closeGoal())) {
+            closedGoals.add("closed goal " + (n.serialNr() + 1)); // TODO: is it always the next nr?
         }
 
-        n.register(new DependencyNodeData(inputStrings, outputStrings, ruleApp.rule().displayName() + "_" + n.serialNr()), DependencyNodeData.class);
+        var input = new ArrayList<TrackedFormula>();
+        var output = new ArrayList<TrackedFormula>();
+        for (var in : inputs) {
+            var loc = n.branchLocation();
+            var size = loc.size();
+            var added = false;
+            for (int i = 0; i <= size; i++) {
+                var formula = new TrackedFormula(in.sequentFormula(), loc, in.isInAntec(), proof.getServices());
+                if (formulas.contains(formula)) {
+                    input.add(formula);
+                    added = true;
+                    break;
+                }
+                loc = loc.tail();
+            }
+            if (!added) {
+                // TODO: should only happen for initial sequent?
+                var formula = new TrackedFormula(in.sequentFormula(), loc, in.isInAntec(), proof.getServices());
+                input.add(formula);
+            }
+        }
+
+        for (var out : outputs) {
+            var loc = n.branchLocation();
+            if (!out.second.equals("")) {
+                loc = loc.append("/" + n.serialNr() + "_" + out.second);
+            }
+            var formula = new TrackedFormula(out.first.sequentFormula(), loc, out.first.isInAntec(), proof.getServices());
+            formulas.add(formula);
+            output.add(formula);
+        }
+
+        n.register(new DependencyNodeData(input, output, closedGoals, ruleApp.rule().displayName() + "_" + n.serialNr()), DependencyNodeData.class);
     }
 
     public String exportDot() {
@@ -118,9 +109,14 @@ public class DependencyTracker implements RuleAppListener {
                 continue;
             }
             for (var in : data.inputs) {
-                for (var out : data.outputs) {
-                    buf.append('"').append(in).append("\" -> \"").append(out).append("\" [label=\"").append(data.label).append("\"]");
-                }
+                Stream.concat(data.outputs.stream().map(Object::toString), data.closedGoals.stream()).forEach(out -> buf
+                        .append('"')
+                        .append(in)
+                        .append("\" -> \"")
+                        .append(out)
+                        .append("\" [label=\"")
+                        .append(data.label)
+                        .append("\"]\n"));
             }
         }
         buf.append("}");
