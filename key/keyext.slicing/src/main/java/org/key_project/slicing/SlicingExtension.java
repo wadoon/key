@@ -22,7 +22,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
@@ -96,13 +95,15 @@ public class SlicingExtension implements KeYGuiExtension,
 
     @Override
     public List<JComponent> getStatusLineComponents() {
-        var button = new JButton("Export DOT");
+        var button = new JButton("Export .dot");
         button.addActionListener(e -> exportDot(e));
-        return Collections.singletonList(button);
+        var button2 = new JButton("View formula graph");
+        button2.addActionListener(e -> previewGraph(e));
+        return Arrays.asList(button, button2);
     }
 
     private void exportDot(ActionEvent e) {
-        if (currentProof == null) {
+        if (currentProof == null || currentProof.countNodes() < 2) {
             return;
         }
         KeYFileChooser fileChooser = KeYFileChooser.getFileChooser(
@@ -121,6 +122,14 @@ public class SlicingExtension implements KeYGuiExtension,
                 assert false;
             }
         }
+    }
+
+    private void previewGraph(ActionEvent e) {
+        if (currentProof == null || currentProof.countNodes() < 2) {
+            return;
+        }
+        String text = trackers.get(currentProof).exportDot();
+        var preview = new PreviewDialog(SwingUtilities.getWindowAncestor((JComponent) e.getSource()), text);
     }
 
     @Override
