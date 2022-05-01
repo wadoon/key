@@ -99,7 +99,9 @@ public class SlicingExtension implements KeYGuiExtension,
         button.addActionListener(e -> exportDot(e));
         var button2 = new JButton("View formula graph");
         button2.addActionListener(e -> previewGraph(e));
-        return Arrays.asList(button, button2);
+        var button3 = new JButton("Analyze dependencies");
+        button3.addActionListener(e -> analyzeProof(e));
+        return Arrays.asList(button, button2, button3);
     }
 
     private void exportDot(ActionEvent e) {
@@ -130,6 +132,13 @@ public class SlicingExtension implements KeYGuiExtension,
         }
         String text = trackers.get(currentProof).exportDot();
         var preview = new PreviewDialog(SwingUtilities.getWindowAncestor((JComponent) e.getSource()), text);
+    }
+
+    private void analyzeProof(ActionEvent e) {
+        if (currentProof == null) {
+            return;
+        }
+        trackers.get(currentProof).analyze();
     }
 
     @Override

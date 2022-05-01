@@ -11,14 +11,26 @@ import de.uka.ilkd.key.rule.IfFormulaInstSeq;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.Pair;
+import org.jgrapht.Graph;
+import org.jgrapht.graph.DefaultDirectedGraph;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 
 public class DependencyTracker implements RuleAppListener {
     private Proof proof;
     private final List<TrackedFormula> formulas = new ArrayList<>();
+    private final Graph<TrackedFormula, Node> graph = new DefaultDirectedGraph<>(Node.class);
+    private boolean analysisDone = false;
+    private final Set<Node> usefulSteps = new HashSet<>();
+    private final Set<TrackedFormula> usefulFormulas = new HashSet<>();
+
+    // TODO: track proof pruning
+    // TODO: investigate One Step Simplifications, at the very least they should not break the analysis
 
     @Override
     public void ruleApplied(ProofEvent e) {
@@ -93,6 +105,14 @@ public class DependencyTracker implements RuleAppListener {
         }
 
         n.register(new DependencyNodeData(input, output, closedGoals, ruleApp.rule().displayName() + "_" + n.serialNr()), DependencyNodeData.class);
+
+        for (var in : input) {
+            for (var out : output) {
+                graph.addVertex(in);
+                graph.addVertex(out);
+                graph.addEdge(in, out, n);
+            }
+        }
     }
 
     public String exportDot() {
@@ -109,17 +129,54 @@ public class DependencyTracker implements RuleAppListener {
                 continue;
             }
             for (var in : data.inputs) {
-                Stream.concat(data.outputs.stream().map(Object::toString), data.closedGoals.stream()).forEach(out -> buf
-                        .append('"')
-                        .append(in)
-                        .append("\" -> \"")
-                        .append(out)
-                        .append("\" [label=\"")
-                        .append(data.label)
-                        .append("\"]\n"));
+                Stream.concat(data.outputs.stream().map(Object::toString), data.closedGoals.stream()).forEach(out -> {
+                    buf
+                            .append('"')
+                            .append(in)
+                            .append("\" -> \"")
+                            .append(out)
+                            .append("\" [label=\"")
+                            .append(data.label);
+                    if (analysisDone && !usefulSteps.contains(node)) {
+                        buf.append("\" color=\"red");
+                    }
+                    buf
+                            .append("\"]\n");
+                });
+            }
+        }
+        if (analysisDone) {
+            for (var formula : formulas) {
+                if (!usefulFormulas.contains(formula)) {
+                    buf.append('"').append(formula).append('"').append(" [color=\"red\"]");
+                }
             }
         }
         buf.append("}");
         return buf.toString();
+    }
+
+    public void analyze() {
+        if (proof == null || !proof.closed()) {
+            return;
+        }
+        var queue = new ArrayDeque<Node>();
+        for (var e : proof.closedGoals()) {
+            queue.add(e.node().parent());
+        }
+
+        while (!queue.isEmpty()) {
+            var node = queue.pop();
+            if (usefulSteps.contains(node)) {
+                continue;
+            }
+            usefulSteps.add(node);
+            var data = node.lookup(DependencyNodeData.class);
+            usefulFormulas.addAll(data.inputs);
+            for (var in : data.inputs) {
+                queue.addAll(graph.incomingEdgesOf(in));
+            }
+        }
+        analysisDone = true;
     }
 }

@@ -1,4 +1,6 @@
 dependencies {
     implementation project(":key.core")
     implementation project(":key.ui")
+
+    implementation group: 'org.jgrapht', name: 'jgrapht-core', version: '1.5.1'
 }
