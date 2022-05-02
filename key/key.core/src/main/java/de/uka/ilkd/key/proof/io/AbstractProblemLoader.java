@@ -9,6 +9,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.*;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.zip.ZipFile;
 
@@ -53,7 +54,7 @@ import de.uka.ilkd.key.util.Triple;
  * no user interaction is required.
  * </p>
  * <p>
- * The basic usage of this class is to instantiate a new 
+ * The basic usage of this class is to instantiate a new
  * {@link SingleThreadProblemLoader} or {@link ProblemLoader}
  * instance which should load the file configured by the constructor's arguments.
  * The next step is to call {@link #load()} which does the loading process and
@@ -119,7 +120,7 @@ public abstract class AbstractProblemLoader {
      * An optional boot class path.
      */
     private final File bootClassPath;
-    
+
     /**
      * The global includes to use.
      */
@@ -137,7 +138,7 @@ public abstract class AbstractProblemLoader {
 
     /**
      * {@code true} to call {@link UserInterfaceControl#selectProofObligation(InitConfig)}
-     * if no {@link Proof} is defined by the loaded proof or 
+     * if no {@link Proof} is defined by the loaded proof or
      * {@code false} otherwise which still allows to work with the loaded {@link InitConfig}.
      */
     private final boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile;
@@ -151,7 +152,7 @@ public abstract class AbstractProblemLoader {
      * {@code} true {@link #profileOfNewProofs} will be used as {@link Profile} of new proofs, {@code false} {@link Profile} specified by problem file will be used for new proofs.
      */
     private final boolean forceNewProfileOfNewProofs;
-    
+
     /**
      * The instantiated {@link EnvInput} which describes the file to load.
      */
@@ -171,7 +172,7 @@ public abstract class AbstractProblemLoader {
      * The instantiate proof or {@code null} if no proof was instantiated during loading process.
      */
     private Proof proof;
-    
+
     /**
      * The {@link ReplayResult} if available or {@code null} otherwise.
      */
@@ -185,12 +186,12 @@ public abstract class AbstractProblemLoader {
      */
     private final static Map<Pair<Integer,Integer>,String> mismatchErrors;
     private final static Map<Integer,String> missedErrors;
-    
+
     static {
         // format: (expected, found)
         mismatchErrors = new HashMap<Pair<Integer, Integer>, String>();
         mismatchErrors.put(new Pair<Integer, Integer>(KeYLexer.SEMI, KeYLexer.COMMA), "there may be only one declaration per line");
-        
+
         missedErrors = new HashMap<Integer, String>();
         missedErrors.put(KeYLexer.RPAREN, "closing parenthesis");
         missedErrors.put(KeYLexer.RBRACE, "closing brace");
@@ -208,11 +209,11 @@ public abstract class AbstractProblemLoader {
      * @param control The {@link ProblemLoaderControl} to use.
      * @param askUiToSelectAProofObligationIfNotDefinedByLoadedFile {@code true} to call {@link UserInterfaceControl#selectProofObligation(InitConfig)} if no {@link Proof} is defined by the loaded proof or {@code false} otherwise which still allows to work with the loaded {@link InitConfig}.
      */
-    public AbstractProblemLoader(File file, 
-                                 List<File> classPath, 
+    public AbstractProblemLoader(File file,
+                                 List<File> classPath,
                                  File bootClassPath,
                                  List<File> includes,
-                                 Profile profileOfNewProofs, 
+                                 Profile profileOfNewProofs,
                                  boolean forceNewProfileOfNewProofs,
                                  ProblemLoaderControl control,
                                  boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile,
@@ -240,6 +241,19 @@ public abstract class AbstractProblemLoader {
      * @throws ProblemLoaderException Occurred Exception.
      */
     public final void load() throws ProofInputException, IOException, ProblemLoaderException {
+        load(null);
+    }
+
+    /**
+     * Executes the loading process and tries to instantiate a proof
+     * and to re-apply rules on it if possible.
+     * @param callbackProofLoaded accepts the proof just before starting the replay
+     * @throws ProofInputException Occurred Exception.
+     * @throws IOException Occurred Exception.
+     * @throws ProblemLoaderException Occurred Exception.
+     */
+    public final void load(Consumer<Proof> callbackProofLoaded)
+            throws ProofInputException, IOException, ProblemLoaderException {
         control.loadingStarted(this);
 
         loadEnvironment();
@@ -254,7 +268,7 @@ public abstract class AbstractProblemLoader {
                 }
             } else {
                 proofList = createProof(poContainer);
-                loadSelectedProof(poContainer, proofList);
+                loadSelectedProof(poContainer, proofList, callbackProofLoaded);
             }
         } catch (Throwable t) {
             // Throw this exception; otherwise, it can for instance occur
@@ -301,13 +315,16 @@ public abstract class AbstractProblemLoader {
      * @throws ProblemLoaderException Occurred Exception.
      * @see AbstractProblemLoader#load()
      */
-    protected void loadSelectedProof(LoadedPOContainer poContainer, ProofAggregate proofList)
+    protected void loadSelectedProof(LoadedPOContainer poContainer, ProofAggregate proofList,
+                                     Consumer<Proof> callbackProofLoaded)
             throws ProofInputException, ProblemLoaderException {
         // try to replay first proof
         proof = proofList.getProof(poContainer.getProofNum());
 
-
         if (proof != null) {
+            if (callbackProofLoaded != null) {
+                callbackProofLoaded.accept(proof);
+            }
             OneStepSimplifier.refreshOSS(proof);
             result = replayProof(proof);
         }
@@ -350,12 +367,12 @@ public abstract class AbstractProblemLoader {
                     final String genericMsg = "expected "+mte.expecting
                                     +", but found "+mte.c;
                     final String readable = mismatchErrors.get(new Pair<Integer, Integer>(mte.expecting,mte.c));
-                    final String msg = "Syntax error: " 
+                    final String msg = "Syntax error: "
                                     +(readable == null? genericMsg: readable)
                                     +" ("+mte.input.getSourceName()
                                     +":"+mte.line+")";
                     return new ProblemLoaderException(this, msg, mte);
-                } 
+                }
             }
         }
         // default
@@ -651,7 +668,7 @@ public abstract class AbstractProblemLoader {
         String status = "";
         List<Throwable> errors = new LinkedList<Throwable>();
         Node lastTouchedNode = proof.root();
-        
+
         IProofFileParser parser = null;
         IntermediateProofReplayer replayer = null;
         IntermediatePresentationProofFileParser.Result parserResult = null;

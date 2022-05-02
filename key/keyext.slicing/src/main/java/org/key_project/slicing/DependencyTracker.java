@@ -16,6 +16,8 @@ import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.DirectedMultigraph;
 
 import javax.swing.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -35,7 +37,11 @@ public class DependencyTracker implements RuleAppListener {
     private final Set<TrackedFormula> usefulFormulas = new HashSet<>();
 
     // TODO: track proof pruning
-    // TODO: investigate One Step Simplifications, at the very least they should not break the analysis
+    // TODO: investigate One Step Simplifications: their inputs are not recorded properly!
+
+    public DependencyTracker(Proof proof) {
+        this.proof = proof;
+    }
 
     @Override
     public void ruleApplied(ProofEvent e) {
@@ -45,6 +51,7 @@ public class DependencyTracker implements RuleAppListener {
         var ruleApp = ruleAppInfo.getRuleApp();
         var goalList = e.getNewGoals();
         var n = ruleAppInfo.getOriginalNode();
+        //System.out.println("processing rule app " + n.getAppliedRuleApp().rule().displayName());
 
         var inputs = new ArrayList<PosInOccurrence>();
         var outputs = new ArrayList<Pair<PosInOccurrence, String>>();
@@ -216,5 +223,34 @@ public class DependencyTracker implements RuleAppListener {
         dialog.pack();
         dialog.setLocationRelativeTo(window);
         dialog.setVisible(true);
+
+        Proof p = new Proof("reduced", proof.root().sequent().succedent().get(0).formula(), proof.header(), proof.getInitConfig().copy());
+        replayProof(p, proof.root());
+        try {
+            p.saveToFile(new File("/tmp/testing.proof"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void replayProof(Proof p, Node node) {
+        if (node.getAppliedRuleApp() == null) {
+            return;
+        }
+        if (usefulSteps.contains(node)) {
+            //System.out.println("at node " + node.serialNr() + " " + node.getAppliedRuleApp().rule().displayName());
+            //System.out.println("applying..");
+            var app = node.getAppliedRuleApp();
+            p.openGoals().head().apply(app);
+        }
+        if (node.childrenCount() > 1) {
+            List<Node> nodes = new ArrayList<>();
+            node.childrenIterator().forEachRemaining(nodes::add);
+            for (int i = nodes.size() - 1; i >= 0; i--) {
+                replayProof(p, nodes.get(i));
+            }
+        } else if (node.childrenCount() == 1) {
+            replayProof(p, node.child(0));
+        }
     }
 }

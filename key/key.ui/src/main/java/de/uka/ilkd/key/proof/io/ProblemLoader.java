@@ -18,7 +18,7 @@ import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 
 /**
  * This class extends the functionality of the {@link AbstractProblemLoader}. It
- * allows to do the loading process as {@link SwingWorker3} {@link Thread} and
+ * allows to do the loading process as {@link SwingWorker} {@link Thread} and
  * it opens the proof obligation browser it is not possible to instantiate a
  * proof configured by the opened file.
  *
@@ -65,7 +65,7 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
 
     private Throwable doWork() {
         try {
-            load();
+            load(mediator::fireProofLoaded);
             return null;
         } catch (Exception exception) {
             final String errorMessage = "Failed to load "

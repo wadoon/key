@@ -1,7 +1,9 @@
 package de.uka.ilkd.key.core;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EventObject;
+import java.util.function.Consumer;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -86,6 +88,12 @@ public class KeYMediator {
      * to this model
      */
     private KeYSelectionModel keySelectionModel;
+
+    private Collection<Consumer<Proof>> proofLoadListeners = new ArrayList<>();
+
+    public synchronized void registerProofLoadListener(Consumer<Proof> listener) {
+        proofLoadListeners.add(listener);
+    }
 
     private TacletFilter filterForInteractiveProving;
 
@@ -478,6 +486,12 @@ public class KeYMediator {
             if (listeners[i] == GUIListener.class) {
                 ((GUIListener) listeners[i + 1]).shutDown(e);
             }
+        }
+    }
+
+    public synchronized void fireProofLoaded(Proof p) {
+        for (var listener : proofLoadListeners) {
+            listener.accept(p);
         }
     }
 
