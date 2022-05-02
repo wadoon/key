@@ -40,7 +40,7 @@ public class Graph {
       @ requires e != f;
       @ ensures \disjoint(e.footprint, f.footprint);
       @*/
-    public void test(Edge e, Edge f) {
+    public /*@ helper @*/ void test(Edge e, Edge f) {
 
     }
 
@@ -56,7 +56,7 @@ public class Graph {
         /*@ loop_invariant
           @  k>=0 && k<=edges.length &&
           @  (\forall int j; j>=0 && j<k; res.contains(edges[j].start) && res.contains(edges[j].end)) &&
-          @  \invariant_for(res) && \disjoint(res.footprint, \set_union(this.edges, \set_union(this.edges[*],\infinite_union(int i; i >= 0 && i < edges.length; \set_union(edges[i].id, \set_union(edges[i].start, edges[i].end))))));
+          @  \invariant_for(res) && \fresh(res.footprint);
           @ assignable res.footprint;
           @ decreases edges.length - k;
           @*/

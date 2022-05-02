@@ -9,6 +9,8 @@ public final class Node {
     //@ public accessible \inv: footprint;
     final private /*@ spec_public @*/ int id;
 
+    /*@ public invariant \subset(this.footprint, this.*); @*/
+
     //@ private represents footprint = \singleton(id);
 
     /*@ public normal_behavior

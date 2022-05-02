@@ -2,11 +2,11 @@ package eplan.simple.graph;
 
 public final class Edge {
 
-    //@ public ghost \locset footprint;
-    // public accessible footprint: footprint;
+    //@ public model \locset footprint;
+    //@ public accessible footprint: footprint;
     //@ public accessible \inv: footprint;
 
-    /*@ public invariant (\forall nullable Object o; o != this; \disjoint(this.footprint, o.*)); @*/
+    /*@ public invariant \subset(this.footprint, this.*); @*/
     /*@ public invariant \invariant_for(start) && \invariant_for(end); @*/
     /*@ public invariant length >= 0; @*/
     final private /*@ spec_public @*/ int id;
@@ -14,8 +14,7 @@ public final class Edge {
     final private /*@ spec_public @*/ Node end;
     final private /*@ spec_public @*/ int length;
 
-    // private represents footprint = id, start, end, length;
-    //@ private invariant footprint == \set_union(id, \set_union(start, \set_union(end, length)));
+    //@ private represents footprint = id, start, end, length;
 
     /*@ public normal_behavior
       @ requires \invariant_for(start) && \invariant_for(end);
@@ -24,9 +23,9 @@ public final class Edge {
       @ ensures this.start == start;
       @ ensures this.end == end;
       @ ensures this.length == 0;
+      @ ensures \fresh(footprint);
       @*/
     public Edge(Node start, Node end, int id) {
-        //@ set footprint = \set_union(id, \set_union(start, \set_union(end, length)));
         this.id = id;
         this.start = start;
         this.end = end;
@@ -42,9 +41,9 @@ public final class Edge {
       @ ensures this.start == start;
       @ ensures this.end == end;
       @ ensures this.length == len;
+      @ ensures \fresh(footprint);
       @*/
     public Edge(Node start, Node end, int id, int len) {
-        //@ set footprint = \set_union(id, \set_union(start, \set_union(end, length)));
         this.id = id;
         this.start = start;
         this.end = end;

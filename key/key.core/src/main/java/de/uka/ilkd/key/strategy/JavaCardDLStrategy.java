@@ -475,7 +475,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         switch (methProp) {
         case StrategyProperties.METHOD_CONTRACT:
             ProjectionToTerm methodName = instOfNonStrict("#mn");
-            Feature isGetter = ifZero(applyTFNonStrict(methodName, IsGetterTermFeature.INSTANCE), longConst(-100), longConst(2000));
+            Feature isGetter = ifZero(applyTFNonStrict(methodName, not(IsGetterTermFeature.INSTANCE)), longConst(2000), longConst(-100));
 
 
             /*
