@@ -793,7 +793,7 @@ public class Node implements Iterable<Node> {
     public ImmutableList<String> branchLocation() {
         if (branchLocation == null) {
             ImmutableList<String> prev = parent != null ? parent.branchLocation() : ImmutableSLList.nil();
-            if (nodeInfo.getBranchLabel() != null) {
+            if (parent != null && parent.children.size() > 1) {
                 prev = prev.append("/" + parent.serialNr + "_" + siblingNr);
             }
             this.branchLocation = prev;

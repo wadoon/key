@@ -69,7 +69,7 @@ public class PreviewDialog extends JDialog {
                     error = stderr.toString();
                 } else {
                     img = ImageIO.read(new ByteArrayInputStream(output.toByteArray()));
-                    ImageIO.write(img, "PNG", new File("/tmp/x2.png"));
+                    //ImageIO.write(img, "PNG", new File("/tmp/x2.png"));
                 }
             } catch (IOException e) {
                 error = e.getMessage();

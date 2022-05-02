@@ -28,7 +28,7 @@ import java.util.stream.Stream;
 public class DependencyTracker implements RuleAppListener {
     private Proof proof;
     private final List<TrackedFormula> formulas = new ArrayList<>();
-    private final Graph<TrackedFormula, DefaultEdge> graph = new DirectedMultigraph<>(DefaultEdge.class);
+    private final Graph<GraphNode, DefaultEdge> graph = new DirectedMultigraph<>(DefaultEdge.class);
     private final Map<DefaultEdge, Node> edgeData = new IdentityHashMap<>();
     private boolean analysisDone = false;
     private final Set<Node> usefulSteps = new HashSet<>();
@@ -48,7 +48,9 @@ public class DependencyTracker implements RuleAppListener {
 
         var inputs = new ArrayList<PosInOccurrence>();
         var outputs = new ArrayList<Pair<PosInOccurrence, String>>();
-        inputs.add(ruleApp.posInOccurrence().topLevel());
+        if (ruleApp.posInOccurrence() != null) {
+            inputs.add(ruleApp.posInOccurrence().topLevel());
+        } // some taclets don't have this kind of input, e.g. sign_case_distinction
         if (ruleApp instanceof PosTacletApp) {
             var posTacletApp = (PosTacletApp) ruleApp;
             if (posTacletApp.ifFormulaInstantiations() != null) {
@@ -77,7 +79,7 @@ public class DependencyTracker implements RuleAppListener {
             closedGoals.add("closed goal " + (n.serialNr() + 1)); // TODO: is it always the next nr?
         }
 
-        var input = new ArrayList<TrackedFormula>();
+        var input = new ArrayList<GraphNode>();
         var output = new ArrayList<TrackedFormula>();
         for (var in : inputs) {
             var loc = n.branchLocation();
@@ -111,6 +113,9 @@ public class DependencyTracker implements RuleAppListener {
 
         n.register(new DependencyNodeData(input, output, closedGoals, ruleApp.rule().displayName() + "_" + n.serialNr()), DependencyNodeData.class);
 
+        if (input.size() == 0) {
+            input.add(new PseudoInput());
+        }
         for (var in : input) {
             for (var out : output) {
                 graph.addVertex(in);
@@ -179,12 +184,25 @@ public class DependencyTracker implements RuleAppListener {
             }
             usefulSteps.add(node);
             var data = node.lookup(DependencyNodeData.class);
-            usefulFormulas.addAll(data.inputs);
+            for (var input : data.inputs) {
+                if (input instanceof TrackedFormula) {
+                    usefulFormulas.add((TrackedFormula) input);
+                }
+            }
             for (var in : data.inputs) {
                 graph.incomingEdgesOf(in).stream().map(edgeData::get).forEach(queue::add);
             }
         }
         analysisDone = true;
+
+        queue.add(proof.root());
+        while (!queue.isEmpty()) {
+            var node = queue.pop();
+            if (!usefulSteps.contains(node)) {
+                node.getNodeInfo().setNotes("useless");
+            }
+            node.childrenIterator().forEachRemaining(queue::add);
+        }
 
         var window = SwingUtilities.getWindowAncestor(parent);
         var dialog = new JDialog(window, "Analysis results");

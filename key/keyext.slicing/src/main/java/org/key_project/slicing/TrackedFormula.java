@@ -7,7 +7,7 @@ import org.key_project.util.collection.ImmutableList;
 
 import java.util.Objects;
 
-public class TrackedFormula {
+public class TrackedFormula implements GraphNode {
     public SequentFormula formula;
     public ImmutableList<String> branchLocation;
     public boolean inAntec;
