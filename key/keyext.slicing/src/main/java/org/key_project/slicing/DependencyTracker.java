@@ -12,20 +12,24 @@ import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.Pair;
 import org.jgrapht.Graph;
-import org.jgrapht.graph.DefaultDirectedGraph;
+import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.DirectedMultigraph;
 
 import javax.swing.*;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
 public class DependencyTracker implements RuleAppListener {
     private Proof proof;
     private final List<TrackedFormula> formulas = new ArrayList<>();
-    private final Graph<TrackedFormula, Node> graph = new DefaultDirectedGraph<>(Node.class);
+    private final Graph<TrackedFormula, DefaultEdge> graph = new DirectedMultigraph<>(DefaultEdge.class);
+    private final Map<DefaultEdge, Node> edgeData = new IdentityHashMap<>();
     private boolean analysisDone = false;
     private final Set<Node> usefulSteps = new HashSet<>();
     private final Set<TrackedFormula> usefulFormulas = new HashSet<>();
@@ -111,7 +115,9 @@ public class DependencyTracker implements RuleAppListener {
             for (var out : output) {
                 graph.addVertex(in);
                 graph.addVertex(out);
-                graph.addEdge(in, out, n);
+                var edge = new DefaultEdge();
+                graph.addEdge(in, out, edge);
+                edgeData.put(edge, n);
             }
         }
     }
@@ -175,7 +181,7 @@ public class DependencyTracker implements RuleAppListener {
             var data = node.lookup(DependencyNodeData.class);
             usefulFormulas.addAll(data.inputs);
             for (var in : data.inputs) {
-                queue.addAll(graph.incomingEdgesOf(in));
+                graph.incomingEdgesOf(in).stream().map(edgeData::get).forEach(queue::add);
             }
         }
         analysisDone = true;
