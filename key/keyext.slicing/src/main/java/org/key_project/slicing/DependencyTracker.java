@@ -14,6 +14,7 @@ import de.uka.ilkd.key.util.Pair;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultDirectedGraph;
 
+import javax.swing.*;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -148,7 +149,7 @@ public class DependencyTracker implements RuleAppListener {
         if (analysisDone) {
             for (var formula : formulas) {
                 if (!usefulFormulas.contains(formula)) {
-                    buf.append('"').append(formula).append('"').append(" [color=\"red\"]");
+                    buf.append('"').append(formula).append('"').append(" [color=\"red\"]\n");
                 }
             }
         }
@@ -156,7 +157,7 @@ public class DependencyTracker implements RuleAppListener {
         return buf.toString();
     }
 
-    public void analyze() {
+    public void analyze(JComponent parent) {
         if (proof == null || !proof.closed()) {
             return;
         }
@@ -178,5 +179,18 @@ public class DependencyTracker implements RuleAppListener {
             }
         }
         analysisDone = true;
+
+        var window = SwingUtilities.getWindowAncestor(parent);
+        var dialog = new JDialog(window, "Analysis results");
+        var steps = proof.countNodes() - proof.closedGoals().size();
+        var text = "Total steps: " + steps + "<br>"
+                + "Useful steps: " + usefulSteps.size() + "<br>"
+                + "Unnecessary steps: " + (steps - usefulSteps.size());
+        JEditorPane statisticsPane = new JEditorPane("text/html", text);
+        statisticsPane.setEditable(false);
+        dialog.add(statisticsPane);
+        dialog.pack();
+        dialog.setLocationRelativeTo(window);
+        dialog.setVisible(true);
     }
 }

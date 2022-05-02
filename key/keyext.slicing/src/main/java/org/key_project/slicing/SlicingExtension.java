@@ -138,7 +138,7 @@ public class SlicingExtension implements KeYGuiExtension,
         if (currentProof == null) {
             return;
         }
-        trackers.get(currentProof).analyze();
+        trackers.get(currentProof).analyze((JComponent) e.getSource());
     }
 
     @Override
