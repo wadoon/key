@@ -21,45 +21,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.abstraction.Field;
+import de.uka.ilkd.key.java.declaration.TypeDeclaration;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.parser.KeYParser;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.java.ContextStatementBlock;
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.OpCollector;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
-import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.OpReplacer;
@@ -87,6 +64,48 @@ public class TacletGenerator {
     public static TacletGenerator getInstance() {
         return instance;
     }
+
+
+    public List<Taclet> generateStorageFormalization(InitConfig proofConfig) {
+        final List<Taclet> axioms = new ArrayList<>();
+
+        // register storage layout
+        final Services services = proofConfig.getServices();
+        final Namespace<Function> funcs = services.getNamespaces().functions();
+        // search contract
+        final JavaInfo javaInfo = services.getJavaInfo();
+        final ImmutableList<KeYJavaType> contractTypes =
+                javaInfo.getAllSubtypes(javaInfo.getKeYJavaType("java.lang.Address"));
+        // HACK: take first type
+        final KeYJavaType contractType = contractTypes.head();
+        // getAllAttributes to determine storage layout
+        final ImmutableList<Field> fields = javaInfo.getAllFields((TypeDeclaration) contractType.getJavaType());
+        final ArrayList<Sort> storageLayoutSignature = new ArrayList<>();
+        for (Field fld : fields) {
+            storageLayoutSignature.add(fld.getProgramVariable().sort());
+        }
+        // create and register storage layout as struct-typed function
+        final Function storage=new Function(new Name("Storage"),
+                services.getNamespaces().sorts().lookup("Struct"),
+                storageLayoutSignature.toArray(new Sort[fields.size()]));
+        services.getNamespaces().functions().addSafely(storage);
+
+        // generate taclet
+        String storageExp = "1=1";
+
+        String tacletAsString = ("""                
+                testRule { 
+                \\find($(storageExp))
+                \\replacewith(true) };
+                """).replace("$(storageExp)", storageExp);
+
+        final Taclet t = KeYParser.parseTaclet(tacletAsString, services);
+        axioms.add(t);
+
+        return axioms;
+    }
+
+
 
     
     private TacletGoalTemplate createAxiomGoalTemplate(Term goalTerm) {

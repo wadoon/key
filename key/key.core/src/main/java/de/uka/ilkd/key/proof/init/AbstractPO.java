@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 
+import de.uka.ilkd.key.rule.tacletbuilder.TacletGenerator;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
