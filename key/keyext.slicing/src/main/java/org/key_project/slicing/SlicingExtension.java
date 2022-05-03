@@ -8,6 +8,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuAdapter;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
+import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofTreeAdapter;
@@ -22,6 +23,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,9 +37,10 @@ import java.util.Map;
 public class SlicingExtension implements KeYGuiExtension,
         KeYGuiExtension.ContextMenu,
         KeYGuiExtension.Startup,
-        KeYGuiExtension.MainMenu, KeYGuiExtension.StatusLine {
-    private final Map<Proof, DependencyTracker> trackers = new IdentityHashMap<>();
-    private Proof currentProof = null;
+        KeYGuiExtension.MainMenu, KeYGuiExtension.LeftPanel {
+    public final Map<Proof, DependencyTracker> trackers = new IdentityHashMap<>();
+    public Proof currentProof = null;
+    private SlicingLeftPanel leftPanel = null;
 
     private final ContextMenuAdapter adapter = new ContextMenuAdapter() {
         @Override
@@ -78,6 +82,7 @@ public class SlicingExtension implements KeYGuiExtension,
                     trackers.put(newProof, tracker);
                 }
                 currentProof = newProof;
+                leftPanel.proofSelected();
             }
         });
         mediator.registerProofLoadListener(newProof -> {
@@ -92,61 +97,11 @@ public class SlicingExtension implements KeYGuiExtension,
         //window.getProofTreeView().getRenderer().add(new ExplorationRenderer());
     }
 
-    /*
     @Nonnull
     @Override
     public Collection<TabPanel> getPanels(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
-        if (leftPanel == null) leftPanel = new ExplorationStepsList(window);
+        if (leftPanel == null) leftPanel = new SlicingLeftPanel(window, mediator, this);
         return Collections.singleton(leftPanel);
-    }
-     */
-
-    @Override
-    public List<JComponent> getStatusLineComponents() {
-        var button = new JButton("Export .dot");
-        button.addActionListener(e -> exportDot(e));
-        var button2 = new JButton("View formula graph");
-        button2.addActionListener(e -> previewGraph(e));
-        var button3 = new JButton("Analyze dependencies");
-        button3.addActionListener(e -> analyzeProof(e));
-        return Arrays.asList(button, button2, button3);
-    }
-
-    private void exportDot(ActionEvent e) {
-        if (currentProof == null || currentProof.countNodes() < 2) {
-            return;
-        }
-        KeYFileChooser fileChooser = KeYFileChooser.getFileChooser(
-                "Choose filename to save dot file");
-        fileChooser.setFileFilter(KeYFileChooser.DOT_FILTER);
-        fileChooser.setSelectedFile(new File("export.dot"));
-        int result = fileChooser.showSaveDialog((JComponent) e.getSource());
-        if (result == JFileChooser.APPROVE_OPTION) {
-            File file = fileChooser.getSelectedFile();
-            try(BufferedWriter writer = new BufferedWriter(
-                    new OutputStreamWriter(new FileOutputStream(file)));) {
-                String text = trackers.get(currentProof).exportDot();
-                writer.write(text);
-            } catch (IOException any) {
-                any.printStackTrace();
-                assert false;
-            }
-        }
-    }
-
-    private void previewGraph(ActionEvent e) {
-        if (currentProof == null || currentProof.countNodes() < 2) {
-            return;
-        }
-        String text = trackers.get(currentProof).exportDot();
-        var preview = new PreviewDialog(SwingUtilities.getWindowAncestor((JComponent) e.getSource()), text);
-    }
-
-    private void analyzeProof(ActionEvent e) {
-        if (currentProof == null) {
-            return;
-        }
-        trackers.get(currentProof).analyze((JComponent) e.getSource());
     }
 
     @Override

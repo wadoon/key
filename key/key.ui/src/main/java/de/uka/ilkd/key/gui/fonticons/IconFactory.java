@@ -84,6 +84,8 @@ public final class IconFactory {
             new IconFontProvider(FontAwesomeSolid.ROUTE);
     public static final IconFontProvider WINDOW_ICON =
             new IconFontProvider(FontAwesomeSolid.WINDOW_RESTORE);
+    public static final IconFontProvider SLICE_ICON =
+            new IconFontProvider(FontAwesomeSolid.ALIGN_JUSTIFY);
 
     /**
      * PLUS SQUARED

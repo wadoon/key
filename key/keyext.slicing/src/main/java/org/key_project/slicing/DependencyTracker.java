@@ -33,6 +33,7 @@ public class DependencyTracker implements RuleAppListener {
     private final Graph<GraphNode, DefaultEdge> graph = new DirectedMultigraph<>(DefaultEdge.class);
     private final Map<DefaultEdge, Node> edgeData = new IdentityHashMap<>();
     private boolean analysisDone = false;
+    public AnalysisResults analysisResults = null;
     private final Set<Node> usefulSteps = new HashSet<>();
     private final Set<TrackedFormula> usefulFormulas = new HashSet<>();
 
@@ -175,9 +176,12 @@ public class DependencyTracker implements RuleAppListener {
         return buf.toString();
     }
 
-    public void analyze(JComponent parent) {
+    public AnalysisResults analyze(JComponent parent) {
         if (proof == null || !proof.closed()) {
-            return;
+            return null;
+        }
+        if (analysisDone) {
+            return analysisResults;
         }
         var queue = new ArrayDeque<Node>();
         for (var e : proof.closedGoals()) {
@@ -211,9 +215,10 @@ public class DependencyTracker implements RuleAppListener {
             node.childrenIterator().forEachRemaining(queue::add);
         }
 
+        var steps = proof.countNodes() - proof.closedGoals().size();
+        /*
         var window = SwingUtilities.getWindowAncestor(parent);
         var dialog = new JDialog(window, "Analysis results");
-        var steps = proof.countNodes() - proof.closedGoals().size();
         var text = "Total steps: " + steps + "<br>"
                 + "Useful steps: " + usefulSteps.size() + "<br>"
                 + "Unnecessary steps: " + (steps - usefulSteps.size());
@@ -223,14 +228,18 @@ public class DependencyTracker implements RuleAppListener {
         dialog.pack();
         dialog.setLocationRelativeTo(window);
         dialog.setVisible(true);
+         */
+        analysisResults = new AnalysisResults(steps, usefulSteps.size());
+        return analysisResults;
+    }
 
+    public Proof sliceProof() {
+        if (!analysisDone) {
+            return null;
+        }
         Proof p = new Proof("reduced", proof.root().sequent().succedent().get(0).formula(), proof.header(), proof.getInitConfig().copy());
         replayProof(p, proof.root());
-        try {
-            p.saveToFile(new File("/tmp/testing.proof"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        return p;
     }
 
     private void replayProof(Proof p, Node node) {
