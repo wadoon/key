@@ -14,10 +14,9 @@ import de.uka.ilkd.key.util.Pair;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.DirectedMultigraph;
+import org.key_project.util.collection.ImmutableList;
 
 import javax.swing.*;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -100,7 +99,11 @@ public class DependencyTracker implements RuleAppListener {
                     added = true;
                     break;
                 }
-                loc = loc.tail();
+                if (loc.size() > 0) {
+                    var list = loc.toList();
+                    list.remove(list.size() - 1);
+                    loc = ImmutableList.fromList(list);
+                }
             }
             if (!added) {
                 // TODO: should only happen for initial sequent?
@@ -246,7 +249,7 @@ public class DependencyTracker implements RuleAppListener {
         if (node.getAppliedRuleApp() == null) {
             return;
         }
-        if (usefulSteps.contains(node)) {
+        if (usefulSteps.contains(node) || node.childrenCount() > 1) { // TODO: cut elimination
             //System.out.println("at node " + node.serialNr() + " " + node.getAppliedRuleApp().rule().displayName());
             //System.out.println("applying..");
             var app = node.getAppliedRuleApp();
