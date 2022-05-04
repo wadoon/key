@@ -305,9 +305,20 @@ public class TacletGenerator {
                 kjt.getJavaType() instanceof ClassDeclaration
                 && ((ClassDeclaration) kjt.getJavaType()).isFinal();
         final Sequent ifSeq;
-        if (target.isStatic() || finalClass) {
+        if (target.isStatic()) {
             ifSeq = null;
+        } else if (finalClass) {
+            /* part of fix for #1598
+             * invariants for final class should not be applied to null
+             * \assumes ( ==> self = null ) */
+            //ifSeq = null;
+            final Term ifFormula = TB.equals(TB.var(selfSV), TB.NULL());
+            final SequentFormula ifCf = new SequentFormula(ifFormula);
+            final Semisequent ifSemiSeq = Semisequent.EMPTY_SEMISEQUENT
+                    .insertFirst(ifCf).semisequent();
+            ifSeq = Sequent.createSuccSequent(ifSemiSeq);
         } else {
+            /* \assumes ( Sort.exactInstance(self) ==> ) */
             final Term ifFormula = TB.exactInstance(kjt.getSort(), TB.var(
                     selfSV));
             final SequentFormula ifCf = new SequentFormula(ifFormula);
@@ -500,7 +511,9 @@ public class TacletGenerator {
     public ImmutableSet<Taclet> generateContractAxiomTaclets(
             Name name,
             Term originalPre,
+            Term originalFreePre,
             Term originalPost,
+            Term originalFreePost,
             Term originalMby,
             KeYJavaType kjt,
             IObserverFunction target,
@@ -577,25 +590,25 @@ public class TacletGenerator {
         final Term find =TB.func(target, subs);
 
         //build taclet
-        Term addForumlaTerm = originalPre;
+        Term addFormulaTerm = originalPre;
         if(wfFormula != null) {
-            addForumlaTerm = TB.and(addForumlaTerm, wfFormula);
+            addFormulaTerm = TB.and(addFormulaTerm, wfFormula);
         }
         if(createdFormula != null) {
-            addForumlaTerm = TB.and(addForumlaTerm, createdFormula);
+            addFormulaTerm = TB.and(addFormulaTerm, createdFormula);
         }
         if(selfNull != null) {
-            addForumlaTerm = TB.and(addForumlaTerm, TB.not(selfNull));
+            addFormulaTerm = TB.and(addFormulaTerm, TB.not(selfNull));
         }
         if(mbyOK != null) {
-            addForumlaTerm = TB.and(addForumlaTerm, mbyOK);
+            addFormulaTerm = TB.and(addFormulaTerm, mbyOK);
         }
 
         pvs = pvs.append(originalSelfVar).append(originalParamVars); // .append(originalResultVar)
         svs = svs.append(selfSV).append(paramSVs); // .append(resultSV)
         final TermAndBoundVarPair schemaAdd =
-               createSchemaTerm(TB.imp(addForumlaTerm, OpReplacer.replace(TB.var(originalResultVar), 
-                       find, originalPost, services.getTermFactory())), pvs, svs, services);
+               createSchemaTerm(TB.imp(addFormulaTerm, OpReplacer.replace(TB.var(originalResultVar), 
+                       find, TB.and(originalPost, originalFreePost), services.getTermFactory())), pvs, svs, services);
 
         final Term addedFormula = schemaAdd.term;
         final SequentFormula addedCf = new SequentFormula(addedFormula);
@@ -764,14 +777,26 @@ public class TacletGenerator {
             }
         }
 
-        //\assumes(self = EQ ==>)
         if (eqVersion) {
             assert !isStatic;
-            final Term ifFormula = TB.equals(TB.var(selfSV), TB.var(eqSV));
-            final SequentFormula ifCf = new SequentFormula(ifFormula);
-            final Semisequent ifSemiSeq = Semisequent.EMPTY_SEMISEQUENT.insertFirst(
-                    ifCf).semisequent();
-            final Sequent ifSeq = Sequent.createAnteSequent(ifSemiSeq);
+            // \assumes( self = EQ ==> EQ = null )
+            final Term selfEQ = TB.equals(TB.var(selfSV), TB.var(eqSV));
+            final Term eqNull = TB.equals(TB.var(eqSV), TB.NULL());
+            final SequentFormula selfEQSF = new SequentFormula(selfEQ);
+            final SequentFormula eqNullSF = new SequentFormula(eqNull);
+            final Semisequent succ = Semisequent.EMPTY_SEMISEQUENT.insertFirst(
+                    selfEQSF).semisequent();
+            final Semisequent ant = Semisequent.EMPTY_SEMISEQUENT.insertFirst(
+                    eqNullSF).semisequent();
+            final Sequent ifSeq = Sequent.createSequent(succ, ant);
+            tacletBuilder.setIfSequent(ifSeq);
+        } else if (!isStatic) {
+            // \assumes( ==> self = null )
+            final Term selfNull = TB.equals(TB.var(selfSV), TB.NULL());
+            final SequentFormula selfNullSF = new SequentFormula(selfNull);
+            final Semisequent succ = Semisequent.EMPTY_SEMISEQUENT.insertFirst(
+                    selfNullSF).semisequent();
+            final Sequent ifSeq = Sequent.createSuccSequent(succ);
             tacletBuilder.setIfSequent(ifSeq);
         }
 

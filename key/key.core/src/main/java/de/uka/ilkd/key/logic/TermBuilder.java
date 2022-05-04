@@ -18,6 +18,8 @@ import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.ldt.BooleanLDT;
+import de.uka.ilkd.key.ldt.DoubleLDT;
+import de.uka.ilkd.key.ldt.FloatLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
@@ -29,6 +31,7 @@ import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.DefaultTermParser;
+import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.OpReplacer;
@@ -209,10 +212,7 @@ public class TermBuilder {
     public LocationVariable selfVar(KeYJavaType kjt, boolean makeNameUnique,
                                     String postfix) {
         String name = "self" + postfix;
-        if (makeNameUnique) {
-            name = newName(name);
-        }
-        return new LocationVariable(new ProgramElementName(name), kjt);
+        return locationVariable(name, kjt, makeNameUnique);
     }
 
     /**
@@ -258,11 +258,7 @@ public class TermBuilder {
             } else {
                 name = paramType.getSort().name().toString().charAt(0) + "";
             }
-            if (makeNamesUnique) {
-                name = newName(name);
-            }
-            final LocationVariable paramVar = new LocationVariable(
-                    new ProgramElementName(name), paramType);
+            final LocationVariable paramVar = locationVariable(name, paramType, makeNamesUnique);
             result = result.append(paramVar);
         }
         return result;
@@ -305,11 +301,8 @@ public class TermBuilder {
         if (pm.isVoid() || pm.isConstructor()) {
             return null;
         } else {
-            if (makeNameUnique) {
-                name = newName(name);
-            }
-            return new LocationVariable(new ProgramElementName(name),
-                    pm.getReturnType());
+            name += "_" + pm.getName();
+            return locationVariable(name, pm.getReturnType(), makeNameUnique);
         }
     }
 
@@ -327,11 +320,9 @@ public class TermBuilder {
      */
     public LocationVariable excVar(String name, IProgramMethod pm,
                                    boolean makeNameUnique) {
-        if (makeNameUnique) {
-            name = newName(name);
-        }
-        return new LocationVariable(new ProgramElementName(name),
-                services.getJavaInfo().getTypeByClassName(JAVA_LANG_THROWABLE));
+        return locationVariable(name,
+                services.getJavaInfo().getTypeByClassName(JAVA_LANG_THROWABLE),
+                makeNameUnique);
     }
 
     /**
@@ -341,21 +332,63 @@ public class TermBuilder {
     public LocationVariable heapAtPreVar(String baseName,
                                          boolean makeNameUnique) {
         HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-        return heapAtPreVar(baseName, heapLDT.getHeap().sort(), makeNameUnique);
+        return locationVariable(baseName, heapLDT.getHeap().sort(), makeNameUnique);
     }
 
     /**
-     * Creates a program variable for the atPre heap. Take care to register it
+     * Creates a location variable for prestate variables. Take care to register it
      * in the namespaces.
+     *
+     * @param baseName the base name to use
+     * @param sort the sort of the variable
+     * @param makeNameUnique whether to change the base name to be unique
+     * @return a location variable for the given name and type
      */
-    public LocationVariable heapAtPreVar(String baseName, Sort sort,
+    public LocationVariable atPreVar(String baseName, Sort sort, boolean makeNameUnique) {
+        return atPreVar(baseName, new KeYJavaType(sort), makeNameUnique);
+    }
+
+    /**
+     * Creates a location variable for prestate variables. Take care to register it
+     * in the namespaces.
+     *
+     * @param baseName the base name to use
+     * @param kjt the type of the variable
+     * @param makeNameUnique whether to change the base name to be unique
+     * @return a location variable for the given name and type
+     */
+    public LocationVariable atPreVar(String baseName, KeYJavaType kjt, boolean makeNameUnique) {
+        return locationVariable(baseName + "AtPre", kjt, makeNameUnique);
+    }
+
+    /**
+     * Creates a location variable for example for prestate variables. Take care to register it
+     * in the namespaces.
+     *
+     * @param baseName the base name to use
+     * @param sort the sort of the variable
+     * @param makeNameUnique whether to change the base name to be unique
+     * @return a location variable for the given name and type
+     */
+    public LocationVariable locationVariable(String baseName, Sort sort, boolean makeNameUnique) {
+        return locationVariable(baseName, new KeYJavaType(sort), makeNameUnique);
+    }
+
+    /**
+     * Creates a location variable for example for prestate variables. Take care to register it
+     * in the namespaces.
+     *
+     * @param baseName the base name to use
+     * @param kjt the type of the variable
+     * @param makeNameUnique whether to change the base name to be unique
+     * @return a location variable for the given name and type
+     */
+    public LocationVariable locationVariable(String baseName, KeYJavaType kjt,
                                          boolean makeNameUnique) {
-        assert sort != null;
         if (makeNameUnique) {
             baseName = newName(baseName);
         }
-        return new LocationVariable(new ProgramElementName(baseName),
-                new KeYJavaType(sort));
+        return new LocationVariable(new ProgramElementName(baseName), kjt);
     }
 
     // -------------------------------------------------------------------------
@@ -1173,14 +1206,14 @@ public class TermBuilder {
     }
 
     /**
-     * Creates Z-/C-terms for ints/chars.
+     * Creates terms to be used in Z/C/FP/DFP/R notations.
+     * The result does not have such a constructor applied yet.
      *
      * @param numberString a string containing the number in a decimal representation
-     * @param containsChar true iff the number represents a char
-     * @return Term in Z-/C-Notation representing the given number
+     * @return Term in "number" notation representing the given number
      * @throws NumberFormatException if <code>numberString</code> is not a number
      */
-    private Term numberTerm(String numberString, boolean containsChar) {
+    private Term numberTerm(String numberString) {
         if (numberString == null || numberString.isEmpty()) {
             throw new NumberFormatException(numberString + " is not a number.");
         }
@@ -1199,66 +1232,44 @@ public class TermBuilder {
 
         int digit;
         for (int i = j, sz = numberString.length(); i < sz; i++) {
-            switch (numberString.charAt(i)) {
-                case '0':
-                    digit = 0;
-                    break;
-                case '1':
-                    digit = 1;
-                    break;
-                case '2':
-                    digit = 2;
-                    break;
-                case '3':
-                    digit = 3;
-                    break;
-                case '4':
-                    digit = 4;
-                    break;
-                case '5':
-                    digit = 5;
-                    break;
-                case '6':
-                    digit = 6;
-                    break;
-                case '7':
-                    digit = 7;
-                    break;
-                case '8':
-                    digit = 8;
-                    break;
-                case '9':
-                    digit = 9;
-                    break;
-                default:
-                    throw new NumberFormatException(numberString + " is not a number.");
+            char c = numberString.charAt(i);
+            if ('0' <= c && c <= '9') {
+                digit = c - '0';
+            } else {
+                throw new NumberFormatException(numberString + " is not a number.");
             }
             numberLiteralTerm = func(intLDT.getNumberLiteralFor(digit), numberLiteralTerm);
         }
         if (negate) {
             numberLiteralTerm = func(intLDT.getNegativeNumberSign(), numberLiteralTerm);
         }
-        // chars get a surrounding C, ints a surrounding Z
-        numberLiteralTerm = func(containsChar ? intLDT.getCharSymbol() : intLDT.getNumberSymbol(),
-                numberLiteralTerm);
+
+        // return the raw number literal term ('C', 'Z' or 'R' must still be added)
         return numberLiteralTerm;
     }
 
     /**
-     * @param numberString String representing an integer with radix 10, may be negative
+     * Get term for an integer literal.
+     *
+     * @param numberString
+     *            String representing an integer with radix 10, may be negative
      * @return Term in Z-Notation representing the given number
      * @throws NumberFormatException if <code>numberString</code> is not a number
      */
     public Term zTerm(String numberString) {
-        return numberTerm(numberString, false);
+        return func(services.getTypeConverter().getIntegerLDT().getNumberSymbol(),
+                numberTerm(numberString));
     }
 
     /**
-     * @param number an integer
+     * Get term for an integer literal.
+     *
+     * @param number
+     *            an integer
      * @return Term in Z-Notation representing the given number
      */
     public Term zTerm(long number) {
-        return zTerm("" + number);
+        return zTerm(Long.toString(number));
     }
 
     /**
@@ -1267,7 +1278,36 @@ public class TermBuilder {
      * @throws NumberFormatException if <code>numberString</code> is not a number
      */
     public Term cTerm(String numberString) {
-        return numberTerm(numberString, true);
+        return func(services.getTypeConverter().getIntegerLDT().getCharSymbol(),
+                numberTerm(numberString));
+    }
+
+    /**
+     * Create a floating point literal value from a float value.
+     *
+     * @param value any float value (even NaN)
+     * @return a term representing the value
+     */
+    public Term fpTerm(float value) {
+        int bitPattern = Float.floatToIntBits(value);
+        String patternStr = Integer.toUnsignedString(bitPattern);
+        Term numberTerm = numberTerm(patternStr);
+        return func(services.getTypeConverter().getFloatLDT().getFloatSymbol(),
+                numberTerm);
+    }
+
+    /**
+     * Create a double floating point literal value from a double value.
+     *
+     * @param value any double value (even NaN)
+     * @return a term representing the value
+     */
+    public Term dfpTerm(double value) {
+        long bitPattern = Double.doubleToLongBits(value);
+        String patternStr = Long.toUnsignedString(bitPattern);
+        Term numberTerm = numberTerm(patternStr);
+        return func(services.getTypeConverter().getDoubleLDT().getDoubleSymbol(),
+                numberTerm);
     }
 
     public Term add(Term t1, Term t2) {
@@ -2314,6 +2354,20 @@ public class TermBuilder {
             return t1;
         } else {
             return tf.createTerm(Junctor.OR, t1, t2);
+        }
+    }
+
+    /**
+     * Floating-point aware equality for floats and double
+     */
+    public Term fpEq(Term t1, Term t2) {
+        FloatLDT floatLDT = services.getTypeConverter().getFloatLDT();
+        if(t1.sort() == floatLDT.targetSort()) {
+            return func(floatLDT.getEquals(), t1, t2);
+        } else {
+            // If it is not float, assume double. It will fail if wrong args
+            DoubleLDT doubleLDT = services.getTypeConverter().getDoubleLDT();
+            return func(doubleLDT.getEquals(), t1, t2);
         }
     }
 }
