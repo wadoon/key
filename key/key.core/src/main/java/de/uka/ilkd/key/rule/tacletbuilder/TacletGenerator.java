@@ -20,7 +20,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
@@ -39,6 +38,8 @@ import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.sort.GenericSort;
+import de.uka.ilkd.key.logic.sort.GenericSupersortException;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RuleSet;
@@ -67,10 +68,25 @@ public class TacletGenerator {
 	
 	
 	public List<Taclet> generateStorageFormalization(InitConfig proofConfig) {
-        final List<Taclet> axioms = new ArrayList<>();
-
+		final List<Taclet> axioms = new ArrayList<>();
+		
         // register storage layout
         final Services services = proofConfig.getServices();
+		
+		Sort someSort = services.getNamespaces().sorts().lookup("alpha");
+		if (someSort == null) {
+			Sort anySort = Sort.ANY;
+			try {
+				Sort gs = new GenericSort(new Name("alpha"),
+				DefaultImmutableSet.<Sort>nil().add(anySort), // extends
+				DefaultImmutableSet.<Sort>nil() //oneof
+				);
+				services.getNamespaces().sorts().add(gs);
+			} catch(GenericSupersortException gse) {
+				System.out.println(gse);
+			}
+		}
+		
         // search contract
         final JavaInfo javaInfo = services.getJavaInfo();
 		
@@ -96,6 +112,10 @@ public class TacletGenerator {
 			List<StructField> signature = getStructSignature(services, javaInfo, structType, programStructSorts);
 			registerStructConstructor(services, structType.getName(), signature);
 			makeAxiomsForStruct(axioms, services, structType.getName(), signature);
+		}
+		
+		if (someSort == null) {
+			services.getNamespaces().sorts().remove(new Name("alpha"));
 		}
 		
         return axioms;
@@ -164,8 +184,6 @@ public class TacletGenerator {
 		final int numFields = structSig.size();
 		
 		final StringBuilder commonSchemaVars = new StringBuilder();
-		commonSchemaVars.append("\\schemaVar \\term any x;\n");
-		commonSchemaVars.append("\\schemaVar \\term Field f;\n");
 		{
 			int fieldIndex = -1;
 			for (StructField field : structSig) {
@@ -173,6 +191,8 @@ public class TacletGenerator {
 				commonSchemaVars.append("\\schemaVar \\term " + field.sort.toString() + " p" + fieldIndex + ";\n");
 			}
 		}
+		commonSchemaVars.append("\\schemaVar \\term any x;\n");
+		commonSchemaVars.append("\\schemaVar \\term Field f;\n");
 		
 		final StringBuilder structConstructorExp = new StringBuilder();
 		structConstructorExp.append(structName + "(");
@@ -262,7 +282,6 @@ public class TacletGenerator {
 		final int numFields = structSig.size();
 		
 		final StringBuilder commonSchemaVars = new StringBuilder();
-		commonSchemaVars.append("\\schemaVar \\term Field f;\n");
 		{
 			int fieldIndex = -1;
 			for (StructField field : structSig) {
@@ -270,6 +289,7 @@ public class TacletGenerator {
 				commonSchemaVars.append("\\schemaVar \\term " + field.sort.toString() + " p" + fieldIndex + ";\n");
 			}
 		}
+		commonSchemaVars.append("\\schemaVar \\term Field f;\n");
 		
 		final StringBuilder structConstructorExp = new StringBuilder();
 		structConstructorExp.append(structName + "(");
@@ -309,6 +329,7 @@ public class TacletGenerator {
 		schemaVars = commonSchemaVars.toString() + extraSchemaVars.toString();
 		
 		tacletString = makeTacletString(ruleName, schemaVars, assumesExp, findExp, varcondExp, replacewithExp, addExp, displayName, heuristics);
+		System.out.println(tacletString);
 		taclets.add(KeYParser.parseTaclet(tacletString, services));
 		
 		// 2. readStructEQ
@@ -322,6 +343,7 @@ public class TacletGenerator {
 		schemaVars = commonSchemaVars.toString() + extraSchemaVars.toString();
 		
 		tacletString = makeTacletString(ruleName, schemaVars, assumesExp, findExp, varcondExp, replacewithExp, addExp, displayName, heuristics);
+		System.out.println(tacletString);
 		taclets.add(KeYParser.parseTaclet(tacletString, services));
 		
 		// 3. readStructSingletonPath
@@ -332,6 +354,7 @@ public class TacletGenerator {
 		schemaVars = commonSchemaVars.toString();
 		
 		tacletString = makeTacletString(ruleName, schemaVars, assumesExp, findExp, varcondExp, replacewithExp, addExp, displayName, heuristics);
+		System.out.println(tacletString);
 		taclets.add(KeYParser.parseTaclet(tacletString, services));
 		
 		// 4. readStructEQSingletonPath
@@ -344,6 +367,7 @@ public class TacletGenerator {
 		schemaVars = commonSchemaVars.toString() + extraSchemaVars.toString();
 		
 		tacletString = makeTacletString(ruleName, schemaVars, assumesExp, findExp, varcondExp, replacewithExp, addExp, displayName, heuristics);
+		System.out.println(tacletString);
 		taclets.add(KeYParser.parseTaclet(tacletString, services));
 	}
 	

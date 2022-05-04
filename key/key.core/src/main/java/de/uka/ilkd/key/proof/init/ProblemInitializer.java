@@ -378,6 +378,7 @@ public final class ProblemInitializer {
     public final void readEnvInput(EnvInput envInput,
                               InitConfig initConfig)
                 throws ProofInputException {
+		// generate storage taclets
         if(alreadyParsed.add(envInput)){
             // read includes
             if(!(envInput instanceof LDTInput)) {
