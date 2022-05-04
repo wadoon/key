@@ -26,6 +26,8 @@ import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.GenericSort;
+import de.uka.ilkd.key.logic.sort.GenericSupersortException;
 import de.uka.ilkd.key.parser.KeYParser;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -67,31 +69,56 @@ public class TacletGenerator {
 
 
     public List<Taclet> generateStorageFormalization(InitConfig proofConfig) {
+
         final List<Taclet> axioms = new ArrayList<>();
 
         // register storage layout
+
         final Services services = proofConfig.getServices();
         final Namespace<Function> funcs = services.getNamespaces().functions();
         // search contract
         final JavaInfo javaInfo = services.getJavaInfo();
         final ImmutableList<KeYJavaType> contractTypes =
                 javaInfo.getAllSubtypes(javaInfo.getKeYJavaType("java.lang.Address"));
+
         // HACK: take first type
         final KeYJavaType contractType = contractTypes.head();
+
         // getAllAttributes to determine storage layout
         final ImmutableList<Field> fields = javaInfo.getAllFields((TypeDeclaration) contractType.getJavaType());
+
         final ArrayList<Sort> storageLayoutSignature = new ArrayList<>();
         for (Field fld : fields) {
-            storageLayoutSignature.add(fld.getProgramVariable().sort());
+            if (!fld.isStatic() && fld.getName().indexOf('<') == -1) {
+                storageLayoutSignature.add(fld.getProgramVariable().sort());
+            }
         }
+
         // create and register storage layout as struct-typed function
         final Function storage=new Function(new Name("Storage"),
                 services.getNamespaces().sorts().lookup("Struct"),
-                storageLayoutSignature.toArray(new Sort[fields.size()]));
+                storageLayoutSignature.toArray(new Sort[storageLayoutSignature.size()]));
         services.getNamespaces().functions().addSafely(storage);
 
+        // register generic sorts
+
+        // general sort lookup:
+        //   Sort someSort = services.getNamespaces().sorts().lookup(<name of sort to lookup>);
+        // special case any:
+        Sort anySort = Sort.ANY;
+
+        try {
+            Sort gs = new GenericSort(new Name("alpha"),
+                    DefaultImmutableSet.<Sort>nil().add(anySort), // extends
+                    DefaultImmutableSet.<Sort>nil() //oneof
+            );
+            services.getNamespaces().sorts().add(gs);
+        } catch(GenericSupersortException gse) {
+            // oops
+        }
+
         // generate taclet
-        String storageExp = "1=1";
+        String storageExp = "1=1"; // Storage(t1,t2)
 
         String tacletAsString = ("""                
                 testRule { 
@@ -101,6 +128,9 @@ public class TacletGenerator {
 
         final Taclet t = KeYParser.parseTaclet(tacletAsString, services);
         axioms.add(t);
+
+        // remove generic sort
+        services.getNamespaces().sorts().remove(new Name("alpha"));
 
         return axioms;
     }
