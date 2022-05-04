@@ -1817,7 +1817,11 @@ keyjavatype returns [KeYJavaType kjt=null]
    boolean array = false;
 }
 :
-    type = simple_ident_dots (EMPTYBRACKETS {type += "[]"; array=true;})* 
+	(
+	type = simple_ident_dots (EMPTYBRACKETS {type += "[]"; array=true;})*
+	|
+	SEQ {type="\\seq";}
+	)
     {
         kjt = getJavaInfo().getKeYJavaType(type);
             

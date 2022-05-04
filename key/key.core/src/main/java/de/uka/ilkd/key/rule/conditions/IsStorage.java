@@ -65,6 +65,7 @@ public final class IsStorage extends VariableConditionAdapter {
 		} else {
 			return negated;
 		}
+		
     }
     
     

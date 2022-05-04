@@ -107,7 +107,6 @@ public abstract class AbstractOperationPO extends AbstractPO {
     /**
      * If this is {@code true} an uninterpreted predicate is added to the
      * postconditions which contains the heap and all parameters as arguments.
-     * @see #buildUninterpretedPredicate(ImmutableList, String)
      * @see #getUninterpretedPredicateName()
      */
     private boolean addUninterpretedPredicate;
@@ -120,7 +119,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
 
     /**
      * The used uninterpreted predicate created via
-     * {@link #buildUninterpretedPredicate(ImmutableList, ProgramVariable, String)}
+     * {@link #getUninterpretedPredicate()}
      * and available via {@link #getUninterpretedPredicate()}.
      */
     private Term uninterpretedPredicate;

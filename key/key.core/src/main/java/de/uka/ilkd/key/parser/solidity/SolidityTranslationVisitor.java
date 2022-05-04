@@ -8,6 +8,7 @@ import java.util.stream.Stream;
 
 public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 	private static final String defaultReturnVariableName = "__returnVal";
+	private static final String structSupertypeName = "Struct";
 
 	private final StringBuilder output = new StringBuilder();
 	private final VariableScopeStack varStack = new VariableScopeStack();
@@ -1202,6 +1203,10 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 		SolidityPreVisitor preVisitor = new SolidityPreVisitor();
 		env = preVisitor.visit(ctx);
 		visitChildren(ctx);
+
+		// Add to the end of the file an interface functioning as a supertype to all struct types.
+		this.output.append("interface " + structSupertypeName + " {}");
+
 		return getOutput();
 	}
 
@@ -1457,10 +1462,11 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 		boolean currentlyVisitingContract = !structureStack.empty() &&
 				structureStack.contains(ContractStructure.CONTRACT_DEF);
 		StringBuffer structOutput = new StringBuffer();
-		if (currentlyVisitingContract) {
+		if (currentlyVisitingContract) { // Free structs are not static
 			structOutput.append("static ");
 		}
-		structOutput.append("class " + visit(ctx.identifier()) + "{\n");
+		// Make all struct classes extend a supertype "Struct"
+		structOutput.append("class " + visit(ctx.identifier()) + " implements " + structSupertypeName + " {\n");
 		ctx.variableDeclaration().stream().forEach(v -> structOutput.append(visit(v)).append(";\n"));
 		structOutput.append("}\n");
 		structureStack.pop();
@@ -1836,7 +1842,8 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 
 		Solidity.Variable var = new Solidity.Variable(identifier, typename);
 
-		// If the variable is shadowing a local variable (or function parameter), rename it
+		// If the variable is shadowing a local variable (or function parameter), rename it.
+		// This is not done if the variable is a struct field.
 		boolean localVarAlreadyExists = false;
 		if (!structureStack.empty() && !structureStack.contains(ContractStructure.STRUCT)) {
 			localVarAlreadyExists = varStack.hasLocalVariableWithNameOrRenamedName(identifier);
@@ -1863,9 +1870,13 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 			var.dataLocation = Solidity.DataLocation.stringToLocation(visit(ctx.storageLocation()));
 		}
 
-		String dataLocationEncoding = getJavaEncodingForVariableDataLocation(var);
-		return (dataLocationEncoding.equals("") ? "" : dataLocationEncoding + " ") +
-				shownTypename + " " + (localVarAlreadyExists ? var.renamedName : identifier);
+		if (!structureStack.empty() && !structureStack.contains(ContractStructure.STRUCT)) {
+			String dataLocationEncoding = getJavaEncodingForVariableDataLocation(var);
+			return (dataLocationEncoding.equals("") ? "" : dataLocationEncoding + " ") +
+					shownTypename + " " + (localVarAlreadyExists ? var.renamedName : identifier);
+		} else {
+			return shownTypename + " " + identifier;
+		}
 	}
 	/**
 	 * {@inheritDoc}

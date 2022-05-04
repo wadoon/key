@@ -21,45 +21,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.abstraction.Field;
+import de.uka.ilkd.key.java.declaration.TypeDeclaration;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.parser.KeYParser;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.java.ContextStatementBlock;
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.OpCollector;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
-import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.OpReplacer;
@@ -87,6 +64,391 @@ public class TacletGenerator {
     public static TacletGenerator getInstance() {
         return instance;
     }
+	
+	
+	public List<Taclet> generateStorageFormalization(InitConfig proofConfig) {
+        final List<Taclet> axioms = new ArrayList<>();
+
+        // register storage layout
+        final Services services = proofConfig.getServices();
+        // search contract
+        final JavaInfo javaInfo = services.getJavaInfo();
+		
+		// Construct a list of all structs in the program
+		final ImmutableList<KeYJavaType> programStructTypes = 
+			javaInfo.getAllSubtypes(javaInfo.getKeYJavaType("Struct")); // All output Java classes for the Solidity structs should inherit from "Struct"
+		final List<String> programStructSorts = new ArrayList<>();
+		for (KeYJavaType structType : programStructTypes) {
+			programStructSorts.add(structType.getSort().toString()); // Structs inside contracts have the contract name as a qualifier
+		}
+		
+		// Register the storage struct
+        final ImmutableList<KeYJavaType> contractTypes =
+                javaInfo.getAllSubtypes(javaInfo.getKeYJavaType("java.lang.Address"));
+        // HACK: take first type
+        final KeYJavaType contractType = contractTypes.head();
+		List<StructField> storageSignature = getStructSignature(services, javaInfo, contractType, programStructSorts);
+		registerStructConstructor(services, "Storage", storageSignature);
+		makeAxiomsForStruct(axioms, services, "Storage", storageSignature);
+		
+		// Register all program structs
+		for (KeYJavaType structType : programStructTypes) {
+			List<StructField> signature = getStructSignature(services, javaInfo, structType, programStructSorts);
+			registerStructConstructor(services, structType.getName(), signature);
+			makeAxiomsForStruct(axioms, services, structType.getName(), signature);
+		}
+		
+        return axioms;
+    }
+	
+	
+	private static class StructField {
+		Sort sort;
+		String name;
+	}
+	
+	
+	private List<StructField> getStructSignature(Services services, JavaInfo javaInfo, KeYJavaType programStructType, List<String> programStructSorts) {
+		final ImmutableList<Field> fields = javaInfo.getAllFields((TypeDeclaration) programStructType.getJavaType());
+        final List<StructField> signature = new ArrayList<>();
+        for (Field fld : fields) {
+			IProgramVariable progVar = fld.getProgramVariable();
+			String name = progVar.name().toString();
+			// Do not include built-in KeY fields such as '<classInitialized>', '<classErroneous>', etc.
+			if (!name.contains("<")) {
+				StructField structField = new StructField();
+				// If the sort is a program struct type, store it as "Struct" instead.
+				Sort sort = progVar.sort();
+				if (programStructSorts.contains(sort.toString())) {
+					sort = services.getNamespaces().sorts().lookup("Struct");
+				}
+				structField.sort = sort;
+				structField.name = name;
+				signature.add(structField);
+			}
+        }
+		return signature;
+	}
+	
+	
+	private void registerStructConstructor(Services services, String structName, List<StructField> signature) {
+		// create and register storage layout as struct-typed function
+		List<Sort> sorts = new ArrayList<>();
+		for (StructField field : signature) {
+			sorts.add(field.sort);
+		}
+        final Function constructor = new Function(new Name(structName),
+                services.getNamespaces().sorts().lookup("Struct"),
+                sorts.toArray(new Sort[sorts.size()]));
+        services.getNamespaces().functions().addSafely(constructor);
+	}
+	
+	
+	private void makeAxiomsForStruct(List<Taclet> axioms, Services services, String structName, List<StructField> signature) {
+		makeWriteStructTaclets(axioms, services, structName, signature);
+		makeReadStructTaclets(axioms, services, structName, signature);
+	}
+
+
+	private final static String seqConcatExp = "seqConcat(seqSingleton(f), rest)";
+	private final static String seqSingleExp = "seqSingleton(f)";
+	private final static String writeStructName = "write";
+	private final static String readStructName = "read";
+	private final static String genericType = "alpha";
+	
+
+	private void makeWriteStructTaclets(List<Taclet> taclets, Services services, String structName, List<StructField> structSig) {
+		if (structSig.size() == 0)
+			return;
+		
+		final int numFields = structSig.size();
+		
+		final StringBuilder commonSchemaVars = new StringBuilder();
+		commonSchemaVars.append("\\schemaVar \\term any x;\n");
+		commonSchemaVars.append("\\schemaVar \\term Field f;\n");
+		{
+			int fieldIndex = -1;
+			for (StructField field : structSig) {
+				++fieldIndex;
+				commonSchemaVars.append("\\schemaVar \\term " + field.sort.toString() + " p" + fieldIndex + ";\n");
+			}
+		}
+		
+		final StringBuilder structConstructorExp = new StringBuilder();
+		structConstructorExp.append(structName + "(");
+		{
+			for (int fieldIndex = 0; fieldIndex < structSig.size(); ++fieldIndex) {
+				structConstructorExp.append("p" + fieldIndex + ",");
+			}
+			structConstructorExp.deleteCharAt(structConstructorExp.length() - 1);
+			structConstructorExp.append(')');
+		}
+		
+		final String addExp = "";
+		final String displayName = structName.equals("Storage") ? "write storage" : "write struct " + structName;
+		final String heuristics = "simplify";
+		final String varcondExp = "";
+		
+		String assumesExp;
+		String findExp;
+		String replacewithExp;
+		String ruleName;
+		String schemaVars;
+		
+		StringBuilder extraSchemaVars;
+		
+		String tacletString;
+		
+		// Rules: 1. writeStruct	2. writeStructEQ	3. writeStructSingletonPath		4. writeStructEQSingletonPath
+		
+		// 1. writeStruct
+		extraSchemaVars = new StringBuilder();
+		extraSchemaVars.append("\\schemaVar \\term Seq rest;\n");
+		
+		assumesExp = "";
+		findExp = writeStructName + "(" + structConstructorExp + ", " + seqConcatExp + ", x)";
+		replacewithExp = makeWriteStructReplacewithExp(structName, structSig, "rest");
+		ruleName = "writeStruct" + "_" + structName;
+		schemaVars = commonSchemaVars.toString() + extraSchemaVars.toString();
+
+		tacletString = makeTacletString(ruleName, schemaVars, assumesExp, findExp, varcondExp, replacewithExp, addExp, displayName, heuristics);
+		System.out.println(tacletString + "\n");
+		taclets.add(KeYParser.parseTaclet(tacletString, services));
+		
+		// 2. writeStructEQ
+		extraSchemaVars = new StringBuilder();
+		extraSchemaVars.append("\\schemaVar \\term Seq rest;\n");
+		extraSchemaVars.append("\\schemaVar \\term Struct struct;\n");
+		
+		assumesExp = structConstructorExp + " = struct ==> ";
+		findExp = writeStructName + "(struct, " + seqConcatExp + ", x)";
+		ruleName = "writeStructEQ" + "_" + structName;
+		schemaVars = commonSchemaVars.toString() + extraSchemaVars.toString();
+		
+		tacletString = makeTacletString(ruleName, schemaVars, assumesExp, findExp, varcondExp, replacewithExp, addExp, displayName, heuristics);
+		System.out.println(tacletString + "\n");
+		taclets.add(KeYParser.parseTaclet(tacletString, services));
+		
+		// 3. writeStructSingletonPath
+		assumesExp = "";
+		findExp = writeStructName + "(" + structConstructorExp + ", " + seqSingleExp + ", x)";
+		replacewithExp = makeWriteStructReplacewithExp(structName, structSig, "seqEmpty");
+		ruleName = "writeStructSingletonPath" + "_" + structName;
+		schemaVars = commonSchemaVars.toString();
+		
+		tacletString = makeTacletString(ruleName, schemaVars, assumesExp, findExp, varcondExp, replacewithExp, addExp, displayName, heuristics);
+		System.out.println(tacletString + "\n");
+		taclets.add(KeYParser.parseTaclet(tacletString, services));
+		
+		// 4. writeStructEQSingletonPath
+		extraSchemaVars = new StringBuilder();
+		extraSchemaVars.append("\\schemaVar \\term Struct struct;\n");
+		
+		assumesExp = structConstructorExp + " = struct ==> ";
+		findExp = writeStructName + "(struct, " + seqSingleExp + ", x)";
+		ruleName = "writeStructEQSingletonPath" + "_" + structName;
+		schemaVars = commonSchemaVars.toString() + extraSchemaVars.toString();
+
+		tacletString = makeTacletString(ruleName, schemaVars, assumesExp, findExp, varcondExp, replacewithExp, addExp, displayName, heuristics);
+		System.out.println(tacletString + "\n");
+		taclets.add(KeYParser.parseTaclet(tacletString, services));
+	}
+	
+	
+	private void makeReadStructTaclets(List<Taclet> taclets, Services services, String structName, List<StructField> structSig) {
+		if (structSig.size() == 0)
+			return;
+		
+		final int numFields = structSig.size();
+		
+		final StringBuilder commonSchemaVars = new StringBuilder();
+		commonSchemaVars.append("\\schemaVar \\term Field f;\n");
+		{
+			int fieldIndex = -1;
+			for (StructField field : structSig) {
+				++fieldIndex;
+				commonSchemaVars.append("\\schemaVar \\term " + field.sort.toString() + " p" + fieldIndex + ";\n");
+			}
+		}
+		
+		final StringBuilder structConstructorExp = new StringBuilder();
+		structConstructorExp.append(structName + "(");
+		{
+			for (int fieldIndex = 0; fieldIndex < structSig.size(); ++fieldIndex) {
+				structConstructorExp.append("p" + fieldIndex + ",");
+			}
+			structConstructorExp.deleteCharAt(structConstructorExp.length() - 1);
+			structConstructorExp.append(')');
+		}
+		
+		final String addExp = "";
+		final String displayName = structName.equals("Storage") ? "read storage" : "read struct " + structName;
+		final String heuristics = "simplify";
+		final String varcondExp = "";
+		
+		String assumesExp;
+		String findExp;
+		String replacewithExp;
+		String ruleName;
+		String schemaVars;
+		
+		StringBuilder extraSchemaVars;
+		
+		String tacletString;
+		
+		// Rules: 1. readStruct		2. readStructEQ		3. readStructSingletonPath		4. readStructEQSingletonPath
+		
+		// 1. readStruct
+		extraSchemaVars = new StringBuilder();
+		extraSchemaVars.append("\\schemaVar \\term Seq rest;\n");
+		
+		assumesExp = "";
+		findExp = genericType + "::" + readStructName + "(" + structConstructorExp + ", " + seqConcatExp + ")";
+		replacewithExp = makeReadStructReplacewithExp(structName, structSig, "rest");
+		ruleName = "readStruct" + "_" + structName;
+		schemaVars = commonSchemaVars.toString() + extraSchemaVars.toString();
+		
+		tacletString = makeTacletString(ruleName, schemaVars, assumesExp, findExp, varcondExp, replacewithExp, addExp, displayName, heuristics);
+		taclets.add(KeYParser.parseTaclet(tacletString, services));
+		
+		// 2. readStructEQ
+		extraSchemaVars = new StringBuilder();
+		extraSchemaVars.append("\\schemaVar \\term Seq rest;\n");
+		extraSchemaVars.append("\\schemaVar \\term Struct struct;\n");
+		
+		assumesExp = structConstructorExp + " = struct ==> ";
+		findExp = genericType + "::" + readStructName + "(struct, " + seqConcatExp + ")";
+		ruleName = "readStructEQ" + "_" + structName;
+		schemaVars = commonSchemaVars.toString() + extraSchemaVars.toString();
+		
+		tacletString = makeTacletString(ruleName, schemaVars, assumesExp, findExp, varcondExp, replacewithExp, addExp, displayName, heuristics);
+		taclets.add(KeYParser.parseTaclet(tacletString, services));
+		
+		// 3. readStructSingletonPath
+		assumesExp = "";
+		findExp = genericType + "::" + readStructName + "(" + structConstructorExp + ", " + seqSingleExp + ")";
+		replacewithExp = makeReadStructReplacewithExp(structName, structSig, "seqEmpty");
+		ruleName = "readStructSingletonPath" + "_" + structName;
+		schemaVars = commonSchemaVars.toString();
+		
+		tacletString = makeTacletString(ruleName, schemaVars, assumesExp, findExp, varcondExp, replacewithExp, addExp, displayName, heuristics);
+		taclets.add(KeYParser.parseTaclet(tacletString, services));
+		
+		// 4. readStructEQSingletonPath
+		extraSchemaVars = new StringBuilder();
+		extraSchemaVars.append("\\schemaVar \\term Struct struct;\n");
+		
+		assumesExp = structConstructorExp + " = struct ==> ";
+		findExp = genericType + "::" + readStructName + "(struct, " + seqSingleExp + ")";
+		ruleName = "readStructEQSingletonPath" + "_" + structName;
+		schemaVars = commonSchemaVars.toString() + extraSchemaVars.toString();
+		
+		tacletString = makeTacletString(ruleName, schemaVars, assumesExp, findExp, varcondExp, replacewithExp, addExp, displayName, heuristics);
+		taclets.add(KeYParser.parseTaclet(tacletString, services));
+	}
+	
+	
+	private String makeWriteStructReplacewithExp(String structName, List<StructField> structSig, String subtractedSequence) {
+		final StringBuilder replacewithExp = new StringBuilder();
+		final int numFields = structSig.size();
+		if (numFields == 1) {
+			replacewithExp.append(structName + "((" + structSig.get(0).sort + ")" + writeStructName + "(p0, " + subtractedSequence + ", x))");
+		} else {
+			for (int fieldIndex = 0; fieldIndex < numFields - 1; ++fieldIndex) {
+				Sort sort = structSig.get(fieldIndex).sort;
+				String name = getStaticFieldRepr(structSig.get(fieldIndex).name);
+				replacewithExp.append("\\if(f = " + name + ")\n");
+				replacewithExp.append("\\then( " + structName + "(");
+				for (int i = 0; i < fieldIndex; ++i) {
+					replacewithExp.append("p" + i + ",");
+				}
+				replacewithExp.append("(" + sort + ")" + writeStructName + "(p" + fieldIndex + "," + subtractedSequence + ",x)");
+				replacewithExp.append(",");
+				for (int i = fieldIndex + 1; i < numFields; ++i) {
+					replacewithExp.append("p" + i + ",");
+				}
+				replacewithExp.deleteCharAt(replacewithExp.length() - 1);
+				replacewithExp.append(") )\n");
+				replacewithExp.append("\\else( ");
+				if (fieldIndex == numFields - 2) {
+					replacewithExp.append(structName + "(");
+					for (int i = 0; i < numFields - 1; ++i) {
+						replacewithExp.append("p" + i + ",");
+					}
+					replacewithExp.append("(" + structSig.get(numFields - 1).sort + ")" + writeStructName + "(p" + String.valueOf(numFields - 1) + "," + subtractedSequence + ",x))");
+				}
+			}
+			for (int i = 0; i < numFields - 1; ++i) {
+				replacewithExp.append(")");
+			}
+		}
+		return replacewithExp.toString();
+	}
+	
+	
+	private String makeReadStructReplacewithExp(String structName, List<StructField> structSig, String subtractedSequence) {
+		final StringBuilder replacewithExp = new StringBuilder();
+		final int numFields = structSig.size();
+		if (numFields == 1) {
+			replacewithExp.append(genericType + "::" + readStructName + "(p0, " + subtractedSequence + ")");
+		} else {
+			for (int fieldIndex = 0; fieldIndex < numFields - 1; ++fieldIndex) {
+				String name = getStaticFieldRepr(structSig.get(fieldIndex).name);
+				replacewithExp.append("\\if(f = " + name + ")\n");
+				replacewithExp.append("\\then( " + genericType + "::" + readStructName + "(p" + fieldIndex + ", " + subtractedSequence + "))\n");
+				replacewithExp.append("\\else( ");
+				if (fieldIndex == numFields - 2) {
+					replacewithExp.append(genericType + "::" + readStructName + "(p" + String.valueOf(numFields - 1) + ", " + subtractedSequence + ")");
+				}
+			}
+			for (int i = 0; i < numFields - 1; ++i) {
+				replacewithExp.append(")");
+			}
+		}
+		return replacewithExp.toString();
+	}
+	
+	
+	// Turn a field string "MyContract::f" into "MyContract::$f"
+	private String getStaticFieldRepr(String field) {
+		int colonEndIndex = field.indexOf("::");
+		assert colonEndIndex != -1;
+		colonEndIndex += "::".length();
+		return field.substring(0, colonEndIndex) + "$" + field.substring(colonEndIndex);
+	}
+	
+	
+	private String makeTacletString(String ruleName,
+	                                String schemaVars,
+									String assumesExp,
+									String findExp,
+									String varcondExp,
+									String replacewithExp,
+									String addExp,
+									String displayName,
+									String heuristics)
+	{
+		return ("""                
+		$(ruleName) {
+		$(schemaVars)
+		$(assumes)
+		$(find)
+		$(varcond) 
+		$(replacewith)
+		$(add)
+		$(displayName)
+		$(heuristics)
+		};
+		""").replace("$(ruleName)", ruleName)
+			.replace("$(schemaVars)", schemaVars)
+			.replace("$(assumes)", assumesExp.equals("") ? "" : "\\assumes( " + assumesExp + " )")
+			.replace("$(find)", "\\find( " + findExp + " )")
+			.replace("$(varcond)", varcondExp.equals("") ? "" : "\\varcond( " + varcondExp + " )")
+			.replace("$(replacewith)", "\\replacewith( " + replacewithExp + " )")
+			.replace("$(add)", addExp.equals("") ? "" : "\\add( " + addExp + " )")
+			.replace("$(displayName)", displayName.equals("") ? "" : "\\displayname \"" + displayName + "\"")
+			.replace("$(heuristics)", heuristics.equals("") ? "" : "\\heuristics( " + heuristics + " )");
+	}
 
     
     private TacletGoalTemplate createAxiomGoalTemplate(Term goalTerm) {
