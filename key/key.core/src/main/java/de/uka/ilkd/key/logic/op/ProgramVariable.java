@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.logic.op;
 
 import java.io.IOException;
+import java.util.Objects;
 
 import org.key_project.util.ExtList;
 
@@ -304,4 +305,16 @@ public abstract class ProgramVariable extends AbstractSortedOperator
      */
     abstract public Operator rename(Name name);
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ProgramVariable that = (ProgramVariable) o;
+        return Objects.equals(name(), that.name()) && arity() == that.arity() && Objects.equals(whereToBind(), that.whereToBind()) && isRigid() == that.isRigid() && Objects.equals(sort(), that.sort()) && Objects.equals(argSorts(), that.argSorts()) && isStatic == that.isStatic && isModel == that.isModel && isGhost == that.isGhost && isFinal == that.isFinal && Objects.equals(type, that.type) && Objects.equals(containingType, that.containingType);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(type, isStatic, isModel, isGhost, isFinal, containingType);
+    }
 }
