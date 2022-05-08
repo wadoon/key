@@ -1,11 +1,16 @@
 package org.key_project.slicing;
 
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.RuleAppListener;
+import de.uka.ilkd.key.proof.init.AbstractPO;
+import de.uka.ilkd.key.proof.init.ProblemInitializer;
+import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.proofevent.NodeChangeAddFormula;
 import de.uka.ilkd.key.rule.IfFormulaInstSeq;
 import de.uka.ilkd.key.rule.PosTacletApp;
@@ -27,6 +32,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 public class DependencyTracker implements RuleAppListener {
+    private final KeYMediator mediator;
     private Proof proof;
     private final List<TrackedFormula> formulas = new ArrayList<>();
     private final Graph<GraphNode, DefaultEdge> graph = new DirectedMultigraph<>(DefaultEdge.class);
@@ -39,7 +45,8 @@ public class DependencyTracker implements RuleAppListener {
     // TODO: track proof pruning
     // TODO: investigate One Step Simplifications: their inputs are not recorded properly!
 
-    public DependencyTracker(Proof proof) {
+    public DependencyTracker(KeYMediator mediator, Proof proof) {
+        this.mediator = mediator;
         this.proof = proof;
     }
 
@@ -179,7 +186,7 @@ public class DependencyTracker implements RuleAppListener {
         return buf.toString();
     }
 
-    public AnalysisResults analyze(JComponent parent) {
+    public AnalysisResults analyze() {
         if (proof == null || !proof.closed()) {
             return null;
         }
@@ -240,7 +247,25 @@ public class DependencyTracker implements RuleAppListener {
         if (!analysisDone) {
             return null;
         }
-        Proof p = new Proof("reduced", proof.root().sequent().succedent().get(0).formula(), proof.header(), proof.getInitConfig().copy());
+        Proof p = null;
+        var it = proof.getServices().getSpecificationRepository().getProofOblInput(proof);
+        if (it != null) {
+            if (it instanceof AbstractPO) {
+                var po = ((AbstractPO) it).getNewPO();
+                try {
+                    new ProblemInitializer(mediator.getProfile()).setUpProofHelper(it, po);
+                    p = po.getFirstProof();
+                    p.getServices()
+                            .getSpecificationRepository().registerProof(it, p);
+                } catch (ProofInputException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        if (p == null) {
+            // note: this constructor only works for "simple" proof inputs (≈ pure logic)
+            p = new Proof("reduced", proof.root().sequent().succedent().get(0).formula(), proof.header(), proof.getInitConfig().copy());
+        }
         replayProof(p, proof.root());
         return p;
     }

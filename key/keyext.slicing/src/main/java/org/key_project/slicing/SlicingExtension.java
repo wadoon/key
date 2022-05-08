@@ -77,7 +77,7 @@ public class SlicingExtension implements KeYGuiExtension,
             public void selectedProofChanged(KeYSelectionEvent e) {
                 Proof newProof = mediator.getSelectedProof();
                 if (!trackers.containsKey(newProof)) {
-                    var tracker = new DependencyTracker(newProof);
+                    var tracker = new DependencyTracker(mediator, newProof);
                     newProof.addRuleAppListener(tracker);
                     trackers.put(newProof, tracker);
                 }
@@ -87,7 +87,7 @@ public class SlicingExtension implements KeYGuiExtension,
         });
         mediator.registerProofLoadListener(newProof -> {
             if (!trackers.containsKey(newProof)) {
-                var tracker = new DependencyTracker(newProof);
+                var tracker = new DependencyTracker(mediator, newProof);
                 newProof.addRuleAppListener(tracker);
                 trackers.put(newProof, tracker);
             }

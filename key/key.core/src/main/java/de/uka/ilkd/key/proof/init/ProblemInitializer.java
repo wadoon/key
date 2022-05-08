@@ -411,7 +411,7 @@ public final class ProblemInitializer {
         return initConfig;
     }
 
-    private void setUpProofHelper(ProofOblInput problem, ProofAggregate pl)
+    public void setUpProofHelper(ProofOblInput problem, ProofAggregate pl)
             throws ProofInputException {
         if (pl == null) {
             throw new ProofInputException("No proof");

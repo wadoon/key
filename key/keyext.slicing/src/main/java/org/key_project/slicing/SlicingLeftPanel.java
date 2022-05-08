@@ -144,7 +144,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel {
         if (extension.currentProof == null) {
             return;
         }
-        var results = extension.trackers.get(extension.currentProof).analyze((JComponent) e.getSource());
+        var results = extension.trackers.get(extension.currentProof).analyze();
         if (results != null) {
             displayResults(results);
         }
