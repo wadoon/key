@@ -558,6 +558,7 @@ public final class IssueDialog extends JDialog {
                 String causeMessage = exception.getCause().getMessage();
                 message = message == null ? causeMessage :
                     String.format("%s%n%nCaused by: %s", message, exception.getCause().toString());
+                exception.printStackTrace();
             }
 
             String resourceLocation = "";
