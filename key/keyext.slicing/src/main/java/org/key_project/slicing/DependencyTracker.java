@@ -10,10 +10,12 @@ import de.uka.ilkd.key.proof.RuleAppListener;
 import de.uka.ilkd.key.proof.init.AbstractPO;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.proofevent.NodeChangeAddFormula;
+import de.uka.ilkd.key.rule.IfFormulaInstDirect;
 import de.uka.ilkd.key.rule.IfFormulaInstSeq;
+import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.rule.PosTacletApp;
+import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.Pair;
 import org.jgrapht.Graph;
@@ -21,9 +23,9 @@ import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.DirectedMultigraph;
 import org.key_project.util.collection.ImmutableList;
 
-import javax.swing.*;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
@@ -43,28 +45,18 @@ public class DependencyTracker implements RuleAppListener {
     private final Set<TrackedFormula> usefulFormulas = new HashSet<>();
 
     // TODO: track proof pruning
-    // TODO: investigate One Step Simplifications: their inputs are not recorded properly!
 
     public DependencyTracker(KeYMediator mediator, Proof proof) {
         this.mediator = mediator;
         this.proof = proof;
     }
 
-    @Override
-    public void ruleApplied(ProofEvent e) {
-        var proof = e.getSource();
-        this.proof = proof;
-        var ruleAppInfo = e.getRuleAppInfo();
-        var ruleApp = ruleAppInfo.getRuleApp();
-        var goalList = e.getNewGoals();
-        var n = ruleAppInfo.getOriginalNode();
-        //System.out.println("processing rule app " + n.getAppliedRuleApp().rule().displayName());
-
-        var inputs = new ArrayList<PosInOccurrence>();
-        var outputs = new ArrayList<Pair<PosInOccurrence, String>>();
+    private static Set<PosInOccurrence> inputsOfRuleApp(RuleApp ruleApp) {
+        var inputs = new HashSet<PosInOccurrence>();
         if (ruleApp.posInOccurrence() != null) {
             inputs.add(ruleApp.posInOccurrence().topLevel());
-        } // some taclets don't have this kind of input, e.g. sign_case_distinction
+        }
+        // taclets with \find or similar
         if (ruleApp instanceof PosTacletApp) {
             var posTacletApp = (PosTacletApp) ruleApp;
             if (posTacletApp.ifFormulaInstantiations() != null) {
@@ -76,6 +68,27 @@ public class DependencyTracker implements RuleAppListener {
                 }
             }
         }
+        // built-ins need special treatment
+        if (ruleApp instanceof OneStepSimplifierRuleApp) {
+            var oss = (OneStepSimplifierRuleApp) ruleApp;
+            oss.ifInsts().forEach(inputs::add);
+        }
+        // TODO: other built-ins
+        return inputs;
+    }
+
+    @Override
+    public void ruleApplied(ProofEvent e) {
+        var proof = e.getSource();
+        this.proof = proof;
+        var ruleAppInfo = e.getRuleAppInfo();
+        var ruleApp = ruleAppInfo.getRuleApp();
+        var goalList = e.getNewGoals();
+        var n = ruleAppInfo.getOriginalNode();
+
+        var inputs = inputsOfRuleApp(ruleApp);
+        var outputs = new ArrayList<Pair<PosInOccurrence, String>>();
+
         int sibling = ruleAppInfo.getReplacementNodesList().size() - 1;
         for (var b : ruleAppInfo.getReplacementNodesList()) {
             String id = ruleAppInfo.getReplacementNodesList().size() > 1 ? ("" + sibling) : "";
@@ -138,6 +151,9 @@ public class DependencyTracker implements RuleAppListener {
             for (var out : output) {
                 graph.addVertex(in);
                 graph.addVertex(out);
+                if (graph.containsEdge(in, out)) {
+                    continue;
+                }
                 var edge = new DefaultEdge();
                 graph.addEdge(in, out, edge);
                 edgeData.put(edge, n);
