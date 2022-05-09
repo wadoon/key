@@ -49,13 +49,6 @@ public class SlicingExtension implements KeYGuiExtension,
         }
     };
 
-    private final ProofTreeListener proofTreeListener = new ProofTreeAdapter() {
-
-        public void proofPruned(de.uka.ilkd.key.proof.ProofTreeEvent e) {
-
-        }
-    };
-
     @Nonnull
     @Override
     public List<Action> getContextActions(@Nonnull KeYMediator mediator,
@@ -66,7 +59,6 @@ public class SlicingExtension implements KeYGuiExtension,
 
     @Override
     public void init(MainWindow window, KeYMediator mediator) {
-        System.out.println("init called");
         mediator.addKeYSelectionListener(new KeYSelectionListener() {
             @Override
             public void selectedNodeChanged(KeYSelectionEvent e) {
@@ -79,6 +71,7 @@ public class SlicingExtension implements KeYGuiExtension,
                 if (!trackers.containsKey(newProof)) {
                     var tracker = new DependencyTracker(mediator, newProof);
                     newProof.addRuleAppListener(tracker);
+                    newProof.addProofTreeListener(tracker);
                     trackers.put(newProof, tracker);
                 }
                 currentProof = newProof;

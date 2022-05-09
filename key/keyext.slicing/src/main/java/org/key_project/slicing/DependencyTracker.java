@@ -6,6 +6,8 @@ import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
+import de.uka.ilkd.key.proof.ProofTreeEvent;
+import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.proof.RuleAppListener;
 import de.uka.ilkd.key.proof.init.AbstractPO;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
@@ -33,7 +35,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
-public class DependencyTracker implements RuleAppListener {
+public class DependencyTracker implements RuleAppListener, ProofTreeListener {
     private final KeYMediator mediator;
     private Proof proof;
     private final List<TrackedFormula> formulas = new ArrayList<>();
@@ -43,8 +45,6 @@ public class DependencyTracker implements RuleAppListener {
     public AnalysisResults analysisResults = null;
     private final Set<Node> usefulSteps = new HashSet<>();
     private final Set<TrackedFormula> usefulFormulas = new HashSet<>();
-
-    // TODO: track proof pruning
 
     public DependencyTracker(KeYMediator mediator, Proof proof) {
         this.mediator = mediator;
@@ -161,6 +161,12 @@ public class DependencyTracker implements RuleAppListener {
         }
     }
 
+    @Override
+    public void proofPruned(ProofTreeEvent e) {
+        // TODO: clean up removed formulas / nodes /...
+        analysisDone = false;
+    }
+
     public String exportDot() {
         var buf = new StringBuilder();
         buf.append("digraph {\n");
@@ -209,6 +215,8 @@ public class DependencyTracker implements RuleAppListener {
         if (analysisDone) {
             return analysisResults;
         }
+        usefulSteps.clear();
+        usefulFormulas.clear();
         var queue = new ArrayDeque<Node>();
         for (var e : proof.closedGoals()) {
             queue.add(e.node().parent());
@@ -242,19 +250,6 @@ public class DependencyTracker implements RuleAppListener {
         }
 
         var steps = proof.countNodes() - proof.closedGoals().size();
-        /*
-        var window = SwingUtilities.getWindowAncestor(parent);
-        var dialog = new JDialog(window, "Analysis results");
-        var text = "Total steps: " + steps + "<br>"
-                + "Useful steps: " + usefulSteps.size() + "<br>"
-                + "Unnecessary steps: " + (steps - usefulSteps.size());
-        JEditorPane statisticsPane = new JEditorPane("text/html", text);
-        statisticsPane.setEditable(false);
-        dialog.add(statisticsPane);
-        dialog.pack();
-        dialog.setLocationRelativeTo(window);
-        dialog.setVisible(true);
-         */
         analysisResults = new AnalysisResults(steps, usefulSteps.size());
         return analysisResults;
     }
