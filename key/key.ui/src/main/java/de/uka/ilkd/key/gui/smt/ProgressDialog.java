@@ -25,18 +25,7 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.AbstractCellEditor;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
+import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.plaf.basic.BasicProgressBarUI;
 import javax.swing.table.TableCellEditor;
@@ -48,8 +37,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.smt.ProgressModel.ProcessColumn.ProcessData;
 import de.uka.ilkd.key.gui.smt.ProgressTable.ProgressTableListener;
-
-
+import de.uka.ilkd.key.gui.utilities.ClickableMessageBox;
 
 
 public class ProgressDialog extends JDialog{
@@ -161,7 +149,7 @@ public class ProgressDialog extends JDialog{
 
         	if(statusMessages == null){
         		statusMessages = new ClickableMessageBox();
-           		statusMessages.add(new ClickableMessageBoxListener() {
+                statusMessages.add(new ClickableMessageBox.ClickableMessageBoxListener() {
 					
 					@Override
 					public void eventMessageClicked(Object object) {
@@ -200,7 +188,7 @@ public class ProgressDialog extends JDialog{
                         listener.focusButtonClicked();
                     } catch(Exception exception) {
                         // There may be exceptions during rule application that should not be lost.
-                        ExceptionDialog.showDialog(ProgressDialog.this, exception);
+                        IssueDialog.showExceptionDialog(ProgressDialog.this, exception);
                     }
                 }
             });
