@@ -102,11 +102,10 @@ public class JMLSpecFactory {
             final ImmutableList<LocationVariable> allHeaps, final TermBuilder tb) {
         Map<LocationVariable, Term> atPres = new LinkedHashMap<>();
         for (LocationVariable heap : allHeaps) {
-            atPres.put(heap, tb.var(tb.heapAtPreVar(heap + AT_PRE, heap.sort(), false)));
+            atPres.put(heap, tb.var(tb.atPreVar(heap.toString(), heap.sort(), false)));
         }
         for (LocationVariable param : paramVars) {
-            // TODO rename heapAtPreVar
-            atPres.put(param, tb.var(tb.heapAtPreVar(param + AT_PRE, param.sort(), false)));
+            atPres.put(param, tb.var(tb.atPreVar(param.toString(), param.sort(), false)));
         }
         return atPres;
     }
@@ -345,7 +344,7 @@ public class JMLSpecFactory {
         progVar.atPreVars = new LinkedHashMap<>();
         progVar.atPres = new LinkedHashMap<>();
         for (LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-            LocationVariable lv = tb.heapAtPreVar(h + AT_PRE, h.sort(), false);
+            LocationVariable lv = tb.atPreVar(h.toString(), h.sort(), false);
             progVar.atPreVars.put(h, lv);
             progVar.atPres.put(h, tb.var(lv));
         }
@@ -429,7 +428,7 @@ public class JMLSpecFactory {
                 axioms.isEmpty() //either the list is empty
                         || (axioms.size() == 1 //or the first element is an empty method_decl
                         && axioms.head().first instanceof JmlParser.Method_declarationContext
-                        && ((JmlParser.Method_declarationContext) axioms.head().first).BODY() == null);
+                        && ((JmlParser.Method_declarationContext) axioms.head().first).method_body() == null);
         if (empty) {
             clauses.axioms.put(heap, null);
         } else {
@@ -1305,10 +1304,10 @@ public class JMLSpecFactory {
             final Map<LocationVariable, Term> atPres = new LinkedHashMap<>();
             final ImmutableList<LocationVariable> allHeaps
                     = services.getTypeConverter().getHeapLDT().getAllHeaps();
-            final String atPrePrefix = AT_PRE;
-            allHeaps.forEach(heap -> atPres.put(heap, tb.var(tb.heapAtPreVar(heap + atPrePrefix, heap.sort(), false))));
+            allHeaps.forEach(heap -> atPres.put(heap, tb.var(tb.atPreVar(heap.toString(),
+                    heap.sort(), false))));
             params.forEach(param -> atPres.put(param,
-                    tb.var(tb.heapAtPreVar(param + atPrePrefix, param.sort(), false))));
+                    tb.var(tb.atPreVar(param.toString(), param.sort(), false))));
 
             final MergeParamsSpec specs = jmlIo
                     .clear()
@@ -1436,6 +1435,37 @@ public class JMLSpecFactory {
                 clauses.infFlowSpecs, clauses.breaks, clauses.continues, clauses.returns,
                 clauses.signals, clauses.signalsOnly, clauses.diverges, clauses.assignables,
                 clauses.hasMod, clauses.decreases, services).create();
+    }
+
+    /**
+     * Translates the condition Term of a JmlAssert statement.
+     *
+     * @param jmlAssert the statement to create the condition for
+     * @param pm the enclosing method
+     */
+    public void translateJmlAssertCondition(final JmlAssert jmlAssert, final IProgramMethod pm) {
+        final Map<LocationVariable, LocationVariable> atPreVars = new LinkedHashMap<>();
+        for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            atPreVars.put(heap, tb.atPreVar(heap.toString(), heap.sort(), true));
+        }
+        final ImmutableList<LocationVariable> parameters = pm.collectParameters();
+        for (LocationVariable parameter : parameters) {
+            atPreVars.put(parameter, tb.atPreVar(parameter.toString(),
+                    parameter.getKeYJavaType(), true));
+        }
+        final ImmutableList<ProgramVariable> paramVars =
+                append(collectLocalVariablesVisibleTo(jmlAssert, pm), parameters);
+        final ProgramVariableCollection pv = new ProgramVariableCollection(
+                tb.selfVar(pm, pm.getContainerType(), false),
+                paramVars,
+                tb.resultVar(pm, false),
+                tb.excVar(pm, false),
+                atPreVars,
+                termify(atPreVars),
+                Collections.emptyMap(), // should be the pre-state of the enclosing contract
+                Collections.emptyMap()  // ignore for now
+        );
+        jmlAssert.translateCondition(jmlIo.classType(pm.getContainerType()), pv);
     }
 
     /**

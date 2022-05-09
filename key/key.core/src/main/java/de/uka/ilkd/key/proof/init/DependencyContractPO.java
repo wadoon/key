@@ -180,7 +180,7 @@ public final class DependencyContractPO extends AbstractPO
           }
           heaps.add(h);
           LocationVariable preVar = twoState ?
-                tb.heapAtPreVar(h.name()+"AtPre", h.sort(), true)
+                tb.atPreVar(h.name().toString(), h.sort(), true)
                 : null ;
                 if(preVar != null) { register(preVar, proofServices); heaps.add(preVar); }
                 preHeapVars.put(h, preVar);
@@ -245,7 +245,7 @@ public final class DependencyContractPO extends AbstractPO
              buildFreePre(heaps, selfVar,
                    contract.getKJT(), paramVars, wellFormedHeaps, proofServices),
                    permsFor, contract.getPre(heapLDT.getHeap(), selfVar, paramVars,
-                         null, proofServices));
+                         preHeapVars, proofServices));
 
        assert heaps.size() == heapCount * contract.getTarget().getStateCount();
        //prepare target term

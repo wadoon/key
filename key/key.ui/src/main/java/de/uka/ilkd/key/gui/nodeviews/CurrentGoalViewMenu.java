@@ -52,7 +52,7 @@ import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.settings.SMTSettings;
+import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
@@ -68,14 +68,14 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
     private static final long serialVersionUID = 8151230546928796116L;
 
     private static final String INTRODUCE_AXIOM_TACLET_NAME = "introduceAxiom";
-    private static final String CREATE_ABBREVIATION = "Create abbreviation";
+    private static final String CREATE_ABBREVIATION = "Create abbreviation...";
     private static final String ENABLE_ABBREVIATION = "Enable abbreviation";
     private static final String DISABLE_ABBREVIATION = "Disable abbreviation";
-    private static final String CHANGE_ABBREVIATION = "Change abbreviation";
+    private static final String CHANGE_ABBREVIATION = "Change abbreviation...";
     private static final String MORE_RULES = "More rules";
     private static final String APPLY_CONTRACT = "Apply Contract";
-    private static final String CHOOSE_AND_APPLY_CONTRACT = "Choose and Apply Contract";
-    private static final String ENTER_LOOP_SPECIFICATION = "Enter Loop Specification";
+    private static final String CHOOSE_AND_APPLY_CONTRACT = "Choose and Apply Contract...";
+    private static final String ENTER_LOOP_SPECIFICATION = "Enter Loop Specification...";
     private static final String APPLY_RULE = "Apply Rule";
     private static final String NO_RULES_APPLICABLE = "No rules applicable.";
 
@@ -553,7 +553,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                 assert goal != null;
 
                 Thread thread = new Thread(() -> {
-                    SMTSettings settings = new SMTSettings(goal.proof().getSettings().getSMTSettings(),
+                    DefaultSMTSettings settings = new DefaultSMTSettings(goal.proof().getSettings().getSMTSettings(),
                             ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
                             goal.proof().getSettings().getNewSMTSettings(),
                             goal.proof());
@@ -574,7 +574,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                 // No functionality is allowed in this method body!
                 mediator.getUI().getProofControl().selectedBuiltInRule(mediator.getSelectedGoal(),
                         birmi.connectedTo(), getPos().getPosInOccurrence(),
-                        birmi.forcedApplication());
+                        birmi.forcedApplication(), true);
 
             } else if (e.getSource() instanceof FocussedRuleApplicationMenuItem) {
                 mediator.getUI().getProofControl().startFocussedAutoMode(
