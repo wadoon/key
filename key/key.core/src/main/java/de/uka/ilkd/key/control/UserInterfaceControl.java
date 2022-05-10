@@ -6,6 +6,7 @@ import java.util.Properties;
 
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.RuleAppListener;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
@@ -62,13 +63,14 @@ public interface UserInterfaceControl {
      * @return The opened {@link AbstractProblemLoader}.
      * @throws ProblemLoaderException Occurred Exception.
      */
-    AbstractProblemLoader load(Profile profile, 
-                               File file, 
-                               List<File> classPaths, 
-                               File bootClassPath, 
+    AbstractProblemLoader load(Profile profile,
+                               File file,
+                               List<File> classPaths,
+                               File bootClassPath,
                                List<File> includes,
-                               Properties poPropertiesToForce, 
-                               boolean forceNewProfileOfNewProofs) throws ProblemLoaderException;
+                               Properties poPropertiesToForce,
+                               boolean forceNewProfileOfNewProofs,
+                               RuleAppListener ruleAppListener) throws ProblemLoaderException;
     
     /**
      * Instantiates a new {@link Proof} in this {@link UserInterfaceControl} for the given

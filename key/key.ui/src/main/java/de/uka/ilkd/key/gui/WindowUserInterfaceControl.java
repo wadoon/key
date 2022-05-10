@@ -8,6 +8,7 @@ import java.util.Properties;
 
 import javax.swing.*;
 
+import de.uka.ilkd.key.proof.RuleAppListener;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.control.AbstractProofControl;
@@ -325,18 +326,19 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
     */
    @Override
    public AbstractProblemLoader load(Profile profile,
-                                    File file,
-                                    List<File> classPath,
-                                    File bootClassPath,
-                                    List<File> includes,
-                                    Properties poPropertiesToForce,
-                                    boolean forceNewProfileOfNewProofs) throws ProblemLoaderException {
+                                     File file,
+                                     List<File> classPath,
+                                     File bootClassPath,
+                                     List<File> includes,
+                                     Properties poPropertiesToForce,
+                                     boolean forceNewProfileOfNewProofs,
+                                     RuleAppListener ruleAppListener) throws ProblemLoaderException {
       if (file != null) {
          mainWindow.getRecentFiles().addRecentFile(file.getAbsolutePath());
       }
       try {
          getMediator().stopInterface(true);
-         return super.load(profile, file, classPath, bootClassPath, includes, poPropertiesToForce, forceNewProfileOfNewProofs);
+         return super.load(profile, file, classPath, bootClassPath, includes, poPropertiesToForce, forceNewProfileOfNewProofs, null);
       }
       finally {
          getMediator().startInterface(true);
@@ -564,7 +566,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
       if (makeMainWindowVisible && !main.isVisible()) {
           main.setVisible(true);
       }
-      AbstractProblemLoader loader = main.getUserInterface().load(profile, location, classPaths, bootClassPath, includes, null, forceNewProfileOfNewProofs);
+      AbstractProblemLoader loader = main.getUserInterface().load(profile, location, classPaths, bootClassPath, includes, null, forceNewProfileOfNewProofs, null);
       InitConfig initConfig = loader.getInitConfig();
       return new KeYEnvironment<WindowUserInterfaceControl>(main.getUserInterface(), initConfig,
           loader.getProof(), loader.getProofScript(), loader.getResult());

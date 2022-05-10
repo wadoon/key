@@ -3,7 +3,6 @@ package org.key_project.slicing;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
-import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuAdapter;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
@@ -11,17 +10,9 @@ import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofTreeAdapter;
-import de.uka.ilkd.key.proof.ProofTreeListener;
 
 import javax.annotation.Nonnull;
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -69,7 +60,7 @@ public class SlicingExtension implements KeYGuiExtension,
             public void selectedProofChanged(KeYSelectionEvent e) {
                 Proof newProof = mediator.getSelectedProof();
                 if (!trackers.containsKey(newProof)) {
-                    var tracker = new DependencyTracker(mediator, newProof);
+                    var tracker = new DependencyTracker();
                     newProof.addRuleAppListener(tracker);
                     newProof.addProofTreeListener(tracker);
                     trackers.put(newProof, tracker);
@@ -80,7 +71,7 @@ public class SlicingExtension implements KeYGuiExtension,
         });
         mediator.registerProofLoadListener(newProof -> {
             if (!trackers.containsKey(newProof)) {
-                var tracker = new DependencyTracker(mediator, newProof);
+                var tracker = new DependencyTracker();
                 newProof.addRuleAppListener(tracker);
                 trackers.put(newProof, tracker);
             }

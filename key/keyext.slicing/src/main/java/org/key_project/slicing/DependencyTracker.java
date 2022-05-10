@@ -13,12 +13,12 @@ import de.uka.ilkd.key.proof.init.AbstractPO;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.proofevent.NodeChangeAddFormula;
-import de.uka.ilkd.key.rule.IfFormulaInstDirect;
 import de.uka.ilkd.key.rule.IfFormulaInstSeq;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.util.Pair;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultEdge;
@@ -36,7 +36,6 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 public class DependencyTracker implements RuleAppListener, ProofTreeListener {
-    private final KeYMediator mediator;
     private Proof proof;
     private final List<TrackedFormula> formulas = new ArrayList<>();
     private final Graph<GraphNode, DefaultEdge> graph = new DirectedMultigraph<>(DefaultEdge.class);
@@ -46,9 +45,8 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
     private final Set<Node> usefulSteps = new HashSet<>();
     private final Set<TrackedFormula> usefulFormulas = new HashSet<>();
 
-    public DependencyTracker(KeYMediator mediator, Proof proof) {
-        this.mediator = mediator;
-        this.proof = proof;
+    public DependencyTracker() {
+        GeneralSettings.noPruningClosed = false;
     }
 
     private static Set<PosInOccurrence> inputsOfRuleApp(RuleApp ruleApp) {
@@ -79,8 +77,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
 
     @Override
     public void ruleApplied(ProofEvent e) {
-        var proof = e.getSource();
-        this.proof = proof;
+        this.proof = e.getSource();
         var ruleAppInfo = e.getRuleAppInfo();
         var ruleApp = ruleAppInfo.getRuleApp();
         var goalList = e.getNewGoals();
@@ -264,7 +261,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
             if (it instanceof AbstractPO) {
                 var po = ((AbstractPO) it).getNewPO();
                 try {
-                    new ProblemInitializer(mediator.getProfile()).setUpProofHelper(it, po);
+                    new ProblemInitializer(proof.getServices().getProfile()).setUpProofHelper(it, po);
                     p = po.getFirstProof();
                     p.getServices()
                             .getSpecificationRepository().registerProof(it, p);

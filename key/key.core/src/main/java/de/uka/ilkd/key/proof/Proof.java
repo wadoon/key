@@ -1228,6 +1228,9 @@ public class Proof implements Named {
     }
 
     public void addRuleAppListener(RuleAppListener p) {
+        if (p == null) {
+            return;
+        }
         synchronized (ruleAppListenerList) {
             ruleAppListenerList.add(p);
         }

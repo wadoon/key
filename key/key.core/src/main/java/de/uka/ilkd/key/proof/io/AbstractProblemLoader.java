@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipFile;
 
 import de.uka.ilkd.key.nparser.KeYLexer;
+import de.uka.ilkd.key.proof.RuleAppListener;
 import org.antlr.runtime.MismatchedTokenException;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.reflection.ClassLoaderUtil;
@@ -263,6 +264,7 @@ public abstract class AbstractProblemLoader {
         ProofAggregate proofList = null;
         try {
             if (poContainer == null) {
+                // TODO: pass ruleAppListener along
                 if (askUiToSelectAProofObligationIfNotDefinedByLoadedFile) {
                     selectAndLoadProof(control, initConfig);
                 }
