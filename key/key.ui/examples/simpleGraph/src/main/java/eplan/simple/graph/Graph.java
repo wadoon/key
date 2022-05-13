@@ -41,6 +41,14 @@ public class Graph {
       @ ensures \disjoint(e.footprint, f.footprint);
       @*/
     public /*@ helper @*/ void test(Edge e, Edge f) {
+        NodeList nl = new NodeList();
+        Node n1 = new Node(1);
+        Node n2 = new Node(2);
+        nl.add(n1);
+        nl.add(n2);
+        n2.id = 1;
+        Node n3 = new Node(3);
+        nl.add(n3);
 
     }
 

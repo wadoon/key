@@ -7,7 +7,7 @@ public final class Node {
     //@ public model \locset footprint;
     //@ public accessible footprint: footprint;
     //@ public accessible \inv: footprint;
-    final private /*@ spec_public @*/ int id;
+    public /*@ spec_public @*/ int id;
 
     /*@ public invariant \subset(this.footprint, this.*); @*/
 

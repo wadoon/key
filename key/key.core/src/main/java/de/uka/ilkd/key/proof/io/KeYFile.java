@@ -326,12 +326,12 @@ public class KeYFile implements EnvInput {
         readRules();
         SpecificationRepository specRepos
                 = initConfig.getServices().getSpecificationRepository();
-        ContractsAndInvariantsFinder cinvs =
-                new ContractsAndInvariantsFinder(initConfig.getServices(), initConfig.namespaces());
-        getParseContext().accept(cinvs);
-        specRepos.addContracts(ImmutableSet.fromCollection(cinvs.getContracts()));
-        specRepos.addClassInvariants(ImmutableSet.fromCollection(cinvs.getInvariants()));
-        LOGGER.debug("Read KeY file {}", file);
+      //  ContractsAndInvariantsFinder cinvs =
+      //          new ContractsAndInvariantsFinder(initConfig.getServices(), initConfig.namespaces());
+       // getParseContext().accept(cinvs);
+       // specRepos.addContracts(ImmutableSet.fromCollection(cinvs.getContracts()));
+       // specRepos.addClassInvariants(ImmutableSet.fromCollection(cinvs.getInvariants()));
+       // LOGGER.debug("Read KeY file {}", file);
         return warnings;
     }
 
