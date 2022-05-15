@@ -371,7 +371,6 @@ public class StateVars {
         }
         final TermBuilder tb = services.getTermBuilder();
         Term selfVar = tb.var(tb.selfVar(pm, kjt, true, postfix));
-        register(selfVar.op(ProgramVariable.class), services);
         return selfVar;
     }
 
