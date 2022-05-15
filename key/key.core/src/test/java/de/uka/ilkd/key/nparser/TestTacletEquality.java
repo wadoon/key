@@ -84,7 +84,7 @@ public class TestTacletEquality {
             SingleThreadProblemLoader loader = new SingleThreadProblemLoader(
                     file, null, null, null, JavaProfile.getDefaultInstance(),
                     true, control, false, null);
-            loader.load();
+            loader.load(null);
             initConfig = loader.getInitConfig();
             //uncomment the line, if you want to generate a new oracle file
             //createNewOracle();

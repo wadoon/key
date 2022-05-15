@@ -3,6 +3,7 @@ package org.key_project.slicing;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
+import de.uka.ilkd.key.settings.GeneralSettings;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.key_project.util.helper.FindResources;
@@ -14,6 +15,8 @@ public class EndToEndTests {
 
     @Test
     public void SliceAgatha() throws Exception {
+        boolean oldValue = GeneralSettings.noPruningClosed;
+        GeneralSettings.noPruningClosed = false;
         // Load proof
         File proofFile = new File(testCaseDirectory, "/agatha.proof");
         Assertions.assertTrue(proofFile.exists());
@@ -34,5 +37,6 @@ public class EndToEndTests {
         finally {
             environment.dispose();
         }
+        GeneralSettings.noPruningClosed = oldValue;
     }
 }

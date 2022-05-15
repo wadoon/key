@@ -55,7 +55,7 @@ public abstract class AbstractSort implements Sort {
 
     @Override
     public final boolean extendsTrans(Sort sort) {
-        if (sort == this) {
+        if (sort == this || sort.name().equals(this.name())) {
             return true;
         } else if (this == Sort.FORMULA || this == Sort.UPDATE) {
             return false;

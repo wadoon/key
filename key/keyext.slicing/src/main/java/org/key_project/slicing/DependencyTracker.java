@@ -3,6 +3,7 @@ package org.key_project.slicing;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
@@ -13,11 +14,16 @@ import de.uka.ilkd.key.proof.init.AbstractPO;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.proofevent.NodeChangeAddFormula;
+import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.IfFormulaInstSeq;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.merge.CloseAfterMergeRuleBuiltInRuleApp;
+import de.uka.ilkd.key.rule.merge.MergeRule;
+import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.util.Pair;
 import org.jgrapht.Graph;
@@ -25,6 +31,8 @@ import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.DirectedMultigraph;
 import org.key_project.util.collection.ImmutableList;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -44,9 +52,10 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
     public AnalysisResults analysisResults = null;
     private final Set<Node> usefulSteps = new HashSet<>();
     private final Set<TrackedFormula> usefulFormulas = new HashSet<>();
+    private final Set<Goal> ignoredGoals = new HashSet<>();
 
     public DependencyTracker() {
-        GeneralSettings.noPruningClosed = false;
+        //GeneralSettings.noPruningClosed = false;
     }
 
     private static Set<PosInOccurrence> inputsOfRuleApp(RuleApp ruleApp) {
@@ -255,6 +264,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         if (!analysisDone) {
             return null;
         }
+        ignoredGoals.clear();
         Proof p = null;
         var it = proof.getServices().getSpecificationRepository().getProofOblInput(proof);
         if (it != null) {
@@ -283,10 +293,39 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
             return;
         }
         if (usefulSteps.contains(node) || node.childrenCount() > 1) { // TODO: cut elimination
-            //System.out.println("at node " + node.serialNr() + " " + node.getAppliedRuleApp().rule().displayName());
+            System.out.println("at node " + node.serialNr() + " " + node.getAppliedRuleApp().rule().displayName());
+            if (node.getAppliedRuleApp().rule().displayName().equals("deleteMergePoint") || true) {
+                try {
+                    p.saveToFile(new File("/tmp/beforeApplying" + node.serialNr() + ".proof"));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    throw new RuntimeException("aaah");
+                }
+            }
             //System.out.println("applying..");
             var app = node.getAppliedRuleApp();
-            p.openGoals().head().apply(app);
+            if (app instanceof MergeRuleBuiltInRuleApp) {
+                // re-construct merge rule
+                var pio = app.posInOccurrence();
+
+                var newApp = MergeRule.INSTANCE.createApp(pio, p.getServices());
+
+                if (!newApp.complete()) {
+                    //newApp = newApp.setIfInsts(app.ifInsts());
+                    // TODO: check for force ?
+                    final boolean force = true;
+                    newApp = newApp.forceInstantiate(p.openGoals().stream().filter(it -> !ignoredGoals.contains(it)).findFirst().get());
+                }
+                app = newApp;
+            }
+            if (app instanceof CloseAfterMergeRuleBuiltInRuleApp) {
+                var toIgnore = p.openGoals().stream().filter(it -> !ignoredGoals.contains(it)).findFirst().get();
+                ignoredGoals.add(toIgnore);
+                // this goal will be closed automatically when the merge is complete
+                // CloseAfterMerge applications are done by the MergeRule!
+            } else {
+                p.openGoals().stream().filter(it -> !ignoredGoals.contains(it)).findFirst().get().apply(app);
+            }
         }
         if (node.childrenCount() > 1) {
             List<Node> nodes = new ArrayList<>();

@@ -6,6 +6,8 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 
+import java.util.Objects;
+
 
 /**
  * Objects of this class represent function and predicate symbols. Note
@@ -158,5 +160,18 @@ public class Function extends AbstractSortedOperator {
 
     public Function rename(Name newName) {
         return new Function(newName, sort(), argSorts(), whereToBind(), unique, skolemConstant);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Function that = (Function) o;
+        return unique == that.unique && skolemConstant == that.skolemConstant && Objects.equals(name(), that.name()) && arity() == that.arity() && Objects.equals(whereToBind(), that.whereToBind()) && isRigid() == that.isRigid() && Objects.equals(sort(), that.sort()) && Objects.equals(argSorts(), that.argSorts());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(unique, skolemConstant, name());
     }
 }

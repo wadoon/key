@@ -76,6 +76,7 @@ public class ProofSaver extends OutputStreamProofSaver {
       catch (RuntimeException e) {
          errorMsg = e.toString();
          e.printStackTrace();
+         throw e;
       }
       fireProofSaved(new ProofSaverEvent(this, filename(), errorMsg));
       return errorMsg;
