@@ -17,6 +17,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import de.uka.ilkd.key.rule.OneStepSimplifier;
+import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -693,6 +695,10 @@ public class IntermediateProofReplayer {
             }
         }
         ourApp = ruleApps.iterator().next();
+        if (ourApp instanceof OneStepSimplifierRuleApp) {
+            ourApp.setIfInsts(builtinIfInsts);
+            ((OneStepSimplifierRuleApp) ourApp).restrictedIfInsts = true;
+        }
         builtinIfInsts = null;
         return ourApp;
     }

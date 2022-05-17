@@ -3,7 +3,8 @@ package de.uka.ilkd.key.rule;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 
 public class OneStepSimplifierRuleApp extends DefaultBuiltInRuleApp {
-    
+
+    public boolean restrictedIfInsts = false;
     private OneStepSimplifier.Protocol protocol;
 
     protected OneStepSimplifierRuleApp(BuiltInRule builtInRule, PosInOccurrence pio) {

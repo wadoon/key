@@ -1,12 +1,15 @@
 package de.uka.ilkd.key.rule;
 
 import java.util.ArrayList;
+import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import de.uka.ilkd.key.logic.Semisequent;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -625,10 +628,33 @@ public final class OneStepSimplifier implements BuiltInRule {
 
         Protocol protocol = new Protocol();
 
+        var seq = goal.sequent();
+        if (((OneStepSimplifierRuleApp) ruleApp).restrictedIfInsts) {
+            var ifInsts = ((OneStepSimplifierRuleApp) ruleApp).ifInsts();
+            ImmutableList<SequentFormula> anteFormulas = ImmutableSLList.nil();
+            ImmutableList<SequentFormula> succFormulas = ImmutableSLList.nil();
+            if (ifInsts != null) {
+                for (var it : ifInsts) {
+                    if (it.isInAntec()) {
+                        anteFormulas = anteFormulas.prepend(it.sequentFormula());
+                    } else {
+                        succFormulas = succFormulas.prepend(it.sequentFormula());
+                    }
+                }
+            }
+            if (pos.isInAntec()) {
+                anteFormulas = anteFormulas.prepend(pos.sequentFormula());
+            } else {
+                succFormulas = succFormulas.prepend(pos.sequentFormula());
+            }
+            var antecedent = new Semisequent(anteFormulas);
+            var succedent = new Semisequent(succFormulas);
+            seq = Sequent.createSequent(antecedent, succedent);
+        }
         // get instantiation
         final Instantiation inst = computeInstantiation(services,
                                                         pos,
-                                                        goal.sequent(),
+                                                        seq,
                                                         protocol,
                                                         goal,
                                                         ruleApp);
