@@ -370,7 +370,7 @@ public class Semisequent implements Iterable<SequentFormula> {
         ImmutableList<SequentFormula> searchList = seqList;
         int index = 0;
         while (!searchList.isEmpty()) {
-            if (searchList.head() == sequentFormula || searchList.head().equals(sequentFormula)) {
+            if (searchList.head() == sequentFormula) { // || searchList.head().equals(sequentFormula)) {
                 return index;
             }
             searchList = searchList.tail();

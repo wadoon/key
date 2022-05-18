@@ -1,8 +1,9 @@
 package org.key_project.slicing;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.Semisequent;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -14,28 +15,23 @@ import de.uka.ilkd.key.proof.init.AbstractPO;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.proofevent.NodeChangeAddFormula;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.IfFormulaInstSeq;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.merge.CloseAfterMergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
-import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.util.Pair;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.DirectedMultigraph;
 import org.key_project.util.collection.ImmutableList;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
@@ -48,17 +44,20 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
     private final List<TrackedFormula> formulas = new ArrayList<>();
     private final Graph<GraphNode, DefaultEdge> graph = new DirectedMultigraph<>(DefaultEdge.class);
     private final Map<DefaultEdge, Node> edgeData = new IdentityHashMap<>();
+    private final Map<Node, Node> edgeDependencies = new IdentityHashMap<>();
     private boolean analysisDone = false;
     public AnalysisResults analysisResults = null;
     private final Set<Node> usefulSteps = new HashSet<>();
     private final Set<TrackedFormula> usefulFormulas = new HashSet<>();
     private final Set<Goal> ignoredGoals = new HashSet<>();
 
+    private final Map<Node, Node> replayedNodes = new IdentityHashMap<>();
+
     public DependencyTracker() {
         //GeneralSettings.noPruningClosed = false;
     }
 
-    private static Set<PosInOccurrence> inputsOfRuleApp(RuleApp ruleApp) {
+    private static Set<PosInOccurrence> inputsOfRuleApp(RuleApp ruleApp, Node node) {
         var inputs = new HashSet<PosInOccurrence>();
         if (ruleApp.posInOccurrence() != null) {
             inputs.add(ruleApp.posInOccurrence().topLevel());
@@ -80,6 +79,15 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
             var oss = (OneStepSimplifierRuleApp) ruleApp;
             oss.ifInsts().forEach(inputs::add);
         }
+        if (ruleApp instanceof MergeRuleBuiltInRuleApp || ruleApp instanceof CloseAfterMergeRuleBuiltInRuleApp) {
+            // add all formulas as inputs
+            node.sequent().antecedent().iterator().forEachRemaining(it -> {
+                inputs.add(new PosInOccurrence(it, PosInTerm.getTopLevel(), true));
+            });
+            node.sequent().succedent().iterator().forEachRemaining(it -> {
+                inputs.add(new PosInOccurrence(it, PosInTerm.getTopLevel(), false));
+            });
+        }
         // TODO: other built-ins
         return inputs;
     }
@@ -91,8 +99,17 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         var ruleApp = ruleAppInfo.getRuleApp();
         var goalList = e.getNewGoals();
         var n = ruleAppInfo.getOriginalNode();
+        System.out.println("applied node " + n.serialNr());
 
-        var inputs = inputsOfRuleApp(ruleApp);
+        var rule = n.getAppliedRuleApp().rule();
+        if (rule instanceof Taclet) {
+            var taclet = (Taclet) rule;
+            if (taclet.getAddedBy() != null) {
+                edgeDependencies.put(n, taclet.getAddedBy());
+            }
+        }
+
+        var inputs = inputsOfRuleApp(ruleApp, n);
         var outputs = new ArrayList<Pair<PosInOccurrence, String>>();
 
         int sibling = ruleAppInfo.getReplacementNodesList().size() - 1;
@@ -243,6 +260,9 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
             for (var in : data.inputs) {
                 graph.incomingEdgesOf(in).stream().map(edgeData::get).forEach(queue::add);
             }
+            if (edgeDependencies.get(node) != null) {
+                queue.add(edgeDependencies.get(node));
+            }
         }
         analysisDone = true;
 
@@ -265,6 +285,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
             return null;
         }
         ignoredGoals.clear();
+        replayedNodes.clear();
         Proof p = null;
         var it = proof.getServices().getSpecificationRepository().getProofOblInput(proof);
         if (it != null) {
@@ -284,6 +305,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
             // note: this constructor only works for "simple" proof inputs (≈ pure logic)
             p = new Proof("reduced", proof.root().sequent().succedent().get(0).formula(), proof.header(), proof.getInitConfig().copy());
         }
+        //p.root().setSequent(proof.root().sequent());
         replayProof(p, proof.root());
         return p;
     }
@@ -294,6 +316,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         }
         if (usefulSteps.contains(node) || node.childrenCount() > 1) { // TODO: cut elimination
             System.out.println("at node " + node.serialNr() + " " + node.getAppliedRuleApp().rule().displayName());
+            /*
             if (node.getAppliedRuleApp().rule().displayName().equals("deleteMergePoint") || true) {
                 try {
                     p.saveToFile(new File("/tmp/beforeApplying" + node.serialNr() + ".proof"));
@@ -302,6 +325,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
                     throw new RuntimeException("aaah");
                 }
             }
+             */
             //System.out.println("applying..");
             var app = node.getAppliedRuleApp();
             if (app instanceof MergeRuleBuiltInRuleApp) {
@@ -324,7 +348,54 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
                 // this goal will be closed automatically when the merge is complete
                 // CloseAfterMerge applications are done by the MergeRule!
             } else {
-                p.openGoals().stream().filter(it -> !ignoredGoals.contains(it)).findFirst().get().apply(app);
+                var goal = p.openGoals().stream().filter(it -> !ignoredGoals.contains(it)).findFirst().get();
+                // fix sequent object identity
+                var origSequent = node.sequent();
+                var ourSequent = goal.sequent();
+                var origSemisequents = new Semisequent[] { origSequent.antecedent(), origSequent.succedent() };
+                var ourSemisequents = new Semisequent[] { ourSequent.antecedent(), ourSequent.succedent() };
+                var idx = 1;
+                for (int j = 0; j < origSemisequents.length; j++) {
+                    var origAnte = origSemisequents[j];
+                    var ourAnte = ourSemisequents[j];
+                    for (int i = 0; i < ourAnte.size(); i++) {
+                        var pio = PosInOccurrence.findInSequent(ourSequent, idx, PosInTerm.getTopLevel());
+                        if (!origAnte.contains(pio.sequentFormula())) {
+                            // replace with equal object
+                            for (var origFormula : origAnte.asList()) {
+                                if (origFormula.realEquals(pio.sequentFormula())) {
+                                    ourAnte = ourAnte.replace(i, origFormula).semisequent();
+                                    if (!origFormula.toString().equals(pio.sequentFormula().toString())) {
+                                        System.err.println("catastrophic failure");
+                                    }
+                                }
+                            }
+                        }
+                        idx++;
+                    }
+                    ourSemisequents[j] = ourAnte;
+                }
+                goal.node().setSequent(Sequent.createSequent(ourSemisequents[0], ourSemisequents[1]));
+                replayedNodes.put(node, goal.node());
+                if (edgeDependencies.containsKey(node)) {
+                    // find the correct rule app
+                    boolean done = false;
+                    for (var partialApp : goal.ruleAppIndex().tacletIndex().getPartialInstantiatedApps()) {
+                        if (partialApp.taclet().getAddedBy() == replayedNodes.get(edgeDependencies.get(node))) {
+                            // correct taclet
+                            var fullApp = partialApp.matchFind(app.posInOccurrence(), p.getServices()).setPosInOccurrence(app.posInOccurrence(), p.getServices());
+                            //assert fullApp != null && fullApp.complete();
+                            goal.apply(fullApp);
+                            done = true;
+                            break;
+                        }
+                    }
+                    if (!done) {
+                        goal.apply(app);
+                    }
+                } else {
+                    goal.apply(app);
+                }
             }
         }
         if (node.childrenCount() > 1) {

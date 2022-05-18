@@ -105,7 +105,7 @@ public final class PosInOccurrence {
 	// NB: the class <code>NonDuplicateAppFeature</code> depends on the usage
 	// of <code>!=</code> in this condition
 	if ( sequentFormula() != cmp.sequentFormula() ) {
-	    return eqEquals(obj); //false;
+	    return false;
 	}
 
 	return equalsHelp ( cmp );

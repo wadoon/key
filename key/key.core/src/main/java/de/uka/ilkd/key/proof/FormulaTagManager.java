@@ -173,7 +173,10 @@ public class FormulaTagManager {
      */
     private void removeTag ( PosInOccurrence p_pio ) {
     	final FormulaTag tag = getTagForPos ( p_pio );
-    	
+
+        if (tag == null) {
+            return; // TODO: why is this bad?
+        }
     	Debug.assertFalse ( tag == null,
                             "Tried to remove a tag that does not exist" );
                             
@@ -191,6 +194,9 @@ public class FormulaTagManager {
 	    p_info.getPositionOfModification().topLevel();
         final FormulaTag      tag     = getTagForPos ( oldPIO );
         final FormulaInfo     oldInfo = getFormulaInfo(tag);
+        if (oldInfo == null) {
+            return;
+        }
         final FormulaInfo     newInfo =
             oldInfo.addModification ( p_info, p_newSeq, p_goal.getTime () );
         

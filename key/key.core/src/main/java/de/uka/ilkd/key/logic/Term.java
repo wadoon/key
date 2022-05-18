@@ -1,6 +1,8 @@
 package de.uka.ilkd.key.logic;
 
 import javax.annotation.Nullable;
+
+import org.key_project.util.RealEquals;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -41,7 +43,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * currently supported: {@link Term#execPostOrder(Visitor)} and
  * {@link Term#execPreOrder(Visitor)}.
  */
-public interface Term extends SVSubstitute, Sorted {
+public interface Term extends SVSubstitute, Sorted, RealEquals {
 
     /**
      * The top operator (e.g., in "A and B" this is "and", in f(x,y) it is "f").
@@ -193,4 +195,16 @@ public interface Term extends SVSubstitute, Sorted {
      * with line and offset.
      */
     default @Nullable String getOrigin() {return null;}
+
+    @Override
+    default boolean realEquals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof Term)) {
+            return false;
+        }
+        var that = (Term) obj;
+        return op().realEquals(that.op()) && subs().realEquals(that.subs()); // TODO remaining variables
+    }
 }

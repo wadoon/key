@@ -1,5 +1,7 @@
 package org.key_project.util.collection;
 
+import org.key_project.util.RealEquals;
+
 import javax.annotation.Nonnull;
 
 import java.lang.reflect.Array;
@@ -13,7 +15,7 @@ import java.util.List;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Serializable {
+public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Serializable, RealEquals {
 
     /**
      *
@@ -214,5 +216,39 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
      */
     public Stream<S> stream() {
         return StreamSupport.stream(spliterator(), false);
+    }
+
+    @Override
+    public boolean realEquals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof ImmutableArray)) {
+            return false;
+        }
+        var that = (ImmutableArray) obj;
+        if (size() != that.size()) {
+            return false;
+        }
+        for (int i = 0; i < size(); i++) {
+            var a = get(i);
+            var b = that.get(i);
+            if (a == b) {
+                continue;
+            }
+            if (b.getClass() != a.getClass()) {
+                return false;
+            }
+            if (a instanceof RealEquals) {
+                if (!((RealEquals) a).realEquals(b)) {
+                    return false;
+                }
+            } else {
+                if (!a.equals(b)) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }

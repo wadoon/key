@@ -218,12 +218,14 @@ public class IntermediateProofReplayer {
                              // to free memory.
                             currInterm.setChildren(null);
                         } catch (Exception e) {
+                            e.printStackTrace();
                             reportError(ERROR_LOADING_PROOF_LINE + "Line "
                                     + appInterm.getLineNr() + ", goal "
                                     + currGoal.node().serialNr() + ", rule "
                                     + appInterm.getRuleName() + NOT_APPLICABLE,
                                 e);
                         } catch (AssertionError e) {
+                            e.printStackTrace();
                             reportError(ERROR_LOADING_PROOF_LINE + "Line "
                                     + appInterm.getLineNr() + ", goal "
                                     + currGoal.node().serialNr() + ", rule "

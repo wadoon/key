@@ -8,6 +8,7 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
 import javax.annotation.Nullable;
+import java.util.Objects;
 
 /**
  * Abstract base class for implementations of the Sort interface.
@@ -55,7 +56,7 @@ public abstract class AbstractSort implements Sort {
 
     @Override
     public final boolean extendsTrans(Sort sort) {
-        if (sort == this) {
+        if (sort == this) { // || (Objects.equals(name(), sort.name()) && Objects.equals(extendsSorts(), sort.extendsSorts()) && Objects.equals(isAbstract(), sort.isAbstract()))) {
             return true;
         } else if (this == Sort.FORMULA || this == Sort.UPDATE) {
             return false;

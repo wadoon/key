@@ -315,7 +315,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
 
     /**
      * adds the given rules (i.e. the rules to add according to the Taclet goal
-     * template to the node of the given goal
+     * template to the node of the given goal)
      * @param rules the rules to be added
      * @param goal the goal describing the node where the rules should be added
      * @param services the Services encapsulating all java information
@@ -367,6 +367,8 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
             for (final GenericSortCondition gsc : cs) {
                 neededInstances = neededInstances.add(gsc, services );
             }
+
+            tacletToAdd.setAddedBy(goal.node().parent());
 
             goal.addTaclet(tacletToAdd, neededInstances, true);
         }

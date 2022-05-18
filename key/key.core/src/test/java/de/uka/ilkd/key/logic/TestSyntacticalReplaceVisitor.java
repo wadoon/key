@@ -90,6 +90,6 @@ public class TestSyntacticalReplaceVisitor {
 	    SyntacticalReplaceVisitor
 	    (new TermLabelState(), null, null, SVInstantiations.EMPTY_SVINSTANTIATIONS, null, null, null, TacletForTests.services());
 	orig.execPostOrder(v);
-		assertEquals(v.getTerm().sub(0), result.sub(0), "Substitution Term not resolved correctly.");
+		assertEquals(result.sub(0), v.getTerm().sub(0), "Substitution Term not resolved correctly.");
     }
 }

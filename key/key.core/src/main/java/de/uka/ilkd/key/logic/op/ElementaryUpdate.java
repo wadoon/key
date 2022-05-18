@@ -57,17 +57,4 @@ public final class ElementaryUpdate extends AbstractSortedOperator {
     public UpdateableOperator lhs() {
 	return lhs;
     }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ElementaryUpdate that = (ElementaryUpdate) o;
-        return Objects.equals(lhs, that.lhs) && Objects.equals(name(), that.name()) && arity() == that.arity() && Objects.equals(whereToBind(), that.whereToBind()) && isRigid() == that.isRigid() && Objects.equals(sort(), that.sort()) && Objects.equals(argSorts(), that.argSorts());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(lhs);
-    }
 }

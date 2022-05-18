@@ -2,6 +2,7 @@ package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.util.RealEquals;
 
 
 /**
@@ -14,7 +15,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * by providing a way to add additional annotations or to cache local information
  * about the formula.
  */
-public class SequentFormula {
+public class SequentFormula implements RealEquals {
 
     private final Term term;
 
@@ -55,5 +56,16 @@ public class SequentFormula {
 
     public int hashCode () {
         return hashCode;
+    }
+
+    @Override
+    public boolean realEquals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof SequentFormula)) {
+            return false;
+        }
+        return term.realEquals(((SequentFormula) obj).term);
     }
 }
