@@ -212,6 +212,7 @@ group blockContracts {
    provable ./heap/block_loop_contracts/SimpleVariants/sum_onLoop_loop.key
    provable ./heap/block_loop_contracts/Free/blockContracts0.key
    provable ./heap/block_loop_contracts/Free/blockContracts1.key
+   provable ./heap/block_loop_contracts/Free/blockContracts2.key
    notprovable ./heap/block_loop_contracts/Finally/block_finally.key
    notprovable ./heap/block_loop_contracts/Finally/loop_finally.key
 }
