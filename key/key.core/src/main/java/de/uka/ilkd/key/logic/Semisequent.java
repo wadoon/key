@@ -151,7 +151,7 @@ public class Semisequent implements Iterable<SequentFormula> {
             cf         = searchList.head ();
             searchList = searchList.tail();
 
-            if (sequentFormula != null &&
+            if (sequentFormula != null && 
                     cf.formula().equalsModRenaming(sequentFormula.formula())) {
                 semiCI.rejectedFormula( sequentFormula );
                 return semiCI; // semisequent already contains formula
@@ -239,7 +239,7 @@ public class Semisequent implements Iterable<SequentFormula> {
     private SemisequentChangeInfo removeRedundance(int idx,
             SequentFormula sequentFormula) {
         return complete
-                (insertAndRemoveRedundancyHelper(idx, sequentFormula,
+                (insertAndRemoveRedundancyHelper(idx, sequentFormula, 
                         new SemisequentChangeInfo(seqList), null));
     }
 
@@ -293,7 +293,7 @@ public class Semisequent implements Iterable<SequentFormula> {
 
     /**
      * replaces the formula at position {@code idx} by the given list of formulas
-     * @param idx the position
+     * @param idx the position 
      * @param replacements the new formulas
      * @return change information including the resulting semisequent after the replacement
      */
@@ -370,7 +370,7 @@ public class Semisequent implements Iterable<SequentFormula> {
         ImmutableList<SequentFormula> searchList = seqList;
         int index = 0;
         while (!searchList.isEmpty()) {
-            if (searchList.head() == sequentFormula) { // || searchList.head().equals(sequentFormula)) {
+            if (searchList.head() == sequentFormula) {
                 return index;
             }
             searchList = searchList.tail();

@@ -629,6 +629,7 @@ public final class OneStepSimplifier implements BuiltInRule {
         Protocol protocol = new Protocol();
 
         var seq = goal.sequent();
+        // restrict sequent view to avoid different simplification results
         if (((OneStepSimplifierRuleApp) ruleApp).restrictedIfInsts) {
             var ifInsts = ((OneStepSimplifierRuleApp) ruleApp).ifInsts();
             ImmutableList<SequentFormula> anteFormulas = ImmutableSLList.nil();
@@ -668,7 +669,7 @@ public final class OneStepSimplifier implements BuiltInRule {
         goal.setBranchLabel(inst.getNumAppliedRules()
                     + (inst.getNumAppliedRules() > 1
                                     ? " rules" : " rule"));
-        ruleApp = ((IBuiltInRuleApp)ruleApp).setIfInsts(inst.getIfInsts());
+        ((IBuiltInRuleApp)ruleApp).setIfInsts(inst.getIfInsts());
 
 
         return result;

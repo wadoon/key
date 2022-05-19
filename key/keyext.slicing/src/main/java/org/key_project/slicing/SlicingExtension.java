@@ -86,13 +86,13 @@ public class SlicingExtension implements KeYGuiExtension,
     @Nonnull
     @Override
     public Collection<TabPanel> getPanels(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
-        if (leftPanel == null) leftPanel = new SlicingLeftPanel(window, mediator, this);
+        if (leftPanel == null) leftPanel = new SlicingLeftPanel(mediator, this);
         return Collections.singleton(leftPanel);
     }
 
     @Override
     public @Nonnull
     List<Action> getMainMenuActions(@Nonnull MainWindow mainWindow) {
-        return Arrays.asList();
+        return List.of();
     }
 }

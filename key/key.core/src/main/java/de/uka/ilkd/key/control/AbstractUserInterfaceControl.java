@@ -27,7 +27,6 @@ import de.uka.ilkd.key.prover.ProverCore;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskFinishedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo;
-import de.uka.ilkd.key.rule.RuleApp;
 
 /**
  * Provides a basic implementation of {@link UserInterfaceControl}.
@@ -35,19 +34,19 @@ import de.uka.ilkd.key.rule.RuleApp;
  */
 public abstract class AbstractUserInterfaceControl implements UserInterfaceControl, ProblemLoaderControl, ProverTaskListener {
     private int numOfInvokedMacros = 0;
-
+    
     /**
      * The registered {@link ProverTaskListener}.
      */
     private final List<ProverTaskListener> proverTaskListener = new LinkedList<ProverTaskListener>();
-
+    
     /**
      * Constructor.
      */
     public AbstractUserInterfaceControl() {
        addProverTaskListener(new ProofMacroListenerAdapter());
     }
-
+    
     /**
      * {@inheritDoc}
      */
@@ -129,9 +128,9 @@ public abstract class AbstractUserInterfaceControl implements UserInterfaceContr
 
     /**
      * registers the proof aggregate at the UI
-     *
+     * 
      * @param proofOblInput the {@link ProofOblInput}
-     * @param proofList the {@link ProofAggregate}
+     * @param proofList the {@link ProofAggregate} 
      * @param initConfig the {@link InitConfig} to be used
      * @return the new {@link ProofEnvironment} where the {@link ProofAggregate} has been registered
      */
@@ -144,7 +143,7 @@ public abstract class AbstractUserInterfaceControl implements UserInterfaceContr
     public void proofCreated(ProblemInitializer sender, ProofAggregate proofAggregate) {
        // Nothing to do
     }
-
+    
     public boolean isAtLeastOneMacroRunning() {
        return numOfInvokedMacros != 0;
     }
@@ -157,7 +156,7 @@ public abstract class AbstractUserInterfaceControl implements UserInterfaceContr
         if (numOfInvokedMacros > 0) {
             numOfInvokedMacros--;
         }
-        else {
+        else { 
             Logger.getLogger(this.getClass().getName(), "Number of running macros became negative.");
         }
     }

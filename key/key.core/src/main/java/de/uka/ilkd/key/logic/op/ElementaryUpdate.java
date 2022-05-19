@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.logic.op;
 
 import java.lang.ref.WeakReference;
-import java.util.Objects;
 import java.util.WeakHashMap;
 
 import de.uka.ilkd.key.logic.Name;

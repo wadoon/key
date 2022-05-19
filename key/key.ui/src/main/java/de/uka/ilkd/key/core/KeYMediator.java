@@ -478,7 +478,7 @@ public class KeYMediator {
     }
 
     /**
-     * Fires the shut down event.
+     * Fires the shut-down event.
      */
     public synchronized void fireShutDown(EventObject e) {
         Object[] listeners = listenerList.getListenerList();

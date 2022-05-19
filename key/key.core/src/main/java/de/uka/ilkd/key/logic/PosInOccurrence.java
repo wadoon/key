@@ -2,18 +2,18 @@ package de.uka.ilkd.key.logic;
 
 /**
  * This class describes a position in an occurrence of a term. A
- * SequentFormula and a PosInTerm determine an object of this
- * class exactly.
+ * SequentFormula and a PosInTerm determine an object of this 
+ * class exactly. 
  */
 public final class PosInOccurrence {
 
-    public static PosInOccurrence findInSequent(Sequent seq,
-                                                int formulaNumber,
+    public static PosInOccurrence findInSequent(Sequent seq, 
+                                                int formulaNumber, 
                                                 PosInTerm pos) {
-       return new PosInOccurrence(seq.getFormulabyNr(formulaNumber),
+       return new PosInOccurrence(seq.getFormulabyNr(formulaNumber),  
                                   pos, seq.numberInAntec(formulaNumber));
     }
-
+    
     /**
      * the constrained formula the pos in occurrence describes
      */
@@ -22,9 +22,9 @@ public final class PosInOccurrence {
     // saves 8 bytes (due to alignment issues) per instance if we use a
     // short here instead of an int
     private final short hashCode;
-
+    
     /**
-     * is true iff the position is in the antecedent of a sequent.
+     * is true iff the position is in the antecedent of a sequent. 
      */
     private final boolean inAntec;
 
@@ -42,14 +42,14 @@ public final class PosInOccurrence {
         assert posInTerm != null;
         assert sequentFormula != null;
 	this.inAntec = inAntec;
-	this.sequentFormula = sequentFormula;
-	this.posInTerm = posInTerm;
+	this.sequentFormula = sequentFormula;	
+	this.posInTerm = posInTerm;	
 	this.hashCode = (short) (sequentFormula.hashCode() * 13 + posInTerm.hashCode());
     }
-
+           
     /**
      * returns the SequentFormula that determines the occurrence of
-     * this PosInOccurrence
+     * this PosInOccurrence 
      */
     public SequentFormula sequentFormula() {
 	return sequentFormula;
@@ -66,16 +66,16 @@ public final class PosInOccurrence {
     /**
      * creates a new PosInOccurrence that has exactly the same state as this
      * object except the PosInTerm is new and walked down the specified
-     * subterm, as specified in method down of
+     * subterm, as specified in method down of 
      * {@link de.uka.ilkd.key.logic.PosInTerm}.
      */
     public PosInOccurrence down(int i) {
 	return new PosInOccurrence(sequentFormula, posInTerm.down(i), inAntec);
     }
-
-    /**
+    
+    /** 
      * compares this PosInOccurrence with another PosInOccurrence
-     * and returns true if both describe the same occurrence
+     * and returns true if both describe the same occurrence 
      */
     public boolean eqEquals(Object obj) {
 	if (!(obj instanceof PosInOccurrence)) {
@@ -86,9 +86,9 @@ public final class PosInOccurrence {
 	if ( !sequentFormula.equals ( cmp.sequentFormula ) ) {
 	    return false;
         }
-
+    
 	return equalsHelp ( cmp );
-    }
+    } 
 
     /**
      * Contrary to <code>eqEquals</code>, this method returns true only for pio
@@ -107,7 +107,7 @@ public final class PosInOccurrence {
 	if ( sequentFormula() != cmp.sequentFormula() ) {
 	    return false;
 	}
-
+    
 	return equalsHelp ( cmp );
     }
 
@@ -129,13 +129,13 @@ public final class PosInOccurrence {
 
     public int hashCode () {
     	return hashCode;
-    }
+    }  
 
     /**
      * returns true iff the occurrence is in the
-     * antecedent of a sequent.
+     * antecedent of a sequent. 
      */
-    public boolean isInAntec() {
+    public boolean isInAntec() {	
 	return inAntec;
     }
 
@@ -156,12 +156,12 @@ public final class PosInOccurrence {
     }
 
     /**
-     * The usage of this method is strongly discouraged, use
-     * {@link PosInOccurrence#iterator} instead.
+     * The usage of this method is strongly discouraged, use 
+     * {@link PosInOccurrence#iterator} instead.     
      * describes the exact occurrence of the referred term inside
-     * {@link SequentFormula#formula()}
+     * {@link SequentFormula#formula()} 
      * @returns the position in the formula of the SequentFormula of
-     * this PosInOccurrence.
+     * this PosInOccurrence. 
      */
     public PosInTerm posInTerm() {
 	return posInTerm;
@@ -169,7 +169,7 @@ public final class PosInOccurrence {
 
     /**
      * Replace the formula this object points to with the new formula given
-     *
+     * 
      * @param p_newFormula
      *                the new formula
      * @return a <code>PosInOccurrence</code> object that points to the same
@@ -190,7 +190,7 @@ public final class PosInOccurrence {
     /**
      * returns the subterm this object points to
      */
-    public Term subTerm () {
+    public Term subTerm () {        
         if ( subTermCache == null ) {
             subTermCache = posInTerm.getSubTerm(sequentFormula.formula());
         }
@@ -198,14 +198,14 @@ public final class PosInOccurrence {
     }
 
     /**
-     * Ascend to the top node of the formula this object points to
+     * Ascend to the top node of the formula this object points to 
      */
     public PosInOccurrence topLevel () {
         if (isTopLevel()) {
             return this;
         }
-	return new PosInOccurrence(sequentFormula, PosInTerm.getTopLevel(),
-				   inAntec);
+	return new PosInOccurrence(sequentFormula, PosInTerm.getTopLevel(), 
+				   inAntec);    	
     }
 
 
@@ -213,7 +213,7 @@ public final class PosInOccurrence {
     public String toString() {
 	String res = "Term "+
 	    posInTerm()+" of "+ sequentFormula();
-
+	
 	return res;
 
     }
@@ -226,18 +226,18 @@ public final class PosInOccurrence {
     public PosInOccurrence up() {
 	assert !isTopLevel() : "not possible to go up from top level position";
 
-	return new PosInOccurrence(sequentFormula, posInTerm.up(),
+	return new PosInOccurrence(sequentFormula, posInTerm.up(), 
 		inAntec);
 
     }
 
-
-    private final class PIOPathIteratorImpl implements PIOPathIterator {
+    
+    private final class PIOPathIteratorImpl implements PIOPathIterator {	
 	int               child;
 	int               count             = 0;
 	IntIterator       currentPathIt;
 	Term              currentSubTerm    = null;
-
+	
 	private PIOPathIteratorImpl               () {
 	    currentPathIt = posInTerm ().iterator ();
 	}
@@ -259,12 +259,12 @@ public final class PosInOccurrence {
 	    // the object is created only now to make the method
 	    // <code>next()</code> faster
 
-	    final PosInOccurrence pio;
+	    final PosInOccurrence pio;	   
 	    pio = new PosInOccurrence ( sequentFormula,
 		    posInTerm.firstN(count - 1),
-		    inAntec );
+		    inAntec );            
 
-
+        
 	    return pio;
 	}
 
@@ -306,4 +306,5 @@ public final class PosInOccurrence {
 	    return res;
 	}
     }
+	
 }

@@ -97,12 +97,11 @@ public abstract class AbstractSortedOperator extends AbstractOperator
 	private boolean possibleSub(int at, Term possibleSub) {
 		final Sort s = possibleSub.sort();
 
-		boolean ret = s == AbstractTermTransformer.METASORT
+		return s == AbstractTermTransformer.METASORT
 				|| s instanceof ProgramSVSort
 				|| argSort(at) == AbstractTermTransformer.METASORT
 				|| argSort(at) instanceof ProgramSVSort
 				|| s.extendsTrans(argSort(at));
-		return ret;
 	}
     
     

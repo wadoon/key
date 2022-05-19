@@ -6,8 +6,6 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 
-import java.util.Objects;
-
 
 /**
  * Objects of this class represent function and predicate symbols. Note

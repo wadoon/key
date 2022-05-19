@@ -666,7 +666,7 @@ public abstract class AbstractProblemLoader {
         }
     }
 
-    private ReplayResult replayProof(Proof proof) throws ProofInputException, ProblemLoaderException {
+    private ReplayResult replayProof(Proof proof) {
         String status = "";
         List<Throwable> errors = new LinkedList<Throwable>();
         Node lastTouchedNode = proof.root();

@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.logic.op;
 
 import java.io.IOException;
-import java.util.Objects;
 
 import org.key_project.util.ExtList;
 
@@ -304,4 +303,5 @@ public abstract class ProgramVariable extends AbstractSortedOperator
      * @return      equivalent operator with the new name
      */
     abstract public Operator rename(Name name);
+
 }

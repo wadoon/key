@@ -20,6 +20,7 @@ import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.proof.Proof;
 
+import javax.annotation.Nonnull;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
@@ -33,17 +34,17 @@ import java.io.OutputStreamWriter;
 public class SlicingLeftPanel extends JPanel implements TabPanel {
 
     public static final Icon INFO_ICON = IconFactory.SLICE_ICON.get(MainWindowTabbedPane.TAB_ICON_SIZE);
+    public static final String NAME = "slicingPane";
 
-    private MainWindow mainWindow;
-    private KeYMediator mediator;
-    private SlicingExtension extension;
-    private JLabel totalSteps;
-    private JLabel usefulSteps;
+    private final KeYMediator mediator;
+    private final SlicingExtension extension;
+    private final JLabel totalSteps;
+    private final JLabel usefulSteps;
 
-    public SlicingLeftPanel(MainWindow window, KeYMediator mediator, SlicingExtension extension) {
+    public SlicingLeftPanel(KeYMediator mediator, SlicingExtension extension) {
         super();
 
-        setName("slicingPane");
+        setName(NAME);
 
         setLayout(new GridBagLayout());
 
@@ -52,13 +53,13 @@ public class SlicingLeftPanel extends JPanel implements TabPanel {
         panel.setBorder(new TitledBorder("Dependency analysis"));
 
         var button = new JButton("Export .dot");
-        button.addActionListener(e -> exportDot(e));
+        button.addActionListener(this::exportDot);
         var button2 = new JButton("View formula graph");
-        button2.addActionListener(e -> previewGraph(e));
+        button2.addActionListener(this::previewGraph);
         var button3 = new JButton("Run analysis");
-        button3.addActionListener(e -> analyzeProof(e));
+        button3.addActionListener(this::analyzeProof);
         var button4 = new JButton("Slice proof");
-        button4.addActionListener(e -> sliceProof(e));
+        button4.addActionListener(this::sliceProof);
         totalSteps = new JLabel();
         usefulSteps = new JLabel();
         resetLabels();
@@ -93,7 +94,6 @@ public class SlicingLeftPanel extends JPanel implements TabPanel {
         add(button4, c);
         invalidate();
 
-        this.mainWindow = window;
         this.mediator = mediator;
         this.extension = extension;
     }
@@ -176,6 +176,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel {
         usefulSteps.setText("Useful steps: " + results.usefulSteps);
     }
 
+    @Nonnull
     @Override
     public String getTitle() {
         return "Proof Slicing";
@@ -186,6 +187,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel {
         return INFO_ICON;
     }
 
+    @Nonnull
     @Override
     public JComponent getComponent() {
         return this;
