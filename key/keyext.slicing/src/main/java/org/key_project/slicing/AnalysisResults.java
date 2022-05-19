@@ -1,27 +1,21 @@
 package org.key_project.slicing;
 
-import java.util.Objects;
+import de.uka.ilkd.key.util.Triple;
+
+import java.util.Map;
 
 public class AnalysisResults {
     public int totalSteps;
     public int usefulSteps;
+    /**
+     * displayName of rule -> (total applications, useless applications, initial useless applications)
+     */
+    public Map<String, Triple<Integer, Integer, Integer>> ruleStatistics;
 
-    public AnalysisResults(int totalSteps, int usefulSteps) {
+    public AnalysisResults(int totalSteps, int usefulSteps, Map<String, Triple<Integer, Integer, Integer>> ruleStatistics) {
         this.totalSteps = totalSteps;
         this.usefulSteps = usefulSteps;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        AnalysisResults that = (AnalysisResults) o;
-        return totalSteps == that.totalSteps && usefulSteps == that.usefulSteps;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(totalSteps, usefulSteps);
+        this.ruleStatistics = ruleStatistics;
     }
 
     @Override

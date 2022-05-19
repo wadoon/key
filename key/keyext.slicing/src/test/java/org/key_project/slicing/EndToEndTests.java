@@ -27,7 +27,9 @@ public class EndToEndTests {
             Proof proof = environment.getLoadedProof();
             Assertions.assertNotNull(proof);
             // Analyze proof
-            Assertions.assertEquals(new AnalysisResults(145, 79), tracker.analyze());
+            var results = tracker.analyze();
+            Assertions.assertEquals(145, results.totalSteps);
+            Assertions.assertEquals(79, results.usefulSteps);
             // Slice proof
             Proof slicedProof = tracker.sliceProof();
             // 79 rule applications + 3 closed goals

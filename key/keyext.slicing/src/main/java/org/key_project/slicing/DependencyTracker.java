@@ -25,6 +25,7 @@ import de.uka.ilkd.key.rule.merge.CloseAfterMergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.Triple;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.DirectedMultigraph;
@@ -32,6 +33,7 @@ import org.key_project.util.collection.ImmutableList;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
@@ -276,7 +278,23 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         }
 
         var steps = proof.countNodes() - proof.closedGoals().size();
-        analysisResults = new AnalysisResults(steps, usefulSteps.size());
+
+        var rules = new HashMap<String, Triple<Integer, Integer, Integer>>();
+        proof.breadthFirstSearch(proof.root(), (_proof, node) -> {
+            if (node.getAppliedRuleApp() == null) {
+                return;
+            }
+            var displayName = node.getAppliedRuleApp().rule().displayName();
+            if (!rules.containsKey(displayName)) {
+                rules.put(displayName, new Triple<>(0, 0, 0));
+            }
+            var triple = rules.get(displayName);
+            var d2 = !usefulSteps.contains(node) ? 1 : 0;
+            var d3 = d2 == 1 && node.lookup(DependencyNodeData.class).inputs.stream().anyMatch(usefulFormulas::contains) ? 1 : 0;
+            rules.put(displayName, new Triple<>(triple.first + 1, triple.second + d2, triple.third + d3));
+        });
+
+        analysisResults = new AnalysisResults(steps, usefulSteps.size(), rules);
         return analysisResults;
     }
 

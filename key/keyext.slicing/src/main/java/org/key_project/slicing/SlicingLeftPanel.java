@@ -19,6 +19,7 @@ import de.uka.ilkd.key.gui.MainWindowTabbedPane;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.proof.Proof;
+import org.key_project.slicing.ui.RuleStatisticsDialog;
 
 import javax.annotation.Nonnull;
 import javax.swing.*;
@@ -60,12 +61,15 @@ public class SlicingLeftPanel extends JPanel implements TabPanel {
         button3.addActionListener(this::analyzeProof);
         var button4 = new JButton("Slice proof");
         button4.addActionListener(this::sliceProof);
+        var button5 = new JButton("Show rule statistics");
+        button5.addActionListener(this::showRuleStatistics);
         totalSteps = new JLabel();
         usefulSteps = new JLabel();
         resetLabels();
         panel.add(totalSteps);
         panel.add(usefulSteps);
         panel.add(button3);
+        panel.add(button5);
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 0;
@@ -132,12 +136,23 @@ public class SlicingLeftPanel extends JPanel implements TabPanel {
         }
     }
 
+    private void showRuleStatistics(ActionEvent e) {
+        if (extension.currentProof == null) {
+            return;
+        }
+        this.analyzeProof(e);
+        var results = extension.trackers.get(extension.currentProof).analyze();
+        if (results != null) {
+            new RuleStatisticsDialog(SwingUtilities.getWindowAncestor((JComponent) e.getSource()), results);
+        }
+    }
+
     private void previewGraph(ActionEvent e) {
         if (extension.currentProof == null || extension.currentProof.countNodes() < 2) {
             return;
         }
         String text = extension.trackers.get(extension.currentProof).exportDot();
-        var preview = new PreviewDialog(SwingUtilities.getWindowAncestor((JComponent) e.getSource()), text);
+        new PreviewDialog(SwingUtilities.getWindowAncestor((JComponent) e.getSource()), text);
     }
 
     private void analyzeProof(ActionEvent e) {
