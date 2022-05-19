@@ -10,10 +10,10 @@ import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Proof;
+import org.key_project.slicing.ui.ShowCreatedByAction;
 
 import javax.annotation.Nonnull;
 import javax.swing.*;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.IdentityHashMap;
@@ -22,7 +22,7 @@ import java.util.Map;
 
 @KeYGuiExtension.Info(name = "Slicing",
         description = "Author: Arne Keller <arne.keller@student.kit.edu>",
-        experimental = true,
+        experimental = false,
         optional = true,
         priority = 9001)
 public class SlicingExtension implements KeYGuiExtension,
@@ -36,7 +36,15 @@ public class SlicingExtension implements KeYGuiExtension,
     private final ContextMenuAdapter adapter = new ContextMenuAdapter() {
         @Override
         public List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind, PosInSequent pos) {
-            return super.getContextActions(mediator, kind, pos);
+            var tracker = trackers.get(currentProof);
+            if (tracker == null) {
+                return List.of();
+            }
+            var node = tracker.getNodeThatProduced(mediator.getSelectedNode(), pos.getPosInOccurrence().topLevel());
+            if (node == null) {
+                return List.of();
+            }
+            return List.of(new ShowCreatedByAction(MainWindow.getInstance(), node));
         }
     };
 
@@ -59,12 +67,12 @@ public class SlicingExtension implements KeYGuiExtension,
             @Override
             public void selectedProofChanged(KeYSelectionEvent e) {
                 Proof newProof = mediator.getSelectedProof();
-                if (!trackers.containsKey(newProof)) {
+                trackers.computeIfAbsent(newProof, proof -> {
                     var tracker = new DependencyTracker();
-                    newProof.addRuleAppListener(tracker);
-                    newProof.addProofTreeListener(tracker);
-                    trackers.put(newProof, tracker);
-                }
+                    proof.addRuleAppListener(tracker);
+                    proof.addProofTreeListener(tracker);
+                    return tracker;
+                });
                 currentProof = newProof;
                 leftPanel.proofSelected();
             }

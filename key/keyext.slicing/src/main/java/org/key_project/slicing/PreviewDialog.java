@@ -7,7 +7,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
@@ -29,9 +28,9 @@ public class PreviewDialog extends JDialog {
     private static class DotExecutor extends SwingWorker<Void, Void> {
         private String error;
         private BufferedImage img;
-        private String dot;
-        private PreviewDialog dialog;
-        private Window window;
+        private final String dot;
+        private final PreviewDialog dialog;
+        private final Window window;
 
         public DotExecutor(String dot, Window window, PreviewDialog dialog) {
             this.dot = dot;

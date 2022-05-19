@@ -5,12 +5,12 @@ import de.uka.ilkd.key.util.Triple;
 import java.util.Map;
 
 public class AnalysisResults {
-    public int totalSteps;
-    public int usefulSteps;
+    public final int totalSteps;
+    public final int usefulSteps;
     /**
      * displayName of rule -> (total applications, useless applications, initial useless applications)
      */
-    public Map<String, Triple<Integer, Integer, Integer>> ruleStatistics;
+    public final Map<String, Triple<Integer, Integer, Integer>> ruleStatistics;
 
     public AnalysisResults(int totalSteps, int usefulSteps, Map<String, Triple<Integer, Integer, Integer>> ruleStatistics) {
         this.totalSteps = totalSteps;

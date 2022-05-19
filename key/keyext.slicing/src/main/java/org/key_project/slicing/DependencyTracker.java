@@ -47,8 +47,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
     private final Graph<GraphNode, DefaultEdge> graph = new DirectedMultigraph<>(DefaultEdge.class);
     private final Map<DefaultEdge, Node> edgeData = new IdentityHashMap<>();
     private final Map<Node, Node> edgeDependencies = new IdentityHashMap<>();
-    private boolean analysisDone = false;
-    public AnalysisResults analysisResults = null;
+    private AnalysisResults analysisResults = null;
     private final Set<Node> usefulSteps = new HashSet<>();
     private final Set<TrackedFormula> usefulFormulas = new HashSet<>();
     private final Set<Goal> ignoredGoals = new HashSet<>();
@@ -83,12 +82,12 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         }
         if (ruleApp instanceof MergeRuleBuiltInRuleApp || ruleApp instanceof CloseAfterMergeRuleBuiltInRuleApp) {
             // add all formulas as inputs
-            node.sequent().antecedent().iterator().forEachRemaining(it -> {
-                inputs.add(new PosInOccurrence(it, PosInTerm.getTopLevel(), true));
-            });
-            node.sequent().succedent().iterator().forEachRemaining(it -> {
-                inputs.add(new PosInOccurrence(it, PosInTerm.getTopLevel(), false));
-            });
+            node.sequent().antecedent().iterator().forEachRemaining(it ->
+                    inputs.add(new PosInOccurrence(it, PosInTerm.getTopLevel(), true))
+            );
+            node.sequent().succedent().iterator().forEachRemaining(it ->
+                    inputs.add(new PosInOccurrence(it, PosInTerm.getTopLevel(), false))
+            );
         }
         // TODO: other built-ins
         return inputs;
@@ -169,7 +168,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
 
         n.register(new DependencyNodeData(input, output, closedGoals, ruleApp.rule().displayName() + "_" + n.serialNr()), DependencyNodeData.class);
 
-        if (input.size() == 0) {
+        if (input.isEmpty()) {
             input.add(new PseudoInput());
         }
         for (var in : input) {
@@ -189,7 +188,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
     @Override
     public void proofPruned(ProofTreeEvent e) {
         // TODO: clean up removed formulas / nodes /...
-        analysisDone = false;
+        analysisResults = null;
     }
 
     public String exportDot() {
@@ -214,7 +213,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
                             .append(out)
                             .append("\" [label=\"")
                             .append(data.label);
-                    if (analysisDone && !usefulSteps.contains(node)) {
+                    if (analysisResults != null && !usefulSteps.contains(node)) {
                         buf.append("\" color=\"red");
                     }
                     buf
@@ -222,7 +221,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
                 });
             }
         }
-        if (analysisDone) {
+        if (analysisResults != null) {
             for (var formula : formulas) {
                 if (!usefulFormulas.contains(formula)) {
                     buf.append('"').append(formula).append('"').append(" [color=\"red\"]\n");
@@ -237,7 +236,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         if (proof == null || !proof.closed()) {
             return null;
         }
-        if (analysisDone) {
+        if (analysisResults != null) {
             return analysisResults;
         }
         usefulSteps.clear();
@@ -266,7 +265,6 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
                 queue.add(edgeDependencies.get(node));
             }
         }
-        analysisDone = true;
 
         queue.add(proof.root());
         while (!queue.isEmpty()) {
@@ -299,7 +297,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
     }
 
     public Proof sliceProof() {
-        if (!analysisDone) {
+        if (analysisResults == null) {
             return null;
         }
         ignoredGoals.clear();
@@ -353,9 +351,6 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
                 var newApp = MergeRule.INSTANCE.createApp(pio, p.getServices());
 
                 if (!newApp.complete()) {
-                    //newApp = newApp.setIfInsts(app.ifInsts());
-                    // TODO: check for force ?
-                    final boolean force = true;
                     newApp = newApp.forceInstantiate(p.openGoals().stream().filter(it -> !ignoredGoals.contains(it)).findFirst().get());
                 }
                 app = newApp;
@@ -425,5 +420,22 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         } else if (node.childrenCount() == 1) {
             replayProof(p, node.child(0));
         }
+    }
+
+    public Node getNodeThatProduced(Node currentNode, PosInOccurrence pio) {
+        var loc = currentNode.branchLocation();
+        while (true) {
+            var incoming = graph.incomingEdgesOf(new TrackedFormula(pio.sequentFormula(), loc, pio.isInAntec(), proof.getServices()));
+            if (!incoming.isEmpty()) {
+                return edgeData.get(incoming.stream().findFirst().get());
+            }
+            if (loc.isEmpty()) {
+                break;
+            }
+            var list = loc.toList();
+            list.remove(list.size() - 1);
+            loc = ImmutableList.fromList(list);
+        }
+        return null;
     }
 }

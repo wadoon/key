@@ -11,7 +11,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
 public class PanZoomImageView extends JComponent implements MouseListener, MouseMotionListener, MouseWheelListener {
-    private final BufferedImage image;
+    private final transient BufferedImage image;
     private final AffineTransform at;
     private Timer timer;
     private long lastPaint = 0;
@@ -33,7 +33,7 @@ public class PanZoomImageView extends JComponent implements MouseListener, Mouse
         at = AffineTransform.getScaleInstance(scale, scale);
         at.translate(x, y);
 
-        this.timer = new Timer(150, (e) -> {
+        this.timer = new Timer(150, e -> {
             if (quickRender && System.currentTimeMillis() - lastPaint > 100) {
                 quickRender = false;
                 repaint();

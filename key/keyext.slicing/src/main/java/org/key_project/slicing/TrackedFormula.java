@@ -8,10 +8,10 @@ import org.key_project.util.collection.ImmutableList;
 import java.util.Objects;
 
 public class TrackedFormula implements GraphNode {
-    public SequentFormula formula;
-    public ImmutableList<String> branchLocation;
-    public boolean inAntec;
-    public Services services;
+    public final SequentFormula formula;
+    public final ImmutableList<String> branchLocation;
+    public final boolean inAntec;
+    public final Services services;
 
     private static final String SEQ_ARROW = "⟹";
 

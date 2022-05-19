@@ -1,25 +1,20 @@
 package org.key_project.slicing.ui;
 
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.actions.ShowProofStatistics;
 import de.uka.ilkd.key.gui.configuration.Config;
-import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Quadruple;
 import org.key_project.slicing.AnalysisResults;
-import org.key_project.slicing.PreviewDialog;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class RuleStatisticsDialog extends JDialog {
-    private List<Quadruple<String, Integer, Integer, Integer>> rules;
+    private final transient List<Quadruple<String, Integer, Integer, Integer>> rules;
 
     public RuleStatisticsDialog(Window window, AnalysisResults results) {
         super(window, "Rule Statistics");

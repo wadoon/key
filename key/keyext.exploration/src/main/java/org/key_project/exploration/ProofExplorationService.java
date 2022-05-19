@@ -78,10 +78,10 @@ public class ProofExplorationService {
     }
 
     /**
-     * Create a new Tacletapp that add a formula to the sequent using the cut rule and disabeling one of the branches
+     * Create a new Tacletapp that add a formula to the sequent using the cut rule and disabling one of the branches
      *
-     * @param t          Term to add to teh sequent
-     * @param antecedent whether to add teh term to antecedent
+     * @param t          Term to add to the sequent
+     * @param antecedent whether to add the term to antecedent
      */
     public @Nonnull Node soundAddition(@Nonnull Goal g, @Nonnull Term t, boolean antecedent) {
         Taclet cut = g.proof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(new Name("cut"));

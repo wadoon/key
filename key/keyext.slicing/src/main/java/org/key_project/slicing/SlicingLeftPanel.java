@@ -1,20 +1,7 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
 package org.key_project.slicing;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.KeYFileChooser;
-import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.MainWindowTabbedPane;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
@@ -37,8 +24,8 @@ public class SlicingLeftPanel extends JPanel implements TabPanel {
     public static final Icon INFO_ICON = IconFactory.SLICE_ICON.get(MainWindowTabbedPane.TAB_ICON_SIZE);
     public static final String NAME = "slicingPane";
 
-    private final KeYMediator mediator;
-    private final SlicingExtension extension;
+    private final transient KeYMediator mediator;
+    private final transient SlicingExtension extension;
     private final JLabel totalSteps;
     private final JLabel usefulSteps;
 
@@ -131,8 +118,8 @@ public class SlicingLeftPanel extends JPanel implements TabPanel {
         if (tracker == null) {
             return;
         }
-        if (tracker.analysisResults != null) {
-            displayResults(tracker.analysisResults);
+        if (tracker.analyze() != null) {
+            displayResults(tracker.analyze());
         }
     }
 
