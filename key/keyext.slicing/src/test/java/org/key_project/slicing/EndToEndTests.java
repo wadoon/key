@@ -10,11 +10,11 @@ import org.key_project.util.helper.FindResources;
 
 import java.io.File;
 
-public class EndToEndTests {
+class EndToEndTests {
     public static final File testCaseDirectory = FindResources.getTestCasesDirectory();
 
     @Test
-    public void SliceAgatha() throws Exception {
+    void SliceAgatha() throws Exception {
         boolean oldValue = GeneralSettings.noPruningClosed;
         GeneralSettings.noPruningClosed = false;
         // Load proof

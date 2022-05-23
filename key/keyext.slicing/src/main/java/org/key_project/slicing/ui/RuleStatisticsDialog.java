@@ -81,7 +81,7 @@ public class RuleStatisticsDialog extends JDialog {
 
             @Override
             public void keyTyped(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_ESCAPE) {
                     getRootPane().getDefaultButton().doClick();
                 }
             }

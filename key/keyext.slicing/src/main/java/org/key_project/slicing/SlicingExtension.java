@@ -11,6 +11,7 @@ import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Proof;
 import org.key_project.slicing.ui.ShowCreatedByAction;
+import org.key_project.slicing.ui.SlicingLeftPanel;
 
 import javax.annotation.Nonnull;
 import javax.swing.*;

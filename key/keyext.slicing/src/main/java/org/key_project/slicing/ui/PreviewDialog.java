@@ -1,4 +1,4 @@
-package org.key_project.slicing;
+package org.key_project.slicing.ui;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;

@@ -24,6 +24,7 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.merge.CloseAfterMergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
+import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 import org.jgrapht.Graph;
@@ -54,10 +55,6 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
 
     private final Map<Node, Node> replayedNodes = new IdentityHashMap<>();
 
-    public DependencyTracker() {
-        //GeneralSettings.noPruningClosed = false;
-    }
-
     private static Set<PosInOccurrence> inputsOfRuleApp(RuleApp ruleApp, Node node) {
         var inputs = new HashSet<PosInOccurrence>();
         if (ruleApp.posInOccurrence() != null) {
@@ -76,12 +73,15 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
             }
         }
         // built-ins need special treatment
+        // OSS: record if instantiations
         if (ruleApp instanceof OneStepSimplifierRuleApp) {
             var oss = (OneStepSimplifierRuleApp) ruleApp;
             oss.ifInsts().forEach(inputs::add);
         }
+        // State Merging: add all formulas as inputs
+        // TODO: this is not enough, as the State Merge processes every formula in the sequent
+        // (-> if more formulas are present after slicing, a different result will be produced!)
         if (ruleApp instanceof MergeRuleBuiltInRuleApp || ruleApp instanceof CloseAfterMergeRuleBuiltInRuleApp) {
-            // add all formulas as inputs
             node.sequent().antecedent().iterator().forEachRemaining(it ->
                     inputs.add(new PosInOccurrence(it, PosInTerm.getTopLevel(), true))
             );
@@ -89,7 +89,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
                     inputs.add(new PosInOccurrence(it, PosInTerm.getTopLevel(), false))
             );
         }
-        // TODO: other built-ins
+        // TODO: other built-ins?
         return inputs;
     }
 
@@ -100,7 +100,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         var ruleApp = ruleAppInfo.getRuleApp();
         var goalList = e.getNewGoals();
         var n = ruleAppInfo.getOriginalNode();
-        System.out.println("applied node " + n.serialNr());
+        //System.out.println("applied node " + n.serialNr());
 
         var rule = n.getAppliedRuleApp().rule();
         if (rule instanceof Taclet) {
@@ -233,6 +233,9 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
     }
 
     public AnalysisResults analyze() {
+        if (GeneralSettings.noPruningClosed) {
+            throw new IllegalStateException("cannot analyze proof with no (recorded) closed goals, try disabling GeneralSettings.noPruningClosed");
+        }
         if (proof == null || !proof.closed()) {
             return null;
         }
@@ -395,7 +398,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
                     boolean done = false;
                     for (var partialApp : goal.ruleAppIndex().tacletIndex().getPartialInstantiatedApps()) {
                         if (partialApp.taclet().getAddedBy() == replayedNodes.get(edgeDependencies.get(node))) {
-                            // correct taclet
+                            // re-apply the taclet
                             var fullApp = partialApp.matchFind(app.posInOccurrence(), p.getServices()).setPosInOccurrence(app.posInOccurrence(), p.getServices());
                             //assert fullApp != null && fullApp.complete();
                             goal.apply(fullApp);
@@ -423,6 +426,9 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
     }
 
     public Node getNodeThatProduced(Node currentNode, PosInOccurrence pio) {
+        if (proof == null) {
+            return null;
+        }
         var loc = currentNode.branchLocation();
         while (true) {
             var incoming = graph.incomingEdgesOf(new TrackedFormula(pio.sequentFormula(), loc, pio.isInAntec(), proof.getServices()));

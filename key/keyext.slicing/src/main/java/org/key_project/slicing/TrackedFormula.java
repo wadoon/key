@@ -7,6 +7,9 @@ import org.key_project.util.collection.ImmutableList;
 
 import java.util.Objects;
 
+/**
+ * A sequent formula tracked by the dependency graph.
+ */
 public class TrackedFormula implements GraphNode {
     public final SequentFormula formula;
     public final ImmutableList<String> branchLocation;
