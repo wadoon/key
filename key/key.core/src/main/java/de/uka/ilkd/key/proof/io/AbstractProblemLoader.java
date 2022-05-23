@@ -310,16 +310,13 @@ public abstract class AbstractProblemLoader {
         control.selectProofObligation(initConfig);
     }
     /**
-     * Loads a proof from the proof list.
+     * Loads a proof from the proof list and re-applies rules on the initial proof obligation.
      * @param poContainer the container created by {@link #createProofObligationContainer()}.
      * @param proofList the proof list containing the proof to load.
-     * @throws ProofInputException Occurred Exception.
-     * @throws ProblemLoaderException Occurred Exception.
      * @see AbstractProblemLoader#load()
      */
     protected void loadSelectedProof(LoadedPOContainer poContainer, ProofAggregate proofList,
-                                     Consumer<Proof> callbackProofLoaded)
-            throws ProofInputException, ProblemLoaderException {
+                                     Consumer<Proof> callbackProofLoaded) {
         // try to replay first proof
         proof = proofList.getProof(poContainer.getProofNum());
 

@@ -648,8 +648,8 @@ public final class OneStepSimplifier implements BuiltInRule {
             } else {
                 succFormulas = succFormulas.prepend(pos.sequentFormula());
             }
-            var antecedent = new Semisequent(anteFormulas);
-            var succedent = new Semisequent(succFormulas);
+            var antecedent = anteFormulas.isEmpty() ? Semisequent.EMPTY_SEMISEQUENT : new Semisequent(anteFormulas);
+            var succedent = succFormulas.isEmpty() ? Semisequent.EMPTY_SEMISEQUENT : new Semisequent(succFormulas);
             seq = Sequent.createSequent(antecedent, succedent);
         }
         // get instantiation
