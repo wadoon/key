@@ -160,6 +160,9 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         } catch (IOException ioe) {
             throw new ProofInputException(ioe);
         }
+		
+		 // generate storage taclets
+        collectStorageAxioms(this, initConfig);
                 
         //read key file itself
         warnings = warnings.union(super.read());

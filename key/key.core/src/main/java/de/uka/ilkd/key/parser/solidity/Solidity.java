@@ -364,17 +364,30 @@ public class Solidity {
          * @return The display name.
          */
         public String getDisplayName(Contract callingContract) {
-            if (!this.owner.equals(callingContract) && this.hasOverride(callingContract)) {
-                return "__" + owner.name + "__" + name;
-            } else {
-                return name;
-            }
+			if (this.owner.equals(callingContract)) {
+				return name;
+			}
+			boolean isOutermost = false;
+			boolean fieldFound = false;
+			Iterator<Solidity.Contract> it = callingContract.c3Linearization.descendingIterator();
+			while (it.hasNext() && !fieldFound) {
+				Solidity.Contract parent = it.next();
+				for (Solidity.Field field : parent.fields) {
+					if (field.name.equals(this.name)) {
+						isOutermost = field.equals(this);
+						fieldFound = true;
+						break;
+					}
+				}
+			}
+			assert fieldFound == true;
+			return isOutermost ? name : "__" + owner.name + "__" + name;
         }
 
         public boolean hasOverride(Contract callingContract) {
             for (Contract parent : callingContract.c3Linearization) {
                 Field parentField = parent.getField(this.name);
-                if (parentField != null && parentField != this) {
+                if (parentField != null && !parentField.owner.equals(callingContract)) {
                     return true;
                 }
             }

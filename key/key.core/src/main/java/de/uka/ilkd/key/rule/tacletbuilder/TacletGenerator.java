@@ -47,6 +47,8 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.util.Pair;
 
+import de.uka.ilkd.key.parser.solidity.SolidityTranslationVisitor;
+
 
 
 /**
@@ -73,26 +75,28 @@ public class TacletGenerator {
         // register storage layout
         final Services services = proofConfig.getServices();
 		
-		Sort someSort = services.getNamespaces().sorts().lookup("alpha");
-		if (someSort == null) {
-			Sort anySort = Sort.ANY;
-			try {
-				Sort gs = new GenericSort(new Name("alpha"),
-				DefaultImmutableSet.<Sort>nil().add(anySort), // extends
-				DefaultImmutableSet.<Sort>nil() //oneof
-				);
-				services.getNamespaces().sorts().add(gs);
-			} catch(GenericSupersortException gse) {
-				System.out.println(gse);
-			}
+		// register generic sorts
+        // general sort lookup:
+        //   Sort someSort = services.getNamespaces().sorts().lookup(<name of sort to lookup>);
+        // special case any:
+		Sort anySort = Sort.ANY;
+		try {
+			Sort gs = new GenericSort(new Name("alpha"),
+			DefaultImmutableSet.<Sort>nil().add(anySort), // extends
+			DefaultImmutableSet.<Sort>nil() //oneof
+			);
+			services.getNamespaces().sorts().add(gs);
+		} catch(GenericSupersortException gse) {
+			System.out.println(gse);
 		}
 		
         // search contract
         final JavaInfo javaInfo = services.getJavaInfo();
 		
 		// Construct a list of all structs in the program
+		// All output Java classes for the Solidity structs inherit from a struct supertype
 		final ImmutableList<KeYJavaType> programStructTypes = 
-			javaInfo.getAllSubtypes(javaInfo.getKeYJavaType("Struct")); // All output Java classes for the Solidity structs should inherit from "Struct"
+			javaInfo.getAllSubtypes(javaInfo.getKeYJavaType(SolidityTranslationVisitor.structSupertypeName)); 
 		final List<String> programStructSorts = new ArrayList<>();
 		for (KeYJavaType structType : programStructTypes) {
 			programStructSorts.add(structType.getSort().toString()); // Structs inside contracts have the contract name as a qualifier
@@ -113,10 +117,9 @@ public class TacletGenerator {
 			registerStructConstructor(services, structType.getName(), signature);
 			makeAxiomsForStruct(axioms, services, structType.getName(), signature);
 		}
-		
-		if (someSort == null) {
-			services.getNamespaces().sorts().remove(new Name("alpha"));
-		}
+				
+		// remove generic sort
+		services.getNamespaces().sorts().remove(new Name("alpha"));
 		
         return axioms;
     }
@@ -135,12 +138,15 @@ public class TacletGenerator {
 			IProgramVariable progVar = fld.getProgramVariable();
 			String name = progVar.name().toString();
 			// Do not include built-in KeY fields such as '<classInitialized>', '<classErroneous>', etc.
-			if (!name.contains("<")) {
+			if (!fld.isStatic() && !name.contains("<")) {
 				StructField structField = new StructField();
 				// If the sort is a program struct type, store it as "Struct" instead.
+				// If the sort is an array, store it as "Seq" instead.
 				Sort sort = progVar.sort();
 				if (programStructSorts.contains(sort.toString())) {
 					sort = services.getNamespaces().sorts().lookup("Struct");
+				} else if (sort.toString().endsWith("[]")) { // TODO: may not work for fixed-size or nested array
+					sort = services.getNamespaces().sorts().lookup("Seq");
 				}
 				structField.sort = sort;
 				structField.name = name;
@@ -232,7 +238,6 @@ public class TacletGenerator {
 		schemaVars = commonSchemaVars.toString() + extraSchemaVars.toString();
 
 		tacletString = makeTacletString(ruleName, schemaVars, assumesExp, findExp, varcondExp, replacewithExp, addExp, displayName, heuristics);
-		System.out.println(tacletString + "\n");
 		taclets.add(KeYParser.parseTaclet(tacletString, services));
 		
 		// 2. writeStructEQ
@@ -246,7 +251,6 @@ public class TacletGenerator {
 		schemaVars = commonSchemaVars.toString() + extraSchemaVars.toString();
 		
 		tacletString = makeTacletString(ruleName, schemaVars, assumesExp, findExp, varcondExp, replacewithExp, addExp, displayName, heuristics);
-		System.out.println(tacletString + "\n");
 		taclets.add(KeYParser.parseTaclet(tacletString, services));
 		
 		// 3. writeStructSingletonPath
@@ -257,7 +261,6 @@ public class TacletGenerator {
 		schemaVars = commonSchemaVars.toString();
 		
 		tacletString = makeTacletString(ruleName, schemaVars, assumesExp, findExp, varcondExp, replacewithExp, addExp, displayName, heuristics);
-		System.out.println(tacletString + "\n");
 		taclets.add(KeYParser.parseTaclet(tacletString, services));
 		
 		// 4. writeStructEQSingletonPath
@@ -270,7 +273,6 @@ public class TacletGenerator {
 		schemaVars = commonSchemaVars.toString() + extraSchemaVars.toString();
 
 		tacletString = makeTacletString(ruleName, schemaVars, assumesExp, findExp, varcondExp, replacewithExp, addExp, displayName, heuristics);
-		System.out.println(tacletString + "\n");
 		taclets.add(KeYParser.parseTaclet(tacletString, services));
 	}
 	
@@ -343,7 +345,6 @@ public class TacletGenerator {
 		schemaVars = commonSchemaVars.toString() + extraSchemaVars.toString();
 		
 		tacletString = makeTacletString(ruleName, schemaVars, assumesExp, findExp, varcondExp, replacewithExp, addExp, displayName, heuristics);
-		System.out.println(tacletString);
 		taclets.add(KeYParser.parseTaclet(tacletString, services));
 		
 		// 3. readStructSingletonPath
@@ -354,7 +355,6 @@ public class TacletGenerator {
 		schemaVars = commonSchemaVars.toString();
 		
 		tacletString = makeTacletString(ruleName, schemaVars, assumesExp, findExp, varcondExp, replacewithExp, addExp, displayName, heuristics);
-		System.out.println(tacletString);
 		taclets.add(KeYParser.parseTaclet(tacletString, services));
 		
 		// 4. readStructEQSingletonPath
@@ -367,7 +367,6 @@ public class TacletGenerator {
 		schemaVars = commonSchemaVars.toString() + extraSchemaVars.toString();
 		
 		tacletString = makeTacletString(ruleName, schemaVars, assumesExp, findExp, varcondExp, replacewithExp, addExp, displayName, heuristics);
-		System.out.println(tacletString);
 		taclets.add(KeYParser.parseTaclet(tacletString, services));
 	}
 	

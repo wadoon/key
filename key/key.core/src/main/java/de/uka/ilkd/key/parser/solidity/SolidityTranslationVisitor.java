@@ -7,8 +7,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
+	public static final String structSupertypeName = "__Struct";
+
 	private static final String defaultReturnVariableName = "__returnVal";
-	private static final String structSupertypeName = "Struct";
 
 	private final StringBuilder output = new StringBuilder();
 	private final VariableScopeStack varStack = new VariableScopeStack();
@@ -188,6 +189,20 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 		CallableFlatteningResult(String mainBodyOutput, String externalMethodsOutput) {
 			this.mainBodyOutput = mainBodyOutput; this.externalMethodsOutput = externalMethodsOutput;
 		}
+	}
+	
+	/**
+	 * If an identifier has been renamed, e.g., to __A__id, get the "id" portion back
+	 */
+	private String deRenameIdentifier(String identifier) {
+		String reservedPrefix = "__";
+		if (identifier.startsWith(reservedPrefix)) {
+			identifier = identifier.substring(0, reservedPrefix.length());
+			int nextReservedPrefixPos = identifier.indexOf("__");
+			assert nextReservedPrefixPos != -1;
+			return identifier.substring(nextReservedPrefixPos + reservedPrefix.length());
+		}
+		return identifier;
 	}
 
 	private String visitCallableBody(Solidity.Callable callable) {
@@ -565,8 +580,9 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 			isConstructorCall = fctName.startsWith("new") &&
 					(nameIsAContract(fctName.substring("new".length())) || Solidity.typeIsArray(fctName.substring("new".length())));
 		} else {
-			objectName = fctName.substring(0, firstDotPos);
-			comparableName = fctName.substring(firstDotPos + 1);
+			// TODO: for now, only expressions involving at most one dot are supported
+			objectName = deRenameIdentifier(fctName.substring(0, firstDotPos));
+			comparableName = deRenameIdentifier(fctName.substring(firstDotPos + 1));
 			if (objectName.equals("this")) {
 				referenceType = FunctionCallReferenceType.THIS;
 			} else if (objectName.equals("super")) {
@@ -736,6 +752,7 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 						Solidity.Variable var = varStack.getVariableFromIdentifier(objectName);
 						displayName = var.getDisplayName(currentContract) + "." + displayName;
 					}
+					break;
 				}
 			}
 		}
@@ -1465,7 +1482,7 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 		if (currentlyVisitingContract) { // Free structs are not static
 			structOutput.append("static ");
 		}
-		// Make all struct classes extend a supertype "Struct"
+		// Make all struct classes extend a struct supertype
 		structOutput.append("class " + visit(ctx.identifier()) + " implements " + structSupertypeName + " {\n");
 		ctx.variableDeclaration().stream().forEach(v -> structOutput.append(visit(v)).append(";\n"));
 		structOutput.append("}\n");
@@ -2336,23 +2353,12 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 	@Override public String visitDotExpression(SolidityParser.DotExpressionContext ctx) {
 		// If you have more than one dot, say A.B.C.D, this method will still be called only once,
 		//  and "expression" will contain "A.B.C", while "identifier" contains "D".
-
-		// TODO: As far as I can see, when the dot expression is also part of a function call, visitDotExpression works
+		//  It seems that when the dot expression is also part of a function call, visitDotExpression works
 		//  with visitFunctionCallExpression as follows. First, visitDotExpression is called. We return the output.
 		//  Then, visitFunctionCall is called, and the output from visitDotExpression is then used as
 		//  the input function name (ctx.expression()).
-		//  If this is a field getter call, we can simply let resolveFunctionCall() do its job by identifying that it
-		//  is a field and rename everything that needs to be renamed. We do not rename anything here, otherwise,
-		//  the resolution may not work correctly.
-		//  However, if this is not a field getter call, and e.g. just a field access without the (), we need to format
-		//  the correct output here, and e.g. rename what is front of the dot if it refers to an object that has
-		//  been inherited.
-		//  However, from here, we have no way of knowing whether this expression is part of a function call or not.
-		//  >>> For now: the assumption is that for field accesses with a qualifier (where a dot is involved),
-		//  we always use the getter (i.e., the '()'), i.e., we don't access the field "raw" (e.g. C.field).
-		//  This is not needed for field access on 'msg' or elementary types.
-		String beforeDot = ctx.expression().getText();
-		String afterDot = ctx.identifier().getText();
+		String beforeDot = visit(ctx.expression());
+		String afterDot = visit(ctx.identifier());
 		return beforeDot + "." + afterDot;
 	}
 	/**
@@ -2685,6 +2691,9 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 	 */
 	@Override public String visitIdentifier(SolidityParser.IdentifierContext ctx) {
 		String identifier = ctx.getText();
+		
+		if (identifier.equals("this"))
+			return identifier;
 
 		if (!structureStack.isEmpty() && structureStack.peek() == ContractStructure.MODIFIER_INVOCATION_FLATTENING) {
 			// We are now performing modifier flattening, and are about to insert a call to another modifier.

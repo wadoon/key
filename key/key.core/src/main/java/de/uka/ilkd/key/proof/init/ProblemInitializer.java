@@ -573,18 +573,6 @@ public final class ProblemInitializer {
         return initConfig;
     }
 
-    private void collectStorageAxioms(ProofOblInput po, InitConfig proofConfig) {
-        for (Taclet taclet : TacletGenerator.getInstance().generateStorageFormalization(proofConfig)) {
-            register(taclet,proofConfig);
-        }
-    }
-
-    private void register(Taclet t, InitConfig proofConfig) {
-        assert t != null;
-        proofConfig.setTaclets(proofConfig.getTaclets().append(t));
-        proofConfig.registerRule(t, AxiomJustification.INSTANCE);
-    }
-
     public ProofAggregate startProver(InitConfig initConfig, ProofOblInput po)
             throws ProofInputException {
         assert initConfig != null;
@@ -592,8 +580,6 @@ public final class ProblemInitializer {
         try {
             //determine environment
             initConfig = determineEnvironment(po, initConfig);
-			// generate storage taclets
-			collectStorageAxioms(po, initConfig);
             //read problem
             reportStatus("Loading problem \"" + po.name() + "\"");
             po.readProblem();

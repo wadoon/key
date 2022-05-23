@@ -20,6 +20,9 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.uka.ilkd.key.proof.init.*;
+import de.uka.ilkd.key.proof.mgt.AxiomJustification;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletGenerator;
 import org.antlr.runtime.RecognitionException;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -31,10 +34,6 @@ import de.uka.ilkd.key.parser.KeYLexerF;
 import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserConfig;
 import de.uka.ilkd.key.parser.ParserMode;
-import de.uka.ilkd.key.proof.init.Includes;
-import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.Taclet;
@@ -190,6 +189,20 @@ public class KeYFile implements EnvInput {
     //internal methods
     //-------------------------------------------------------------------------
     
+	 protected void collectStorageAxioms(ProofOblInput po, InitConfig proofConfig) {
+        for (Taclet taclet : TacletGenerator.getInstance().generateStorageFormalization(proofConfig)) {
+            register(taclet,proofConfig);
+        }
+    }
+
+
+    private void register(Taclet t, InitConfig proofConfig) {
+        assert t != null;
+        proofConfig.setTaclets(proofConfig.getTaclets().append(t));
+        proofConfig.registerRule(t, AxiomJustification.INSTANCE);
+    }
+	
+	
     private KeYParserF createDeclParser(InputStream is) throws IOException {
         return new KeYParserF(ParserMode.DECLARATION,
                              new KeYLexerF(is,
