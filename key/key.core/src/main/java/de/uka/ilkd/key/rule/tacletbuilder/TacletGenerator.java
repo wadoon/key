@@ -331,7 +331,6 @@ public class TacletGenerator {
 		schemaVars = commonSchemaVars.toString() + extraSchemaVars.toString();
 		
 		tacletString = makeTacletString(ruleName, schemaVars, assumesExp, findExp, varcondExp, replacewithExp, addExp, displayName, heuristics);
-		System.out.println(tacletString);
 		taclets.add(KeYParser.parseTaclet(tacletString, services));
 		
 		// 2. readStructEQ

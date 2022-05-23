@@ -3,12 +3,12 @@ contract MyContract {
 	struct B { int b1; int b2; }
 	struct A { B a1; B a2; }
 	
-	A f;
-	//int i;
+	//A f;
+	int i;
 	//int[] j;
 	
   function m() public {
-		//this.i = 0;
+	int j = this.i;
 	   //int x;
 	   //x = j[0];
 	   //this.i = 42;
