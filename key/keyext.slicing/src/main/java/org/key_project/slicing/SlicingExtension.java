@@ -38,7 +38,7 @@ public class SlicingExtension implements KeYGuiExtension,
         @Override
         public List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind, PosInSequent pos) {
             var tracker = trackers.get(currentProof);
-            if (tracker == null) {
+            if (tracker == null || pos == null || pos.getPosInOccurrence() == null || pos.getPosInOccurrence().topLevel() == null) {
                 return List.of();
             }
             var node = tracker.getNodeThatProduced(mediator.getSelectedNode(), pos.getPosInOccurrence().topLevel());
@@ -78,6 +78,7 @@ public class SlicingExtension implements KeYGuiExtension,
                 leftPanel.proofSelected();
             }
         });
+        /*
         mediator.registerProofLoadListener(newProof -> {
             if (!trackers.containsKey(newProof)) {
                 if (newProof != null) {
@@ -88,6 +89,8 @@ public class SlicingExtension implements KeYGuiExtension,
             }
             currentProof = newProof;
         });
+
+         */
 
         //window.getProofTreeView().getRenderer().add(new ExplorationRenderer());
     }
