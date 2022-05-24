@@ -80,12 +80,14 @@ public class SlicingExtension implements KeYGuiExtension,
         });
         /*
         mediator.registerProofLoadListener(newProof -> {
+            if (newProof == null) {
+                return;
+            }
             if (!trackers.containsKey(newProof)) {
-                if (newProof != null) {
-                    var tracker = new DependencyTracker();
-                    newProof.addRuleAppListener(tracker);
-                    trackers.put(newProof, tracker);
-                }
+                var tracker = new DependencyTracker();
+                newProof.addRuleAppListener(tracker);
+                newProof.addProofTreeListener(tracker);
+                trackers.put(newProof, tracker);
             }
             currentProof = newProof;
         });

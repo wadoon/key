@@ -199,9 +199,17 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
 
     @Override
     public void proofPruned(ProofTreeEvent e) {
-        System.out.println("proof pruned");
-        // TODO: clean up removed formulas / nodes /...
+        // clean up removed formulas / nodes /...
         analysisResults = null;
+        for (var edge : graph.edgeSet().toArray(new DefaultEdge[0])) {
+            var node = edgeData.get(edge);
+            if (!e.getSource().find(node) || node.getAppliedRuleApp() == null) {
+                var data = node.lookup(DependencyNodeData.class);
+                for (var out : data.outputs) {
+                    graph.removeVertex(out);
+                }
+            }
+        }
     }
 
     public String exportDot(boolean abbreviateFormulas) {
