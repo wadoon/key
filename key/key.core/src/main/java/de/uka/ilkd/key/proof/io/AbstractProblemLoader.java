@@ -239,7 +239,6 @@ public abstract class AbstractProblemLoader {
      * and to re-apply rules on it if possible.
      * @throws ProofInputException Occurred Exception.
      * @throws IOException Occurred Exception.
-     * @throws ProblemLoaderException Occurred Exception.
      */
     public final void load() throws ProofInputException, IOException, ProblemLoaderException {
         load(null);

@@ -25,8 +25,10 @@ public class TrackedFormula implements GraphNode {
         this.services = services;
     }
 
-    @Override
-    public String toString() {
+    public String toString(boolean abbreviated) {
+        if (abbreviated) {
+            return Integer.toHexString(hashCode());
+        }
         String input = LogicPrinter.quickPrintTerm(formula.formula(), services, true, true).trim();
         var id = input + branchLocation.stream().reduce("", String::concat);
         return !inAntec ? (SEQ_ARROW + " " + id) : (id + " " + SEQ_ARROW);

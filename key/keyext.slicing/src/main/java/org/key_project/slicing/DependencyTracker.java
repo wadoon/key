@@ -40,7 +40,6 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Stream;
 
 public class DependencyTracker implements RuleAppListener, ProofTreeListener {
     private Proof proof;
@@ -100,39 +99,29 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         var ruleApp = ruleAppInfo.getRuleApp();
         var goalList = e.getNewGoals();
         var n = ruleAppInfo.getOriginalNode();
-        //System.out.println("applied node " + n.serialNr());
 
+        var input = new ArrayList<GraphNode>();
+        var output = new ArrayList<GraphNode>();
+
+        // check for rules added by taclets
         var rule = n.getAppliedRuleApp().rule();
         if (rule instanceof Taclet) {
             var taclet = (Taclet) rule;
             if (taclet.getAddedBy() != null) {
                 edgeDependencies.put(n, taclet.getAddedBy());
+                input.add(new AddedRule(taclet.name().toString()));
             }
         }
-
-        var inputs = inputsOfRuleApp(ruleApp, n);
-        var outputs = new ArrayList<Pair<PosInOccurrence, String>>();
-
-        int sibling = ruleAppInfo.getReplacementNodesList().size() - 1;
-        for (var b : ruleAppInfo.getReplacementNodesList()) {
-            String id = ruleAppInfo.getReplacementNodesList().size() > 1 ? ("" + sibling) : "";
-            b.getNodeChanges().forEachRemaining(c -> {
-                if (c instanceof NodeChangeAddFormula) {
-                    outputs.add(new Pair<>(c.getPos(), id));
+        ruleAppInfo.getReplacementNodes().forEachRemaining(newNode -> {
+                for (var newRule : newNode.getNode().getLocalIntroducedRules()) {
+                    if (newRule.rule() instanceof Taclet && ((Taclet) newRule.rule()).getAddedBy() == n) {
+                            output.add(new AddedRule(newRule.rule().name().toString()));
+                    }
                 }
-            });
-            sibling--;
-        }
+        });
 
-        var closedGoals = new ArrayList<String>();
-        if (goalList.isEmpty() || (ruleApp instanceof TacletApp &&
-                ((TacletApp) ruleApp).taclet().closeGoal())) {
-            closedGoals.add("closed goal " + (n.serialNr() + 1)); // TODO: is it always the next nr?
-        }
-
-        var input = new ArrayList<GraphNode>();
-        var output = new ArrayList<TrackedFormula>();
-        for (var in : inputs) {
+        // regular inputs
+        for (var in : inputsOfRuleApp(ruleApp, n)) {
             var loc = n.branchLocation();
             var size = loc.size();
             var added = false;
@@ -156,6 +145,19 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
             }
         }
 
+        var outputs = new ArrayList<Pair<PosInOccurrence, String>>();
+
+        int sibling = ruleAppInfo.getReplacementNodesList().size() - 1;
+        for (var b : ruleAppInfo.getReplacementNodesList()) {
+            String id = ruleAppInfo.getReplacementNodesList().size() > 1 ? ("" + sibling) : "";
+            b.getNodeChanges().forEachRemaining(c -> {
+                if (c instanceof NodeChangeAddFormula) {
+                    outputs.add(new Pair<>(c.getPos(), id));
+                }
+            });
+            sibling--;
+        }
+
         for (var out : outputs) {
             var loc = n.branchLocation();
             if (!out.second.equals("")) {
@@ -166,11 +168,21 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
             output.add(formula);
         }
 
-        n.register(new DependencyNodeData(input, output, closedGoals, ruleApp.rule().displayName() + "_" + n.serialNr()), DependencyNodeData.class);
+        if (goalList.isEmpty() || (ruleApp instanceof TacletApp &&
+                ((TacletApp) ruleApp).taclet().closeGoal())) {
+            output.add(new ClosedGoal(n.serialNr() + 1)); // TODO: is it always the next nr?
+        }
 
+        n.register(new DependencyNodeData(input, output, ruleApp.rule().displayName() + "_" + n.serialNr()), DependencyNodeData.class);
+
+        // add pseudo nodes so the rule application is always included in the graph
         if (input.isEmpty()) {
             input.add(new PseudoInput());
         }
+        if (output.isEmpty()) {
+            output.add(new PseudoOutput());
+        }
+
         for (var in : input) {
             for (var out : output) {
                 graph.addVertex(in);
@@ -187,11 +199,12 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
 
     @Override
     public void proofPruned(ProofTreeEvent e) {
+        System.out.println("proof pruned");
         // TODO: clean up removed formulas / nodes /...
         analysisResults = null;
     }
 
-    public String exportDot() {
+    public String exportDot(boolean abbreviateFormulas) {
         var buf = new StringBuilder();
         buf.append("digraph {\n");
         buf.append("edge [dir=\"back\"];\n");
@@ -205,10 +218,10 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
                 continue;
             }
             for (var in : data.inputs) {
-                Stream.concat(data.outputs.stream().map(Object::toString), data.closedGoals.stream()).forEach(out -> {
+                data.outputs.stream().map(it -> it.toString(abbreviateFormulas)).forEach(out -> {
                     buf
                             .append('"')
-                            .append(in)
+                            .append(in.toString(abbreviateFormulas))
                             .append("\" -> \"")
                             .append(out)
                             .append("\" [label=\"")
@@ -224,7 +237,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         if (analysisResults != null) {
             for (var formula : formulas) {
                 if (!usefulFormulas.contains(formula)) {
-                    buf.append('"').append(formula).append('"').append(" [color=\"red\"]\n");
+                    buf.append('"').append(formula.toString(abbreviateFormulas)).append('"').append(" [color=\"red\"]\n");
                 }
             }
         }
@@ -264,9 +277,11 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
             for (var in : data.inputs) {
                 graph.incomingEdgesOf(in).stream().map(edgeData::get).forEach(queue::add);
             }
+            /*
             if (edgeDependencies.get(node) != null) {
                 queue.add(edgeDependencies.get(node));
             }
+             */
         }
 
         queue.add(proof.root());
@@ -393,7 +408,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
                 }
                 goal.node().setSequent(Sequent.createSequent(ourSemisequents[0], ourSemisequents[1]));
                 replayedNodes.put(node, goal.node());
-                if (edgeDependencies.containsKey(node)) {
+                if (app.rule() instanceof Taclet && ((Taclet) app.rule()).getAddedBy() != null) {
                     // find the correct rule app
                     boolean done = false;
                     for (var partialApp : goal.ruleAppIndex().tacletIndex().getPartialInstantiatedApps()) {

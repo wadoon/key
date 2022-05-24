@@ -29,6 +29,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel {
     private final transient SlicingExtension extension;
     private final JLabel totalSteps;
     private final JLabel usefulSteps;
+    private final JCheckBox abbreviateFormulas;
 
     public SlicingLeftPanel(KeYMediator mediator, SlicingExtension extension) {
         super();
@@ -41,6 +42,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel {
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBorder(new TitledBorder("Dependency analysis"));
 
+        abbreviateFormulas = new JCheckBox("Abbreviate formulas");
         var button = new JButton("Export .dot");
         button.addActionListener(this::exportDot);
         var button2 = new JButton("View formula graph");
@@ -58,9 +60,10 @@ public class SlicingLeftPanel extends JPanel implements TabPanel {
         panel.add(usefulSteps);
         panel.add(button3);
         panel.add(button5);
+        var y = 0;
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
-        c.gridy = 0;
+        c.gridy = y++;
         c.fill = GridBagConstraints.HORIZONTAL;
         c.weightx = 1.0;
         c.weighty = 0.0;
@@ -68,19 +71,25 @@ public class SlicingLeftPanel extends JPanel implements TabPanel {
         add(panel, c);
         c = new GridBagConstraints();
         c.gridx = 0;
-        c.gridy = 1;
+        c.gridy = y++;
+        c.weighty = 0.0;
+        c.anchor = GridBagConstraints.FIRST_LINE_START;
+        add(abbreviateFormulas, c);
+        c = new GridBagConstraints();
+        c.gridx = 0;
+        c.gridy = y++;
         c.weighty = 0.0;
         c.anchor = GridBagConstraints.FIRST_LINE_START;
         add(button, c);
         c = new GridBagConstraints();
         c.gridx = 0;
-        c.gridy = 2;
+        c.gridy = y++;
         c.weighty = 0.0;
         c.anchor = GridBagConstraints.FIRST_LINE_START;
         add(button2, c);
         c = new GridBagConstraints();
         c.gridx = 0;
-        c.gridy = 3;
+        c.gridy = y++;
         c.weighty = 1.0;
         c.anchor = GridBagConstraints.FIRST_LINE_START;
         add(button4, c);
@@ -104,7 +113,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel {
             File file = fileChooser.getSelectedFile();
             try(BufferedWriter writer = new BufferedWriter(
                     new OutputStreamWriter(new FileOutputStream(file)));) {
-                String text = extension.trackers.get(currentProof).exportDot();
+                String text = extension.trackers.get(currentProof).exportDot(abbreviateFormulas.isSelected());
                 writer.write(text);
             } catch (IOException any) {
                 any.printStackTrace();
@@ -139,7 +148,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel {
         if (extension.currentProof == null || extension.currentProof.countNodes() < 2) {
             return;
         }
-        String text = extension.trackers.get(extension.currentProof).exportDot();
+        String text = extension.trackers.get(extension.currentProof).exportDot(abbreviateFormulas.isSelected());
         new PreviewDialog(SwingUtilities.getWindowAncestor((JComponent) e.getSource()), text);
     }
 
