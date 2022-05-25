@@ -29,7 +29,9 @@ import java.util.Map;
 public class SlicingExtension implements KeYGuiExtension,
         KeYGuiExtension.ContextMenu,
         KeYGuiExtension.Startup,
-        KeYGuiExtension.MainMenu, KeYGuiExtension.LeftPanel {
+        KeYGuiExtension.LeftPanel,
+        KeYSelectionListener {
+
     public final Map<Proof, DependencyTracker> trackers = new IdentityHashMap<>();
     public Proof currentProof = null;
     private SlicingLeftPanel leftPanel = null;
@@ -38,7 +40,9 @@ public class SlicingExtension implements KeYGuiExtension,
         @Override
         public List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind, PosInSequent pos) {
             var tracker = trackers.get(currentProof);
-            if (tracker == null || pos == null || pos.getPosInOccurrence() == null || pos.getPosInOccurrence().topLevel() == null) {
+            if (tracker == null
+                    || pos == null || pos.getPosInOccurrence() == null || pos.getPosInOccurrence().topLevel() == null
+                    || mediator.getSelectedNode() == null) {
                 return List.of();
             }
             var node = tracker.getNodeThatProduced(mediator.getSelectedNode(), pos.getPosInOccurrence().topLevel());
@@ -58,27 +62,22 @@ public class SlicingExtension implements KeYGuiExtension,
     }
 
     @Override
-    public void init(MainWindow window, KeYMediator mediator) {
-        mediator.addKeYSelectionListener(new KeYSelectionListener() {
-            @Override
-            public void selectedNodeChanged(KeYSelectionEvent e) {
-                // ignored
-            }
-
-            @Override
-            public void selectedProofChanged(KeYSelectionEvent e) {
-                Proof newProof = mediator.getSelectedProof();
-                trackers.computeIfAbsent(newProof, proof -> {
-                    var tracker = new DependencyTracker();
-                    proof.addRuleAppListener(tracker);
-                    proof.addProofTreeListener(tracker);
-                    return tracker;
-                });
-                currentProof = newProof;
-                leftPanel.proofSelected();
-            }
+    public void selectedProofChanged(KeYSelectionEvent e) {
+        Proof newProof = e.getSource().getSelectedProof();
+        trackers.computeIfAbsent(newProof, proof -> {
+            var tracker = new DependencyTracker();
+            proof.addRuleAppListener(tracker);
+            proof.addProofTreeListener(tracker);
+            return tracker;
         });
-        /*
+
+        currentProof = newProof;
+        leftPanel.proofSelected();
+    }
+
+    @Override
+    public void init(MainWindow window, KeYMediator mediator) {
+        mediator.addKeYSelectionListener(this);
         mediator.registerProofLoadListener(newProof -> {
             if (newProof == null) {
                 return;
@@ -91,10 +90,6 @@ public class SlicingExtension implements KeYGuiExtension,
             }
             currentProof = newProof;
         });
-
-         */
-
-        //window.getProofTreeView().getRenderer().add(new ExplorationRenderer());
     }
 
     @Nonnull
@@ -102,11 +97,5 @@ public class SlicingExtension implements KeYGuiExtension,
     public Collection<TabPanel> getPanels(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
         if (leftPanel == null) leftPanel = new SlicingLeftPanel(mediator, this);
         return Collections.singleton(leftPanel);
-    }
-
-    @Override
-    public @Nonnull
-    List<Action> getMainMenuActions(@Nonnull MainWindow mainWindow) {
-        return List.of();
     }
 }

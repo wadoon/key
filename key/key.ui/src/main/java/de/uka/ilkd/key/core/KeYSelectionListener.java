@@ -7,10 +7,10 @@ package de.uka.ilkd.key.core;
 public interface KeYSelectionListener {
 
     /** focused node has changed */
-    void selectedNodeChanged(KeYSelectionEvent e);
+    default void selectedNodeChanged(KeYSelectionEvent e) {}
 
     /** the selected proof has changed (e.g. a new proof has been
      * loaded) */ 
-    void selectedProofChanged(KeYSelectionEvent e);
+    default void selectedProofChanged(KeYSelectionEvent e) {}
 
 }
