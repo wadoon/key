@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.nio.file.Files;
 
 public class SlicingLeftPanel extends JPanel implements TabPanel {
 
@@ -172,9 +173,9 @@ public class SlicingLeftPanel extends JPanel implements TabPanel {
         try {
             Proof p = extension.trackers.get(extension.currentProof).sliceProof();
             if (p != null) {
-                // TODO: do this differently
-                p.saveToFile(new File("/tmp/sliced.proof"));
-                mediator.getUI().loadProblem(new File("/tmp/sliced.proof"));
+                var tempFile = Files.createTempFile("", ".proof");
+                p.saveToFile(tempFile.toFile());
+                mediator.getUI().loadProblem(tempFile.toFile());
             }
         } catch (Exception e) {
             e.printStackTrace();
