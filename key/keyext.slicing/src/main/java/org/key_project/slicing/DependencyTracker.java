@@ -352,99 +352,95 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         return p;
     }
 
-    private void replayProof(Proof p, Node node) {
-        if (node.getAppliedRuleApp() == null) {
-            return;
-        }
-        if (usefulSteps.contains(node) || node.childrenCount() > 1) { // TODO: cut elimination
-            System.out.println("at node " + node.serialNr() + " " + node.getAppliedRuleApp().rule().displayName());
-            /*
-            if (node.getAppliedRuleApp().rule().displayName().equals("deleteMergePoint") || true) {
-                try {
-                    p.saveToFile(new File("/tmp/beforeApplying" + node.serialNr() + ".proof"));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    throw new RuntimeException("aaah");
-                }
+    private void replayProof(Proof p, Node inputNode) {
+        var node = inputNode;
+        while (true) {
+            if (node.getAppliedRuleApp() == null) {
+                return;
             }
-             */
-            //System.out.println("applying..");
-            var app = node.getAppliedRuleApp();
-            if (app instanceof MergeRuleBuiltInRuleApp) {
-                // re-construct merge rule
-                var pio = app.posInOccurrence();
+            if (usefulSteps.contains(node) || node.childrenCount() > 1) { // TODO: cut elimination
+                System.out.println("at node " + node.serialNr() + " " + node.getAppliedRuleApp().rule().displayName());
 
-                var newApp = MergeRule.INSTANCE.createApp(pio, p.getServices());
+                var app = node.getAppliedRuleApp();
+                if (app instanceof MergeRuleBuiltInRuleApp) {
+                    // re-construct merge rule
+                    var pio = app.posInOccurrence();
 
-                if (!newApp.complete()) {
-                    newApp = newApp.forceInstantiate(p.openGoals().stream().filter(it -> !ignoredGoals.contains(it)).findFirst().get());
+                    var newApp = MergeRule.INSTANCE.createApp(pio, p.getServices());
+
+                    if (!newApp.complete()) {
+                        newApp = newApp.forceInstantiate(p.openGoals().stream().filter(it -> !ignoredGoals.contains(it)).findFirst().get());
+                    }
+                    app = newApp;
                 }
-                app = newApp;
-            }
-            if (app instanceof CloseAfterMergeRuleBuiltInRuleApp) {
-                var toIgnore = p.openGoals().stream().filter(it -> !ignoredGoals.contains(it)).findFirst().get();
-                ignoredGoals.add(toIgnore);
-                // this goal will be closed automatically when the merge is complete
-                // CloseAfterMerge applications are done by the MergeRule!
-            } else {
-                var goal = p.openGoals().stream().filter(it -> !ignoredGoals.contains(it)).findFirst().get();
-                // fix sequent object identity
-                var origSequent = node.sequent();
-                var ourSequent = goal.sequent();
-                var origSemisequents = new Semisequent[] { origSequent.antecedent(), origSequent.succedent() };
-                var ourSemisequents = new Semisequent[] { ourSequent.antecedent(), ourSequent.succedent() };
-                var idx = 1;
-                for (int j = 0; j < origSemisequents.length; j++) {
-                    var origAnte = origSemisequents[j];
-                    var ourAnte = ourSemisequents[j];
-                    for (int i = 0; i < ourAnte.size(); i++) {
-                        var pio = PosInOccurrence.findInSequent(ourSequent, idx, PosInTerm.getTopLevel());
-                        if (!origAnte.contains(pio.sequentFormula())) {
-                            // replace with equal object
-                            for (var origFormula : origAnte.asList()) {
-                                if (origFormula.realEquals(pio.sequentFormula())) {
-                                    ourAnte = ourAnte.replace(i, origFormula).semisequent();
-                                    if (!origFormula.toString().equals(pio.sequentFormula().toString())) {
-                                        System.err.println("catastrophic failure");
+                if (app instanceof CloseAfterMergeRuleBuiltInRuleApp) {
+                    var toIgnore = p.openGoals().stream().filter(it -> !ignoredGoals.contains(it)).findFirst().get();
+                    ignoredGoals.add(toIgnore);
+                    // this goal will be closed automatically when the merge is complete
+                    // CloseAfterMerge applications are done by the MergeRule!
+                } else {
+                    var goal = p.openGoals().stream().filter(it -> !ignoredGoals.contains(it)).findFirst().get();
+                    // fix sequent object identity
+                    var origSequent = node.sequent();
+                    var ourSequent = goal.sequent();
+                    var origSemisequents = new Semisequent[]{origSequent.antecedent(), origSequent.succedent()};
+                    var ourSemisequents = new Semisequent[]{ourSequent.antecedent(), ourSequent.succedent()};
+                    var idx = 1;
+                    for (int j = 0; j < origSemisequents.length; j++) {
+                        var origAnte = origSemisequents[j];
+                        var ourAnte = ourSemisequents[j];
+                        for (int i = 0; i < ourAnte.size(); i++) {
+                            var pio = PosInOccurrence.findInSequent(ourSequent, idx, PosInTerm.getTopLevel());
+                            if (!origAnte.contains(pio.sequentFormula())) {
+                                // replace with equal object
+                                for (var origFormula : origAnte.asList()) {
+                                    if (origFormula.realEquals(pio.sequentFormula())) {
+                                        ourAnte = ourAnte.replace(i, origFormula).semisequent();
+                                        if (!origFormula.toString().equals(pio.sequentFormula().toString())) {
+                                            System.err.println("catastrophic failure");
+                                        }
                                     }
                                 }
                             }
+                            idx++;
                         }
-                        idx++;
+                        ourSemisequents[j] = ourAnte;
                     }
-                    ourSemisequents[j] = ourAnte;
-                }
-                goal.node().setSequent(Sequent.createSequent(ourSemisequents[0], ourSemisequents[1]));
-                replayedNodes.put(node, goal.node());
-                if (app.rule() instanceof Taclet && ((Taclet) app.rule()).getAddedBy() != null) {
-                    // find the correct rule app
-                    boolean done = false;
-                    for (var partialApp : goal.ruleAppIndex().tacletIndex().getPartialInstantiatedApps()) {
-                        if (partialApp.taclet().getAddedBy() == replayedNodes.get(edgeDependencies.get(node))) {
-                            // re-apply the taclet
-                            var fullApp = partialApp.matchFind(app.posInOccurrence(), p.getServices()).setPosInOccurrence(app.posInOccurrence(), p.getServices());
-                            //assert fullApp != null && fullApp.complete();
-                            goal.apply(fullApp);
-                            done = true;
-                            break;
+                    goal.node().setSequent(Sequent.createSequent(ourSemisequents[0], ourSemisequents[1]));
+                    replayedNodes.put(node, goal.node());
+                    if (app.rule() instanceof Taclet && ((Taclet) app.rule()).getAddedBy() != null) {
+                        // find the correct rule app
+                        boolean done = false;
+                        for (var partialApp : goal.ruleAppIndex().tacletIndex().getPartialInstantiatedApps()) {
+                            if (partialApp.taclet().getAddedBy() == replayedNodes.get(edgeDependencies.get(node))) {
+                                // re-apply the taclet
+                                var fullApp = partialApp.matchFind(app.posInOccurrence(), p.getServices()).setPosInOccurrence(app.posInOccurrence(), p.getServices());
+                                //assert fullApp != null && fullApp.complete();
+                                goal.apply(fullApp);
+                                done = true;
+                                break;
+                            }
                         }
-                    }
-                    if (!done) {
+                        if (!done) {
+                            goal.apply(app);
+                        }
+                    } else {
                         goal.apply(app);
                     }
-                } else {
-                    goal.apply(app);
                 }
             }
-        }
-        if (node.childrenCount() > 1) {
-            List<Node> nodes = new ArrayList<>();
-            node.childrenIterator().forEachRemaining(nodes::add);
-            for (int i = nodes.size() - 1; i >= 0; i--) {
-                replayProof(p, nodes.get(i));
+            if (node.childrenCount() > 1) {
+                List<Node> nodes = new ArrayList<>();
+                node.childrenIterator().forEachRemaining(nodes::add);
+                for (int i = nodes.size() - 1; i >= 0; i--) {
+                    replayProof(p, nodes.get(i));
+                }
+                break;
+            } else if (node.childrenCount() == 1) {
+                node = node.child(0);
+            } else {
+                break;
             }
-        } else if (node.childrenCount() == 1) {
-            replayProof(p, node.child(0));
         }
     }
 
