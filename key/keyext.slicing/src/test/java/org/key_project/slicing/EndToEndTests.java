@@ -29,7 +29,7 @@ class EndToEndTests {
             // Analyze proof
             var results = tracker.analyze();
             Assertions.assertEquals(145, results.totalSteps);
-            Assertions.assertEquals(79, results.usefulSteps);
+            Assertions.assertEquals(79, results.usefulStepsNr);
             // Slice proof
             Proof slicedProof = tracker.sliceProof();
             // 79 rule applications + 3 closed goals

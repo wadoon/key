@@ -1,4 +1,4 @@
-package org.key_project.slicing;
+package org.key_project.slicing.graph;
 
 import java.util.Objects;
 

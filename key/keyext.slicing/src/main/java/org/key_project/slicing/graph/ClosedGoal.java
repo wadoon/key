@@ -1,4 +1,4 @@
-package org.key_project.slicing;
+package org.key_project.slicing.graph;
 
 public class ClosedGoal implements GraphNode {
     public final int serialNr;

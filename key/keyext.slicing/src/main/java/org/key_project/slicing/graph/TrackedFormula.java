@@ -1,4 +1,4 @@
-package org.key_project.slicing;
+package org.key_project.slicing.graph;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.SequentFormula;

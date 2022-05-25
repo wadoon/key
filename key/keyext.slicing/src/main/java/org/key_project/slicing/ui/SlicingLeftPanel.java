@@ -186,7 +186,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel {
 
     private void displayResults(AnalysisResults results) {
         totalSteps.setText("Total steps: " + results.totalSteps);
-        usefulSteps.setText("Useful steps: " + results.usefulSteps);
+        usefulSteps.setText("Useful steps: " + results.usefulStepsNr);
     }
 
     @Nonnull

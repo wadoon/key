@@ -1,5 +1,7 @@
 package org.key_project.slicing;
 
+import org.key_project.slicing.graph.GraphNode;
+
 import java.util.List;
 
 public class DependencyNodeData {
