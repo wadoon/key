@@ -10,6 +10,11 @@ import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
+/**
+ * A simple image view that may be panned and zoomed by the user.
+ *
+ * TODO: move to key.ui? it can be used for any image
+ */
 public class PanZoomImageView extends JComponent implements MouseListener, MouseMotionListener, MouseWheelListener {
     private final transient BufferedImage image;
     private final AffineTransform at;

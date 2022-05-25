@@ -1,5 +1,6 @@
 package org.key_project.slicing;
 
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Semisequent;
@@ -329,6 +330,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         if (analysisResults == null) {
             return null;
         }
+        MainWindow.getInstance().setStatusLine("Slicing proof", analysisResults.usefulSteps.size());
         ignoredGoals.clear();
         replayedNodes.clear();
         Proof p = null;
@@ -361,7 +363,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
                 return;
             }
             if (analysisResults.usefulSteps.contains(node) || node.childrenCount() > 1) { // TODO: cut elimination
-                System.out.println("at node " + node.serialNr() + " " + node.getAppliedRuleApp().rule().displayName());
+                //System.out.println("at node " + node.serialNr() + " " + node.getAppliedRuleApp().rule().displayName());
 
                 var app = node.getAppliedRuleApp();
                 if (app instanceof MergeRuleBuiltInRuleApp) {
@@ -431,6 +433,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
                     } else {
                         goal.apply(app);
                     }
+                    MainWindow.getInstance().getUserInterface().setProgress(replayedNodes.size());
                 }
             }
             if (node.childrenCount() > 1) {

@@ -114,13 +114,13 @@ public class SlicingLeftPanel extends JPanel implements TabPanel {
         int result = fileChooser.showSaveDialog((JComponent) e.getSource());
         if (result == JFileChooser.APPROVE_OPTION) {
             File file = fileChooser.getSelectedFile();
-            try(BufferedWriter writer = new BufferedWriter(
-                    new OutputStreamWriter(new FileOutputStream(file)));) {
+            try (BufferedWriter writer = new BufferedWriter(
+                    new OutputStreamWriter(new FileOutputStream(file)))) {
                 String text = extension.trackers.get(currentProof).exportDot(abbreviateFormulas.isSelected());
                 writer.write(text);
             } catch (IOException any) {
                 any.printStackTrace();
-                assert false;
+                IssueDialog.showExceptionDialog(MainWindow.getInstance(), any);
             }
         }
     }
@@ -170,17 +170,23 @@ public class SlicingLeftPanel extends JPanel implements TabPanel {
             return;
         }
         analyzeProof(event);
-        try {
-            Proof p = extension.trackers.get(extension.currentProof).sliceProof();
-            if (p != null) {
-                var tempFile = Files.createTempFile("", ".proof");
-                p.saveToFile(tempFile.toFile());
-                mediator.getUI().loadProblem(tempFile.toFile());
+        new Thread(() -> {
+            try {
+                Proof p = extension.trackers.get(extension.currentProof).sliceProof();
+                if (p != null) {
+                    var tempFile = Files.createTempFile("", ".proof");
+                    p.saveToFile(tempFile.toFile());
+                    SwingUtilities.invokeLater(() ->
+                            mediator.getUI().loadProblem(tempFile.toFile())
+                    );
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                SwingUtilities.invokeLater(() ->
+                        IssueDialog.showExceptionDialog(MainWindow.getInstance(), e)
+                );
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            IssueDialog.showExceptionDialog(MainWindow.getInstance(), e);
-        }
+        }).start();
     }
 
     private void resetLabels() {
