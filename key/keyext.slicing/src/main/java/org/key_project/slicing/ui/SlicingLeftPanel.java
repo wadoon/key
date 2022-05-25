@@ -4,7 +4,6 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.MainWindowTabbedPane;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.proof.Proof;
@@ -25,7 +24,7 @@ import java.nio.file.Files;
 
 public class SlicingLeftPanel extends JPanel implements TabPanel {
 
-    public static final Icon INFO_ICON = IconFactory.SLICE_ICON.get(MainWindowTabbedPane.TAB_ICON_SIZE);
+    public static final Icon INFO_ICON = IconFactory.SLICE_ICON.get(MainWindow.TAB_ICON_SIZE);
     public static final String NAME = "slicingPane";
 
     private final transient KeYMediator mediator;

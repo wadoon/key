@@ -32,11 +32,8 @@ import java.awt.event.MouseEvent;
  */
 public class InfoView extends JSplitPane implements TabPanel {
 
-    /**
-     *
-     */
     private static final long serialVersionUID = -6944612837850368411L;
-    public static final Icon INFO_ICON = IconFactory.INFO_VIEW.get(MainWindowTabbedPane.TAB_ICON_SIZE);
+    public static final Icon INFO_ICON = IconFactory.INFO_VIEW.get(MainWindow.TAB_ICON_SIZE);
 
 
     private final InfoTree infoTree;

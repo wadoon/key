@@ -42,7 +42,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
 
     public static final Icon GOAL_LIST_ICON =
             IconFontSwing.buildIcon(FontAwesomeSolid.FLAG_CHECKERED,
-                                    MainWindowTabbedPane.TAB_ICON_SIZE);
+                                    MainWindow.TAB_ICON_SIZE);
     /**
      *
      */
