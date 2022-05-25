@@ -409,6 +409,8 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
                         ourSemisequents[j] = ourAnte;
                     }
                     goal.node().setSequent(Sequent.createSequent(ourSemisequents[0], ourSemisequents[1]));
+                    // Register name proposals
+                    p.getServices().getNameRecorder().setProposals(node.getNameRecorder().getProposals());
                     replayedNodes.put(node, goal.node());
                     if (app.rule() instanceof Taclet && ((Taclet) app.rule()).getAddedBy() != null) {
                         // find the correct rule app
