@@ -1,7 +1,9 @@
 package org.key_project.slicing.ui;
 
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.KeYFileChooser;
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.MainWindowTabbedPane;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
@@ -167,15 +169,16 @@ public class SlicingLeftPanel extends JPanel implements TabPanel {
             return;
         }
         analyzeProof(event);
-        Proof p = extension.trackers.get(extension.currentProof).sliceProof();
         try {
+            Proof p = extension.trackers.get(extension.currentProof).sliceProof();
             if (p != null) {
                 // TODO: do this differently
                 p.saveToFile(new File("/tmp/sliced.proof"));
                 mediator.getUI().loadProblem(new File("/tmp/sliced.proof"));
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
+            IssueDialog.showExceptionDialog(MainWindow.getInstance(), e);
         }
     }
 
