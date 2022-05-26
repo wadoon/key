@@ -8,10 +8,16 @@ import java.awt.event.ActionEvent;
 
 /**
  * Context menu action to select the proof step that created a formula.
+ *
+ * @author Arne Keller
  */
 public class ShowCreatedByAction extends MainWindowAction {
 
     private static final long serialVersionUID = 1475202264543002419L;
+
+    /**
+     * The node to switch to.
+     */
     private final transient Node node;
 
     public ShowCreatedByAction(MainWindow mw, Node node) {

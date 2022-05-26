@@ -13,17 +13,29 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Dialog that displays the results of the dependency analysis algorithm.
+ *
+ * @author Arne Keller
+ */
 public class RuleStatisticsDialog extends JDialog {
+    /**
+     * List of (rule name, total applications, useless applications, initial useless applications).
+     */
     private final transient List<Quadruple<String, Integer, Integer, Integer>> rules;
 
     public RuleStatisticsDialog(Window window, AnalysisResults results) {
         super(window, "Rule Statistics");
-        setLayout(new BorderLayout());
 
         rules = results.ruleStatistics.entrySet().stream()
                 .map(entry -> new Quadruple<>(entry.getKey(), entry.getValue().first, entry.getValue().second, entry.getValue().third))
                 .collect(Collectors.toList());
-        rules.sort(Comparator.comparing((Quadruple<String, Integer, Integer, Integer> it) -> it.second).reversed());
+        rules.sort(
+                Comparator.comparing((Quadruple<String, Integer, Integer, Integer> it) -> it.second)
+                .reversed()
+        );
+
+        setLayout(new BorderLayout());
 
         JEditorPane statisticsPane = new JEditorPane("text/html", genTable());
         statisticsPane.setEditable(false);

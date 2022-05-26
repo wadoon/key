@@ -24,7 +24,13 @@ import java.nio.file.Files;
 
 public class SlicingLeftPanel extends JPanel implements TabPanel {
 
+    /**
+     * The icon of this panel.
+     */
     public static final Icon INFO_ICON = IconFactory.SLICE_ICON.get(MainWindow.TAB_ICON_SIZE);
+    /**
+     * ID of this panel.
+     */
     public static final String NAME = "slicingPane";
 
     private final transient KeYMediator mediator;

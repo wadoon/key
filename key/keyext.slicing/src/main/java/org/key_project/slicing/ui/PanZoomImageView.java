@@ -14,13 +14,37 @@ import java.awt.image.BufferedImage;
  * A simple image view that may be panned and zoomed by the user.
  *
  * TODO: move to key.ui? it can be used for any image
+ *
+ * @author Arne Keller
  */
-public class PanZoomImageView extends JComponent implements MouseListener, MouseMotionListener, MouseWheelListener {
+public class PanZoomImageView extends JComponent
+        implements MouseListener, MouseMotionListener, MouseWheelListener {
+    /**
+     * Image to be displayed.
+     */
     private final transient BufferedImage image;
+    /**
+     * Current display transformation.
+     */
     private final AffineTransform at;
+    /**
+     * Timer used to control redraws.
+     */
     private Timer timer;
+    /**
+     * Time of last paint in milliseconds.
+     */
     private long lastPaint = 0;
+    /**
+     * Whether to render the image using a fast interpolation method.
+     */
     private boolean quickRender = false;
+    /**
+     * Variable used to record mouse movements.
+     *
+     * @see #mouseDragged(MouseEvent)
+     */
+    private final Point p = new Point();
 
     public PanZoomImageView(BufferedImage img, int width, int height) {
         this.image = img;
@@ -56,12 +80,8 @@ public class PanZoomImageView extends JComponent implements MouseListener, Mouse
         g2.drawRenderedImage(image, at);
     }
 
-    private final Point p = new Point();
-
     @Override
-    public void mouseClicked(MouseEvent e) {
-
-    }
+    public void mouseClicked(MouseEvent e) { }
 
     @Override
     public void mousePressed(MouseEvent e) {
@@ -69,17 +89,13 @@ public class PanZoomImageView extends JComponent implements MouseListener, Mouse
     }
 
     @Override
-    public void mouseReleased(MouseEvent e) {
-    }
+    public void mouseReleased(MouseEvent e) { }
 
     @Override
-    public void mouseEntered(MouseEvent e) {
-
-    }
+    public void mouseEntered(MouseEvent e) { }
 
     @Override
-    public void mouseExited(MouseEvent e) {
-    }
+    public void mouseExited(MouseEvent e) { }
 
     @Override
     public void mouseDragged(MouseEvent e) {
@@ -95,8 +111,7 @@ public class PanZoomImageView extends JComponent implements MouseListener, Mouse
     }
 
     @Override
-    public void mouseMoved(MouseEvent e) {
-    }
+    public void mouseMoved(MouseEvent e) { }
 
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {

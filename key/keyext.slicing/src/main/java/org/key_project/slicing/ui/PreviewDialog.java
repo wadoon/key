@@ -10,6 +10,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * Dialog that displays a rendering of the dependency graph.
+ * Requires an installation of graphviz on the system.
+ *
+ * @author Arne Keller
+ */
 public class PreviewDialog extends JDialog {
     public PreviewDialog(Window window, String dot) {
         super(window, "Preview");
@@ -26,10 +32,25 @@ public class PreviewDialog extends JDialog {
     }
 
     private static class DotExecutor extends SwingWorker<Void, Void> {
+        /**
+         * Execution error.
+         */
         private String error;
+        /**
+         * The rendered graph.
+         */
         private BufferedImage img;
+        /**
+         * Graph to be rendered (dot format).
+         */
         private final String dot;
+        /**
+         * The preview dialog.
+         */
         private final PreviewDialog dialog;
+        /**
+         * The main window (used to set the relative position of the dialog).
+         */
         private final Window window;
 
         public DotExecutor(String dot, Window window, PreviewDialog dialog) {

@@ -56,10 +56,6 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
     private final Map<Node, Node> edgeDependencies = new IdentityHashMap<>();
     private AnalysisResults analysisResults = null;
 
-    // used when slicing the proof
-    private final Set<Goal> ignoredGoals = new HashSet<>();
-    private final Map<Node, Node> replayedNodes = new IdentityHashMap<>();
-
     /**
      * @param ruleApp a rule application
      * @param node node corresponding to the rule application
@@ -251,197 +247,18 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
     }
 
     public AnalysisResults analyze() {
-        if (GeneralSettings.noPruningClosed) {
-            throw new IllegalStateException("cannot analyze proof with no (recorded) closed goals, try disabling GeneralSettings.noPruningClosed");
-        }
-        if (proof == null || !proof.closed()) {
-            return null;
-        }
         if (analysisResults != null) {
             return analysisResults;
         }
-        var usefulSteps = new HashSet<Node>();
-        var usefulFormulas = new HashSet<TrackedFormula>();
-        var queue = new ArrayDeque<Node>();
-        for (var e : proof.closedGoals()) {
-            queue.add(e.node().parent());
-        }
-
-        while (!queue.isEmpty()) {
-            var node = queue.pop();
-            if (usefulSteps.contains(node)) {
-                continue;
-            }
-            usefulSteps.add(node);
-            var data = node.lookup(DependencyNodeData.class);
-            for (var input : data.inputs) {
-                if (input instanceof TrackedFormula) {
-                    usefulFormulas.add((TrackedFormula) input);
-                }
-            }
-            for (var in : data.inputs) {
-                graph.incomingEdgesOf(in).forEach(queue::add);
-            }
-        }
-
-        queue.add(proof.root());
-        while (!queue.isEmpty()) {
-            var node = queue.pop();
-            if (!usefulSteps.contains(node) && node.getNodeInfo().getNotes() == null) {
-                node.getNodeInfo().setNotes("useless");
-            }
-            node.childrenIterator().forEachRemaining(queue::add);
-        }
-
-        var steps = proof.countNodes() - proof.closedGoals().size();
-
-        // gather statistics on useful/useless rules
-        var rules = new HashMap<String, Triple<Integer, Integer, Integer>>();
-        proof.breadthFirstSearch(proof.root(), (_proof, node) -> {
-            if (node.getAppliedRuleApp() == null) {
-                return;
-            }
-            var displayName = node.getAppliedRuleApp().rule().displayName();
-            if (!rules.containsKey(displayName)) {
-                rules.put(displayName, new Triple<>(0, 0, 0));
-            }
-            var triple = rules.get(displayName);
-            var d2 = !usefulSteps.contains(node) ? 1 : 0;
-            var d3 = d2 == 1 && node.lookup(DependencyNodeData.class).inputs.stream().anyMatch(usefulFormulas::contains) ? 1 : 0;
-            rules.put(displayName, new Triple<>(triple.first + 1, triple.second + d2, triple.third + d3));
-        });
-
-        analysisResults = new AnalysisResults(steps, usefulSteps.size(), rules, usefulSteps, usefulFormulas);
+        analysisResults = DependencyAnalyzer.analyze(proof, graph);
         return analysisResults;
     }
 
     public Proof sliceProof() {
-        if (analysisResults == null) {
+        if (proof == null || analysisResults == null) {
             return null;
         }
-        if (MainWindow.hasInstance()) {
-            MainWindow.getInstance().setStatusLine("Slicing proof", analysisResults.usefulSteps.size());
-        }
-        ignoredGoals.clear();
-        replayedNodes.clear();
-        Proof p = null;
-        var it = proof.getServices().getSpecificationRepository().getProofOblInput(proof);
-        if (it != null) {
-            if (it instanceof AbstractPO) {
-                var po = ((AbstractPO) it).getNewPO();
-                try {
-                    new ProblemInitializer(proof.getServices().getProfile()).setUpProofHelper(it, po);
-                    p = po.getFirstProof();
-                    p.getServices()
-                            .getSpecificationRepository().registerProof(it, p);
-                } catch (ProofInputException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        if (p == null) {
-            // note: this constructor only works for "simple" proof inputs (≈ pure logic)
-            p = new Proof("reduced", proof.root().sequent().succedent().get(0).formula(), proof.header(), proof.getInitConfig().copy());
-        }
-        replayProof(p, proof.root());
-        return p;
-    }
-
-    private void replayProof(Proof p, Node inputNode) {
-        var node = inputNode;
-        while (true) {
-            if (node.getAppliedRuleApp() == null) {
-                return;
-            }
-            if (analysisResults.usefulSteps.contains(node) || node.childrenCount() > 1) { // TODO: cut elimination
-                //System.out.println("at node " + node.serialNr() + " " + node.getAppliedRuleApp().rule().displayName());
-
-                var app = node.getAppliedRuleApp();
-                if (app instanceof MergeRuleBuiltInRuleApp) {
-                    // re-construct merge rule
-                    var pio = app.posInOccurrence();
-
-                    var newApp = MergeRule.INSTANCE.createApp(pio, p.getServices());
-
-                    if (!newApp.complete()) {
-                        newApp = newApp.forceInstantiate(p.openGoals().stream().filter(it -> !ignoredGoals.contains(it)).findFirst().get());
-                    }
-                    app = newApp;
-                }
-                if (app instanceof CloseAfterMergeRuleBuiltInRuleApp) {
-                    var toIgnore = p.openGoals().stream().filter(it -> !ignoredGoals.contains(it)).findFirst().get();
-                    ignoredGoals.add(toIgnore);
-                    // this goal will be closed automatically when the merge is complete
-                    // CloseAfterMerge applications are done by the MergeRule!
-                } else {
-                    var goal = p.openGoals().stream().filter(it -> !ignoredGoals.contains(it)).findFirst().get();
-                    // fix sequent object identity
-                    var origSequent = node.sequent();
-                    var ourSequent = goal.sequent();
-                    var origSemisequents = new Semisequent[]{origSequent.antecedent(), origSequent.succedent()};
-                    var ourSemisequents = new Semisequent[]{ourSequent.antecedent(), ourSequent.succedent()};
-                    var idx = 1;
-                    for (int j = 0; j < origSemisequents.length; j++) {
-                        var origAnte = origSemisequents[j];
-                        var ourAnte = ourSemisequents[j];
-                        for (int i = 0; i < ourAnte.size(); i++) {
-                            var pio = PosInOccurrence.findInSequent(ourSequent, idx, PosInTerm.getTopLevel());
-                            if (!origAnte.contains(pio.sequentFormula())) {
-                                // replace with equal object
-                                for (var origFormula : origAnte.asList()) {
-                                    if (origFormula.realEquals(pio.sequentFormula())) {
-                                        ourAnte = ourAnte.replace(i, origFormula).semisequent();
-                                        if (!origFormula.toString().equals(pio.sequentFormula().toString())) {
-                                            System.err.println("name / index mismatch");
-                                        }
-                                    }
-                                }
-                            }
-                            idx++;
-                        }
-                        ourSemisequents[j] = ourAnte;
-                    }
-                    goal.node().setSequent(Sequent.createSequent(ourSemisequents[0], ourSemisequents[1]));
-                    // register name proposals
-                    p.getServices().getNameRecorder().setProposals(node.getNameRecorder().getProposals());
-                    replayedNodes.put(node, goal.node());
-                    if (app.rule() instanceof Taclet && ((Taclet) app.rule()).getAddedBy() != null) {
-                        // find the correct rule app
-                        boolean done = false;
-                        for (var partialApp : goal.ruleAppIndex().tacletIndex().getPartialInstantiatedApps()) {
-                            if (partialApp.taclet().getAddedBy() == replayedNodes.get(edgeDependencies.get(node))) {
-                                // re-apply the taclet
-                                var fullApp = partialApp.matchFind(app.posInOccurrence(), p.getServices()).setPosInOccurrence(app.posInOccurrence(), p.getServices());
-                                //assert fullApp != null && fullApp.complete();
-                                goal.apply(fullApp);
-                                done = true;
-                                break;
-                            }
-                        }
-                        if (!done) {
-                            goal.apply(app);
-                        }
-                    } else {
-                        goal.apply(app);
-                    }
-                    if (MainWindow.hasInstance()) {
-                        MainWindow.getInstance().getUserInterface().setProgress(replayedNodes.size());
-                    }
-                }
-            }
-            if (node.childrenCount() > 1) {
-                List<Node> nodes = new ArrayList<>();
-                node.childrenIterator().forEachRemaining(nodes::add);
-                for (int i = nodes.size() - 1; i >= 0; i--) {
-                    replayProof(p, nodes.get(i));
-                }
-                break;
-            } else if (node.childrenCount() == 1) {
-                node = node.child(0);
-            } else {
-                break;
-            }
-        }
+        return new ProofSlicer(proof, analysisResults, edgeDependencies).sliceProof();
     }
 
     public Node getNodeThatProduced(Node currentNode, PosInOccurrence pio) {

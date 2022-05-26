@@ -41,7 +41,9 @@ public class SlicingExtension implements KeYGuiExtension,
         public List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind, PosInSequent pos) {
             var tracker = trackers.get(currentProof);
             if (tracker == null
-                    || pos == null || pos.getPosInOccurrence() == null || pos.getPosInOccurrence().topLevel() == null
+                    || pos == null
+                    || pos.getPosInOccurrence() == null
+                    || pos.getPosInOccurrence().topLevel() == null
                     || mediator.getSelectedNode() == null) {
                 return List.of();
             }

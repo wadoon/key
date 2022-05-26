@@ -12,10 +12,32 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
+/**
+ * This dependency graph tracks the flow of rule applications in the proof tree.
+ * Formulas (plus their branch location and sequent location) correspond to nodes.
+ * Rule applications correspond to edges.
+ *
+ * @author Arne Keller
+ */
 public class DependencyGraph {
+    /**
+     * Main storage container.
+     * Edges start at input formulas and end at formulas produced by the rule application.
+     */
     private final Graph<GraphNode, DefaultEdge> graph = new DirectedMultigraph<>(DefaultEdge.class);
+    /**
+     * Mapping of graph edges to rule applications.
+     * Required because we can not add the same edge twice.
+     */
     private final Map<DefaultEdge, Node> edgeData = new IdentityHashMap<>();
 
+    /**
+     * Add a rule application to the dependency graph.
+     *
+     * @param node the node to add
+     * @param input inputs required by this proof step
+     * @param output outputs produced by this proof step
+     */
     public void addRuleApplication(Node node, Collection<GraphNode> input, Collection<GraphNode> output) {
         for (var in : input) {
             for (var out : output) {
@@ -31,10 +53,20 @@ public class DependencyGraph {
         }
     }
 
+    /**
+     * @param node a graph node
+     * @return the rule application(s) that produced the graph node
+     */
     public Stream<Node> incomingEdgesOf(GraphNode node) {
         return graph.incomingEdgesOf(node).stream().map(edgeData::get);
     }
 
+    /**
+     * Process a prune of the proof tree.
+     * Deletes graph data that belongs to removed steps.
+     *
+     * @param e the proof slicing event
+     */
     public void prune(ProofTreeEvent e) {
         for (var edge : graph.edgeSet().toArray(new DefaultEdge[0])) {
             var node = edgeData.get(edge);
