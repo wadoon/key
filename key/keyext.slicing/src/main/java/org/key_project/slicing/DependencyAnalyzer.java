@@ -5,7 +5,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.util.Triple;
 import org.key_project.slicing.graph.DependencyGraph;
-import org.key_project.slicing.graph.TrackedFormula;
+import org.key_project.slicing.graph.GraphNode;
 
 import java.util.ArrayDeque;
 import java.util.HashMap;
@@ -16,7 +16,7 @@ import java.util.HashSet;
  *
  * @author Arne Keller
  */
-public class DependencyAnalyzer {
+public final class DependencyAnalyzer {
     private DependencyAnalyzer() { }
 
     public static AnalysisResults analyze(Proof proof, DependencyGraph graph) {
@@ -28,7 +28,7 @@ public class DependencyAnalyzer {
             return null;
         }
         var usefulSteps = new HashSet<Node>();
-        var usefulFormulas = new HashSet<TrackedFormula>();
+        var usefulFormulas = new HashSet<GraphNode>();
 
         // BFS, starting from all closed goals
         var queue = new ArrayDeque<Node>();
@@ -43,11 +43,8 @@ public class DependencyAnalyzer {
             }
             usefulSteps.add(node);
             var data = node.lookup(DependencyNodeData.class);
-            for (var input : data.inputs) {
-                if (input instanceof TrackedFormula) {
-                    usefulFormulas.add((TrackedFormula) input);
-                }
-            }
+            usefulFormulas.addAll(data.inputs);
+
             for (var in : data.inputs) {
                 graph.incomingEdgesOf(in).forEach(queue::add);
             }

@@ -1,20 +1,13 @@
 package org.key_project.slicing;
 
-import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.proof.RuleAppListener;
-import de.uka.ilkd.key.proof.init.AbstractPO;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
-import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.proofevent.NodeChangeAddFormula;
 import de.uka.ilkd.key.rule.IfFormulaInstSeq;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
@@ -23,11 +16,8 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.merge.CloseAfterMergeRuleBuiltInRuleApp;
-import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
-import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.util.Pair;
-import de.uka.ilkd.key.util.Triple;
 import org.key_project.slicing.graph.AddedRule;
 import org.key_project.slicing.graph.ClosedGoal;
 import org.key_project.slicing.graph.DependencyGraph;
@@ -37,18 +27,20 @@ import org.key_project.slicing.graph.PseudoOutput;
 import org.key_project.slicing.graph.TrackedFormula;
 import org.key_project.util.collection.ImmutableList;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public class DependencyTracker implements RuleAppListener, ProofTreeListener {
+    /**
+     * The proof this tracker monitors.
+     */
     private Proof proof;
-    private final List<TrackedFormula> formulas = new ArrayList<>();
+    /**
+     * The dependency graph populated by this tracker.
+     */
     private final DependencyGraph graph = new DependencyGraph();
     /**
      * Dependencies between edges. Only used for taclets that add new rules to the proof.
@@ -110,7 +102,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         var input = new ArrayList<GraphNode>();
         var output = new ArrayList<GraphNode>();
 
-        // check for rules added by taclets
+        // check whether the rule of this proof step was added by another node
         var rule = n.getAppliedRuleApp().rule();
         if (rule instanceof Taclet) {
             var taclet = (Taclet) rule;
@@ -119,22 +111,25 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
                 input.add(new AddedRule(taclet.name().toString()));
             }
         }
-        ruleAppInfo.getReplacementNodes().forEachRemaining(newNode -> {
-                for (var newRule : newNode.getNode().getLocalIntroducedRules()) {
-                    if (newRule.rule() instanceof Taclet && ((Taclet) newRule.rule()).getAddedBy() == n) {
-                            output.add(new AddedRule(newRule.rule().name().toString()));
-                    }
-                }
-        });
 
-        // regular inputs
+        // record any rules added by this rule application
+        for (var newNode : ruleAppInfo.getReplacementNodes()) {
+            for (var newRule : newNode.getNode().getLocalIntroducedRules()) {
+                if (newRule.rule() instanceof Taclet
+                        && ((Taclet) newRule.rule()).getAddedBy() == n) {
+                    output.add(new AddedRule(newRule.rule().name().toString()));
+                }
+            }
+        }
+
+        // record sequent formula inputs
         for (var in : inputsOfRuleApp(ruleApp, n)) {
             var loc = n.branchLocation();
             var size = loc.size();
             var added = false;
             for (int i = 0; i <= size; i++) {
                 var formula = new TrackedFormula(in.sequentFormula(), loc, in.isInAntec(), proof.getServices());
-                if (formulas.contains(formula)) {
+                if (graph.containsNode(formula)) {
                     input.add(formula);
                     added = true;
                     break;
@@ -173,8 +168,12 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
             if (!out.second.equals("")) {
                 loc = loc.append("/" + n.serialNr() + "_" + out.second);
             }
-            var formula = new TrackedFormula(out.first.sequentFormula(), loc, out.first.isInAntec(), proof.getServices());
-            formulas.add(formula);
+            var formula = new TrackedFormula(
+                    out.first.sequentFormula(),
+                    loc,
+                    out.first.isInAntec(),
+                    proof.getServices()
+            );
             output.add(formula);
         }
 
@@ -184,7 +183,11 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
             output.add(new ClosedGoal(n.serialNr() + 1)); // TODO: is it always the next nr?
         }
 
-        n.register(new DependencyNodeData(input, output, ruleApp.rule().displayName() + "_" + n.serialNr()), DependencyNodeData.class);
+        n.register(new DependencyNodeData(
+                input,
+                output,
+                ruleApp.rule().displayName() + "_" + n.serialNr()
+        ), DependencyNodeData.class);
 
         // add pseudo nodes so the rule application is always included in the graph
         if (input.isEmpty()) {
@@ -203,6 +206,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         // clean up removed formulas / nodes /...
         analysisResults = null;
         graph.prune(e);
+        // TODO: clean up formulas too?
     }
 
     public String exportDot(boolean abbreviateFormulas) {
@@ -236,8 +240,8 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
             }
         }
         if (analysisResults != null) {
-            for (var formula : formulas) {
-                if (!analysisResults.usefulFormulas.contains(formula)) {
+            for (var formula : graph.nodes()) {
+                if (!analysisResults.usefulNodes.contains(formula)) {
                     buf.append('"').append(formula.toString(abbreviateFormulas)).append('"').append(" [color=\"red\"]\n");
                 }
             }

@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class ProofSlicer {
+public final class ProofSlicer {
     private final Proof proof;
     private final AnalysisResults analysisResults;
     private final Map<Node, Node> edgeDependencies;

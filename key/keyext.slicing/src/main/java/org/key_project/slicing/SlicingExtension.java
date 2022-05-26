@@ -32,14 +32,26 @@ public class SlicingExtension implements KeYGuiExtension,
         KeYGuiExtension.LeftPanel,
         KeYSelectionListener {
 
+    /**
+     * Collection of dependency trackers.
+     *
+     * TODO: delete tracker when the proof is closed?
+     */
     public final Map<Proof, DependencyTracker> trackers = new IdentityHashMap<>();
-    public Proof currentProof = null;
+    /**
+     * The left panel inserted into the GUI.
+     */
     private SlicingLeftPanel leftPanel = null;
 
+    /**
+     * The context menu adapter used by the extension.
+     */
     private final ContextMenuAdapter adapter = new ContextMenuAdapter() {
         @Override
-        public List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind, PosInSequent pos) {
-            var tracker = trackers.get(currentProof);
+        public List<Action> getContextActions(
+                KeYMediator mediator, ContextMenuKind kind, PosInSequent pos) {
+
+            var tracker = trackers.get(mediator.getSelectedProof());
             if (tracker == null
                     || pos == null
                     || pos.getPosInOccurrence() == null
@@ -47,7 +59,8 @@ public class SlicingExtension implements KeYGuiExtension,
                     || mediator.getSelectedNode() == null) {
                 return List.of();
             }
-            var node = tracker.getNodeThatProduced(mediator.getSelectedNode(), pos.getPosInOccurrence().topLevel());
+            var node = tracker.getNodeThatProduced(
+                    mediator.getSelectedNode(), pos.getPosInOccurrence().topLevel());
             if (node == null) {
                 return List.of();
             }
@@ -65,39 +78,32 @@ public class SlicingExtension implements KeYGuiExtension,
 
     @Override
     public void selectedProofChanged(KeYSelectionEvent e) {
-        Proof newProof = e.getSource().getSelectedProof();
+        createTrackerForProof(e.getSource().getSelectedProof());
+    }
+
+    @Override
+    public void init(MainWindow window, KeYMediator mediator) {
+        mediator.addKeYSelectionListener(this);
+        mediator.registerProofLoadListener(this::createTrackerForProof);
+    }
+
+    private void createTrackerForProof(Proof newProof) {
         trackers.computeIfAbsent(newProof, proof -> {
             var tracker = new DependencyTracker();
             proof.addRuleAppListener(tracker);
             proof.addProofTreeListener(tracker);
             return tracker;
         });
-
-        currentProof = newProof;
-        leftPanel.proofSelected();
-    }
-
-    @Override
-    public void init(MainWindow window, KeYMediator mediator) {
-        mediator.addKeYSelectionListener(this);
-        mediator.registerProofLoadListener(newProof -> {
-            if (newProof == null) {
-                return;
-            }
-            if (!trackers.containsKey(newProof)) {
-                var tracker = new DependencyTracker();
-                newProof.addRuleAppListener(tracker);
-                newProof.addProofTreeListener(tracker);
-                trackers.put(newProof, tracker);
-            }
-            currentProof = newProof;
-        });
     }
 
     @Nonnull
     @Override
-    public Collection<TabPanel> getPanels(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
-        if (leftPanel == null) leftPanel = new SlicingLeftPanel(mediator, this);
+    public Collection<TabPanel> getPanels(
+            @Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
+        if (leftPanel == null) {
+            leftPanel = new SlicingLeftPanel(mediator, this);
+            mediator.addKeYSelectionListener(leftPanel);
+        }
         return Collections.singleton(leftPanel);
     }
 }

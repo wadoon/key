@@ -89,7 +89,7 @@ public class KeYMediator {
      */
     private KeYSelectionModel keySelectionModel;
 
-    private Collection<Consumer<Proof>> proofLoadListeners = new ArrayList<>();
+    private final Collection<Consumer<Proof>> proofLoadListeners = new ArrayList<>();
 
     public synchronized void registerProofLoadListener(Consumer<Proof> listener) {
         proofLoadListeners.add(listener);
@@ -490,6 +490,9 @@ public class KeYMediator {
     }
 
     public synchronized void fireProofLoaded(Proof p) {
+        if (p == null) {
+            return;
+        }
         for (var listener : proofLoadListeners) {
             listener.accept(p);
         }

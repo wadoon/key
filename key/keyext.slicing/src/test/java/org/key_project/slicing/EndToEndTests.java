@@ -13,6 +13,8 @@ import java.nio.file.Files;
 
 /**
  * Tests of the {@link DependencyTracker}.
+ *
+ * @author Arne Keller
  */
 class EndToEndTests {
     public static final File testCaseDirectory = FindResources.getTestCasesDirectory();

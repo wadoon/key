@@ -1,6 +1,8 @@
 package org.key_project.slicing.ui;
 
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.KeYSelectionEvent;
+import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -22,7 +24,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.file.Files;
 
-public class SlicingLeftPanel extends JPanel implements TabPanel {
+public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionListener {
 
     /**
      * The icon of this panel.
@@ -35,6 +37,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel {
 
     private final transient KeYMediator mediator;
     private final transient SlicingExtension extension;
+    private transient Proof currentProof = null;
     private final JLabel totalSteps;
     private final JLabel usefulSteps;
     private final JCheckBox abbreviateFormulas;
@@ -108,7 +111,6 @@ public class SlicingLeftPanel extends JPanel implements TabPanel {
     }
 
     private void exportDot(ActionEvent e) {
-        var currentProof = extension.currentProof;
         if (currentProof == null || currentProof.countNodes() < 2) {
             return;
         }
@@ -132,7 +134,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel {
 
     public void proofSelected() {
         resetLabels();
-        var tracker = extension.trackers.get(extension.currentProof);
+        var tracker = extension.trackers.get(currentProof);
         if (tracker == null) {
             return;
         }
@@ -142,42 +144,42 @@ public class SlicingLeftPanel extends JPanel implements TabPanel {
     }
 
     private void showRuleStatistics(ActionEvent e) {
-        if (extension.currentProof == null) {
+        if (currentProof == null) {
             return;
         }
         this.analyzeProof(e);
-        var results = extension.trackers.get(extension.currentProof).analyze();
+        var results = extension.trackers.get(currentProof).analyze();
         if (results != null) {
             new RuleStatisticsDialog(SwingUtilities.getWindowAncestor((JComponent) e.getSource()), results);
         }
     }
 
     private void previewGraph(ActionEvent e) {
-        if (extension.currentProof == null || extension.currentProof.countNodes() < 2) {
+        if (currentProof == null || currentProof.countNodes() < 2) {
             return;
         }
-        String text = extension.trackers.get(extension.currentProof).exportDot(abbreviateFormulas.isSelected());
+        String text = extension.trackers.get(currentProof).exportDot(abbreviateFormulas.isSelected());
         new PreviewDialog(SwingUtilities.getWindowAncestor((JComponent) e.getSource()), text);
     }
 
     private void analyzeProof(ActionEvent e) {
-        if (extension.currentProof == null) {
+        if (currentProof == null) {
             return;
         }
-        var results = extension.trackers.get(extension.currentProof).analyze();
+        var results = extension.trackers.get(currentProof).analyze();
         if (results != null) {
             displayResults(results);
         }
     }
 
     private void sliceProof(ActionEvent event) {
-        if (extension.currentProof == null) {
+        if (currentProof == null) {
             return;
         }
         analyzeProof(event);
         new Thread(() -> {
             try {
-                Proof p = extension.trackers.get(extension.currentProof).sliceProof();
+                Proof p = extension.trackers.get(currentProof).sliceProof();
                 if (p != null) {
                     var tempFile = Files.createTempFile("", ".proof");
                     p.saveToFile(tempFile.toFile());
@@ -219,5 +221,10 @@ public class SlicingLeftPanel extends JPanel implements TabPanel {
     @Override
     public JComponent getComponent() {
         return this;
+    }
+
+    @Override
+    public void selectedProofChanged(KeYSelectionEvent e) {
+        this.currentProof = e.getSource().getSelectedProof();
     }
 }

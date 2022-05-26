@@ -2,7 +2,7 @@ package org.key_project.slicing;
 
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.util.Triple;
-import org.key_project.slicing.graph.TrackedFormula;
+import org.key_project.slicing.graph.GraphNode;
 
 import java.util.Collections;
 import java.util.Map;
@@ -14,7 +14,7 @@ import java.util.Set;
  * @see DependencyTracker#analyze()
  * @author Arne Keller
  */
-public class AnalysisResults {
+public final class AnalysisResults {
     /**
      * Total amount of rule applications.
      */
@@ -33,16 +33,22 @@ public class AnalysisResults {
      */
     public final Set<Node> usefulSteps;
     /**
-     * Set of formulas required by useful rule applications.
+     * Set of graph nodes required by useful rule applications.
      */
-    public final Set<TrackedFormula> usefulFormulas;
+    public final Set<GraphNode> usefulNodes;
 
-    public AnalysisResults(int totalSteps, int usefulStepsNr, Map<String, Triple<Integer, Integer, Integer>> ruleStatistics, Set<Node> usefulSteps, Set<TrackedFormula> usefulFormulas) {
+    public AnalysisResults(
+            int totalSteps,
+            int usefulStepsNr,
+            Map<String, Triple<Integer, Integer, Integer>> ruleStatistics,
+            Set<Node> usefulSteps,
+            Set<GraphNode> usefulNodes
+    ) {
         this.totalSteps = totalSteps;
         this.usefulStepsNr = usefulStepsNr;
         this.ruleStatistics = Collections.unmodifiableMap(ruleStatistics);
         this.usefulSteps = Collections.unmodifiableSet(usefulSteps);
-        this.usefulFormulas = Collections.unmodifiableSet(usefulFormulas);
+        this.usefulNodes = Collections.unmodifiableSet(usefulNodes);
     }
 
     @Override

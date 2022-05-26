@@ -55,10 +55,25 @@ public class DependencyGraph {
 
     /**
      * @param node a graph node
+     * @return whether the graph contains that node
+     */
+    public boolean containsNode(GraphNode node) {
+        return graph.containsVertex(node);
+    }
+
+    /**
+     * @param node a graph node
      * @return the rule application(s) that produced the graph node
      */
     public Stream<Node> incomingEdgesOf(GraphNode node) {
         return graph.incomingEdgesOf(node).stream().map(edgeData::get);
+    }
+
+    /**
+     * @return all nodes contained in the graph
+     */
+    public Iterable<GraphNode> nodes() {
+        return graph.vertexSet();
     }
 
     /**
