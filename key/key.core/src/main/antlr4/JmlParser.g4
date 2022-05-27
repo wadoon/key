@@ -188,7 +188,7 @@ block_specification: method_specification;
 block_loop_specification:
   loop_contract_keyword spec_case ((also_keyword)+ loop_contract_keyword spec_case)*;
 loop_contract_keyword: LOOP_CONTRACT;
-assert_statement: (ASSERT (ident COLON)? expression | UNREACHABLE) (ASSUMING LT IDENT GT )? SEMI_TOPLEVEL;
+assert_statement: (ASSERT (ident COLON)? expression | UNREACHABLE) (ASSUMING (LT IDENT (COMMA IDENT)* GT | SPECIAL_IDENT) )? SEMI_TOPLEVEL;
 propose_statement: PROPOSE ident COLON expression SEMI_TOPLEVEL;
 //breaks_clause: BREAKS expression;
 //continues_clause: CONTINUES expression;
