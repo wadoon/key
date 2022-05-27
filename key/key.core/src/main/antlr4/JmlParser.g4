@@ -22,6 +22,7 @@ classlevel_element
   | monitors_for_clause | readable_if_clause | writable_if_clause
   | datagroup_clause    | set_statement      | nowarn_pragma
   | accessible_clause   | assert_statement   | assume_statement
+  | propose_statement
   ;
 
 methodlevel_comment: (modifiers? methodlevel_element modifiers?)* EOF;
@@ -29,7 +30,7 @@ methodlevel_element
   : field_declaration | set_statement | merge_point_statement
   | loop_specification | assert_statement | assume_statement | nowarn_pragma
   | debug_statement | block_specification | block_loop_specification
-  | assert_statement | assume_statement
+  | assert_statement | assume_statement | propose_statement
  ;
 
 modifiers: modifier+;
@@ -187,7 +188,8 @@ block_specification: method_specification;
 block_loop_specification:
   loop_contract_keyword spec_case ((also_keyword)+ loop_contract_keyword spec_case)*;
 loop_contract_keyword: LOOP_CONTRACT;
-assert_statement: (ASSERT expression | UNREACHABLE) SEMI_TOPLEVEL;
+assert_statement: (ASSERT (ident COLON)? expression | UNREACHABLE) (ASSUMING LT IDENT GT )? SEMI_TOPLEVEL;
+propose_statement: PROPOSE ident COLON expression SEMI_TOPLEVEL;
 //breaks_clause: BREAKS expression;
 //continues_clause: CONTINUES expression;
 //returns_clause: RETURNS expression;

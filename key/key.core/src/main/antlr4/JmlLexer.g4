@@ -118,6 +118,7 @@ MONITORS_FOR: 'monitors_for' -> pushMode(expr);
 //OLD: 'old' -> pushMode(expr);
 //POST: 'post'Pred -> pushMode(expr);
 //PRE: 'pre' Pred -> pushMode(expr);
+PROPOSE: 'propose' Pred -> pushMode(expr);
 READABLE: 'readable';
 REPRESENTS: 'represents' Pred -> pushMode(expr);
 REQUIRES: ('requires' (Pfree|Pred) | 'pre' Pred) -> pushMode(expr);
@@ -201,6 +202,7 @@ RETURNS: 'returns';  //KeY extension, not official JML
 SEPARATES: 'separates';  //KeY extension, not official JML
 SIGNALS: 'signals';
 SIGNALS_ONLY: 'signals_only';*/
+ASSUMING: 'assuming';
 
 /* JML keywords prefixed with a backslash */
 ALLFIELDS: '\\all_fields';  //KeY extension, not official JML
