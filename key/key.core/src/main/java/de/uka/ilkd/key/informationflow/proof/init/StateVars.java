@@ -1,16 +1,9 @@
 package de.uka.ilkd.key.informationflow.proof.init;
 
-import java.util.Iterator;
-
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -18,10 +11,14 @@ import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
+import java.util.Iterator;
 
 
 /**
@@ -210,7 +207,6 @@ public class StateVars {
         LocationVariable newVar = new LocationVariable(pen, progVar.getKeYJavaType(),
                                                        progVar.getContainerType(),
                                                        progVar.isStatic(), progVar.isModel());
-        register(newVar, services);
         return tb.var(newVar);
     }
 
@@ -258,7 +254,6 @@ public class StateVars {
         }
         final TermBuilder tb = services.getTermBuilder();
         final Function newFunc = new Function(new Name(name), t.sort());
-        register(newFunc, services);
         return tb.func(newFunc);
     }
 
@@ -370,8 +365,7 @@ public class StateVars {
             return null;
         }
         final TermBuilder tb = services.getTermBuilder();
-        Term selfVar = tb.var(tb.selfVar(pm, kjt, true, postfix));
-        return selfVar;
+        return tb.var(tb.selfVar(pm, kjt, true, postfix));
     }
 
 
@@ -379,10 +373,7 @@ public class StateVars {
                                                       String postfix,
                                                       IProgramMethod pm) {
         final TermBuilder tb = services.getTermBuilder();
-        ImmutableList<Term> paramVars =
-                tb.var(tb.paramVars(postfix, pm, true));
-        register(ops(paramVars, ProgramVariable.class), services);
-        return paramVars;
+        return tb.var(tb.paramVars(postfix, pm, true));
     }
 
 
@@ -393,10 +384,7 @@ public class StateVars {
             return null;
         }
         final TermBuilder tb = services.getTermBuilder();
-        Term resultVar =
-                tb.var(tb.resultVar("result" + postfix, pm, true));
-        register(resultVar.op(ProgramVariable.class), services);
-        return resultVar;
+        return tb.var(tb.resultVar("result" + postfix, pm, true));
     }
 
 
@@ -412,7 +400,6 @@ public class StateVars {
             Function heap =
                      new Function(heapName, heapLDT.getHeap().sort());
             Term heapFunc = tb.func(heap);
-            register(heap, services);
             return tb.label(heapFunc, labels);
         }
     }
@@ -422,9 +409,7 @@ public class StateVars {
                                           String postfix,
                                           IProgramMethod pm) {
         final TermBuilder tb = services.getTermBuilder();
-        Term excVar = tb.var(tb.excVar("exc" + postfix, pm, true));
-        register(excVar.op(ProgramVariable.class), services);
-        return excVar;
+        return tb.var(tb.excVar("exc" + postfix, pm, true));
     }
 
 
@@ -436,50 +421,7 @@ public class StateVars {
         String newName = tb.newName("mbyAtPre" + postfix);
         final Function mbyAtPreFunc =
                 new Function(new Name(newName), intSort);
-        register(mbyAtPreFunc, services);
         return tb.func(mbyAtPreFunc);
-    }
-
-
-    static void register(ProgramVariable pv,
-                         Services services) {
-        Namespace<IProgramVariable> progVarNames = services.getNamespaces().programVariables();
-        if (pv != null && progVarNames.lookup(pv.name()) == null) {
-            progVarNames.addSafely(pv);
-        }
-    }
-
-
-    static void register(ImmutableList<ProgramVariable> pvs,
-                         Services services) {
-        for (ProgramVariable pv : pvs) {
-            register(pv, services);
-        }
-    }
-
-
-    static void register(Function f,
-                         Services services) {
-        Namespace<Function> functionNames = services.getNamespaces().functions();
-        if (f != null && functionNames.lookup(f.name()) == null) {
-            assert f.sort() != Sort.UPDATE;
-            if (f.sort() == Sort.FORMULA) {
-                functionNames.addSafely(f);
-            } else {
-                functionNames.addSafely(f);
-            }
-        }
-    }
-
-
-    static <T> ImmutableList<T> ops(ImmutableList<Term> terms,
-                                    Class<T> opClass)
-            throws IllegalArgumentException {
-        ImmutableList<T> ops = ImmutableSLList.<T>nil();
-        for (Term t : terms) {
-            ops = ops.append(t.op(opClass));
-        }
-        return ops;
     }
 
 
