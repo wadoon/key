@@ -123,6 +123,17 @@ public class RuleStatisticsDialog extends JDialog {
         }
         stats.append("</thead><tbody>");
 
+        // summary row
+        var uniqueRules = rules.size();
+        var totalSteps = rules.stream().mapToInt(it -> it.second).sum();
+        var uselessSteps = rules.stream().mapToInt(it -> it.third).sum();
+        var initialUseless = rules.stream().mapToInt(it -> it.fourth).sum();
+        stats.append("<tr>");
+        stats.append("<td>").append(String.format("(all %d rules)", uniqueRules)).append("</td>");
+        stats.append("<td>").append(totalSteps).append("</td>");
+        stats.append("<td>").append(uselessSteps).append("</td>");
+        stats.append("<td>").append(initialUseless).append("</td>");
+        stats.append("</tr>");
         rules.forEach(a -> {
             var name = a.first;
             var all = a.second;
