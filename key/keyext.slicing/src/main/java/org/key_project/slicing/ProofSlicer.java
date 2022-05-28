@@ -79,7 +79,7 @@ public final class ProofSlicer {
             if (node.getAppliedRuleApp() == null) {
                 return; // closed goal
             }
-            if (analysisResults.usefulSteps.contains(node) || node.childrenCount() > 1) { // TODO: cut elimination
+            if (analysisResults.usefulSteps.contains(node)) { // TODO: cut elimination
                 //System.out.println("at node " + node.serialNr() + " " + node.getAppliedRuleApp().rule().displayName());
 
                 var app = node.getAppliedRuleApp();

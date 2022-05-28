@@ -208,4 +208,18 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
         }
         return result;
     }
+
+    default boolean hasPrefix(ImmutableList<T> other) {
+        if (other.size() > this.size()) {
+            return false;
+        }
+        if (other.size() == 0) {
+            return true;
+        }
+        if (Objects.equals(head(), other.head())) {
+            return tail().hasPrefix(other.tail());
+        } else {
+            return false;
+        }
+    }
 }

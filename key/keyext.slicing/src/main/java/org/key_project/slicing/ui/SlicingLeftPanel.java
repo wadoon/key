@@ -132,17 +132,6 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         }
     }
 
-    public void proofSelected() {
-        resetLabels();
-        var tracker = extension.trackers.get(currentProof);
-        if (tracker == null) {
-            return;
-        }
-        if (tracker.analyze() != null) {
-            displayResults(tracker.analyze());
-        }
-    }
-
     private void showRuleStatistics(ActionEvent e) {
         if (currentProof == null) {
             return;
@@ -226,5 +215,13 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
     @Override
     public void selectedProofChanged(KeYSelectionEvent e) {
         this.currentProof = e.getSource().getSelectedProof();
+        resetLabels();
+        var tracker = extension.trackers.get(currentProof);
+        if (tracker == null) {
+            return;
+        }
+        if (tracker.getAnalysisResults() != null) {
+            displayResults(tracker.getAnalysisResults());
+        }
     }
 }

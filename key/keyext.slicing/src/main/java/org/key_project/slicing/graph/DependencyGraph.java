@@ -5,7 +5,9 @@ import de.uka.ilkd.key.proof.ProofTreeEvent;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.DirectedMultigraph;
+import org.jgrapht.traverse.BreadthFirstIterator;
 import org.key_project.slicing.DependencyNodeData;
+import org.key_project.util.collection.ImmutableList;
 
 import java.util.Collection;
 import java.util.IdentityHashMap;
@@ -63,10 +65,35 @@ public class DependencyGraph {
 
     /**
      * @param node a graph node
-     * @return the rule application(s) that produced the graph node
+     * @return the rule application(s) that produced the graph node, if any
      */
     public Stream<Node> incomingEdgesOf(GraphNode node) {
+        if (!graph.containsVertex(node)) {
+            return Stream.of();
+        }
         return graph.incomingEdgesOf(node).stream().map(edgeData::get);
+    }
+
+    /**
+     * @param node a graph node
+     * @return the rule application(s) that used the graph node, if any
+     */
+    public Stream<Node> outgoingEdgesOf(GraphNode node) {
+        if (!graph.containsVertex(node)) {
+            return Stream.of();
+        }
+        return graph.outgoingEdgesOf(node).stream().map(edgeData::get);
+    }
+
+    public Stream<TrackedFormula> nodesInBranch(ImmutableList<String> location) {
+        return graph.vertexSet().stream()
+                .filter(TrackedFormula.class::isInstance)
+                .map(TrackedFormula.class::cast)
+                .filter(it -> it.branchLocation.hasPrefix(location));
+    }
+
+    public BreadthFirstIterator<GraphNode, DefaultEdge> breadthFirstIterator(GraphNode start) {
+        return new BreadthFirstIterator<>(graph, start);
     }
 
     /**

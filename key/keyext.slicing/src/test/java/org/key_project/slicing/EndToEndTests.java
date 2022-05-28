@@ -20,39 +20,25 @@ class EndToEndTests {
     public static final File testCaseDirectory = FindResources.getTestCasesDirectory();
 
     @Test
-    void SliceAgatha() throws Exception {
-        boolean oldValue = GeneralSettings.noPruningClosed;
-        GeneralSettings.noPruningClosed = false;
-        // load proof
-        File proofFile = new File(testCaseDirectory, "/agatha.proof");
-        Assertions.assertTrue(proofFile.exists());
-        DependencyTracker tracker = new DependencyTracker();
-        KeYEnvironment<?> environment = KeYEnvironment.load(JavaProfile.getDefaultInstance(), proofFile, null, null, null, null, null, tracker, true);
-        try {
-            // get loaded proof
-            Proof proof = environment.getLoadedProof();
-            Assertions.assertNotNull(proof);
-            // analyze proof
-            var results = tracker.analyze();
-            Assertions.assertEquals(145, results.totalSteps);
-            Assertions.assertEquals(79, results.usefulStepsNr);
-            // slice proof
-            Proof slicedProof = tracker.sliceProof();
-            // 79 rule applications + 3 closed goals
-            Assertions.assertEquals(79 + 3, slicedProof.countNodes());
-            Assertions.assertTrue(slicedProof.closed());
-        } finally {
-            environment.dispose();
-        }
-        GeneralSettings.noPruningClosed = oldValue;
+    void sliceAgatha() throws Exception {
+        sliceProof("/agatha.proof", 145, 79);
     }
 
     @Test
-    void SliceRemoveDuplicates() throws Exception {
+    void sliceJavaExample() throws Exception {
+        sliceProof("/removeDuplicates.zproof", 4960, 2626);
+    }
+
+    @Test
+    void sliceCut() throws Exception {
+        sliceProof("/cutExample.proof", 10, 7);
+    }
+
+    private void sliceProof(String filename, int expectedTotal, int expectedUseful) throws Exception {
         boolean oldValue = GeneralSettings.noPruningClosed;
         GeneralSettings.noPruningClosed = false;
         // load proof
-        File proofFile = new File(testCaseDirectory, "/removeDuplicates.zproof");
+        File proofFile = new File(testCaseDirectory, filename);
         Assertions.assertTrue(proofFile.exists());
         DependencyTracker tracker = new DependencyTracker();
         KeYEnvironment<?> environment = KeYEnvironment.load(JavaProfile.getDefaultInstance(), proofFile, null, null, null, null, null, tracker, true);
@@ -62,20 +48,19 @@ class EndToEndTests {
             Assertions.assertNotNull(proof);
             // analyze proof
             var results = tracker.analyze();
-            Assertions.assertEquals(4960, results.totalSteps);
-            Assertions.assertEquals(2626, results.usefulStepsNr);
+            Assertions.assertEquals(expectedTotal, results.totalSteps);
+            Assertions.assertEquals(expectedUseful, results.usefulStepsNr);
             // slice proof
             Proof slicedProof = tracker.sliceProof();
 
             // reload proof to verify the slicing was correct
             var tempFile = Files.createTempFile("", ".proof");
             slicedProof.saveToFile(tempFile.toFile());
-            KeYEnvironment<?> loadedEnvironment = KeYEnvironment.load(JavaProfile.getDefaultInstance(), tempFile.toFile(), null, null, null, null, null, tracker, true);
+            KeYEnvironment<?> loadedEnvironment = KeYEnvironment.load(JavaProfile.getDefaultInstance(), tempFile.toFile(), null, null, null, null, null, null, true);
             try {
                 slicedProof = loadedEnvironment.getLoadedProof();
 
-                // 2626 rule applications + closed goals
-                Assertions.assertEquals(2626 + slicedProof.closedGoals().size(), slicedProof.countNodes());
+                Assertions.assertEquals(expectedUseful + slicedProof.closedGoals().size(), slicedProof.countNodes());
                 Assertions.assertTrue(slicedProof.closed());
 
                 Files.delete(tempFile);

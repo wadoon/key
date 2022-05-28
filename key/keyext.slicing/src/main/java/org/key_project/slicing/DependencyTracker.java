@@ -141,8 +141,8 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
                 }
             }
             if (!added) {
-                // should only happen for initial sequent
-                if (n.serialNr() != 0) {
+                // should only happen if the formula is the initial proof obligation
+                if (!proof.root().sequent().contains(in.sequentFormula())) {
                     throw new IllegalStateException("found formula that was not produced by any rule!");
                 }
                 var formula = new TrackedFormula(in.sequentFormula(), loc, in.isInAntec(), proof.getServices());
@@ -180,7 +180,17 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         // add closed goals as output
         if (goalList.isEmpty() || (ruleApp instanceof TacletApp &&
                 ((TacletApp) ruleApp).taclet().closeGoal())) {
-            output.add(new ClosedGoal(n.serialNr() + 1)); // TODO: is it always the next nr?
+            var closedGoal = proof.closedGoals()
+                    .stream()
+                    .filter(goal -> goal.node().parent() == n)
+                    .findFirst();
+            if (closedGoal.isPresent()) {
+                output.add(new ClosedGoal(closedGoal.get().node().serialNr()));
+            } else {
+                System.err.println(
+                        "Warning: did not locate the goal closed by step " + n.serialNr());
+                output.add(new ClosedGoal(n.serialNr() + 1));
+            }
         }
 
         n.register(new DependencyNodeData(

@@ -6,6 +6,7 @@ import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.util.Triple;
 import org.key_project.slicing.graph.DependencyGraph;
 import org.key_project.slicing.graph.GraphNode;
+import org.key_project.slicing.graph.TrackedFormula;
 
 import java.util.ArrayDeque;
 import java.util.HashMap;
@@ -49,6 +50,34 @@ public final class DependencyAnalyzer {
                 graph.incomingEdgesOf(in).forEach(queue::add);
             }
         }
+
+        // analyze cuts: they are only useful if all of their outputs were used
+        proof.breadthFirstSearch(proof.root(), (proof1, node) -> {
+            if (!usefulSteps.contains(node)) {
+                return;
+            }
+            var displayName = node.getAppliedRuleApp().rule().displayName();
+            if (!displayName.equals("cut")) { // TODO: cut_direct?
+                return;
+            }
+            var data = node.lookup(DependencyNodeData.class);
+            var cutWasUseful = usefulFormulas.containsAll(data.outputs);
+            if (cutWasUseful) {
+                return;
+            }
+            usefulSteps.remove(node);
+            // mark sub-proof as useless, if necessary
+            for (var output : data.outputs) {
+                if (!usefulFormulas.contains(output)) {
+                    continue;
+                }
+                var formula = (TrackedFormula) output;
+                graph.nodesInBranch(formula.branchLocation).forEach(theNode -> {
+                    usefulFormulas.remove(theNode);
+                    graph.outgoingEdgesOf(theNode).forEach(usefulSteps::remove);
+                });
+            }
+        });
 
         // add a note to each useless proof step to allow easy identification by the user
         // TODO: make this configurable / add a different indicator?

@@ -1665,7 +1665,7 @@ public final class MainWindow extends JFrame {
             if (getMediator().isInAutoMode()) {
                 return;
             }
-            updateSequentView();
+            SwingUtilities.invokeLater(MainWindow.this::updateSequentView);
         }
 
         /**
