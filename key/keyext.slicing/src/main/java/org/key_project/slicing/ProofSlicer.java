@@ -11,6 +11,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.AbstractPO;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.merge.CloseAfterMergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRule;
@@ -66,9 +67,16 @@ public final class ProofSlicer {
             }
         }
         if (p == null) {
+            System.err.println("cloning proof using fallback method");
             // note: this constructor only works for "simple" proof inputs (≈ pure logic)
-            p = new Proof("reduced", proof.root().sequent().succedent().get(0).formula(), proof.header(), proof.getInitConfig().copy());
+            p = new Proof(
+                    "reduced",
+                    proof.root().sequent().succedent().get(0).formula(),
+                    proof.header(),
+                    proof.getInitConfig().copy()
+            );
         }
+        OneStepSimplifier.refreshOSS(p);
         replayProof(p, proof.root());
         return p;
     }
