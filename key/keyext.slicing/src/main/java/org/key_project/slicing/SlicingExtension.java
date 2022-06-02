@@ -15,6 +15,7 @@ import org.key_project.slicing.ui.SlicingLeftPanel;
 
 import javax.annotation.Nonnull;
 import javax.swing.*;
+import java.awt.*;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.IdentityHashMap;
