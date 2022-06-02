@@ -828,6 +828,11 @@ class Translator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
+    public Object visitInv_free(JmlParser.Inv_freeContext ctx) {
+        return termFactory.createInvFree(selfVar == null ? null : tb.var(selfVar), containerType);
+    }
+
+    @Override
     public Object visitTrue_(JmlParser.True_Context ctx) {
         return new SLExpression(tb.tt());
     }
@@ -940,6 +945,13 @@ class Translator extends JmlParserBaseVisitor<Object> {
                 raiseError("Unknown reference to " + fullyQualifiedName, ctx);
             }
             return termFactory.createInv(receiver.getTerm(), receiver.getType());
+        }
+        if (ctx.INV_FREE() != null) {
+            assert !methodCall;
+            if (receiver == null) {
+                raiseError("Unknown reference to " + fullyQualifiedName, ctx);
+            }
+            return termFactory.createInvFree(receiver.getTerm(), receiver.getType());
         }
         if (ctx.MULT() != null) {
             assert !methodCall;
@@ -1405,9 +1417,22 @@ class Translator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
+    public SLExpression visitPrimaryInvFreeFor(JmlParser.PrimaryInvFreeForContext ctx) {
+        SLExpression result = accept(ctx.expression());
+        assert result != null;
+        return termFactory.invFreeFor(result);
+    }
+
+    @Override
     public SLExpression visitPrimaryStaticInv(JmlParser.PrimaryStaticInvContext ctx) {
         KeYJavaType typ = accept(ctx.referencetype());
         return termFactory.staticInfFor(typ);
+    }
+
+    @Override
+    public SLExpression visitPrimaryStaticInvFree(JmlParser.PrimaryStaticInvFreeContext ctx) {
+        KeYJavaType typ = accept(ctx.referencetype());
+        return termFactory.staticInfFreeFor(typ);
     }
 
     @Override

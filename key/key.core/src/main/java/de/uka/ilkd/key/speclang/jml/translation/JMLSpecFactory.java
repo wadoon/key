@@ -1062,7 +1062,7 @@ public class JMLSpecFactory {
         // create invariant
         String name = getDefaultInvName(null, kjt);
         String display = getDefaultInvName(textualInv.getName(), kjt);
-        return new ClassInvariantImpl(name, display, kjt, getVisibility(textualInv), inv, selfVar);
+        return new ClassInvariantImpl(name, display, kjt, getVisibility(textualInv), inv, selfVar, textualInv.isFree());
     }
 
     public InitiallyClause createJMLInitiallyClause(@Nonnull KeYJavaType kjt, VisibilityModifier visibility,

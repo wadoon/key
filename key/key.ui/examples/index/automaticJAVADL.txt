@@ -603,6 +603,9 @@ group javadl {
    provable ./standard_key/java_dl/jml-bigint/cast.key
    provable ./standard_key/java_dl/jml-free/loopInvFree.key
    provable ./standard_key/java_dl/jml-free/ensuresFree.key
+   provable ./standard_key/java_dl/jml-free/invFree1.key
+   provable ./standard_key/java_dl/jml-free/invFree2.key
+   provable ./standard_key/java_dl/jml-free/invFree3.key
 # proof gets very long
 # requires further investigations
    provable ./standard_key/java_dl/jml-information-flow.key

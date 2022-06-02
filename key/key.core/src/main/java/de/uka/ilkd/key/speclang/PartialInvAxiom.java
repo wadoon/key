@@ -158,6 +158,7 @@ public final class PartialInvAxiom extends ClassAxiom {
                                                 inv.getKJT(),
                                                 toLimit,
                                                 target.isStatic(),
+                                                inv.isFree(),
                                                 i == 1,
                                                 services);
             result = result.union(taclets);

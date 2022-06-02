@@ -820,6 +820,16 @@ public final class JmlTermFactory {
         return new SLExpression(term);
     }
 
+    public SLExpression invFreeFor(SLExpression param) {
+        Term obj = param.getTerm();
+        return new SLExpression(tb.invFree(obj));
+    }
+
+    public SLExpression staticInfFreeFor(KeYJavaType kjt) {
+        final Term term = tb.staticInvFree(kjt);
+        return new SLExpression(term);
+    }
+
     public SLExpression empty(JavaInfo javaInfo) {
         return createIntersect(tb.empty(), javaInfo);
     }
@@ -844,6 +854,14 @@ public final class JmlTermFactory {
         final boolean isStatic = selfVar == null;
         assert targetType != null || !isStatic;
         final Term result = isStatic ? tb.staticInv(targetType) : tb.inv(selfVar);
+        return new SLExpression(result);
+    }
+    
+    @Nonnull
+    public SLExpression createInvFree(Term selfVar, KeYJavaType targetType) {
+        final boolean isStatic = selfVar == null;
+        assert targetType != null || !isStatic;
+        final Term result = isStatic ? tb.staticInvFree(targetType) : tb.invFree(selfVar);
         return new SLExpression(result);
     }
 
