@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.smt.communication;
 
-import de.uka.ilkd.key.smt.st.SolverType;
+import de.uka.ilkd.key.smt.solvertypes.SolverType;
 
 import java.io.InputStream;
 import java.io.OutputStream;

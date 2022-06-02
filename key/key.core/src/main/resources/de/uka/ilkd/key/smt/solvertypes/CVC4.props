@@ -1,12 +1,11 @@
-name=veriT
-info=veriT solver.
-minVersion=This is veriT, version 2021.06
-command=veriT
-pipe=BUFFERED_PIPE
-sendTriggers=(check-sat),(get-proof),(get-model)
-params=--input=smtlib2 --output=smtlib2 --disable-banner
+params=--no-print-success -m --interactive --lang smt2
+timeout=-1
+name=CVC4
+info=CVC4 solver (https://cvc4.github.io/index.html).
+command=cvc4
 version=--version
-preamble=veriT_preamble.smt2
+delimiters=CVC4>
+socketClass=de.uka.ilkd.key.smt.communication.CVC4Socket
 handlers=de.uka.ilkd.key.smt.newsmt2.BooleanConnectiveHandler,\
 de.uka.ilkd.key.smt.newsmt2.PolymorphicHandler,\
 de.uka.ilkd.key.smt.newsmt2.QuantifierHandler,\

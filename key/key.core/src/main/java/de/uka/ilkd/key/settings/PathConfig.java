@@ -1,21 +1,8 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.settings;
 
 import java.io.File;
 
-import de.uka.ilkd.key.smt.st.SolverPropertiesLoader;
+import de.uka.ilkd.key.smt.solvertypes.SolverPropertiesLoader;
 import org.key_project.util.java.IOUtil;
 
 /**
@@ -25,14 +12,14 @@ import org.key_project.util.java.IOUtil;
  * <p>
  * By default all KeY configurations are stored in a directory named ".key"
  * inside the user's home directory. In Microsoft windows operating systems
- * this is directly the hard disc that contains the KeY code. 
+ * this is directly the hard disc that contains the KeY code.
  * But the eclipse integration requires to change the default location.
- * This is possible via {@link #setKeyConfigDir(String)} which should be 
- * called once before something is done with KeY (e.g. before the 
+ * This is possible via {@link #setKeyConfigDir(String)} which should be
+ * called once before something is done with KeY (e.g. before the
  * {@link MainWindow} is opened).
  * </p>
  */
-public class PathConfig {
+public final class PathConfig {
 
     /**
      * The Java system property used to indicate that the
@@ -47,17 +34,20 @@ public class PathConfig {
      */
     public static final String KEY_DIRECTORY_NAME = ".key";
 
-    /** directory where to find the KeY configuration files */ 
-    private static String keyConfigDir;
-    
     /**
      * In which file to store the recent files.
      */
-    public static String recentFileStorage;
-    
-    public static String proofIndependentSettings;
+    private static String recentFileStorage;
 
-    public static String smtSolverPropertiesDirectory;
+    /**
+     * In which file to store the proof-independent settings.
+     */
+    private static String proofIndependentSettings;
+
+    /** directory where to find the KeY configuration files */
+    private static String keyConfigDir;
+
+    private PathConfig() { }
 
     /**
      * Initializes the instance variables with the default settings.
@@ -65,7 +55,7 @@ public class PathConfig {
     static {
         setKeyConfigDir(IOUtil.getHomeDirectory() + File.separator + KEY_DIRECTORY_NAME);
     }
-    
+
     /**
      * Returns the path to the directory that contains KeY configuration files.
      * @return The directory.
@@ -81,9 +71,8 @@ public class PathConfig {
     public static void setKeyConfigDir(String keyConfigDir) {
         PathConfig.keyConfigDir = keyConfigDir;
         PathConfig.recentFileStorage = getKeyConfigDir() + File.separator + "recentFiles.props";
-        PathConfig.proofIndependentSettings = getKeyConfigDir() + File.separator + "proofIndependentSettings.props";
-        PathConfig.smtSolverPropertiesDirectory = getKeyConfigDir() + File.separator
-                + "smtSolverProperties" + File.separator;
+        PathConfig.proofIndependentSettings = getKeyConfigDir() + File.separator
+                + "proofIndependentSettings.props";
     }
 
     /**
@@ -102,12 +91,4 @@ public class PathConfig {
         return proofIndependentSettings;
     }
 
-    /**
-     * Returns the path to the directory used for storing SMT solver properties.
-     * See {@link ProofIndependentSMTSettings} and {@link SolverPropertiesLoader} for usage.
-     * @return The path to the directory.
-     */
-    public static String getSmtSolverPropertiesDirectory() {
-        return smtSolverPropertiesDirectory;
-    }
 }

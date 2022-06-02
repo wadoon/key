@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.smt;
 
 import de.uka.ilkd.key.java.Services;
@@ -96,10 +83,12 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
      * This constructor only exists to have uniform constructors for both the modular and
      * the legacy translation.
      * @param handlerNames not used by this translator!
-     * @param preamble also not used
+     * @param handlerOptions also not used by this translator
+     * @param preamble also also not used
      */
     @SuppressWarnings("unused")     // can be called via reflection
-    public SmtLib2Translator(String[] handlerNames, String[] handlerOptions, @Nullable String preamble){
+    public SmtLib2Translator(String[] handlerNames, String[] handlerOptions,
+                             @Nullable String preamble) {
     }
 
     @Override
@@ -112,7 +101,9 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
                                               ArrayList<StringBuilder> types, SortHierarchy sortHierarchy,
                                               SMTSettings settings) {
         StringBuilder result = new StringBuilder();
-        // always set logic now, (hopefully) does no harm with the modern SMT solvers we support
+        /* Always set logic now, (hopefully) does no harm with the modern SMT solvers we support.
+        Note that the logic to be set may be (and is) hardcoded into the
+        SMTSettings#getLogic() method (currently AUFNIRA). */
         //if (getConfig().mentionLogic()) {
             result.append("(set-logic " + settings.getLogic() + " )\n");
         //}
@@ -163,7 +154,7 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
 
 
         //add the assumptions
-        ArrayList<StringBuilder> AssumptionsToRemove = new ArrayList<>();
+        ArrayList<StringBuilder> assumptionsToRemove = new ArrayList<>();
         StringBuilder assump = new StringBuilder();
         boolean needsAnd = assumptions.size() > 1;
 
@@ -173,7 +164,7 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
             if (block.getStart() <= block.getEnd()) {
                 assump.append("\n" + GAP + "; ").append(commentAssumption[block.getType()]).append("\n");
                 for (int i = block.getStart(); i <= block.getEnd(); i++) {
-                    AssumptionsToRemove.add(assumptions.get(i));
+                    assumptionsToRemove.add(assumptions.get(i));
                     assump.append(assumptions.get(i));
                     assump.append("\n");
                 }
@@ -181,7 +172,7 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
         }
 
 
-        assumptions.removeAll(AssumptionsToRemove);
+        assumptions.removeAll(assumptionsToRemove);
 
 
         if (!assumptions.isEmpty()) {

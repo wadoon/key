@@ -2,7 +2,7 @@
 
 (set-option :print-success true)
 (set-option :produce-unsat-cores true)
-(set-option :produce-models true)
+(set-option :produce-proofs true)
 (set-logic AUFLIA)
 
 (declare-sort T 0)

@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.smt;
 
 import de.uka.ilkd.key.java.Services;
@@ -18,12 +5,12 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.smt.communication.AbstractSolverSocket;
 import de.uka.ilkd.key.smt.communication.ExternalProcessLauncher;
-import de.uka.ilkd.key.smt.communication.SolverSocket;
 import de.uka.ilkd.key.smt.communication.SolverCommunication;
 import de.uka.ilkd.key.smt.communication.SolverCommunication.Message;
-import de.uka.ilkd.key.smt.st.SolverType;
-import de.uka.ilkd.key.smt.st.SolverTypes;
+import de.uka.ilkd.key.smt.solvertypes.SolverType;
+import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
 
 import javax.annotation.Nonnull;
@@ -62,7 +49,7 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
      * external solver process
      */
     private final @Nonnull
-    SolverSocket socket;
+    AbstractSolverSocket socket;
 
     /**
      * the ModelExtractor used to generate counterexamples (only used for CE solver type)
@@ -167,8 +154,8 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
         this.listener = listener;
         this.services = services;
         this.type = myType;
-        // TODO Why not just call type.getSocket(query)?
-        this.socket = SolverSocket.createSocket(type, query);
+        // Why not just call type.getSocket(query) here?
+        this.socket = AbstractSolverSocket.createSocket(type, query);
         processLauncher = new ExternalProcessLauncher(solverCommunication, myType);
     }
 
@@ -354,7 +341,7 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
             tacletTranslation = null;
 
         } else {
-            SMTTranslator trans = getType().createTranslator(services);
+            SMTTranslator trans = getType().createTranslator();
             problemString = indent(trans.translateProblem(sequent, services, smtSettings)
                     .toString());
             if (trans instanceof AbstractSMTTranslator) {
@@ -434,7 +421,7 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
     }
 
     @Override
-    public SolverSocket getSocket() {
+    public AbstractSolverSocket getSocket() {
         return socket;
     }
 

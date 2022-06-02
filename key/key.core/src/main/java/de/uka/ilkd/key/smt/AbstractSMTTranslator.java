@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.smt;
 
 
@@ -68,7 +55,7 @@ import static de.uka.ilkd.key.smt.SMTProblem.sequentToTerm;
 public abstract class AbstractSMTTranslator implements SMTTranslator {
         private static final Logger LOGGER = LoggerFactory.getLogger(AbstractSMTTranslator.class);
 
-        private int nameCounter =0;
+        private int nameCounter = 0;
 
         /** The string used as standard sort for translations */
         private final StringBuilder standardSort = new StringBuilder("u");
@@ -172,7 +159,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         /** Formulae made of taclets, used for assumptions. */
         private TacletSetTranslation tacletSetTranslation = null;
 
-        private Collection<Throwable> exceptionsForTacletTranslation= new LinkedList<>();
+        private Collection<Throwable> exceptionsForTacletTranslation = new LinkedList<>();
 
         /**
          * Assumptions made of taclets - the translation of
@@ -208,7 +195,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
                 // add one variable for each sort
                 for (Sort s : this.usedRealSort.keySet()) {
-                   if(!s.equals(Sort.FORMULA)){
+                   if(!s.equals(Sort.FORMULA)) {
                         LogicVariable l = new LogicVariable(new Name("dummy_"
                                         + s.name().toString()), s);
                         this.addFunction(l, new ArrayList<>(), s, services);
@@ -975,22 +962,22 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         }
 
         private ArrayList<StringBuilder> buildAssumptionsForSorts(Services services){
-        	ArrayList<StringBuilder> result = new ArrayList<>();
-        	if(this.isMultiSorted()){
-         		for(Sort sort : usedRealSort.keySet()){
+            ArrayList<StringBuilder> result = new ArrayList<>();
+            if(this.isMultiSorted()){
+                for(Sort sort : usedRealSort.keySet()) {
 
-         		//Do not add Assumptions for Boolean or integer sorts
-                    if(!isSomeIntegerSort(sort, services) && sort != Sort.FORMULA ){
-             			Term var = createLogicalVar(services, "x", sort);
-             			StringBuilder sVar = translateVariable(var.op());
-            			//StringBuilder var = this.makeUnique(new StringBuilder("x"));
-             			StringBuilder typePredicate = this.getTypePredicate(sort, sVar);
-             			StringBuilder assumption = translateLogicalExist(sVar, this.standardSort, typePredicate);
-             			result.add(assumption);
-             		}
-        		}
-        	}
-        	return result;
+                //Do not add Assumptions for Boolean or integer sorts
+                    if(!isSomeIntegerSort(sort, services) && sort != Sort.FORMULA) {
+                        Term var = createLogicalVar(services, "x", sort);
+                        StringBuilder sVar = translateVariable(var.op());
+                        //StringBuilder var = this.makeUnique(new StringBuilder("x"));
+                        StringBuilder typePredicate = this.getTypePredicate(sort, sVar);
+                        StringBuilder assumption = translateLogicalExist(sVar, this.standardSort, typePredicate);
+                        result.add(assumption);
+                    }
+                }
+            }
+            return result;
         }
 
         private HashMap<Long, StringBuilder> getRightConstantContainer(
@@ -2869,66 +2856,66 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
 
         private StringBuilder removeIllegalChars(StringBuilder template, ArrayList<String> toReplace, ArrayList<String> replacement) {
-    	//replace one String
-    	for (int i = 0; i < toReplace.size(); i++) {
-    	    String toRep = toReplace.get(i);
-    	    String replace = replacement.get(i);
-    	    int index = template.indexOf(toRep);
-    	    while (index >= 0) {
-    		template.replace(index, index + toRep.length(), replace);
-    		index = template.indexOf(toRep);
-    	    }
-    	}
+        //replace one String
+        for (int i = 0; i < toReplace.size(); i++) {
+            String toRep = toReplace.get(i);
+            String replace = replacement.get(i);
+            int index = template.indexOf(toRep);
+            while (index >= 0) {
+            template.replace(index, index + toRep.length(), replace);
+            index = template.indexOf(toRep);
+            }
+        }
 
-    	return template;
+        return template;
         }
 
 
         protected StringBuilder makeUnique(StringBuilder name) {
-        	StringBuilder toReturn = new StringBuilder(name);
+            StringBuilder toReturn = new StringBuilder(name);
 
-        	//build the replacement pairs
-        	ArrayList<String> toReplace = new ArrayList<>();
-        	ArrayList<String> replacement = new ArrayList<>();
+            //build the replacement pairs
+            ArrayList<String> toReplace = new ArrayList<>();
+            ArrayList<String> replacement = new ArrayList<>();
 
-        	toReplace.add("[]");
-        	replacement.add("_Array");
+            toReplace.add("[]");
+            replacement.add("_Array");
 
-        	toReplace.add("<");
-        	replacement.add("_abo_");
+            toReplace.add("<");
+            replacement.add("_abo_");
 
-        	toReplace.add(">");
-        	replacement.add("_abc_");
+            toReplace.add(">");
+            replacement.add("_abc_");
 
-        	toReplace.add("{");
-        	replacement.add("_cbo_");
+            toReplace.add("{");
+            replacement.add("_cbo_");
 
-        	toReplace.add("}");
-        	replacement.add("_cbc_");
+            toReplace.add("}");
+            replacement.add("_cbc_");
 
-        	toReplace.add(".");
-        	replacement.add("_dot_");
+            toReplace.add(".");
+            replacement.add("_dot_");
 
-        	toReplace.add(":");
-        	replacement.add("_col_");
+            toReplace.add(":");
+            replacement.add("_col_");
 
-        	toReplace.add("\\");
-        	replacement.add("_");
+            toReplace.add("\\");
+            replacement.add("_");
 
-        	toReplace.add("$");
-        	replacement.add("_dollar_");
+            toReplace.add("$");
+            replacement.add("_dollar_");
 
-        	toReturn = this.removeIllegalChars(toReturn, toReplace, replacement);
-        	// names are must not begin with special characters
+            toReturn = this.removeIllegalChars(toReturn, toReplace, replacement);
+            // names are must not begin with special characters
 
-        	if(!('A' <= toReturn.charAt(0) && toReturn.charAt(0) <= 'Z') &&
-        	   !('a' <= toReturn.charAt(0) && toReturn.charAt(0) <= 'z')){
-        	toReturn = (new StringBuilder()).append("a_").append(toReturn);
-        	}
+            if(!('A' <= toReturn.charAt(0) && toReturn.charAt(0) <= 'Z') &&
+               !('a' <= toReturn.charAt(0) && toReturn.charAt(0) <= 'z')){
+            toReturn = (new StringBuilder()).append("a_").append(toReturn);
+            }
 
-        	toReturn.append("_").append(nameCounter);
-        	nameCounter++;
-        	return toReturn;
+            toReturn.append("_").append(nameCounter);
+            nameCounter++;
+            return toReturn;
             }
 
 
@@ -2990,7 +2977,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
                         for (Term subterm : tf.getInstantiations()) {
                                 try {
-                                		StringBuilder term = translateComment(1,tf.getTaclet().displayName()+":\n");
+                                        StringBuilder term = translateComment(1,tf.getTaclet().displayName() + ":\n");
 
                                         term.append(translateTerm(
                                                         subterm, vector,
@@ -3012,8 +2999,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 return result;
         }
 
-        protected StringBuilder translateComment(int newLines, String comment){
-        	return new StringBuilder();
+        protected StringBuilder translateComment(int newLines, String comment) {
+            return new StringBuilder();
         }
 
         /**

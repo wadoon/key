@@ -5,7 +5,7 @@ import de.uka.ilkd.key.gui.settings.SettingsManager;
 import de.uka.ilkd.key.gui.settings.SettingsPanel;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
-import de.uka.ilkd.key.smt.st.SolverType;
+import de.uka.ilkd.key.smt.solvertypes.SolverType;
 
 import javax.swing.*;
 
@@ -31,13 +31,12 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
 
     private static final int SOLVER_NOT_SUPPOTED = 1;
     private static final int SOLVER_SUPPORT_NOT_CHECKED = 2;
-    private final SolverType solverType;
+    private final transient SolverType solverType;
     private final JTextField solverCommand;
     private final JTextField solverParameters;
     private final JTextField solverSupported;
     private final JTextField solverName;
     private final JTextField solverInstalled;
-    private final JTextField solverInfo;
     private final JSpinner solverTimeout;
 
     public SolverOptions(SolverType solverType) {
@@ -46,7 +45,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
         setHeaderText("SMT Solver: " + getDescription());
 
         solverName = createSolverName();
-        solverInfo = createSolverInformation();
+        createSolverInformation();
         solverInstalled = createSolverInstalled();
         solverCommand = createSolverCommand();
         solverTimeout = createSolverTimeout();
@@ -56,6 +55,15 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
         createCheckSupportButton();
     }
 
+    private static final String versionInfo(String info, String versionString) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(info);
+        builder.append(" ");
+        builder.append("(");
+        builder.append(versionString);
+        builder.append(")");
+        return builder.toString();
+    }
 
     protected JButton createDefaultButton() {
         JButton toDefaultButton = new JButton("Set parameters to default");
@@ -138,10 +146,10 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
             final String versionString;
             try {
                 versionString = solverType.getRawVersion();
-                info = info + (versionString.startsWith("version") ? " (" : " (version ") + versionString + ")";
+                info = versionInfo(info, versionString);
             } catch (RuntimeException re) {
-                // this case occurs for instance, if there user can see e.g. z3 but has not the permission
-                // to execute the solver
+                // this case occurs for instance if the user can see e.g. z3 but doesn't have
+                // the permission to execute the solver
                 info = "(version: unknown) solver is installed, but trying to access it resulted in an error " +
                         (re.getCause() != null ? re.getCause().getLocalizedMessage() : re.getLocalizedMessage());
             }
@@ -172,7 +180,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
         if (clone.containsSolver(solverType)) {
             solverCommand.setText(clone.getCommand(solverType));
             solverParameters.setText(clone.getParameters(solverType));
-            solverTimeout.setValue((Long) clone.getSolverTimeout(solverType)/1000L);
+            solverTimeout.setValue(clone.getSolverTimeout(solverType)/1000L);
             solverName.setText(solverType.getName());
         } else {
             throw new IllegalStateException("Could not find solver data for type: " + solverType);
@@ -182,7 +190,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
         String info = installed ? "yes" : "no";
         if (installed) {
             final String versionString = solverType.getRawVersion();
-            info = info + (versionString.startsWith("version") ? " (" : " (version ") + versionString + ")";
+            info = versionInfo(info, versionString);
         }
         solverInstalled.setText(info);
     }

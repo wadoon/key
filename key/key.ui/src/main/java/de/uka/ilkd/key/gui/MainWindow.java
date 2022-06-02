@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.gui;
 
 import bibliothek.gui.dock.StackDockStation;
@@ -42,8 +29,7 @@ import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.proofdiff.ProofDiffFrame;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.gui.settings.SettingsManager;
-import de.uka.ilkd.key.gui.smt.ComplexButton;
-import de.uka.ilkd.key.gui.smt.SolverListener;
+import de.uka.ilkd.key.gui.smt.DropdownSelectionButton;
 import de.uka.ilkd.key.gui.sourceview.SourceViewFrame;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.logic.Name;
@@ -52,14 +38,9 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.settings.SettingsListener;
-import de.uka.ilkd.key.smt.SMTProblem;
-import de.uka.ilkd.key.smt.SMTSolver;
-import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
-import de.uka.ilkd.key.smt.st.SolverType;
-import de.uka.ilkd.key.smt.st.SolverTypes;
+import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.util.*;
 import org.slf4j.Logger;
@@ -76,9 +57,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.*;
+import java.util.function.Function;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @HelpInfo()
@@ -163,11 +144,10 @@ public final class MainWindow extends JFrame {
             new ToggleSourceViewTooltipAction(this);
     private final TermLabelMenu termLabelMenu;
     public boolean frozen = false;
-    JCheckBoxMenuItem saveSMTFile;
     /**
      *
      */
-    private CControl dockControl = new CControl(this);
+    private final CControl dockControl = new CControl(this);
     /**
      * the first toolbar
      */
@@ -227,7 +207,11 @@ public final class MainWindow extends JFrame {
      */
     private GoalSelectAboveAction goalSelectAboveAction;
     private GoalSelectBelowAction goalSelectBelowAction;
-    private ComplexButton smtComponent;
+    private DropdownSelectionButton smtComponent;
+    private DropdownSelectionButton.EmptyAction noSolverSelected;
+    private ChangeListener selectAllListener;
+    private JCheckBoxMenuItem selectAll;
+    private JSeparator separator;
     private ExitMainAction exitMainAction;
     private ShowActiveSettingsAction showActiveSettingsAction;
     private UnicodeToggleAction unicodeToggleAction;
@@ -235,6 +219,30 @@ public final class MainWindow extends JFrame {
     private SingleCDockable dockProofListView;
     private SingleCDockable dockSourceView;
     private SingleCDockable dockSequent;
+
+    /* A function collapsing multiple SMTInvokeActions into one that starts a union
+    of all solver types contained in any of the input actions. None-SMTInvokeActions
+    in the input are ignored. */
+    private final Function<Action[], Action> collapseChoice = a -> {
+        Set<SolverType> types = new HashSet<>();
+        StringBuilder builder = new StringBuilder();
+        for (Action action : a) {
+            // Ignore all none-SMTInvokeActions
+            if (action instanceof SMTInvokeAction) {
+                types.addAll(((SMTInvokeAction) action).getSolverUnion().getTypes());
+            }
+        }
+        if (types.isEmpty() || a.length == 0) {
+            return noSolverSelected;
+        }
+        for (SolverType type : types) {
+            builder.append(type.getName() + ", ");
+        }
+        builder.delete(builder.length() - 2, builder.length());
+        SolverTypeCollection chosenSolvers
+                    = new SolverTypeCollection(builder.toString(), types.size(), types);
+        return new SMTInvokeAction(chosenSolvers, this);
+    };
 
     /**
      * set to true if the view of the current goal should not be updated
@@ -305,7 +313,7 @@ public final class MainWindow extends JFrame {
             Class<?> appClass = Class.forName("java.awt.Taskbar");
             Method getTaskbar = appClass.getMethod("getTaskbar");
             Method setIconImage = appClass.getMethod("setIconImage", Image.class);
-            Object taskbar = getTaskbar.invoke(null);//static method
+            Object taskbar = getTaskbar.invoke(null); //static method
             setIconImage.invoke(taskbar, image);
             return true;
         } catch (ClassNotFoundException | NoSuchMethodException
@@ -327,7 +335,8 @@ public final class MainWindow extends JFrame {
             Method setDockIconImage = appClass.getMethod("setDockIconImage", params);
             setDockIconImage.invoke(application, IconFactory.keyLogo());
             return true;
-        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
+        } catch (NoSuchMethodException | SecurityException
+                | IllegalAccessException | IllegalArgumentException
                 | InvocationTargetException | ClassNotFoundException ignored) {
             return false;
         }
@@ -339,7 +348,8 @@ public final class MainWindow extends JFrame {
 
     public static MainWindow getInstance(boolean ensureIsVisible) {
         if (GraphicsEnvironment.isHeadless()) {
-            LOGGER.error("Error: KeY started in graphical mode, but no graphical environment present.");
+            LOGGER.error("Error: KeY started in graphical mode, " +
+                    "but no graphical environment present.");
             LOGGER.error("Please use the --auto option to start KeY in batch mode.");
             LOGGER.error("Use the --help option for more command line options.");
             System.exit(-1);
@@ -362,7 +372,8 @@ public final class MainWindow extends JFrame {
      * to do some cleanup only if a {@link MainWindow} instance exists.</b>
      * </p>
      *
-     * @return {@code true} {@link MainWindow} exists and is available via {@link #getInstance()}, {@code false} {@link MainWindow} is not instantiated and will be instantiated via {@link #getInstance()}.
+     * @return {@code true} {@link MainWindow} exists and is available via {@link #getInstance()},
+     * {@code false} {@link MainWindow} is not instantiated and will be instantiated via {@link #getInstance()}.
      */
     public static boolean hasInstance() {
         return instance != null;
@@ -598,7 +609,7 @@ public final class MainWindow extends JFrame {
         toolBar.addSeparator();
         toolBar.addSeparator();
         toolBar.addSeparator();
-        ComplexButton comp = createSMTComponent();
+        DropdownSelectionButton comp = createSMTComponent();
         toolBar.add(comp.getActionComponent());
         toolBar.add(comp.getSelectionComponent());
         toolBar.addSeparator();
@@ -611,25 +622,67 @@ public final class MainWindow extends JFrame {
         return toolBar;
     }
 
-    private ComplexButton createSMTComponent() {
-        smtComponent = new ComplexButton(TOOLBAR_ICON_SIZE);
-        smtComponent.setEmptyItem("No solver available",
+    /**
+     * Create the {@link #smtComponent} for selecting SMT solvers.
+     *
+     * @return the {@link #smtComponent}
+     */
+    private DropdownSelectionButton createSMTComponent() {
+        smtComponent = new DropdownSelectionButton(TOOLBAR_ICON_SIZE);
+        noSolverSelected = new DropdownSelectionButton.EmptyAction(true);
+        noSolverSelected.setText("SMT");
+        noSolverSelected.setToolTip("Choose at least one SMT solver to run");
+        // Configure the smtComponent's empty item (this is selected if no solvers are available):
+        String noneAvailableText = "No solver available";
+        String noneAvailableTip =
                 "<html>No SMT solver is applicable for KeY.<br>" +
                         "<br>If a solver is installed on your system," +
-                        "<br>please configure the KeY-System accordingly:\n" +
-                        "<br>Options | SMT Solvers</html>");
+                        "<br>please configure the KeY-System accordingly:" +
+                        System.lineSeparator() +
+                        "<br>Options | SMT Solvers</html>";
+        smtComponent.setEmptyItem(noneAvailableText, noneAvailableTip);
 
+        // Prepend "Run" to the currently selected action in the smtComponent
         smtComponent.setPrefix("Run ");
 
+        /* Add a ChangeListener to the smtComponent that sets the active solver union of
+        the settings to the currently selected one (if the selected action is an SMTInvokeAction).
+        */
         smtComponent.addListener(e -> {
-            ComplexButton but = (ComplexButton) e.getSource();
-            if (but.getSelectedItem() instanceof SMTInvokeAction) {
-                SMTInvokeAction action = (SMTInvokeAction) but.getSelectedItem();
+            DropdownSelectionButton but = (DropdownSelectionButton) e.getSource();
+            if (but.getAction() instanceof SMTInvokeAction) {
+                SMTInvokeAction action = (SMTInvokeAction) but.getAction();
                 ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings()
-                        .setActiveSolverUnion(action.solverUnion);
+                        .setActiveSolverUnion(action.getSolverUnion());
             }
         });
 
+        /* Add a ChangeListener to the smtComponent that checks whether currently no solvers
+        are selected, but solvers are available (<-> noSolverSelected is the selected action,
+        see collapseChoice for that).
+         */
+        smtComponent.addListener(c -> {
+            if (smtComponent.getAction() == noSolverSelected) {
+                // Make sure the tooltip and text are shown.
+                noSolverSelected.putValue(Action.NAME, noSolverSelected.toString());
+                noSolverSelected.putValue(Action.SHORT_DESCRIPTION, noSolverSelected.getToolTip());
+                boolean selectionEnabled = smtComponent.getSelectionComponent().isEnabled();
+                // Disable the action button.
+                smtComponent.setEnabled(false);
+                // Disabling the action button also disables the selection button,
+                // so enable that again (if it was before).
+                smtComponent.getSelectionComponent().setEnabled(selectionEnabled);
+            }
+        });
+
+        // The selectAll button of the dropdown menu, this can be reused instead of creating
+        // it anew every time.
+        selectAll = new JCheckBoxMenuItem("Select All");
+        selectAll.setFocusPainted(false);
+        selectAll.setEnabled(true);
+        separator = new JSeparator();
+
+        // Update the smtComponent with the currently (on start) available SMT solvers.
         updateSMTSelectMenu();
         mediator.addKeYSelectionListener(new DPEnableControl());
         return smtComponent;
@@ -771,7 +824,7 @@ public final class MainWindow extends JFrame {
         submenu.add(loadUserDefinedTacletsForProvingAction);
         submenu.add(loadKeYTaclets);
         submenu.add(lemmaGenerationBatchModeAction);
-        if(Main.isExperimentalMode()) {
+        if (Main.isExperimentalMode()) {
             RunAllProofsAction runAllProofsAction = new RunAllProofsAction(this);
             submenu.add(runAllProofsAction);
         }
@@ -896,10 +949,9 @@ public final class MainWindow extends JFrame {
         options.setMnemonic(KeyEvent.VK_O);
 
         options.add(SettingsManager.getInstance().getActionShowSettings(this));
-
         options.add(new TacletOptionsAction(this));
         options.add(new SMTOptionsAction(this));
-//	options.add(setupSpeclangMenu()); // legacy since only JML supported
+        // options.add(setupSpeclangMenu()); // legacy since only JML supported
         options.addSeparator();
         options.add(new JCheckBoxMenuItem(new ToggleConfirmExitAction(this)));
         options.add(new JCheckBoxMenuItem(new AutoSave(this)));
@@ -924,8 +976,8 @@ public final class MainWindow extends JFrame {
     }
 
     /**
-     * update the selection menu for Decisionprocedures.
-     * Remove those, that are not installed anymore, add those, that got installed.
+     * Update the selection menu for decision procedures using SMT solvers.
+     * Remove those SMT solvers, that are not installed anymore, add those, that got installed.
      */
     public void updateSMTSelectMenu() {
         Collection<SolverTypeCollection> solverUnions = ProofIndependentSettings.DEFAULT_INSTANCE.
@@ -940,53 +992,72 @@ public final class MainWindow extends JFrame {
     }
 
     private void updateDPSelectionMenu() {
-        smtComponent.setItems(null);
-    }
-
-    private SMTInvokeAction findAction(SMTInvokeAction[] actions, SolverTypeCollection union) {
-        for (SMTInvokeAction action : actions) {
-            if (action.solverUnion.equals(union)) {
-                return action;
-            }
-        }
-        return null;
+        /* No solvers available -> this leads to the empty item of the smtComponent being set.
+        Thus, the smtComponent will be deactivated until solvers become available. */
+        smtComponent.setItems(null, actions -> null, 0);
     }
 
     private void updateDPSelectionMenu(Collection<SolverTypeCollection> unions) {
         int size = unions.size();
-        SMTInvokeAction actions[] = new SMTInvokeAction[size > 1 ? size + 1 : size];
+        SMTInvokeAction[] actions = new SMTInvokeAction[size];
 
+        // create SMTInvokeActions for the given solver unions.
         int i = 0;
         for (SolverTypeCollection union : unions) {
-
-            actions[i] = new SMTInvokeAction(union);
+            SMTInvokeAction action = new SMTInvokeAction(union, this);
+            actions[i] = action;
             i++;
         }
 
-        if (size > 1) {
-            actions[size] = new SMTInvokeMultipleAction(unions);
-        }
+        // Set the new selection items of the smtComponent.
+        smtComponent.setItems(actions, collapseChoice, actions.length);
 
-        smtComponent.setItems(actions);
-
-        SolverTypeCollection active = ProofIndependentSettings
-                .DEFAULT_INSTANCE.getSMTSettings().computeActiveSolverUnion();
-
-        SMTInvokeAction activeAction = findAction(actions, active);
-
-        boolean found = activeAction != null;
-        if (!found) {
-            Object item = smtComponent.getTopItem();
-            if (item instanceof SMTInvokeAction) {
-                active = ((SMTInvokeAction) item).solverUnion;
-                ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings()
-                        .setActiveSolverUnion(active);
-            } else {
-                activeAction = null;
+        // If more than one action can be selected, add the selectAll-button.
+        if (actions.length > 1) {
+            // The old selection listener is not needed anymore.
+            if (selectAllListener != null) {
+                smtComponent.removeListener(selectAllListener);
             }
-
+            smtComponent.addComponent(separator);
+            smtComponent.addComponent(selectAll);
+            selectAll.setAction(
+                    new AbstractAction() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            if (selectAll.isSelected()) {
+                                smtComponent.selectMaxNumber();
+                            } else {
+                                smtComponent.deselectAll();
+                            }
+                        }
+                    });
+            /* Set this stuff anew because for some reason it is not displayed anymore
+            after setting the action? */
+            selectAll.setText("Select All");
+            selectAll.setToolTipText("(De)select all menu items by (un)checking this");
+            // Don't close the smtComponent's menu when clicking selectAll
+            selectAll.putClientProperty("CheckBoxMenuItem.doNotCloseOnMouseClick", Boolean.TRUE);
+            // The new selection listener checking whether all the current items or none of them
+            // are selected and changing the selection status of selectAll accordingly.
+            selectAllListener = new ChangeListener() {
+                @Override
+                public void stateChanged(ChangeEvent e) {
+                    if (smtComponent.getSelectedItems().length == actions.length
+                            && !selectAll.isSelected()) {
+                        selectAll.setSelected(true);
+                    } else if (smtComponent.getSelectedItems().length == 0
+                            && selectAll.isSelected()) {
+                        selectAll.setSelected(false);
+                    }
+                }
+            };
+            smtComponent.addListener(selectAllListener);
+        } else {
+            // If only one action is available, the selectAll button is not needed.
+            smtComponent.removeComponent(selectAll);
+            smtComponent.removeComponent(separator);
         }
-        smtComponent.setSelectedItem(activeAction);
+
     }
 
     @SuppressWarnings("unused")
@@ -1097,7 +1168,16 @@ public final class MainWindow extends JFrame {
         };
 
         if (isPrintRunImmediately) {
-            sequentUpdater.run();
+            try {
+                sequentUpdater.run();
+            } catch (RuntimeException ex) {
+                // This is a quickfix for some situations where exceptions
+                // in the UI update would corrupt the entire proof state
+                // such that the entire app needs to be closed. Just print
+                // the exception and pretend everything was good. (Like would
+                // happen when incoked on the event queue.
+                ex.printStackTrace();
+            }
         } else {
             SwingUtilities.invokeLater(sequentUpdater);
         }
@@ -1661,265 +1741,6 @@ public final class MainWindow extends JFrame {
         @Override
         public void selectedNodeChanged(KeYSelectionEvent e) {
             selectedProofChanged(e);
-        }
-
-    }
-
-    /**
-     * This action is responsible for the invocation of an SMT solver For
-     * example the toolbar button is parameterized with an instance of this action
-     */
-    private class SMTInvokeAction extends MainWindowAction {
-        /**
-         *
-         */
-        private static final long serialVersionUID = -8176122007799747342L;
-
-        SolverTypeCollection solverUnion;
-
-        public SMTInvokeAction(SolverTypeCollection solverUnion) {
-            super(MainWindow.this);
-            this.solverUnion = solverUnion;
-            if (solverUnion != SolverTypeCollection.EMPTY_COLLECTION) {
-                putValue(SHORT_DESCRIPTION, "Invokes " + solverUnion.toString());
-            }
-        }
-
-        @Override
-        public boolean isEnabled() {
-            boolean b = super.isEnabled() && solverUnion != SolverTypeCollection.EMPTY_COLLECTION
-                    && mediator != null
-                    && mediator.getSelectedProof() != null
-                    && !mediator.getSelectedProof().closed();
-            return b;
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (!mediator.ensureProofLoaded() || solverUnion == SolverTypeCollection.EMPTY_COLLECTION) {
-                MainWindow.this.popupWarning("No proof loaded or no solvers selected.", "Oops...");
-                return;
-            }
-            final Proof proof = mediator.getSelectedProof();
-
-            Thread thread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-
-                    DefaultSMTSettings settings = new DefaultSMTSettings(proof.getSettings().getSMTSettings(),
-                            ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
-                            proof.getSettings().getNewSMTSettings(), proof);
-                    SolverLauncher launcher = new SolverLauncher(settings);
-                    launcher.addListener(new SolverListener(settings, proof));
-                    launcher.launch(solverUnion.getTypes(),
-                            SMTProblem.createSMTProblems(proof),
-                            proof.getServices());
-
-                }
-            }, "SMTRunner");
-            thread.start();
-
-        }
-
-        @Override
-        public String toString() {
-            return solverUnion.toString();
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (!(obj instanceof SMTInvokeAction)) {
-                return false;
-            }
-            return this.solverUnion.equals(((SMTInvokeAction) obj).solverUnion);
-        }
-
-        @Override
-        public int hashCode() {
-            return solverUnion.hashCode() * 7;
-        }
-
-    }
-
-    private final class SMTInvokeMultipleAction extends SMTInvokeAction {
-
-        private final SolverTypeCollection solverUnion;
-        private final Collection<SolverTypeCollection> possibleSolvers;
-        private static final String SELECT_ALL = "Select All";
-        private static final String DESELECT_ALL = "Deselect All";
-        private static final String START = "Start Solvers";
-        private static final String CANCEL = "Cancel";
-
-
-        public SMTInvokeMultipleAction(Collection<SolverTypeCollection> solverUnions) {
-            super(SolverTypeCollection.EMPTY_COLLECTION);
-            this.solverUnion = SolverTypeCollection.EMPTY_COLLECTION;
-            this.possibleSolvers = solverUnions;
-        }
-
-        @Override
-        public boolean isEnabled() {
-            boolean b = possibleSolvers.size() > 1
-                    && mediator != null
-                    && mediator.getSelectedProof() != null
-                    && !mediator.getSelectedProof().closed();
-            return b;
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (!mediator.ensureProofLoaded()) {
-                MainWindow.this.popupWarning("No proof loaded.", "Oops...");
-                return;
-            }
-
-            JDialog choiceDialog = new JDialog(mainWindow);
-            choiceDialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-            choiceDialog.setLocationByPlatform(true);
-            // available solver unions
-            List<UnionCheckBox> choiceOptions = new LinkedList<>();
-
-            JButton start = new JButton(START);
-            start.setEnabled(false);
-            JButton cancel = new JButton(CANCEL);
-            cancel.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    choiceDialog.dispose();
-                }
-            });
-            start.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    new SMTInvokeAction(createSolverTypeCollection(choiceOptions)).actionPerformed(e);
-                    choiceDialog.dispose();
-                }
-            });
-
-
-            JPanel choicePanel = new JPanel();
-            choicePanel.setLayout(new BoxLayout(choicePanel, BoxLayout.Y_AXIS));
-
-            JRadioButton selectAll = new JRadioButton(SELECT_ALL);
-            selectAll.setFocusPainted(false);
-            // Change behaviour of checkAll to unchecking all if all solvers are checked
-            selectAll.setEnabled(true);
-            selectAll.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    boolean checkedValue = selectAll.getText().equals(SELECT_ALL);
-                    for (UnionCheckBox checkBox: choiceOptions) {
-                        checkBox.setSelected(checkedValue);
-                    }
-                    selectAll.setSelected(false);
-                }
-            });
-
-            Box selectAllBox = Box.createVerticalBox();
-            selectAllBox.setAlignmentX(Component.CENTER_ALIGNMENT);
-            selectAllBox.add(selectAll);
-            choicePanel.add(selectAllBox);
-
-            Box separatorBox = Box.createVerticalBox();
-            separatorBox.setAlignmentX(Component.CENTER_ALIGNMENT);
-            separatorBox.add(new JSeparator());
-            choicePanel.add(separatorBox);
-
-            Box choiceBox = Box.createVerticalBox();
-            choiceBox.setAlignmentX(Component.CENTER_ALIGNMENT);
-            choicePanel.add(choiceBox);
-
-            choicePanel.add(Box.createVerticalGlue());
-
-            for (SolverTypeCollection union: possibleSolvers){
-                UnionCheckBox chooseUnion = new UnionCheckBox(union);
-                chooseUnion.setFocusPainted(false);
-                chooseUnion.addChangeListener(new ChangeListener() {
-                    @Override
-                    public void stateChanged(ChangeEvent e) {
-                        // Enable start button iff at least one solver is checked
-                        if (createSolverTypeCollection(choiceOptions).equals(SolverTypeCollection.EMPTY_COLLECTION)) {
-                            start.setEnabled(false);
-                            return;
-                        }
-                        start.setEnabled(true);
-                        selectAll.setText((choiceOptions.stream().filter(u -> u.isSelected())
-                                .collect(Collectors.toList()).size() <= choiceOptions.size()/2)
-                                ? SELECT_ALL : DESELECT_ALL);
-                    }
-                });
-                choiceOptions.add(chooseUnion);
-                chooseUnion.setSelected(true);
-                choiceBox.add(chooseUnion);
-            }
-
-            JPanel buttonPanel = new JPanel(new GridLayout(2, 1));
-            buttonPanel.add(start);
-            buttonPanel.add(cancel);
-
-            JPanel panel = new JPanel(new BorderLayout(5, 20));
-            panel.add(choicePanel, BorderLayout.CENTER);
-            panel.add(buttonPanel, BorderLayout.SOUTH);
-            choiceDialog.setContentPane(panel);
-            choiceDialog.setTitle("Choose Multiple Solvers");
-            choiceDialog.pack();
-            int titleWidth = SwingUtilities.computeStringWidth(
-                    new JLabel().getFontMetrics(UIManager.getDefaults().getFont("Label.font")),
-                    choiceDialog.getTitle());
-            choiceDialog.setSize(new Dimension(titleWidth + choiceDialog.getWidth(),
-                    choiceDialog.getHeight()));
-            choiceDialog.setEnabled(true);
-            choiceDialog.setVisible(true);
-        }
-
-        private SolverTypeCollection createSolverTypeCollection(Collection<UnionCheckBox> checkBoxes) {
-            Set<SolverType> types = new HashSet<>();
-            StringBuilder builder = new StringBuilder();
-            for (UnionCheckBox box: checkBoxes.stream().filter(c -> c.isSelected()).collect(Collectors.toList())) {
-                types.addAll(box.getUnion().getTypes());
-            }
-            if (types.size() < 1) {
-                return SolverTypeCollection.EMPTY_COLLECTION;
-            }
-            for (SolverType type: types) {
-                builder.append(type.getName() + ", ");
-            }
-            builder.delete(builder.length()-2, builder.length());
-            return new SolverTypeCollection(builder.toString(), types.size(), types);
-        }
-
-        @Override
-        public String toString() {
-            return "Multiple Solvers";
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (!(obj instanceof SMTInvokeMultipleAction)) {
-                return false;
-            }
-            return this.solverUnion.equals(((SMTInvokeMultipleAction) obj).solverUnion)
-                    && this.possibleSolvers.equals(((SMTInvokeMultipleAction) obj).possibleSolvers);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hashCode(possibleSolvers);
-        }
-
-    }
-
-    private class UnionCheckBox extends JCheckBox {
-
-        private SolverTypeCollection union;
-
-        private UnionCheckBox(SolverTypeCollection union) {
-            super(union.name());
-            this.union = union;
-        }
-
-        private SolverTypeCollection getUnion() {
-            return union;
         }
 
     }

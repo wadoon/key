@@ -8,9 +8,8 @@ import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings.ProgressMode;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.smt.st.SolverPropertiesLoader;
-import de.uka.ilkd.key.smt.st.SolverType;
-import de.uka.ilkd.key.smt.st.SolverTypes;
+import de.uka.ilkd.key.smt.solvertypes.SolverType;
+import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 
 
 import javax.swing.*;
@@ -65,16 +64,23 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
         seqBoundField = createSeqBoundField();
         solverSupportCheck = createSolverSupportCheck();
 
+        // Load all available solver types in the system according to SolverTypes.
+        // Note that this should happen before creating the NewTranslationOptions, otherwise
+        // the SMT translation options used by the solvers' handlers won't be added to the menu.
+        Collection<SolverType> solverTypes = SolverTypes.getSolverTypes();
+
         getChildren().add(new TacletTranslationOptions());
         getChildren().add(new NewTranslationOptions());
 
-        Collection<SolverType> solverTypes = SolverTypes.getSolverTypes();
         if (!Main.isExperimentalMode()) {
             solverTypes.removeAll(SolverTypes.getLegacySolvers());
         } else {
             getChildren().add(new TranslationOptions());
         }
-        // Only add options for those solvers that are actually theoretically available according to the settings.
+        /* Only add options for those solvers that are actually theoretically available
+        according to the settings. Note that these aren't necessarily all the types
+        provided by SolverTypes, depending on the implementation of the
+        ProofIndependentSettings. */
         for (SolverType options : solverTypes.stream().filter(
                 t -> ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().containsSolver(t))
                 .collect(Collectors.toList())) {
