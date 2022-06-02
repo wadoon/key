@@ -88,7 +88,7 @@ public class BufferedPipe implements Pipe {
         }
         // Add the message to the sent message buffer as it will have to be used again for further communication.
         sentMessages.add(message);
-        boolean shouldSend = sendTriggers.stream().anyMatch(s -> message.trim().endsWith(s));
+        boolean shouldSend = sendTriggers.stream().anyMatch(s -> message.trim().contains(s));
         if (!shouldSend && !sendTriggers.isEmpty()) {
             return;
         }
