@@ -12,6 +12,7 @@ import de.uka.ilkd.key.proof.init.AbstractPO;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
+import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.merge.CloseAfterMergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRule;
@@ -88,7 +89,14 @@ public final class ProofSlicer {
                 return; // closed goal
             }
             if (analysisResults.usefulSteps.contains(node)) { // TODO: cut elimination
-                //System.out.println("at node " + node.serialNr() + " " + node.getAppliedRuleApp().rule().displayName());
+                /*
+                System.out.println("at node " + node.serialNr() + " " + node.getAppliedRuleApp().rule().displayName());
+                try {
+                    p.saveToFile(new java.io.File("/tmp/before" + node.serialNr() + ".proof"));
+                } catch (Throwable t) {
+
+                }
+                 */
 
                 var app = node.getAppliedRuleApp();
 
@@ -134,6 +142,8 @@ public final class ProofSlicer {
                                         ourAnte = ourAnte.replace(i, origFormula).semisequent();
                                         if (!origFormula.toString().equals(pio.sequentFormula().toString())) {
                                             System.err.println("name / index mismatch");
+                                            System.err.println(origFormula);
+                                            System.err.println(pio.sequentFormula());
                                             // TODO: this seems to only happen for index mismatches
                                             // (see IndProgramElementName)
                                         }
@@ -150,6 +160,10 @@ public final class ProofSlicer {
                             .setProposals(node.getNameRecorder().getProposals());
                     replayedNodes.put(node, goal.node());
 
+                    // restrict OSS applications
+                    if (app instanceof OneStepSimplifierRuleApp) {
+                        ((OneStepSimplifierRuleApp) app).restrictedIfInsts = true;
+                    }
                     // handle rules added dynamically by other proof steps
                     if (app.rule() instanceof Taclet
                             && ((Taclet) app.rule()).getAddedBy() != null) {
