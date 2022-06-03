@@ -30,6 +30,12 @@ class EndToEndTests {
     }
 
     @Test
+    void sliceJavaExampleWithTrickyOSS() throws Exception {
+        // this test case requires One Step Simplifactions to be restricted when slicing the proof
+        sliceProof("/sitaRearrange.zproof", 2722, 2204);
+    }
+
+    @Test
     void sliceCut() throws Exception {
         sliceProof("/cutExample.proof", 10, 7);
     }
