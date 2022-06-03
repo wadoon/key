@@ -48,12 +48,7 @@ import recoder.service.KeYCrossReferenceSourceInfo;
  *
  * <p> For this to work correctly, you must call
  * {@link #collectSubtermOrigins(Term, TermBuilder)} for every top-level formula in your
- * original proof obligation.
- * Before doing this, you can call {@link TermBuilder#addLabelToAllSubs(Term, TermLabel)}
- * for every term you have added to the original contract in your PO to add an
- * {@link OriginTermLabel}
- * of your choosing. Terms for which you do not do this get a label of the form
- * {@code new OriginTermLabel(Collections.emptySet())}. </p>
+ * original proof obligation. </p>
  *
  * @author lanzinger
  */
