@@ -102,22 +102,32 @@ public class OriginTermLabel implements TermLabel {
 
         OriginTermLabel originLabel =
                 (OriginTermLabel) term.getLabel(OriginTermLabel.NAME);
+        
+        if (originLabel != null) {
+            return originLabel.getOrigins();
+        }
 
         // If the term has no origin,
-        // iterate over its parent terms until we find one with an origin.
-        while ((originLabel == null || originLabel.getOrigins().isEmpty()) && !pio.isTopLevel()) {
+        // iterate over its parent terms until we find one with some origins.
+        // But only return that origin if it is unique, otherwise we get a set of possibly
+        // unrelated origins of the term's siblings.
+        while (!pio.isTopLevel()) {
             pio = pio.up();
             term = pio.subTerm();
             
             originLabel =
                     (OriginTermLabel) term.getLabel(OriginTermLabel.NAME);
-        }
 
-        if (originLabel != null) {
-            return originLabel.getOrigins();
-        } else {
-            return Collections.emptySet();
+            if (originLabel != null) {
+                if (originLabel.getOrigins().size() == 1) {
+                    return originLabel.getOrigins();
+                } else {
+                    return Collections.emptySet();
+                }
+            }
         }
+        
+        return Collections.emptySet();
     }
 
     /**
