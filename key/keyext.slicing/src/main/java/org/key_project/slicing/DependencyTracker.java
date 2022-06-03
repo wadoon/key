@@ -152,9 +152,9 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
 
         var outputs = new ArrayList<Pair<PosInOccurrence, String>>();
 
-        int sibling = ruleAppInfo.getReplacementNodesList().size() - 1;
-        for (var b : ruleAppInfo.getReplacementNodesList()) {
-            String id = ruleAppInfo.getReplacementNodesList().size() > 1 ? ("" + sibling) : "";
+        int sibling = ruleAppInfo.getReplacementNodes().size() - 1;
+        for (var b : ruleAppInfo.getReplacementNodes()) {
+            String id = ruleAppInfo.getReplacementNodes().size() > 1 ? ("" + sibling) : "";
             b.getNodeChanges().forEachRemaining(c -> {
                 if (c instanceof NodeChangeAddFormula) {
                     outputs.add(new Pair<>(c.getPos(), id));

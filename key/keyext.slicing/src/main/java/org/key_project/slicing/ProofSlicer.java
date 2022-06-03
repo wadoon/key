@@ -145,11 +145,12 @@ public final class ProofSlicer {
                                 for (var origFormula : origAnte.asList()) {
                                     if (origFormula.realEquals(pio.sequentFormula())) {
                                         ourAnte = ourAnte.replace(i, origFormula).semisequent();
+                                        // TODO: remove this rather expensive check if it never occurs
                                         if (!origFormula.toString().equals(pio.sequentFormula().toString())) {
                                             System.err.println("name / index mismatch");
                                             System.err.println(origFormula);
                                             System.err.println(pio.sequentFormula());
-                                            // TODO: check whether this still happens
+                                            throw new IllegalStateException("Proof Slicer failed to identify correct sequent formula!");
                                         }
                                     }
                                 }

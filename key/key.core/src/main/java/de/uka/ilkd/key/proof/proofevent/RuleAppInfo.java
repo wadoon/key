@@ -24,17 +24,17 @@ public class RuleAppInfo {
     /**
      * RuleApp this event reports
      */
-    RuleApp               app          = null;
+    private RuleApp               app          = null;
 
     /**
      * Node the rule has been applied on
      */
-    Node                  originalNode = null;
+    private Node                  originalNode = null;
 
     /**
      * New nodes that have been introduced by this rule application
      */
-    ImmutableList<NodeReplacement> newNodes     = null;
+    private ImmutableList<NodeReplacement> newNodes     = null;
 
     public RuleApp                   getRuleApp          () {
 	return app;
@@ -53,10 +53,6 @@ public class RuleAppInfo {
      * been changed)
      */
     public ImmutableList<NodeReplacement> getReplacementNodes () {
-        return newNodes;
-    }
-
-    public ImmutableList<NodeReplacement> getReplacementNodesList() {
         return newNodes;
     }
 
