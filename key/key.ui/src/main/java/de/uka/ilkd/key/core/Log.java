@@ -25,6 +25,7 @@ public class Log {
     public static void configureLogging(int verbosity) {
         ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger)
                 LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
+        root.getAppender("STDOUT").clearAllFilters(); // to allow log messages on the console
         switch (verbosity) {
             case Verbosity.TRACE:
                 root.setLevel(Level.TRACE);
