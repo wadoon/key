@@ -565,11 +565,11 @@ public class ContractFactory {
                     for (TermLabel l : labels) {
                         if (l instanceof OriginTermLabel) {
                             // found origin label -> merge origins
-                            Origin o1 = ((OriginTermLabel) ol).getOrigin();
-                            Origin o2 = ((OriginTermLabel) l).getOrigin();
+                            Set<Origin> o1 = ((OriginTermLabel) ol).getOrigins();
+                            Set<Origin> o2 = ((OriginTermLabel) l).getOrigins();
                             Set<Origin> origins = new HashSet<>();
-                            origins.add(o1);
-                            origins.add(o2);
+                            origins.addAll(o1);
+                            origins.addAll(o2);
                             uol = new OriginTermLabel(origins);
                             newLabels.add(uol);
                             break;
@@ -688,27 +688,37 @@ public class ContractFactory {
                                                  t.originalResultVar, t.originalAtPreVars,
                                                  services);
                 mby = combineMeasuredBy(mby, otherMby, h, otherPre, services);
+                
+                mby = OriginTermLabel.collectSubtermOrigins(mby, services);
 
                 // the modifies clause must be computed before the preconditions
                 combineModifies(t, hasMod, mods, uniformMod, other, h, otherPre, services);
 
                 if (otherPre != null) {
-                    pres.put(h, pres.get(h) == null ? otherPre : tb.or(pres.get(h), otherPre));
+                    Term newPre = pres.get(h) == null ? otherPre : tb.or(pres.get(h), otherPre);
+                    newPre = OriginTermLabel.collectSubtermOrigins(newPre, services);
+                    pres.put(h, newPre);
                 }
                 if (otherPost != null) {
                     final Term oPost = tb.imp(atPreify(otherPre, t.originalAtPreVars), otherPost);
-                    posts.put(h, posts.get(h) == null ? oPost : tb.and(posts.get(h), oPost));
+                    Term newPost = posts.get(h) == null ? oPost : tb.and(posts.get(h), oPost);
+                    newPost = OriginTermLabel.collectSubtermOrigins(newPost, services);
+                    posts.put(h, newPost);
                 }
                 if (otherFreePost != null) {
                     final Term oFreePost =
                             tb.imp(atPreify(otherPre, t.originalAtPreVars), otherFreePost);
-                    freePosts.put(h, freePosts.get(h) == null
-                                        ? oFreePost : tb.and(freePosts.get(h), oFreePost));
+                    Term newFreePost = freePosts.get(h) == null
+                            ? oFreePost : tb.and(freePosts.get(h), oFreePost);
+                    newFreePost = OriginTermLabel.collectSubtermOrigins(newFreePost, services);
+                    freePosts.put(h, newFreePost);
                 }
                 if (otherAxiom != null) {
                     final Term oAxiom =
                             tb.imp(atPreify(otherPre, t.originalAtPreVars), otherAxiom);
-                    axioms.put(h, axioms.get(h) == null ? oAxiom : tb.and(axioms.get(h), oAxiom));
+                    Term newAxiom = axioms.get(h) == null ? oAxiom : tb.and(axioms.get(h), oAxiom);
+                    newAxiom = OriginTermLabel.collectSubtermOrigins(newAxiom, services);
+                    axioms.put(h, newAxiom);
                 }
             }
             deps = joinDependencies(t, deps, other, services);

@@ -12,6 +12,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -600,11 +601,8 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         }
 
         OriginTermLabel label = (OriginTermLabel) pio.subTerm().getLabel(OriginTermLabel.NAME);
-        Origin origin = OriginTermLabel.getOrigin(pio);
-
-        return "<html>Origin of selected term: <b>" + (origin == null ? "" : origin) +
-                "</b><hr>Origin of (former) sub-terms:<br>" +
-                (label == null ? "" : label.getSubtermOrigins().stream()
+        return "<html>Origins of selected term:<br>" +
+                (label == null ? "" : label.getOrigins().stream()
                 .map(o -> "" + o + "<br>").reduce("", String::concat));
     }
 
@@ -633,10 +631,10 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
             termTextLabel.setBackground(OriginTermLabelVisualizer.this.getBackground());
 
             JLabel originTextLabel = new JLabel();
-            Origin origin = OriginTermLabel.getOrigin(pio);
+            Set<Origin> origins = OriginTermLabel.getOrigins(pio);
 
-            if (origin != null) {
-                originTextLabel.setText(getShortOriginText(origin));
+            if (origins.size() == 1) {
+                originTextLabel.setText(getShortOriginText(origins.iterator().next()));
                 originTextLabel.setHorizontalAlignment(SwingConstants.TRAILING);
             }
 

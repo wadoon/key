@@ -4,7 +4,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.Services;
@@ -12,7 +11,6 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
-import de.uka.ilkd.key.logic.label.OriginTermLabel.FileOrigin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -27,7 +25,7 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 /**
  * Refactoring for {@link OriginTermLabel}s.
  *
- * This ensures that {@link OriginTermLabel#getSubtermOrigins()}
+ * This ensures that {@link OriginTermLabel#getOrigins()}
  * always returns an up-to-date value.
  *
  * @author lanzinger
@@ -73,7 +71,6 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
         }
 
         OriginTermLabel oldLabel = null;
-
         for (TermLabel label : labels) {
             if (label instanceof OriginTermLabel) {
                 oldLabel = (OriginTermLabel) label;
@@ -81,43 +78,31 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
             }
         }
 
+        labels.remove(oldLabel);
+
         if (!ProofIndependentSettings.DEFAULT_INSTANCE
                 .getTermLabelSettings().getUseOriginLabels()) {
-            if (oldLabel != null) {
-                labels.remove(oldLabel);
-            }
             return;
         }
 
-        Set<Origin> subtermOrigins = collectSubtermOrigins(term.subs(), new LinkedHashSet<>());
-
-        OriginTermLabel newLabel = null;
+        Set<Origin> origins = new LinkedHashSet<>();
+        
+        // Inherit origins from old label.
         if (oldLabel != null) {
-            labels.remove(oldLabel);
-            final Origin oldOrigin = oldLabel.getOrigin();
-            newLabel = new OriginTermLabel(oldOrigin, subtermOrigins);
-        } else if (!subtermOrigins.isEmpty()) {
-            final Origin commonOrigin = OriginTermLabel.computeCommonOrigin(subtermOrigins);
-            newLabel = new OriginTermLabel(commonOrigin, subtermOrigins);
+            origins.addAll(oldLabel.getOrigins());
         }
-
-        if (newLabel != null) {
-            final Origin origin = newLabel.getOrigin();
-            if (OriginTermLabel.canAddLabel(term, services)
-                    && (!subtermOrigins.isEmpty()
-                            || origin.specType != SpecType.NONE)) {
-                labels.add(newLabel);
+        
+        // Add new origins of subterms.
+        for (Term sub : term.subs()) {
+            OriginTermLabel subLabel = (OriginTermLabel) sub.getLabel(OriginTermLabel.NAME);
+            if (subLabel != null) {
+                origins.addAll(subLabel.getOrigins());
             }
         }
-    }
 
-    private Set<Origin> collectSubtermOrigins(ImmutableArray<Term> terms,
-            Set<Origin> result) {
-        for (Term term : terms) {
-            collectSubtermOrigins(term, result);
+        if (OriginTermLabel.canAddLabel(term, services) && !origins.isEmpty()) {
+            labels.add(new OriginTermLabel(origins));
         }
-
-        return result;
     }
 
     /**
@@ -133,24 +118,4 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
         return !taclet.name().toString().startsWith("arrayLength")
                 && taclet.goalTemplates().size() <= 1;
     }
-
-    @SuppressWarnings("unchecked")
-    private Set<Origin> collectSubtermOrigins(Term term, Set<Origin> result) {
-        TermLabel label = term.getLabel(OriginTermLabel.NAME);
-
-        if (label != null) {
-            result.add((Origin) label.getChild(0));
-            result.addAll((Set<Origin>) label.getChild(1));
-        }
-
-        ImmutableArray<Term> subterms = term.subs();
-
-        for (int i = 0; i < subterms.size(); ++i) {
-            Term subterm = subterms.get(i);
-            collectSubtermOrigins(subterm, result);
-        }
-
-        return result;
-    }
-
 }

@@ -1057,7 +1057,7 @@ public class JMLSpecFactory {
                 .clear()
                 .classType(kjt)
                 .selfVar(selfVar)
-                .translateTerm(textualInv.getInv());
+                .translateTerm(textualInv.getInv(), SpecType.INVARIANT);
         Term inv = tb.convertToFormula(inv0);
         // create invariant
         String name = getDefaultInvName(null, kjt);

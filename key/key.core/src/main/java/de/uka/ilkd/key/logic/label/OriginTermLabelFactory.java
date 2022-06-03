@@ -29,10 +29,9 @@ public class OriginTermLabelFactory implements TermLabelFactory<OriginTermLabel>
                             + " children, but should have " + OriginTermLabel.CHILD_COUNT);
         }
 
-        Origin origin = parseOrigin(arguments.get(0));
-        Set<Origin> subtermOrigins = parseSubtermOrigins(arguments.get(1));
+        Set<Origin> origins = parseOrigins(arguments.get(0));
 
-        return new OriginTermLabel(origin, subtermOrigins);
+        return new OriginTermLabel(origins);
     }
 
     /**
@@ -42,7 +41,7 @@ public class OriginTermLabelFactory implements TermLabelFactory<OriginTermLabel>
      * @return the parsed set of origins.
      * @throws TermLabelException if a parsing error occurs.
      */
-    private Set<Origin> parseSubtermOrigins(String str) throws TermLabelException {
+    private Set<Origin> parseOrigins(String str) throws TermLabelException {
         if (!str.startsWith("[") || !str.endsWith("]")) {
             throw new TermLabelException("Malformed set of origins: \"" + str + "\"\n"
                     + "(Should be a comma-separated set of of origins, "
@@ -132,10 +131,6 @@ public class OriginTermLabelFactory implements TermLabelFactory<OriginTermLabel>
      * @return the parsed spec type.
      */
     private SpecType parseSpecType(String str) {
-        if (str.toLowerCase().equals(SpecType.NONE.toString())) {
-            str = "none";
-        }
-
         return SpecType.valueOf(str.toUpperCase());
     }
 

@@ -1006,7 +1006,7 @@ public class TacletGenerator {
         }
 
         //reassemble, return
-        final Term term = services.getTermBuilder().tf().createTerm(newOp, subs, t.boundVars(), t.javaBlock());
+        final Term term = services.getTermBuilder().tf().createTerm(newOp, subs, t.boundVars(), t.javaBlock(), t.getLabels());
         return new Pair<Term, ImmutableSet<Taclet>>(term, taclets);
     }
 

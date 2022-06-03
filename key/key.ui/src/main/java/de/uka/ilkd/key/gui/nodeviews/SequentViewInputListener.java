@@ -25,7 +25,6 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.FileOrigin;
-import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -44,7 +43,7 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
      */
     private static final ColorSettings.ColorProperty ORIGIN_HIGHLIGHT_COLOR =
         ColorSettings.define("[SourceView]originHighlight",
-                "Color for highlighting origin of selected term in source view",
+                "Color for highlighting unique origin of selected term in source view",
                 new Color(252, 202, 80));
 
     /**
@@ -53,8 +52,8 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
      * @see #highlightOriginInSourceView(PosInSequent)
      */
     private static final ColorSettings.ColorProperty SUBTERM_ORIGIN_HIGHLIGHT_COLOR =
-        ColorSettings.define("[SourceView]originHighlight",
-                "Color for highlighting origin of subterms of selected term in source view",
+        ColorSettings.define("[SourceView]originsHighlight",
+                "Color for highlighting multiple origins of selected term in source view",
                 new Color(252, 228, 169));
 
     /**
@@ -167,40 +166,23 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
             return;
         }
 
-        FileOrigin origin;
-        Set<FileOrigin> subtermOrigins;
-
-        Term term = pos.getPosInOccurrence().subTerm();
-        OriginTermLabel label = (OriginTermLabel) term.getLabel(OriginTermLabel.NAME);
-
-        if (label == null) {
-            Origin or = OriginTermLabel.getOrigin(pos);
-
-            origin = or instanceof FileOrigin ? (FileOrigin) or : null;
-            subtermOrigins = Collections.emptySet();
-        } else {
-            Origin or = label.getOrigin();
-
-            origin = or instanceof FileOrigin ? (FileOrigin) or : null;
-            subtermOrigins = label.getSubtermOrigins().stream()
-                    .filter(o -> o instanceof FileOrigin)
-                    .map(o -> (FileOrigin) o).collect(Collectors.toSet());
-        }
+        Set<FileOrigin> origins = OriginTermLabel.getOrigins(pos.getPosInOccurrence()).stream()
+                .filter(o -> o instanceof FileOrigin)
+                .map(o -> (FileOrigin) o).collect(Collectors.toSet());
 
         try {
-            if (origin != null) {
+            if (origins.size() == 1) {
+                FileOrigin origin = origins.iterator().next();
                 originHighlights.addAll(sourceView.addHighlightsForJMLStatement(
                         origin.fileName,
                         origin.line,
                         ORIGIN_HIGHLIGHT_COLOR.get(),
                         20));
-            }
-
-            for (FileOrigin subtermOrigin : subtermOrigins) {
-                if (!subtermOrigin.equals(origin)) {
+            } else {
+                for (FileOrigin  origin : origins) {
                     originHighlights.addAll(sourceView.addHighlightsForJMLStatement(
-                            subtermOrigin.fileName,
-                            subtermOrigin.line,
+                            origin.fileName,
+                            origin.line,
                             SUBTERM_ORIGIN_HIGHLIGHT_COLOR.get(),
                             10));
                 }

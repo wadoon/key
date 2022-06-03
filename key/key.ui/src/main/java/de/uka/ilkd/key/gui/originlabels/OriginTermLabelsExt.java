@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.swing.Action;
@@ -87,12 +88,12 @@ public class OriginTermLabelsExt
 
     @Override
     public List<String> getTermInfoStrings(MainWindow mainWindow, PosInSequent pos) {
-        Origin origin = OriginTermLabel.getOrigin(pos);
+        Set<Origin> origins = OriginTermLabel.getOrigins(pos);
 
         List<String> result = new LinkedList<>();
 
-        if (origin != null) {
-            result.add("Origin: " + origin);
+        if (origins.size() == 1) {
+            result.add("Origin: " + origins.iterator().next());
         }
 
         return result;
@@ -104,22 +105,12 @@ public class OriginTermLabelsExt
             return Collections.emptyList();
         }
 
-        Origin origin = OriginTermLabel.getOrigin(pos);
-
         String result = "";
+        Set<Origin> origins = OriginTermLabel.getOrigins(pos);
 
-        if (origin != null) {
-            result += "<b>Origin:</b> " + origin + "<br>";
-        }
-
-        PosInOccurrence pio = pos.getPosInOccurrence();
-
-        OriginTermLabel label = pio == null ? null : (OriginTermLabel) pio
-                .subTerm().getLabel(OriginTermLabel.NAME);
-
-        if (label != null && !label.getSubtermOrigins().isEmpty()) {
-            result += "<b>Origin of (former) sub-terms:</b><br>" +
-                    label.getSubtermOrigins().stream()
+        if (!origins.isEmpty()) {
+            result += "<b>Origins:</b><br>" +
+                    origins.stream()
                     .map(o -> "" + o + "<br>").reduce("", String::concat);
         }
 

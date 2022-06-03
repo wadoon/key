@@ -7,8 +7,6 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
-import de.uka.ilkd.key.logic.label.OriginTermLabel.FileOrigin;
-import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -61,10 +59,6 @@ public class OriginTermLabelPolicy implements TermLabelPolicy {
             result = newLabel;
         } else {
             result = oldLabel;
-        }
-
-        if (result.getOrigin().specType == SpecType.NONE && result.getSubtermOrigins().isEmpty()) {
-            result = null;
         }
 
         return result;

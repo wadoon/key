@@ -17,6 +17,7 @@ import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -235,8 +236,10 @@ public class JmlIO {
     public Term translateTerm(LabeledParserRuleContext expr, OriginTermLabel.SpecType type) {
         Term term = translateTerm(expr.first);
         OriginTermLabel origin = new OriginTermLabel(new OriginTermLabel.Origin(type));
-        if (expr.second != null)
+        if (expr.second instanceof OriginTermLabel)
             return services.getTermBuilder().addLabel(term, expr.second);
+        else if (expr.second != null)
+            return services.getTermBuilder().addLabel(term, new ImmutableArray<>(expr.second, origin));
         else
             return services.getTermBuilder().addLabel(term, origin);
     }
