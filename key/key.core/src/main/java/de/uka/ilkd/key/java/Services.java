@@ -448,4 +448,13 @@ public class Services implements TermServices {
         lookup.register(getVariableNamer());
         return lookup;
     }
+
+    /**
+     * Resets all counters to zero.
+     *
+     * @see #getCounter(String)
+     */
+    public void resetCounters() {
+       counters.clear();
+    }
 }

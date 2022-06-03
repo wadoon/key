@@ -77,6 +77,8 @@ public final class ProofSlicer {
                     proof.getInitConfig().copy()
             );
         }
+        // reset index counters, so we hopefully get the same indices
+        p.getServices().resetCounters();
         OneStepSimplifier.refreshOSS(p);
         replayProof(p, proof.root());
         return p;
@@ -144,8 +146,7 @@ public final class ProofSlicer {
                                             System.err.println("name / index mismatch");
                                             System.err.println(origFormula);
                                             System.err.println(pio.sequentFormula());
-                                            // TODO: this seems to only happen for index mismatches
-                                            // (see IndProgramElementName)
+                                            // TODO: check whether this still happens
                                         }
                                     }
                                 }
