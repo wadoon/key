@@ -90,9 +90,12 @@ public final class ProofSlicer {
             if (node.getAppliedRuleApp() == null) {
                 return; // closed goal
             }
+            if (!analysisResults.usefulSteps.contains(node) && node.childrenCount() > 1) {
+                System.err.println("about to skip cut @ node " + node.serialNr());
+            }
             if (analysisResults.usefulSteps.contains(node)) { // TODO: cut elimination
+                System.err.println("at node " + node.serialNr() + " " + node.getAppliedRuleApp().rule().displayName());
                 /*
-                System.out.println("at node " + node.serialNr() + " " + node.getAppliedRuleApp().rule().displayName());
                 try {
                     p.saveToFile(new java.io.File("/tmp/before" + node.serialNr() + ".proof"));
                 } catch (Throwable t) {
@@ -110,17 +113,17 @@ public final class ProofSlicer {
                     var newApp = MergeRule.INSTANCE.createApp(pio, p.getServices());
 
                     if (!newApp.complete()) {
-                        newApp = newApp.forceInstantiate(p.openGoals().stream().filter(it -> !ignoredGoals.contains(it)).findFirst().get());
+                        newApp = newApp.forceInstantiate(getCurrentGoal(p));
                     }
                     app = newApp;
                 }
                 if (app instanceof CloseAfterMergeRuleBuiltInRuleApp) {
-                    var toIgnore = p.openGoals().stream().filter(it -> !ignoredGoals.contains(it)).findFirst().get();
+                    var toIgnore = getCurrentGoal(p);
                     ignoredGoals.add(toIgnore);
                     // this goal will be closed automatically when the merge is complete
                     // CloseAfterMerge applications are done by the MergeRule!
                 } else {
-                    var goal = p.openGoals().stream().filter(it -> !ignoredGoals.contains(it)).findFirst().get();
+                    var goal = getCurrentGoal(p);
                     // fix sequent object identity
                     // then we can re-apply the steps done in the original proof
                     var origSequent = node.sequent();
@@ -183,8 +186,8 @@ public final class ProofSlicer {
                             }
                         }
                         if (!done) {
-                            System.err.println("fallback in ProofSlicer");
-                            goal.apply(app); // TODO: eliminate this fallback if possible
+                            throw new IllegalStateException(
+                                    "Proof Slicer failed to find dynamically added taclet!");
                         }
                     } else {
                         goal.apply(app);
@@ -195,18 +198,29 @@ public final class ProofSlicer {
                     }
                 }
             }
-            if (node.childrenCount() > 1) {
+            if (node.childrenCount() == 0) {
+                break;
+            }
+            if (node.childrenCount() > 1 && analysisResults.usefulSteps.contains(node)) {
                 List<Node> nodes = new ArrayList<>();
                 node.childrenIterator().forEachRemaining(nodes::add);
                 for (int i = nodes.size() - 1; i >= 0; i--) {
                     replayProof(p, nodes.get(i));
                 }
                 break;
-            } else if (node.childrenCount() == 1) {
-                node = node.child(0);
             } else {
-                break;
+                // if the split was not useful, we only descend into the first sub-tree
+                // TODO: perhaps descend into the shortest one (if they are not equal?!)
+                node = node.child(0);
             }
         }
+    }
+
+    private Goal getCurrentGoal(Proof p) {
+        var goal = p.openGoals().stream().filter(it -> !ignoredGoals.contains(it)).findFirst();
+        if (goal.isEmpty()) {
+            throw new IllegalStateException("Proof Slicer ran out of open goals!");
+        }
+        return goal.get();
     }
 }

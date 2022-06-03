@@ -21,26 +21,32 @@ class EndToEndTests {
 
     @Test
     void sliceAgatha() throws Exception {
-        sliceProof("/agatha.proof", 145, 79);
+        sliceProof("/agatha.proof", 145, 79, 79);
     }
 
     @Test
     void sliceJavaExample() throws Exception {
-        sliceProof("/removeDuplicates.zproof", 4960, 2626);
+        sliceProof("/removeDuplicates.zproof", 4960, 2626, 2626);
     }
 
     @Test
     void sliceJavaExampleWithTrickyOSS() throws Exception {
         // this test case requires One Step Simplifactions to be restricted when slicing the proof
-        sliceProof("/sitaRearrange.zproof", 2722, 2204);
+        sliceProof("/sitaRearrange.zproof", 2722, 2204, 2204);
     }
 
     @Test
     void sliceCut() throws Exception {
-        sliceProof("/cutExample.proof", 10, 7);
+        sliceProof("/cutExample.proof", 10, 7, 7);
     }
 
-    private void sliceProof(String filename, int expectedTotal, int expectedUseful) throws Exception {
+    @Test
+    void sliceIfThenElseSplit() throws Exception {
+        // TODO: the analysis should mark one of the branches as useless! or somehow subtract the number of steps..
+        sliceProof("/ifThenElseSplit.proof", 12, 11, 6);
+    }
+
+    private void sliceProof(String filename, int expectedTotal, int expectedUseful, int expectedInSlice) throws Exception {
         boolean oldValue = GeneralSettings.noPruningClosed;
         GeneralSettings.noPruningClosed = false;
         // load proof
@@ -66,7 +72,7 @@ class EndToEndTests {
             try {
                 slicedProof = loadedEnvironment.getLoadedProof();
 
-                Assertions.assertEquals(expectedUseful + slicedProof.closedGoals().size(), slicedProof.countNodes());
+                Assertions.assertEquals(expectedInSlice + slicedProof.closedGoals().size(), slicedProof.countNodes());
                 Assertions.assertTrue(slicedProof.closed());
 
                 Files.delete(tempFile);
