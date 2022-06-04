@@ -72,7 +72,7 @@ public final class ProofSlicer {
             }
         }
         if (p == null) {
-            System.err.println("cloning proof using fallback method");
+            LOGGER.debug("cloning proof using fallback method");
             // note: this constructor only works for "simple" proof inputs (≈ pure logic)
             p = new Proof(
                     "reduced",

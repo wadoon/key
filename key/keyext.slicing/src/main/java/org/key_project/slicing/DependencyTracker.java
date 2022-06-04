@@ -26,6 +26,8 @@ import org.key_project.slicing.graph.PseudoInput;
 import org.key_project.slicing.graph.PseudoOutput;
 import org.key_project.slicing.graph.TrackedFormula;
 import org.key_project.util.collection.ImmutableList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -34,6 +36,8 @@ import java.util.Map;
 import java.util.Set;
 
 public class DependencyTracker implements RuleAppListener, ProofTreeListener {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DependencyTracker.class);
+
     /**
      * The proof this tracker monitors.
      */
@@ -187,8 +191,8 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
             if (closedGoal.isPresent()) {
                 output.add(new ClosedGoal(closedGoal.get().node().serialNr()));
             } else {
-                System.err.println(
-                        "Warning: did not locate the goal closed by step " + n.serialNr());
+                LOGGER.debug(
+                        "Warning: did not locate the goal closed by step {}", n.serialNr());
                 output.add(new ClosedGoal(n.serialNr() + 1));
             }
         }
