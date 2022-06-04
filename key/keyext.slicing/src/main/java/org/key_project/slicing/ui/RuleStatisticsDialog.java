@@ -4,6 +4,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.util.Quadruple;
 import org.key_project.slicing.AnalysisResults;
+import org.key_project.slicing.RuleStatistics;
 
 import javax.swing.*;
 import java.awt.*;
@@ -19,25 +20,16 @@ import java.util.stream.Collectors;
  * @author Arne Keller
  */
 public class RuleStatisticsDialog extends JDialog {
-    /**
-     * List of (rule name, total applications, useless applications, initial useless applications).
-     */
-    private final transient List<Quadruple<String, Integer, Integer, Integer>> rules;
+    private final transient RuleStatistics statistics;
 
     public RuleStatisticsDialog(Window window, AnalysisResults results) {
         super(window, "Rule Statistics");
 
-        rules = results.ruleStatistics.entrySet().stream()
-                .map(entry -> new Quadruple<>(entry.getKey(), entry.getValue().first, entry.getValue().second, entry.getValue().third))
-                .collect(Collectors.toList());
-        rules.sort(
-                Comparator.comparing((Quadruple<String, Integer, Integer, Integer> it) -> it.second)
-                .reversed()
-        );
+        this.statistics = results.ruleStatistics;
 
         setLayout(new BorderLayout());
 
-        JEditorPane statisticsPane = new JEditorPane("text/html", genTable());
+        JEditorPane statisticsPane = new JEditorPane("text/html", "");
         statisticsPane.setEditable(false);
         statisticsPane.setBorder(BorderFactory.createEmptyBorder());
         statisticsPane.setCaretPosition(0);
@@ -63,23 +55,30 @@ public class RuleStatisticsDialog extends JDialog {
 
         JButton sortButton1 = new JButton("Sort by name");
         sortButton1.addActionListener(event -> {
-            rules.sort(Comparator.comparing(it -> it.first));
-            statisticsPane.setText(genTable());
+            statisticsPane.setText(genTable(
+                    statistics.sortBy(Comparator.comparing(it -> it.first))));
+            statisticsPane.setCaretPosition(0);
         });
         JButton sortButton2 = new JButton("Sort by total");
         sortButton2.addActionListener(event -> {
-            rules.sort(Comparator.comparing((Quadruple<String, Integer, Integer, Integer> it) -> it.second).reversed());
-            statisticsPane.setText(genTable());
+            statisticsPane.setText(genTable(
+                    statistics.sortBy(
+                            Comparator.comparing((Quadruple<String, Integer, Integer, Integer> it) -> it.second).reversed())));
+            statisticsPane.setCaretPosition(0);
         });
         JButton sortButton3 = new JButton("Sort by useless");
         sortButton3.addActionListener(event -> {
-            rules.sort(Comparator.comparing((Quadruple<String, Integer, Integer, Integer> it) -> it.third).reversed());
-            statisticsPane.setText(genTable());
+            statisticsPane.setText(genTable(
+                    statistics.sortBy(
+                            Comparator.comparing((Quadruple<String, Integer, Integer, Integer> it) -> it.third).reversed())));
+            statisticsPane.setCaretPosition(0);
         });
         JButton sortButton4 = new JButton("Sort by initial useless");
         sortButton4.addActionListener(event -> {
-            rules.sort(Comparator.comparing((Quadruple<String, Integer, Integer, Integer> it) -> it.fourth).reversed());
-            statisticsPane.setText(genTable());
+            statisticsPane.setText(genTable(
+                    statistics.sortBy(
+                            Comparator.comparing((Quadruple<String, Integer, Integer, Integer> it) -> it.fourth).reversed())));
+            statisticsPane.setCaretPosition(0);
         });
 
         buttonPane.add(sortButton1);
@@ -113,10 +112,16 @@ public class RuleStatisticsDialog extends JDialog {
                 + 100;
         setSize(w, h);
         setLocationRelativeTo(window);
+
+        statisticsPane.setText(genTable(
+                statistics.sortBy(
+                        Comparator.comparing((Quadruple<String, Integer, Integer, Integer> it) -> it.second).reversed())));
+        statisticsPane.setCaretPosition(0);
+
         setVisible(true);
     }
 
-    private String genTable() {
+    private String genTable(List<Quadruple<String, Integer, Integer, Integer>> rules) {
         StringBuilder stats = new StringBuilder("<table><thead>");
         for (var a : new String[] { "Rule name", "Total applications", "Useless applications", "Initial useless applications" }) {
             stats.append("<td>").append(a).append("</td>");
@@ -133,6 +138,18 @@ public class RuleStatisticsDialog extends JDialog {
         stats.append("<td>").append(totalSteps).append("</td>");
         stats.append("<td>").append(uselessSteps).append("</td>");
         stats.append("<td>").append(initialUseless).append("</td>");
+        stats.append("</tr>");
+        // next summary row
+        var rulesBranching = rules.stream().filter(it -> statistics.branches(it.first)).collect(Collectors.toList());
+        var uniqueRules2 = rulesBranching.size();
+        var totalSteps2 = rulesBranching.stream().mapToInt(it -> it.second).sum();
+        var uselessSteps2 = rulesBranching.stream().mapToInt(it -> it.third).sum();
+        var initialUseless2 = rulesBranching.stream().mapToInt(it -> it.fourth).sum();
+        stats.append("<tr>");
+        stats.append("<td>").append(String.format("(%d branching rules)", uniqueRules2)).append("</td>");
+        stats.append("<td>").append(totalSteps2).append("</td>");
+        stats.append("<td>").append(uselessSteps2).append("</td>");
+        stats.append("<td>").append(initialUseless2).append("</td>");
         stats.append("</tr>");
         rules.forEach(a -> {
             var name = a.first;

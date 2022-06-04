@@ -17,6 +17,8 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.merge.CloseAfterMergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -26,6 +28,8 @@ import java.util.Map;
 import java.util.Set;
 
 public final class ProofSlicer {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProofSlicer.class);
+
     private final Proof proof;
     private final AnalysisResults analysisResults;
     private final Map<Node, Node> edgeDependencies;
@@ -91,10 +95,10 @@ public final class ProofSlicer {
                 return; // closed goal
             }
             if (!analysisResults.usefulSteps.contains(node) && node.childrenCount() > 1) {
-                System.err.println("about to skip cut @ node " + node.serialNr());
+                LOGGER.debug("about to skip cut @ node {}", node.serialNr());
             }
-            if (analysisResults.usefulSteps.contains(node)) { // TODO: cut elimination
-                System.err.println("at node " + node.serialNr() + " " + node.getAppliedRuleApp().rule().displayName());
+            if (analysisResults.usefulSteps.contains(node)) {
+                LOGGER.trace("at node {} {}", node.serialNr(), node.getAppliedRuleApp().rule().displayName());
                 /*
                 try {
                     p.saveToFile(new java.io.File("/tmp/before" + node.serialNr() + ".proof"));
@@ -147,9 +151,7 @@ public final class ProofSlicer {
                                         ourAnte = ourAnte.replace(i, origFormula).semisequent();
                                         // TODO: remove this rather expensive check if it never occurs
                                         if (!origFormula.toString().equals(pio.sequentFormula().toString())) {
-                                            System.err.println("name / index mismatch");
-                                            System.err.println(origFormula);
-                                            System.err.println(pio.sequentFormula());
+                                            LOGGER.error("name / index mismatch {} {}", origFormula, pio.sequentFormula());
                                             throw new IllegalStateException("Proof Slicer failed to identify correct sequent formula!");
                                         }
                                     }

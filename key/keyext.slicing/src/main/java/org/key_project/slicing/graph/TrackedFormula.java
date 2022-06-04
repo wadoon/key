@@ -84,4 +84,9 @@ public class TrackedFormula implements GraphNode {
     public int hashCode() {
         return Objects.hash(formula, branchLocation, inAntec);
     }
+
+    @Override
+    public ImmutableList<String> branch() {
+        return branchLocation;
+    }
 }

@@ -27,7 +27,7 @@ public final class AnalysisResults {
      * Mapping of (rule display name)
      * to (total applications, useless applications, initial useless applications).
      */
-    public final Map<String, Triple<Integer, Integer, Integer>> ruleStatistics;
+    public final RuleStatistics ruleStatistics;
     /**
      * Set of useful rule applications.
      */
@@ -40,13 +40,13 @@ public final class AnalysisResults {
     public AnalysisResults(
             int totalSteps,
             int usefulStepsNr,
-            Map<String, Triple<Integer, Integer, Integer>> ruleStatistics,
+            RuleStatistics ruleStatistics,
             Set<Node> usefulSteps,
             Set<GraphNode> usefulNodes
     ) {
         this.totalSteps = totalSteps;
         this.usefulStepsNr = usefulStepsNr;
-        this.ruleStatistics = Collections.unmodifiableMap(ruleStatistics);
+        this.ruleStatistics = ruleStatistics;
         this.usefulSteps = Collections.unmodifiableSet(usefulSteps);
         this.usefulNodes = Collections.unmodifiableSet(usefulNodes);
     }
