@@ -299,4 +299,8 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         }
         return null;
     }
+
+    public AnalysisResults getAnalysisResults() {
+        return analysisResults;
+    }
 }
