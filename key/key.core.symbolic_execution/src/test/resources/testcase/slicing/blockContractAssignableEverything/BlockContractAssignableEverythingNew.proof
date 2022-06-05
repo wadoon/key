@@ -2,7 +2,7 @@
 
 \settings {
 "#Proof-Settings-Config-File
-#Sun Jun 05 12:45:33 CEST 2022
+#Sun Jun 05 12:49:15 CEST 2022
 [Labels]UseOriginLabels=true
 [StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_ON
 [SMTSettings]invariantForall=false
@@ -45,7 +45,7 @@
 \javaSource ".";
 
 \proofObligation "#Proof Obligation Settings
-#Sun Jun 05 12:45:33 CEST 2022
+#Sun Jun 05 12:49:15 CEST 2022
 addSymbolicExecutionLabel=true
 contract=BlockContractAssignableEverything[BlockContractAssignableEverything\\:\\:main()].JML normal_behavior operation contract.0
 name=BlockContractAssignableEverything[BlockContractAssignableEverything\\:\\:main()].JML normal_behavior operation contract.0
@@ -55,7 +55,7 @@ class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
 \proof {
 (keyLog "0" (keyUser "marti" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))
 (keyLog "1" (keyUser "marti" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))
-(keyLog "2" (keyUser "arne" ) (keyVersion "5fd5f0162e"))
+(keyLog "2" (keyUser "arne" ) (keyVersion "918167e5141904ed2eb706a9d176ad9ff56d9421"))
 
 (autoModeTime "657")
 

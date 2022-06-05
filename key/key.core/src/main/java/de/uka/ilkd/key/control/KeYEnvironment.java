@@ -3,6 +3,7 @@ package de.uka.ilkd.key.control;
 import java.io.File;
 import java.util.List;
 import java.util.Properties;
+import java.util.function.Consumer;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
@@ -245,7 +246,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
     * @param includes Optional includes to consider.
     * @param poPropertiesToForce Some optional PO {@link Properties} to force.
     * @param ruleCompletionHandler An optional {@link RuleCompletionHandler}.
-    * @param ruleAppListener An optional {@link RuleAppListener}
+    * @param callbackProofLoaded An optional callback
     * @param forceNewProfileOfNewProofs {@code} true
     *     {@link AbstractProblemLoader#profileOfNewProofs} will be used as
     *     {@link Profile} of new proofs, {@code false} {@link Profile}
@@ -260,10 +261,10 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
                                                                   List<File> includes,
                                                                   Properties poPropertiesToForce,
                                                                   RuleCompletionHandler ruleCompletionHandler,
-                                                                  RuleAppListener ruleAppListener,
+                                                                  Consumer<Proof> callbackProofLoaded,
                                                                   boolean forceNewProfileOfNewProofs) throws ProblemLoaderException {
       DefaultUserInterfaceControl ui = new DefaultUserInterfaceControl(ruleCompletionHandler);
-      AbstractProblemLoader loader = ui.load(profile, location, classPaths, bootClassPath, includes, poPropertiesToForce, forceNewProfileOfNewProofs, ruleAppListener);
+      AbstractProblemLoader loader = ui.load(profile, location, classPaths, bootClassPath, includes, poPropertiesToForce, forceNewProfileOfNewProofs, callbackProofLoaded);
       InitConfig initConfig = loader.getInitConfig();
 
       return new KeYEnvironment<>(ui, initConfig, loader.getProof(), loader.getProofScript(), loader.getResult());

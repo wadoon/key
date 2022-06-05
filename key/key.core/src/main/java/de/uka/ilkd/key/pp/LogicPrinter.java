@@ -714,9 +714,6 @@ public class LogicPrinter {
             ImmutableList<SequentPrintFilterEntry> succ = filter.getFilteredSucc();
 
             markStartSub();
-            if (succ == null) {
-                return;
-            }
             startTerm(antec.size() + succ.size());
 
             layouter.beginC(1).ind();

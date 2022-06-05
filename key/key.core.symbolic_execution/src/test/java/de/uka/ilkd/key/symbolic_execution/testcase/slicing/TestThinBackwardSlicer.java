@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.statement.Return;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofVisitor;
+import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeSymbolicLayoutExtractor;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
@@ -20,7 +21,9 @@ import de.uka.ilkd.key.symbolic_execution.slicing.ThinBackwardSlicer;
 import de.uka.ilkd.key.symbolic_execution.testcase.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.Pair;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
@@ -38,6 +41,17 @@ import java.io.File;
  */
 @TestMethodOrder(MethodOrderer.MethodName.class)
 public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
+   @BeforeAll
+   static void setup() {
+      // test proofs are too old to support this option
+      GeneralSettings.disableOSSRestriction = true;
+   }
+
+   @AfterAll
+   static void teardown() {
+      GeneralSettings.disableOSSRestriction = false;
+   }
+
    /**
     * Flag to print found slices in the console.
     */

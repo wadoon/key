@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.logic.Semisequent;
+import de.uka.ilkd.key.settings.GeneralSettings;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -630,7 +631,7 @@ public final class OneStepSimplifier implements BuiltInRule {
 
         var seq = goal.sequent();
         // restrict sequent view to avoid different simplification results
-        if (((OneStepSimplifierRuleApp) ruleApp).restrictedIfInsts) {
+        if (((OneStepSimplifierRuleApp) ruleApp).restrictedIfInsts && !GeneralSettings.disableOSSRestriction) {
             var ifInsts = ((OneStepSimplifierRuleApp) ruleApp).ifInsts();
             ImmutableList<SequentFormula> anteFormulas = ImmutableSLList.nil();
             ImmutableList<SequentFormula> succFormulas = ImmutableSLList.nil();

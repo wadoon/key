@@ -3,6 +3,7 @@ package de.uka.ilkd.key.control;
 import java.io.File;
 import java.util.List;
 import java.util.Properties;
+import java.util.function.Consumer;
 
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -70,7 +71,7 @@ public interface UserInterfaceControl {
                                List<File> includes,
                                Properties poPropertiesToForce,
                                boolean forceNewProfileOfNewProofs,
-                               RuleAppListener ruleAppListener) throws ProblemLoaderException;
+                               Consumer<Proof> callbackProofLoaded) throws ProblemLoaderException;
     
     /**
      * Instantiates a new {@link Proof} in this {@link UserInterfaceControl} for the given

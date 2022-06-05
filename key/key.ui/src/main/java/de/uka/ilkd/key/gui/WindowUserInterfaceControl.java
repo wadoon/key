@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
+import java.util.function.Consumer;
 
 import javax.swing.*;
 
@@ -332,13 +333,13 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                                      List<File> includes,
                                      Properties poPropertiesToForce,
                                      boolean forceNewProfileOfNewProofs,
-                                     RuleAppListener ruleAppListener) throws ProblemLoaderException {
+                                     Consumer<Proof> callback) throws ProblemLoaderException {
       if (file != null) {
          mainWindow.getRecentFiles().addRecentFile(file.getAbsolutePath());
       }
       try {
          getMediator().stopInterface(true);
-         return super.load(profile, file, classPath, bootClassPath, includes, poPropertiesToForce, forceNewProfileOfNewProofs, null);
+         return super.load(profile, file, classPath, bootClassPath, includes, poPropertiesToForce, forceNewProfileOfNewProofs, callback);
       }
       finally {
          getMediator().startInterface(true);

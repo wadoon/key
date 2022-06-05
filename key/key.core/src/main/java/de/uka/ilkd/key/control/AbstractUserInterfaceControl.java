@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 import de.uka.ilkd.key.java.Services;
@@ -195,12 +196,16 @@ public abstract class AbstractUserInterfaceControl implements UserInterfaceContr
                                       List<File> includes,
                                       Properties poPropertiesToForce,
                                       boolean forceNewProfileOfNewProofs,
-                                      RuleAppListener ruleAppListener) throws ProblemLoaderException {
+                                      Consumer<Proof> callbackProofLoaded) throws ProblemLoaderException {
        AbstractProblemLoader loader = null;
        try {
           loader = new SingleThreadProblemLoader(file, classPath, bootClassPath, includes, profile, forceNewProfileOfNewProofs,
                                                  this, false, poPropertiesToForce);
-            loader.load(proof -> proof.addRuleAppListener(ruleAppListener));
+          if (callbackProofLoaded != null) {
+              loader.load(callbackProofLoaded);
+          } else {
+              loader.load();
+          }
           return loader;
        }
        catch(ProblemLoaderException e) {

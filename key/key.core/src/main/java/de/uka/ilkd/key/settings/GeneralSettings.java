@@ -4,7 +4,10 @@ import java.util.EventObject;
 import java.util.LinkedList;
 import java.util.Properties;
 
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.io.AutoSaver;
+import de.uka.ilkd.key.rule.RuleApp;
 
 
 public class GeneralSettings implements Settings, Cloneable {
@@ -27,6 +30,17 @@ public class GeneralSettings implements Settings, Cloneable {
      * in this run of KeY, regardless of the regular settings
      */
     public static boolean disableSpecs = false;
+
+    /**
+     * If true, the OneStepSimplifier has access to the entire sequent during replay.
+     * If false, it is restricted to the formulas specified in the proof file.
+     *
+     * Only use this when loading old proof files (that do not contain this information)!
+     *
+     * @see de.uka.ilkd.key.rule.OneStepSimplifier#apply(Goal, Services, RuleApp)
+     */
+    public static boolean disableOSSRestriction = false;
+
     private static final String TACLET_FILTER = "[General]StupidMode";
     private static final String DND_DIRECTION_SENSITIVE_KEY
         = "[General]DnDDirectionSensitive";

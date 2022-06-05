@@ -3,6 +3,7 @@ package de.uka.ilkd.key.symbolic_execution.testcase;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodePreorderIterator;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil.BranchResult;
@@ -875,6 +876,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
     * Tests example: /set/truthValueSimpleInstanceMethodContractApplication
     */
    @Test public void testSimpleInstanceMethodContractApplication() throws Exception {
+      GeneralSettings.disableOSSRestriction = true; // proof is too old
       // Create expected results
       ExpectedTruthValueEvaluationResult preResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("12.0", TruthValue.TRUE), new ExpectedTruthValueResult("10.0", TruthValue.TRUE), new ExpectedTruthValueResult("9.0", TruthValue.TRUE), new ExpectedTruthValueResult("11.0", TruthValue.TRUE), new ExpectedTruthValueResult("7.0", TruthValue.TRUE)));
       ExpectedTruthValueEvaluationResult terminationResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("1.0", TruthValue.TRUE), new ExpectedTruthValueResult("5.0", TruthValue.TRUE)));
@@ -886,6 +888,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
                                  false,
                                  preResult,
                                  terminationResult);
+      GeneralSettings.disableOSSRestriction = false;
    }
 
    /**
@@ -909,6 +912,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
     * Tests example: /set/truthValueSimpleMethodContractApplication
     */
    @Test public void testSimpleMethodContractApplication() throws Exception {
+      GeneralSettings.disableOSSRestriction = true;
       // Create expected results
       ExpectedTruthValueEvaluationResult preResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("10.0", TruthValue.TRUE), new ExpectedTruthValueResult("9.0", TruthValue.TRUE), new ExpectedTruthValueResult("11.0", TruthValue.TRUE), new ExpectedTruthValueResult("7.0", TruthValue.TRUE)));
       ExpectedTruthValueEvaluationResult terminationResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("1.0", TruthValue.TRUE), new ExpectedTruthValueResult("5.0", TruthValue.TRUE), new ExpectedTruthValueResult("2.0", TruthValue.TRUE)));
@@ -920,6 +924,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
                                  false,
                                  preResult,
                                  terminationResult);
+      GeneralSettings.disableOSSRestriction = false;
    }
    
    /**

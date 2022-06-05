@@ -46,7 +46,7 @@ public final class Main {
         LOGGER.info("Processing proof: {}", proofFile.getName());
         GeneralSettings.noPruningClosed = false;
         DependencyTracker tracker = new DependencyTracker();
-        KeYEnvironment<?> environment = KeYEnvironment.load(JavaProfile.getDefaultInstance(), proofFile, null, null, null, null, null, tracker, true);
+        KeYEnvironment<?> environment = KeYEnvironment.load(JavaProfile.getDefaultInstance(), proofFile, null, null, null, null, null, proof -> proof.addRuleAppListener(tracker), true);
         try {
             // get loaded proof
             Proof proof = environment.getLoadedProof();
