@@ -84,5 +84,157 @@ group ToyBanking_nomacro {
   notprovable "./InformationFlow/ToyBanking/banking_example.Bank(banking_example.Bank__login(int,(C)).Non-interference contract.0.key"
 }
 
+group mini {
+  provable "./InformationFlow/MiniExamples/mini.AliasingExamples(mini.AliasingExamples__secure_1(mini.AliasingExamples,mini.AliasingExamples,int)).Non-interference contract.0.key"
+  provable "./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_1()).Non-interference contract.0.key"
+  provable "./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_1()).Non-interference contract.1.key"
+  provable "./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_2()).Non-interference contract.0.key"
+  provable "./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_3()).Non-interference contract.0.key"
+  provable "./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_4()).Non-interference contract.0.key"
+  provable "./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_5()).Non-interference contract.0.key"
+  provable "./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_6()).Non-interference contract.0.key"
+  provable "./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_1()).Non-interference contract.0.key"
+  provable "./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_2()).Non-interference contract.0.key"
+  provable "./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_3()).Non-interference contract.0.key"
+  provable "./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_4()).Non-interference contract.0.key"
+  provable "./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_5()).Non-interference contract.0.key"
+  provable "./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_6()).Non-interference contract.0.key"
+  provable "./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_7()).Non-interference contract.0.key"
+  provable "./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_8()).Non-interference contract.0.key"
+  provable "./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_parameter(int)).Non-interference contract.0.key"
+
+  provable "./InformationFlow/MiniExamples/mini.MiniExamplesLecture(mini.MiniExamplesLecture__m_2()).Non-interference contract.0.key"
+  provable "./InformationFlow/MiniExamples/mini.MiniExamplesLecture(mini.MiniExamplesLecture__m_4()).Non-interference contract.0.key"
+  provable "./InformationFlow/MiniExamples/mini.MiniExamplesLecture(mini.MiniExamplesLecture__m_5()).Non-interference contract.0.key"
+  provable "./InformationFlow/MiniExamples/mini.MiniExamplesLecture(mini.MiniExamplesLecture__m_6()).Non-interference contract.0.key"
+
+  notprovable "./InformationFlow/MiniExamples/mini.AliasingExamples(mini.AliasingExamples__insecure_1(mini.AliasingExamples,mini.AliasingExamples,int)).Non-interference contract.0.key"
+  notprovable "./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__insecure_p1_1()).Non-interference contract.0.key"
+  notprovable "./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__insecure_p1_2()).Non-interference contract.0.key"
+  notprovable "./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__insecure_p2_1()).Non-interference contract.0.key"
+  notprovable "./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__insecure_p2_2()).Non-interference contract.0.key"
+
+  notprovable "./InformationFlow/MiniExamples/mini.MiniExamplesLecture(mini.MiniExamplesLecture__m_1()).Non-interference contract.0.key"
+  notprovable "./InformationFlow/MiniExamples/mini.MiniExamplesLecture(mini.MiniExamplesLecture__m_3()).Non-interference contract.0.key"
+
+  # FIXME (LG 20220606): There is another file called "DifferentSeqLocset.java" where I don't know the expected result
+}
+
+group BlockContracts {
+  provable "./InformationFlow/BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__block_no_return_secure(int)).Non-interference contract.0.key"
+  provable "./InformationFlow/BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__block_while_secure(int)).Non-interference contract.0.key"
+  provable "./InformationFlow/BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__secure_1(int)).Non-interference contract.0.key"
+  provable "./InformationFlow/BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__secure_2(int)).Non-interference contract.0.key"
+  provable "./InformationFlow/BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__secure_3(int)).Non-interference contract.0.key"
+  provable "./InformationFlow/BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__secure_4(int)).Non-interference contract.0.key"
+  provable "./InformationFlow/BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__secure_5()).Non-interference contract.0.key"
+  provable "./InformationFlow/BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__secure_6(int)).Non-interference contract.0.key"
+  provable "./InformationFlow/BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__secure_7(int)).Non-interference contract.0.key"
+  provable "./InformationFlow/BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__secure_8(int)).Non-interference contract.0.key"
+  provable "./InformationFlow/BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__while_block_secure(int)).Non-interference contract.0.key"
+
+  provable "./InformationFlow/BlockContracts/contract.IFEfficiencyExamples(contract.IFEfficiencyExamples__mWithBlockContract()).Non-interference contract.0.key"
+  provable "./InformationFlow/BlockContracts/contract.IFEfficiencyExamples(contract.IFEfficiencyExamples__mWithoutBlockContract()).Non-interference contract.0.key"
+
+  notprovable "./InformationFlow/BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__insecure_1(int)).Non-interference contract.0.key"
+  notprovable "./InformationFlow/BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__insecure_3(int)).Non-interference contract.0.key"
+  notprovable "./InformationFlow/BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__insecure_4(int)).Non-interference contract.0.key"
+  notprovable "./InformationFlow/BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__while_block_insecure(int)).Non-interference contract.0.key"
+}
+
+group LoopInvariants {
+  provable "./InformationFlow/LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__loc_secure_while(int)).Non-interference contract.0.key"
+  provable "./InformationFlow/LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__secure_doubleNestedWhile(int)).Non-interference contract.0.key"
+  provable "./InformationFlow/LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__secure_nestedTwoWhile(int)).Non-interference contract.0.key"
+  provable "./InformationFlow/LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__secure_nestedWhile(int)).Non-interference contract.0.key"
+  provable "./InformationFlow/LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__secure_twoWhile(int)).Non-interference contract.0.key"
+  provable "./InformationFlow/LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__secure_while_2(int)).Non-interference contract.0.key"
+  provable "./InformationFlow/LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__secure_while_4(int)).Non-interference contract.0.key"
+  provable "./InformationFlow/LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__secure_while(int)).Non-interference contract.0.key"
+
+  provable "./InformationFlow/LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__hammer(int)).Non-interference contract.0.key"
+
+  provable "./InformationFlow/LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__print(int)).Non-interference contract.0.key"
+
+  notprovable "./InformationFlow/LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__notSecure_while(int)).Non-interference contract.0.key"
+  notprovable "./InformationFlow/LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__notSecure_while_wrongInv(int)).Non-interference contract.0.key"
+
+  notprovable "./InformationFlow/LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__insecure_doubleNestedWhile2(int)).Non-interference contract.0.key"
+  notprovable "./InformationFlow/LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__insecure_doubleNestedWhile(int)).Non-interference contract.0.key"
+  notprovable "./InformationFlow/LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__insecure_twoWhile_2(int)).Non-interference contract.0.key"
+  notprovable "./InformationFlow/LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__insecure_twoWhile(int)).Non-interference contract.0.key"
+  notprovable "./InformationFlow/LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__insecure_while_3(int)).Non-interference contract.0.key"
+}
+
+group MethodContracts {
+  provable "./InformationFlow/MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_array_param((I,int)).Non-interference contract.0.key"
+  provable "./InformationFlow/MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_assignment_0_n9()).Non-interference contract.0.key"
+  provable "./InformationFlow/MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_assignments_n2()).Non-interference contract.0.key"
+  provable "./InformationFlow/MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_catch_exception()).Non-interference contract.0.key"
+  provable "./InformationFlow/MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_if_high_n1()).Non-interference contract.0.key"
+  provable "./InformationFlow/MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_if_high_n5_n1()).Non-interference contract.0.key"
+  provable "./InformationFlow/MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_n5()).Non-interference contract.0.key"
+  provable "./InformationFlow/MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_n6()).Non-interference contract.0.key"
+  provable "./InformationFlow/MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_recursion_2((I,int)).Non-interference contract.0.key"
+  provable "./InformationFlow/MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_recursion(int)).Non-interference contract.0.key"
+  provable "./InformationFlow/MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_sequential_n1_n2()).Non-interference contract.0.key"
+  provable "./InformationFlow/MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_sequential_n3_precond_n4()).Non-interference contract.0.key"
+
+  provable "./InformationFlow/MethodContracts/contract.IFMethodContract(contract.IFMethodContract__n1()).Non-interference contract.0.key"
+  provable "./InformationFlow/MethodContracts/contract.IFMethodContract(contract.IFMethodContract__n2()).Non-interference contract.0.key"
+  provable "./InformationFlow/MethodContracts/contract.IFMethodContract(contract.IFMethodContract__n3()).Non-interference contract.0.key"
+  provable "./InformationFlow/MethodContracts/contract.IFMethodContract(contract.IFMethodContract__n4()).Non-interference contract.0.key"
+  provable "./InformationFlow/MethodContracts/contract.IFMethodContract(contract.IFMethodContract__n5(int)).Non-interference contract.0.key"
+  provable "./InformationFlow/MethodContracts/contract.IFMethodContract(contract.IFMethodContract__n6()).Non-interference contract.0.key"
+
+  notprovable "./InformationFlow/MethodContracts/contract.IFMethodContract(contract.IFMethodContract__insecure_assignment_n2()).Non-interference contract.0.key"
+  notprovable "./InformationFlow/MethodContracts/contract.IFMethodContract(contract.IFMethodContract__insecure_if_high_n5_n1()).Non-interference contract.0.key"
+}
+
+group NewObjects {
+  # Automatically provable but not with current settings (takes 25451 rule apps and 89 sec)
+  # provable "./InformationFlow/NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_if_two_object_creation()).Non-interference contract.0.key"
+  provable "./InformationFlow/NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_method_call()).Non-interference contract.0.key"
+  provable "./InformationFlow/NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_object_creation_2()).Non-interference contract.0.key"
+  provable "./InformationFlow/NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_object_creation_3()).Non-interference contract.0.key"
+  provable "./InformationFlow/NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_object_creation()).Non-interference contract.0.key"
+  provable "./InformationFlow/NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_two_object_creation()).Non-interference contract.0.key"
+  provable "./InformationFlow/NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_while_i((Ljava.lang.Object)).Non-interference contract.0.key"
+
+  # Automatically provable but not with current settings (takes 27742 rule apps and 97.2 sec)
+  # provable "./InformationFlow/NewObjects/object.ObjectOrientation(object.ObjectOrientation__if_two_object_creation_next()).Non-interference contract.0.key"
+
+  notprovable "./InformationFlow/NewObjects/object.ObjectOrientation(object.ObjectOrientation__insecure_object_assignment()).Non-interference contract.0.key"
+  notprovable "./InformationFlow/NewObjects/object.ObjectOrientation(object.ObjectOrientation__insecure_object_assignment()).Non-interference contract.1.key"
+  notprovable "./InformationFlow/NewObjects/object.ObjectOrientation(object.ObjectOrientation__insecure_two_object_creation()).Non-interference contract.0.key"
+
+  notprovable "./InformationFlow/NewObjects/object.ObjectOrientation(object.ObjectOrientation__if_two_object_creation_next()).Non-interference contract.1.key"
+
+  # FIXME (LG 20220606): For "AmtoftBanerjee{,1,2,3}" and "Naumann" I don't know the expected results
+}
+
+group PasswordFile {
+  # FIXME (LG 20220606): I found no information flow contracts so there is nothing to show...
+}
+
+group SimpleEvoting {
+  # FIXME: TODO
+}
+
+group Sum {
+  provable "./InformationFlow/Sum/SumExample(SumExample__getSum()).Non-interference contract.0.key"
+}
+
+group ToyVoting {
+  # FIXME
+  # provable "./InformationFlow/ToyVoting/Voter(Voter__secure_voting()).Non-interference contract.0.key"
+
+  provable "./InformationFlow/ToyVoting/Voter(Voter__inputVote()).Non-interference contract.0.key"
+  provable "./InformationFlow/ToyVoting/Voter(Voter__isValid(int)).Non-interference contract.0.key"
+  provable "./InformationFlow/ToyVoting/Voter(Voter__publishVoterParticipation()).Non-interference contract.0.key"
+  provable "./InformationFlow/ToyVoting/Voter(Voter__sendVote(int)).Non-interference contract.0.key"
+
+  notprovable "./InformationFlow/ToyVoting/Voter(Voter__insecure_voting()).Non-interference contract.0.key"
+}
 
 # End -- please do not remove this line.
