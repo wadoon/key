@@ -86,12 +86,12 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
 
         Set<Origin> origins = new LinkedHashSet<>();
         
-        // Inherit origins from old label.
+        // Add new origins from oldLabel.
         if (oldLabel != null) {
             origins.addAll(oldLabel.getOrigins());
         }
         
-        // Add new origins of subterms.
+        // Inherit origins of subterms.
         for (Term sub : term.subs()) {
             OriginTermLabel subLabel = (OriginTermLabel) sub.getLabel(OriginTermLabel.NAME);
             if (subLabel != null) {

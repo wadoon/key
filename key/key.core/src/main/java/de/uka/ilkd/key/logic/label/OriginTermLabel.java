@@ -181,7 +181,7 @@ public class OriginTermLabel implements TermLabel {
      * @return {@code true} iff an {@code OriginTermLabel} can be added to the specified term.
      */
     public static boolean canAddLabel(Term term, Services services) {
-        return canAddLabel(term.op(), services);
+        return term != null && canAddLabel(term.op(), services);
     }
 
     /**
