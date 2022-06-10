@@ -856,7 +856,7 @@ public class JMLSpecFactory {
         } else {
             for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
                 if (clauses.ensures.get(heap) != null) {
-                    Term excNull = tb.addLabel(
+                    Term excNull = tb.addLabelToAllSubs(
                             (tb.label(tb.equals(tb.var(progVars.excVar), tb.NULL()),
                                     ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL)),
                             new OriginTermLabel(new Origin(SpecType.ENSURES)));

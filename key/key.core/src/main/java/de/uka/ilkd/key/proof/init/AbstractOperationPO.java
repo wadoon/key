@@ -695,7 +695,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
                       selfNotNull, selfCreated, selfExactType,
                       paramsOK, mbyAtPreDef);
 
-        return tb.addLabel(result, new OriginTermLabel(
+        return tb.addLabelToAllSubs(result, new OriginTermLabel(
                 new Origin(SpecType.REQUIRES)));
     }
 

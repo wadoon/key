@@ -1706,6 +1706,19 @@ public class TermBuilder {
     }
 
     /**
+     * Applies the label to the term and almost every (direct or indirect) sub-term recursively.
+     *
+     * <p> The label is not added to heap variables. </p>
+     *
+     * @param term  term to label.
+     * @param label the label to apply.
+     * @return a labeled term.
+     */
+    public Term addLabelToAllSubs(Term term, TermLabel label) {
+        return addLabelToAllSubs(term, new ImmutableArray<TermLabel>(label));
+    }
+
+    /**
      * Adds labels to a term, removing any existing labels of the same type.
      *
      * @param term   the term.

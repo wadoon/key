@@ -252,7 +252,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
             }
         }
 
-        return tb.addLabel(frameTerm, new OriginTermLabel(
+        return tb.addLabelToAllSubs(frameTerm, new OriginTermLabel(
                 new Origin(SpecType.ASSIGNABLE)));
     }
 
