@@ -25,7 +25,7 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
  * Refactoring for {@link OriginTermLabel}s.
  *
  * This ensures that {@link OriginTermLabel#getOrigins()}
- * always returns an up-to-date value.
+ * remains up to date when terms are combined (e.g., by applyEq).
  *
  * @author lanzinger
  */
@@ -56,16 +56,9 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
                                Term applicationTerm, Rule rule, Goal goal,
                                Object hint, Term tacletTerm, Term term,
                                List<TermLabel> labels) {
-        if (services.getProof() == null) {
-            return;
-        }
-
-        if (rule instanceof BuiltInRule
-                && !TermLabelRefactoring.shouldRefactorOnBuiltInRule(rule, goal, hint)) {
-            return;
-        }
-
-        if (rule instanceof Taclet && !shouldRefactorOnTaclet((Taclet) rule)) {
+        if (services.getProof() == null
+                || rule instanceof BuiltInRule && !TermLabelRefactoring.shouldRefactorOnBuiltInRule(rule, goal, hint)
+                || rule instanceof Taclet && !shouldRefactorOnTaclet((Taclet) rule)) {
             return;
         }
 
@@ -79,19 +72,19 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
 
         labels.remove(oldLabel);
 
-        if (!ProofIndependentSettings.DEFAULT_INSTANCE
-                .getTermLabelSettings().getUseOriginLabels()) {
+        if (!ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().getUseOriginLabels()
+                || !OriginTermLabel.canAddLabel(term, services)) {
             return;
         }
 
         Set<Origin> origins = new LinkedHashSet<>();
         
-        // Add new origins from oldLabel.
+        // Inherit origins from the old label.
         if (oldLabel != null) {
             origins.addAll(oldLabel.getOrigins());
         }
         
-        // Inherit origins of subterms.
+        // Add new origins of new subterms.
         for (Term sub : term.subs()) {
             OriginTermLabel subLabel = (OriginTermLabel) sub.getLabel(OriginTermLabel.NAME);
             if (subLabel != null) {
@@ -99,7 +92,7 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
             }
         }
 
-        if (OriginTermLabel.canAddLabel(term, services) && !origins.isEmpty()) {
+        if (!origins.isEmpty()) {
             labels.add(new OriginTermLabel(origins));
         }
     }

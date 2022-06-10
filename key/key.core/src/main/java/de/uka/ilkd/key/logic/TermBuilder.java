@@ -1672,9 +1672,7 @@ public class TermBuilder {
     }
 
     /**
-     * Applies the labels to the term and almost every (direct or indirect) sub-term recursively.
-     *
-     * <p> The labels are not added to heap variables. </p>
+     * Applies the labels to the term and every (direct or indirect) sub-term recursively.
      *
      * @param term   term to label.
      * @param labels the labels to apply.
@@ -1694,7 +1692,6 @@ public class TermBuilder {
             newSubs[i] = addLabelToAllSubs(oldSubs.get(i), labels);
         }
 
-
         Term result = tf.createTerm(
                 term.op(),
                 newSubs,
@@ -1706,9 +1703,7 @@ public class TermBuilder {
     }
 
     /**
-     * Applies the label to the term and almost every (direct or indirect) sub-term recursively.
-     *
-     * <p> The label is not added to heap variables. </p>
+     * Applies the label to the term and every (direct or indirect) sub-term recursively.
      *
      * @param term  term to label.
      * @param label the label to apply.

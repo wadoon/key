@@ -5,6 +5,7 @@ import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -129,7 +130,7 @@ public class JmlIO {
     }
 
     private Term attachTermLabel(Term term, OriginTermLabel.SpecType type) {
-        return services.getTermBuilder().addLabel(term,
+        return services.getTermBuilder().addLabelToAllSubs(term,
                 new OriginTermLabel(new OriginTermLabel.Origin(type)));
     }
 
@@ -223,10 +224,13 @@ public class JmlIO {
      */
     public Term translateTerm(LabeledParserRuleContext expr) {
         Term term = translateTerm(expr.first);
-        if (expr.second != null)
+        if (expr.second instanceof OriginTermLabel) {
+            return services.getTermBuilder().addLabelToAllSubs(term, expr.second);
+        } else if (expr.second != null) {
             return services.getTermBuilder().addLabel(term, expr.second);
-        else
+        } else {
             return term;
+        }
     }
 
     /**
@@ -236,12 +240,17 @@ public class JmlIO {
     public Term translateTerm(LabeledParserRuleContext expr, OriginTermLabel.SpecType type) {
         Term term = translateTerm(expr.first);
         OriginTermLabel origin = new OriginTermLabel(new OriginTermLabel.Origin(type));
-        if (expr.second instanceof OriginTermLabel)
-            return services.getTermBuilder().addLabel(term, expr.second);
-        else if (expr.second != null)
-            return services.getTermBuilder().addLabel(term, new ImmutableArray<>(expr.second, origin));
-        else
-            return services.getTermBuilder().addLabel(term, origin);
+        if (expr.second instanceof OriginTermLabel) {
+            return services.getTermBuilder().addLabelToAllSubs(term, expr.second);
+        } else if (expr.second != null) {
+            TermBuilder tb = services.getTermBuilder();
+            term = tb.addLabel(term, expr.second);
+            term = tb.addLabelToAllSubs(term, origin);
+            return term;
+        } else {
+            return services.getTermBuilder().addLabelToAllSubs(term, origin);
+        }
+            
     }
 
 
@@ -266,7 +275,9 @@ public class JmlIO {
      */
     public Term translateTermAsFormula(final LabeledParserRuleContext condition) {
         Term term = services.getTermBuilder().convertToFormula(translateTerm(condition.first));
-        if (condition.second != null) {
+        if (condition.second instanceof OriginTermLabel) {
+            return services.getTermBuilder().addLabelToAllSubs(term, condition.second);
+        } if (condition.second != null) {
             return services.getTermBuilder().addLabel(term, condition.second);
         }
         return term;

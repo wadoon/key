@@ -18,7 +18,10 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;;
 /**
  * Policy for {@link OriginTermLabel}s.
  *
- * This ensures that every term always has a valid term label, i.e., that no labels are lost.
+ * This ensures that {@link OriginTermLabel}s are maintained when a term changes.
+ * 
+ * Meanwhile, the {@link OriginTermLabelRefactoring} ensures that the origin information
+ * in the labels remains up to date when terms are combined (e.g., by applyEq).
  *
  * @author lanzinger
  */

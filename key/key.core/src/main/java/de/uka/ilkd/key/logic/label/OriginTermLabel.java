@@ -223,8 +223,7 @@ public class OriginTermLabel implements TermLabel {
             }
         } else {
             return !(op instanceof Function)
-                    || (op.getClass().equals(Function.class)
-                            && ((Function) op).sort().extendsTrans(Sort.FORMULA));
+                    || ((Function) op).sort().extendsTrans(Sort.FORMULA);
         }
     }
 
