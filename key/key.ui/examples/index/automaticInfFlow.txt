@@ -32,13 +32,13 @@ statisticsFile = ../../key.core/build/reports/runallproofs/runStatistics_infflow
  *                 perGroup - one subprocess is created for each group
  *                 perFile - one subprocess is created for each file
  */
-forkMode = noFork
+forkMode = perGroup
 
 /*
  * Enable or disable proof reloading.
  * If enabled, closed proofs will be saved and reloaded after prover is finished.
  */
-reloadEnabled = false
+reloadEnabled = true
 
 /*
  * Temporary directory, which is used for inter process communication when using forked mode.
