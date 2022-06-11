@@ -147,22 +147,24 @@ public class ExceptionDialog extends JDialog {
 
         if (location != null) {
             // read the content via URLs openStream() method
-            try (InputStream is = IOUtil.openStream(location.getFileURL().toString());
-                    InputStreamReader isr = new InputStreamReader(is);
-                    BufferedReader br = new BufferedReader(isr)) {
-
-                List<String> list = br.lines()
-                        // optimization: read only as far as necessary
-                        .limit(location.getLine()).collect(Collectors.toList());
-                String line = list.get(location.getLine() - 1);
-                String pointLine = StringUtil.repeat(" ", location.getColumn() - 1) + "^";
-                message.append(StringUtil.NEW_LINE).append(StringUtil.NEW_LINE).append(line)
-                        .append(StringUtil.NEW_LINE).append(pointLine);
-            } catch (IOException e) {
-                LOGGER.error("Creating an error line did not work for {}", location, e);
-            } catch (NullPointerException npe) {
-                npe.printStackTrace();
-            }
+            BufferedReader br = new BufferedReader(
+                    new InputStreamReader(IOUtil.openStream(location.getFileURL().toString())));
+            List<String> list = br.lines()
+                    // optimization: read only as far as necessary
+                    .limit(location.getLine())
+                    .collect(Collectors.toList());
+            String line = list.get(location.getLine() - 1);
+            String pointLine = StringUtil.repeat(" ", location.getColumn() - 1) + "^";
+            message.append(StringUtil.NEW_LINE).
+                    append(StringUtil.NEW_LINE).
+                    append(line).
+                    append(StringUtil.NEW_LINE).
+                    append(pointLine);
+        } catch (IOException e) {
+            System.err.println("Creating an error line did not work for " + location);
+            e.printStackTrace();
+        } catch (NullPointerException npe) {
+            npe.printStackTrace();
         }
 
         exTextArea.setText(message.toString());
@@ -239,4 +241,69 @@ public class ExceptionDialog extends JDialog {
         pack();
         setLocationRelativeTo(getParent());
     }
+
+// in earlier versions, KeY supported several exceptions.
+
+//    private JScrollPane createJListScroll(final List<Throwable> exceptions) {
+//         Vector<String> excMessages = new Vector<String>();
+//         int i = 1;
+//         for (Throwable throwable : exceptions) {
+//            Location location = ExceptionTools.getLocation(throwable);
+//            if(location != null) {
+//                excMessages.add(i + ") Location: " +  location + "\n" + throwable.getMessage());
+//            } else {
+//                excMessages.add(i + ") " + throwable.getMessage());
+//            }
+//            i ++;
+//         }
+//
+//         final JList list = new JList(excMessages);
+//         list.setCellRenderer(new TextAreaRenderer());
+//         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+//         list.setSelectedIndex(0);
+//
+//         JScrollPane elistScroll =
+//             new JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+//                     ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+//         elistScroll.getViewport().setView(list);
+//         elistScroll.setBorder(new TitledBorder("Exceptions/Errors"));
+//         elistScroll.setPreferredSize(new Dimension(500, 300));
+//         ListSelectionListener listListener = new ListSelectionListener() {
+//             public void valueChanged(ListSelectionEvent e) {
+//                 Throwable exc = exceptions.get(list.getSelectedIndex());
+//                 setStackTraceText(exc);
+//             }
+//         };
+//
+//         list.addListSelectionListener(listListener);
+//         return elistScroll;
+//
+//    }
+//
+//    private static class TextAreaRenderer
+//      extends JTextArea implements ListCellRenderer<String> {
+//        /**
+//         *
+//         */
+//        private static final long serialVersionUID = -1151786934514170956L;
+//
+//        public TextAreaRenderer()
+//        {
+//            setLineWrap(true);
+//	    setWrapStyleWord(true);
+//	    // setRows(10);
+//        }
+//
+//        public Component getListCellRendererComponent(JList<? extends String> list, String value,
+//            int index, boolean isSelected, boolean cellHasFocus)
+//        {
+//            // if (index==0) setFont(getFont().deriveFont(Font.BOLD, 12)); else
+//	    setFont(getFont().deriveFont(Font.PLAIN, 12));
+//            setText(value.toString());
+//            setBackground(isSelected ? list.getSelectionBackground() : null);
+//            setForeground(isSelected ? list.getSelectionForeground() : null);
+//            return this;
+//        }
+//    }
+
 }
