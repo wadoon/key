@@ -38,7 +38,8 @@ forkMode = perGroup
  * Enable or disable proof reloading.
  * If enabled, closed proofs will be saved and reloaded after prover is finished.
  */
-reloadEnabled = true
+# Some InfFlow proofs are not reloadable!
+reloadEnabled = false
 
 /*
  * Temporary directory, which is used for inter process communication when using forked mode.
