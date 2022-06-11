@@ -160,6 +160,8 @@ public class ExceptionDialog extends JDialog {
                         .append(StringUtil.NEW_LINE).append(pointLine);
             } catch (IOException e) {
                 LOGGER.error("Creating an error line did not work for {}", location, e);
+            } catch (NullPointerException npe) {
+                npe.printStackTrace();
             }
         }
 
