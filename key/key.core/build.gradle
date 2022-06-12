@@ -121,9 +121,29 @@ task testProveRules(type: Test) {
 task testRunAllProofs(type: Test) {
     description 'Prove/reload all keyfiles tagged for regression testing'
     group "verification"
+
+
     filter {
         includeTestsMatching "RunAllProofsInfFlow"
         includeTestsMatching "RunAllProofsFunctional"
+    }
+}
+
+task testRunAllProofsFunctional(type: Test) {
+    description 'Prove/reload all keyfiles tagged for regression testing'
+    group "verification"
+
+    filter {
+        includeTestsMatching "RunAllProofsFunctional"
+    }
+}
+
+task testRunAllProofsInfFlow(type: Test) {
+    description 'Prove/reload all keyfiles tagged for regression testing'
+    group "verification"
+
+    filter {
+        includeTestsMatching "RunAllProofsInfFlow"
     }
 }
 

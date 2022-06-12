@@ -35,9 +35,15 @@ pipeline {
             }
         }    
 
-        stage('Test: testRunAllProofs') {
+        stage('Test: testRunAllProofsFunctional') {
             steps {
-                sh 'cd key && ./gradlew --continue testRunAllProofs'
+                sh 'cd key && ./gradlew --continue testRunAllProofsFunctional'
+            }
+        }
+
+        stage('Test: testRunAllProofsInfFlow') {
+            steps {
+                sh 'cd key && ./gradlew --continue testRunAllProofsInfFlow'
             }
         }
 
