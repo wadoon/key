@@ -212,10 +212,6 @@ group NewObjects {
   # FIXME (LG 20220606): For "AmtoftBanerjee{,1,2,3}" and "Naumann" I don't know the expected results
 }
 
-group PasswordFile {
-  # FIXME (LG 20220606): I found no information flow contracts so there is nothing to show...
-}
-
 group SimpleEvoting {
   provable "SimpleEvoting/simple_evoting.Environment(simple_evoting.Environment__untrustedInputMessage((B)).Non-interference contract.0.m.key"
   provable "SimpleEvoting/simple_evoting.Environment(simple_evoting.Environment__untrustedInputMessage()).Non-interference contract.0.m.key"
