@@ -84,6 +84,7 @@ forkTimeout = 2000
  * test can be restricted to these groups (for debugging).
  */
 # runOnlyOn = group1,group2
+runOnlyOn = reload_examples
 
 keySettings = "#Proof-Settings-Config-File
 #Mon Aug 03 16:58:18 CEST 2009

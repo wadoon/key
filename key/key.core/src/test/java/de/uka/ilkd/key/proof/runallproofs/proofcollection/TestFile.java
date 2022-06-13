@@ -159,7 +159,7 @@ public class TestFile implements Serializable {
         // Name resolution for the available KeY file.
         File keyFile = getKeYFile();
         if (verbose) {
-            LOGGER.debug("Now processing file {}", keyFile);
+            LOGGER.warn("Now processing file {}", keyFile);
         }
         // File that the created proof will be saved to.
         File proofFile = new File(keyFile.getAbsolutePath() + ".proof");
@@ -179,17 +179,17 @@ public class TestFile implements Serializable {
                 try {
                     replayResult = env.getReplayResult();
                 } catch (Throwable t) {
-                    LOGGER.info("... success: loading failed");
+                    LOGGER.warn("... success: loading failed");
                     return getRunAllProofsTestResult(true);
                 }
                 assertTrue(replayResult.hasErrors(), "Loading problem file succeded but it shouldn't");
-                LOGGER.info("... success: loading failed");
+                LOGGER.warn("... success: loading failed");
                 return getRunAllProofsTestResult(true);
             }
 
             replayResult = env.getReplayResult();
             if (replayResult.hasErrors() && verbose) {
-                LOGGER.info("... error(s) while loading");
+                LOGGER.warn("... error(s) while loading");
                 for (Throwable error : replayResult.getErrorList()) {
                     error.printStackTrace();
                 }
@@ -200,7 +200,7 @@ public class TestFile implements Serializable {
             // For a reload test we are done at this point. Loading was successful.
             if (testProperty == TestProperty.LOADABLE) {
                 if (verbose) {
-                    LOGGER.info("... success: loaded");
+                    LOGGER.warn("... success: loaded");
                 }
                 return getRunAllProofsTestResult(true);
             }
@@ -210,7 +210,7 @@ public class TestFile implements Serializable {
             boolean closed = loadedProof.closed();
             success = (testProperty == TestProperty.PROVABLE) == closed;
             if (verbose) {
-                LOGGER.info("... finished proof: " + (closed ? "closed." : "open goal(s)"));
+                LOGGER.warn("... finished proof: " + (closed ? "closed." : "open goal(s)"));
             }
 
             // Write statistics.
@@ -226,7 +226,7 @@ public class TestFile implements Serializable {
             reload(verbose, proofFile, loadedProof, success);
         } catch (Throwable t) {
             if (verbose) {
-                LOGGER.debug("Exception", t);
+                LOGGER.warn("Exception", t);
             }
             throw t;
         } finally {
@@ -251,7 +251,7 @@ public class TestFile implements Serializable {
             loadedProof.saveToFile(proofFile);
             reloadProof(proofFile);
             if (verbose) {
-                LOGGER.debug("... success: reloaded.");
+                LOGGER.warn("... success: reloaded.");
             }
         }
     }

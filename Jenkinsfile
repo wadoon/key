@@ -22,6 +22,12 @@ pipeline {
                 sh 'cd key && ./gradlew --parallel clean compileTest :key.ui:shadowJar :key.ui:distZip'
             }
         }
+        stage('Test: testRunAllProofsFunctional') {
+            steps {
+                sh 'cd key && ./gradlew --continue testRunAllProofsFunctional'
+            }
+        }
+
 
         stage('Test: JUnit') {
             steps {
@@ -34,12 +40,6 @@ pipeline {
                 sh 'cd key && ./gradlew --continue testProveRules'
             }
         }    
-
-        stage('Test: testRunAllProofsFunctional') {
-            steps {
-                sh 'cd key && ./gradlew --continue testRunAllProofsFunctional'
-            }
-        }
 
         stage('Test: testRunAllProofsInfFlow') {
             steps {
