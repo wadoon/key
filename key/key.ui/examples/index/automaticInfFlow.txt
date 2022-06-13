@@ -18,7 +18,7 @@
  * Defines a base directory.
  * All paths in this file are treated relative to base directory (except path for base directory itself).
  */
-baseDirectory = ../
+baseDirectory = ../InformationFlow/
 
 /*
  * Defines a statistics file.

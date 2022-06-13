@@ -968,10 +968,11 @@ group completionScopes {
    provable ./completionscopes/testCcatchBreakLabelNonmatchingNested.key
 }
 
+   provable ./firstTouch/05-ReverseArray/reverseArray.key
+
 # These are the proof files which can be loaded from the examples menu.
 # They must work with the current version.
 group reload_examples {
-   provable ./firstTouch/05-ReverseArray/reverseArray.key
 
    # This is a reload regression test. Since it is the only one
    # it goes here with the sibling reload tests
