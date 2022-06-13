@@ -132,6 +132,7 @@ task testRunAllProofs(type: Test) {
 task testRunAllProofsFunctional(type: Test) {
     description 'Prove/reload all keyfiles tagged for regression testing'
     group "verification"
+    jvmArgs = ['-Dkey.runallproofs.skipInfFlow=true', '-DverboseOutput=true']
 
     filter {
         includeTestsMatching "RunAllProofsFunctional"
