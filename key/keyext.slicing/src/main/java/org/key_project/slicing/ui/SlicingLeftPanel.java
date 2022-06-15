@@ -111,7 +111,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
     }
 
     private void exportDot(ActionEvent e) {
-        if (currentProof == null || currentProof.countNodes() < 2) {
+        if (currentProof == null) {
             return;
         }
         KeYFileChooser fileChooser = KeYFileChooser.getFileChooser(
@@ -144,7 +144,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
     }
 
     private void previewGraph(ActionEvent e) {
-        if (currentProof == null || currentProof.countNodes() < 2) {
+        if (currentProof == null) {
             return;
         }
         String text = extension.trackers.get(currentProof).exportDot(abbreviateFormulas.isSelected());

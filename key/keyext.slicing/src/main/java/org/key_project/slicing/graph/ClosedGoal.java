@@ -1,11 +1,13 @@
 package org.key_project.slicing.graph;
 
+import org.key_project.util.collection.ImmutableList;
+
 /**
  * Graph node that represents a closed goal.
  *
  * @author Arne Keller
  */
-public class ClosedGoal implements GraphNode {
+public class ClosedGoal extends GraphNode {
     /**
      * The serial number of the corresponding node in the proof tree.
      *
@@ -13,7 +15,8 @@ public class ClosedGoal implements GraphNode {
      */
     public final int serialNr;
 
-    public ClosedGoal(int serialNr) {
+    public ClosedGoal(int serialNr, ImmutableList<String> branchLocation) {
+        super(branchLocation);
         this.serialNr = serialNr;
     }
 

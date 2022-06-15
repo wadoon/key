@@ -12,12 +12,14 @@ import java.io.File;
 import java.nio.file.Files;
 
 /**
- * Tests of the {@link DependencyTracker}.
+ * Tests for the {@link DependencyTracker}, {@link DependencyAnalyzer}, {@link ProofSlicer}, ...
  *
  * @author Arne Keller
  */
 class EndToEndTests {
     public static final File testCaseDirectory = FindResources.getTestCasesDirectory();
+
+    // TODO: tests for: proof pruning, dot export, getNodeThatProduced
 
     @Test
     void sliceAgatha() throws Exception {
@@ -25,18 +27,20 @@ class EndToEndTests {
     }
 
     @Test
-    void sliceJavaExample() throws Exception {
-        sliceProof("/removeDuplicates.zproof", 4960, 2626, 2626);
+    void sliceRemoveDuplicates() throws Exception {
+        // simple Java proof
+        sliceProof("/removeDuplicates.zproof", 4960, 2469, 2467);
     }
 
     @Test
-    void sliceJavaExampleWithTrickyOSS() throws Exception {
+    void sliceSitaRearrange() throws Exception {
         // this test case requires One Step Simplifactions to be restricted when slicing the proof
-        sliceProof("/sitaRearrange.zproof", 2722, 2204, 2204);
+        Assertions.assertFalse(GeneralSettings.disableOSSRestriction);
+        sliceProof("/sitaRearrange.zproof", 2722, 2162, 2162);
     }
 
     @Test
-    void sliceCut() throws Exception {
+    void sliceCutExample() throws Exception {
         sliceProof("/cutExample.proof", 10, 7, 7);
     }
 
@@ -44,6 +48,11 @@ class EndToEndTests {
     void sliceIfThenElseSplit() throws Exception {
         // TODO: the analysis should mark one of the branches as useless! or somehow subtract the number of steps..
         sliceProof("/ifThenElseSplit.proof", 12, 11, 6);
+    }
+
+    @Test
+    void sliceSimpleSMT() throws Exception {
+        sliceProof("/simpleSMT.proof", 1, 1, 0);
     }
 
     private void sliceProof(String filename, int expectedTotal, int expectedUseful, int expectedInSlice) throws Exception {

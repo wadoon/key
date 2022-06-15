@@ -1,5 +1,8 @@
 package org.key_project.slicing.graph;
 
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
 import java.util.Objects;
 
 /**
@@ -7,13 +10,14 @@ import java.util.Objects;
  *
  * @author Arne Keller
  */
-public class AddedRule implements GraphNode {
+public class AddedRule extends GraphNode {
     /**
      * The name of the added rule.
      */
     public final String name;
 
     public AddedRule(String name) {
+        super(ImmutableSLList.nil()); // TODO
         this.name = name;
     }
 

@@ -1,5 +1,6 @@
 package org.key_project.slicing;
 
+import de.uka.ilkd.key.core.Log;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
@@ -17,6 +18,8 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.merge.CloseAfterMergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
+import de.uka.ilkd.key.settings.GeneralSettings;
+import de.uka.ilkd.key.ui.Verbosity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +38,7 @@ public final class ProofSlicer {
     private final Map<Node, Node> edgeDependencies;
     private final Set<Goal> ignoredGoals = new HashSet<>();
     private final Map<Node, Node> replayedNodes = new IdentityHashMap<>();
+    private final boolean saveIntermediateSteps = false;
 
     public ProofSlicer(
             Proof proof,
@@ -67,7 +71,7 @@ public final class ProofSlicer {
                     p.getServices()
                             .getSpecificationRepository().registerProof(it, p);
                 } catch (ProofInputException e) {
-                    e.printStackTrace();
+                    LOGGER.error("failed to duplicate proof obligation", e);
                 }
             }
         }
@@ -84,6 +88,10 @@ public final class ProofSlicer {
         // reset index counters, so we hopefully get the same indices
         p.getServices().resetCounters();
         OneStepSimplifier.refreshOSS(p);
+        //Log.configureLogging(Verbosity.INFO);
+        if (GeneralSettings.disableOSSRestriction) {
+            LOGGER.warn("OSS restriction is disabled, slicing may not work properly!");
+        }
         replayProof(p, proof.root());
         return p;
     }
@@ -99,13 +107,13 @@ public final class ProofSlicer {
             }
             if (analysisResults.usefulSteps.contains(node)) {
                 LOGGER.trace("at node {} {}", node.serialNr(), node.getAppliedRuleApp().rule().displayName());
-                /*
-                try {
-                    p.saveToFile(new java.io.File("/tmp/before" + node.serialNr() + ".proof"));
-                } catch (Throwable t) {
-
+                if (saveIntermediateSteps) {
+                    try {
+                        p.saveToFile(new java.io.File("/tmp/before" + node.serialNr() + ".proof"));
+                    } catch (Throwable t) {
+                        throw new IllegalStateException(t);
+                    }
                 }
-                 */
 
                 var app = node.getAppliedRuleApp();
 
@@ -204,17 +212,25 @@ public final class ProofSlicer {
             if (node.childrenCount() == 0) {
                 break;
             }
-            if (node.childrenCount() > 1 && analysisResults.usefulSteps.contains(node)) {
+            if (node.childrenCount() > 1) {
                 List<Node> nodes = new ArrayList<>();
                 node.childrenIterator().forEachRemaining(nodes::add);
+                boolean descendIntoAll = analysisResults.usefulSteps.contains(node);
                 for (int i = nodes.size() - 1; i >= 0; i--) {
-                    replayProof(p, nodes.get(i));
+                    var childNode = nodes.get(i);
+                    // if this branch of the split was not useful, we do not descend into it
+                    if (analysisResults.branchIsUseful(childNode.branchLocation())) {
+                        replayProof(p, childNode);
+                        if (!descendIntoAll) {
+                            // TODO: perhaps descend into the shortest one (if they are not equal?!)
+                            break;
+                        }
+                    }
                 }
                 break;
             } else {
-                // if the split was not useful, we only descend into the first sub-tree
-                // TODO: perhaps descend into the shortest one (if they are not equal?!)
                 node = node.child(0);
+                //LOGGER.info("going to node {}", node.serialNr());
             }
         }
     }

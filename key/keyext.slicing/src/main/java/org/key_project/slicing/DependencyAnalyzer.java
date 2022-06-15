@@ -3,10 +3,12 @@ package org.key_project.slicing;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.GeneralSettings;
+import de.uka.ilkd.key.smt.RuleAppSMT;
 import de.uka.ilkd.key.util.Triple;
 import org.key_project.slicing.graph.DependencyGraph;
 import org.key_project.slicing.graph.GraphNode;
 import org.key_project.slicing.graph.TrackedFormula;
+import org.key_project.util.collection.ImmutableList;
 
 import java.util.ArrayDeque;
 import java.util.HashMap;
@@ -19,7 +21,8 @@ import java.util.stream.Collectors;
  * @author Arne Keller
  */
 public final class DependencyAnalyzer {
-    private DependencyAnalyzer() { }
+    private DependencyAnalyzer() {
+    }
 
     public static AnalysisResults analyze(Proof proof, DependencyGraph graph) {
         if (GeneralSettings.noPruningClosed) {
@@ -31,15 +34,20 @@ public final class DependencyAnalyzer {
         }
         var usefulSteps = new HashSet<Node>();
         var usefulFormulas = new HashSet<GraphNode>();
+        var uselessBranches = new HashSet<ImmutableList<String>>();
 
         // BFS, starting from all closed goals
         var queue = new ArrayDeque<Node>();
         for (var e : proof.closedGoals()) {
-            queue.add(e.node().parent());
+            queue.add(e.node());
         }
 
         while (!queue.isEmpty()) {
             var node = queue.pop();
+            // closed goal & has previous step
+            if (node.getAppliedRuleApp() == null && node.parent() != null) {
+                node = node.parent();
+            }
             if (usefulSteps.contains(node)) {
                 continue;
             }
@@ -59,7 +67,7 @@ public final class DependencyAnalyzer {
             }
             var data = node.lookup(DependencyNodeData.class);
             var groupedOutputs = data.outputs
-                    .stream().collect(Collectors.groupingBy(GraphNode::branch));
+                    .stream().collect(Collectors.groupingBy(GraphNode::getBranchLocation));
             var cutWasUseful = groupedOutputs.values().stream()
                     .allMatch(l -> l.stream().anyMatch(usefulFormulas::contains));
             if (cutWasUseful) {
@@ -72,10 +80,11 @@ public final class DependencyAnalyzer {
                     continue;
                 }
                 var formula = (TrackedFormula) output;
-                graph.nodesInBranch(formula.branchLocation).forEach(theNode -> {
+                graph.nodesInBranch(formula.getBranchLocation()).forEach(theNode -> {
                     usefulFormulas.remove(theNode);
                     graph.outgoingEdgesOf(theNode).forEach(usefulSteps::remove);
                 });
+                uselessBranches.add(formula.getBranchLocation());
             }
             // TODO: mark inputs as useless, if possible
             // TODO: process newly useless nodes somehow (-> to mark more edges as useless..)
@@ -92,7 +101,9 @@ public final class DependencyAnalyzer {
             node.childrenIterator().forEachRemaining(queue::add);
         }
 
-        var steps = proof.countNodes() - proof.closedGoals().size();
+        var steps = proof.countNodes() - proof.closedGoals().size()
+                + (int) proof.closedGoals()
+                .stream().filter(it -> it.node().getAppliedRuleApp() instanceof RuleAppSMT).count();
 
         // gather statistics on useful/useless rules
         var rules = new RuleStatistics();
@@ -114,6 +125,6 @@ public final class DependencyAnalyzer {
             }
         });
 
-        return new AnalysisResults(steps, usefulSteps.size(), rules, usefulSteps, usefulFormulas);
+        return new AnalysisResults(steps, usefulSteps.size(), rules, usefulSteps, usefulFormulas, uselessBranches);
     }
 }

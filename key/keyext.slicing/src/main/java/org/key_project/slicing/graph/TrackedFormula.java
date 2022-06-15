@@ -14,7 +14,7 @@ import java.util.Objects;
  *
  * @author Arne Keller
  */
-public class TrackedFormula implements GraphNode {
+public class TrackedFormula extends GraphNode {
     /**
      * Symbol used to indicate the position of the formula in the sequent.
      *
@@ -26,10 +26,6 @@ public class TrackedFormula implements GraphNode {
      * The formula.
      */
     public final SequentFormula formula;
-    /**
-     * Location in the proof tree.
-     */
-    public final ImmutableList<String> branchLocation; // TODO: introduce a proper class for this?
     /**
      * Whether the formula is in the antecedent.
      */
@@ -45,8 +41,8 @@ public class TrackedFormula implements GraphNode {
             boolean inAntec,
             Services services
     ) {
+        super(branchLocation);
         this.formula = formula;
-        this.branchLocation = branchLocation;
         this.inAntec = inAntec;
         this.services = services;
     }
@@ -83,10 +79,5 @@ public class TrackedFormula implements GraphNode {
     @Override
     public int hashCode() {
         return Objects.hash(formula, branchLocation, inAntec);
-    }
-
-    @Override
-    public ImmutableList<String> branch() {
-        return branchLocation;
     }
 }

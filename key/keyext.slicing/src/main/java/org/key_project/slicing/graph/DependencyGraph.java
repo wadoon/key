@@ -92,6 +92,13 @@ public class DependencyGraph {
                 .filter(it -> it.branchLocation.hasPrefix(location));
     }
 
+    public Stream<ClosedGoal> goalsInBranch(ImmutableList<String> location) {
+        return graph.vertexSet().stream()
+                .filter(ClosedGoal.class::isInstance)
+                .map(ClosedGoal.class::cast)
+                .filter(it -> it.branchLocation.hasPrefix(location));
+    }
+
     public BreadthFirstIterator<GraphNode, DefaultEdge> breadthFirstIterator(GraphNode start) {
         return new BreadthFirstIterator<>(graph, start);
     }

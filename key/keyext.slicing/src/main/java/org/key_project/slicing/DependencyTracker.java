@@ -17,6 +17,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.merge.CloseAfterMergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
+import de.uka.ilkd.key.smt.RuleAppSMT;
 import de.uka.ilkd.key.util.Pair;
 import org.key_project.slicing.graph.AddedRule;
 import org.key_project.slicing.graph.ClosedGoal;
@@ -83,7 +84,11 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         // State Merging: add all formulas as inputs
         // TODO: this is not enough, as the State Merge processes every formula in the sequent
         // (-> if more formulas are present after slicing, a different result will be produced!)
-        if (ruleApp instanceof MergeRuleBuiltInRuleApp || ruleApp instanceof CloseAfterMergeRuleBuiltInRuleApp) {
+        // SMT application: add all formulas as inputs
+        // TODO: this may be too much (see unsat core)
+        if (ruleApp instanceof MergeRuleBuiltInRuleApp
+                || ruleApp instanceof CloseAfterMergeRuleBuiltInRuleApp
+                || ruleApp instanceof RuleAppSMT) {
             node.sequent().antecedent().iterator().forEachRemaining(it ->
                     inputs.add(new PosInOccurrence(it, PosInTerm.getTopLevel(), true))
             );
@@ -189,11 +194,11 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
                     .filter(goal -> goal.node().parent() == n)
                     .findFirst();
             if (closedGoal.isPresent()) {
-                output.add(new ClosedGoal(closedGoal.get().node().serialNr()));
+                output.add(new ClosedGoal(closedGoal.get().node().serialNr(), n.branchLocation()));
             } else {
                 LOGGER.debug(
                         "Warning: did not locate the goal closed by step {}", n.serialNr());
-                output.add(new ClosedGoal(n.serialNr() + 1));
+                output.add(new ClosedGoal(n.serialNr() + 1, n.branchLocation()));
             }
         }
 
