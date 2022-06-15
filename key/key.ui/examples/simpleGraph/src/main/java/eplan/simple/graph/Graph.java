@@ -54,10 +54,11 @@ public class Graph {
 
 
     /*@ public normal_behavior
+      @ requires \invariant_for(this);
       @ assignable \nothing;
       @ ensures (\forall int j; j>=0 && j<edges.length; \result.contains(edges[j].start) && \result.contains(edges[j].end));
       @*/
-    public NodeList getAllNodes() {
+    public /*@ helper @*/ NodeList getAllNodes() {
 
         NodeList res = new NodeList();
 

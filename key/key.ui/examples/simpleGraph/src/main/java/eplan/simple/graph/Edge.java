@@ -6,7 +6,7 @@ public final class Edge {
     //@ public accessible footprint: footprint;
     //@ public accessible \inv: footprint;
 
-    /*@ public invariant \subset(this.footprint, this.*); @*/
+    /*@ public invariant \subset(this.footprint, \set_union(this.*, \set_union(start.footprint, end.footprint))); @*/
     /*@ public invariant \invariant_for(start) && \invariant_for(end); @*/
     /*@ public invariant length >= 0; @*/
     final private /*@ spec_public @*/ int id;
@@ -14,7 +14,7 @@ public final class Edge {
     final private /*@ spec_public @*/ Node end;
     final private /*@ spec_public @*/ int length;
 
-    //@ private represents footprint = id, start, end, length;
+    //@ private represents footprint = id, start, end, length, start.footprint, end.footprint;
 
     /*@ public normal_behavior
       @ requires \invariant_for(start) && \invariant_for(end);
