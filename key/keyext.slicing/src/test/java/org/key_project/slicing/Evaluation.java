@@ -6,6 +6,7 @@ import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.IntermediateProofReplayer;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.Triple;
 import org.junit.Ignore;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -126,6 +127,76 @@ class Evaluation {
         //    with tracker: 271606 265942 (+3%)
     }
 
+    @Test
+    @Ignore("used during evaluation")
+    void loadAndSliceAll() throws Exception {
+        GeneralSettings.noPruningClosed = false;
+        // run with: -Xmx4096m
+        var time1 = System.currentTimeMillis();
+        sliceAllOnce();
+        var time2 = System.currentTimeMillis();
+        sliceAllOnce();
+        var time3 = System.currentTimeMillis();
+        LOGGER.info("Replay + Slice + Replay time: {} (warmup) {} (second iteration)", time2-time1, time3-time2);
+        // TODO: measure without branch elimination; slicing up to fixpoint
+        // 338322 331194
+    }
+
+    private void sliceAllOnce() throws Exception {
+        var failures = new ArrayList<>();
+        var sizes = new ArrayList<Pair<Integer, Integer>>();
+        for (var filename : FILES) {
+            LOGGER.info("Loading {}", filename);
+            var result = loadProof(filename, true);
+            try {
+                if (!result.first.getReplayResult().hasErrors()
+                        && result.first.getReplayResult().getStatus().equals(IntermediateProofReplayer.SMT_NOT_RUN)) {
+                    LOGGER.info("skipping"); // TODO: mark the open goals as "closable by SMT"?
+                    result.first.dispose();
+                    continue;
+                }
+                var originalSize = result.second.countNodes();
+                var tracker = result.third;
+                // analyze proof
+                var results = tracker.analyze();
+                // slice proof
+                Proof slicedProof = tracker.sliceProof();
+
+                // reload proof to verify the slicing was correct
+                var tempFile = Files.createTempFile("", ".proof");
+                slicedProof.saveToFile(tempFile.toFile());
+                KeYEnvironment<?> loadedEnvironment = KeYEnvironment.load(JavaProfile.getDefaultInstance(), tempFile.toFile(), null, null, null, null, null, null, true);
+                try {
+                    slicedProof = loadedEnvironment.getLoadedProof();
+
+                    Assertions.assertTrue(slicedProof.closed());
+
+                    Files.delete(tempFile);
+
+                    var slicedSize = slicedProof.countNodes();
+                    sizes.add(new Pair<>(originalSize, slicedSize));
+                } finally {
+                    loadedEnvironment.dispose();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                failures.add(filename);
+            } finally {
+                result.first.dispose();
+            }
+        }
+        if (!failures.isEmpty()) {
+            LOGGER.info("Failures:");
+            for (var filename : failures) {
+                LOGGER.info("{}", filename);
+            }
+        }
+        sizes.sort(Comparator.comparing(it -> it.first));
+        for (var s : sizes) {
+            System.out.printf("%s,%s\n", s.first, s.second);
+        }
+    }
+
     private void loadAllOnce(boolean withTracker) {
         var working = 0;
         var total = 0;
@@ -168,7 +239,7 @@ class Evaluation {
         }
     }
 
-    private Pair<KeYEnvironment<?>, Proof> loadProof(String filename, boolean withTracker) throws Exception {
+    private Triple<KeYEnvironment<?>, Proof, DependencyTracker> loadProof(String filename, boolean withTracker) throws Exception {
         // load proof
         File proofFile = new File(testCaseDirectory, filename);
         Assertions.assertTrue(proofFile.exists());
@@ -180,7 +251,7 @@ class Evaluation {
             Proof proof = environment.getLoadedProof();
             Assertions.assertNotNull(proof);
 
-            return new Pair<>(environment, proof);
+            return new Triple<>(environment, proof, tracker);
         } catch (Exception e) {
             environment.dispose();
             return null;
