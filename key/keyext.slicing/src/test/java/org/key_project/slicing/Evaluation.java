@@ -115,6 +115,18 @@ class Evaluation {
     @Test
     @Ignore("used during evaluation")
     void loadAll() {
+        // run with: -Xmx4096m
+        var time1 = System.currentTimeMillis();
+        loadAllOnce(true);
+        var time2 = System.currentTimeMillis();
+        loadAllOnce(true);
+        var time3 = System.currentTimeMillis();
+        LOGGER.info("Replay time: {} (warmup) {} (second iteration)", time2-time1, time3-time2);
+        // without tracker: 264834 258437
+        //    with tracker: 271606 265942 (+3%)
+    }
+
+    private void loadAllOnce(boolean withTracker) {
         var working = 0;
         var total = 0;
         var failures = new ArrayList<>();
@@ -124,7 +136,7 @@ class Evaluation {
             var loadedCorrectly = false;
             total++;
             try {
-                var result = loadProof(filename);
+                var result = loadProof(filename, withTracker);
                 if (result != null) {
                     if (result.second.closed()
                             || (!result.first.getReplayResult().hasErrors()
@@ -156,12 +168,13 @@ class Evaluation {
         }
     }
 
-    private Pair<KeYEnvironment<?>, Proof> loadProof(String filename) throws Exception {
+    private Pair<KeYEnvironment<?>, Proof> loadProof(String filename, boolean withTracker) throws Exception {
         // load proof
         File proofFile = new File(testCaseDirectory, filename);
         Assertions.assertTrue(proofFile.exists());
         DependencyTracker tracker = new DependencyTracker();
-        KeYEnvironment<?> environment = KeYEnvironment.load(JavaProfile.getDefaultInstance(), proofFile, null, null, null, null, null, proof -> proof.addRuleAppListener(tracker), true);
+        KeYEnvironment<?> environment = KeYEnvironment.load(JavaProfile.getDefaultInstance(), proofFile, null, null, null, null, null,
+                withTracker ? proof -> proof.addRuleAppListener(tracker) : null, true);
         try {
             // get loaded proof
             Proof proof = environment.getLoadedProof();
