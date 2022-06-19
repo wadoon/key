@@ -1,6 +1,5 @@
 package org.key_project.slicing;
 
-import de.uka.ilkd.key.core.Log;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
@@ -19,7 +18,6 @@ import de.uka.ilkd.key.rule.merge.CloseAfterMergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.settings.GeneralSettings;
-import de.uka.ilkd.key.ui.Verbosity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +37,7 @@ public final class ProofSlicer {
     private final Set<Goal> ignoredGoals = new HashSet<>();
     private final Map<Node, Node> replayedNodes = new IdentityHashMap<>();
     private final boolean saveIntermediateSteps = false;
+    private final boolean logAtInfo = false;
 
     public ProofSlicer(
             Proof proof,
@@ -88,9 +87,13 @@ public final class ProofSlicer {
         // reset index counters, so we hopefully get the same indices
         p.getServices().resetCounters();
         OneStepSimplifier.refreshOSS(p);
-        //Log.configureLogging(Verbosity.INFO);
         if (GeneralSettings.disableOSSRestriction) {
             LOGGER.warn("OSS restriction is disabled, slicing may not work properly!");
+        }
+        try {
+            p.saveToFile(new java.io.File("/tmp/AA_initial.proof"));
+        } catch (Throwable t) {
+            throw new IllegalStateException(t);
         }
         replayProof(p, proof.root());
         return p;
@@ -103,10 +106,18 @@ public final class ProofSlicer {
                 return; // closed goal
             }
             if (!analysisResults.usefulSteps.contains(node) && node.childrenCount() > 1) {
-                LOGGER.debug("about to skip cut @ node {}", node.serialNr());
+                if (logAtInfo) {
+                    LOGGER.info("about to skip cut @ node {}", node.serialNr());
+                } else {
+                    LOGGER.debug("about to skip cut @ node {}", node.serialNr());
+                }
             }
             if (analysisResults.usefulSteps.contains(node)) {
-                LOGGER.trace("at node {} {}", node.serialNr(), node.getAppliedRuleApp().rule().displayName());
+                if (logAtInfo) {
+                    LOGGER.info("at node {} {}", node.serialNr(), node.getAppliedRuleApp().rule().displayName());
+                } else {
+                    LOGGER.trace("at node {} {}", node.serialNr(), node.getAppliedRuleApp().rule().displayName());
+                }
                 if (saveIntermediateSteps) {
                     try {
                         p.saveToFile(new java.io.File("/tmp/before" + node.serialNr() + ".proof"));
@@ -156,12 +167,19 @@ public final class ProofSlicer {
                                 // replace with equal object
                                 for (var origFormula : origAnte.asList()) {
                                     if (origFormula.realEquals(pio.sequentFormula())) {
+                                        if (logAtInfo) {
+                                            LOGGER.info("replacing formula identity");
+                                        } else {
+                                            LOGGER.trace("replacing formula identity");
+                                        }
                                         ourAnte = ourAnte.replace(i, origFormula).semisequent();
                                         // TODO: remove this rather expensive check if it never occurs
+                                        /*
                                         if (!origFormula.toString().equals(pio.sequentFormula().toString())) {
-                                            LOGGER.error("name / index mismatch {} {}", origFormula, pio.sequentFormula());
+                                            LOGGER.error("step {}: name / index mismatch {} {}", node.serialNr(), origFormula, pio.sequentFormula());
                                             throw new IllegalStateException("Proof Slicer failed to identify correct sequent formula!");
                                         }
+                                         */
                                     }
                                 }
                             }

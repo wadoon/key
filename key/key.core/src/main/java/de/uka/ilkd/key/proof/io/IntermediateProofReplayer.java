@@ -112,6 +112,8 @@ import org.slf4j.LoggerFactory;
  * @author Dominic Scheurer
  */
 public class IntermediateProofReplayer {
+    public static final String SMT_NOT_RUN = "Your proof has been loaded, but SMT solvers have not been run";
+
 
     private static final String ERROR_LOADING_PROOF_LINE = "Error loading proof.\n";
     private static final String NOT_APPLICABLE = " not available or not applicable in this context.";
@@ -632,7 +634,7 @@ public class IntermediateProofReplayer {
             }
             if (error || smtProblem.getFinalResult()
                     .isValid() != ThreeValuedTruth.VALID) {
-                status = "Your proof has been loaded, but SMT solvers have not been run";
+                status = SMT_NOT_RUN;
                 throw new SkipSMTRuleException();
             } else {
                 return RuleAppSMT.rule.createApp(null, proof.getServices());

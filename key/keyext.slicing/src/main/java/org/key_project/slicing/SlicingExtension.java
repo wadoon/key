@@ -90,6 +90,9 @@ public class SlicingExtension implements KeYGuiExtension,
 
     private void createTrackerForProof(Proof newProof) {
         trackers.computeIfAbsent(newProof, proof -> {
+            if (proof == null) {
+                return null;
+            }
             var tracker = new DependencyTracker();
             proof.addRuleAppListener(tracker);
             proof.addProofTreeListener(tracker);

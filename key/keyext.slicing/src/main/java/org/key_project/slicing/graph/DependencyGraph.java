@@ -45,9 +45,11 @@ public class DependencyGraph {
             for (var out : output) {
                 graph.addVertex(in);
                 graph.addVertex(out);
+                /*
                 if (graph.containsEdge(in, out)) {
                     continue;
                 }
+                 */
                 var edge = new DefaultEdge();
                 graph.addEdge(in, out, edge);
                 edgeData.put(edge, node);

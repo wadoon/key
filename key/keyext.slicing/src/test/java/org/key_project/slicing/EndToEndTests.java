@@ -55,7 +55,7 @@ class EndToEndTests {
         sliceProof("/simpleSMT.proof", 1, 1, 0);
     }
 
-    private void sliceProof(String filename, int expectedTotal, int expectedUseful, int expectedInSlice) throws Exception {
+    private Proof sliceProof(String filename, int expectedTotal, int expectedUseful, int expectedInSlice) throws Exception {
         boolean oldValue = GeneralSettings.noPruningClosed;
         GeneralSettings.noPruningClosed = false;
         // load proof
@@ -85,12 +85,14 @@ class EndToEndTests {
                 Assertions.assertTrue(slicedProof.closed());
 
                 Files.delete(tempFile);
+
+                return slicedProof;
             } finally {
                 loadedEnvironment.dispose();
             }
         } finally {
             environment.dispose();
+            GeneralSettings.noPruningClosed = oldValue;
         }
-        GeneralSettings.noPruningClosed = oldValue;
     }
 }
