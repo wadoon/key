@@ -22,6 +22,7 @@ import de.uka.ilkd.key.util.Pair;
 import org.key_project.slicing.graph.AddedRule;
 import org.key_project.slicing.graph.ClosedGoal;
 import org.key_project.slicing.graph.DependencyGraph;
+import org.key_project.slicing.graph.DotExporter;
 import org.key_project.slicing.graph.GraphNode;
 import org.key_project.slicing.graph.PseudoInput;
 import org.key_project.slicing.graph.PseudoOutput;
@@ -229,44 +230,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
     }
 
     public String exportDot(boolean abbreviateFormulas) {
-        var buf = new StringBuilder();
-        buf.append("digraph {\n");
-        buf.append("edge [dir=\"back\"];\n");
-        var queue = new ArrayList<Node>();
-        queue.add(proof.root());
-        while (!queue.isEmpty()) {
-            var node = queue.remove(queue.size() - 1);
-            node.childrenIterator().forEachRemaining(queue::add);
-            var data = node.lookup(DependencyNodeData.class);
-            if (data == null) {
-                continue;
-            }
-            for (var in : data.inputs) {
-                data.outputs.stream().map(it -> it.toString(abbreviateFormulas)).forEach(out -> {
-                    buf
-                            .append('"')
-                            .append(in.toString(abbreviateFormulas))
-                            .append("\" -> \"")
-                            .append(out)
-                            .append("\" [label=\"")
-                            .append(data.label);
-                    if (analysisResults != null && !analysisResults.usefulSteps.contains(node)) {
-                        buf.append("\" color=\"red");
-                    }
-                    buf
-                            .append("\"]\n");
-                });
-            }
-        }
-        if (analysisResults != null) {
-            for (var formula : graph.nodes()) {
-                if (!analysisResults.usefulNodes.contains(formula)) {
-                    buf.append('"').append(formula.toString(abbreviateFormulas)).append('"').append(" [color=\"red\"]\n");
-                }
-            }
-        }
-        buf.append("}");
-        return buf.toString();
+        return DotExporter.exportDot(proof, graph, analysisResults, abbreviateFormulas);
     }
 
     public AnalysisResults analyze() {
