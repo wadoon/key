@@ -4,6 +4,7 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuAdapter;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
@@ -11,11 +12,13 @@ import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Proof;
 import org.key_project.slicing.ui.ShowCreatedByAction;
+import org.key_project.slicing.ui.ShowGraphAction;
 import org.key_project.slicing.ui.SlicingLeftPanel;
 
 import javax.annotation.Nonnull;
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.IdentityHashMap;
@@ -60,12 +63,19 @@ public class SlicingExtension implements KeYGuiExtension,
                     || mediator.getSelectedNode() == null) {
                 return List.of();
             }
-            var node = tracker.getNodeThatProduced(
-                    mediator.getSelectedNode(), pos.getPosInOccurrence().topLevel());
+            var currentNode = mediator.getSelectedNode();
+            var topLevel = pos.getPosInOccurrence().topLevel();
+            var node = tracker.getNodeThatProduced(currentNode, topLevel);
             if (node == null) {
                 return List.of();
             }
-            return List.of(new ShowCreatedByAction(MainWindow.getInstance(), node));
+            var list = new ArrayList<Action>();
+            list.add(new ShowCreatedByAction(MainWindow.getInstance(), node));
+            var graphNode = tracker.getGraphNode(currentNode, topLevel);
+            if (graphNode != null) {
+                list.add(new ShowGraphAction(MainWindow.getInstance(), tracker, graphNode));
+            }
+            return list;
         }
     };
 

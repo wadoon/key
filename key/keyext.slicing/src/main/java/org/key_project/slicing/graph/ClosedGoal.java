@@ -21,7 +21,7 @@ public class ClosedGoal extends GraphNode {
     }
 
     @Override
-    public String toString(boolean abbreviated) {
+    public String toString(boolean abbreviated, boolean omitBranch) {
         return "closed goal " + serialNr;
     }
 }

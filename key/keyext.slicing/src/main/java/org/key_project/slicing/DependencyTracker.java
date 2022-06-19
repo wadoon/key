@@ -233,6 +233,10 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         return DotExporter.exportDot(proof, graph, analysisResults, abbreviateFormulas);
     }
 
+    public String exportDotAround(boolean abbreviateFormulas, boolean omitBranch, GraphNode node) {
+        return DotExporter.exportDotAround(proof, graph, analysisResults, abbreviateFormulas, omitBranch, node);
+    }
+
     public AnalysisResults analyze() {
         if (analysisResults != null) {
             return analysisResults;
@@ -248,16 +252,15 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         return new ProofSlicer(proof, analysisResults, edgeDependencies).sliceProof();
     }
 
-    public Node getNodeThatProduced(Node currentNode, PosInOccurrence pio) {
+    public GraphNode getGraphNode(Node currentNode, PosInOccurrence pio) {
         if (proof == null) {
             return null;
         }
         var loc = currentNode.branchLocation();
         while (true) {
-            var incoming = graph.incomingEdgesOf(new TrackedFormula(pio.sequentFormula(), loc, pio.isInAntec(), proof.getServices()));
-            var node = incoming.findFirst();
-            if (node.isPresent()) {
-                return node.get();
+            var formula = new TrackedFormula(pio.sequentFormula(), loc, pio.isInAntec(), proof.getServices());
+            if (graph.containsNode(formula)) {
+                return formula;
             }
             if (loc.isEmpty()) {
                 break;
@@ -267,6 +270,16 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
             loc = ImmutableList.fromList(list);
         }
         return null;
+    }
+
+    public Node getNodeThatProduced(Node currentNode, PosInOccurrence pio) {
+        if (proof == null) {
+            return null;
+        }
+        var graphNode = getGraphNode(currentNode, pio);
+        var incoming = graph.incomingEdgesOf(graphNode);
+        var node = incoming.findFirst();
+        return node.orElse(null);
     }
 
     public AnalysisResults getAnalysisResults() {

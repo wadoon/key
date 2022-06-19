@@ -14,7 +14,7 @@ public class PseudoOutput extends GraphNode {
     }
 
     @Override
-    public String toString(boolean abbreviated) {
+    public String toString(boolean abbreviated, boolean omitBranch) {
         return "pseudo output " + Integer.toHexString(hashCode());
     }
 }

@@ -14,7 +14,7 @@ public class PseudoInput extends GraphNode {
     }
 
     @Override
-    public String toString(boolean abbreviated) {
+    public String toString(boolean abbreviated, boolean omitBranch) {
         return "pseudo input " + Integer.toHexString(hashCode());
     }
 }

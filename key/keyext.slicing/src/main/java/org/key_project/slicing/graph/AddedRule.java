@@ -1,6 +1,5 @@
 package org.key_project.slicing.graph;
 
-import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import java.util.Objects;
@@ -39,7 +38,7 @@ public class AddedRule extends GraphNode {
     }
 
     @Override
-    public String toString(boolean abbreviated) {
+    public String toString(boolean abbreviated, boolean omitBranch) {
         return "added rule " + name;
     }
 }

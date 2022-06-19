@@ -129,4 +129,11 @@ public class DependencyGraph {
             }
         }
     }
+
+    public Stream<GraphNode> neighborsOf(GraphNode node) {
+        return Stream.concat(
+                graph.incomingEdgesOf(node).stream().map(graph::getEdgeSource),
+                graph.outgoingEdgesOf(node).stream().map(graph::getEdgeTarget)
+        );
+    }
 }

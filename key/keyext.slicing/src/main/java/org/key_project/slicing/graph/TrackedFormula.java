@@ -18,7 +18,7 @@ public class TrackedFormula extends GraphNode {
     /**
      * Symbol used to indicate the position of the formula in the sequent.
      *
-     * @see #toString(boolean)
+     * @see GraphNode#toString(boolean, boolean)
      */
     private static final String SEQ_ARROW = "⟹";
 
@@ -48,7 +48,7 @@ public class TrackedFormula extends GraphNode {
     }
 
     @Override
-    public String toString(boolean abbreviated) {
+    public String toString(boolean abbreviated, boolean omitBranch) {
         if (abbreviated) {
             return Integer.toHexString(hashCode());
         }
@@ -58,8 +58,12 @@ public class TrackedFormula extends GraphNode {
                 true, // pretty print
                 true // using unicode symbols
         ).trim();
-        var id = input + branchLocation.stream().reduce("", String::concat);
-        return !inAntec ? (SEQ_ARROW + " " + id) : (id + " " + SEQ_ARROW);
+        if (omitBranch) {
+            return !inAntec ? (SEQ_ARROW + " " + input) : (input + " " + SEQ_ARROW);
+        } else {
+            var id = input + branchLocation.stream().reduce("", String::concat);
+            return !inAntec ? (SEQ_ARROW + " " + id) : (id + " " + SEQ_ARROW);
+        }
     }
 
     @Override

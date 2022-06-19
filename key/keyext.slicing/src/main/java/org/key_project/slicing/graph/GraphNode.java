@@ -27,7 +27,8 @@ public abstract class GraphNode {
      * Construct a human-friendly representation of this graph node.
      *
      * @param abbreviated whether any text should be abbreviated
+     * @param omitBranch do not include branch info
      * @return textual representation of this object
      */
-    public abstract String toString(boolean abbreviated);
+    public abstract String toString(boolean abbreviated, boolean omitBranch);
 }
