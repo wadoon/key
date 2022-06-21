@@ -1,10 +1,13 @@
 package org.key_project.slicing;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.IntermediateProofReplayer;
 import de.uka.ilkd.key.settings.GeneralSettings;
+import de.uka.ilkd.key.smt.RuleAppSMT;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 import org.junit.Ignore;
@@ -14,6 +17,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,6 +31,7 @@ class Evaluation {
 
     // commented out file = doesn't load
     private static final String[] FILES = new String[]{
+            /*
             "01_Contraposition.key",
             "02_Liarsville.key",
             "03_AuntAgatha.key",
@@ -67,6 +73,7 @@ class Evaluation {
             "IdentityHashMap/01_KEY_IHM/KeY-proof-files/VerifiedIdentityHashMap/java.util.VerifiedIdentityHashMap(java.util.VerifiedIdentityHashMap__unmaskNull(java.lang.Object)).JML normal_behavior operation contract.0.proof.gz",
 //            "DualPivot_KeY_Proofs/overflow/DualPivotQuicksort/DualPivotQuicksort(DualPivotQuicksort__eInsertionSort((I,int,int,int,int,int,int,int)).JML normal_behavior operation contract.0.proof",
             "DualPivot_KeY_Proofs/overflow/DualPivotQuicksort/DualPivotQuicksort(DualPivotQuicksort__loop_body((I,int,int,int,int,int)).JML normal_behavior operation contract.0.proof",
+             */
             "DualPivot_KeY_Proofs/overflow/DualPivotQuicksort/DualPivotQuicksort(DualPivotQuicksort__move_great_left((I,int,int,int)).JML normal_behavior operation contract.0.proof",
             "DualPivot_KeY_Proofs/overflow/DualPivotQuicksort/DualPivotQuicksort(DualPivotQuicksort__move_great_left_in_loop((I,int,int,int,int)).JML normal_behavior operation contract.0.proof",
             "DualPivot_KeY_Proofs/overflow/DualPivotQuicksort/DualPivotQuicksort(DualPivotQuicksort__move_less_right((I,int,int,int)).JML normal_behavior operation contract.0.proof",
@@ -125,6 +132,56 @@ class Evaluation {
         LOGGER.info("Replay time: {} (warmup) {} (second iteration)", time2-time1, time3-time2);
         // without tracker: 264834 258437
         //    with tracker: 271606 265942 (+3%)
+    }
+
+    @Test
+    @Ignore("used during evaluation")
+    void sliceEach() throws Exception {
+        // run with: -Xmx4096m
+        // warm up taclet index etc.
+        loadProof("DualPivot_KeY_Proofs/sort/DualPivotQuicksort/eInsertionSort_SavedAgain.proof", true).first.dispose();
+        var output = new PrintStream(new FileOutputStream("/tmp/log.txt"));
+        output.println("Proof;Load time;Load time with tracker;Slice time;Number of steps;Number of steps in slice;Branches;Branches in slice");
+
+        var failures = new ArrayList<>();
+
+        for (var filename : FILES) {
+            var iterations = 4;
+            for (int i = 0; i < iterations; i++) {
+                var time1 = System.currentTimeMillis();
+
+                var proof1 = loadProof(filename, false);
+                var origSize = proof1.second.countNodes();
+                var origBranches = proof1.second.countBranches();
+                proof1.first.dispose();
+                var time2 = System.currentTimeMillis();
+
+                loadProof(filename, true).first.dispose();
+                var time3 = System.currentTimeMillis();
+
+                try {
+                    var proof2 = sliceProof(filename);
+                    var sliceSize = proof2.countNodes();
+                    var sliceBranches = proof2.countBranches();
+                    proof2.dispose();
+                    var time4 = System.currentTimeMillis();
+
+                    if (i < iterations - 1) {
+                        System.err.printf("%s;%d;%d;%d;%d;%d;%d;%d\n", filename, time2 - time1, time3 - time2, time4 - time3, origSize, sliceSize, origBranches, sliceBranches);
+                    } else {
+                        output.printf("%s;%d;%d;%d;%d;%d;%d;%d\n", filename, time2 - time1, time3 - time2, time4 - time3, origSize, sliceSize, origBranches, sliceBranches);
+                    }
+                } catch (Exception e) {
+                    failures.add(filename);
+                }
+            }
+        }
+        output.flush();
+        output.close();
+        System.err.println("Failures:");
+        for (var name : failures) {
+            System.err.println(name);
+        }
     }
 
     @Test
@@ -270,6 +327,15 @@ class Evaluation {
             // get loaded proof
             Proof proof = environment.getLoadedProof();
             Assertions.assertNotNull(proof);
+            // pseudo-close any open goals that are supposedly closable by SMT
+            if (!environment.getReplayResult().hasErrors()
+                    && environment.getReplayResult().getStatus().equals(IntermediateProofReplayer.SMT_NOT_RUN)) {
+                System.err.println("closing SMT goals");
+                proof.openGoals().forEach(goal -> {
+                    goal.apply(new RuleAppSMT(RuleAppSMT.rule, PosInOccurrence.findInSequent(goal.sequent(), 1, PosInTerm.getTopLevel())));
+                });
+                Assertions.assertTrue(proof.closed());
+            }
             // analyze proof
             var results = tracker.analyze();
             // slice proof
@@ -279,17 +345,21 @@ class Evaluation {
             var tempFile = Files.createTempFile("", ".proof");
             slicedProof.saveToFile(tempFile.toFile());
             KeYEnvironment<?> loadedEnvironment = KeYEnvironment.load(JavaProfile.getDefaultInstance(), tempFile.toFile(), null, null, null, null, null, null, true);
-            try {
-                slicedProof = loadedEnvironment.getLoadedProof();
+            slicedProof = loadedEnvironment.getLoadedProof();
 
-                Assertions.assertTrue(slicedProof.closed());
-
-                Files.delete(tempFile);
-
-                return slicedProof;
-            } finally {
-                loadedEnvironment.dispose();
+            // pseudo-close any open goals that are supposedly closable by SMT
+            if (!loadedEnvironment.getReplayResult().hasErrors()
+                    && loadedEnvironment.getReplayResult().getStatus().equals(IntermediateProofReplayer.SMT_NOT_RUN)) {
+                System.err.println("closing SMT goals");
+                slicedProof.openGoals().forEach(goal -> {
+                    goal.apply(new RuleAppSMT(RuleAppSMT.rule, PosInOccurrence.findInSequent(goal.sequent(), 1, PosInTerm.getTopLevel())));
+                });
             }
+            Assertions.assertTrue(slicedProof.closed());
+
+            Files.delete(tempFile);
+
+            return slicedProof;
         } finally {
             environment.dispose();
             GeneralSettings.noPruningClosed = oldValue;
