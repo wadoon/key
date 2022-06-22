@@ -23,7 +23,6 @@ public final class Edge {
       @ ensures this.start == start;
       @ ensures this.end == end;
       @ ensures this.length == 0;
-      @ ensures \fresh(footprint);
       @*/
     public Edge(Node start, Node end, int id) {
         this.id = id;
@@ -41,7 +40,6 @@ public final class Edge {
       @ ensures this.start == start;
       @ ensures this.end == end;
       @ ensures this.length == len;
-      @ ensures \fresh(footprint);
       @*/
     public Edge(Node start, Node end, int id, int len) {
         this.id = id;
@@ -67,7 +65,7 @@ public final class Edge {
       @ accessible this.id;
       @ ensures \result == this.id;
       @*/
-    public /*@ helper @*/ int getId() {
+    public int getId() {
         return id;
     }
 

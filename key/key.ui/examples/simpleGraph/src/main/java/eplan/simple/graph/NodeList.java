@@ -91,6 +91,7 @@ public final class NodeList {
       @ requires \invariant_for(n);
       @ ensures \result == (\exists int i; i >= 0 && i < list.length; ((Node) list[i]).equals(n));
       @ assignable \strictly_nothing;
+      @ accessible footprint;
       @*/
     public /*@ strictly_pure @*/ boolean contains (Node n) {
         if(getIndex(n) >= 0) {
@@ -104,6 +105,7 @@ public final class NodeList {
       @ requires \invariant_for(n);
       @ ensures (\exists int i; i >= 0 && i < list.length; ((Node) list[i]).equals(n)) ? \result >= 0 && \result < list.length && ((Node) list[\result]).equals(n) : \result == -1;
       @ assignable \strictly_nothing;
+      @ accessible footprint;
       @*/
     public /*@ strictly_pure @*/ int getIndex (Node n) {
         /*@ loop_invariant
