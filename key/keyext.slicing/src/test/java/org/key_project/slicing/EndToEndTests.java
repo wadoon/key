@@ -72,7 +72,7 @@ class EndToEndTests {
             Assertions.assertEquals(expectedTotal, results.totalSteps);
             Assertions.assertEquals(expectedUseful, results.usefulStepsNr);
             // slice proof
-            Proof slicedProof = tracker.sliceProof();
+            Proof slicedProof = tracker.sliceProof(null);
 
             // reload proof to verify the slicing was correct
             var tempFile = Files.createTempFile("", ".proof");

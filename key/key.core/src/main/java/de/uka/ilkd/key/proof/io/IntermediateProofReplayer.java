@@ -17,8 +17,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
+import de.uka.ilkd.key.settings.GeneralSettings;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -146,7 +146,6 @@ public class IntermediateProofReplayer {
      *            The problem loader, for reporting errors.
      * @param proof
      *            The proof object into which to load the replayed proof.
-     * @param intermediate
      */
     public IntermediateProofReplayer(AbstractProblemLoader loader, Proof proof,
             IntermediatePresentationProofFileParser.Result parserResult) {
@@ -170,11 +169,17 @@ public class IntermediateProofReplayer {
      * {@link #getLastSelectedGoal()}.
      */
     public Result replay() {
+        int stepIndex = 0;
+        int lastLineNr = 0;
         while (!queue.isEmpty()) {
             final Pair<Node, NodeIntermediate> currentP = queue.pollFirst();
-            final Node currNode = currentP.first;
+            Node currNode = currentP.first;
             final NodeIntermediate currNodeInterm = currentP.second;
+            int currNodeIntermChildrenCount = currNodeInterm.getChildren().size();
             currGoal = proof.getGoal(currNode);
+            int finalStepIndex = stepIndex;
+            boolean apply = !GeneralSettings.slicing || GeneralSettings.usefulSteps.contains(finalStepIndex);
+            currNode.stepIndex = stepIndex;
 
             try {
                 if (currNodeInterm instanceof BranchNodeIntermediate) {
@@ -190,15 +195,30 @@ public class IntermediateProofReplayer {
                     continue;
                 } else if (currNodeInterm instanceof AppNodeIntermediate) {
                     AppNodeIntermediate currInterm = (AppNodeIntermediate) currNodeInterm;
+                    if (GeneralSettings.slicing) {
+                        LOGGER.info("slicing @ {} [{}] {} (apply = {}, line = {})", stepIndex, currNode.serialNr(), currInterm.getIntermediateRuleApp().getRuleName(), apply, currInterm.getIntermediateRuleApp().getLineNr());
+                    }
+                    int newLineNr = Integer.parseInt(currInterm.getIntermediateRuleApp().getLineNr());
+                    if (newLineNr < lastLineNr) {
+                        LOGGER.error("didn't follow line number order!");
+                        throw new IllegalStateException("uh oh");
+                    }
+                    if (currGoal == null && apply) {
+                        LOGGER.error("currGoal == null @ step index {} node serialNr {}", stepIndex, currNode.serialNr());
+                        break;
+                    }
+                    lastLineNr = newLineNr;
                     currNode.getNodeInfo().setInteractiveRuleApplication(
                         currInterm.isInteractiveRuleApplication());
                     currNode.getNodeInfo().setScriptRuleApplication(
                         currInterm.isScriptRuleApplication());
                     currNode.getNodeInfo().setNotes(currInterm.getNotes());
 
-                    // Register name proposals
-                    proof.getServices().getNameRecorder().setProposals(
-                        currInterm.getIntermediateRuleApp().getNewNames());
+                    if (apply) {
+                        // Register name proposals
+                        proof.getServices().getNameRecorder().setProposals(
+                                currInterm.getIntermediateRuleApp().getNewNames());
+                    }
 
                     if (currInterm
                             .getIntermediateRuleApp() instanceof TacletAppIntermediate) {
@@ -206,27 +226,22 @@ public class IntermediateProofReplayer {
                                 .getIntermediateRuleApp();
 
                         try {
-                            currGoal.apply(
-                                constructTacletApp(appInterm, currGoal));
+                            if (apply) {
+                                currGoal.apply(
+                                        constructTacletApp(appInterm, currGoal, stepIndex));
+                            }
 
                             final Iterator<Node> children = currNode
                                     .childrenIterator();
                             final LinkedList<NodeIntermediate> intermChildren = currInterm
                                     .getChildren();
 
-                            addChildren(children, intermChildren);
+                            addChildren(currNode, !apply, children, intermChildren);
 
                             // Children are no longer needed, set them to null
                              // to free memory.
                             currInterm.setChildren(null);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            reportError(ERROR_LOADING_PROOF_LINE + "Line "
-                                    + appInterm.getLineNr() + ", goal "
-                                    + currGoal.node().serialNr() + ", rule "
-                                    + appInterm.getRuleName() + NOT_APPLICABLE,
-                                e);
-                        } catch (AssertionError e) {
+                        } catch (Exception | AssertionError e) {
                             e.printStackTrace();
                             reportError(ERROR_LOADING_PROOF_LINE + "Line "
                                     + appInterm.getLineNr() + ", goal "
@@ -299,18 +314,9 @@ public class IntermediateProofReplayer {
                                         LinkedList<NodeIntermediate> intermChildren = partnerNodeInfo.third
                                                 .getChildren();
 
-                                        addChildren(children, intermChildren);
+                                        addChildren(currNode, false, children, intermChildren);
                                     }
-                                } catch (SkipSMTRuleException e) {
-                                    reportError(ERROR_LOADING_PROOF_LINE
-                                            + "Line " + appInterm.getLineNr()
-                                            + ", goal "
-                                            + currGoal.node().serialNr()
-                                            + ", rule "
-                                            + appInterm.getRuleName()
-                                            + NOT_APPLICABLE,
-                                        e);
-                                } catch (BuiltInConstructionException e) {
+                                } catch (SkipSMTRuleException | BuiltInConstructionException e) {
                                     reportError(ERROR_LOADING_PROOF_LINE
                                             + "Line " + appInterm.getLineNr()
                                             + ", goal "
@@ -344,38 +350,26 @@ public class IntermediateProofReplayer {
                                     currNodeInterm));
                         } else {
                             try {
-                                IBuiltInRuleApp app = constructBuiltinApp(
-                                    appInterm, currGoal);
-                                if (!app.complete()) {
-                                    app = app.tryToInstantiate(currGoal);
+                                if (apply) {
+                                    IBuiltInRuleApp app = constructBuiltinApp(
+                                            appInterm, currGoal, stepIndex);
+                                    if (!app.complete()) {
+                                        app = app.tryToInstantiate(currGoal);
+                                    }
+                                    currGoal.apply(app);
                                 }
-                                currGoal.apply(app);
 
                                 final Iterator<Node> children = currNode
                                         .childrenIterator();
                                 LinkedList<NodeIntermediate> intermChildren = currInterm
                                         .getChildren();
 
-                                addChildren(children, intermChildren);
+                                addChildren(currNode, !apply, children, intermChildren);
                             } catch (SkipSMTRuleException e) {
                                 // silently continue; status will be reported
                                 // via
                                 // polling
-                            } catch (BuiltInConstructionException e) {
-                                reportError(ERROR_LOADING_PROOF_LINE + "Line "
-                                        + appInterm.getLineNr() + ", goal "
-                                        + currGoal.node().serialNr() + ", rule "
-                                        + appInterm.getRuleName()
-                                        + NOT_APPLICABLE,
-                                    e);
-                            } catch (RuntimeException e) {
-                                reportError(ERROR_LOADING_PROOF_LINE + "Line "
-                                        + appInterm.getLineNr() + ", goal "
-                                        + currGoal.node().serialNr() + ", rule "
-                                        + appInterm.getRuleName()
-                                        + NOT_APPLICABLE,
-                                    e);
-                            } catch (AssertionError e) {
+                            } catch (BuiltInConstructionException | RuntimeException | AssertionError e) {
                                 reportError(ERROR_LOADING_PROOF_LINE + "Line "
                                         + appInterm.getLineNr() + ", goal "
                                         + currGoal.node().serialNr() + ", rule "
@@ -392,7 +386,13 @@ public class IntermediateProofReplayer {
                 // node in the queue.
                 reportError(ERROR_LOADING_PROOF_LINE, throwable);
             }
+            if (currNodeIntermChildrenCount == 0) {
+                stepIndex++;
+            }
+            stepIndex++;
         }
+        GeneralSettings.slicing = false;
+        GeneralSettings.usefulSteps = Set.of();
 
         return new Result(status, errors, currGoal);
     }
@@ -405,16 +405,18 @@ public class IntermediateProofReplayer {
      * save memory. Note that in this case, some test cases might be adapted
      * which depend on fixed node serial numbers.
      *
-     * @param children
-     *            Iterator of proof node children.
-     * @param intermChildren
-     *            List of corresponding intermediate children.
+     * @param ignoreChildren
+     * @param children Iterator of proof node children.
+     * @param intermChildren List of corresponding intermediate children.
      */
-    private void addChildren(Iterator<Node> children,
-            LinkedList<NodeIntermediate> intermChildren) {
+    private void addChildren(Node currNode, boolean ignoreChildren, Iterator<Node> children,
+                             LinkedList<NodeIntermediate> intermChildren) {
         int i = 0;
-        while (!currGoal.node().isClosed() && children.hasNext()
-                && intermChildren.size() > 0) {
+        while (ignoreChildren || (!currGoal.node().isClosed() && children.hasNext()
+                && intermChildren.size() > 0)) {
+            if (ignoreChildren && i >= intermChildren.size()) {
+                break;
+            }
 
             // NOTE: In the case of an unfinished proof, there
             // is another node after the last application which
@@ -422,8 +424,11 @@ public class IntermediateProofReplayer {
             // application. Therefore, we have to add the last
             // check in the above conjunction.
 
-            Node child = children.next();
-            if (!proof.getGoal(child).isLinked()) {
+            Node child = ignoreChildren ? currNode : children.next();
+            if (ignoreChildren || !proof.getGoal(child).isLinked()) {
+                if (GeneralSettings.slicing) {
+                    LOGGER.info("queue insert @ {}: {}", i, intermChildren.get(i).getClass());
+                }
                 queue.add(i, new Pair<Node, NodeIntermediate>(child,
                     intermChildren.get(i++)));
             }
@@ -460,7 +465,7 @@ public class IntermediateProofReplayer {
      *             In case of an error during construction.
      */
     private TacletApp constructTacletApp(TacletAppIntermediate currInterm,
-            Goal currGoal) throws TacletAppConstructionException {
+            Goal currGoal, int serialNr) throws TacletAppConstructionException {
 
         final String tacletName = currInterm.getRuleName();
         final int currFormula = currInterm.getPosInfo().first;
@@ -473,7 +478,25 @@ public class IntermediateProofReplayer {
         Taclet t = proof.getInitConfig()
                 .lookupActiveTaclet(new Name(tacletName));
         if (t == null) {
-            ourApp = currGoal.indexOfTaclets().lookup(tacletName);
+            LOGGER.info("using taclet index @ {}", tacletName);
+            if (GeneralSettings.slicing && GeneralSettings.stepIndexToDynamicRule.containsKey(serialNr)) {
+                var idx = GeneralSettings.stepIndexToDynamicRule.get(serialNr);
+                // find the correct rule app
+                boolean done = false;
+                for (var partialApp : currGoal.indexOfTaclets().getPartialInstantiatedApps()) {
+                    if (partialApp.taclet().getAddedBy().stepIndex == idx) {
+                        ourApp = partialApp;
+                        done = true;
+                        break;
+                    }
+                }
+                if (!done) {
+                    LOGGER.error("failed to find dynamically added taclet");
+                }
+            } else {
+                LOGGER.warn("using index of new proof");
+                ourApp = currGoal.indexOfTaclets().lookup(tacletName);
+            }
         } else {
             ourApp = NoPosTacletApp.createNoPosTacletApp(t);
         }
@@ -481,10 +504,27 @@ public class IntermediateProofReplayer {
 
         if (currFormula != 0) { // otherwise we have no pos
             try {
-                pos = PosInOccurrence.findInSequent(currGoal.sequent(),
-                    currFormula, currPosInTerm);
-                ourApp = ((NoPosTacletApp) ourApp).matchFind(pos, services);
-                ourApp = ourApp.setPosInOccurrence(pos, services);
+                if (!GeneralSettings.slicing) {
+                    pos = PosInOccurrence.findInSequent(currGoal.sequent(),
+                            currFormula, currPosInTerm);
+                } else {
+                    var oldPos = GeneralSettings.serialNrToPos.get(serialNr);
+                    var oldFormula = oldPos.sequentFormula();
+                    var semiSeq = oldPos.isInAntec() ? currGoal.sequent().antecedent() : currGoal.sequent().succedent();
+                    var done = false;
+                    for (var newFormula : semiSeq.asList()) {
+                        if (newFormula.realEquals(oldFormula)) {
+                            pos = oldPos.replaceConstrainedFormula(newFormula);
+                            done = true;
+                            break;
+                        }
+                    }
+                    if (!done) {
+                        LOGGER.error("failed to find new formula @ rule name {}, serial nr {}", tacletName, serialNr);
+                    }
+                }
+                    ourApp = ((NoPosTacletApp) ourApp).matchFind(pos, services);
+                    ourApp = ourApp.setPosInOccurrence(pos, services);
             } catch (Exception e) {
                 throw (TacletAppConstructionException)new TacletAppConstructionException(
                     "Wrong position information: " + pos).initCause(e);
@@ -496,9 +536,30 @@ public class IntermediateProofReplayer {
 
         ImmutableList<IfFormulaInstantiation> ifFormulaList = ImmutableSLList
                 .<IfFormulaInstantiation> nil();
-        for (String ifFormulaStr : currInterm.getIfSeqFormulaList()) {
-            ifFormulaList = ifFormulaList.append(
-                new IfFormulaInstSeq(seq, Integer.parseInt(ifFormulaStr)));
+        if (!GeneralSettings.slicing) {
+            for (String ifFormulaStr : currInterm.getIfSeqFormulaList()) {
+                ifFormulaList = ifFormulaList.append(
+                        new IfFormulaInstSeq(seq, Integer.parseInt(ifFormulaStr)));
+            }
+        } else {
+            for (var oldFormulaPio : GeneralSettings.serialNrToIfInsts.get(serialNr)) {
+                var semiSeq = oldFormulaPio.isInAntec() ? currGoal.sequent().antecedent() : currGoal.sequent().succedent();
+                var done = false;
+                SequentFormula oldFormula = oldFormulaPio.sequentFormula();
+                for (SequentFormula newFormula : semiSeq) {
+                    if (newFormula.realEquals(oldFormula)) {
+                        ifFormulaList = ifFormulaList.append(
+                                new IfFormulaInstSeq(currGoal.sequent(), oldFormulaPio.isInAntec(), newFormula)
+                        );
+                        done = true;
+                        break;
+                    }
+                }
+                if (!done) {
+                    LOGGER.error("did not locate ifInst during slicing @ rule name {}, serial nr {}", tacletName, serialNr);
+                }
+            }
+
         }
         for (String ifFormulaStr : currInterm.getIfDirectFormulaList()) {
             // MU 2019: #1487. We have to use the right namespaces to not
@@ -558,7 +619,7 @@ public class IntermediateProofReplayer {
      *             In case of an error during construction.
      */
     private IBuiltInRuleApp constructBuiltinApp(
-            BuiltInAppIntermediate currInterm, Goal currGoal)
+            BuiltInAppIntermediate currInterm, Goal currGoal, int stepIndex)
             throws SkipSMTRuleException, BuiltInConstructionException {
 
         final String ruleName = currInterm.getRuleName();
@@ -586,28 +647,40 @@ public class IntermediateProofReplayer {
         // Load ifInsts, if applicable
         if (currInterm.getBuiltInIfInsts() != null) {
             builtinIfInsts = ImmutableSLList.nil();
-            for (final Pair<Integer, PosInTerm> ifInstP : currInterm
-                    .getBuiltInIfInsts()) {
-                final int currIfInstFormula = ifInstP.first;
-                final PosInTerm currIfInstPosInTerm = ifInstP.second;
+            if (!GeneralSettings.slicing) {
+                for (final Pair<Integer, PosInTerm> ifInstP : currInterm
+                        .getBuiltInIfInsts()) {
+                    final int currIfInstFormula = ifInstP.first;
+                    final PosInTerm currIfInstPosInTerm = ifInstP.second;
 
-                try {
-                    final PosInOccurrence ifInst = PosInOccurrence
-                            .findInSequent(currGoal.sequent(),
-                                currIfInstFormula, currIfInstPosInTerm);
-                    builtinIfInsts = builtinIfInsts.append(ifInst);
-                } catch (RuntimeException e) {
-                    reportError(ERROR_LOADING_PROOF_LINE + "Line "
-                            + currInterm.getLineNr() + ", goal "
-                            + currGoal.node().serialNr() + ", rule " + ruleName
-                            + NOT_APPLICABLE,
-                        e);
-                } catch (AssertionError e) {
-                    reportError(ERROR_LOADING_PROOF_LINE + "Line "
-                            + currInterm.getLineNr() + ", goal "
-                            + currGoal.node().serialNr() + ", rule " + ruleName
-                            + NOT_APPLICABLE,
-                        e);
+                    try {
+                        final PosInOccurrence ifInst = PosInOccurrence
+                                .findInSequent(currGoal.sequent(),
+                                        currIfInstFormula, currIfInstPosInTerm);
+                        builtinIfInsts = builtinIfInsts.append(ifInst);
+                    } catch (RuntimeException | AssertionError e) {
+                        reportError(ERROR_LOADING_PROOF_LINE + "Line "
+                                        + currInterm.getLineNr() + ", goal "
+                                        + currGoal.node().serialNr() + ", rule " + ruleName
+                                        + NOT_APPLICABLE,
+                                e);
+                    }
+                }
+            } else {
+                for (var oldFormulaPio : GeneralSettings.serialNrToIfInsts.get(stepIndex)) {
+                    var semiSeq = oldFormulaPio.isInAntec() ? currGoal.sequent().antecedent() : currGoal.sequent().succedent();
+                    var done = false;
+                    SequentFormula oldFormula = oldFormulaPio.sequentFormula();
+                    for (SequentFormula newFormula : semiSeq) {
+                        if (newFormula.realEquals(oldFormula)) {
+                            builtinIfInsts = builtinIfInsts.append(new PosInOccurrence(newFormula, oldFormulaPio.posInTerm(), oldFormulaPio.isInAntec()));
+                            done = true;
+                            break;
+                        }
+                    }
+                    if (!done) {
+                        LOGGER.error("did not locate built-in ifInst during slicing @ rule name {}, serial nr {}", ruleName, stepIndex);
+                    }
                 }
             }
         }
@@ -645,12 +718,29 @@ public class IntermediateProofReplayer {
         PosInOccurrence pos = null;
 
         if (currFormula != 0) { // otherwise we have no pos
-            try {
-                pos = PosInOccurrence.findInSequent(currGoal.sequent(),
-                    currFormula, currPosInTerm);
-            } catch (RuntimeException e) {
-                throw new BuiltInConstructionException(
-                    "Wrong position information.", e);
+            if (!GeneralSettings.slicing) {
+                try {
+                    pos = PosInOccurrence.findInSequent(currGoal.sequent(),
+                            currFormula, currPosInTerm);
+                } catch (RuntimeException e) {
+                    throw new BuiltInConstructionException(
+                            "Wrong position information.", e);
+                }
+            } else {
+                var oldPos = GeneralSettings.serialNrToPos.get(stepIndex);
+                var oldFormula = oldPos.sequentFormula();
+                var semiSeq = oldPos.isInAntec() ? currGoal.sequent().antecedent() : currGoal.sequent().succedent();
+                var done = false;
+                for (var newFormula : semiSeq.asList()) {
+                    if (newFormula.realEquals(oldFormula)) {
+                        pos = oldPos.replaceConstrainedFormula(newFormula);
+                        done = true;
+                        break;
+                    }
+                }
+                if (!done) {
+                    LOGGER.error("failed to find new formula @ built-in rule name {}, serial nr {}", ruleName, stepIndex);
+                }
             }
         }
 
@@ -734,7 +824,7 @@ public class IntermediateProofReplayer {
             final Services services)
             throws SkipSMTRuleException, BuiltInConstructionException {
         final MergeRuleBuiltInRuleApp joinApp = (MergeRuleBuiltInRuleApp) constructBuiltinApp(
-            joinAppInterm, currGoal);
+            joinAppInterm, currGoal, 0);
         joinApp.setConcreteRule(
             MergeProcedure.getProcedureByName(joinAppInterm.getJoinProc()));
         joinApp.setDistinguishingFormula(MergeRuleUtils.translateToFormula(

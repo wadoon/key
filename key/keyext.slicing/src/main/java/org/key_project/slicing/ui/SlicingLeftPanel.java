@@ -168,7 +168,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         analyzeProof(event);
         new Thread(() -> {
             try {
-                Proof p = extension.trackers.get(currentProof).sliceProof();
+                Proof p = extension.trackers.get(currentProof).sliceProof(mediator);
                 if (p != null) {
                     var tempFile = Files.createTempFile("", ".proof");
                     p.saveToFile(tempFile.toFile());

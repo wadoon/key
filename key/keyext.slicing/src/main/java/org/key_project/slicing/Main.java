@@ -53,7 +53,7 @@ public final class Main {
             // analyze proof
             var results = tracker.analyze();
             // slice proof
-            Proof slicedProof = tracker.sliceProof();
+            Proof slicedProof = tracker.sliceProof(null);
 
             // reload proof to verify the slicing was correct
             var tempFile = Files.createTempFile("", ".proof");

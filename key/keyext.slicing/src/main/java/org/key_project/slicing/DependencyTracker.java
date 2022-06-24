@@ -1,5 +1,6 @@
 package org.key_project.slicing;
 
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.proof.Node;
@@ -64,6 +65,12 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         if (ruleApp.posInOccurrence() != null) {
             inputs.add(ruleApp.posInOccurrence().topLevel());
         }
+        inputs.addAll(ifInstsOfRuleApp(ruleApp, node));
+        return inputs;
+    }
+
+    public static Set<PosInOccurrence> ifInstsOfRuleApp(RuleApp ruleApp, Node node) {
+        var inputs = new HashSet<PosInOccurrence>();
         // taclets with \find or similar
         if (ruleApp instanceof PosTacletApp) {
             var posTacletApp = (PosTacletApp) ruleApp;
@@ -245,11 +252,11 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         return analysisResults;
     }
 
-    public Proof sliceProof() {
+    public Proof sliceProof(KeYMediator mediator) {
         if (proof == null || analysisResults == null) {
             return null;
         }
-        return new ProofSlicer(proof, analysisResults, edgeDependencies).sliceProof();
+        return new ProofSlicer(proof, analysisResults, edgeDependencies).sliceProof(mediator);
     }
 
     public GraphNode getGraphNode(Node currentNode, PosInOccurrence pio) {

@@ -102,10 +102,11 @@ public class Node implements Iterable<Node> {
      */
     private final List<StrategyInfoUndoMethod> undoInfoForStrategyInfo = new ArrayList<>();
 
+    public int stepIndex = 0;
+
     /**
      * creates an empty node that is root and leaf.
      */
-
     public Node(Proof proof) {
         this.proof = proof;
         serialNr = proof.getServices().getCounter(NODES).getCountPlusPlus();

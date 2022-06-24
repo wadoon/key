@@ -9,6 +9,8 @@ import org.key_project.slicing.graph.DependencyGraph;
 import org.key_project.slicing.graph.GraphNode;
 import org.key_project.slicing.graph.TrackedFormula;
 import org.key_project.util.collection.ImmutableList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayDeque;
 import java.util.HashMap;
@@ -21,6 +23,8 @@ import java.util.stream.Collectors;
  * @author Arne Keller
  */
 public final class DependencyAnalyzer {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DependencyAnalyzer.class);
+
     private DependencyAnalyzer() {
     }
 
@@ -62,7 +66,7 @@ public final class DependencyAnalyzer {
 
         // analyze cuts: they are only useful if all of their outputs were used
         proof.breadthFirstSearch(proof.root(), (proof1, node) -> {
-            if (!usefulSteps.contains(node) || node.childrenCount() <= 1) {
+            if ((!usefulSteps.contains(node) && false) || node.childrenCount() <= 1) {
                 return;
             }
             var data = node.lookup(DependencyNodeData.class);
@@ -74,11 +78,60 @@ public final class DependencyAnalyzer {
                 return;
             }
             usefulSteps.remove(node);
+            var completelyUseless = data.outputs.stream().noneMatch(usefulFormulas::contains);
+            var counter = node.childrenCount() - 1;
             // mark sub-proof as useless, if necessary
             for (var output : data.outputs) {
-                if (!usefulFormulas.contains(output)) {
+                if (!usefulFormulas.contains(output) && !completelyUseless) {
                     continue;
                 }
+                // TODO: pick the "smallest" sub-proof
+                if (completelyUseless && counter == 0) {
+                    continue;
+                }
+                if (completelyUseless) {
+                    counter--;
+                }
+                var formula = (TrackedFormula) output;
+                graph.nodesInBranch(formula.getBranchLocation()).forEach(theNode -> {
+                    usefulFormulas.remove(theNode);
+                    graph.outgoingEdgesOf(theNode).forEach(step -> {
+                        usefulSteps.remove(step);
+                        step.getNodeInfo().setNotes("useless");
+                    });
+                });
+                uselessBranches.add(formula.getBranchLocation());
+            }
+            // TODO: mark inputs as useless, if possible
+            // TODO: process newly useless nodes somehow (-> to mark more edges as useless..)
+        });
+        var time1 = System.currentTimeMillis();
+        proof.breadthFirstSearch(proof.root(), (proof1, node) -> {
+            if (!usefulSteps.contains(node)) {
+                return;
+            }
+            for (var prefix : uselessBranches) {
+                if (node.branchLocation().hasPrefix(prefix)) {
+                    usefulSteps.remove(node);
+                    node.getNodeInfo().setNotes("useless");
+                    return;
+                }
+            }
+            /*
+            if (node.serialNr() == 52663) {
+                LOGGER.info("at 52663");
+            }
+            if (usefulSteps.contains(node) || node.childrenCount() <= 1) {
+                return;
+            }
+            var data = node.lookup(DependencyNodeData.class);
+            var completelyUseless = data.outputs.stream().noneMatch(usefulFormulas::contains);
+            if (!completelyUseless) {
+                return;
+            }
+            // mark sub-proof as useless, if necessary
+            LOGGER.info("@ cut {}: marking sub-proofs", node.serialNr());
+            for (var output : data.outputs) {
                 var formula = (TrackedFormula) output;
                 graph.nodesInBranch(formula.getBranchLocation()).forEach(theNode -> {
                     usefulFormulas.remove(theNode);
@@ -86,9 +139,9 @@ public final class DependencyAnalyzer {
                 });
                 uselessBranches.add(formula.getBranchLocation());
             }
-            // TODO: mark inputs as useless, if possible
-            // TODO: process newly useless nodes somehow (-> to mark more edges as useless..)
+             */
         });
+        LOGGER.info("last step took {} ms", System.currentTimeMillis() - time1);
 
         // add a note to each useless proof step to allow easy identification by the user
         // TODO: make this configurable / add a different indicator?

@@ -1,5 +1,6 @@
 package org.key_project.slicing;
 
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
@@ -14,19 +15,25 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.merge.CloseAfterMergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.settings.GeneralSettings;
+import de.uka.ilkd.key.util.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.swing.*;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public final class ProofSlicer {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofSlicer.class);
@@ -52,11 +59,41 @@ public final class ProofSlicer {
         this.edgeDependencies = edgeDependencies;
     }
 
-    public Proof sliceProof() {
+    public Proof sliceProof(KeYMediator mediator) {
         if (MainWindow.hasInstance()) {
             MainWindow.getInstance().setStatusLine(
                     "Slicing proof", analysisResults.usefulSteps.size());
         }
+        var stepIndex = 0;
+        var nodeIterator = proof.root().subtreeIterator();
+        while (nodeIterator.hasNext()) {
+            var node = nodeIterator.next();
+            node.stepIndex = stepIndex;
+            stepIndex++;
+        }
+        GeneralSettings.slicing = true;
+        GeneralSettings.usefulSteps = analysisResults.usefulSteps.stream().map(node -> node.stepIndex).collect(Collectors.toSet());
+        GeneralSettings.serialNrToPos = analysisResults
+                .usefulSteps.stream()
+                .map(node ->
+                        new Pair<>(node.stepIndex, node.getAppliedRuleApp().posInOccurrence()))
+                .collect(Collectors.toMap(it -> it.first, it -> it.second));
+        GeneralSettings.serialNrToIfInsts = analysisResults
+                .usefulSteps.stream()
+                .map(node ->
+                        new Pair<>(node.stepIndex, DependencyTracker.ifInstsOfRuleApp(node.getAppliedRuleApp(), node)))
+                .collect(Collectors.toMap(it -> it.first, it -> it.second));
+        GeneralSettings.stepIndexToDynamicRule = analysisResults
+                .usefulSteps.stream()
+                .filter(node -> node.getAppliedRuleApp() != null && node.getAppliedRuleApp().rule() instanceof Taclet && ((Taclet) node.getAppliedRuleApp().rule()).getAddedBy() != null)
+                .map(node ->
+                        new Pair<>(node.stepIndex, ((Taclet) node.getAppliedRuleApp().rule()).getAddedBy().stepIndex))
+                .collect(Collectors.toMap(it -> it.first, it -> it.second));
+        SwingUtilities.invokeLater(() ->
+                mediator.getUI().loadProblem(new File("/tmp/x/x.proof"))
+        );
+        return null;
+        /*
         ignoredGoals.clear();
         replayedNodes.clear();
         Proof p = null;
@@ -97,6 +134,7 @@ public final class ProofSlicer {
         }
         replayProof(p, proof.root());
         return p;
+         */
     }
 
     private void replayProof(Proof p, Node inputNode) {

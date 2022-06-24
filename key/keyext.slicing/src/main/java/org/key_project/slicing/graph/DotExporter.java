@@ -120,7 +120,7 @@ public final class DotExporter {
                     }
                 }
             });
-            if (nodePair.second < 3) {
+            if (nodePair.second < 1) {
                 graph.neighborsOf(nodeB).forEach(newNode -> queue.add(new Pair<>(newNode, nodePair.second + 1)));
             }
         }

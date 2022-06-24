@@ -2,9 +2,13 @@ package de.uka.ilkd.key.settings;
 
 import java.util.EventObject;
 import java.util.LinkedList;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
+import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.io.AutoSaver;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -40,6 +44,13 @@ public class GeneralSettings implements Settings, Cloneable {
      * @see de.uka.ilkd.key.rule.OneStepSimplifier#apply(Goal, Services, RuleApp)
      */
     public static boolean disableOSSRestriction = false;
+
+    // TODO(slicing): remove these fields
+    public static boolean slicing = false;
+    public static Set<Integer> usefulSteps = Set.of();
+    public static Map<Integer, PosInOccurrence> serialNrToPos = Map.of();
+    public static Map<Integer, Set<PosInOccurrence>> serialNrToIfInsts = Map.of();
+    public static Map<Integer, Integer> stepIndexToDynamicRule = Map.of();
 
     private static final String TACLET_FILTER = "[General]StupidMode";
     private static final String DND_DIRECTION_SENSITIVE_KEY
