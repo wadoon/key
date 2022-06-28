@@ -493,6 +493,19 @@ public class IntermediateProofReplayer {
             TacletApp newApp = instApps.head();
             ifFormulaList = newApp.ifFormulaInstantiations();
         }
+        /* Instantiations for \\find and \\assumes must not be identical (see #1716),
+         * same check that is done for proof construction in
+         * AbstractProofControl.filterTaclet(Goal, ImmutableList<NoPosTacletApp>, PosInOccurrence)
+         */
+        if (ifFormulaList != null && ifFormulaList.size() == 1
+            && ifFormulaList.head() instanceof IfFormulaInstSeq) {
+            IfFormulaInstSeq assumesInst = (IfFormulaInstSeq) ifFormulaList.head();
+            if (pos != null && assumesInst.toPosInOccurrence().equals(pos.topLevel())) {
+                // instantiations for find and assumes are same formula
+                throw new TacletAppConstructionException("\nCould not apply " + tacletName + "."
+                    + "\nInstantiations for \\assumes and \\find are identical.");
+            }
+        }
 
         // TODO: In certain cases, the below method call returns null and
         // induces follow-up NullPointerExceptions. This was encountered
