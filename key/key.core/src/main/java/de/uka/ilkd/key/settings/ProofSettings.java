@@ -191,7 +191,8 @@ public class ProofSettings {
                 loadSettingsFromStream(in);
             }
         } catch (IOException e) {
-            LOGGER.warn("No proof-settings could be loaded, using defaults", e);
+            LOGGER.warn("No proof-settings could be loaded, using defaults.");
+            LOGGER.debug("The following Exception was caught: ", e);
         }
     }
 
