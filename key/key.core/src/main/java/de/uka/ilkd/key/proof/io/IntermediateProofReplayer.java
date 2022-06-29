@@ -19,6 +19,7 @@ import java.util.stream.StreamSupport;
 
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.util.ProgressMonitor;
+import de.uka.ilkd.key.rule.*;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -62,17 +63,6 @@ import de.uka.ilkd.key.proof.io.intermediate.MergeAppIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.MergePartnerAppIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.NodeIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.TacletAppIntermediate;
-import de.uka.ilkd.key.rule.AbstractContractRuleApp;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.IfFormulaInstDirect;
-import de.uka.ilkd.key.rule.IfFormulaInstSeq;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
-import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.UseDependencyContractRule;
-import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.merge.MergePartner;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
@@ -453,6 +443,19 @@ public class IntermediateProofReplayer {
         if (currFormula != 0) { // otherwise we have no pos
             try {
                 pos = PosInOccurrence.findInSequent(currGoal.sequent(), currFormula, currPosInTerm);
+
+                /* part of the fix for #1716: ensure that position of find term
+                 * (antecedent/succedent) matches the kind of the taclet.
+                 */
+                Taclet taclet = ourApp.taclet();
+                if (taclet instanceof AntecTaclet && !pos.isInAntec()) {
+                    throw new TacletAppConstructionException("The taclet " + taclet.name()
+                        + " can not be applied to a formula/term in succedent.");
+                } else if (taclet instanceof SuccTaclet && pos.isInAntec()) {
+                    throw new TacletAppConstructionException("The taclet " + taclet.name()
+                        + " can not be applied to a formula/term in antecedent.");
+                }
+
                 ourApp = ((NoPosTacletApp) ourApp).matchFind(pos, services);
                 ourApp = ourApp.setPosInOccurrence(pos, services);
             } catch (Exception e) {
@@ -492,19 +495,6 @@ public class IntermediateProofReplayer {
 
             TacletApp newApp = instApps.head();
             ifFormulaList = newApp.ifFormulaInstantiations();
-        }
-        /* Instantiations for \\find and \\assumes must not be identical (see #1716),
-         * same check that is done for proof construction in
-         * AbstractProofControl.filterTaclet(Goal, ImmutableList<NoPosTacletApp>, PosInOccurrence)
-         */
-        if (ifFormulaList != null && ifFormulaList.size() == 1
-            && ifFormulaList.head() instanceof IfFormulaInstSeq) {
-            IfFormulaInstSeq assumesInst = (IfFormulaInstSeq) ifFormulaList.head();
-            if (pos != null && assumesInst.toPosInOccurrence().equals(pos.topLevel())) {
-                // instantiations for find and assumes are same formula
-                throw new TacletAppConstructionException("\nCould not apply " + tacletName + "."
-                    + "\nInstantiations for \\assumes and \\find are identical.");
-            }
         }
 
         // TODO: In certain cases, the below method call returns null and
