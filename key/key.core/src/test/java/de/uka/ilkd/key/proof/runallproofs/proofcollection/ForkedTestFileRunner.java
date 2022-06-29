@@ -6,6 +6,7 @@ import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.util.IOForwarder;
 
 import java.io.*;
+import java.lang.ProcessBuilder.Redirect;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -125,8 +126,11 @@ public abstract class ForkedTestFileRunner implements Serializable {
         command.add(ForkedTestFileRunner.class.getName());
         command.add(pathToTempDir.toString());
 
+        pb.redirectOutput(Redirect.INHERIT);
+        pb.redirectError(Redirect.INHERIT);
+
         Process process = pb.start();
-        IOForwarder.forward(process);
+        // IOForwarder.forward(process);
         process.waitFor();
         assertEquals(0,process.exitValue(), "Executed process terminated with non-zero exit value.");
 
