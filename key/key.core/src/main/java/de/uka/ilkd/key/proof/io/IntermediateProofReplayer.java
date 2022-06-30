@@ -180,6 +180,7 @@ public class IntermediateProofReplayer {
             int finalStepIndex = stepIndex;
             boolean apply = !GeneralSettings.slicing || GeneralSettings.usefulSteps.contains(finalStepIndex);
             currNode.stepIndex = stepIndex;
+            boolean wasSMT = false;
 
             try {
                 if (currNodeInterm instanceof BranchNodeIntermediate) {
@@ -196,7 +197,12 @@ public class IntermediateProofReplayer {
                 } else if (currNodeInterm instanceof AppNodeIntermediate) {
                     AppNodeIntermediate currInterm = (AppNodeIntermediate) currNodeInterm;
                     if (GeneralSettings.slicing) {
-                        LOGGER.info("slicing @ {} [{}] {} (apply = {}, line = {})", stepIndex, currNode.serialNr(), currInterm.getIntermediateRuleApp().getRuleName(), apply, currInterm.getIntermediateRuleApp().getLineNr());
+                        var name = currInterm.getIntermediateRuleApp().getRuleName();
+                        wasSMT = name.equals("SMTRule");
+                        LOGGER.info("slicing @ {} [{}] {} (apply = {}, line = {}, original app = {})", stepIndex, currNode.serialNr(), name, apply, currInterm.getIntermediateRuleApp().getLineNr(), GeneralSettings.serialNrToName.get(stepIndex));
+                        if (!name.equals(GeneralSettings.serialNrToName.get(stepIndex))) {
+                            LOGGER.error("names do not match");
+                        }
                     }
                     int newLineNr = Integer.parseInt(currInterm.getIntermediateRuleApp().getLineNr());
                     if (newLineNr < lastLineNr) {
@@ -369,6 +375,11 @@ public class IntermediateProofReplayer {
                                 // silently continue; status will be reported
                                 // via
                                 // polling
+                                if (GeneralSettings.slicing) {
+                                    LOGGER.info("slicing: skipping SMT");
+                                    // TODO(slicing): remove this
+                                    currGoal.apply(new RuleAppSMT(RuleAppSMT.rule, PosInOccurrence.findInSequent(currGoal.sequent(), 1, PosInTerm.getTopLevel())));
+                                }
                             } catch (BuiltInConstructionException | RuntimeException | AssertionError e) {
                                 reportError(ERROR_LOADING_PROOF_LINE + "Line "
                                         + appInterm.getLineNr() + ", goal "
@@ -386,7 +397,7 @@ public class IntermediateProofReplayer {
                 // node in the queue.
                 reportError(ERROR_LOADING_PROOF_LINE, throwable);
             }
-            if (currNodeIntermChildrenCount == 0) {
+            if (currNodeIntermChildrenCount == 0 && !wasSMT) {
                 stepIndex++;
             }
             stepIndex++;
@@ -411,6 +422,9 @@ public class IntermediateProofReplayer {
      */
     private void addChildren(Node currNode, boolean ignoreChildren, Iterator<Node> children,
                              LinkedList<NodeIntermediate> intermChildren) {
+        if (GeneralSettings.slicing) {
+            LOGGER.info("addChildren node: {} ignore: {}, children.len: {}, intermChildren.len: {}", currNode.serialNr(), ignoreChildren, 42, intermChildren.size());
+        }
         int i = 0;
         while (ignoreChildren || (!currGoal.node().isClosed() && children.hasNext()
                 && intermChildren.size() > 0)) {
@@ -708,6 +722,8 @@ public class IntermediateProofReplayer {
             if (error || smtProblem.getFinalResult()
                     .isValid() != ThreeValuedTruth.VALID) {
                 status = SMT_NOT_RUN;
+                // TODO(slicing): remove this
+                currGoal.apply(new RuleAppSMT(RuleAppSMT.rule, PosInOccurrence.findInSequent(currGoal.sequent(), 1, PosInTerm.getTopLevel())));
                 throw new SkipSMTRuleException();
             } else {
                 return RuleAppSMT.rule.createApp(null, proof.getServices());

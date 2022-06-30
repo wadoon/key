@@ -20,6 +20,7 @@ import de.uka.ilkd.key.rule.merge.CloseAfterMergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.settings.GeneralSettings;
+import de.uka.ilkd.key.smt.RuleAppSMT;
 import de.uka.ilkd.key.util.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import javax.swing.*;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
@@ -66,9 +68,11 @@ public final class ProofSlicer {
         }
         var stepIndex = 0;
         var nodeIterator = proof.root().subtreeIterator();
+        var toName = new HashMap<Integer, String>();
         while (nodeIterator.hasNext()) {
             var node = nodeIterator.next();
             node.stepIndex = stepIndex;
+            toName.put(node.stepIndex, node.getAppliedRuleApp() != null ? node.getAppliedRuleApp().rule().name().toString() : "none");
             stepIndex++;
         }
         GeneralSettings.slicing = true;
@@ -77,7 +81,9 @@ public final class ProofSlicer {
                 .usefulSteps.stream()
                 .map(node ->
                         new Pair<>(node.stepIndex, node.getAppliedRuleApp().posInOccurrence()))
+                .filter(it -> it.second != null)
                 .collect(Collectors.toMap(it -> it.first, it -> it.second));
+        GeneralSettings.serialNrToName = toName;
         GeneralSettings.serialNrToIfInsts = analysisResults
                 .usefulSteps.stream()
                 .map(node ->

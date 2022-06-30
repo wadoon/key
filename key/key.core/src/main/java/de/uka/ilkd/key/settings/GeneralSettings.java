@@ -51,6 +51,7 @@ public class GeneralSettings implements Settings, Cloneable {
     public static Map<Integer, PosInOccurrence> serialNrToPos = Map.of();
     public static Map<Integer, Set<PosInOccurrence>> serialNrToIfInsts = Map.of();
     public static Map<Integer, Integer> stepIndexToDynamicRule = Map.of();
+    public static Map<Integer, String> serialNrToName = Map.of();
 
     private static final String TACLET_FILTER = "[General]StupidMode";
     private static final String DND_DIRECTION_SENSITIVE_KEY
