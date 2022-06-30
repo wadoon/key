@@ -11,6 +11,8 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.proof.Proof;
 import org.key_project.slicing.AnalysisResults;
 import org.key_project.slicing.SlicingExtension;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.swing.*;
@@ -22,9 +24,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.nio.file.Files;
 
 public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionListener {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SlicingLeftPanel.class);
 
     /**
      * The icon of this panel.
@@ -166,23 +168,15 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
             return;
         }
         analyzeProof(event);
-        new Thread(() -> {
-            try {
-                Proof p = extension.trackers.get(currentProof).sliceProof(mediator);
-                if (p != null) {
-                    var tempFile = Files.createTempFile("", ".proof");
-                    p.saveToFile(tempFile.toFile());
-                    SwingUtilities.invokeLater(() ->
-                            mediator.getUI().loadProblem(tempFile.toFile())
-                    );
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                SwingUtilities.invokeLater(() ->
-                        IssueDialog.showExceptionDialog(MainWindow.getInstance(), e)
-                );
-            }
-        }).start();
+        try {
+            var path = extension.trackers.get(currentProof).sliceProof();
+            SwingUtilities.invokeLater(() -> mediator.getUI().loadProblem(path.toFile()));
+        } catch (Exception e) {
+            LOGGER.error("failed to slice proof", e);
+            SwingUtilities.invokeLater(() ->
+                    IssueDialog.showExceptionDialog(MainWindow.getInstance(), e)
+            );
+        }
     }
 
     private void resetLabels() {

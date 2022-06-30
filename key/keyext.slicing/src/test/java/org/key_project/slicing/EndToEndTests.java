@@ -29,7 +29,7 @@ class EndToEndTests {
     @Test
     void sliceRemoveDuplicates() throws Exception {
         // simple Java proof
-        sliceProof("/removeDuplicates.zproof", 4960, 2469, 2467);
+        sliceProof("/removeDuplicates.zproof", 4960, 2467, 2467);
     }
 
     @Test
@@ -46,8 +46,7 @@ class EndToEndTests {
 
     @Test
     void sliceIfThenElseSplit() throws Exception {
-        // TODO: the analysis should mark one of the branches as useless! or somehow subtract the number of steps..
-        sliceProof("/ifThenElseSplit.proof", 12, 11, 6);
+        sliceProof("/ifThenElseSplit.proof", 12, 6, 6);
     }
 
     @Test
@@ -72,23 +71,29 @@ class EndToEndTests {
             Assertions.assertEquals(expectedTotal, results.totalSteps);
             Assertions.assertEquals(expectedUseful, results.usefulStepsNr);
             // slice proof
-            Proof slicedProof = tracker.sliceProof(null);
-
-            // reload proof to verify the slicing was correct
-            var tempFile = Files.createTempFile("", ".proof");
-            slicedProof.saveToFile(tempFile.toFile());
-            KeYEnvironment<?> loadedEnvironment = KeYEnvironment.load(JavaProfile.getDefaultInstance(), tempFile.toFile(), null, null, null, null, null, null, true);
+            var path = tracker.sliceProof();
+            var env2 = KeYEnvironment.load(JavaProfile.getDefaultInstance(), path.toFile(), null, null, null, null, null, null, true);
             try {
-                slicedProof = loadedEnvironment.getLoadedProof();
+                Proof slicedProof = env2.getLoadedProof();
 
-                Assertions.assertEquals(expectedInSlice + slicedProof.closedGoals().size(), slicedProof.countNodes());
-                Assertions.assertTrue(slicedProof.closed());
+                // reload proof to verify the slicing was correct
+                var tempFile = Files.createTempFile("", ".proof");
+                slicedProof.saveToFile(tempFile.toFile());
+                KeYEnvironment<?> loadedEnvironment = KeYEnvironment.load(JavaProfile.getDefaultInstance(), tempFile.toFile(), null, null, null, null, null, null, true);
+                try {
+                    slicedProof = loadedEnvironment.getLoadedProof();
 
-                Files.delete(tempFile);
+                    Assertions.assertEquals(expectedInSlice + slicedProof.closedGoals().size(), slicedProof.countNodes());
+                    Assertions.assertTrue(slicedProof.closed());
 
-                return slicedProof;
+                    Files.delete(tempFile);
+
+                    return slicedProof;
+                } finally {
+                    loadedEnvironment.dispose();
+                }
             } finally {
-                loadedEnvironment.dispose();
+                env2.dispose();
             }
         } finally {
             environment.dispose();

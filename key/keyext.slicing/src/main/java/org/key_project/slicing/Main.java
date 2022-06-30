@@ -53,7 +53,10 @@ public final class Main {
             // analyze proof
             var results = tracker.analyze();
             // slice proof
-            Proof slicedProof = tracker.sliceProof(null);
+            var saved = tracker.sliceProof();
+            KeYEnvironment<?> environment2 = KeYEnvironment.load(JavaProfile.getDefaultInstance(), saved.toFile(), null, null, null, null, null, proof2 -> proof2.addRuleAppListener(tracker), true);
+            // TODO
+            Proof slicedProof = environment2.getLoadedProof();
 
             // reload proof to verify the slicing was correct
             var tempFile = Files.createTempFile("", ".proof");

@@ -32,6 +32,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
@@ -252,11 +253,8 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         return analysisResults;
     }
 
-    public Proof sliceProof(KeYMediator mediator) {
-        if (proof == null || analysisResults == null) {
-            return null;
-        }
-        return new ProofSlicer(proof, analysisResults, edgeDependencies).sliceProof(mediator);
+    public Path sliceProof() {
+        return new ProofSlicer(proof, analysisResults).sliceProof();
     }
 
     public GraphNode getGraphNode(Node currentNode, PosInOccurrence pio) {

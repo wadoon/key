@@ -175,7 +175,7 @@ public class IntermediateProofReplayer {
             final Pair<Node, NodeIntermediate> currentP = queue.pollFirst();
             Node currNode = currentP.first;
             final NodeIntermediate currNodeInterm = currentP.second;
-            int currNodeIntermChildrenCount = currNodeInterm.getChildren().size();
+            int currNodeIntermChildrenCount = currNodeInterm != null ? currNodeInterm.getChildren().size() : -1;
             currGoal = proof.getGoal(currNode);
             int finalStepIndex = stepIndex;
             boolean apply = !GeneralSettings.slicing || GeneralSettings.usefulSteps.contains(finalStepIndex);
