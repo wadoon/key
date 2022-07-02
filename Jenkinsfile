@@ -41,7 +41,7 @@ pipeline {
             }
         }
 
-        stage('Test: testRunAllFunProofs') {
+        stage('Test: testRunAllInfProofs') {
             steps {
                 sh 'cd key && ./gradlew --continue testRunAllInfProofs'
             }
