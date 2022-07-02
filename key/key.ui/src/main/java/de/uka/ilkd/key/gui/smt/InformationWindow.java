@@ -39,7 +39,8 @@ public class InformationWindow extends JDialog {
             + "\n"
             + "- We have identified the following sources for spurious counterexample:"
             + "\n"
-            + "   - Chosen bit sizes too small. Example: Bit size of Integer is 3 but literal 9 appears in proof obligation."
+            + "   - Chosen bit sizes too small. Example: Bit size of Integer "
+            + "is 3 but literal 9 appears in proof obligation."
             + "\n"
             + "   - Finite type instances: Example: There is no maximum integer."
             + "\n"
@@ -88,7 +89,6 @@ public class InformationWindow extends JDialog {
         this.setModalExclusionType(ModalExclusionType.APPLICATION_EXCLUDE);
         this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         this.setLocationByPlatform(true);
-        this.setVisible(true);
     }
 
     private void initModel(SMTSolver solver) {
@@ -99,8 +99,7 @@ public class InformationWindow extends JDialog {
             return;
         }
 
-        Model m = solver.getSocket().getQuery().getModel();
-        this.model = m;
+        this.model = solver.getSocket().getQuery().getModel();
         this.setTitle("Counterexample " + this.getTitle());
         getTabbedPane().addTab("Counterexample", createModelTab());
         createHelpTab();
@@ -139,11 +138,11 @@ public class InformationWindow extends JDialog {
             public String getText() {
                 int caretPosition = content.getDocument().getLength();
                 Element root = content.getDocument().getDefaultRootElement();
-                String text = "1" + StringUtil.NEW_LINE;
+                StringBuilder text = new StringBuilder("1" + StringUtil.NEW_LINE);
                 for (int i = 2; i < root.getElementIndex(caretPosition) + 2; i++) {
-                    text += i + StringUtil.NEW_LINE;
+                    text.append(i).append(StringUtil.NEW_LINE);
                 }
-                return text;
+                return text.toString();
             }
 
             @Override
