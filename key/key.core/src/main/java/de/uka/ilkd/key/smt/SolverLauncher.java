@@ -6,6 +6,7 @@ import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
@@ -81,7 +82,14 @@ public class SolverLauncher implements SolverListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(SolverLauncher.class);
 
     /**
-     * A sesion encapsulates some attributes that should be accessed only by
+     * {@link ExecutorService} for {@link SMTSolver} callables.
+     * Variable is initialized on first construction of {@link SolverLaunchers}
+     */
+    @Nonnull
+    private static ExecutorService executorService;
+
+    /**
+     * A session encapsulates some attributes that should be accessed only by
      * specified methods (in order to maintain thread safety)
      */
     private final Session session = new Session();
@@ -98,8 +106,6 @@ public class SolverLauncher implements SolverListener {
      */
     private boolean launcherHasBeenUsed = false;
 
-    private static final ExecutorService executorService = Executors.newFixedThreadPool(2);
-
     private final List<Future<SMTSolverResult>> submittedTasks = new ArrayList<>();
 
     /**
@@ -110,7 +116,9 @@ public class SolverLauncher implements SolverListener {
      */
     public SolverLauncher(SMTSettings settings) {
         this.settings = settings;
-        //executorService = Executors.newFixedThreadPool(settings.getMaxConcurrentProcesses());
+        if (executorService == null) {
+            executorService = Executors.newFixedThreadPool(settings.getMaxConcurrentProcesses());
+        }
     }
 
     /**
@@ -161,14 +169,15 @@ public class SolverLauncher implements SolverListener {
     }
 
     /**
-     * Stops the execution of the launcher.
+     * Stops the execution of all previously submitted {@link SMTSolver} task.
      */
-    public void stop() {
-        for (Future<SMTSolverResult> submittedTask : submittedTasks) {
-            submittedTask.cancel(true);
+    public void stop(ReasonOfInterruption reason) {
+        synchronized (submittedTasks) { //can only be called from a different than the thread that called launch"
+            for (Future<SMTSolverResult> submittedTask : submittedTasks) {
+                submittedTask.cancel(true);
+            }
         }
-        //executorService.shutdownNow();
-        session.interruptAll(ReasonOfInterruption.USER);
+        session.interruptAll(reason);
     }
 
 
@@ -239,7 +248,10 @@ public class SolverLauncher implements SolverListener {
                 solvers.stream()
                         .map(it -> executorService.submit(createSolverTask(it)))
                         .collect(Collectors.toList());
-        submittedTasks.addAll(futures);
+
+        synchronized (submittedTasks) {
+            submittedTasks.addAll(futures);
+        }
 
         long alreadyWaitedTime = 0;
         for (int i = 0; i < solvers.size(); i++) {
@@ -247,11 +259,16 @@ public class SolverLauncher implements SolverListener {
             var future = futures.get(i);
             try {
                 future.get(currentTimeout - alreadyWaitedTime, TimeUnit.MILLISECONDS);
-            } catch (InterruptedException | ExecutionException e) {
+            } catch (InterruptedException e) {
+                LOGGER.warn("Waiting for termination of SMTSolver got interrupted. Cancel all submitted tasks!", e);
+                stop(ReasonOfInterruption.TIMEOUT);
+                Thread.currentThread().interrupt();
+            }
+            catch(ExecutionException e) {
                 LOGGER.warn("Exception during the execution of an SMTSolver", e);
                 solvers.get(i).interrupt(ReasonOfInterruption.EXCEPTION);
             } catch (TimeoutException e) {
-                LOGGER.warn("Timout ("+currentTimeout+" ms) hit by SMTSolver. SMTSolver will be killed.", e);
+                LOGGER.warn("Timout (" + currentTimeout + " ms) hit by SMTSolver. SMTSolver will be killed.", e);
                 future.cancel(true);
                 solvers.get(i).interrupt(ReasonOfInterruption.TIMEOUT);
             }

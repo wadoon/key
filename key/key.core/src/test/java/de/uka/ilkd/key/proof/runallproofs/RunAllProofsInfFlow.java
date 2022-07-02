@@ -20,7 +20,6 @@ import java.util.stream.Stream;
  * @author M. Ulbrich
  */
 @Tag("slow") @Tag("owntest") @Tag("testRunAllProofs")
-@Disabled
 public final class RunAllProofsInfFlow extends RunAllProofsTest {
     private static final String SKIP_INF_FLOW_PROPERTY = "key.runallproofs.skipInfFlow";
     public static final String INDEX_FILE = "index/automaticInfFlow.txt";

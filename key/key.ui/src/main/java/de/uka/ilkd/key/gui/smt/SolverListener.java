@@ -1,19 +1,5 @@
 package de.uka.ilkd.key.gui.smt;
 
-import java.awt.Color;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import javax.swing.JOptionPane;
-import javax.swing.JProgressBar;
-import javax.swing.SwingUtilities;
-
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.colors.ColorSettings;
@@ -22,12 +8,13 @@ import de.uka.ilkd.key.gui.smt.ProgressDialog.Modus;
 import de.uka.ilkd.key.gui.smt.ProgressDialog.ProgressDialogListener;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.settings.DefaultSMTSettings;
+import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.smt.SMTSolver.ReasonOfInterruption;
 import de.uka.ilkd.key.smt.SMTSolver.SolverState;
@@ -35,6 +22,19 @@ import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
+
+import javax.swing.*;
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Timer;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class SolverListener implements SolverLauncherListener {
     private static final ColorSettings.ColorProperty RED =
@@ -45,7 +45,8 @@ public class SolverListener implements SolverLauncherListener {
             ColorSettings.define("[solverListener]green", "",
                     new Color(43, 180, 43));
 
-    private static int FILE_ID = 0;
+    //weigl: This variable is incremented very strangely on the generation of finalize path only.
+    private static int fileId = 0;
 
     private static final int RESOLUTION = 1000;
 
@@ -123,26 +124,24 @@ public class SolverListener implements SolverLauncherListener {
             Collection<Throwable> exceptionsOfTacletTranslation = solver
                     .getExceptionsOfTacletTranslation();
             if (!exceptionsOfTacletTranslation.isEmpty()) {
-                String exceptionText = "The following exceptions have ocurred while translating the taclets:\n\n";
+                StringBuilder exceptionText = new StringBuilder(
+                        "The following exceptions have ocurred while translating the taclets:\n\n");
                 int i = 1;
                 for (Throwable e : exceptionsOfTacletTranslation) {
-                    exceptionText += i + ". "
-                            + e.getMessage();
+                    exceptionText.append(i).append(". ").append(e.getMessage());
                     StringWriter sw = new StringWriter();
                     PrintWriter pw = new PrintWriter(sw);
                     e.printStackTrace(pw);
-                    exceptionText += "\n\n" + sw;
-                    exceptionText += "\n #######################\n\n";
+                    exceptionText.append("\n\n").append(sw);
+                    exceptionText.append("\n #######################\n\n");
                     i++;
                 }
-                addInformation("Warning", exceptionText);
+                addInformation("Warning", exceptionText.toString());
             }
 
             if (solver.getType().supportHasBeenChecked() && !solver.getType().isSupportedVersion()) {
                 addInformation("Solver Support", computeSolverTypeWarningMessage(solver.getType()));
             }
-
-            solver.getException();
         }
 
         public List<Information> getInformation() {
@@ -220,9 +219,9 @@ public class SolverListener implements SolverLauncherListener {
     }
 
     private void showInformation(InternSMTProblem problem) {
-        new InformationWindow(
-                progressDialog, problem.solver, problem.information,
+        var dialog = new InformationWindow(progressDialog, problem.solver, problem.information,
                 "Information for " + problem);
+        dialog.setVisible(true);
     }
 
     private void prepareDialog(Collection<SMTProblem> smtProblems,
@@ -285,16 +284,16 @@ public class SolverListener implements SolverLauncherListener {
     }
 
     private void stopEvent(final SolverLauncher launcher) {
-        launcher.stop();
+        launcher.stop(ReasonOfInterruption.USER);
     }
 
     private void discardEvent(final SolverLauncher launcher) {
-        launcher.stop();
+        launcher.stop(ReasonOfInterruption.USER);
         progressDialog.setVisible(false);
     }
 
     private void applyEvent(final SolverLauncher launcher) {
-        launcher.stop();
+        launcher.stop(ReasonOfInterruption.USER);
         applyResults();
         progressDialog.setVisible(false);
     }
@@ -316,7 +315,7 @@ public class SolverListener implements SolverLauncherListener {
 
     private void refreshDialog() {
         for (InternSMTProblem problem : problems) {
-            refreshProgessOfProblem(problem);
+            refreshProgressOfProblem(problem);
         }
     }
 
@@ -337,7 +336,7 @@ public class SolverListener implements SolverLauncherListener {
     }
 
 
-    private boolean refreshProgessOfProblem(InternSMTProblem problem) {
+    private boolean refreshProgressOfProblem(InternSMTProblem problem) {
         SolverState state = problem.solver.getState();
         switch (state) {
             case RUNNING:
@@ -352,7 +351,6 @@ public class SolverListener implements SolverLauncherListener {
 
         }
         return true;
-
     }
 
     private void waiting(InternSMTProblem problem) {
@@ -423,7 +421,7 @@ public class SolverListener implements SolverLauncherListener {
 
                 break;
             case NO_INTERRUPTION:
-                throw new RuntimeException("This position should not be reachable!");
+                throw new IllegalStateException("This position should not be reachable!");
 
             case TIMEOUT:
                 progressModel.setProgress(0, x, y);
@@ -514,15 +512,11 @@ public class SolverListener implements SolverLauncherListener {
         path = path + File.separator + fileName;
         path = finalizePath(path, solver, goal);
         storeToFile(problemString, path);
-
     }
 
     private void storeToFile(String text, String path) {
         try {
-            final BufferedWriter out2 = new BufferedWriter(
-                    new FileWriter(path));
-            out2.write(text);
-            out2.close();
+            Files.writeString(Paths.get(path), text);
         } catch (IOException e) {
             throw new RuntimeException("Could not store to file " + path + ".", e);
         }
@@ -540,7 +534,7 @@ public class SolverListener implements SolverLauncherListener {
         path = path.replace("%d", date);
         path = path.replace("%s", solver.name());
         path = path.replace("%t", time);
-        path = path.replace("%i", Integer.toString(FILE_ID++));
+        path = path.replace("%i", Integer.toString(fileId++));
         path = path.replace("%g", Integer.toString(goal.node().serialNr()));
 
         return path;
@@ -571,7 +565,9 @@ public class SolverListener implements SolverLauncherListener {
         @Override
         public void infoButtonClicked(int column, int row) {
             InternSMTProblem problem = getProblem(column, row);
-            showInformation(problem);
+            if (problem != null) {
+                showInformation(problem);
+            }
         }
 
         @Override
@@ -617,7 +613,8 @@ public class SolverListener implements SolverLauncherListener {
      * Checks if the given {@link Term} contains a modality, query, or update.
      *
      * @param term The {@link Term} to check.
-     * @return {@code true} contains at least one modality or query, {@code false} contains no modalities and no queries.
+     * @return {@code true} contains at least one modality or query, {@code false} contains
+     *         no modalities and no queries.
      */
     public static boolean containsModalityOrQuery(Term term) {
         ContainsModalityOrQueryVisitor visitor = new ContainsModalityOrQueryVisitor();
