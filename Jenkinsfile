@@ -47,6 +47,14 @@ pipeline {
             }
         }
 
+        stage('Check Formatting') {
+            steps {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    sh 'cd key && ./gradlew --continue spotlessCheck'
+                }
+            }
+        }
+
         stage('Docs') {
             steps{ sh 'key/scripts/jenkins/generateDoc.sh'}
         }
