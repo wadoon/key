@@ -1,10 +1,13 @@
 package de.uka.ilkd.key.smt;
 
 import java.util.Collection;
+import java.util.concurrent.Callable;
 
 import de.uka.ilkd.key.smt.communication.AbstractSolverSocket;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
+
+import javax.annotation.Nonnull;
 
 /**
  * The SMTSolver interface represents a solver process (e.g. Z3, Simplify,...)
@@ -19,13 +22,12 @@ import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
  *
  * @author ?
  */
-public interface SMTSolver {
-
+public interface SMTSolver extends Callable<SMTSolverResult> {
     /**
      * Possible reasons for why a solver process was interrupted/stopped.
      */
     enum ReasonOfInterruption {
-        User, Timeout, Exception, NoInterruption
+        USER, TIMEOUT, EXCEPTION, NO_INTERRUPTION
     }
 
     /**
@@ -35,7 +37,7 @@ public interface SMTSolver {
      * state <code>Stopped</code>.
      */
     enum SolverState {
-        Waiting, Running, Stopped
+        WAITING, RUNNING, STOPPED
     }
 
     /**
@@ -49,7 +51,7 @@ public interface SMTSolver {
      * <code>null</code> in order to maintain thread safety.
      *
      * @return String representation of the corresponding problem, if the solver
-     *         process is not running, otherwise null.
+     * process is not running, otherwise null.
      */
     String getTranslation();
 
@@ -87,11 +89,10 @@ public interface SMTSolver {
     /**
      * Use this method in order to interrupt a running solver process.
      *
-     * @param reasonOfInterruption
-     *            The reason of interruption. Can only be set to
-     *            <code>ReasonOfInterruption.Timeout</code> or
-     *            <code>ReasonOfInterruption.User</code> other wise a
-     *            <code>IllegalArgumentException</code> is thrown.
+     * @param reasonOfInterruption The reason of interruption. Can only be set to
+     *                             <code>ReasonOfInterruption.Timeout</code> or
+     *                             <code>ReasonOfInterruption.User</code> other wise a
+     *                             <code>IllegalArgumentException</code> is thrown.
      */
     void interrupt(ReasonOfInterruption reasonOfInterruption);
 
@@ -104,7 +105,12 @@ public interface SMTSolver {
      * @return the amount of milliseconds after a timeout occurs. (in ms)
      */
     long getTimeout();
+
     void setTimeout(long timeout);
+
+    void setSettings(SMTSettings settings);
+
+    SMTSettings getSettings();
 
 
     /**
@@ -124,7 +130,7 @@ public interface SMTSolver {
      * solver is still running) the method returns <code>false</code>.
      *
      * @return true iff the solver process was interrupted by a user, an exception or a timeout
-     * */
+     */
     boolean wasInterrupted();
 
     /**
@@ -132,20 +138,11 @@ public interface SMTSolver {
      */
     boolean isRunning();
 
-    /**
-     * Starts a solver process. This method should be accessed only by an
-     * instance of <code>SolverLauncher</code>. If you want to start a
-     * solver please have a look at <code>SolverLauncher</code>.
-     *
-     * @param timeout
-     * @param settings
-     */
-    void start(SolverTimeout timeout, SMTSettings settings);
 
     /**
      * @return the reason of the interruption: see <code>ReasonOfInterruption</code>.
      */
-    ReasonOfInterruption getReasonOfInterruption();
+    @Nonnull ReasonOfInterruption getReasonOfInterruption();
 
     /**
      * Returns the result of the execution. If the solver process is still
@@ -154,7 +151,7 @@ public interface SMTSolver {
      *
      * @return the result of the solver process' execution
      **/
-    SMTSolverResult getFinalResult();
+    @Nonnull SMTSolverResult getFinalResult();
 
     /**
      * Returns the raw solver output. This includes the result (sat/unsat/unknown), possibly

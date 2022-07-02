@@ -3,6 +3,7 @@ package de.uka.ilkd.key.proof.runallproofs;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.StatisticsFile;
 import org.antlr.runtime.RecognitionException;
+import org.junit.Ignore;
 import org.junit.jupiter.api.*;
 
 import java.io.IOException;
@@ -19,10 +20,11 @@ import java.util.stream.Stream;
  * @author M. Ulbrich
  */
 @Tag("slow") @Tag("owntest") @Tag("testRunAllProofs")
+@Disabled
 public final class RunAllProofsInfFlow extends RunAllProofsTest {
     private static final String SKIP_INF_FLOW_PROPERTY = "key.runallproofs.skipInfFlow";
     public static final String INDEX_FILE = "index/automaticInfFlow.txt";
-    private static ProofCollection proofCollection = getProofCollection();
+    private static final ProofCollection proofCollection = getProofCollection();
 
     private static ProofCollection getProofCollection() {
         if (!Boolean.getBoolean(SKIP_INF_FLOW_PROPERTY)) {
@@ -33,6 +35,7 @@ public final class RunAllProofsInfFlow extends RunAllProofsTest {
                 Assertions.fail();
             }
         }
+        Assertions.fail();
         return null;
     }
 

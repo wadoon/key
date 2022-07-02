@@ -17,6 +17,7 @@ import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -32,7 +33,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author ?
  * @author Wolfram Pfeifer (SMT communication overhaul)
  */
-public final class SMTSolverImplementation implements SMTSolver, Runnable {
+public final class SMTSolverImplementation implements SMTSolver {
 
     /**
      * used to generate unique ids for each running solver instance
@@ -69,6 +70,7 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
     /**
      * starts a external process and returns the result
      */
+    @Nonnull
     private final ExternalProcessLauncher processLauncher;
 
     /**
@@ -84,25 +86,14 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
     private final SolverCommunication solverCommunication = new SolverCommunication();
 
     /**
-     * The thread that is associated with this solver.
-     */
-    private Thread thread;
-
-    /**
-     * The timeout that is associated with this solver. Represents the
-     * timertask that is started when the solver is started.
-     */
-    private SolverTimeout solverTimeout;
-
-    /**
      * stores the reason for interruption if present (e.g. User, Timeout, Exception)
      */
-    private ReasonOfInterruption reasonOfInterruption = ReasonOfInterruption.NoInterruption;
+    private ReasonOfInterruption reasonOfInterruption = ReasonOfInterruption.NO_INTERRUPTION;
 
     /**
      * the state the solver is currently in
      */
-    private SolverState solverState = SolverState.Waiting;
+    private SolverState solverState = SolverState.WAITING;
 
     /**
      * the type of this solver (Z3, CVC4, Z3_CE, ...)
@@ -139,6 +130,7 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
      * The timeout in seconds for this SMT solver run.
      */
     private long timeout = -1;
+    private long startTime = -1;
 
     /**
      * Creates a new instance an SMT solver.
@@ -159,26 +151,9 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
         processLauncher = new ExternalProcessLauncher(solverCommunication, myType.getDelimiters());
     }
 
-    /**
-     * Starts a solver process. This method should be accessed only by an
-     * instance of <code>SolverLauncher</code>. If you want to start a
-     * solver please have a look at <code>SolverLauncher</code>.
-     *
-     * @param timeout  the timeout to use for the solver
-     * @param settings the SMTSettings to use for this solver
-     */
-    @Override
-    public void start(SolverTimeout timeout, SMTSettings settings) {
-        thread = new Thread(this, "SMTProcessor");
-        solverTimeout = timeout;
-        smtSettings = settings;
-        thread.start();
-    }
-
     @Override
     public ReasonOfInterruption getReasonOfInterruption() {
-        return isRunning() ? ReasonOfInterruption.NoInterruption
-                : reasonOfInterruption;
+        return isRunning() ? ReasonOfInterruption.NO_INTERRUPTION : reasonOfInterruption;
     }
 
     public Throwable getException() {
@@ -190,7 +165,9 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
     }
 
     public void setReasonOfInterruption(ReasonOfInterruption reasonOfInterruption) {
-        this.reasonOfInterruption = reasonOfInterruption;
+        if (this.reasonOfInterruption == null) {
+            this.reasonOfInterruption = reasonOfInterruption;
+        }
     }
 
     private void setReasonOfInterruption(ReasonOfInterruption reasonOfInterruption, Throwable exc) {
@@ -205,10 +182,7 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
 
     @Override
     public long getStartTime() {
-        if (solverTimeout == null) {
-            return -1;
-        }
-        return solverTimeout.scheduledExecutionTime();
+        return startTime;
     }
 
     @Override
@@ -222,6 +196,16 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
     }
 
     @Override
+    public void setSettings(SMTSettings settings) {
+        this.smtSettings = settings;
+    }
+
+    @Override
+    public SMTSettings getSettings() {
+        return smtSettings;
+    }
+
+    @Override
     public SolverState getState() {
         return solverState;
     }
@@ -232,20 +216,20 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
 
     @Override
     public boolean wasInterrupted() {
-        return getReasonOfInterruption() != ReasonOfInterruption.NoInterruption;
+        return getReasonOfInterruption() != ReasonOfInterruption.NO_INTERRUPTION;
     }
 
     @Override
     public boolean isRunning() {
-        return getState() == SolverState.Running;
+        return getState() == SolverState.RUNNING;
     }
 
 
     @Override
-    public void run() {
-
+    public SMTSolverResult call() throws Exception {
         // Firstly: Set the state to running and inform the listener.
-        setSolverState(SolverState.Running);
+        startTime = System.currentTimeMillis();
+        setSolverState(SolverState.RUNNING);
         listener.processStarted(this, problem);
 
         // Secondly: Translate the given problem
@@ -255,16 +239,14 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
         } catch (IllegalFormulaException e) {
             interruptionOccurred(e);
             listener.processInterrupted(this, problem, e);
-            setSolverState(SolverState.Stopped);
-            solverTimeout.cancel();
-            return;
+            setSolverState(SolverState.STOPPED);
+            throw e;
         }
 
         // Thirdly: start the external process.
         try {
             processLauncher.launch(commands);
             processLauncher.getPipe().sendMessage(type.modifyProblem(problemString));
-            //processLauncher.getPipe().sendEOF();
 
             String msg = processLauncher.getPipe().readMessage();
             while (msg != null) {
@@ -273,29 +255,28 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
             }
         } catch (IllegalStateException | IOException | InterruptedException e) {
             interruptionOccurred(e);
-            Thread.currentThread().interrupt();
         } finally {
             // Close everything.
-            solverTimeout.cancel();
-            setSolverState(SolverState.Stopped);
+            setSolverState(SolverState.STOPPED);
             listener.processStopped(this, problem);
             processLauncher.stop();
         }
+        return getFinalResult();
     }
 
     private void interruptionOccurred(Throwable e) {
         ReasonOfInterruption reason = getReasonOfInterruption();
-        setReasonOfInterruption(ReasonOfInterruption.Exception, e);
+        setReasonOfInterruption(ReasonOfInterruption.EXCEPTION, e);
         switch (reason) {
-            case Exception:
-            case NoInterruption:
-                setReasonOfInterruption(ReasonOfInterruption.Exception, e);
+            case EXCEPTION:
+            case NO_INTERRUPTION:
+                setReasonOfInterruption(ReasonOfInterruption.EXCEPTION, e);
                 listener.processInterrupted(this, problem, e);
                 break;
-            case Timeout:
+            case TIMEOUT:
                 listener.processTimeout(this, problem);
                 break;
-            case User:
+            case USER:
                 listener.processUser(this, problem);
                 break;
         }
@@ -330,8 +311,8 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
                 }
             }
 
-            KeYJavaType typeOfClassUnderTest =
-                    specrep.getProofOblInput(originalProof).getContainerType();
+            KeYJavaType typeOfClassUnderTest = Objects.requireNonNull(specrep.getProofOblInput(originalProof))
+                    .getContainerType();
 
             SMTObjTranslator objTrans =
                     new SMTObjTranslator(smtSettings, services, typeOfClassUnderTest);
@@ -364,13 +345,9 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
     public void interrupt(ReasonOfInterruption reason) {
         // order of assignments is important
         setReasonOfInterruption(reason);
-        setSolverState(SolverState.Stopped);
-        if (solverTimeout != null) {
-            solverTimeout.cancel();
-        }
-        if (thread != null) {
+        setSolverState(SolverState.STOPPED);
+        if (processLauncher != null) {
             processLauncher.stop();
-            thread.interrupt();
         }
     }
 
