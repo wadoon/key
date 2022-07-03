@@ -4,7 +4,11 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.stream.Stream;
 
+import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.informationflow.po.snippet.InfFlowPOSnippetFactory;
@@ -79,6 +83,19 @@ public class InfFlowContractPO extends AbstractInfFlowPO
 
         final Services proofServices = postInit();
 
+        Stream.of(symbExecVars.pre, symbExecVars.post,
+                        ifVars.c1.pre, ifVars.c1.post,
+                        ifVars.c2.pre, ifVars.c2.post)
+                .flatMap(sv -> sv.termList.stream())
+                .map(Term::op)
+                .forEach(op -> {
+                    final NamespaceSet namespaces = proofServices.getNamespaces();
+                    if (op instanceof Function) {
+                        namespaces.functions().addSafely((Function) op);
+                    } else if (op instanceof IProgramVariable) {
+                        namespaces.programVariables().addSafely((IProgramVariable) op);
+                    }
+                });
         // create proof obligation
         InfFlowPOSnippetFactory f =
                 POSnippetFactory.getInfFlowFactory(contract, ifVars.c1,
