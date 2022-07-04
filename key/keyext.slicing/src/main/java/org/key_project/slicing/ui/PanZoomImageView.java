@@ -2,6 +2,8 @@ package org.key_project.slicing.ui;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -69,6 +71,7 @@ public class PanZoomImageView extends JComponent
                 this.timer.stop();
             }
         });
+        addComponentListener(new ResizeListener());
     }
 
     @Override
@@ -101,13 +104,7 @@ public class PanZoomImageView extends JComponent
     public void mouseDragged(MouseEvent e) {
         var deltaX = e.getX() - p.getX();
         var deltaY = e.getY() - p.getY();
-        var newAt = AffineTransform.getTranslateInstance(deltaX, deltaY);
-        at.preConcatenate(newAt);
-        p.setLocation(e.getPoint());
-        quickRender = true;
-        RepaintManager.currentManager(this).markCompletelyDirty(this);
-        lastPaint = System.currentTimeMillis();
-        this.timer.start();
+        moveBy(deltaX, deltaY, e.getPoint());
     }
 
     @Override
@@ -116,13 +113,55 @@ public class PanZoomImageView extends JComponent
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
         var scale = e.getWheelRotation() < 0 ? 1.1 : 0.9;
-        var mod = AffineTransform.getTranslateInstance(e.getX(), e.getY());
+        this.scale(scale, -e.getX(), -e.getY());
+    }
+
+    private void scale(double scale, double dx, double dy) {
+        var mod = AffineTransform.getTranslateInstance(-dx, -dy);
         mod.scale(scale, scale);
-        mod.translate(-e.getX(), -e.getY());
+        mod.translate(dx, dy);
         at.preConcatenate(mod);
         quickRender = true;
         RepaintManager.currentManager(this).markCompletelyDirty(this);
         lastPaint = System.currentTimeMillis();
         this.timer.start();
+    }
+
+    private void moveBy(double dx, double dy, Point point) {
+        var newAt = AffineTransform.getTranslateInstance(dx, dy);
+        at.preConcatenate(newAt);
+        p.setLocation(point);
+        quickRender = true;
+        RepaintManager.currentManager(this).markCompletelyDirty(this);
+        lastPaint = System.currentTimeMillis();
+        this.timer.start();
+    }
+
+    private static class ResizeListener extends ComponentAdapter {
+        private double prevWidth = 0;
+        private double prevHeight = 0;
+        private int events = 0;
+
+        @Override
+        public void componentResized(ComponentEvent e) {
+            var pziw = (PanZoomImageView) e.getComponent();
+            double newWidth = e.getComponent().getWidth();
+            double newHeight = e.getComponent().getHeight();
+            events++;
+            if (events >= 3) {
+                var ratio1 = newWidth / prevWidth;
+                var ratio2 = newHeight / prevHeight;
+                var ratio = 1.0;
+                if (ratio1 > 1.0 && ratio2 > 1.0) {
+                    ratio = Math.min(ratio1, ratio2);
+                } else {
+                    ratio = Math.max(ratio1, ratio2);
+                }
+                pziw.moveBy((newWidth - prevWidth) / 2.0, (newHeight - prevHeight) / 2.0, pziw.p);
+                pziw.scale(ratio, -newWidth / 2.0, -newHeight / 2.0);
+            }
+                prevWidth = newWidth;
+                prevHeight = newHeight;
+        }
     }
 }
