@@ -28,7 +28,7 @@ public abstract class NodeIntermediate {
         this.children.add(child);
     }
 
-    public int countChildren() {
+    public int subtreeSize() {
         var total = 1;
         var queue = new ArrayDeque<>(getChildren());
         while (!queue.isEmpty()) {

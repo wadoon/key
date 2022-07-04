@@ -176,25 +176,21 @@ public class IntermediateProofReplayer {
         int lastLineNr = 0;
         int reportInterval = 1;
         if (listener != null && progressMonitor != null) {
-            int max = !queue.isEmpty() && queue.peekFirst().second != null ? queue.peekFirst().second.countChildren() : 1;
+            int max = !queue.isEmpty() && queue.peekFirst().second != null ? queue.peekFirst().second.subtreeSize() : 1;
             listener.reportStatus(this, "Replaying proof", max);
             reportInterval = Math.max(1, Integer.highestOneBit(max / 256));
         }
         var mapping = new HashMap<Integer, NodeIntermediate>();
         if (!queue.isEmpty()) {
             final int[] i = {0};
-            final int[] branches = {0};
             queue.peekFirst().second.depthFirstVisit(node -> {
-                if (node instanceof BranchNodeIntermediate) {
-                    //System.out.printf("Branch %s\n", ((BranchNodeIntermediate) node).getBranchTitle());
-                    branches[0]++;
-                    if (branches[0] > 2) {
-                        i[0]++;
-                    }
-                } else if (node instanceof AppNodeIntermediate) {
-                    //System.out.printf("Node %s idx %d\n", ((AppNodeIntermediate) node).getIntermediateRuleApp().getRuleName(), i[0]);
+                if (node instanceof AppNodeIntermediate) {
+                    //LOGGER.info("Node {} idx {}", ((AppNodeIntermediate) node).getIntermediateRuleApp().getRuleName(), i[0]);
                     mapping.put(i[0], node);
                     i[0]++;
+                    if (node.subtreeSize() == 1 && !((AppNodeIntermediate) node).getIntermediateRuleApp().getRuleName().equals("SMTRule")) {
+                        i[0]++;
+                    }
                 }
             });
         }
@@ -246,8 +242,8 @@ public class IntermediateProofReplayer {
                     if (GeneralSettings.slicing) {
                         var name = currInterm.getIntermediateRuleApp().getRuleName();
                         wasSMT = name.equals("SMTRule");
-                        LOGGER.info("slicing @ {} [{}] {} (apply = {}, line = {}, original app = {})", finalStepIndex, currNode.serialNr(), name, apply, currInterm.getIntermediateRuleApp().getLineNr(), GeneralSettings.serialNrToName.get(finalStepIndex));
-                        if (!name.equals(GeneralSettings.serialNrToName.get(finalStepIndex))) {
+                        LOGGER.info("slicing @ {} [{}] {} (apply = {}, line = {}, original app = {})", finalStepIndex, currNode.serialNr(), name, apply, currInterm.getIntermediateRuleApp().getLineNr(), GeneralSettings.stepIdxtoName.get(finalStepIndex));
+                        if (!name.equals(GeneralSettings.stepIdxtoName.get(finalStepIndex))) {
                             LOGGER.error("names do not match");
                         }
                     }

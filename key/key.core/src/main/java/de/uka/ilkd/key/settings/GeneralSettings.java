@@ -4,7 +4,6 @@ import java.util.EventObject;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 
@@ -52,7 +51,7 @@ public class GeneralSettings implements Settings, Cloneable {
     public static Map<Integer, PosInOccurrence> serialNrToPos = Map.of();
     public static Map<Integer, Set<PosInOccurrence>> serialNrToIfInsts = Map.of();
     public static Map<Integer, Integer> stepIndexToDynamicRule = Map.of();
-    public static Map<Integer, String> serialNrToName = Map.of();
+    public static Map<Integer, String> stepIdxtoName = Map.of();
     public static Map<Integer, List<Integer>> branchStacks = Map.of();
 
     private static final String TACLET_FILTER = "[General]StupidMode";

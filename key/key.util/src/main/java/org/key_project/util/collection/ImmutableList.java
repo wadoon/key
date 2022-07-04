@@ -232,4 +232,14 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
         }
         return this.tail().stripPrefix(prefix.tail());
     }
+
+    default T last() {
+        if (isEmpty()) {
+            throw new IllegalStateException("last() called on empty list");
+        }
+        if (tail().isEmpty()) {
+            return head();
+        }
+        return tail().last();
+    }
 }

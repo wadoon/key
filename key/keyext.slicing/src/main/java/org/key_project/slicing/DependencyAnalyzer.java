@@ -137,26 +137,48 @@ public final class DependencyAnalyzer {
         var branchStacks = new HashMap<Node, List<Node>>();
         // search for duplicate rule applications
         graph.nodes().forEach(node -> {
-            var foundRules = new HashMap<Name, List<Node>>();
+            /*
+            if (node.hashCode() != 0) {
+                return;
+            }
+             */
+            var foundRules = new HashMap<RuleApp, List<Node>>();
             var foundSteps = new HashSet<Integer>();
             graph.outgoingEdgesOf(node).forEach(ruleApp -> {
-                if (foundSteps.contains(ruleApp.serialNr())) {
+                if (foundSteps.contains(ruleApp.serialNr()) || !usefulSteps.contains(ruleApp) || ruleApp.childrenCount() > 1) {
                     return;
                 }
                 foundSteps.add(ruleApp.serialNr());
-                var name = ruleApp.getAppliedRuleApp().rule().name();
+                var name = ruleApp.getAppliedRuleApp();
                 foundRules.computeIfAbsent(name, _name -> new ArrayList<>()).add(ruleApp);
             });
             for (var entry : foundRules.entrySet()) {
                 var steps = entry.getValue();
                 if (steps.size() > 1) {
                     LOGGER.info("input {} found duplicate {}", node.toString(false, false), Arrays.toString(steps.stream().map(Node::serialNr).toArray()));
+                    LOGGER.info(" rule names {}", Arrays.toString(steps.stream().map(x -> x.getAppliedRuleApp().rule().displayName()).toArray()));
                     var branchSerial = 0;
+                    var prefixes = new ArrayList<ImmutableList<String>>();
                     for (var step : steps) {
                         var commonPrefix = step.branchLocation().stripPrefix(node.getBranchLocation());
                         LOGGER.info("one common prefix {}", Arrays.toString(commonPrefix.toList().toArray()));
-                        branchSerial = Integer.parseInt(commonPrefix.head().substring(1).split("_")[0]);
+                        prefixes.add(commonPrefix);
                     }
+                    while (true) {
+                        var allSame = true;
+                        for (int i = 1; i < prefixes.size(); i++) {
+                            if (!prefixes.get(0).head().equals(prefixes.get(i).head())) {
+                                allSame = false;
+                                break;
+                            }
+                        }
+                        if (!allSame) {
+                            break;
+                        }
+                        prefixes.replaceAll(ImmutableList::tail);
+                    }
+                    LOGGER.info("differing suffix {}", Arrays.toString(prefixes.get(0).toList().toArray()));
+                    branchSerial = Integer.parseInt(prefixes.get(0).head().substring(1).split("_")[0]);
                     final Node[] branchNode = {null};
                     int finalBranchSerial = branchSerial;
                     proof.breadthFirstSearch(proof.root(), (proof1, visitedNode) -> {

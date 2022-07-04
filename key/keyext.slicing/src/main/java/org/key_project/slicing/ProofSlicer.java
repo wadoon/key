@@ -54,7 +54,7 @@ public final class ProofSlicer {
                         new Pair<>(node.stepIndex, node.getAppliedRuleApp().posInOccurrence()))
                 .filter(it -> it.second != null)
                 .collect(Collectors.toMap(it -> it.first, it -> it.second));
-        GeneralSettings.serialNrToName = toName;
+        GeneralSettings.stepIdxtoName = toName;
         GeneralSettings.serialNrToIfInsts = analysisResults
                 .usefulSteps.stream()
                 .map(node ->
