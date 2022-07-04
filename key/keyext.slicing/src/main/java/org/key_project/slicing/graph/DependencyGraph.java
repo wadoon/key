@@ -87,10 +87,8 @@ public class DependencyGraph {
         return graph.outgoingEdgesOf(node).stream().map(edgeData::get);
     }
 
-    public Stream<TrackedFormula> nodesInBranch(ImmutableList<String> location) {
+    public Stream<GraphNode> nodesInBranch(ImmutableList<String> location) {
         return graph.vertexSet().stream()
-                .filter(TrackedFormula.class::isInstance)
-                .map(TrackedFormula.class::cast)
                 .filter(it -> it.branchLocation.hasPrefix(location));
     }
 

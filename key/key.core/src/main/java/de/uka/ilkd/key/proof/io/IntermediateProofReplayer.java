@@ -3,6 +3,7 @@ package de.uka.ilkd.key.proof.io;
 import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.sequentToSETriple;
 
 import java.io.StringReader;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -179,18 +180,50 @@ public class IntermediateProofReplayer {
             listener.reportStatus(this, "Replaying proof", max);
             reportInterval = Math.max(1, Integer.highestOneBit(max / 256));
         }
+        var mapping = new HashMap<Integer, NodeIntermediate>();
+        if (!queue.isEmpty()) {
+            final int[] i = {0};
+            final int[] branches = {0};
+            queue.peekFirst().second.depthFirstVisit(node -> {
+                if (node instanceof BranchNodeIntermediate) {
+                    //System.out.printf("Branch %s\n", ((BranchNodeIntermediate) node).getBranchTitle());
+                    branches[0]++;
+                    if (branches[0] > 2) {
+                        i[0]++;
+                    }
+                } else if (node instanceof AppNodeIntermediate) {
+                    //System.out.printf("Node %s idx %d\n", ((AppNodeIntermediate) node).getIntermediateRuleApp().getRuleName(), i[0]);
+                    mapping.put(i[0], node);
+                    i[0]++;
+                }
+            });
+        }
+        var stepIdxOverrides = new ArrayDeque<Integer>();
+        Goal overrideGoal = null;
+        var appliedIdxes = new HashSet<>();
         while (!queue.isEmpty()) {
             if (listener != null && progressMonitor != null && stepIndex % reportInterval == 0) {
                 progressMonitor.setProgress(stepIndex);
             }
+            var overridenStep = !stepIdxOverrides.isEmpty();
+            int finalStepIndex = stepIdxOverrides.isEmpty() ? stepIndex : stepIdxOverrides.pollFirst();
+            if (GeneralSettings.slicing && GeneralSettings.branchStacks.containsKey(finalStepIndex)) {
+                var list = GeneralSettings.branchStacks.get(finalStepIndex);
+                for (int i = list.size() - 1; i >= 0; i--) {
+                    queue.addFirst(new Pair<>(queue.peekFirst().first, mapping.get(list.get(i))));
+                    stepIdxOverrides.addFirst(list.get(i));
+                }
+                GeneralSettings.branchStacks.remove(finalStepIndex);
+                continue;
+            }
             final Pair<Node, NodeIntermediate> currentP = queue.pollFirst();
-            Node currNode = currentP.first;
+            Node currNode = overrideGoal != null ? overrideGoal.node() : currentP.first;
             final NodeIntermediate currNodeInterm = currentP.second;
             int currNodeIntermChildrenCount = currNodeInterm != null ? currNodeInterm.getChildren().size() : -1;
-            currGoal = proof.getGoal(currNode);
-            int finalStepIndex = stepIndex;
-            boolean apply = !GeneralSettings.slicing || GeneralSettings.usefulSteps.contains(finalStepIndex);
-            currNode.stepIndex = stepIndex;
+            currGoal = overrideGoal != null ? overrideGoal : proof.getGoal(currNode);
+            overrideGoal = null;
+            boolean apply = !GeneralSettings.slicing || ((GeneralSettings.usefulSteps.contains(finalStepIndex) || overridenStep) && !appliedIdxes.contains(finalStepIndex));
+            currNode.stepIndex = finalStepIndex;
             boolean wasSMT = false;
 
             try {
@@ -206,25 +239,32 @@ public class IntermediateProofReplayer {
                     }
                     continue;
                 } else if (currNodeInterm instanceof AppNodeIntermediate) {
+                    if (apply) {
+                        appliedIdxes.add(finalStepIndex);
+                    }
                     AppNodeIntermediate currInterm = (AppNodeIntermediate) currNodeInterm;
                     if (GeneralSettings.slicing) {
                         var name = currInterm.getIntermediateRuleApp().getRuleName();
                         wasSMT = name.equals("SMTRule");
-                        LOGGER.trace("slicing @ {} [{}] {} (apply = {}, line = {}, original app = {})", stepIndex, currNode.serialNr(), name, apply, currInterm.getIntermediateRuleApp().getLineNr(), GeneralSettings.serialNrToName.get(stepIndex));
-                        if (!name.equals(GeneralSettings.serialNrToName.get(stepIndex))) {
+                        LOGGER.info("slicing @ {} [{}] {} (apply = {}, line = {}, original app = {})", finalStepIndex, currNode.serialNr(), name, apply, currInterm.getIntermediateRuleApp().getLineNr(), GeneralSettings.serialNrToName.get(finalStepIndex));
+                        if (!name.equals(GeneralSettings.serialNrToName.get(finalStepIndex))) {
                             LOGGER.error("names do not match");
                         }
                     }
                     int newLineNr = Integer.parseInt(currInterm.getIntermediateRuleApp().getLineNr());
                     if (newLineNr < lastLineNr) {
-                        LOGGER.error("didn't follow line number order!");
-                        throw new IllegalStateException("uh oh");
+                        LOGGER.warn("didn't follow line number order!");
+                        if (!overridenStep) {
+                            throw new IllegalStateException("Proof Slicer didn't follow line number order!");
+                        }
                     }
                     if (currGoal == null && apply) {
-                        LOGGER.error("currGoal == null @ step index {} node serialNr {}", stepIndex, currNode.serialNr());
+                        LOGGER.error("currGoal == null @ step index {} node serialNr {}", finalStepIndex, currNode.serialNr());
                         break;
                     }
-                    lastLineNr = newLineNr;
+                    if (!overridenStep) {
+                        lastLineNr = newLineNr;
+                    }
                     currNode.getNodeInfo().setInteractiveRuleApplication(
                         currInterm.isInteractiveRuleApplication());
                     currNode.getNodeInfo().setScriptRuleApplication(
@@ -243,9 +283,10 @@ public class IntermediateProofReplayer {
                                 .getIntermediateRuleApp();
 
                         try {
+                            Goal newGoal = null;
                             if (apply) {
-                                currGoal.apply(
-                                        constructTacletApp(appInterm, currGoal, stepIndex));
+                                newGoal = currGoal.apply(
+                                        constructTacletApp(appInterm, currGoal, finalStepIndex)).head();
                             }
 
                             final Iterator<Node> children = currNode
@@ -253,11 +294,17 @@ public class IntermediateProofReplayer {
                             final LinkedList<NodeIntermediate> intermChildren = currInterm
                                     .getChildren();
 
-                            addChildren(currNode, !apply, children, intermChildren);
+                            if (!overridenStep) {
+                                addChildren(currNode, !apply, children, intermChildren);
+                            } else {
+                                overrideGoal = newGoal;
+                            }
 
                             // Children are no longer needed, set them to null
                              // to free memory.
-                            currInterm.setChildren(null);
+                            if (!overridenStep) {
+                                currInterm.setChildren(null);
+                            }
                         } catch (Exception | AssertionError e) {
                             e.printStackTrace();
                             reportError(ERROR_LOADING_PROOF_LINE + "Line "
@@ -369,7 +416,7 @@ public class IntermediateProofReplayer {
                             try {
                                 if (apply) {
                                     IBuiltInRuleApp app = constructBuiltinApp(
-                                            appInterm, currGoal, stepIndex);
+                                            appInterm, currGoal, finalStepIndex);
                                     if (!app.complete()) {
                                         app = app.tryToInstantiate(currGoal);
                                     }
@@ -381,7 +428,9 @@ public class IntermediateProofReplayer {
                                 LinkedList<NodeIntermediate> intermChildren = currInterm
                                         .getChildren();
 
-                                addChildren(currNode, !apply, children, intermChildren);
+                                if (!overridenStep) {
+                                    addChildren(currNode, !apply, children, intermChildren);
+                                }
                             } catch (SkipSMTRuleException e) {
                                 // silently continue; status will be reported
                                 // via
@@ -408,10 +457,12 @@ public class IntermediateProofReplayer {
                 // node in the queue.
                 reportError(ERROR_LOADING_PROOF_LINE, throwable);
             }
-            if (currNodeIntermChildrenCount == 0 && !wasSMT) {
+            if (!overridenStep) {
+                if (currNodeIntermChildrenCount == 0 && !wasSMT) {
+                    stepIndex++;
+                }
                 stepIndex++;
             }
-            stepIndex++;
         }
         GeneralSettings.slicing = false;
         GeneralSettings.usefulSteps = Set.of();

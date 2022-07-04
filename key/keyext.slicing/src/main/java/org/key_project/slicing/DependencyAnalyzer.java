@@ -1,10 +1,13 @@
 package org.key_project.slicing;
 
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.smt.RuleAppSMT;
 import de.uka.ilkd.key.util.Triple;
+import org.key_project.slicing.graph.ClosedGoal;
 import org.key_project.slicing.graph.DependencyGraph;
 import org.key_project.slicing.graph.GraphNode;
 import org.key_project.slicing.graph.TrackedFormula;
@@ -13,8 +16,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Stack;
 import java.util.stream.Collectors;
 
 /**
@@ -49,8 +56,11 @@ public final class DependencyAnalyzer {
         while (!queue.isEmpty()) {
             var node = queue.pop();
             // closed goal & has previous step
+            // => mark output (closed goal) of parent node as useful
+            var considerOutputs = false;
             if (node.getAppliedRuleApp() == null && node.parent() != null) {
                 node = node.parent();
+                considerOutputs = true;
             }
             if (usefulSteps.contains(node)) {
                 continue;
@@ -61,6 +71,9 @@ public final class DependencyAnalyzer {
 
             for (var in : data.inputs) {
                 graph.incomingEdgesOf(in).forEach(queue::add);
+            }
+            if (considerOutputs) {
+                data.outputs.stream().filter(ClosedGoal.class::isInstance).forEach(usefulFormulas::add);
             }
         }
 
@@ -121,6 +134,46 @@ public final class DependencyAnalyzer {
         });
         LOGGER.info("last step took {} ms", System.currentTimeMillis() - time1);
 
+        var branchStacks = new HashMap<Node, List<Node>>();
+        // search for duplicate rule applications
+        graph.nodes().forEach(node -> {
+            var foundRules = new HashMap<Name, List<Node>>();
+            var foundSteps = new HashSet<Integer>();
+            graph.outgoingEdgesOf(node).forEach(ruleApp -> {
+                if (foundSteps.contains(ruleApp.serialNr())) {
+                    return;
+                }
+                foundSteps.add(ruleApp.serialNr());
+                var name = ruleApp.getAppliedRuleApp().rule().name();
+                foundRules.computeIfAbsent(name, _name -> new ArrayList<>()).add(ruleApp);
+            });
+            for (var entry : foundRules.entrySet()) {
+                var steps = entry.getValue();
+                if (steps.size() > 1) {
+                    LOGGER.info("input {} found duplicate {}", node.toString(false, false), Arrays.toString(steps.stream().map(Node::serialNr).toArray()));
+                    var branchSerial = 0;
+                    for (var step : steps) {
+                        var commonPrefix = step.branchLocation().stripPrefix(node.getBranchLocation());
+                        LOGGER.info("one common prefix {}", Arrays.toString(commonPrefix.toList().toArray()));
+                        branchSerial = Integer.parseInt(commonPrefix.head().substring(1).split("_")[0]);
+                    }
+                    final Node[] branchNode = {null};
+                    int finalBranchSerial = branchSerial;
+                    proof.breadthFirstSearch(proof.root(), (proof1, visitedNode) -> {
+                        if (branchNode[0] != null) {
+                            return;
+                        }
+                        if (visitedNode.serialNr() == finalBranchSerial) {
+                            branchNode[0] = visitedNode;
+                        }
+                    });
+                    LOGGER.info("branching node {}", branchNode[0].serialNr());
+                    steps.stream().skip(1).forEach(usefulSteps::remove);
+                    branchStacks.computeIfAbsent(branchNode[0], _node -> new ArrayList<>()).add(steps.get(0));
+                }
+            }
+        });
+
 
         // add a note to each useless proof step to allow easy identification by the user
         // TODO: make this configurable / add a different indicator?
@@ -157,6 +210,6 @@ public final class DependencyAnalyzer {
             }
         });
 
-        return new AnalysisResults(steps, usefulSteps.size(), rules, usefulSteps, usefulFormulas, uselessBranches);
+        return new AnalysisResults(proof, steps, usefulSteps.size(), rules, usefulSteps, usefulFormulas, uselessBranches, branchStacks);
     }
 }

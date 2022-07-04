@@ -1,11 +1,14 @@
 package org.key_project.slicing;
 
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.util.Triple;
 import org.key_project.slicing.graph.GraphNode;
 import org.key_project.util.collection.ImmutableList;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -16,6 +19,7 @@ import java.util.Set;
  * @author Arne Keller
  */
 public final class AnalysisResults {
+    public final Proof proof;
     /**
      * Total amount of rule applications.
      */
@@ -38,21 +42,26 @@ public final class AnalysisResults {
      */
     public final Set<GraphNode> usefulNodes;
     private final Set<ImmutableList<String>> uselessBranches;
+    public final Map<Node, List<Node>> branchStacks;
 
     public AnalysisResults(
+            Proof proof,
             int totalSteps,
             int usefulStepsNr,
             RuleStatistics ruleStatistics,
             Set<Node> usefulSteps,
             Set<GraphNode> usefulNodes,
-            Set<ImmutableList<String>> uselessBranches
+            Set<ImmutableList<String>> uselessBranches,
+            Map<Node, List<Node>> branchStacks
     ) {
+        this.proof = proof;
         this.totalSteps = totalSteps;
         this.usefulStepsNr = usefulStepsNr;
         this.ruleStatistics = ruleStatistics;
         this.usefulSteps = Collections.unmodifiableSet(usefulSteps);
         this.usefulNodes = Collections.unmodifiableSet(usefulNodes);
         this.uselessBranches = uselessBranches;
+        this.branchStacks = branchStacks;
     }
 
     public boolean branchIsUseful(ImmutableList<String> branchLocation) {

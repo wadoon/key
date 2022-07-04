@@ -66,6 +66,12 @@ public final class ProofSlicer {
                 .map(node ->
                         new Pair<>(node.stepIndex, ((Taclet) node.getAppliedRuleApp().rule()).getAddedBy().stepIndex))
                 .collect(Collectors.toMap(it -> it.first, it -> it.second));
+        GeneralSettings.branchStacks = analysisResults
+                .branchStacks.entrySet()
+                .stream().map(entry -> new Pair<>(
+                        entry.getKey().stepIndex,
+                        entry.getValue().stream().map(x -> x.stepIndex).collect(Collectors.toList())))
+                .collect(Collectors.toMap(p -> p.first, p -> p.second));
         try {
             var tempFile = Files.createTempFile("", ".proof");
             proof.saveToFile(tempFile.toFile());

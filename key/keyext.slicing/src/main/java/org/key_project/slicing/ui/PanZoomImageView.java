@@ -148,7 +148,14 @@ public class PanZoomImageView extends JComponent
             double newWidth = e.getComponent().getWidth();
             double newHeight = e.getComponent().getHeight();
             events++;
-            if (events >= 3) {
+            System.out.println("event " + events + " " + e.paramString());
+            // sometimes, the image view is "resized" when showing the window for the first time
+            // => skip that event!
+            if (events == 1 && newWidth < 200 && newHeight < 50) {
+                events--;
+                return;
+            }
+            if (events >= 2) {
                 var ratio1 = newWidth / prevWidth;
                 var ratio2 = newHeight / prevHeight;
                 var ratio = 1.0;

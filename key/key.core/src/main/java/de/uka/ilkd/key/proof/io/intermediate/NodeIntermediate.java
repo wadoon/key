@@ -2,6 +2,8 @@ package de.uka.ilkd.key.proof.io.intermediate;
 
 import java.util.ArrayDeque;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Node in an intermediate proof representation. Responsible for
@@ -34,5 +36,14 @@ public abstract class NodeIntermediate {
             queue.addAll(queue.pollFirst().getChildren());
         }
         return total;
+    }
+
+    public void depthFirstVisit(Consumer<NodeIntermediate> visitor) {
+        var queue = new ArrayDeque<>(List.of(this));
+        while (!queue.isEmpty()) {
+            var node = queue.pollFirst();
+            visitor.accept(node);
+            node.children.descendingIterator().forEachRemaining(queue::addFirst);
+        }
     }
 }

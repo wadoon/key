@@ -222,4 +222,14 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
             return false;
         }
     }
+
+    default ImmutableList<T> stripPrefix(ImmutableList<T> prefix) {
+        if (prefix.isEmpty()) {
+            return this;
+        }
+        if (!hasPrefix(prefix)) {
+            throw new IllegalArgumentException("not a prefix of this list");
+        }
+        return this.tail().stripPrefix(prefix.tail());
+    }
 }
