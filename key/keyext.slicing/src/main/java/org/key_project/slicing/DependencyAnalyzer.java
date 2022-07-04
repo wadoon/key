@@ -106,6 +106,7 @@ public final class DependencyAnalyzer {
             // TODO: process newly useless nodes somehow (-> to mark more edges as useless..)
         });
         var time1 = System.currentTimeMillis();
+        // unmark all 'useful' steps in useless branches
         proof.breadthFirstSearch(proof.root(), (proof1, node) -> {
             if (!usefulSteps.contains(node)) {
                 return;
@@ -117,31 +118,9 @@ public final class DependencyAnalyzer {
                     return;
                 }
             }
-            /*
-            if (node.serialNr() == 52663) {
-                LOGGER.info("at 52663");
-            }
-            if (usefulSteps.contains(node) || node.childrenCount() <= 1) {
-                return;
-            }
-            var data = node.lookup(DependencyNodeData.class);
-            var completelyUseless = data.outputs.stream().noneMatch(usefulFormulas::contains);
-            if (!completelyUseless) {
-                return;
-            }
-            // mark sub-proof as useless, if necessary
-            LOGGER.info("@ cut {}: marking sub-proofs", node.serialNr());
-            for (var output : data.outputs) {
-                var formula = (TrackedFormula) output;
-                graph.nodesInBranch(formula.getBranchLocation()).forEach(theNode -> {
-                    usefulFormulas.remove(theNode);
-                    graph.outgoingEdgesOf(theNode).forEach(usefulSteps::remove);
-                });
-                uselessBranches.add(formula.getBranchLocation());
-            }
-             */
         });
         LOGGER.info("last step took {} ms", System.currentTimeMillis() - time1);
+
 
         // add a note to each useless proof step to allow easy identification by the user
         // TODO: make this configurable / add a different indicator?

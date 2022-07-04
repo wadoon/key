@@ -175,9 +175,9 @@ public class IntermediateProofReplayer {
         int lastLineNr = 0;
         int reportInterval = 1;
         if (listener != null && progressMonitor != null) {
-            int max = !queue.isEmpty() ? queue.peekFirst().second.countChildren() : 0;
+            int max = !queue.isEmpty() && queue.peekFirst().second != null ? queue.peekFirst().second.countChildren() : 1;
             listener.reportStatus(this, "Replaying proof", max);
-            reportInterval = Integer.highestOneBit(max / 256);
+            reportInterval = Math.max(1, Integer.highestOneBit(max / 256));
         }
         while (!queue.isEmpty()) {
             if (listener != null && progressMonitor != null && stepIndex % reportInterval == 0) {
