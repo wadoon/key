@@ -17,8 +17,10 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.settings.GeneralSettings;
+import de.uka.ilkd.key.util.ProgressMonitor;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -168,10 +170,19 @@ public class IntermediateProofReplayer {
      * proof object; the last selected goal may be obtained by
      * {@link #getLastSelectedGoal()}.
      */
-    public Result replay() {
+    public Result replay(ProblemInitializer.ProblemInitializerListener listener, ProgressMonitor progressMonitor) {
         int stepIndex = 0;
         int lastLineNr = 0;
+        int reportInterval = 1;
+        if (listener != null && progressMonitor != null) {
+            int max = !queue.isEmpty() ? queue.peekFirst().second.countChildren() : 0;
+            listener.reportStatus(this, "Replaying proof", max);
+            reportInterval = Integer.highestOneBit(max / 256);
+        }
         while (!queue.isEmpty()) {
+            if (listener != null && progressMonitor != null && stepIndex % reportInterval == 0) {
+                progressMonitor.setProgress(stepIndex);
+            }
             final Pair<Node, NodeIntermediate> currentP = queue.pollFirst();
             Node currNode = currentP.first;
             final NodeIntermediate currNodeInterm = currentP.second;
@@ -199,7 +210,7 @@ public class IntermediateProofReplayer {
                     if (GeneralSettings.slicing) {
                         var name = currInterm.getIntermediateRuleApp().getRuleName();
                         wasSMT = name.equals("SMTRule");
-                        LOGGER.info("slicing @ {} [{}] {} (apply = {}, line = {}, original app = {})", stepIndex, currNode.serialNr(), name, apply, currInterm.getIntermediateRuleApp().getLineNr(), GeneralSettings.serialNrToName.get(stepIndex));
+                        LOGGER.trace("slicing @ {} [{}] {} (apply = {}, line = {}, original app = {})", stepIndex, currNode.serialNr(), name, apply, currInterm.getIntermediateRuleApp().getLineNr(), GeneralSettings.serialNrToName.get(stepIndex));
                         if (!name.equals(GeneralSettings.serialNrToName.get(stepIndex))) {
                             LOGGER.error("names do not match");
                         }
@@ -376,7 +387,7 @@ public class IntermediateProofReplayer {
                                 // via
                                 // polling
                                 if (GeneralSettings.slicing) {
-                                    LOGGER.info("slicing: skipping SMT");
+                                    LOGGER.trace("slicing: skipping SMT");
                                     // TODO(slicing): remove this
                                     currGoal.apply(new RuleAppSMT(RuleAppSMT.rule, PosInOccurrence.findInSequent(currGoal.sequent(), 1, PosInTerm.getTopLevel())));
                                 }
@@ -423,7 +434,7 @@ public class IntermediateProofReplayer {
     private void addChildren(Node currNode, boolean ignoreChildren, Iterator<Node> children,
                              LinkedList<NodeIntermediate> intermChildren) {
         if (GeneralSettings.slicing) {
-            LOGGER.info("addChildren node: {} ignore: {}, children.len: {}, intermChildren.len: {}", currNode.serialNr(), ignoreChildren, 42, intermChildren.size());
+            LOGGER.trace("addChildren node: {} ignore: {}, children.len: {}, intermChildren.len: {}", currNode.serialNr(), ignoreChildren, 42, intermChildren.size());
         }
         int i = 0;
         while (ignoreChildren || (!currGoal.node().isClosed() && children.hasNext()
@@ -441,7 +452,7 @@ public class IntermediateProofReplayer {
             Node child = ignoreChildren ? currNode : children.next();
             if (ignoreChildren || !proof.getGoal(child).isLinked()) {
                 if (GeneralSettings.slicing) {
-                    LOGGER.info("queue insert @ {}: {}", i, intermChildren.get(i).getClass());
+                    LOGGER.trace("queue insert @ {}: {}", i, intermChildren.get(i).getClass());
                 }
                 queue.add(i, new Pair<Node, NodeIntermediate>(child,
                     intermChildren.get(i++)));
@@ -492,7 +503,7 @@ public class IntermediateProofReplayer {
         Taclet t = proof.getInitConfig()
                 .lookupActiveTaclet(new Name(tacletName));
         if (t == null) {
-            LOGGER.info("using taclet index @ {}", tacletName);
+            LOGGER.trace("using taclet index @ {}", tacletName);
             if (GeneralSettings.slicing && GeneralSettings.stepIndexToDynamicRule.containsKey(serialNr)) {
                 var idx = GeneralSettings.stepIndexToDynamicRule.get(serialNr);
                 // find the correct rule app
@@ -508,7 +519,7 @@ public class IntermediateProofReplayer {
                     LOGGER.error("failed to find dynamically added taclet");
                 }
             } else {
-                LOGGER.warn("using index of new proof");
+                LOGGER.trace("using index of new proof");
                 ourApp = currGoal.indexOfTaclets().lookup(tacletName);
             }
         } else {
@@ -586,7 +597,7 @@ public class IntermediateProofReplayer {
         }
 
         if (!ourApp.ifInstsCorrectSize(ifFormulaList)) {
-            LOGGER.warn("Proof contains wrong number of \\assumes instatiations for ",
+            LOGGER.warn("Proof contains wrong number of \\assumes instatiations for {}",
                     tacletName);
             // try to find instantiations automatically
             ImmutableList<TacletApp> instApps = ourApp
@@ -723,8 +734,8 @@ public class IntermediateProofReplayer {
                     .isValid() != ThreeValuedTruth.VALID) {
                 status = SMT_NOT_RUN;
                 // TODO(slicing): remove this
-                currGoal.apply(new RuleAppSMT(RuleAppSMT.rule, PosInOccurrence.findInSequent(currGoal.sequent(), 1, PosInTerm.getTopLevel())));
-                throw new SkipSMTRuleException();
+                return RuleAppSMT.rule.createApp(null, proof.getServices());
+                //throw new SkipSMTRuleException();
             } else {
                 return RuleAppSMT.rule.createApp(null, proof.getServices());
             }

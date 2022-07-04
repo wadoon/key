@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.proof.io.intermediate;
 
+import java.util.ArrayDeque;
 import java.util.LinkedList;
 
 /**
@@ -23,5 +24,15 @@ public abstract class NodeIntermediate {
     
     public void addChild(NodeIntermediate child) {
         this.children.add(child);
+    }
+
+    public int countChildren() {
+        var total = 1;
+        var queue = new ArrayDeque<>(getChildren());
+        while (!queue.isEmpty()) {
+            total++;
+            queue.addAll(queue.pollFirst().getChildren());
+        }
+        return total;
     }
 }

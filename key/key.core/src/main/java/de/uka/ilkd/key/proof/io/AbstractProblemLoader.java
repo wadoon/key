@@ -698,7 +698,7 @@ public abstract class AbstractProblemLoader {
                 OneStepSimplifier.refreshOSS(proof);
 
                 replayer = new IntermediateProofReplayer(this, proof, parserResult);
-                replayResult = replayer.replay();
+                replayResult = replayer.replay(problemInitializer.getListener(), problemInitializer.getProgMon());
 
                 lastTouchedNode = replayResult.getLastSelectedGoal() != null ? replayResult.getLastSelectedGoal().node() : proof.root();
 

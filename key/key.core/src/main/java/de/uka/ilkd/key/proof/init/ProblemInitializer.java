@@ -646,6 +646,14 @@ public final class ProblemInitializer {
         this.fileRepo = fileRepo;
     }
 
+    public ProblemInitializerListener getListener() {
+        return listener;
+    }
+
+    public ProgressMonitor getProgMon() {
+        return progMon;
+    }
+
     public interface ProblemInitializerListener {
         void proofCreated(ProblemInitializer sender, ProofAggregate proofAggregate);
 
