@@ -242,7 +242,7 @@ public class IntermediateProofReplayer {
                     if (GeneralSettings.slicing) {
                         var name = currInterm.getIntermediateRuleApp().getRuleName();
                         wasSMT = name.equals("SMTRule");
-                        LOGGER.info("slicing @ {} [{}] {} (apply = {}, line = {}, original app = {})", finalStepIndex, currNode.serialNr(), name, apply, currInterm.getIntermediateRuleApp().getLineNr(), GeneralSettings.stepIdxtoName.get(finalStepIndex));
+                        LOGGER.debug("slicing @ {} [{}] {} (apply = {}, line = {}, original app = {})", finalStepIndex, currNode.serialNr(), name, apply, currInterm.getIntermediateRuleApp().getLineNr(), GeneralSettings.stepIdxtoName.get(finalStepIndex));
                         if (!name.equals(GeneralSettings.stepIdxtoName.get(finalStepIndex))) {
                             LOGGER.error("names do not match");
                         }

@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Stack;
 import java.util.stream.Collectors;
 
@@ -49,6 +50,7 @@ public final class DependencyAnalyzer {
 
         // BFS, starting from all closed goals
         var queue = new ArrayDeque<Node>();
+        /*
         for (var e : proof.closedGoals()) {
             queue.add(e.node());
         }
@@ -133,19 +135,30 @@ public final class DependencyAnalyzer {
             }
         });
         LOGGER.info("last step took {} ms", System.currentTimeMillis() - time1);
-
-        var branchStacks = new HashMap<Node, List<Node>>();
-        // search for duplicate rule applications
-        graph.nodes().forEach(node -> {
-            /*
-            if (node.hashCode() != 0) {
+         */
+        // mark everything as 'useful' to evaluate the second algorithm in isolation
+        proof.breadthFirstSearch(proof.root(), ((proof1, visitedNode) -> {
+            if (visitedNode.getAppliedRuleApp() == null) {
                 return;
             }
-             */
+            usefulSteps.add(visitedNode);
+            var data = visitedNode.lookup(DependencyNodeData.class);
+            if (data == null) {
+                return;
+            }
+            usefulFormulas.addAll(data.inputs);
+            usefulFormulas.addAll(data.outputs);
+        }));
+
+        var branchStacks = new HashMap<Node, List<Node>>();
+        var ignoredRules = Set.of("commute_or", "all_pull_out3", "inEqSimp_ltRight", "inEqSimp_ltToLeq", "elementOfUnion", "commute_or_2", "inEqSimp_gtToGeq", "nnf_notAnd");
+        var foundDuplicates = new HashSet<String>();
+        // search for duplicate rule applications
+        graph.nodes().forEach(node -> {
             var foundRules = new HashMap<RuleApp, List<Node>>();
             var foundSteps = new HashSet<Integer>();
             graph.outgoingEdgesOf(node).forEach(ruleApp -> {
-                if (foundSteps.contains(ruleApp.serialNr()) || !usefulSteps.contains(ruleApp) || ruleApp.childrenCount() > 1) {
+                if (foundSteps.contains(ruleApp.serialNr()) || !usefulSteps.contains(ruleApp) || ruleApp.childrenCount() > 1 || ignoredRules.contains(ruleApp.getAppliedRuleApp().rule().displayName())) {
                     return;
                 }
                 foundSteps.add(ruleApp.serialNr());
@@ -155,8 +168,9 @@ public final class DependencyAnalyzer {
             for (var entry : foundRules.entrySet()) {
                 var steps = entry.getValue();
                 if (steps.size() > 1) {
-                    LOGGER.info("input {} found duplicate {}", node.toString(false, false), Arrays.toString(steps.stream().map(Node::serialNr).toArray()));
+                    LOGGER.info("input {} found duplicate {}", node.toString(true, false), Arrays.toString(steps.stream().map(Node::serialNr).toArray()));
                     LOGGER.info(" rule names {}", Arrays.toString(steps.stream().map(x -> x.getAppliedRuleApp().rule().displayName()).toArray()));
+                    foundDuplicates.add(steps.get(0).getAppliedRuleApp().rule().displayName());
                     var branchSerial = 0;
                     var prefixes = new ArrayList<ImmutableList<String>>();
                     for (var step : steps) {
@@ -195,6 +209,9 @@ public final class DependencyAnalyzer {
                 }
             }
         });
+        for (var x : foundDuplicates) {
+            LOGGER.info("rule {}", x);
+        }
 
 
         // add a note to each useless proof step to allow easy identification by the user
