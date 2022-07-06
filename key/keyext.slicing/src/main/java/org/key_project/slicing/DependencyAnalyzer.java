@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.stream.Collectors;
@@ -50,7 +51,6 @@ public final class DependencyAnalyzer {
 
         // BFS, starting from all closed goals
         var queue = new ArrayDeque<Node>();
-        /*
         for (var e : proof.closedGoals()) {
             queue.add(e.node());
         }
@@ -135,7 +135,8 @@ public final class DependencyAnalyzer {
             }
         });
         LOGGER.info("last step took {} ms", System.currentTimeMillis() - time1);
-         */
+
+        /*
         // mark everything as 'useful' to evaluate the second algorithm in isolation
         proof.breadthFirstSearch(proof.root(), ((proof1, visitedNode) -> {
             if (visitedNode.getAppliedRuleApp() == null) {
@@ -212,6 +213,7 @@ public final class DependencyAnalyzer {
         for (var x : foundDuplicates) {
             LOGGER.info("rule {}", x);
         }
+         */
 
 
         // add a note to each useless proof step to allow easy identification by the user
@@ -249,6 +251,6 @@ public final class DependencyAnalyzer {
             }
         });
 
-        return new AnalysisResults(proof, steps, usefulSteps.size(), rules, usefulSteps, usefulFormulas, uselessBranches, branchStacks);
+        return new AnalysisResults(proof, steps, usefulSteps.size(), rules, usefulSteps, usefulFormulas, uselessBranches, Map.of()); // branchStacks
     }
 }

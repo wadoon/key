@@ -132,7 +132,7 @@ class Evaluation {
         var time2 = System.currentTimeMillis();
         loadAllOnce(true);
         var time3 = System.currentTimeMillis();
-        LOGGER.info("Replay time: {} (warmup) {} (second iteration)", time2-time1, time3-time2);
+        LOGGER.info("Replay time: {} (warmup) {} (second iteration)", time2 - time1, time3 - time2);
         // without tracker: 264834 258437
         //    with tracker: 271606 265942 (+3%)
     }
@@ -142,7 +142,7 @@ class Evaluation {
     void sliceEach() throws Exception {
         // run with: -Xmx4096m
         // warm up taclet index etc.
-        loadProof("DualPivot_KeY_Proofs/sort/DualPivotQuicksort/eInsertionSort_SavedAgain.proof", true).first.dispose();
+        loadProof("DualPivot_KeY_Proofs/sort/DualPivotQuicksort/eInsertionSort_SavedAgain.proof", true, false).first.dispose();
         var output = new PrintStream(new FileOutputStream("/tmp/log.txt"));
         output.println("Proof;Load time;Load time with tracker;Analyze time;Slice time;Number of steps;Number of steps in slice;Branches;Branches in slice;Number of SMT goals;Number of SMT in slice");
 
@@ -154,7 +154,7 @@ class Evaluation {
             for (int i = 0; i < iterations; i++) {
                 var time1 = System.currentTimeMillis();
 
-                var proof1 = loadProof(filename, false);
+                var proof1 = loadProof(filename, false, false);
                 if (!proof1.second.closed()) {
                     LOGGER.warn("proof not closed!");
                     proof1.first.dispose();
@@ -166,11 +166,11 @@ class Evaluation {
                 proof1.first.dispose();
                 var time2 = System.currentTimeMillis();
 
-                loadProof(filename, true).first.dispose();
+                loadProof(filename, true, false).first.dispose();
                 var time3 = System.currentTimeMillis();
 
                 try {
-                    var proof2 = sliceProof(filename);
+                    var proof2 = sliceProof(filename).first;
                     var sliceSize = proof2.countNodes();
                     var sliceBranches = proof2.countBranches();
                     var numberOfSMT2 = proof2.allGoals().stream().filter(goal -> goal.node().getAppliedRuleApp() != null && goal.node().getAppliedRuleApp() instanceof RuleAppSMT).count();
@@ -197,6 +197,75 @@ class Evaluation {
 
     @Test
     @Ignore("used during evaluation")
+    void sliceEachToFixedPoint() throws Exception {
+        GeneralSettings.noPruningClosed = false;
+        // run with: -Xmx4096m
+        // warm up taclet index etc.
+        //loadProof("DualPivot_KeY_Proofs/sort/DualPivotQuicksort/eInsertionSort_SavedAgain.proof", true).first.dispose();
+        var output = new PrintStream(new FileOutputStream("/tmp/log_fixedpoint.txt"));
+        output.println("Proof;Load time;Load time with tracker;Analyze time;Slice time;Number of steps;Number of steps in slice;Branches;Branches in slice;Number of SMT goals;Number of SMT in slice");
+
+        var failures = new ArrayList<>();
+
+        for (var filename : FILES) {
+            LOGGER.info("loading {}", filename);
+            var iterations = 1;
+            for (int i = 0; i < iterations; i++) {
+                var time1 = System.currentTimeMillis();
+
+                var proof1 = loadProof(filename, false, false);
+                if (!proof1.second.closed()) {
+                    LOGGER.warn("proof not closed!");
+                    proof1.first.dispose();
+                    continue;
+                }
+                var origSize = proof1.second.countNodes();
+                var origBranches = proof1.second.countBranches();
+                var numberOfSMT = proof1.second.allGoals().stream().filter(goal -> goal.node().parent().getAppliedRuleApp() != null && goal.node().parent().getAppliedRuleApp() instanceof RuleAppSMT).count();
+                proof1.first.dispose();
+                var time2 = System.currentTimeMillis();
+
+                loadProof(filename, true, false).first.dispose();
+                var time3 = System.currentTimeMillis();
+
+                var furtherSliceUseful = true;
+                try {
+                    var pair = sliceProof(filename);
+                    while (furtherSliceUseful) {
+                        var proof2 = pair.first;
+                        var sliceSize = proof2.countNodes();
+                        var sliceBranches = proof2.countBranches();
+                        var numberOfSMT2 = proof2.allGoals().stream().filter(goal -> goal.node().getAppliedRuleApp() != null && goal.node().getAppliedRuleApp() instanceof RuleAppSMT).count();
+                        var results = pair.second.analyze();
+                        furtherSliceUseful = results.totalSteps != results.usefulStepsNr;
+                        var time4 = System.currentTimeMillis();
+                        if (furtherSliceUseful) {
+                            var nextPath = pair.second.sliceProof();
+                            LOGGER.info("loading {}", nextPath.toString());
+                            var nextProof = loadProof(nextPath.toString(), true, true);
+                            pair = new Pair<>(nextProof.second, nextProof.third);
+                        }
+                        proof2.dispose();
+
+                        System.err.printf("%s;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d\n", filename, time2 - time1, time3 - time2, analyzeTime, time4 - time3, origSize, sliceSize, origBranches, sliceBranches, numberOfSMT, numberOfSMT2);
+                        output.printf("%s;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d\n", filename, time2 - time1, time3 - time2, analyzeTime, time4 - time3, origSize, sliceSize, origBranches, sliceBranches, numberOfSMT, numberOfSMT2);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    failures.add(filename);
+                }
+            }
+        }
+        output.flush();
+        output.close();
+        System.err.println("Failures:");
+        for (var name : failures) {
+            System.err.println(name);
+        }
+    }
+
+    @Test
+    @Ignore("used during evaluation")
     void loadAndSliceAll() throws Exception {
         GeneralSettings.noPruningClosed = false;
         // run with: -Xmx4096m
@@ -205,7 +274,7 @@ class Evaluation {
         var time2 = System.currentTimeMillis();
         sliceAllOnce();
         var time3 = System.currentTimeMillis();
-        LOGGER.info("Replay + Slice + Replay time: {} (warmup) {} (second iteration)", time2-time1, time3-time2);
+        LOGGER.info("Replay + Slice + Replay time: {} (warmup) {} (second iteration)", time2 - time1, time3 - time2);
         // TODO: measure without branch elimination; slicing up to fixpoint
         // 338322 331194
     }
@@ -215,7 +284,7 @@ class Evaluation {
         var sizes = new ArrayList<Pair<Integer, Integer>>();
         for (var filename : FILES) {
             LOGGER.info("Loading {}", filename);
-            var result = loadProof(filename, true);
+            var result = loadProof(filename, true, false);
             try {
                 if (!result.first.getReplayResult().hasErrors()
                         && result.first.getReplayResult().getStatus().equals(IntermediateProofReplayer.SMT_NOT_RUN)) {
@@ -278,7 +347,7 @@ class Evaluation {
             var loadedCorrectly = false;
             total++;
             try {
-                var result = loadProof(filename, withTracker);
+                var result = loadProof(filename, withTracker, false);
                 if (result != null) {
                     if (result.second.closed()
                             || (!result.first.getReplayResult().hasErrors()
@@ -310,9 +379,9 @@ class Evaluation {
         }
     }
 
-    private Triple<KeYEnvironment<?>, Proof, DependencyTracker> loadProof(String filename, boolean withTracker) throws Exception {
+    private Triple<KeYEnvironment<?>, Proof, DependencyTracker> loadProof(String filename, boolean withTracker, boolean literalName) throws Exception {
         // load proof
-        File proofFile = new File(testCaseDirectory, filename);
+        File proofFile = literalName ? new File(filename) : new File(testCaseDirectory, filename);
         Assertions.assertTrue(proofFile.exists());
         DependencyTracker tracker = new DependencyTracker();
         KeYEnvironment<?> environment = KeYEnvironment.load(JavaProfile.getDefaultInstance(), proofFile, null, null, null, null, null,
@@ -329,7 +398,7 @@ class Evaluation {
         }
     }
 
-    private Proof sliceProof(String filename) throws Exception {
+    private Pair<Proof, DependencyTracker> sliceProof(String filename) throws Exception {
         boolean oldValue = GeneralSettings.noPruningClosed;
         GeneralSettings.noPruningClosed = false;
         // load proof
@@ -356,7 +425,8 @@ class Evaluation {
             analyzeTime = System.currentTimeMillis() - time1;
             // slice proof
             var path = tracker.sliceProof();
-            var env2 = KeYEnvironment.load(JavaProfile.getDefaultInstance(), path.toFile(), null, null, null, null, null, null, true);
+            var tracker2 = new DependencyTracker();
+            var env2 = KeYEnvironment.load(JavaProfile.getDefaultInstance(), path.toFile(), null, null, null, null, null, proof1 -> proof1.addRuleAppListener(tracker2), true);
             Proof slicedProof = env2.getLoadedProof();
 
             /*
@@ -369,6 +439,7 @@ class Evaluation {
              */
 
             // pseudo-close any open goals that are supposedly closable by SMT
+            /*
             if (!env2.getReplayResult().hasErrors()
                     && env2.getReplayResult().getStatus().equals(IntermediateProofReplayer.SMT_NOT_RUN)) {
                 System.err.println("closing SMT goals");
@@ -376,13 +447,14 @@ class Evaluation {
                     goal.apply(new RuleAppSMT(RuleAppSMT.rule, PosInOccurrence.findInSequent(goal.sequent(), 1, PosInTerm.getTopLevel())));
                 });
             }
+             */
             if (!slicedProof.closed()) {
                 throw new IllegalStateException("sliced proof not closed!");
             }
 
             //Files.delete(tempFile);
 
-            return slicedProof;
+            return new Pair<>(slicedProof, tracker2);
         } finally {
             environment.dispose();
             GeneralSettings.noPruningClosed = oldValue;
