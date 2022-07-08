@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
+import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.filter.ThresholdFilter;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -15,8 +16,6 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.impl.SimpleLogger;
-import org.slf4j.impl.SimpleLoggerConfiguration;
 
 import java.io.File;
 import java.io.IOException;
@@ -151,14 +150,12 @@ public class TestFile implements Serializable {
      */
     public TestResult runKey() throws Exception {
         boolean verbose = "true".equals(settings.get(RunAllProofsTest.VERBOSE_OUTPUT_KEY));
-        if(verbose) { // set filter to INFO level
-            var root = (ch.qos.logback.classic.Logger)
-                    LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
-            var appender = root.getAppender("STDOUT");
-            appender.clearAllFilters();
-            final var thresholdFilter = new ThresholdFilter();
-            thresholdFilter.setLevel("INFO");
-            appender.addFilter(thresholdFilter);
+        var root = (ch.qos.logback.classic.Logger)
+                LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
+        if (verbose) { // set filter to INFO level
+            root.setLevel(Level.INFO);
+        }else {
+            root.setLevel(Level.WARN);
         }
 
         // Initialize KeY settings.
@@ -169,9 +166,7 @@ public class TestFile implements Serializable {
 
         // Name resolution for the available KeY file.
         File keyFile = getKeYFile();
-        if (verbose) {
-            LOGGER.debug("Now processing file {}", keyFile);
-        }
+        LOGGER.debug("Now processing file {}", keyFile);
         // File that the created proof will be saved to.
         File proofFile = new File(keyFile.getAbsolutePath() + ".proof");
 
@@ -199,8 +194,8 @@ public class TestFile implements Serializable {
             }
 
             replayResult = env.getReplayResult();
-            if (replayResult.hasErrors() && verbose) {
-                LOGGER.info("... error(s) while loading");
+            if (replayResult.hasErrors()) {
+                LOGGER.warn("... error(s) while loading");
                 for (Throwable error : replayResult.getErrorList()) {
                     error.printStackTrace();
                 }
@@ -210,9 +205,7 @@ public class TestFile implements Serializable {
 
             // For a reload test we are done at this point. Loading was successful.
             if (testProperty == TestProperty.LOADABLE) {
-                if (verbose) {
-                    LOGGER.info("... success: loaded");
-                }
+                LOGGER.info("... success: loaded");
                 return getRunAllProofsTestResult(true);
             }
 
@@ -220,9 +213,7 @@ public class TestFile implements Serializable {
 
             boolean closed = loadedProof.closed();
             success = (testProperty == TestProperty.PROVABLE) == closed;
-            if (verbose) {
-                LOGGER.info("... finished proof: " + (closed ? "closed." : "open goal(s)"));
-            }
+            LOGGER.info("... finished proof: " + (closed ? "closed." : "open goal(s)"));
 
             // Write statistics.
             StatisticsFile statisticsFile = settings.getStatisticsFile();
@@ -234,11 +225,9 @@ public class TestFile implements Serializable {
              * Testing proof reloading now. Saving and reloading proof only in case
              * it was closed and test property is PROVABLE.
              */
-            reload(verbose, proofFile, loadedProof, success);
+            reload(proofFile, loadedProof, success);
         } catch (Throwable t) {
-            if (verbose) {
-                LOGGER.debug("Exception", t);
-            }
+            LOGGER.debug("Exception occurred:", t);
             throw t;
         } finally {
             if (loadedProof != null) {
@@ -255,15 +244,13 @@ public class TestFile implements Serializable {
     /**
      * Override this method in order to change reload behaviour.
      */
-    protected void reload(boolean verbose, File proofFile, Proof loadedProof, boolean success)
+    protected void reload(File proofFile, Proof loadedProof, boolean success)
             throws Exception {
         if (settings.reloadEnabled() && (testProperty == TestProperty.PROVABLE) && success) {
             // Save the available proof to a temporary file.
             loadedProof.saveToFile(proofFile);
             reloadProof(proofFile);
-            if (verbose) {
-                LOGGER.debug("... success: reloaded.");
-            }
+            LOGGER.info("... success: reloaded.");
         }
     }
 

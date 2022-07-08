@@ -1,6 +1,9 @@
 package de.uka.ilkd.key.smt.communication;
 
+import de.uka.ilkd.key.smt.SMTSolverImplementation;
 import org.key_project.util.java.IOUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import java.io.*;
@@ -17,6 +20,8 @@ import java.io.*;
  * @author Wolfram Pfeifer (overhaul)
  */
 public class ExternalProcessLauncher {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExternalProcessLauncher.class);
+
     /**
      * the store of all messages send to and received from the external process
      */
@@ -76,9 +81,10 @@ public class ExternalProcessLauncher {
      * Stops the external process: In particular the pipe is closed and the process is destroyed.
      */
     public void stop() {
-        pipe.close();
         if (process != null) {
             var handle = process.toHandle();
+            LOGGER.info("Stopping process {}, {}", handle.pid(), handle.info());
+            pipe.close();
             handle.destroy();
             if (handle.isAlive()) {
                 handle.destroyForcibly();
