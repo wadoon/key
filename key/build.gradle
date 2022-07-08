@@ -114,6 +114,8 @@ subprojects {
         testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.8.2'
         testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
 
+        //logging implementation used by the slf4j
+        testImplementation 'ch.qos.logback:logback-classic:1.2.10'
 
         testImplementation project(':key.util')
     }
