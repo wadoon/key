@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
+import ch.qos.logback.classic.filter.ThresholdFilter;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
@@ -14,6 +15,8 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.impl.SimpleLogger;
+import org.slf4j.impl.SimpleLoggerConfiguration;
 
 import java.io.File;
 import java.io.IOException;
@@ -147,8 +150,16 @@ public class TestFile implements Serializable {
      *                   exception as cause.
      */
     public TestResult runKey() throws Exception {
-
         boolean verbose = "true".equals(settings.get(RunAllProofsTest.VERBOSE_OUTPUT_KEY));
+        if(verbose) { // set filter to INFO level
+            var root = (ch.qos.logback.classic.Logger)
+                    LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
+            var appender = root.getAppender("STDOUT");
+            appender.clearAllFilters();
+            final var thresholdFilter = new ThresholdFilter();
+            thresholdFilter.setLevel("INFO");
+            appender.addFilter(thresholdFilter);
+        }
 
         // Initialize KeY settings.
         String gks = settings.getGlobalKeYSettings();
