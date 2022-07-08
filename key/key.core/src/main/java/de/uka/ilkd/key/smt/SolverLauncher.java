@@ -166,9 +166,9 @@ public class SolverLauncher implements SolverListener {
      */
     private final Condition wait = lock.newCondition();
     /**
-     * The timer that is responsible for the timeouts.
+     * The timer that is responsible for the timeouts of all launchers.
      */
-    private final Timer timer = new Timer(true);
+    private final static Timer timer = new Timer("SMT Timeouts", true);
     /**
      * A sesion encapsulates some attributes that should be accessed only by
      * specified methods (in oder to maintain thread safety)
@@ -319,9 +319,9 @@ public class SolverLauncher implements SolverListener {
      */
     private void launchLoop(Queue<SMTSolver> solvers) {
         // as long as there are jobs to do, start solvers
-        while (!solvers.isEmpty() && !isInterrupted()) {
-            lock.lock();
-            try {
+        lock.lock();
+        try {
+            while (!solvers.isEmpty() && !isInterrupted()) {
                 // start solvers as many as possible
                 fillRunningList(solvers);
                 if (!startNextSolvers(solvers) && !isInterrupted()) {
@@ -334,9 +334,9 @@ public class SolverLauncher implements SolverListener {
                         launcherInterrupted(e);
                     }
                 }
-            } finally {
-                lock.unlock();
             }
+        } finally {
+            lock.unlock();
         }
     }
 
