@@ -275,6 +275,11 @@ public class SolverLauncher implements SolverListener {
             alreadyWaitedTime = currentTimeout;
         }
 
+        // kill remaining tasks!
+        for (Future<SMTSolverResult> submittedTask : submittedTasks) {
+            submittedTask.cancel(true);
+        }
+
         for (SMTSolver solver : solvers) {
             solver.interrupt(ReasonOfInterruption.USER);
         }
