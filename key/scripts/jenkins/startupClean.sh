@@ -6,9 +6,20 @@ git clean -x -d -f -q
 rm -rf /var/lib/jenkins/.key/ $HOME/.key
 
 
-cvc4 --version
+echo "=== CVC 4 ==="
+cvc4 --version | head -n 3
+
+echo "=== MATHSAT ==="
 mathsat -version
-princess --version
+
+echo "=== PRINCESS ==="
+princess -logo +version
+
+echo "=== VAMPIRE ==="
 vampire --version
+
+echo "=== YICES ==="
 yices-smt2 --version
+
+echo "=== z3 ==="
 z3 -version
