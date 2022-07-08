@@ -76,11 +76,14 @@ public class ExternalProcessLauncher {
      * Stops the external process: In particular the pipe is closed and the process is destroyed.
      */
     public void stop() {
+        pipe.close();
         if (process != null) {
-            process.destroy();
+            var handle = process.toHandle();
+            handle.destroy();
+            if (handle.isAlive()) {
+                handle.destroyForcibly();
+            }
         }
-        // TODO: where to close the pipe?
-        //pipe.close();
     }
 
     public Pipe getPipe() {
