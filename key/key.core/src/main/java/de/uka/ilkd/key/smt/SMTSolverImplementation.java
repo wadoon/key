@@ -12,6 +12,9 @@ import de.uka.ilkd.key.smt.communication.SolverCommunication.Message;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import recoder.util.Debug;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
@@ -34,6 +37,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Wolfram Pfeifer (SMT communication overhaul)
  */
 public final class SMTSolverImplementation implements SMTSolver {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SMTSolverImplementation.class);
 
     /**
      * used to generate unique ids for each running solver instance
@@ -253,6 +257,7 @@ public final class SMTSolverImplementation implements SMTSolver {
                 socket.messageIncoming(processLauncher.getPipe(), msg);
                 msg = processLauncher.getPipe().readMessage();
             }
+            setReasonOfInterruption(ReasonOfInterruption.NO_INTERRUPTION);
         } catch (IllegalStateException | IOException | InterruptedException e) {
             interruptionOccurred(e);
         } finally {
@@ -343,6 +348,7 @@ public final class SMTSolverImplementation implements SMTSolver {
 
     @Override
     public void interrupt(ReasonOfInterruption reason) {
+        LOGGER.info("Interupt SMT solver with reason {}", reason);
         // order of assignments is important
         setReasonOfInterruption(reason);
         setSolverState(SolverState.STOPPED);

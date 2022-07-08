@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -106,7 +107,8 @@ public class SolverLauncher implements SolverListener {
      */
     private boolean launcherHasBeenUsed = false;
 
-    private final List<Future<SMTSolverResult>> submittedTasks = new ArrayList<>();
+    private final Map<SMTProblem, List<Future<SMTSolverResult>>> submittedTasks =
+            new HashMap<>();
 
     /**
      * Create for every solver execution a new object. Don't reuse the solver
@@ -173,11 +175,13 @@ public class SolverLauncher implements SolverListener {
      */
     public void stop(ReasonOfInterruption reason) {
         synchronized (submittedTasks) { //can only be called from a different than the thread that called launch"
-            for (Future<SMTSolverResult> submittedTask : submittedTasks) {
-                submittedTask.cancel(true);
-            }
+            submittedTasks.forEach((k, v) -> {
+                for (Future<SMTSolverResult> submittedTask : v) {
+                    submittedTask.cancel(true);
+                }
+            });
+            session.interruptAll(reason);
         }
-        session.interruptAll(reason);
     }
 
 
@@ -229,7 +233,7 @@ public class SolverLauncher implements SolverListener {
     }
 
     private void launchIntern(Collection<SMTProblem> problems, Collection<SolverType> factories) {
-        var solvers = new ArrayList<SMTSolver>(problems.size());
+        var solvers = new ArrayList<SMTSolver>(problems.size() * factories.size());
         for (SMTProblem problem : problems) {
             solvers.addAll(problem.getSolvers());
         }
@@ -241,16 +245,24 @@ public class SolverLauncher implements SolverListener {
         //Show progress dialog
         notifyListenersOfStart(problems, solverTypes);
 
-
         solvers.sort(Comparator.comparing(SMTSolver::getTimeout));
 
-        var futures =
-                solvers.stream()
-                        .map(it -> executorService.submit(createSolverTask(it)))
-                        .collect(Collectors.toList());
+        Consumer<SMTProblem> cancel = smtProblem -> {
+            synchronized (submittedTasks) {
+                if (submittedTasks.containsKey(smtProblem)) {
+                    smtProblem.getSolvers().forEach(it -> it.interrupt(ReasonOfInterruption.LOOSER));
+                    submittedTasks.get(smtProblem).forEach(it -> it.cancel(true));
+                }
+            }
+        };
 
+        var futures = new ArrayList<Future<SMTSolverResult>>();
         synchronized (submittedTasks) {
-            submittedTasks.addAll(futures);
+            for (var it : solvers) {
+                final var future = executorService.submit(createSolverTask(it, cancel));
+                submittedTasks.computeIfAbsent(it.getProblem(), (k) -> new ArrayList<>(4)).add(future);
+                futures.add(future);
+            }
         }
 
         long alreadyWaitedTime = 0;
@@ -263,12 +275,11 @@ public class SolverLauncher implements SolverListener {
                 LOGGER.warn("Waiting for termination of SMTSolver got interrupted. Cancel all submitted tasks!", e);
                 stop(ReasonOfInterruption.TIMEOUT);
                 Thread.currentThread().interrupt();
-            }
-            catch(ExecutionException e) {
+            } catch (ExecutionException e) {
                 LOGGER.warn("Exception during the execution of an SMTSolver", e);
                 solvers.get(i).interrupt(ReasonOfInterruption.EXCEPTION);
             } catch (TimeoutException e) {
-                LOGGER.warn("Timout (" + currentTimeout + " ms) hit by SMTSolver. SMTSolver will be killed.", e);
+                LOGGER.warn("Timout ({} ms) hit by SMTSolver. SMTSolver will be killed.", currentTimeout);
                 future.cancel(true);
                 solvers.get(i).interrupt(ReasonOfInterruption.TIMEOUT);
             }
@@ -276,8 +287,10 @@ public class SolverLauncher implements SolverListener {
         }
 
         // kill remaining tasks!
-        for (Future<SMTSolverResult> submittedTask : submittedTasks) {
-            submittedTask.cancel(true);
+        for (var entries : submittedTasks.entrySet()) {
+            for (var submittedTask : entries.getValue()) {
+                submittedTask.cancel(true);
+            }
         }
 
         for (SMTSolver solver : solvers) {
@@ -293,13 +306,16 @@ public class SolverLauncher implements SolverListener {
         }
     }
 
-    private Callable<SMTSolverResult> createSolverTask(SMTSolver it) {
+    private Callable<SMTSolverResult> createSolverTask(SMTSolver it, Consumer<SMTProblem> cancel) {
         return () -> {
             session.addCurrentlyRunning(it);
             it.setSettings(settings);
             var res = it.call();
             session.removeCurrentlyRunning(it);
             session.addFinishedSolver(it);
+            if (res.isValid() != SMTSolverResult.ThreeValuedTruth.UNKNOWN) {
+                cancel.accept(it.getProblem());
+            }
             return res;
         };
     }

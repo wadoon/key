@@ -27,7 +27,11 @@ public interface SMTSolver extends Callable<SMTSolverResult> {
      * Possible reasons for why a solver process was interrupted/stopped.
      */
     enum ReasonOfInterruption {
-        USER, TIMEOUT, EXCEPTION, NO_INTERRUPTION
+        USER, TIMEOUT, EXCEPTION, NO_INTERRUPTION,
+        /**
+         * This SMT solver run has lost against an other SMT solver on the same instance.
+         */
+        LOOSER;
     }
 
     /**

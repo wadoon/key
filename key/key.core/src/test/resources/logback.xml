@@ -3,14 +3,11 @@
         <file>key.log</file>
         <append>false</append>
         <encoder>
-            <pattern>%-5level %-15thread %-10logger %msg %ex</pattern>
+            <pattern>%-10relative %-5level %-15thread %-25logger{5} %msg %ex{short}%n</pattern>
         </encoder>
-        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>WARN</level>
-        </filter>
     </appender>
 
-    <root level="debug">
+    <root level="WARN">
         <appender-ref ref="STDOUT"/>
     </root>
 </configuration>
