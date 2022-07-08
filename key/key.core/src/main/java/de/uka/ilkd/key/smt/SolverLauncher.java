@@ -151,6 +151,7 @@ public class SolverLauncher implements SolverListener {
      */
     public void launch(SMTProblem problem, Services services, SolverType... solverTypes) {
         checkLaunchCall();
+        LOGGER.info("Launch SMT solvers ({} solvers, {} problem)", solverTypes, problem);
         launchIntern(problem, solverTypes, services);
     }
 
@@ -306,15 +307,16 @@ public class SolverLauncher implements SolverListener {
         }
     }
 
-    private Callable<SMTSolverResult> createSolverTask(SMTSolver it, Consumer<SMTProblem> cancel) {
+    private Callable<SMTSolverResult> createSolverTask(SMTSolver solver, Consumer<SMTProblem> cancel) {
         return () -> {
-            session.addCurrentlyRunning(it);
-            it.setSettings(settings);
-            var res = it.call();
-            session.removeCurrentlyRunning(it);
-            session.addFinishedSolver(it);
+            session.addCurrentlyRunning(solver);
+            solver.setSettings(settings);
+            LOGGER.info("launch SMT solver {}, (t/o: {})", solver.getType().getInfo(), solver.getTimeout());
+            var res = solver.call();
+            session.removeCurrentlyRunning(solver);
+            session.addFinishedSolver(solver);
             if (res.isValid() != SMTSolverResult.ThreeValuedTruth.UNKNOWN) {
-                cancel.accept(it.getProblem());
+                cancel.accept(solver.getProblem());
             }
             return res;
         };

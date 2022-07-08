@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import java.io.*;
+import java.util.Arrays;
 
 /**
  * This class is responsible for starting external processes:
@@ -65,6 +66,7 @@ public class ExternalProcessLauncher {
      */
     public void launch(final String[] command) throws IOException {
         try {
+            LOGGER.info("Run smt solver {}", Arrays.toString(command));
             ProcessBuilder builder = new ProcessBuilder(command);
             builder.redirectErrorStream(true);
             process = builder.start();
