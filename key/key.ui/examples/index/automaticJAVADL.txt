@@ -52,7 +52,7 @@ tempDir = ../../key.core/build/runallproofs_tmp
  * 
  * Timeout per subprocess in seconds
  */
-forkTimeout = 2000
+forkTimeout = 20000
 
 /*
  * If the fork mode is not set to noFork, the launched subprocesses 
