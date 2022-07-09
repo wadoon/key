@@ -25,13 +25,13 @@ pipeline {
 
         stage('Test: JUnit') {
             steps {
-                sh 'echo 1'//'cd key && ./gradlew --continue test'
+                sh 'cd key && ./gradlew --continue test'
             }
         }
 
         stage('Test: testProveRules') {
             steps {
-                sh 'echo 1'//sh 'cd key && ./gradlew --continue testProveRules'
+                sh 'cd key && ./gradlew --continue testProveRules'
             }
         }    
 
