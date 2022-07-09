@@ -133,6 +133,7 @@ public class TestFile implements Serializable {
                 testProperty.toString().toLowerCase(),
                 success ? " was successful " : " failed ",
                 getKeYFile().toString());
+        LOGGER.info(message);
         return new TestResult(message, success);
     }
 

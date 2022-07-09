@@ -53,10 +53,12 @@ public abstract class ForkedTestFileRunner implements Serializable {
      * a file at given location.
      */
     private static void writeObject(Path path, Serializable s) throws IOException {
+        LOGGER.info("Dump result information to {}", path);
         try (ObjectOutputStream objectOutputStream =
                      new ObjectOutputStream(Files.newOutputStream(path))) {
             objectOutputStream.writeObject(s);
         }
+        LOGGER.info("Result information are written to {}", path);
     }
 
     /**
@@ -181,12 +183,14 @@ public abstract class ForkedTestFileRunner implements Serializable {
                     testResults.add(testFile.runKey());
                 } catch (Exception e) {
                     error = true;
-                    e.printStackTrace();
+                    LOGGER.error("Error occurred during runKey", e);
                 }
             }
             writeObject(getLocationOfSerializedTestResults(tempDirectory),
                     testResults.toArray(new TestResult[0]));
+            LOGGER.info("Run without errors, result error={}", error);
         } catch (Throwable t) {
+            LOGGER.info("A very unexpected error occurred in the test environment", t);
             try {
                 writeObject(getLocationOfSerializedException(tempDirectory), t);
             } catch (NotSerializableException e) {
