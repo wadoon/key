@@ -1,5 +1,12 @@
 package de.uka.ilkd.key.proof.runallproofs;
 
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.ForkMode;
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.ForkedTestFileRunner;
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionSettings;
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.TestFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -8,29 +15,26 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.ForkMode;
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.ForkedTestFileRunner;
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionSettings;
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.TestFile;
-
 /**
  * A single unit that will be tested during {@link RunAllProofsTest} run.
  * 
  * @author Kai Wallisch
  */
 public final class RunAllProofsTestUnit implements Serializable {
+    private static final Logger LOGGER = LoggerFactory.getLogger(RunAllProofsTestUnit.class);
+
     private static final long serialVersionUID = -2406881153415390252L;
 
    /**
     * The name of this test.
     */
-    private String testName;
+    private final String testName;
 
     private final ProofCollectionSettings settings;
     private final List<TestFile> testFiles;
     private final boolean ungrouped;
 
-   /**
+    /**
     * Method {@link Object#toString()} is used by class {@link RunAllProofsTest}
     * to determine the name of a test case. It is overridden here so that test
     * cases can be easily recognized by their name.
@@ -68,15 +72,12 @@ public final class RunAllProofsTestUnit implements Serializable {
         List<TestResult> testResults;
 
         boolean verbose = "true".equals(settings.get(RunAllProofsTest.VERBOSE_OUTPUT_KEY));
-        if(verbose) {
-            System.out.println("Running test " + testName);
-        }
+        LOGGER.info("Running test {}", testName);
+
 
         boolean ignoreTest = "true".equals(settings.get(RunAllProofsTest.IGNORE_KEY));
         if(ignoreTest) {
-            if(verbose) {
-                System.out.println("... ignoring this test due to 'ignore=true' in file");
-            }
+            LOGGER.info("... ignoring this test due to 'ignore=true' in file");
             return new TestResult("Test case has been ignored", true);
         }
 
