@@ -283,6 +283,8 @@ public class SolverLauncher implements SolverListener {
                 LOGGER.warn("Timout ({} ms) hit by SMTSolver. SMTSolver will be killed.", currentTimeout);
                 future.cancel(true);
                 solvers.get(i).interrupt(ReasonOfInterruption.TIMEOUT);
+            } catch (CancellationException e) {
+                LOGGER.info("SMT solver was cancelled while we wait on termination.");
             }
             alreadyWaitedTime = currentTimeout;
         }
