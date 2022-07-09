@@ -136,7 +136,9 @@ public abstract class ForkedTestFileRunner implements Serializable {
 
         Process process = pb.start();
         // IOForwarder.forward(process);
+        LOGGER.info("Worker process started (pid: {}). Waiting for termination", process.toHandle().pid());
         process.waitFor();
+        LOGGER.info("Worker process terminated: {}", process.exitValue());
         assertEquals(0, process.exitValue(), "Executed process terminated with non-zero exit value.");
 
         /*
@@ -144,6 +146,7 @@ public abstract class ForkedTestFileRunner implements Serializable {
          */
         Path exceptionFile = getLocationOfSerializedException(pathToTempDir);
         if (exceptionFile.toFile().exists()) {
+            LOGGER.info("Read exception file {} ", exceptionFile);
             Throwable t = ForkedTestFileRunner.readObject(exceptionFile, Throwable.class);
             throw new Exception(
                     "Subprocess returned exception (see cause for details):\n"
@@ -154,9 +157,10 @@ public abstract class ForkedTestFileRunner implements Serializable {
          * Read serialized list of test results and return.
          */
         Path testResultsFile = getLocationOfSerializedTestResults(pathToTempDir);
+        LOGGER.info("Read result test files {}", testResultsFile);
         assertTrue(testResultsFile.toFile().exists(), "File containing serialized test results not present.");
         TestResult[] array = ForkedTestFileRunner.readObject(testResultsFile, TestResult[].class);
-
+        LOGGER.info("Test file read.");
         return Arrays.asList(array);
     }
 
@@ -188,7 +192,6 @@ public abstract class ForkedTestFileRunner implements Serializable {
             }
             writeObject(getLocationOfSerializedTestResults(tempDirectory),
                     testResults.toArray(new TestResult[0]));
-            LOGGER.info("Run without errors, result error={}", error);
         } catch (Throwable t) {
             LOGGER.info("A very unexpected error occurred in the test environment", t);
             try {
@@ -204,6 +207,9 @@ public abstract class ForkedTestFileRunner implements Serializable {
 
         if (error)
             fail("Exception during the execution of proofs. See log for more details.");
+
+        LOGGER.info("Run without errors; process terminates");
+        System.exit(0);
     }
 
     /**
