@@ -32,7 +32,7 @@ statisticsFile = ../../key.core/build/reports/runallproofs/runStatistics.csv
  *                 perGroup - one subprocess is created for each group
  *                 perFile - one subprocess is created for each file
  */
-forkMode = perGroup
+forkMode = noFork
 
 /*
  * Enable or disable proof reloading.
@@ -128,15 +128,5 @@ keySettings = "#Proof-Settings-Config-File
 # These are the proof files which can be loaded from the examples menu.
 # They must work with the current version.
 group reload_examples {
-   provable ./firstTouch/05-ReverseArray/reverseArray.key
-
-   # This is a reload regression test. Since it is the only one
-   # it goes here with the sibling reload tests
-   loadable ./standard_key/arith/saveProofTest.key.proof
-   loadable ./heap/permutedSum/perm.proof
-   loadable ./firstTouch/05-ReverseArray/reverseArray.proof
-   loadable ./heap/verifyThis15_1_RelaxedPrefix/relax.proof
-   loadable ./heap/verifyThis15_3_DLL/doUndo.proof
-   loadable ./heap/verifyThis15_2_ParallelGcd/parallelGcd.proof
    loadable ./heap/verifyThis17_1_PairInsertionSort/sort.proof.gz
 }
