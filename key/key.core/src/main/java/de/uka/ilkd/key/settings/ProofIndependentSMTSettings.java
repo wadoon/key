@@ -92,13 +92,13 @@ public final class ProofIndependentSMTSettings implements de.uka.ilkd.key.settin
         nonLegacyTypes.removeAll(legacyTypes);
         // Z3_CE solver should not be a usable solver union or part of any as it is
         // treated separately.
-        for (SolverType type: nonLegacyTypes.stream().filter(t -> t != SolverTypes.Z3_CE_SOLVER)
+        for (SolverType type : nonLegacyTypes.stream().filter(t -> t != SolverTypes.Z3_CE_SOLVER)
                 .collect(Collectors.toList())) {
             solverUnions.add(new SolverTypeCollection(type.getName(), 1, type));
         }
 
         // single solvers with legacy translation
-        for (SolverType type: legacyTypes) {
+        for (SolverType type : legacyTypes) {
             legacyTranslationSolverUnions.add(new SolverTypeCollection(type.getName(), 1, type));
         }
     }
@@ -353,6 +353,13 @@ public final class ProofIndependentSMTSettings implements de.uka.ilkd.key.settin
     }
 
     public SolverTypeCollection computeActiveSolverUnion() {
+        //hack
+        for (SolverTypeCollection solverUnion : solverUnions) {
+            if (solverUnion.name().equals("CVC4"))
+                return solverUnion;
+        }
+
+
         if (activeSolverUnion.isUsable()) {
             return activeSolverUnion;
         }

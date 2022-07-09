@@ -86,11 +86,19 @@ public class ExternalProcessLauncher {
         if (process != null) {
             var handle = process.toHandle();
             LOGGER.info("Stopping process {}, {}", handle.pid(), handle.info());
-            pipe.close();
-            handle.destroy();
-            if (handle.isAlive()) {
-                handle.destroyForcibly();
+            handle.destroyForcibly();
+            try {
+                pipe.close();
+                process.getInputStream().close();
+            } catch (IOException e) {
+                LOGGER.error("", e);
             }
+            try {
+                process.getOutputStream().close();
+            } catch (IOException e) {
+                LOGGER.error("", e);
+            }
+            LOGGER.info("Process is still alive: {}!", handle.isAlive());
         }
     }
 
