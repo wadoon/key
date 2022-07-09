@@ -9,8 +9,8 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 /**
  * IN ORDER TO START THE SOLVERS USE THIS CLASS.<br>
@@ -119,7 +119,8 @@ public class SolverLauncher implements SolverListener {
     public SolverLauncher(SMTSettings settings) {
         this.settings = settings;
         if (executorService == null) {
-            executorService = Executors.newFixedThreadPool(settings.getMaxConcurrentProcesses());
+            executorService = Executors.newFixedThreadPool(settings.getMaxConcurrentProcesses(),
+                    new DefaultDaemonThreadFactory());
         }
     }
 
@@ -446,5 +447,27 @@ class Session {
         synchronized (finishedSolvers) {
             return new ArrayList<>(finishedSolvers);
         }
+    }
+}
+
+
+class DefaultDaemonThreadFactory implements ThreadFactory {
+    private static final AtomicInteger poolNumber = new AtomicInteger(1);
+    private final ThreadGroup group;
+    private final AtomicInteger threadNumber = new AtomicInteger(1);
+    private final String namePrefix;
+
+    DefaultDaemonThreadFactory() {
+        SecurityManager s = System.getSecurityManager();
+        group = (s != null) ? s.getThreadGroup() : Thread.currentThread().getThreadGroup();
+        namePrefix = "solver-launcher-pool-" + poolNumber.getAndIncrement() + "-thread-";
+    }
+
+    public Thread newThread(@Nonnull Runnable r) {
+        Thread t = new Thread(group, r, namePrefix + threadNumber.getAndIncrement(), 0);
+        t.setDaemon(true);
+        if (t.getPriority() != Thread.NORM_PRIORITY)
+            t.setPriority(Thread.NORM_PRIORITY);
+        return t;
     }
 }
