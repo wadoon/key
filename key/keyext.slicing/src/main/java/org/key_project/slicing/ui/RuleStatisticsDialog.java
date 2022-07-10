@@ -52,6 +52,8 @@ public class RuleStatisticsDialog extends JDialog {
 
         JButton okButton = new JButton("Close");
         okButton.addActionListener(event -> dispose());
+        KeyStroke stroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+        rootPane.registerKeyboardAction(e -> dispose(), stroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
 
         JButton sortButton1 = new JButton("Sort by name");
         sortButton1.addActionListener(event -> {
