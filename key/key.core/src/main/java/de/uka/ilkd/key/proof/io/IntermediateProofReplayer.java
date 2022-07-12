@@ -17,6 +17,10 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import de.uka.ilkd.key.proof.io.intermediate.*;
+import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
+import de.uka.ilkd.key.smt.*;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -53,24 +57,6 @@ import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.io.intermediate.AppNodeIntermediate;
-import de.uka.ilkd.key.proof.io.intermediate.BranchNodeIntermediate;
-import de.uka.ilkd.key.proof.io.intermediate.BuiltInAppIntermediate;
-import de.uka.ilkd.key.proof.io.intermediate.MergeAppIntermediate;
-import de.uka.ilkd.key.proof.io.intermediate.MergePartnerAppIntermediate;
-import de.uka.ilkd.key.proof.io.intermediate.NodeIntermediate;
-import de.uka.ilkd.key.proof.io.intermediate.TacletAppIntermediate;
-import de.uka.ilkd.key.rule.AbstractContractRuleApp;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.IfFormulaInstDirect;
-import de.uka.ilkd.key.rule.IfFormulaInstSeq;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
-import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.UseDependencyContractRule;
-import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.merge.MergePartner;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
@@ -78,11 +64,7 @@ import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstractionFactory;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.DefaultSMTSettings;
-import de.uka.ilkd.key.smt.RuleAppSMT;
-import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
-import de.uka.ilkd.key.smt.SolverLauncher;
-import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.util.Pair;
@@ -477,6 +459,19 @@ public class IntermediateProofReplayer {
             try {
                 pos = PosInOccurrence.findInSequent(currGoal.sequent(),
                     currFormula, currPosInTerm);
+
+                /* part of the fix for #1716: ensure that position of find term
+                 * (antecedent/succedent) matches the kind of the taclet.
+                 */
+                Taclet taclet = ourApp.taclet();
+                if (taclet instanceof AntecTaclet && !pos.isInAntec()) {
+                    throw new TacletAppConstructionException("The taclet " + taclet.name()
+                        + " can not be applied to a formula/term in succedent.");
+                } else if (taclet instanceof SuccTaclet && pos.isInAntec()) {
+                    throw new TacletAppConstructionException("The taclet " + taclet.name()
+                        + " can not be applied to a formula/term in antecedent.");
+                }
+
                 ourApp = ((NoPosTacletApp) ourApp).matchFind(pos, services);
                 ourApp = ourApp.setPosInOccurrence(pos, services);
             } catch (Exception e) {
@@ -606,7 +601,7 @@ public class IntermediateProofReplayer {
             }
         }
 
-        if (RuleAppSMT.rule.name().toString().equals(ruleName)) {
+        if (RuleAppSMT.RULE.name().toString().equals(ruleName)) {
             boolean error = false;
             final SMTProblem smtProblem = new SMTProblem(currGoal);
             try {
@@ -615,12 +610,26 @@ public class IntermediateProofReplayer {
                     ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
                     proof.getSettings().getNewSMTSettings(),
                     proof);
-                SolverLauncher launcher = new SolverLauncher(settings);
-                // launcher.addListener(new SolverListener(settings, proof));
-                SolverTypeCollection active = ProofIndependentSettings.DEFAULT_INSTANCE
-                        .getSMTSettings().computeActiveSolverUnion();
-                ArrayList<SMTProblem> problems = new ArrayList<SMTProblem>();
+
+                ProofIndependentSMTSettings smtSettings = ProofIndependentSettings.DEFAULT_INSTANCE
+                    .getSMTSettings();
+                SolverTypeCollection active = smtSettings.computeActiveSolverUnion();
+                SMTAppIntermediate smtAppIntermediate = (SMTAppIntermediate) currInterm;
+                String smtSolver = smtAppIntermediate.getSolver();
+                if (smtSolver == null || smtSolver.isEmpty()) {
+                    // default to Z3 because this one most likely was used when saving the proof
+                    smtSolver = "Z3";
+                }
+                // try to find the solver that closed the proof
+                for (SolverTypeCollection su : smtSettings.getSolverUnions(true)) {
+                    if (su.name().equals(smtSolver)) {
+                        active = su;
+                        break;
+                    }
+                }
+                ArrayList<SMTProblem> problems = new ArrayList<>();
                 problems.add(smtProblem);
+                SolverLauncher launcher = new SolverLauncher(settings);
                 launcher.launch(active.getTypes(), problems,
                     proof.getServices());
             } catch (Exception e) {
@@ -631,7 +640,7 @@ public class IntermediateProofReplayer {
                 status = "Your proof has been loaded, but SMT solvers have not been run";
                 throw new SkipSMTRuleException();
             } else {
-                return RuleAppSMT.rule.createApp(null, proof.getServices());
+                return RuleAppSMT.RULE.createApp(null, proof.getServices());
             }
         }
 
