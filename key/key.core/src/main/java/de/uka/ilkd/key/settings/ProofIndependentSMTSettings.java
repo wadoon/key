@@ -353,13 +353,6 @@ public final class ProofIndependentSMTSettings implements de.uka.ilkd.key.settin
     }
 
     public SolverTypeCollection computeActiveSolverUnion() {
-        //hack
-        for (SolverTypeCollection solverUnion : solverUnions) {
-            if (solverUnion.name().equals("CVC4"))
-                return solverUnion;
-        }
-
-
         if (activeSolverUnion.isUsable()) {
             return activeSolverUnion;
         }
