@@ -423,15 +423,17 @@ public final class JMLTransformer extends RecoderModelTransformer {
                 .getParent().getASTParent();
         int childIndex = astParent
                 .getIndexOfChild(originalComments[0].getParent());
-        String labelName = "_" + stat.getClauseText().substring(1, stat.getClauseText().indexOf(':'));
-
+        String labelName = "no_label_so_far";
+        if(stat.getClauseText().indexOf(':') > 0) {
+            labelName = "_" + stat.getClauseText().substring(1, stat.getClauseText().indexOf(':'));
+        }
         ParserRuleContext ctx = stat.getContext().first;
 
         de.uka.ilkd.key.java.Position pos = new de.uka.ilkd.key.java.Position(
                 ctx.start.getLine(),
                 ctx.start.getCharPositionInLine());
         final Kind kind = stat.getKind();
-        JmlAssert jmlAssert = new JmlAssert(kind, stat.getContext());
+        JmlAssert jmlAssert = new JmlAssert(kind, stat.getContext(), labelName);
         try {
             updatePositionInformation(jmlAssert, pos);
             doAttach(jmlAssert, astParent, childIndex);

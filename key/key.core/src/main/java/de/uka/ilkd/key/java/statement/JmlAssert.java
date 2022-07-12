@@ -79,7 +79,7 @@ public class JmlAssert extends JavaStatement {
      */
     public JmlAssert(ExtList children, Services services) {
         super(children);
-        LocationVariable var = new LocationVariable(new ProgramElementName(this.getLabelName()), new KeYJavaType(), new KeYJavaType(), false, false);
+        //LocationVariable var = new LocationVariable(new ProgramElementName(this.getLabelName()), new KeYJavaType(), new KeYJavaType(), false, false);
 
         this.kind = children.get(TextualJMLAssertStatement.Kind.class);
         this.condition = children.get(LabeledParserRuleContext.class);

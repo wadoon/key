@@ -182,13 +182,13 @@ public final class JmlAssertRule implements BuiltInRule {
         System.out.println(ProofSaver.printAnything("#########################################################################################################################################################", services));
         // TermBuilder elementary update
         System.out.println(PROPOSE_INSTANCE);
-
         System.out.println(ProofSaver.printAnything("#########################################################################################################################################################", services));
         final JavaBlock javaBlock = JavaTools.removeActiveStatement(target.javaBlock(), services);
-        System.out.println();
+        System.out.println(occurrence.toString());
         System.out.println(ProofSaver.printAnything("#########################################################################################################################################################", services));
         // Variable erzeugen
-        String newName = tb.newName(goal.getLocalNamespaces().programVariables().toString()); // Raussuchen
+
+        String newName = tb.newName("hello"); // Raussuchen
         LocationVariable newVariable = tb.locationVariable(newName, services.getTypeConverter().getBooleanType(), true );
 
         // und registrieren
@@ -196,7 +196,6 @@ public final class JmlAssertRule implements BuiltInRule {
 
 
         //System.out.println(ProofSaver.printAnything(update.getLabels(), services));
-
 
         Term elementaryUpdate = tb.elementary(newVariable, tb.convertToBoolean(condition));
         Term proposal = tb.apply(update,

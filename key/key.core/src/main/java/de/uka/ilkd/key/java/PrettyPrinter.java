@@ -3250,7 +3250,8 @@ public class PrettyPrinter {
         write(kind);
         markKeywordEnd();
         write(" ");
-
+        write(jmlAssert.getLabelName());
+        write(": ");
         write(jmlAssert.getConditionText());
 
         write(";");
