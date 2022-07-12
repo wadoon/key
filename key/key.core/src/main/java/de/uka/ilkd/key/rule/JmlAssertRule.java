@@ -183,12 +183,14 @@ public final class JmlAssertRule implements BuiltInRule {
         // TermBuilder elementary update
         System.out.println(PROPOSE_INSTANCE);
         System.out.println(ProofSaver.printAnything("#########################################################################################################################################################", services));
-        final JavaBlock javaBlock = JavaTools.removeActiveStatement(target.javaBlock(), services);
-        System.out.println(occurrence.toString());
+        System.out.println("");
         System.out.println(ProofSaver.printAnything("#########################################################################################################################################################", services));
-        // Variable erzeugen
 
-        String newName = tb.newName("hello"); // Raussuchen
+        final JavaBlock javaBlock = JavaTools.removeActiveStatement(target.javaBlock(), services);
+        // Variable erzeugen
+        String program = occurrence.toString();
+        program = program.substring(program.indexOf("@propose")).substring(9);
+        String newName = tb.newName(program.substring(0, program.indexOf(":")-1)); // Raussuchen
         LocationVariable newVariable = tb.locationVariable(newName, services.getTypeConverter().getBooleanType(), true );
 
         // und registrieren
