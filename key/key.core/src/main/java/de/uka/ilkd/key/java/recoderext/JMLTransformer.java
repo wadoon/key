@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.java.recoderext;
 
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
@@ -421,6 +423,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
                 .getParent().getASTParent();
         int childIndex = astParent
                 .getIndexOfChild(originalComments[0].getParent());
+        String labelName = "_" + stat.getClauseText().substring(1, stat.getClauseText().indexOf(':'));
 
         ParserRuleContext ctx = stat.getContext().first;
 

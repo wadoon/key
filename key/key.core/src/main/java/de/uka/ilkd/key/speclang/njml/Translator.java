@@ -2396,6 +2396,11 @@ class Translator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
+    public Object visitPropose_statement(JmlParser.Propose_statementContext ctx) {
+        return accept(ctx.expression());
+    }
+
+    @Override
     public LocationVariable[] visitTargetHeap(JmlParser.TargetHeapContext ctx) {
         if (ctx == null || ctx.SPECIAL_IDENT().isEmpty()) {
             return new LocationVariable[]{getBaseHeap()};

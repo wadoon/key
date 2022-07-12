@@ -15,7 +15,7 @@ import recoder.java.statement.JavaStatement;
 public class JmlAssert extends JavaStatement {
 
     /**
-     * The kind of this statment either ASSERT or ASSUME
+     * The kind of this statment either ASSERT, ASSUME or PROPOSE
      */
     private final TextualJMLAssertStatement.Kind kind;
 
@@ -32,11 +32,28 @@ public class JmlAssert extends JavaStatement {
     private final LabeledParserRuleContext condition;
 
     /**
+     * The Label for propose-assert cases in the form 'propose labelName: x=5;'
+     */
+    private String labelName;
+
+    /**
      *
      * @param kind the kind of this statment
      * @param condition the condition for this statement
      */
     public JmlAssert(TextualJMLAssertStatement.Kind kind, LabeledParserRuleContext condition) {
+        this.kind = kind;
+        this.condition = condition;
+    }
+
+    /**
+     *
+     * @param kind the kind of this statment
+     * @param condition the condition for this statement
+     * @param labelName the name label for this statement
+     */
+    public JmlAssert(TextualJMLAssertStatement.Kind kind, LabeledParserRuleContext condition, String labelName) {
+        this.labelName = labelName;
         this.kind = kind;
         this.condition = condition;
     }
@@ -51,6 +68,8 @@ public class JmlAssert extends JavaStatement {
         this.kind = proto.kind;
         this.condition = proto.condition;
     }
+
+    public String getLabelName() {return labelName; }
 
     public TextualJMLAssertStatement.Kind getKind() {
         return kind;

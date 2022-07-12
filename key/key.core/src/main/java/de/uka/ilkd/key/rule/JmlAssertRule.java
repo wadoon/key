@@ -3,19 +3,17 @@ package de.uka.ilkd.key.rule;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.JmlAssert;
 import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.ProgVarReplacer;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement.Kind;
 import de.uka.ilkd.key.util.MiscTools;
 import org.key_project.util.collection.ImmutableList;
@@ -39,13 +37,35 @@ import java.util.Optional;
  *
  * <p>
  * {@code
- *    \DELTA => update(cond), \GAMMA   \DELTA => update(cond -> <.. ...>), \GAMMA
+ *    \DELTA => update({_label:=cond} <.. ...>), \GAMMA
+ * --------------------------------------------------------
+ *    \DELTA => update(<.. //@propose label: cond; ...>), \GAMMA
+ * }
+ * </p>
+ *
+ * and
+ *
+ * <p>
+ * {@code
+ *    \DELTA => update(_label -> cond), \GAMMA  // könnte Probleme geben falls es erst initialisiert werden muss
+ *    \DELTA => update({_name:=cond} <.. ...>), \GAMMA
+ * --------------------------------------------------------
+ *    \DELTA => update(<.. //@assert name: cond assuming <label>; ...>), \GAMMA
+ * }
+ * </p>
+ *
+ * and
+ *
+ * <p>
+ * {@code
+ *    \DELTA => update(cond), \GAMMA
+ *    \DELTA => update(<.. ...>), \GAMMA
  * ---------------------------------------------------------------------------------
  *             \DELTA => update(<.. //@assert cond; ...>), \GAMMA
  * }
  * </p>
  *
- * @author Benjamin Takacs
+ * @author Benjamin Takacs, Felix Graner
  */
 public final class JmlAssertRule implements BuiltInRule {
 
@@ -57,6 +77,10 @@ public final class JmlAssertRule implements BuiltInRule {
      * The instance for assume statements
      */
     public static final JmlAssertRule ASSUME_INSTANCE = new JmlAssertRule(Kind.ASSUME);
+    /**
+     * The instance for propose statements
+     */
+    public static final JmlAssertRule PROPOSE_INSTANCE = new JmlAssertRule(Kind.PROPOSE);
     /**
      * The name of this rule
      */
@@ -135,13 +159,54 @@ public final class JmlAssertRule implements BuiltInRule {
             setUpValidityRule(result.tail().head(), occurrence, update, condition, tb);
         } else if (kind == Kind.ASSUME) {
             result = goal.split(1);
+        } else if(kind == Kind.PROPOSE) {
+            result = goal.split(1);
+            //setUpValidityRule(result.tail().head(), occurrence, update, condition, tb);
+            setUpProposalRule(result.head(), occurrence, update, target, condition, tb, services);
+
+            return result;
         } else {
-            throw new RuleAbortException(
-                    String.format("Unknown assertion type %s", jmlAssert.getKind()));
+                throw new RuleAbortException(
+                        String.format("Unknown assertion type %s", jmlAssert.getKind()));
         }
         setUpUsageGoal(result.head(), occurrence, update, target, condition, tb, services);
 
         return result;
+    }
+
+    private void setUpProposalRule(Goal goal, PosInOccurrence occurrence,
+                                   Term update, Term target, Term condition,
+                                   TermBuilder tb, Services services) {
+        goal.setBranchLabel("Proposed");
+
+        System.out.println(ProofSaver.printAnything("#########################################################################################################################################################", services));
+        // TermBuilder elementary update
+        System.out.println(PROPOSE_INSTANCE);
+
+        System.out.println(ProofSaver.printAnything("#########################################################################################################################################################", services));
+        final JavaBlock javaBlock = JavaTools.removeActiveStatement(target.javaBlock(), services);
+        System.out.println();
+        System.out.println(ProofSaver.printAnything("#########################################################################################################################################################", services));
+        // Variable erzeugen
+        String newName = tb.newName(goal.getLocalNamespaces().programVariables().toString()); // Raussuchen
+        LocationVariable newVariable = tb.locationVariable(newName, services.getTypeConverter().getBooleanType(), true );
+
+        // und registrieren
+        services.getNamespaces().programVariables().add(newVariable);
+
+
+        //System.out.println(ProofSaver.printAnything(update.getLabels(), services));
+
+
+        Term elementaryUpdate = tb.elementary(newVariable, tb.convertToBoolean(condition));
+        Term proposal = tb.apply(update,
+                tb.apply(elementaryUpdate, tb.prog((Modality) target.op(), // ProgVarReplacer() anstatt tb.prog() falls später Propose praktisch variablenDeklaration wird um Konflikte zu verhindern
+                javaBlock, target.sub(0), null)));
+
+
+        //System.out.println(ProofSaver.printAnything(proposal, services));
+
+        goal.changeFormula(new SequentFormula(proposal), occurrence);
     }
 
     private void setUpValidityRule(Goal goal, PosInOccurrence occurrence,
@@ -153,9 +218,9 @@ public final class JmlAssertRule implements BuiltInRule {
     private void setUpUsageGoal(Goal goal, PosInOccurrence occurrence,
                                 Term update, Term target, Term condition,
                                 TermBuilder tb, Services services) {
-        goal.setBranchLabel("Usage");
-        final JavaBlock javaBlock = JavaTools.removeActiveStatement(target.javaBlock(), services);
-        final Term newTerm = tb.apply(update,
+            goal.setBranchLabel("Usage");
+            final JavaBlock javaBlock = JavaTools.removeActiveStatement(target.javaBlock(), services);
+            final Term newTerm = tb.apply(update,
                                       tb.imp(condition,
                                              tb.prog((Modality) target.op(),
                                                      javaBlock, target.sub(0), null)));

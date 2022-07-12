@@ -59,7 +59,8 @@ public class TextualJMLAssertStatement extends TextualJMLConstruct {
 
     public static enum Kind {
         ASSERT("assert"),
-        ASSUME("assume");
+        ASSUME("assume"),
+        PROPOSE("propose");
 
         private String name;
 

@@ -1,12 +1,14 @@
 package de.uka.ilkd.key.java.statement;
 
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
@@ -29,7 +31,7 @@ import java.util.Objects;
 public class JmlAssert extends JavaStatement {
 
     /**
-     * the kind of the statement, assert or assume
+     * the kind of the statement, assert, assume or propose
      */
     private final TextualJMLAssertStatement.Kind kind;
     /**
@@ -49,9 +51,11 @@ public class JmlAssert extends JavaStatement {
      */
     private Services services;
 
+    private String labelName;
+
     /**
      *
-     * @param kind assert or assume
+     * @param kind assert or assume or propose
      * @param condition the condition of this statement
      * @param positionInfo the position information for this statement
      * @param services needed for pretty printing (not pretty when null)
@@ -59,11 +63,13 @@ public class JmlAssert extends JavaStatement {
     public JmlAssert(TextualJMLAssertStatement.Kind kind,
                      LabeledParserRuleContext condition,
                      PositionInfo positionInfo,
+                     String labelName,
                      Services services) {
         super(positionInfo);
         this.kind = kind;
         this.condition = condition;
         this.services = services;
+        this.labelName = labelName;
     }
 
     /**
@@ -73,10 +79,13 @@ public class JmlAssert extends JavaStatement {
      */
     public JmlAssert(ExtList children, Services services) {
         super(children);
+        LocationVariable var = new LocationVariable(new ProgramElementName(this.getLabelName()), new KeYJavaType(), new KeYJavaType(), false, false);
+
         this.kind = children.get(TextualJMLAssertStatement.Kind.class);
         this.condition = children.get(LabeledParserRuleContext.class);
         this.cond = children.get(Term.class);
         this.vars = children.get(ProgramVariableCollection.class);
+        this.labelName = children.get(String.class);
         this.services = services;
         if ((cond == null) == (condition == null)) {
             throw new IllegalArgumentException("exactly one of cond and condition has to be null");
@@ -218,5 +227,9 @@ public class JmlAssert extends JavaStatement {
         cond = replacer.replace(cond);
         vars.atPres = atPres;
 
+    }
+
+    public String getLabelName() {
+        return this.labelName;
     }
 }

@@ -404,7 +404,14 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
         }
         return null;
     }
-
+    @Override
+    public Object visitPropose_statement(JmlParser.Propose_statementContext ctx) {
+        TextualJMLAssertStatement b = new TextualJMLAssertStatement(
+                TextualJMLAssertStatement.Kind.PROPOSE,
+                new LabeledParserRuleContext(ctx, OriginTermLabel.SpecType.PROPOSE));
+        constructs = constructs.append(b);
+        return null;
+    }
 
     @Override
     public Object visitAssume_statement(JmlParser.Assume_statementContext ctx) {
