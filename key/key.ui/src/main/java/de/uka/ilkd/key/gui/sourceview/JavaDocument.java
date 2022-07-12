@@ -189,7 +189,7 @@ public class JavaDocument extends DefaultStyledDocument {
         "ensures_redundantly", "\\erases", "forall", "for_example", "hence_by", "implies_that",
         "in", "in_redundantly", "\\into", "loop_invariant", "loop_invariant_redundantly",
         "measured_by", "measured_by_redundantly", "maintaining", "maintaining_redundantly",
-        "maps", "maps_redundantly", "\\new_objects", "old", "refining", "represents",
+        "maps", "maps_redundantly", "\\new_objects", "old", "propose", "refining", "represents",
         "requires", "set", "signals", "signals_only", "\\such_that", "unreachable", "when",
         "working_space",
         // "invariant-like" keywords

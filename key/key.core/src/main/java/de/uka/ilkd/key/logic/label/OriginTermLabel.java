@@ -825,6 +825,11 @@ public class OriginTermLabel implements TermLabel {
         LOOP_INVARIANT_FREE("loop_invariant_free"),
 
         /**
+         * propose
+         */
+        PROPOSE("propose"),
+
+        /**
          * requires
          */
         REQUIRES("requires"),
