@@ -1,6 +1,5 @@
 package org.key_project.slicing;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.proof.Node;
@@ -46,9 +45,6 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      * The proof this tracker monitors.
      */
     private Proof proof;
-    /**
-     * The dependency graph populated by this tracker.
-     */
     private final DependencyGraph graph = new DependencyGraph();
     /**
      * Dependencies between edges. Only used for taclets that add new rules to the proof.
@@ -289,5 +285,12 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
 
     public AnalysisResults getAnalysisResults() {
         return analysisResults;
+    }
+
+    /**
+     * @return the dependency graph populated by this tracker
+     */
+    public DependencyGraph getDependencyGraph() {
+        return graph;
     }
 }

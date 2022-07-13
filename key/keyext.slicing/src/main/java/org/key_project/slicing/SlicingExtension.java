@@ -13,6 +13,7 @@ import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Proof;
 import org.key_project.slicing.ui.ShowCreatedByAction;
 import org.key_project.slicing.ui.ShowGraphAction;
+import org.key_project.slicing.ui.ShowNodeInfoAction;
 import org.key_project.slicing.ui.SlicingLeftPanel;
 
 import javax.annotation.Nonnull;
@@ -74,6 +75,7 @@ public class SlicingExtension implements KeYGuiExtension,
             var graphNode = tracker.getGraphNode(currentNode, topLevel);
             if (graphNode != null) {
                 list.add(new ShowGraphAction(MainWindow.getInstance(), tracker, graphNode));
+                list.add(new ShowNodeInfoAction(MainWindow.getInstance(), tracker, graphNode));
             }
             return list;
         }

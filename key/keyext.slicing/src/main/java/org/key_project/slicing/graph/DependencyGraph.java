@@ -2,6 +2,7 @@ package org.key_project.slicing.graph;
 
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
+import de.uka.ilkd.key.util.Pair;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.DirectedMultigraph;
@@ -78,6 +79,18 @@ public class DependencyGraph {
 
     /**
      * @param node a graph node
+     * @return the incoming (graph edges, graph sources) of that node
+     */
+    public Stream<Pair<Node, GraphNode>> incomingGraphEdgesOf(GraphNode node) {
+        if (!graph.containsVertex(node)) {
+            return Stream.of();
+        }
+        return graph.incomingEdgesOf(node).stream()
+                .map(edge -> new Pair<>(edgeData.get(edge), graph.getEdgeSource(edge)));
+    }
+
+    /**
+     * @param node a graph node
      * @return the rule application(s) that used the graph node, if any
      */
     public Stream<Node> outgoingEdgesOf(GraphNode node) {
@@ -85,6 +98,18 @@ public class DependencyGraph {
             return Stream.of();
         }
         return graph.outgoingEdgesOf(node).stream().map(edgeData::get);
+    }
+
+    /**
+     * @param node a graph node
+     * @return the outgoing (graph edges, graph targets) of that node
+     */
+    public Stream<Pair<Node, GraphNode>> outgoingGraphEdgesOf(GraphNode node) {
+        if (!graph.containsVertex(node)) {
+            return Stream.of();
+        }
+        return graph.outgoingEdgesOf(node).stream()
+                .map(edge -> new Pair<>(edgeData.get(edge), graph.getEdgeTarget(edge)));
     }
 
     public Stream<GraphNode> nodesInBranch(ImmutableList<String> location) {
