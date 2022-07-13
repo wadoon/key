@@ -1,19 +1,11 @@
 package org.key_project.slicing.ui;
 
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.configuration.Config;
-import de.uka.ilkd.key.util.Quadruple;
-import org.key_project.slicing.AnalysisResults;
-import org.key_project.slicing.RuleStatistics;
 
 import javax.swing.*;
 import javax.swing.event.HyperlinkListener;
 import java.awt.*;
-import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class HtmlDialog extends JDialog {
 

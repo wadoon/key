@@ -69,10 +69,10 @@ public final class DependencyAnalyzer {
             }
             usefulSteps.add(node);
             var data = node.lookup(DependencyNodeData.class);
-            usefulFormulas.addAll(data.inputs);
+            data.inputs.forEach(it -> usefulFormulas.add(it.first));
 
             for (var in : data.inputs) {
-                graph.incomingEdgesOf(in).forEach(queue::add);
+                graph.incomingEdgesOf(in.first).forEach(queue::add);
             }
             if (considerOutputs) {
                 data.outputs.stream().filter(ClosedGoal.class::isInstance).forEach(usefulFormulas::add);
@@ -243,7 +243,7 @@ public final class DependencyAnalyzer {
                 rules.addApplication(rule, branches);
             } else {
                 if (node.lookup(DependencyNodeData.class)
-                        .inputs.stream().anyMatch(usefulFormulas::contains)) {
+                        .inputs.stream().map(it -> it.first).anyMatch(usefulFormulas::contains)) {
                     rules.addInitialUselessApplication(rule, branches);
                 } else {
                     rules.addUselessApplication(rule, branches);

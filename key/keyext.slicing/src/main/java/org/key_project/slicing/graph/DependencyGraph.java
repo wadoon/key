@@ -3,8 +3,8 @@ package org.key_project.slicing.graph;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.Triple;
 import org.jgrapht.Graph;
-import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.DirectedMultigraph;
 import org.jgrapht.traverse.BreadthFirstIterator;
 import org.key_project.slicing.DependencyNodeData;
@@ -27,32 +27,33 @@ public class DependencyGraph {
      * Main storage container.
      * Edges start at input formulas and end at formulas produced by the rule application.
      */
-    private final Graph<GraphNode, DefaultEdge> graph = new DirectedMultigraph<>(DefaultEdge.class);
+    private final Graph<GraphNode, AnnotatedEdge> graph = new DirectedMultigraph<>(AnnotatedEdge.class);
     /**
      * Mapping of graph edges to rule applications.
-     * Required because we can not add the same edge twice.
+     * Required to get the proof node corresponding to an edge.
      */
-    private final Map<DefaultEdge, Node> edgeData = new IdentityHashMap<>();
+    private final Map<AnnotatedEdge, Node> edgeData = new IdentityHashMap<>();
 
     /**
      * Add a rule application to the dependency graph.
      *
      * @param node the node to add
      * @param input inputs required by this proof step
+     *              (pairs of graph node + whether the rule app consumes the node)
      * @param output outputs produced by this proof step
      */
-    public void addRuleApplication(Node node, Collection<GraphNode> input, Collection<GraphNode> output) {
+    public void addRuleApplication(Node node, Collection<Pair<GraphNode, Boolean>> input, Collection<GraphNode> output) {
         for (var in : input) {
             for (var out : output) {
-                graph.addVertex(in);
+                graph.addVertex(in.first);
                 graph.addVertex(out);
                 /*
                 if (graph.containsEdge(in, out)) {
                     continue;
                 }
                  */
-                var edge = new DefaultEdge();
-                graph.addEdge(in, out, edge);
+                var edge = new AnnotatedEdge(in.second);
+                graph.addEdge(in.first, out, edge);
                 edgeData.put(edge, node);
             }
         }
@@ -81,12 +82,12 @@ public class DependencyGraph {
      * @param node a graph node
      * @return the incoming (graph edges, graph sources) of that node
      */
-    public Stream<Pair<Node, GraphNode>> incomingGraphEdgesOf(GraphNode node) {
+    public Stream<Triple<Node, GraphNode, AnnotatedEdge>> incomingGraphEdgesOf(GraphNode node) {
         if (!graph.containsVertex(node)) {
             return Stream.of();
         }
         return graph.incomingEdgesOf(node).stream()
-                .map(edge -> new Pair<>(edgeData.get(edge), graph.getEdgeSource(edge)));
+                .map(edge -> new Triple<>(edgeData.get(edge), graph.getEdgeSource(edge), edge));
     }
 
     /**
@@ -104,12 +105,12 @@ public class DependencyGraph {
      * @param node a graph node
      * @return the outgoing (graph edges, graph targets) of that node
      */
-    public Stream<Pair<Node, GraphNode>> outgoingGraphEdgesOf(GraphNode node) {
+    public Stream<Triple<Node, GraphNode, AnnotatedEdge>> outgoingGraphEdgesOf(GraphNode node) {
         if (!graph.containsVertex(node)) {
             return Stream.of();
         }
         return graph.outgoingEdgesOf(node).stream()
-                .map(edge -> new Pair<>(edgeData.get(edge), graph.getEdgeTarget(edge)));
+                .map(edge -> new Triple<>(edgeData.get(edge), graph.getEdgeTarget(edge), edge));
     }
 
     public Stream<GraphNode> nodesInBranch(ImmutableList<String> location) {
@@ -124,7 +125,7 @@ public class DependencyGraph {
                 .filter(it -> it.branchLocation.hasPrefix(location));
     }
 
-    public BreadthFirstIterator<GraphNode, DefaultEdge> breadthFirstIterator(GraphNode start) {
+    public BreadthFirstIterator<GraphNode, AnnotatedEdge> breadthFirstIterator(GraphNode start) {
         return new BreadthFirstIterator<>(graph, start);
     }
 
@@ -142,7 +143,7 @@ public class DependencyGraph {
      * @param e the proof slicing event
      */
     public void prune(ProofTreeEvent e) {
-        for (var edge : graph.edgeSet().toArray(new DefaultEdge[0])) {
+        for (var edge : graph.edgeSet().toArray(new AnnotatedEdge[0])) {
             var node = edgeData.get(edge);
             if (!e.getSource().find(node) || node.getAppliedRuleApp() == null) {
                 var data = node.lookup(DependencyNodeData.class);

@@ -36,7 +36,7 @@ public final class DotExporter {
                 data.outputs.stream().map(it -> it.toString(abbreviateFormulas, false)).forEach(out -> {
                     buf
                             .append('"')
-                            .append(in.toString(abbreviateFormulas, false))
+                            .append(in.first.toString(abbreviateFormulas, false))
                             .append("\" -> \"")
                             .append(out)
                             .append("\" [label=\"")
@@ -95,7 +95,7 @@ public final class DotExporter {
                 }
                 for (var in : data.inputs) {
                     for (var out : data.outputs) {
-                        var inString = in.toString(abbreviateFormulas, omitBranch);
+                        var inString = in.first.toString(abbreviateFormulas, omitBranch);
                         var outString = out.toString(abbreviateFormulas, omitBranch);
                         buf
                                 .append('"')
@@ -110,7 +110,7 @@ public final class DotExporter {
                         buf
                                 .append("\"];\n");
                         if (analysisResults != null) {
-                            if (!analysisResults.usefulNodes.contains(in)) {
+                            if (!analysisResults.usefulNodes.contains(in.first)) {
                                 buf.append('"').append(inString).append('"').append(" [color=\"red\"]\n");
                             }
                             if (!analysisResults.usefulNodes.contains(out)) {
