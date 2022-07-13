@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.settings;
 
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.smt.SMTSettings;
@@ -94,6 +95,13 @@ public class DefaultSMTSettings implements SMTSettings {
         return piSettings.getTimeout();
     }
 
+    /**
+     * Note that this value is interpreted as milliseconds by
+     * {@link de.uka.ilkd.key.smt.SolverLauncher#prepareSolvers(Collection, Collection, Services)}.
+     *
+     * @param type the solver type whose timeout is desired
+     * @return the given type's timeout value (in ms)
+     */
     @Override
     public long getTimeout(SolverType type) {
         if (piSettings.getSolverTimeout(type) >= 1) {

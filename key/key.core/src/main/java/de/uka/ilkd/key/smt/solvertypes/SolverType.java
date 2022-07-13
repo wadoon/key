@@ -16,7 +16,6 @@ package de.uka.ilkd.key.smt.solvertypes;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.smt.communication.AbstractSolverSocket;
-import de.uka.ilkd.key.smt.communication.PipeFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -117,7 +116,7 @@ public interface SolverType {
      * Unless {@link #setSolverTimeout(long)} has been called, this should be the same
      * as {@link #getDefaultSolverTimeout()}.
      *
-     * @return the currently set solver timeout, e.g. 2000L milliseconds
+     * @return the currently set solver timeout in milliseconds
      */
     long getSolverTimeout();
 
@@ -208,14 +207,6 @@ public interface SolverType {
      */
     @Nonnull
     AbstractSolverSocket getSocket(ModelExtractor query);
-
-    @Nonnull
-    PipeFactory getPipeFactory();
-
-    @Nonnull
-    String[] getSendTriggers();
-
-    boolean lineFeedback();
 
 }
 

@@ -107,7 +107,8 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
     }
 
     private JSpinner createSolverTimeout() {
-        var model = new SpinnerNumberModel(Long.valueOf(0L), Long.valueOf(-1L), Long.valueOf(Long.MAX_VALUE),
+        var model = new SpinnerNumberModel(Long.valueOf(solverType.getSolverTimeout()/1000L),
+                Long.valueOf(-1L), Long.valueOf(Long.MAX_VALUE),
                 Long.valueOf(1L));
         var jsp = createNumberTextField(model, null);
         addTitledComponent("Timeout", jsp, BUNDLE.getString(INFO_SOLVER_TIMEOUT));
@@ -180,6 +181,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
         if (clone.containsSolver(solverType)) {
             solverCommand.setText(clone.getCommand(solverType));
             solverParameters.setText(clone.getParameters(solverType));
+            // Set a Long object (see typecast in #applySettings):
             solverTimeout.setValue(clone.getSolverTimeout(solverType)/1000L);
             solverName.setText(solverType.getName());
         } else {
@@ -201,14 +203,11 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
         if (settings.containsSolver(solverType)) {
             String command = solverCommand.getText();
             String params = solverParameters.getText();
-            long timeout = ((Long) solverTimeout.getValue())*1000L;
+            long timeout = (Long) solverTimeout.getValue();
 
             solverType.setSolverCommand(command);
             solverType.setSolverParameters(params);
-            solverType.setSolverTimeout(timeout);
-            // This is not necessary as it just calls solverData.setSolver... again
-            // SettingsManager.getSmtPiSettings().setCommand(solverType, command);
-            // SettingsManager.getSmtPiSettings().setParameters(solverType, params);
+            solverType.setSolverTimeout(timeout*1000L);
             window.updateSMTSelectMenu();
 
             setSmtSettings(SettingsManager.getSmtPiSettings().clone()); // refresh gui

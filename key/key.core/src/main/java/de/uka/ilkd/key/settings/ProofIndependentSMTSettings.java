@@ -269,6 +269,13 @@ public final class ProofIndependentSMTSettings implements de.uka.ilkd.key.settin
         return type.getSolverCommand();
     }
 
+    /**
+     * Note that this value is interpreted as milliseconds by
+     * {@link DefaultSMTSettings#getTimeout(SolverType)}.
+     *
+     * @param type the solver type whose timeout is desired
+     * @return the given type's timeout value (in ms)
+     */
     public long getSolverTimeout(SolverType type) {
         return type.getSolverTimeout();
     }

@@ -1,8 +1,6 @@
 package de.uka.ilkd.key.smt.solvertypes;
 
 import de.uka.ilkd.key.settings.SettingsConverter;
-import de.uka.ilkd.key.smt.communication.Pipe;
-import de.uka.ilkd.key.smt.communication.PipeFactory;
 import de.uka.ilkd.key.smt.communication.Z3Socket;
 import de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator;
 import org.key_project.util.reflection.ClassLoaderUtil;
@@ -174,10 +172,6 @@ public class SolverPropertiesLoader {
      */
     private static final Map<String, Integer> NAME_COUNTERS = new HashMap<>();
 
-    private static String LINE_FEEDBACK = "lineFeedback";
-    private static String SEND_TRIGGERS = "sendTriggers";
-    private static String PIPE = "pipe";
-
     private static String uniqueName(String name) {
         Integer counter = NAME_COUNTERS.get(name);
         // if NAME has not been used yet, use it and set counter to 0
@@ -242,9 +236,6 @@ public class SolverPropertiesLoader {
         String[] handlerNames;
         String[] handlerOptions;
         String[] delimiters;
-        PipeFactory pipe;
-        String[] sendTriggers;
-        boolean lineFeedback;
 
         // Read props file to create a SolverTypeImplementation object:
 
@@ -255,6 +246,7 @@ public class SolverPropertiesLoader {
         // default solver COMMAND, TIMEOUT, parameters, VERSION parameter, solver INFO (some string)
         command = SettingsConverter.readRawString(props, SolverPropertiesLoader.COMMAND,
                 DEFAULT_COMMAND);
+        // timeout is given in seconds! needs to be multiplied by 1000 in order to get milliseconds
         timeout = SettingsConverter.read(props, SolverPropertiesLoader.TIMEOUT, DEFAULT_TIMEOUT);
         if (timeout < -1) {
             timeout = -1;
@@ -300,14 +292,10 @@ public class SolverPropertiesLoader {
         // the solver specific preamble, may be null
         preamble = SettingsConverter.readFile(props, PREAMBLE_FILE, null);
 
-        pipe = PipeFactory.valueOf(SettingsConverter.readRawString(props, PIPE, DEFAULT_PIPE));
-        sendTriggers = SettingsConverter.readRawStringList(props, SEND_TRIGGERS, SPLIT, new String[0]);
-        lineFeedback = SettingsConverter.read(props, LINE_FEEDBACK, true);
-
         // create the solver type
         return new SolverTypeImplementation(name, info, params, command, version, minVersion,
-                timeout, delimiters, translatorClass, handlerNames, handlerOptions,
-                solverSocketClass, preamble, pipe, sendTriggers, lineFeedback);
+                timeout*1000L, delimiters, translatorClass, handlerNames, handlerOptions,
+                solverSocketClass, preamble);
     }
 
     /**

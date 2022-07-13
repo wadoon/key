@@ -3,7 +3,6 @@ package de.uka.ilkd.key.smt.solvertypes;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.smt.communication.AbstractSolverSocket;
-import de.uka.ilkd.key.smt.communication.PipeFactory;
 import de.uka.ilkd.key.smt.communication.Z3Socket;
 import de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator;
 import org.slf4j.Logger;
@@ -177,11 +176,6 @@ public final class SolverTypeImplementation implements SolverType {
      */
     private final SMTTranslator translator;
 
-    private final PipeFactory pipeFactory;
-    private final boolean lineFeedback;
-    private final String[] sendTriggers;
-
-
     /**
      * Instantiate the solver type object with all its default values.
      * The changeable values such as {@link #command} and {@link #params}
@@ -212,9 +206,7 @@ public final class SolverTypeImplementation implements SolverType {
                                     long defaultTimeout, String[] delimiters,
                                     Class<?> translatorClass,
                                     String[] handlerNames, String[] handlerOptions,
-                                    Class<?> solverSocketClass, String preamble,
-                                    PipeFactory pipeFactory, String[] sendTriggers,
-                                    boolean lineFeedback) {
+                                    Class<?> solverSocketClass, String preamble) {
         this.name = name;
         this.info = info;
         this.defaultParams = defaultParams;
@@ -234,9 +226,6 @@ public final class SolverTypeImplementation implements SolverType {
         this.preamble = preamble;
         this.translator = makeTranslator();
         this.solverSocket = makeSocket();
-        this.pipeFactory = pipeFactory;
-        this.lineFeedback = lineFeedback;
-        this.sendTriggers = sendTriggers;
     }
 
     private AbstractSolverSocket makeSocket() {
@@ -470,23 +459,6 @@ public final class SolverTypeImplementation implements SolverType {
         AbstractSolverSocket socket = solverSocket.copy();
         socket.setQuery(query);
         return socket;
-    }
-
-    @Nonnull
-    @Override
-    public PipeFactory getPipeFactory() {
-        return pipeFactory;
-    }
-
-    @Nonnull
-    @Override
-    public String[] getSendTriggers() {
-        return sendTriggers;
-    }
-
-    @Override
-    public boolean lineFeedback() {
-        return lineFeedback;
     }
 
 }
