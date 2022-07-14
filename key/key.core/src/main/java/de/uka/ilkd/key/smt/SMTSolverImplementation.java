@@ -134,7 +134,11 @@ public final class SMTSolverImplementation implements SMTSolver {
      * The timeout in seconds for this SMT solver run.
      */
     private long timeout = -1;
-    private long startTime = -1;
+    /**
+     * Time in ms, when the {{@link #call()}} was called; {@code -1} if {@link #call()} was not called on this class.
+     * Read and written by different threads!
+     */
+    private volatile long startTime = -1;
 
     /**
      * Creates a new instance an SMT solver.
