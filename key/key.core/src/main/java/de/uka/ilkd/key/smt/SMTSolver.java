@@ -31,7 +31,7 @@ public interface SMTSolver extends Callable<SMTSolverResult> {
         /**
          * This SMT solver run has lost against an other SMT solver on the same instance.
          */
-        LOOSER;
+        LOSER;
     }
 
     /**
@@ -93,12 +93,9 @@ public interface SMTSolver extends Callable<SMTSolverResult> {
     /**
      * Use this method in order to interrupt a running solver process.
      *
-     * @param reasonOfInterruption The reason of interruption. Can only be set to
-     *                             <code>ReasonOfInterruption.Timeout</code> or
-     *                             <code>ReasonOfInterruption.User</code> other wise a
-     *                             <code>IllegalArgumentException</code> is thrown.
+     * @param reasonOfInterruption The reason of interruption.
      */
-    void interrupt(ReasonOfInterruption reasonOfInterruption);
+    void interrupt(@Nonnull ReasonOfInterruption reasonOfInterruption);
 
     /**
      * @return the system time when the solver was started. (in ms)
@@ -146,7 +143,8 @@ public interface SMTSolver extends Callable<SMTSolverResult> {
     /**
      * @return the reason of the interruption: see <code>ReasonOfInterruption</code>.
      */
-    @Nonnull ReasonOfInterruption getReasonOfInterruption();
+    @Nonnull
+    ReasonOfInterruption getReasonOfInterruption();
 
     /**
      * Returns the result of the execution. If the solver process is still
@@ -155,7 +153,8 @@ public interface SMTSolver extends Callable<SMTSolverResult> {
      *
      * @return the result of the solver process' execution
      **/
-    @Nonnull SMTSolverResult getFinalResult();
+    @Nonnull
+    SMTSolverResult getFinalResult();
 
     /**
      * Returns the raw solver output. This includes the result (sat/unsat/unknown), possibly

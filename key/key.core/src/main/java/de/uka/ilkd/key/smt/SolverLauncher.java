@@ -247,13 +247,21 @@ public class SolverLauncher implements SolverListener {
         //Show progress dialog
         notifyListenersOfStart(problems, solverTypes);
 
+        // sorting by timeout to maintain a increasing waiting time list
         solvers.sort(Comparator.comparing(SMTSolver::getTimeout));
 
-        Consumer<SMTProblem> cancel = smtProblem -> {
+        // callback to cancelCallback all known solvers on the same sub-problem
+        Consumer<SMTProblem> cancelCallback = smtProblem -> {
             synchronized (submittedTasks) {
                 if (submittedTasks.containsKey(smtProblem)) {
-                    smtProblem.getSolvers().forEach(it -> it.interrupt(ReasonOfInterruption.LOOSER));
-                    submittedTasks.get(smtProblem).forEach(it -> it.cancel(true));
+                    smtProblem.getSolvers().forEach(it -> it.interrupt(ReasonOfInterruption.LOSER));
+                    submittedTasks.get(smtProblem).forEach(it -> {
+                        try {
+                            it.cancel(true);
+                        } catch (CompletionException ignore) {
+                            //ignore: Task is already finished. No actions needed.
+                        }
+                    });
                 }
             }
         };
@@ -261,18 +269,21 @@ public class SolverLauncher implements SolverListener {
         var futures = new ArrayList<Future<SMTSolverResult>>();
         synchronized (submittedTasks) {
             for (var it : solvers) {
-                final var future = executorService.submit(createSolverTask(it, cancel));
-                submittedTasks.computeIfAbsent(it.getProblem(), (k) -> new ArrayList<>(4)).add(future);
+                final var future = executorService.submit(createSolverTask(it, cancelCallback));
+                submittedTasks.computeIfAbsent(it.getProblem(), k -> new ArrayList<>(4)).add(future);
                 futures.add(future);
             }
         }
 
-        long alreadyWaitedTime = 0;
         for (int i = 0; i < solvers.size(); i++) {
             long currentTimeout = solvers.get(i).getTimeout();
+            final var startTime = solvers.get(i).getStartTime();
+            long waitTime = currentTimeout +
+                    startTime < 0 ? 0 /* not started, just wait the timeout */
+                    : Math.min(0, startTime) - System.currentTimeMillis(); // time wasted between start and get() call.
             var future = futures.get(i);
             try {
-                future.get(currentTimeout - alreadyWaitedTime, TimeUnit.MILLISECONDS);
+                future.get(waitTime, TimeUnit.MILLISECONDS);
             } catch (InterruptedException e) {
                 LOGGER.warn("Waiting for termination of SMTSolver got interrupted. Cancel all submitted tasks!", e);
                 stop(ReasonOfInterruption.TIMEOUT);
@@ -287,7 +298,6 @@ public class SolverLauncher implements SolverListener {
             } catch (CancellationException e) {
                 LOGGER.info("SMT solver was cancelled while we wait on termination.");
             }
-            alreadyWaitedTime = currentTimeout;
         }
 
         // kill remaining tasks!
@@ -448,9 +458,14 @@ class Session {
             return new ArrayList<>(finishedSolvers);
         }
     }
+
 }
 
-
+/**
+ * An adoption of the original {@link java.util.concurrent.Executors.DefaultThreadFactory} for creating daemon threads.
+ * Using this thread factory in {@link ExecutorService} does prevent them from blocking regular termination by
+ * reaching the end of main entry point.
+ */
 class DefaultDaemonThreadFactory implements ThreadFactory {
     private static final AtomicInteger poolNumber = new AtomicInteger(1);
     private final ThreadGroup group;
