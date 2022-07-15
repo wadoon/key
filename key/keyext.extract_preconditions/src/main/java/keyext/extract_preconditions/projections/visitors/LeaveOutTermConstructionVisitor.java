@@ -7,6 +7,7 @@ import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 import java.util.LinkedList;
@@ -186,20 +187,9 @@ public class LeaveOutTermConstructionVisitor implements Visitor {
             List<Term> childTerms = this.termStorage.pop();
             // We also visit the node itself so we need to drop the last element again
             // (or only add this last once if there are no children)
-            // TODO(steuber): Do this more elegantly?
-            Term newTerm;
-            if (childTerms.size() > 1) {
-                childTerms.remove(childTerms.size()-1);
-                // TODO(steuber): createTerm does not support NOT => Is this on purpose?
-                if (subtreeRoot.op() == Junctor.NOT) {
-                    assert childTerms.size() == 1;
-                    newTerm = this.termBuilder.not(childTerms.get(0));
-                } else {
-                    newTerm = this.termBuilder.tf().createTerm(subtreeRoot.op(), childTerms);
-                }
-            } else {
-                newTerm = this.termBuilder.tf().createTerm(subtreeRoot.op());
-            }
+            childTerms.remove(childTerms.size()-1);
+            Term newTerm = this.termBuilder.tf().createTerm(subtreeRoot.op(), new ImmutableArray<>(childTerms),
+                    null, null);
             this.addNodeAtCurPos(newTerm);
         }
     }
