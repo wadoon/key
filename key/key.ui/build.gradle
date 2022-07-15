@@ -26,6 +26,7 @@ dependencies {
 
     runtimeOnly project(":keyext.interactionlog")
     //runtimeOnly project(":keyext.script.ui")
+    runtimeOnly project(":keyext.extract_preconditions")
 }
 
 task createExamplesZip(type: Zip) {
@@ -42,6 +43,7 @@ processResources.dependsOn << createExamplesZip
 shadowJar {
     archiveClassifier = "exe"
     archiveBaseName = "key"
+    mergeServiceFiles()
 }
 
 distZip {
