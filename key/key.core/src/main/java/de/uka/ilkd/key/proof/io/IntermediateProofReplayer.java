@@ -183,16 +183,18 @@ public class IntermediateProofReplayer {
         var mapping = new HashMap<Integer, NodeIntermediate>();
         if (!queue.isEmpty()) {
             final int[] i = {0};
-            queue.peekFirst().second.depthFirstVisit(node -> {
-                if (node instanceof AppNodeIntermediate) {
-                    //LOGGER.info("Node {} idx {}", ((AppNodeIntermediate) node).getIntermediateRuleApp().getRuleName(), i[0]);
-                    mapping.put(i[0], node);
-                    i[0]++;
-                    if (node.subtreeSize() == 1 && !((AppNodeIntermediate) node).getIntermediateRuleApp().getRuleName().equals("SMTRule")) {
+            if (queue.peekFirst().second != null) {
+                queue.peekFirst().second.depthFirstVisit(node -> {
+                    if (node instanceof AppNodeIntermediate) {
+                        //LOGGER.info("Node {} idx {}", ((AppNodeIntermediate) node).getIntermediateRuleApp().getRuleName(), i[0]);
+                        mapping.put(i[0], node);
                         i[0]++;
+                        if (node.subtreeSize() == 1 && !((AppNodeIntermediate) node).getIntermediateRuleApp().getRuleName().equals("SMTRule")) {
+                            i[0]++;
+                        }
                     }
-                }
-            });
+                });
+            }
         }
         var stepIdxOverrides = new ArrayDeque<Integer>();
         Goal overrideGoal = null;
