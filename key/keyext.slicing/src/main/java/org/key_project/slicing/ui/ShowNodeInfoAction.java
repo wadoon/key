@@ -49,7 +49,7 @@ public class ShowNodeInfoAction extends MainWindowAction {
             var ruleName = n.first.getAppliedRuleApp().rule().displayName();
             return List.of(
                     Integer.toString(n.first.serialNr()),
-                    analysisResults != null && !analysisResults.usefulSteps.contains(n.first) ? ruleName + "*" : ruleName,
+                    analysisResults != null && !analysisResults.usefulSteps.contains(n.first) ? "<strike>" + ruleName + "</strike>" : ruleName,
                     n.third.consumesInput ? "yes" : "no",
                     n.second.toString(false, false));
         };
@@ -64,9 +64,14 @@ public class ShowNodeInfoAction extends MainWindowAction {
                 .outgoingGraphEdgesOf(node).map(nodeToTableRow).collect(Collectors.toList());
         var html1 = HtmlFactory.generateTable(headers1, clickable, incoming, idxFactory);
         var html2 = HtmlFactory.generateTable(headers2, clickable, outgoing, idxFactory);
+        var useful = analysisResults != null ? tracker.getDependencyGraph().outgoingGraphEdgesOf(node).filter(t -> analysisResults.usefulSteps.contains(t.first)).count() : -1;
+        var extraInfo = useful != -1 ? "<h2>" + useful + " useful rule apps</h2>" : "";
         var html = "<h1>Produced by</h1>" + html1
                 + "<h1>This node</h1>" + "<p>" + node.toString(false, false) + "</p>"
-                + "<h1>Used by</h1>" + html2;
+                + "<h1>Used by</h1>"
+                + extraInfo
+                + html2
+                + "<p>strikethrough rule name = useless rule app</p>";
         new HtmlDialog(parentWindow,
                 "Dependency graph node info", html, event -> {
             if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
