@@ -1,5 +1,7 @@
 package org.key_project.slicing.ui;
 
+import org.apache.commons.text.StringEscapeUtils;
+
 import java.util.Collection;
 
 public final class HtmlFactory {
@@ -31,7 +33,11 @@ public final class HtmlFactory {
                     stats.append(indexFactory.nextIndex());
                     stats.append("'>");
                 }
-                stats.append(cell);
+                if (cell.startsWith("<")) {
+                    stats.append(cell);
+                } else {
+                    stats.append(escapeText(cell));
+                }
                 if (clickable[i]) {
                     stats.append("</a>");
                 }
@@ -43,5 +49,9 @@ public final class HtmlFactory {
 
         stats.append("</tbody></table>");
         return stats.toString();
+    }
+
+    private static String escapeText(String text) {
+        return StringEscapeUtils.escapeHtml4(text);
     }
 }

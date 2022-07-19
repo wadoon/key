@@ -1,11 +1,14 @@
 package org.key_project.slicing;
 
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.smt.RuleAppSMT;
+import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 import org.key_project.slicing.graph.ClosedGoal;
 import org.key_project.slicing.graph.DependencyGraph;
@@ -51,6 +54,7 @@ public final class DependencyAnalyzer {
 
         // BFS, starting from all closed goals
         var queue = new ArrayDeque<Node>();
+        /*
         for (var e : proof.closedGoals()) {
             queue.add(e.node());
         }
@@ -135,8 +139,8 @@ public final class DependencyAnalyzer {
             }
         });
         LOGGER.info("last step took {} ms", System.currentTimeMillis() - time1);
+        */
 
-        /*
         // mark everything as 'useful' to evaluate the second algorithm in isolation
         proof.breadthFirstSearch(proof.root(), ((proof1, visitedNode) -> {
             if (visitedNode.getAppliedRuleApp() == null) {
@@ -147,26 +151,32 @@ public final class DependencyAnalyzer {
             if (data == null) {
                 return;
             }
-            usefulFormulas.addAll(data.inputs);
+            data.inputs.stream().map(it -> it.first).forEach(usefulFormulas::add);
             usefulFormulas.addAll(data.outputs);
         }));
 
         var branchStacks = new HashMap<Node, List<Node>>();
-        var ignoredRules = Set.of("commute_or", "all_pull_out3", "inEqSimp_ltRight", "inEqSimp_ltToLeq", "elementOfUnion", "commute_or_2", "inEqSimp_gtToGeq", "nnf_notAnd");
         var foundDuplicates = new HashSet<String>();
         // search for duplicate rule applications
         graph.nodes().forEach(node -> {
-            var foundRules = new HashMap<RuleApp, List<Node>>();
-            var foundSteps = new HashSet<Integer>();
-            graph.outgoingEdgesOf(node).forEach(ruleApp -> {
-                if (foundSteps.contains(ruleApp.serialNr()) || !usefulSteps.contains(ruleApp) || ruleApp.childrenCount() > 1 || ignoredRules.contains(ruleApp.getAppliedRuleApp().rule().displayName())) {
-                    return;
+            var foundDupes = new HashMap<Triple<RuleApp, SequentFormula, Boolean>, List<Node>>();
+            graph.outgoingGraphEdgesOf(node).forEach(t -> {
+                var proofNode = t.first;
+                if (proofNode.childrenCount() > 1) {
+                    return; // do not deduplicate branching steps
                 }
-                foundSteps.add(ruleApp.serialNr());
-                var name = ruleApp.getAppliedRuleApp();
-                foundRules.computeIfAbsent(name, _name -> new ArrayList<>()).add(ruleApp);
+                if (!usefulSteps.contains(proofNode)) {
+                    return; // do not deduplicate steps that will be sliced away anyway
+                }
+                var produced = t.second;
+                if (!(produced instanceof TrackedFormula)) {
+                    return; // do not try to deduplicate the addition of new rules
+                }
+                var formula = (TrackedFormula) produced;
+                foundDupes.computeIfAbsent(new Triple<>(proofNode.getAppliedRuleApp(), formula.formula, formula.inAntec), _a -> new ArrayList<>())
+                        .add(proofNode);
             });
-            for (var entry : foundRules.entrySet()) {
+            for (var entry : foundDupes.entrySet()) {
                 var steps = entry.getValue();
                 if (steps.size() > 1) {
                     LOGGER.info("input {} found duplicate {}", node.toString(true, false), Arrays.toString(steps.stream().map(Node::serialNr).toArray()));
@@ -213,7 +223,6 @@ public final class DependencyAnalyzer {
         for (var x : foundDuplicates) {
             LOGGER.info("rule {}", x);
         }
-         */
 
 
         // add a note to each useless proof step to allow easy identification by the user

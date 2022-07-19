@@ -1,6 +1,7 @@
 package org.key_project.slicing.graph;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import org.key_project.util.collection.ImmutableList;
