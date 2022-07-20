@@ -1,6 +1,6 @@
 package org.key_project.slicing.graph;
 
-import org.key_project.util.collection.ImmutableSLList;
+import de.uka.ilkd.key.proof.BranchLocation;
 
 import java.util.Objects;
 
@@ -16,7 +16,7 @@ public class AddedRule extends GraphNode {
     public final String name;
 
     public AddedRule(String name) {
-        super(ImmutableSLList.nil()); // TODO
+        super(BranchLocation.root()); // branch location does not matter since the rule name is unique
         this.name = name;
     }
 

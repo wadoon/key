@@ -1,6 +1,6 @@
 package org.key_project.slicing.graph;
 
-import org.key_project.util.collection.ImmutableList;
+import de.uka.ilkd.key.proof.BranchLocation;
 
 /**
  * A graph node used in the {@link DependencyGraph}.
@@ -11,15 +11,16 @@ public abstract class GraphNode {
     /**
      * Location in the proof tree.
      */
-    protected final ImmutableList<String> branchLocation; // TODO: introduce a proper class for this?
-    protected GraphNode(ImmutableList<String> branchLocation) {
+    protected final BranchLocation branchLocation;
+
+    protected GraphNode(BranchLocation branchLocation) {
         this.branchLocation = branchLocation;
     }
 
     /**
      * @return the branch location of this node (empty if not applicable)
      */
-    public ImmutableList<String> getBranchLocation() {
+    public BranchLocation getBranchLocation() {
         return branchLocation;
     }
 

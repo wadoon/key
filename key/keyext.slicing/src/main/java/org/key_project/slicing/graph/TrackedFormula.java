@@ -1,10 +1,9 @@
 package org.key_project.slicing.graph;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.pp.LogicPrinter;
-import org.key_project.util.collection.ImmutableList;
+import de.uka.ilkd.key.proof.BranchLocation;
 
 import java.util.Objects;
 
@@ -38,7 +37,7 @@ public class TrackedFormula extends GraphNode {
 
     public TrackedFormula(
             SequentFormula formula,
-            ImmutableList<String> branchLocation,
+            BranchLocation branchLocation,
             boolean inAntec,
             Services services
     ) {
@@ -62,7 +61,7 @@ public class TrackedFormula extends GraphNode {
         if (omitBranch) {
             return !inAntec ? (SEQ_ARROW + " " + input) : (input + " " + SEQ_ARROW);
         } else {
-            var id = input + branchLocation.stream().reduce("", String::concat);
+            var id = input + branchLocation.toString();
             return !inAntec ? (SEQ_ARROW + " " + id) : (id + " " + SEQ_ARROW);
         }
     }

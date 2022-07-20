@@ -1,5 +1,6 @@
 package org.key_project.slicing.graph;
 
+import de.uka.ilkd.key.proof.BranchLocation;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.util.Pair;
@@ -8,8 +9,8 @@ import org.jgrapht.Graph;
 import org.jgrapht.graph.DirectedMultigraph;
 import org.jgrapht.traverse.BreadthFirstIterator;
 import org.key_project.slicing.DependencyNodeData;
-import org.key_project.util.collection.ImmutableList;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -19,6 +20,7 @@ import java.util.stream.Stream;
  * This dependency graph tracks the flow of rule applications in the proof tree.
  * Formulas (plus their branch location and sequent location) correspond to nodes.
  * Rule applications correspond to edges.
+ * Note that the direction of edges is as follows: inputs/assumptions --(rule app)--> outputs
  *
  * @author Arne Keller
  */
@@ -33,6 +35,10 @@ public class DependencyGraph {
      * Required to get the proof node corresponding to an edge.
      */
     private final Map<AnnotatedEdge, Node> edgeData = new IdentityHashMap<>();
+    /**
+     * Mapping of rule applications to graph edges.
+     */
+    private final Map<Node, Collection<AnnotatedEdge>> edgeDataReversed = new IdentityHashMap<>();
 
     /**
      * Add a rule application to the dependency graph.
@@ -52,9 +58,10 @@ public class DependencyGraph {
                     continue;
                 }
                  */
-                var edge = new AnnotatedEdge(in.second);
+                var edge = new AnnotatedEdge(node, in.second);
                 graph.addEdge(in.first, out, edge);
                 edgeData.put(edge, node);
+                edgeDataReversed.computeIfAbsent(node, n -> new ArrayList<>()).add(edge);
             }
         }
     }
@@ -113,12 +120,12 @@ public class DependencyGraph {
                 .map(edge -> new Triple<>(edgeData.get(edge), graph.getEdgeTarget(edge), edge));
     }
 
-    public Stream<GraphNode> nodesInBranch(ImmutableList<String> location) {
+    public Stream<GraphNode> nodesInBranch(BranchLocation location) {
         return graph.vertexSet().stream()
                 .filter(it -> it.branchLocation.hasPrefix(location));
     }
 
-    public Stream<ClosedGoal> goalsInBranch(ImmutableList<String> location) {
+    public Stream<ClosedGoal> goalsInBranch(BranchLocation location) {
         return graph.vertexSet().stream()
                 .filter(ClosedGoal.class::isInstance)
                 .map(ClosedGoal.class::cast)
@@ -159,5 +166,32 @@ public class DependencyGraph {
                 graph.incomingEdgesOf(node).stream().map(graph::getEdgeSource),
                 graph.outgoingEdgesOf(node).stream().map(graph::getEdgeTarget)
         );
+    }
+
+    /**
+     * Gets all the edges representing the supplied proof step.
+     * May be used to reconstruct the hyperedge corresponding to the proof step.
+     *
+     * @param proofStep the proof step
+     * @return the edges representing this step
+     */
+    public Collection<AnnotatedEdge> edgesOf(Node proofStep) {
+        return edgeDataReversed.get(proofStep);
+    }
+
+    /**
+     * @param edge a graph edge
+     * @return source node of this edge
+     */
+    public GraphNode inputOf(AnnotatedEdge edge) {
+        return graph.getEdgeSource(edge);
+    }
+
+    public Stream<GraphNode> inputsOf(Node proofStep) {
+        return edgesOf(proofStep).stream().map(this::inputOf);
+    }
+
+    public Stream<AnnotatedEdge> edgesConsuming(GraphNode node) {
+        return outgoingGraphEdgesOf(node).filter(it -> it.third.consumesInput).map(it -> it.third);
     }
 }

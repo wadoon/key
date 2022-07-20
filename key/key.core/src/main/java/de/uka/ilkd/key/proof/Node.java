@@ -11,6 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
+import de.uka.ilkd.key.util.Pair;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -49,7 +50,7 @@ public class Node implements Iterable<Node> {
 
     /** The parent node. **/
     private Node parent = null;
-    private ImmutableList<String> branchLocation = null;
+    private BranchLocation branchLocation = null;
 
     private Sequent seq = Sequent.EMPTY_SEQUENT;
 
@@ -791,11 +792,11 @@ public class Node implements Iterable<Node> {
         return userData;
     }
 
-    public ImmutableList<String> branchLocation() {
+    public BranchLocation branchLocation() {
         if (branchLocation == null) {
-            ImmutableList<String> prev = parent != null ? parent.branchLocation() : ImmutableSLList.nil();
+            var prev = parent != null ? parent.branchLocation() : BranchLocation.root();
             if (parent != null && parent.children.size() > 1) {
-                prev = prev.append("/" + parent.serialNr + "_" + siblingNr);
+                prev = prev.append(new Pair<>(parent, siblingNr));
             }
             this.branchLocation = prev;
         }

@@ -4,7 +4,6 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuAdapter;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
@@ -18,7 +17,6 @@ import org.key_project.slicing.ui.SlicingLeftPanel;
 
 import javax.annotation.Nonnull;
 import javax.swing.*;
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -27,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 @KeYGuiExtension.Info(name = "Slicing",
-        description = "Author: Arne Keller <arne.keller@student.kit.edu>",
+        description = "Author: Arne Keller <arne.keller@posteo.de>",
         experimental = false,
         optional = true,
         priority = 9001)

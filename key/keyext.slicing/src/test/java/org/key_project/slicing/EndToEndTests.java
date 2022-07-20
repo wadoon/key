@@ -19,7 +19,7 @@ import java.nio.file.Files;
 class EndToEndTests {
     public static final File testCaseDirectory = FindResources.getTestCasesDirectory();
 
-    // TODO: tests for: proof pruning, dot export, getNodeThatProduced
+    // TODO tests for: proof pruning, dot export, getNodeThatProduced, the entire second algorithm...
 
     @Test
     void sliceAgatha() throws Exception {

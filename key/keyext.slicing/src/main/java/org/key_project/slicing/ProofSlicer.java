@@ -72,6 +72,7 @@ public final class ProofSlicer {
                         entry.getKey().stepIndex,
                         entry.getValue().stream().map(x -> x.stepIndex).collect(Collectors.toList())))
                 .collect(Collectors.toMap(p -> p.first, p -> p.second));
+        LOGGER.info("branch stacks: {} entries", GeneralSettings.branchStacks.size());
         try {
             var tempFile = Files.createTempFile("", ".proof");
             proof.saveToFile(tempFile.toFile());

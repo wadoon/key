@@ -1,6 +1,6 @@
 package org.key_project.slicing.graph;
 
-import org.key_project.util.collection.ImmutableSLList;
+import de.uka.ilkd.key.proof.BranchLocation;
 
 /**
  * Graph node used if a rule application did not use any input formulas.
@@ -10,7 +10,7 @@ import org.key_project.util.collection.ImmutableSLList;
  */
 public class PseudoInput extends GraphNode {
     public PseudoInput() {
-        super(ImmutableSLList.nil()); // TODO
+        super(BranchLocation.root()); // branch location of pseudo outputs does not matter
     }
 
     @Override

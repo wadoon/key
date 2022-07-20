@@ -1,6 +1,6 @@
 package org.key_project.slicing.graph;
 
-import org.key_project.util.collection.ImmutableList;
+import de.uka.ilkd.key.proof.BranchLocation;
 
 /**
  * Graph node that represents a closed goal.
@@ -15,7 +15,7 @@ public class ClosedGoal extends GraphNode {
      */
     public final int serialNr;
 
-    public ClosedGoal(int serialNr, ImmutableList<String> branchLocation) {
+    public ClosedGoal(int serialNr, BranchLocation branchLocation) {
         super(branchLocation);
         this.serialNr = serialNr;
     }

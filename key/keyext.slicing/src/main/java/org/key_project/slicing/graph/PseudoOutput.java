@@ -1,6 +1,6 @@
 package org.key_project.slicing.graph;
 
-import org.key_project.util.collection.ImmutableSLList;
+import de.uka.ilkd.key.proof.BranchLocation;
 
 /**
  * Graph node used if a rule application did not produce any outputs.
@@ -10,7 +10,7 @@ import org.key_project.util.collection.ImmutableSLList;
  */
 public class PseudoOutput extends GraphNode {
     public PseudoOutput() {
-        super(ImmutableSLList.nil()); // TODO
+        super(BranchLocation.root()); // branch location of pseudo outputs does not matter
     }
 
     @Override

@@ -28,7 +28,6 @@ import org.key_project.slicing.graph.GraphNode;
 import org.key_project.slicing.graph.PseudoInput;
 import org.key_project.slicing.graph.PseudoOutput;
 import org.key_project.slicing.graph.TrackedFormula;
-import org.key_project.util.collection.ImmutableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +37,6 @@ import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class DependencyTracker implements RuleAppListener, ProofTreeListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(DependencyTracker.class);
@@ -150,6 +148,8 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         }
         // record sequent formula inputs
         for (var in : inputsOfRuleApp(ruleApp, n)) {
+            // need to find the used sequent formula in the graph
+            // (requires knowing the branch it was produced in)
             var loc = n.branchLocation();
             var size = loc.size();
             var added = false;
@@ -161,9 +161,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
                     break;
                 }
                 if (loc.size() > 0) {
-                    var list = loc.toList();
-                    list.remove(list.size() - 1);
-                    loc = ImmutableList.fromList(list);
+                    loc = loc.removeLast();
                 }
             }
             if (!added) {
@@ -176,11 +174,11 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
             }
         }
 
-        var outputs = new ArrayList<Pair<PosInOccurrence, String>>();
+        var outputs = new ArrayList<Pair<PosInOccurrence, Integer>>();
 
         int sibling = ruleAppInfo.getReplacementNodes().size() - 1;
         for (var b : ruleAppInfo.getReplacementNodes()) {
-            String id = ruleAppInfo.getReplacementNodes().size() > 1 ? ("" + sibling) : "";
+            var id = ruleAppInfo.getReplacementNodes().size() > 1 ? sibling : -1;
             b.getNodeChanges().forEachRemaining(c -> {
                 if (c instanceof NodeChangeAddFormula) {
                     outputs.add(new Pair<>(c.getPos(), id));
@@ -191,8 +189,8 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
 
         for (var out : outputs) {
             var loc = n.branchLocation();
-            if (!out.second.equals("")) {
-                loc = loc.append("/" + n.serialNr() + "_" + out.second);
+            if (out.second != -1) {
+                loc = loc.append(new Pair<>(n, out.second));
             }
             var formula = new TrackedFormula(
                     out.first.sequentFormula(),
@@ -257,7 +255,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         if (analysisResults != null) {
             return analysisResults;
         }
-        analysisResults = DependencyAnalyzer.analyze(proof, graph);
+        analysisResults = new DependencyAnalyzer(proof, graph).analyze();
         return analysisResults;
     }
 
@@ -278,9 +276,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
             if (loc.isEmpty()) {
                 break;
             }
-            var list = loc.toList();
-            list.remove(list.size() - 1);
-            loc = ImmutableList.fromList(list);
+            loc = loc.removeLast();
         }
         return null;
     }

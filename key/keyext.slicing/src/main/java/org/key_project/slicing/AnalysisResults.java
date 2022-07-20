@@ -1,13 +1,11 @@
 package org.key_project.slicing;
 
+import de.uka.ilkd.key.proof.BranchLocation;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.util.Triple;
 import org.key_project.slicing.graph.GraphNode;
-import org.key_project.util.collection.ImmutableList;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -41,7 +39,7 @@ public final class AnalysisResults {
      * Set of graph nodes required by useful rule applications.
      */
     public final Set<GraphNode> usefulNodes;
-    private final Set<ImmutableList<String>> uselessBranches;
+    private final Set<BranchLocation> uselessBranches;
     public final Map<Node, List<Node>> branchStacks;
 
     public AnalysisResults(
@@ -51,7 +49,7 @@ public final class AnalysisResults {
             RuleStatistics ruleStatistics,
             Set<Node> usefulSteps,
             Set<GraphNode> usefulNodes,
-            Set<ImmutableList<String>> uselessBranches,
+            Set<BranchLocation> uselessBranches,
             Map<Node, List<Node>> branchStacks
     ) {
         this.proof = proof;
@@ -64,7 +62,7 @@ public final class AnalysisResults {
         this.branchStacks = branchStacks;
     }
 
-    public boolean branchIsUseful(ImmutableList<String> branchLocation) {
+    public boolean branchIsUseful(BranchLocation branchLocation) {
         return uselessBranches.stream().noneMatch(branchLocation::hasPrefix);
     }
 
