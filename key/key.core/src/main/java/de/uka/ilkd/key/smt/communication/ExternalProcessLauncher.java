@@ -63,7 +63,7 @@ public class ExternalProcessLauncher {
             process = builder.start();
             InputStream input = process.getInputStream();
             OutputStream output = process.getOutputStream();
-            pipe = type.getPipeFactory().createPipe(command, session, type, process, input, output);
+            pipe = new SimplePipe(input, type.getDelimiters(), output, session, process);
         } catch (IOException ex) {
             stop();
             throw ex;
