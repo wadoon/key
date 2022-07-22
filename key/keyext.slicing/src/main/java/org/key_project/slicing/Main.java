@@ -51,7 +51,7 @@ public final class Main {
             // get loaded proof
             Proof proof = environment.getLoadedProof();
             // analyze proof
-            var results = tracker.analyze();
+            var results = tracker.analyze(true, false);
             // slice proof
             var saved = tracker.sliceProof();
             KeYEnvironment<?> environment2 = KeYEnvironment.load(JavaProfile.getDefaultInstance(), saved.toFile(), null, null, null, null, null, proof2 -> proof2.addRuleAppListener(tracker), true);

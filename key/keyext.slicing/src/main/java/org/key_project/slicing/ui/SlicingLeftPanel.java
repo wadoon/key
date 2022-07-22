@@ -26,8 +26,6 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 
 public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionListener {
-    private static final Logger LOGGER = LoggerFactory.getLogger(SlicingLeftPanel.class);
-
     /**
      * The icon of this panel.
      */
@@ -37,12 +35,19 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
      */
     public static final String NAME = "slicingPane";
 
+    /**
+     * Logger of this class.
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(SlicingLeftPanel.class);
+
     private final transient KeYMediator mediator;
     private final transient SlicingExtension extension;
     private transient Proof currentProof = null;
     private final JLabel totalSteps;
     private final JLabel usefulSteps;
     private final JCheckBox abbreviateFormulas;
+    private final JCheckBox doDependencyAnalysis;
+    private final JCheckBox doDeduplicateRuleApps;
 
     public SlicingLeftPanel(KeYMediator mediator, SlicingExtension extension) {
         super();
@@ -68,9 +73,18 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         button5.addActionListener(this::showRuleStatistics);
         totalSteps = new JLabel();
         usefulSteps = new JLabel();
+        doDependencyAnalysis = new JCheckBox("Dependency analysis");
+        doDependencyAnalysis.setSelected(true);
+        doDependencyAnalysis.addActionListener(e -> resetLabels());
+        doDeduplicateRuleApps = new JCheckBox("De-duplicate rule applications");
+        doDeduplicateRuleApps.setSelected(false);
+        doDeduplicateRuleApps.addActionListener(e -> resetLabels());
+
         resetLabels();
         panel.add(totalSteps);
         panel.add(usefulSteps);
+        panel.add(doDependencyAnalysis);
+        panel.add(doDeduplicateRuleApps);
         panel.add(button3);
         panel.add(button5);
         var y = 0;
@@ -125,7 +139,9 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
             File file = fileChooser.getSelectedFile();
             try (BufferedWriter writer = new BufferedWriter(
                     new OutputStreamWriter(new FileOutputStream(file)))) {
-                String text = extension.trackers.get(currentProof).exportDot(abbreviateFormulas.isSelected());
+                String text = extension
+                        .trackers.get(currentProof)
+                        .exportDot(abbreviateFormulas.isSelected());
                 writer.write(text);
             } catch (IOException any) {
                 any.printStackTrace();
@@ -138,10 +154,12 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         if (currentProof == null) {
             return;
         }
-        this.analyzeProof(e);
-        var results = extension.trackers.get(currentProof).analyze();
+        var results = this.analyzeProof(e);
         if (results != null) {
-            new RuleStatisticsDialog(SwingUtilities.getWindowAncestor((JComponent) e.getSource()), results);
+            new RuleStatisticsDialog(
+                    SwingUtilities.getWindowAncestor((JComponent) e.getSource()),
+                    results
+            );
         }
     }
 
@@ -149,18 +167,22 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         if (currentProof == null) {
             return;
         }
-        String text = extension.trackers.get(currentProof).exportDot(abbreviateFormulas.isSelected());
+        String text = extension
+                .trackers.get(currentProof)
+                .exportDot(abbreviateFormulas.isSelected());
         new PreviewDialog(SwingUtilities.getWindowAncestor((JComponent) e.getSource()), text);
     }
 
-    private void analyzeProof(ActionEvent e) {
+    private AnalysisResults analyzeProof(ActionEvent e) {
         if (currentProof == null) {
-            return;
+            return null;
         }
-        var results = extension.trackers.get(currentProof).analyze();
+        var results = extension.trackers.get(currentProof).analyze(
+                doDependencyAnalysis.isSelected(), doDeduplicateRuleApps.isSelected());
         if (results != null) {
             displayResults(results);
         }
+        return results;
     }
 
     private void sliceProof(ActionEvent event) {

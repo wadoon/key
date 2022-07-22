@@ -236,7 +236,7 @@ class Evaluation {
                         var sliceSize = proof2.countNodes();
                         var sliceBranches = proof2.countBranches();
                         var numberOfSMT2 = proof2.allGoals().stream().filter(goal -> goal.node().getAppliedRuleApp() != null && goal.node().getAppliedRuleApp() instanceof RuleAppSMT).count();
-                        var results = pair.second.analyze();
+                        var results = pair.second.analyze(true, false);
                         furtherSliceUseful = results.totalSteps != results.usefulStepsNr;
                         var time4 = System.currentTimeMillis();
                         if (furtherSliceUseful) {
@@ -295,7 +295,7 @@ class Evaluation {
                 var originalSize = result.second.countNodes();
                 var tracker = result.third;
                 // analyze proof
-                var results = tracker.analyze();
+                var results = tracker.analyze(true, false);
                 // slice proof
                 var path = tracker.sliceProof();
                 var env2 = KeYEnvironment.load(JavaProfile.getDefaultInstance(), path.toFile(), null, null, null, null, null, null, true);
@@ -421,7 +421,7 @@ class Evaluation {
             }
             // analyze proof
             var time1 = System.currentTimeMillis();
-            var results = tracker.analyze();
+            var results = tracker.analyze(true, false);
             analyzeTime = System.currentTimeMillis() - time1;
             // slice proof
             var path = tracker.sliceProof();

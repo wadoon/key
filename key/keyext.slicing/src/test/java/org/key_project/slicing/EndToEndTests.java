@@ -67,7 +67,7 @@ class EndToEndTests {
             Proof proof = environment.getLoadedProof();
             Assertions.assertNotNull(proof);
             // analyze proof
-            var results = tracker.analyze();
+            var results = tracker.analyze(true, false);
             Assertions.assertEquals(expectedTotal, results.totalSteps);
             Assertions.assertEquals(expectedUseful, results.usefulStepsNr);
             // slice proof

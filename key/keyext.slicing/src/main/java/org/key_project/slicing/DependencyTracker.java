@@ -248,14 +248,18 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
     }
 
     public String exportDotAround(boolean abbreviateFormulas, boolean omitBranch, GraphNode node) {
-        return DotExporter.exportDotAround(proof, graph, analysisResults, abbreviateFormulas, omitBranch, node);
+        return DotExporter.exportDotAround(
+                proof, graph, analysisResults, abbreviateFormulas, omitBranch, node);
     }
 
-    public AnalysisResults analyze() {
-        if (analysisResults != null) {
+    public AnalysisResults analyze(boolean doDependencyAnalysis, boolean doDeduplicateRuleApps) {
+        if (analysisResults != null
+                && analysisResults.didDependencyAnalysis == doDependencyAnalysis
+                && analysisResults.didDeduplicateRuleApps == doDeduplicateRuleApps) {
             return analysisResults;
         }
-        analysisResults = new DependencyAnalyzer(proof, graph).analyze();
+        analysisResults = new DependencyAnalyzer(
+                proof, graph, doDependencyAnalysis, doDeduplicateRuleApps).analyze();
         return analysisResults;
     }
 

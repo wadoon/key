@@ -13,7 +13,7 @@ import java.util.Set;
 /**
  * Results of the dependency analysis algorithm.
  *
- * @see DependencyTracker#analyze()
+ * @see DependencyTracker#analyze(boolean, boolean)
  * @author Arne Keller
  */
 public final class AnalysisResults {
@@ -42,6 +42,9 @@ public final class AnalysisResults {
     private final Set<BranchLocation> uselessBranches;
     public final Map<Node, List<Node>> branchStacks;
 
+    public final boolean didDependencyAnalysis;
+    public final boolean didDeduplicateRuleApps;
+
     public AnalysisResults(
             Proof proof,
             int totalSteps,
@@ -50,7 +53,9 @@ public final class AnalysisResults {
             Set<Node> usefulSteps,
             Set<GraphNode> usefulNodes,
             Set<BranchLocation> uselessBranches,
-            Map<Node, List<Node>> branchStacks
+            Map<Node, List<Node>> branchStacks,
+            boolean didDependencyAnalysis,
+            boolean didDeduplicateRuleApps
     ) {
         this.proof = proof;
         this.totalSteps = totalSteps;
@@ -60,6 +65,8 @@ public final class AnalysisResults {
         this.usefulNodes = Collections.unmodifiableSet(usefulNodes);
         this.uselessBranches = uselessBranches;
         this.branchStacks = branchStacks;
+        this.didDependencyAnalysis = didDependencyAnalysis;
+        this.didDeduplicateRuleApps = didDeduplicateRuleApps;
     }
 
     public boolean branchIsUseful(BranchLocation branchLocation) {

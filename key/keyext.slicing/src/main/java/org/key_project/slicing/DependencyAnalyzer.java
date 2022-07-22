@@ -33,8 +33,8 @@ import java.util.stream.Stream;
  */
 public final class DependencyAnalyzer {
     private static final Logger LOGGER = LoggerFactory.getLogger(DependencyAnalyzer.class);
-    private static final boolean doDependencyAnalysis = false;
-    private static final boolean doDeduplicateRuleApps = true;
+    private final boolean doDependencyAnalysis;
+    private final boolean doDeduplicateRuleApps;
 
     private final Proof proof;
     private final DependencyGraph graph;
@@ -43,9 +43,16 @@ public final class DependencyAnalyzer {
     private final Set<BranchLocation> uselessBranches = new HashSet<>();
     private final Map<Node, List<Node>> branchStacks = new HashMap<>();
 
-    public DependencyAnalyzer(Proof proof, DependencyGraph graph) {
+    public DependencyAnalyzer(
+            Proof proof,
+            DependencyGraph graph,
+            boolean doDependencyAnalysis,
+            boolean doDeduplicateRuleApps
+    ) {
         this.proof = proof;
         this.graph = graph;
+        this.doDependencyAnalysis = doDependencyAnalysis;
+        this.doDeduplicateRuleApps = doDeduplicateRuleApps;
     }
 
     public AnalysisResults analyze() {
@@ -116,7 +123,7 @@ public final class DependencyAnalyzer {
             }
         });
 
-        return new AnalysisResults(proof, steps, usefulSteps.size(), rules, usefulSteps, usefulFormulas, uselessBranches, branchStacks);
+        return new AnalysisResults(proof, steps, usefulSteps.size(), rules, usefulSteps, usefulFormulas, uselessBranches, branchStacks, doDependencyAnalysis, doDeduplicateRuleApps);
     }
 
     private void analyzeDependencies() {
@@ -218,7 +225,7 @@ public final class DependencyAnalyzer {
             }
              */
 
-            // groups rule apps on this node by their rule (+ their output...)
+            // groups rule apps on this node by their rule (+ their output formula + inAntec)
             var foundDupes = new HashMap<Triple<RuleApp, SequentFormula, Boolean>, List<AnnotatedEdge>>();
             graph.outgoingGraphEdgesOf(node).forEach(t -> {
                 var proofNode = t.first;
