@@ -29,7 +29,8 @@ public class PreviewDialog extends JDialog implements WindowListener {
     public PreviewDialog(Window window, String dot) {
         super(window, "Preview");
         setLayout(new BorderLayout());
-        var label = new JLabel("Running dot...");
+        var label = new JLabel(
+                String.format("Running dot on %d KB of graph data...", dot.length() / 1024));
         label.setBorder(new EmptyBorder(10, 10, 10, 10));
         getContentPane().add(label, BorderLayout.NORTH);
 
@@ -92,7 +93,8 @@ public class PreviewDialog extends JDialog implements WindowListener {
                 var output = new ByteArrayOutputStream();
                 var stderr = new ByteArrayOutputStream();
                 byte[] buffer = new byte[65536];
-                while (process.isAlive()) {
+                while (process.isAlive()
+                        || outStream.available() > 0 || errStream.available() > 0) {
                     while (outStream.available() > 0) {
                         int res = outStream.read(buffer);
                         if (res > 0) {
