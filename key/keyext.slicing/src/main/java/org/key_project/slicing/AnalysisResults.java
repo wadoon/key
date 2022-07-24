@@ -4,6 +4,7 @@ import de.uka.ilkd.key.proof.BranchLocation;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import org.key_project.slicing.graph.GraphNode;
+import org.key_project.slicing.util.ExecutionTime;
 
 import java.util.Collections;
 import java.util.List;
@@ -39,11 +40,12 @@ public final class AnalysisResults {
      * Set of graph nodes required by useful rule applications.
      */
     public final Set<GraphNode> usefulNodes;
-    private final Set<BranchLocation> uselessBranches;
+    public final Set<BranchLocation> uselessBranches;
     public final Map<Node, List<Node>> branchStacks;
 
     public final boolean didDependencyAnalysis;
     public final boolean didDeduplicateRuleApps;
+    public final ExecutionTime executionTime;
 
     public AnalysisResults(
             Proof proof,
@@ -55,7 +57,8 @@ public final class AnalysisResults {
             Set<BranchLocation> uselessBranches,
             Map<Node, List<Node>> branchStacks,
             boolean didDependencyAnalysis,
-            boolean didDeduplicateRuleApps
+            boolean didDeduplicateRuleApps,
+            ExecutionTime executionTime
     ) {
         this.proof = proof;
         this.totalSteps = totalSteps;
@@ -63,10 +66,11 @@ public final class AnalysisResults {
         this.ruleStatistics = ruleStatistics;
         this.usefulSteps = Collections.unmodifiableSet(usefulSteps);
         this.usefulNodes = Collections.unmodifiableSet(usefulNodes);
-        this.uselessBranches = uselessBranches;
+        this.uselessBranches = Collections.unmodifiableSet(uselessBranches);
         this.branchStacks = branchStacks;
         this.didDependencyAnalysis = didDependencyAnalysis;
         this.didDeduplicateRuleApps = didDeduplicateRuleApps;
+        this.executionTime = executionTime;
     }
 
     public boolean branchIsUseful(BranchLocation branchLocation) {
@@ -78,6 +82,6 @@ public final class AnalysisResults {
         return "AnalysisResults{" +
                 "totalSteps=" + totalSteps +
                 ", usefulSteps=" + usefulStepsNr +
-                '}';
+                ", ...}";
     }
 }

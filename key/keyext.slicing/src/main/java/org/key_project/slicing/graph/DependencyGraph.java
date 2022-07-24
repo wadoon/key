@@ -194,4 +194,12 @@ public class DependencyGraph {
     public Stream<AnnotatedEdge> edgesConsuming(GraphNode node) {
         return outgoingGraphEdgesOf(node).filter(it -> it.third.consumesInput).map(it -> it.third);
     }
+
+    public int countNodes() {
+        return graph.vertexSet().size();
+    }
+
+    public int countEdges() {
+        return graph.edgeSet().size();
+    }
 }

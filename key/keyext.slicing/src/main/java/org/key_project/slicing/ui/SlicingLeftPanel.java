@@ -10,6 +10,7 @@ import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.proof.Proof;
 import org.key_project.slicing.AnalysisResults;
+import org.key_project.slicing.DependencyTracker;
 import org.key_project.slicing.SlicingExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionListener {
     /**
@@ -43,22 +47,37 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
     private final transient KeYMediator mediator;
     private final transient SlicingExtension extension;
     private transient Proof currentProof = null;
+    private final JLabel graphNodes;
+    private final JLabel graphEdges;
     private final JLabel totalSteps;
     private final JLabel usefulSteps;
+    private final JLabel totalBranches;
+    private final JLabel usefulBranches;
     private final JCheckBox abbreviateFormulas;
     private final JCheckBox doDependencyAnalysis;
     private final JCheckBox doDeduplicateRuleApps;
+    private final JPanel timings;
+
+    private int graphNodesNr = 0;
+    private int graphEdgesNr = 0;
+    private boolean updateGraphLabels = false;
+    private Timer updateGraphLabelsTimer;
 
     public SlicingLeftPanel(KeYMediator mediator, SlicingExtension extension) {
         super();
 
         setName(NAME);
 
-        setLayout(new GridBagLayout());
+        var mainPanel = new JPanel();
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 
-        var panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBorder(new TitledBorder("Dependency analysis"));
+        var panel1 = new JPanel();
+        panel1.setLayout(new BoxLayout(panel1, BoxLayout.Y_AXIS));
+        panel1.setBorder(new TitledBorder("Dependency graph"));
+
+        var panel2 = new JPanel();
+        panel2.setLayout(new BoxLayout(panel2, BoxLayout.Y_AXIS));
+        panel2.setBorder(new TitledBorder("Dependency analysis"));
 
         abbreviateFormulas = new JCheckBox("Abbreviate formulas");
         var button = new JButton("Export .dot");
@@ -71,8 +90,13 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         button4.addActionListener(this::sliceProof);
         var button5 = new JButton("Show rule statistics");
         button5.addActionListener(this::showRuleStatistics);
+        graphNodes = new JLabel();
+        graphEdges = new JLabel();
+        resetGraphLabels();
         totalSteps = new JLabel();
         usefulSteps = new JLabel();
+        totalBranches = new JLabel();
+        usefulBranches = new JLabel();
         doDependencyAnalysis = new JCheckBox("Dependency analysis");
         doDependencyAnalysis.setSelected(true);
         doDependencyAnalysis.addActionListener(e -> resetLabels());
@@ -80,50 +104,53 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         doDeduplicateRuleApps.setSelected(false);
         doDeduplicateRuleApps.addActionListener(e -> resetLabels());
 
-        resetLabels();
-        panel.add(totalSteps);
-        panel.add(usefulSteps);
-        panel.add(doDependencyAnalysis);
-        panel.add(doDeduplicateRuleApps);
-        panel.add(button3);
-        panel.add(button5);
-        var y = 0;
-        GridBagConstraints c = new GridBagConstraints();
-        c.gridx = 0;
-        c.gridy = y++;
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.weightx = 1.0;
-        c.weighty = 0.0;
-        c.anchor = GridBagConstraints.PAGE_START;
-        add(panel, c);
-        c = new GridBagConstraints();
-        c.gridx = 0;
-        c.gridy = y++;
-        c.weighty = 0.0;
-        c.anchor = GridBagConstraints.FIRST_LINE_START;
-        add(abbreviateFormulas, c);
-        c = new GridBagConstraints();
-        c.gridx = 0;
-        c.gridy = y++;
-        c.weighty = 0.0;
-        c.anchor = GridBagConstraints.FIRST_LINE_START;
-        add(button, c);
-        c = new GridBagConstraints();
-        c.gridx = 0;
-        c.gridy = y++;
-        c.weighty = 0.0;
-        c.anchor = GridBagConstraints.FIRST_LINE_START;
-        add(button2, c);
-        c = new GridBagConstraints();
-        c.gridx = 0;
-        c.gridy = y++;
-        c.weighty = 1.0;
-        c.anchor = GridBagConstraints.FIRST_LINE_START;
-        add(button4, c);
+        abbreviateFormulas.setAlignmentX(Component.LEFT_ALIGNMENT);
+        button.setAlignmentX(Component.LEFT_ALIGNMENT);
+        button2.setAlignmentX(Component.LEFT_ALIGNMENT);
+        panel1.add(graphNodes);
+        panel1.add(graphEdges);
+        panel1.add(abbreviateFormulas);
+        panel1.add(button);
+        panel1.add(button2);
+
+        panel2.add(totalSteps);
+        panel2.add(usefulSteps);
+        panel2.add(totalBranches);
+        panel2.add(usefulBranches);
+        panel2.add(doDependencyAnalysis);
+        panel2.add(doDeduplicateRuleApps);
+        panel2.add(button3);
+        panel2.add(button5);
+
+        timings = new JPanel();
+        timings.setLayout(new BoxLayout(timings, BoxLayout.Y_AXIS));
+        timings.setBorder(new TitledBorder("Execution timings"));
+        timings.setVisible(false);
+
+        panel1.setAlignmentX(Component.LEFT_ALIGNMENT);
+        panel2.setAlignmentX(Component.LEFT_ALIGNMENT);
+        button4.setAlignmentX(Component.LEFT_ALIGNMENT);
+        timings.setAlignmentX(Component.LEFT_ALIGNMENT);
+        mainPanel.add(panel1);
+        mainPanel.add(panel2);
+        mainPanel.add(button4);
+        mainPanel.add(timings);
+
+        setLayout(new BorderLayout());
+        mainPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        add(new JScrollPane(mainPanel));
+
         invalidate();
 
         this.mediator = mediator;
         this.extension = extension;
+
+        updateGraphLabelsTimer = new Timer(100, e -> {
+            if (updateGraphLabels) {
+                displayGraphLabels();
+                updateGraphLabelsTimer.stop();
+            }
+        });
     }
 
     private void exportDot(ActionEvent e) {
@@ -204,11 +231,41 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
     private void resetLabels() {
         totalSteps.setText("Total steps: ?");
         usefulSteps.setText("Useful steps: ?");
+        totalBranches.setText("Total branches: ?");
+        usefulBranches.setText("Useful branches: ?");
+        timings.setVisible(false);
+        timings.removeAll();
     }
 
     private void displayResults(AnalysisResults results) {
         totalSteps.setText("Total steps: " + results.totalSteps);
         usefulSteps.setText("Useful steps: " + results.usefulStepsNr);
+        totalBranches.setText("Total branches: " + results.proof.countBranches());
+        usefulBranches.setText("Useful branches: "
+                + (results.proof.countBranches() - results.uselessBranches.size()));
+        timings.removeAll();
+        var coll = results.executionTime.executionTimes()
+                .map(action -> (Collection<String>)
+                        List.of(action.first, "" + action.second + " ms"))
+                .collect(Collectors.toList());
+        var html = HtmlFactory.generateTable(
+                List.of("Algorithm", "Time"),
+                new boolean[] { false, false },
+                coll,
+                null
+        );
+        timings.add(HtmlFactory.createComponent(html));
+        timings.setVisible(true);
+    }
+
+    private void resetGraphLabels() {
+        graphNodes.setText("Graph nodes: ?");
+        graphEdges.setText("Graph edges: ?");
+    }
+
+    private void displayGraphLabels() {
+        graphNodes.setText("Graph nodes: " + graphNodesNr);
+        graphEdges.setText("Graph edges: " + graphEdgesNr);
     }
 
     @Nonnull
@@ -230,8 +287,9 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
 
     @Override
     public void selectedProofChanged(KeYSelectionEvent e) {
-        this.currentProof = e.getSource().getSelectedProof();
+        currentProof = e.getSource().getSelectedProof();
         resetLabels();
+        resetGraphLabels();
         var tracker = extension.trackers.get(currentProof);
         if (tracker == null) {
             return;
@@ -239,5 +297,18 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         if (tracker.getAnalysisResults() != null) {
             displayResults(tracker.getAnalysisResults());
         }
+        if (tracker.getDependencyGraph() != null) {
+            graphNodesNr = tracker.getDependencyGraph().countNodes();
+            graphEdgesNr = tracker.getDependencyGraph().countEdges();
+            displayGraphLabels();
+        }
+    }
+
+    public void ruleAppliedOnProof(Proof proof, DependencyTracker tracker) {
+        currentProof = proof;
+        graphNodesNr = tracker.getDependencyGraph().countNodes();
+        graphEdgesNr = tracker.getDependencyGraph().countEdges();
+        updateGraphLabels = true;
+        updateGraphLabelsTimer.start();
     }
 }

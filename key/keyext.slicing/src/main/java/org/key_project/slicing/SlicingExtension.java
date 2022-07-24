@@ -105,6 +105,9 @@ public class SlicingExtension implements KeYGuiExtension,
             }
             var tracker = new DependencyTracker();
             proof.addRuleAppListener(tracker);
+            if (leftPanel != null) {
+                proof.addRuleAppListener(e -> leftPanel.ruleAppliedOnProof(proof, tracker));
+            }
             proof.addProofTreeListener(tracker);
             return tracker;
         });

@@ -2,11 +2,19 @@ package org.key_project.slicing.ui;
 
 import org.apache.commons.text.StringEscapeUtils;
 
+import javax.swing.*;
 import java.util.Collection;
 
 public final class HtmlFactory {
     private HtmlFactory() { }
 
+    /**
+     * @param columnNames
+     * @param clickable
+     * @param rows
+     * @param indexFactory only required if any entry in clickable is true
+     * @return
+     */
     public static String generateTable(
             Collection<String> columnNames,
             boolean[] clickable,
@@ -49,6 +57,14 @@ public final class HtmlFactory {
 
         stats.append("</tbody></table>");
         return stats.toString();
+    }
+
+    public static JComponent createComponent(String html) {
+        JEditorPane htmlContent = new JEditorPane("text/html", html);
+        htmlContent.setEditable(false);
+        htmlContent.setBorder(BorderFactory.createEmptyBorder());
+        htmlContent.setCaretPosition(0);
+        return htmlContent;
     }
 
     private static String escapeText(String text) {

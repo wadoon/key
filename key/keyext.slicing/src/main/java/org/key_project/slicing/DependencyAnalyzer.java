@@ -13,6 +13,7 @@ import org.key_project.slicing.graph.ClosedGoal;
 import org.key_project.slicing.graph.DependencyGraph;
 import org.key_project.slicing.graph.GraphNode;
 import org.key_project.slicing.graph.TrackedFormula;
+import org.key_project.slicing.util.ExecutionTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +33,14 @@ import java.util.stream.Stream;
  * @author Arne Keller
  */
 public final class DependencyAnalyzer {
+    public static final String TOTAL_WORK = "0 (total time)";
+    public static final String DEPENDENCY_ANALYSIS = "1 Dependency Analysis";
+    public static final String DEPENDENCY_ANALYSIS2 = "1a Dependency Analysis: search starting @ closed goals";
+    public static final String DEPENDENCY_ANALYSIS3 = "1b Dependency Analysis: analyze branching nodes";
+    public static final String DEPENDENCY_ANALYSIS4 = "1c Dependency Analysis: final mark of useless steps";
+    public static final String DUPLICATE_ANALYSIS = "2 Duplicate Analysis";
+    public static final String DUPLICATE_ANALYSIS_SETUP = "~ Duplicate Analysis setup";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(DependencyAnalyzer.class);
     private final boolean doDependencyAnalysis;
     private final boolean doDeduplicateRuleApps;
@@ -42,6 +51,7 @@ public final class DependencyAnalyzer {
     private final Set<GraphNode> usefulFormulas = new HashSet<>();
     private final Set<BranchLocation> uselessBranches = new HashSet<>();
     private final Map<Node, List<Node>> branchStacks = new HashMap<>();
+    private final ExecutionTime executionTime = new ExecutionTime();
 
     public DependencyAnalyzer(
             Proof proof,
@@ -64,10 +74,15 @@ public final class DependencyAnalyzer {
             return null;
         }
 
+        executionTime.start(TOTAL_WORK);
+
         if (doDependencyAnalysis) {
+            executionTime.start(DEPENDENCY_ANALYSIS);
             analyzeDependencies();
+            executionTime.end(DEPENDENCY_ANALYSIS);
         }
         if (!doDependencyAnalysis && doDeduplicateRuleApps) {
+            executionTime.start(DUPLICATE_ANALYSIS_SETUP);
             // mark everything as 'useful' to evaluate the second algorithm in isolation
             proof.breadthFirstSearch(proof.root(), ((proof1, visitedNode) -> {
                 if (visitedNode.getAppliedRuleApp() == null) {
@@ -81,9 +96,12 @@ public final class DependencyAnalyzer {
                 data.inputs.stream().map(it -> it.first).forEach(usefulFormulas::add);
                 usefulFormulas.addAll(data.outputs);
             }));
+            executionTime.end(DUPLICATE_ANALYSIS_SETUP);
         }
         if (doDeduplicateRuleApps) {
+            executionTime.start(DUPLICATE_ANALYSIS);
             deduplicateRuleApps();
+            executionTime.end(DUPLICATE_ANALYSIS);
         }
 
 
@@ -122,8 +140,21 @@ public final class DependencyAnalyzer {
                 }
             }
         });
+        executionTime.end(TOTAL_WORK);
 
-        return new AnalysisResults(proof, steps, usefulSteps.size(), rules, usefulSteps, usefulFormulas, uselessBranches, branchStacks, doDependencyAnalysis, doDeduplicateRuleApps);
+        return new AnalysisResults(
+                proof,
+                steps,
+                usefulSteps.size(),
+                rules,
+                usefulSteps,
+                usefulFormulas,
+                uselessBranches,
+                branchStacks,
+                doDependencyAnalysis,
+                doDeduplicateRuleApps,
+                executionTime
+        );
     }
 
     private void analyzeDependencies() {
@@ -133,6 +164,7 @@ public final class DependencyAnalyzer {
             queue.add(e.node());
         }
 
+        executionTime.start(DEPENDENCY_ANALYSIS2);
         while (!queue.isEmpty()) {
             var node = queue.pop();
             // closed goal & has previous step
@@ -156,8 +188,10 @@ public final class DependencyAnalyzer {
                 data.outputs.stream().filter(ClosedGoal.class::isInstance).forEach(usefulFormulas::add);
             }
         }
+        executionTime.end(DEPENDENCY_ANALYSIS2);
 
         // analyze cuts: they are only useful if all of their outputs were used
+        executionTime.start(DEPENDENCY_ANALYSIS3);
         proof.breadthFirstSearch(proof.root(), (proof1, node) -> {
             if (node.childrenCount() <= 1) {
                 return;
@@ -178,28 +212,23 @@ public final class DependencyAnalyzer {
                 if (!usefulFormulas.contains(output) && !completelyUseless) {
                     continue;
                 }
-                // TODO: pick the "smallest" sub-proof
+                // TODO: pick the "smallest" sub-proof?
                 if (completelyUseless && counter == 0) {
                     continue;
                 }
                 if (completelyUseless) {
                     counter--;
                 }
-                var formula = (TrackedFormula) output;
-                graph.nodesInBranch(formula.getBranchLocation()).forEach(theNode -> {
-                    usefulFormulas.remove(theNode);
-                    graph.outgoingEdgesOf(theNode).forEach(step -> {
-                        usefulSteps.remove(step);
-                        step.getNodeInfo().setNotes("useless");
-                    });
-                });
-                uselessBranches.add(formula.getBranchLocation());
+                uselessBranches.add(output.getBranchLocation());
+                // TODO: mark inputs as useless, if possible
+                // TODO: process newly useless nodes somehow (-> to mark more edges as useless..)
+                // otherwise further branch eliminations are only done in the next iteration
             }
-            // TODO: mark inputs as useless, if possible
-            // TODO: process newly useless nodes somehow (-> to mark more edges as useless..)
         });
-        var time1 = System.currentTimeMillis();
+        executionTime.end(DEPENDENCY_ANALYSIS3);
+
         // unmark all 'useful' steps in useless branches
+        executionTime.start(DEPENDENCY_ANALYSIS4);
         proof.breadthFirstSearch(proof.root(), (proof1, node) -> {
             if (!usefulSteps.contains(node)) {
                 return;
@@ -212,7 +241,7 @@ public final class DependencyAnalyzer {
                 }
             }
         });
-        LOGGER.info("last step took {} ms", System.currentTimeMillis() - time1);
+        executionTime.end(DEPENDENCY_ANALYSIS4);
     }
 
     private void deduplicateRuleApps() {
@@ -255,7 +284,7 @@ public final class DependencyAnalyzer {
                 }
                 // try merging "adjacent" rule apps
                 // (rule apps are sorted by serial nr ≈ location in the proof tree)
-                LOGGER.info("input {} found duplicate; attempt to merge:", node.toString(true, false));
+                LOGGER.debug("input {} found duplicate; attempt to merge:", node.toString(true, false));
                 var apps = new ArrayList<>(steps);
                 var locs = steps.stream()
                         .map(e -> e.proofStep.branchLocation())
@@ -263,7 +292,7 @@ public final class DependencyAnalyzer {
                 var idxA = 0;
                 var idxB = 1;
                 while (idxB < steps.size()) {
-                    LOGGER.info("idxes {} {}", idxA, idxB);
+                    LOGGER.trace("idxes {} {}", idxA, idxB);
                     if (idxA >= idxB) {
                         idxB++;
                         continue;
@@ -307,7 +336,7 @@ public final class DependencyAnalyzer {
                         idxB++;
                     } else {
                         // merge step B into step A
-                        LOGGER.info("merging {} and {}", stepA.serialNr(), stepB.serialNr());
+                        LOGGER.trace("merging {} and {}", stepA.serialNr(), stepB.serialNr());
                         locs.set(idxA, mergeBase);
                         apps.set(idxB, null);
                         idxB++;
@@ -316,10 +345,10 @@ public final class DependencyAnalyzer {
                 for (int i = 0; i < apps.size(); i++) {
                     var keep = apps.get(i) != null;
                     var originalLoc = steps.get(i).proofStep.branchLocation();
-                    LOGGER.info("step {} kept? {}", steps.get(i).proofStep.serialNr(), keep);
+                    LOGGER.trace("step {} kept? {}", steps.get(i).proofStep.serialNr(), keep);
                     if (keep && locs.get(i) != originalLoc) {
                         var differingSuffix = originalLoc.stripPrefix(locs.get(i));
-                        LOGGER.info("should be done before branching node {}", differingSuffix);
+                        LOGGER.trace("should be done before branching node {}", differingSuffix);
                         branchStacks.computeIfAbsent(
                                         differingSuffix.getNode(0),
                                         _node -> new ArrayList<>())
