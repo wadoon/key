@@ -10,6 +10,8 @@ import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
+import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import org.key_project.slicing.ui.ShowCreatedByAction;
 import org.key_project.slicing.ui.ShowGraphAction;
 import org.key_project.slicing.ui.ShowNodeInfoAction;
@@ -33,12 +35,11 @@ public class SlicingExtension implements KeYGuiExtension,
         KeYGuiExtension.ContextMenu,
         KeYGuiExtension.Startup,
         KeYGuiExtension.LeftPanel,
-        KeYSelectionListener {
+        KeYSelectionListener,
+        ProofDisposedListener {
 
     /**
      * Collection of dependency trackers.
-     *
-     * TODO: delete tracker when the proof is closed?
      */
     public final Map<Proof, DependencyTracker> trackers = new IdentityHashMap<>();
     /**
@@ -103,6 +104,7 @@ public class SlicingExtension implements KeYGuiExtension,
             if (proof == null) {
                 return null;
             }
+            proof.addProofDisposedListener(this);
             var tracker = new DependencyTracker();
             proof.addRuleAppListener(tracker);
             if (leftPanel != null) {
@@ -123,4 +125,12 @@ public class SlicingExtension implements KeYGuiExtension,
         }
         return Collections.singleton(leftPanel);
     }
+
+    @Override
+    public void proofDisposing(ProofDisposedEvent e) {
+        trackers.remove(e.getSource());
+    }
+
+    @Override
+    public void proofDisposed(ProofDisposedEvent e) { }
 }
