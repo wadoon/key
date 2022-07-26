@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.visitor;
 
 import java.util.HashMap;
@@ -134,8 +137,8 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
         if (isJumpToOuterLabel(x)) {
             final ProgramVariable flag = flags.get(x.getLabel());
             assert flag != null : "a label flag must not be null";
-            final Statement assign = KeYJavaASTFactory.assign(flag, BooleanLiteral.TRUE,
-                    x.getPositionInfo());
+            final Statement assign =
+                KeYJavaASTFactory.assign(flag, BooleanLiteral.TRUE, x.getPositionInfo());
             final Statement[] statements = new Statement[] { assign, breakOut };
             addChild(new StatementBlock(statements));
             changed();
@@ -156,14 +159,14 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
             if (!changeList.isEmpty() && changeList.getFirst() == CHANGED) {
                 changeList.removeFirst();
             }
-            Statement assignFlag = KeYJavaASTFactory.assign(returnFlag, BooleanLiteral.TRUE,
-                    x.getPositionInfo());
+            Statement assignFlag =
+                KeYJavaASTFactory.assign(returnFlag, BooleanLiteral.TRUE, x.getPositionInfo());
             final Statement[] statements;
             if (returnValue == null) {
                 statements = new Statement[] { assignFlag, breakOut };
             } else {
-                Statement assignValue = KeYJavaASTFactory.assign(returnValue, x.getExpression(),
-                        x.getPositionInfo());
+                Statement assignValue =
+                    KeYJavaASTFactory.assign(returnValue, x.getExpression(), x.getPositionInfo());
                 statements = new Statement[] { assignFlag, assignValue, breakOut };
             }
             addChild(new StatementBlock(statements));
@@ -310,12 +313,12 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
             changeList.removeFirst();
             if (x.getChildCount() == 3) {
                 addChild(new MethodFrame((IProgramVariable) changeList.get(0),
-                        (IExecutionContext) changeList.get(1), (StatementBlock) changeList.get(2),
-                        PositionInfo.UNDEFINED));
+                    (IExecutionContext) changeList.get(1), (StatementBlock) changeList.get(2),
+                    PositionInfo.UNDEFINED));
 
             } else if (x.getChildCount() == 2) {
                 addChild(new MethodFrame(null, (IExecutionContext) changeList.get(0),
-                        (StatementBlock) changeList.get(1), PositionInfo.UNDEFINED));
+                    (StatementBlock) changeList.get(1), PositionInfo.UNDEFINED));
             } else {
                 throw new IllegalStateException("Method-frame has wrong number of children.");
             }
@@ -451,13 +454,13 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
             // Remember current flags.
             for (Entry<ProgramVariable, ProgramVariable> entry : oldFlags.entrySet()) {
                 newStatements.add(KeYJavaASTFactory.declare(entry.getValue(), entry.getKey(),
-                        entry.getValue().getKeYJavaType()));
+                    entry.getValue().getKeYJavaType()));
             }
 
             // Reset flags.
             for (ProgramVariable flag : oldFlags.keySet()) {
                 newStatements.add(
-                        KeYJavaASTFactory.assign(flag, flag.getKeYJavaType().getDefaultValue()));
+                    KeYJavaASTFactory.assign(flag, flag.getKeYJavaType().getDefaultValue()));
             }
 
             // Execute finally-block.
@@ -479,10 +482,10 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
         }
 
         oldFlags.put(flag,
-                new LocationVariable(
-                        new ProgramElementName(
-                                flag.getProgramElementName().toString() + "__BEFORE_FINALLY"),
-                        flag.getKeYJavaType()));
+            new LocationVariable(
+                new ProgramElementName(
+                    flag.getProgramElementName().toString() + "__BEFORE_FINALLY"),
+                flag.getKeYJavaType()));
     }
 
     private void changed() {

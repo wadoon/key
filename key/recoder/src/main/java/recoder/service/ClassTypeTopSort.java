@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.service;
@@ -58,7 +61,7 @@ abstract class ClassTypeTopSort implements Formats {
             int idx = classesDFS.indexOf(c);
             if (idx == -1) {
                 Debug.error(Format.toString("Could not find " + ELEMENT_LONG, c) + "\nList: "
-                        + Format.toString("%N", result) + "\n" + Debug.makeStackTrace());
+                    + Format.toString("%N", result) + "\n" + Debug.makeStackTrace());
                 System.exit(0);
             }
             if (decrIndeg(idx) == 0) {

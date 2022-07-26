@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import org.key_project.util.collection.ImmutableSet;
@@ -19,8 +22,8 @@ import de.uka.ilkd.key.util.MiscTools;
 
 /**
  * Expects a loop body and creates the anonymizing update
- * <code>out_1:=anon_1||...||out_n:=anon_n</code>, where anon_1, ..., anon_n are
- * the written variables in the loop body visible to the outside.
+ * <code>out_1:=anon_1||...||out_n:=anon_n</code>, where anon_1, ..., anon_n are the written
+ * variables in the loop body visible to the outside.
  *
  * @author Dominic Steinhoefel
  */
@@ -47,27 +50,26 @@ public final class CreateLocalAnonUpdate extends AbstractTermTransformer {
         assert pe instanceof StatementBlock;
 
         final ImmutableSet<ProgramVariable> localOuts = //
-                MiscTools.getLocalOuts(pe, services);
+            MiscTools.getLocalOuts(pe, services);
         return createLocalAnonUpdate(localOuts, services);
     }
 
-    private static Term createLocalAnonUpdate(
-            ImmutableSet<ProgramVariable> localOuts, Services services) {
+    private static Term createLocalAnonUpdate(ImmutableSet<ProgramVariable> localOuts,
+            Services services) {
         final TermBuilder tb = services.getTermBuilder();
 
         Term anonUpdate = tb.skip();
         for (ProgramVariable pv : localOuts) {
             final Function anonFunc = anonConstForPV(pv, services);
             final Term elemUpd = //
-                    tb.elementary((LocationVariable) pv, tb.func(anonFunc));
+                tb.elementary((LocationVariable) pv, tb.func(anonFunc));
             anonUpdate = tb.parallel(anonUpdate, elemUpd);
         }
 
         return anonUpdate;
     }
 
-    private static Function anonConstForPV(ProgramVariable pv,
-            Services services) {
+    private static Function anonConstForPV(ProgramVariable pv, Services services) {
         final TermBuilder tb = services.getTermBuilder();
         final Name anonFuncName = new Name(tb.newName(pv.name().toString()));
         final Function anonFunc = new Function(anonFuncName, pv.sort(), true);

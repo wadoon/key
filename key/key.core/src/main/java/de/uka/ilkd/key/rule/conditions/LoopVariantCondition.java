@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
@@ -20,8 +23,7 @@ public class LoopVariantCondition implements VariableCondition {
     private final SchemaVariable loopStmtSV;
     private final SchemaVariable variantSV;
 
-    public LoopVariantCondition(ProgramSV loopStmtSV,
-            SchemaVariable variantSV) {
+    public LoopVariantCondition(ProgramSV loopStmtSV, SchemaVariable variantSV) {
         this.loopStmtSV = loopStmtSV;
         this.variantSV = variantSV;
     }
@@ -35,22 +37,21 @@ public class LoopVariantCondition implements VariableCondition {
             return matchCond;
         }
 
-        final LoopStatement loop = (LoopStatement) svInst
-                .getInstantiation(loopStmtSV);
+        final LoopStatement loop = (LoopStatement) svInst.getInstantiation(loopStmtSV);
         final LoopSpecification loopSpec = services.getSpecificationRepository().getLoopSpec(loop);
 
         if (loopSpec == null) {
             return null;
         }
         final Term variant = loopSpec.getVariant(loopSpec.getInternalSelfTerm(),
-                loopSpec.getInternalAtPres(), services);
+            loopSpec.getInternalAtPres(), services);
 
         if (variant == null) {
             return null;
         }
 
         return matchCond.setInstantiations(//
-                svInst.add(variantSV, variant, services));
+            svInst.add(variantSV, variant, services));
     }
 
     @Override

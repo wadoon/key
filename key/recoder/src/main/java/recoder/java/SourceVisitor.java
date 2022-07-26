@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.java;
@@ -11,9 +14,8 @@ import recoder.java.reference.*;
 import recoder.java.statement.*;
 
 /**
- * A source visitor defines actions to be triggered while visiting source
- * elements. The {@link recoder.java.PrettyPrinter}is an instance of this
- * visitor.
+ * A source visitor defines actions to be triggered while visiting source elements. The
+ * {@link recoder.java.PrettyPrinter}is an instance of this visitor.
  */
 public abstract class SourceVisitor {
 
@@ -85,8 +87,8 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified constructor declaration. The default implementation
-     * calls {@link #visitMethodDeclaration}.
+     * Visits the specified constructor declaration. The default implementation calls
+     * {@link #visitMethodDeclaration}.
      *
      * @param x the program element to visit.
      */
@@ -132,8 +134,8 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified local variable declaration. The default
-     * implementation calls {@link #visitVariableDeclaration}.
+     * Visits the specified local variable declaration. The default implementation calls
+     * {@link #visitVariableDeclaration}.
      *
      * @param x the program element to visit.
      */
@@ -151,8 +153,8 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified annotation property declaration.
-     * Defaults to call visitMethodDeclaration.
+     * Visits the specified annotation property declaration. Defaults to call
+     * visitMethodDeclaration.
      *
      * @param x the program element to visit.
      */
@@ -161,8 +163,8 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visit the specified AnnotationPropertyReference.
-     * Defaults to call <code>x.getIdentifier().accept(this)</code>, if identifier is not null.
+     * Visit the specified AnnotationPropertyReference. Defaults to call
+     * <code>x.getIdentifier().accept(this)</code>, if identifier is not null.
      *
      * @param x
      */
@@ -174,8 +176,8 @@ public abstract class SourceVisitor {
 
 
     /**
-     * Visits the specified parameter declaration. The default implementation
-     * calls {@link #visitVariableDeclaration}.
+     * Visits the specified parameter declaration. The default implementation calls
+     * {@link #visitVariableDeclaration}.
      *
      * @param x the program element to visit.
      */
@@ -200,8 +202,8 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified field specification. The default implementation
-     * calls {@link #visitVariableSpecification}.
+     * Visits the specified field specification. The default implementation calls
+     * {@link #visitVariableSpecification}.
      *
      * @param x the program element to visit.
      */
@@ -220,8 +222,7 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified final modifier. The default implementation calls
-     * {@link #visitModifier}.
+     * Visits the specified final modifier. The default implementation calls {@link #visitModifier}.
      *
      * @param x the program element to final.
      */
@@ -290,8 +291,8 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified synchronized modifier. The default implementation
-     * calls {@link #visitModifier}.
+     * Visits the specified synchronized modifier. The default implementation calls
+     * {@link #visitModifier}.
      *
      * @param x the program element to final.
      */
@@ -365,8 +366,7 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified boolean literal. The default implementation calls
-     * {@link #visitLiteral}.
+     * Visits the specified boolean literal. The default implementation calls {@link #visitLiteral}.
      *
      * @param x the program element to visit.
      */
@@ -375,8 +375,7 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified char literal. The default implementation calls
-     * {@link #visitLiteral}.
+     * Visits the specified char literal. The default implementation calls {@link #visitLiteral}.
      *
      * @param x the program element to visit.
      */
@@ -385,8 +384,7 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified double literal. The default implementation calls
-     * {@link #visitLiteral}.
+     * Visits the specified double literal. The default implementation calls {@link #visitLiteral}.
      *
      * @param x the program element to visit.
      */
@@ -395,8 +393,7 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified float literal. The default implementation calls
-     * {@link #visitLiteral}.
+     * Visits the specified float literal. The default implementation calls {@link #visitLiteral}.
      *
      * @param x the program element to visit.
      */
@@ -405,8 +402,7 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified int literal. The default implementation calls
-     * {@link #visitLiteral}.
+     * Visits the specified int literal. The default implementation calls {@link #visitLiteral}.
      *
      * @param x the program element to visit.
      */
@@ -415,8 +411,7 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified long literal. The default implementation calls
-     * {@link #visitLiteral}.
+     * Visits the specified long literal. The default implementation calls {@link #visitLiteral}.
      *
      * @param x the program element to visit.
      */
@@ -425,8 +420,7 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified null literal. The default implementation calls
-     * {@link #visitLiteral}.
+     * Visits the specified null literal. The default implementation calls {@link #visitLiteral}.
      *
      * @param x the program element to visit.
      */
@@ -435,8 +429,7 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified string literal. The default implementation calls
-     * {@link #visitLiteral}.
+     * Visits the specified string literal. The default implementation calls {@link #visitLiteral}.
      *
      * @param x the program element to visit.
      */
@@ -445,8 +438,8 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified binary-and operator. The default implementation
-     * calls {@link #visitOperator}.
+     * Visits the specified binary-and operator. The default implementation calls
+     * {@link #visitOperator}.
      *
      * @param x the program element to visit.
      */
@@ -455,8 +448,8 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified binary-and assignment operator. The default
-     * implementation calls {@link #visitOperator}.
+     * Visits the specified binary-and assignment operator. The default implementation calls
+     * {@link #visitOperator}.
      *
      * @param x the program element to visit.
      */
@@ -465,8 +458,8 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified binary-not operator. The default implementation
-     * calls {@link #visitOperator}.
+     * Visits the specified binary-not operator. The default implementation calls
+     * {@link #visitOperator}.
      *
      * @param x the program element to visit.
      */
@@ -485,8 +478,8 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified binary-or assignment operator. The default
-     * implementation calls {@link #visitOperator}.
+     * Visits the specified binary-or assignment operator. The default implementation calls
+     * {@link #visitOperator}.
      *
      * @param x the program element to visit.
      */
@@ -495,8 +488,8 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified binary-xor operator. The default implementation
-     * calls {@link #visitOperator}.
+     * Visits the specified binary-xor operator. The default implementation calls
+     * {@link #visitOperator}.
      *
      * @param x the program element to visit.
      */
@@ -505,8 +498,8 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified binary-xor assignment operator. The default
-     * implementation calls {@link #visitOperator}.
+     * Visits the specified binary-xor assignment operator. The default implementation calls
+     * {@link #visitOperator}.
      *
      * @param x the program element to visit.
      */
@@ -515,8 +508,8 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified conditional operator. The default implementation
-     * calls {@link #visitOperator}.
+     * Visits the specified conditional operator. The default implementation calls
+     * {@link #visitOperator}.
      *
      * @param x the program element to visit.
      */
@@ -525,8 +518,8 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified copy assignment operator. The default implementation
-     * calls {@link #visitOperator}.
+     * Visits the specified copy assignment operator. The default implementation calls
+     * {@link #visitOperator}.
      *
      * @param x the program element to visit.
      */
@@ -545,8 +538,8 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified divide assignment operator. The default
-     * implementation calls {@link #visitOperator}.
+     * Visits the specified divide assignment operator. The default implementation calls
+     * {@link #visitOperator}.
      *
      * @param x the program element to visit.
      */
@@ -565,8 +558,8 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified greater-or-equals operator. The default
-     * implementation calls {@link #visitOperator}.
+     * Visits the specified greater-or-equals operator. The default implementation calls
+     * {@link #visitOperator}.
      *
      * @param x the program element to visit.
      */
@@ -575,8 +568,8 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified greater-than operator. The default implementation
-     * calls {@link #visitOperator}.
+     * Visits the specified greater-than operator. The default implementation calls
+     * {@link #visitOperator}.
      *
      * @param x the program element to visit.
      */
@@ -585,8 +578,8 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified instanceof operator. The default implementation
-     * calls {@link #visitOperator}.
+     * Visits the specified instanceof operator. The default implementation calls
+     * {@link #visitOperator}.
      *
      * @param x the program element to visit.
      */
@@ -595,8 +588,8 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified less-or-equals operator. The default implementation
-     * calls {@link #visitOperator}.
+     * Visits the specified less-or-equals operator. The default implementation calls
+     * {@link #visitOperator}.
      *
      * @param x the program element to visit.
      */
@@ -615,8 +608,8 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified logical-and operator. The default implementation
-     * calls {@link #visitOperator}.
+     * Visits the specified logical-and operator. The default implementation calls
+     * {@link #visitOperator}.
      *
      * @param x the program element to visit.
      */
@@ -625,8 +618,8 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified logical-not operator. The default implementation
-     * calls {@link #visitOperator}.
+     * Visits the specified logical-not operator. The default implementation calls
+     * {@link #visitOperator}.
      *
      * @param x the program element to visit.
      */
@@ -635,8 +628,8 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified logical-or operator. The default implementation
-     * calls {@link #visitOperator}.
+     * Visits the specified logical-or operator. The default implementation calls
+     * {@link #visitOperator}.
      *
      * @param x the program element to visit.
      */
@@ -645,8 +638,7 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified minus operator. The default implementation calls
-     * {@link #visitOperator}.
+     * Visits the specified minus operator. The default implementation calls {@link #visitOperator}.
      *
      * @param x the program element to visit.
      */
@@ -655,8 +647,8 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified minus assignment operator. The default
-     * implementation calls {@link #visitOperator}.
+     * Visits the specified minus assignment operator. The default implementation calls
+     * {@link #visitOperator}.
      *
      * @param x the program element to visit.
      */
@@ -675,8 +667,8 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified modulo assignment operator. The default
-     * implementation calls {@link #visitOperator}.
+     * Visits the specified modulo assignment operator. The default implementation calls
+     * {@link #visitOperator}.
      *
      * @param x the program element to visit.
      */
@@ -695,8 +687,7 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified new operator. The default implementation calls
-     * {@link #visitOperator}.
+     * Visits the specified new operator. The default implementation calls {@link #visitOperator}.
      *
      * @param x the program element to visit.
      */
@@ -715,8 +706,8 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified not-equals operator. The default implementation
-     * calls {@link #visitOperator}.
+     * Visits the specified not-equals operator. The default implementation calls
+     * {@link #visitOperator}.
      *
      * @param x the program element to visit.
      */
@@ -725,8 +716,7 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified plus operator. The default implementation calls
-     * {@link #visitOperator}.
+     * Visits the specified plus operator. The default implementation calls {@link #visitOperator}.
      *
      * @param x the program element to visit.
      */
@@ -735,8 +725,8 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified plus assignment operator. The default implementation
-     * calls {@link #visitOperator}.
+     * Visits the specified plus assignment operator. The default implementation calls
+     * {@link #visitOperator}.
      *
      * @param x the program element to visit.
      */
@@ -755,8 +745,8 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified post-decrement operator. The default implementation
-     * calls {@link #visitOperator}.
+     * Visits the specified post-decrement operator. The default implementation calls
+     * {@link #visitOperator}.
      *
      * @param x the program element to visit.
      */
@@ -765,8 +755,8 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified post-increment operator. The default implementation
-     * calls {@link #visitOperator}.
+     * Visits the specified post-increment operator. The default implementation calls
+     * {@link #visitOperator}.
      *
      * @param x the program element to visit.
      */
@@ -775,8 +765,8 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified pre-decrement operator. The default implementation
-     * calls {@link #visitOperator}.
+     * Visits the specified pre-decrement operator. The default implementation calls
+     * {@link #visitOperator}.
      *
      * @param x the program element to visit.
      */
@@ -785,8 +775,8 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified pre-increment operator. The default implementation
-     * calls {@link #visitOperator}.
+     * Visits the specified pre-increment operator. The default implementation calls
+     * {@link #visitOperator}.
      *
      * @param x the program element to visit.
      */
@@ -795,8 +785,8 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified shift-left operator. The default implementation
-     * calls {@link #visitOperator}.
+     * Visits the specified shift-left operator. The default implementation calls
+     * {@link #visitOperator}.
      *
      * @param x the program element to visit.
      */
@@ -805,8 +795,8 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified shift-left assignment operator. The default
-     * implementation calls {@link #visitOperator}.
+     * Visits the specified shift-left assignment operator. The default implementation calls
+     * {@link #visitOperator}.
      *
      * @param x the program element to visit.
      */
@@ -815,8 +805,8 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified shift-right operator. The default implementation
-     * calls {@link #visitOperator}.
+     * Visits the specified shift-right operator. The default implementation calls
+     * {@link #visitOperator}.
      *
      * @param x the program element to visit.
      */
@@ -825,8 +815,8 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified shift-right assignment operator. The default
-     * implementation calls {@link #visitOperator}.
+     * Visits the specified shift-right assignment operator. The default implementation calls
+     * {@link #visitOperator}.
      *
      * @param x the program element to visit.
      */
@@ -835,8 +825,7 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified times operator. The default implementation calls
-     * {@link #visitOperator}.
+     * Visits the specified times operator. The default implementation calls {@link #visitOperator}.
      *
      * @param x the program element to visit.
      */
@@ -845,8 +834,8 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified times assignment operator. The default
-     * implementation calls {@link #visitOperator}.
+     * Visits the specified times assignment operator. The default implementation calls
+     * {@link #visitOperator}.
      *
      * @param x the program element to visit.
      */
@@ -865,8 +854,8 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified unsigned shift-right operator. The default
-     * implementation calls {@link #visitOperator}.
+     * Visits the specified unsigned shift-right operator. The default implementation calls
+     * {@link #visitOperator}.
      *
      * @param x the program element to visit.
      */
@@ -875,8 +864,8 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified unsigned shift-right assignment operator. The
-     * default implementation calls {@link #visitOperator}.
+     * Visits the specified unsigned shift-right assignment operator. The default implementation
+     * calls {@link #visitOperator}.
      *
      * @param x the program element to visit.
      */
@@ -1173,8 +1162,7 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified uncollated reference qualifier. Defaults to do
-     * nothing.
+     * Visits the specified uncollated reference qualifier. Defaults to do nothing.
      *
      * @param x the program element to visit.
      */
@@ -1228,8 +1216,8 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified single-line comment. The default implementation
-     * calls {@link #visitComment}.
+     * Visits the specified single-line comment. The default implementation calls
+     * {@link #visitComment}.
      *
      * @param x the comment to visit.
      */
@@ -1238,8 +1226,7 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified doc comment. The default implementation calls
-     * {@link #visitComment}.
+     * Visits the specified doc comment. The default implementation calls {@link #visitComment}.
      *
      * @param x the comment to visit.
      */
@@ -1257,8 +1244,7 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified EnumConstructorReference,
-     * which is part of an EnumConstantSpecification.
+     * Visits the specified EnumConstructorReference, which is part of an EnumConstantSpecification.
      * Defaults to do nothing.
      *
      * @param x the comment to visit.
@@ -1268,8 +1254,7 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified EnumConstantDeclaration.
-     * Defaults to do nothing.
+     * Visits the specified EnumConstantDeclaration. Defaults to do nothing.
      *
      * @param x the EnumConstantDeclaration to visit.
      */
@@ -1278,8 +1263,7 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified EnumConstantSpecification.
-     * Defaults to nothing
+     * Visits the specified EnumConstantSpecification. Defaults to nothing
      *
      * @param x the EnumConstantSpecification to visit.
      */
@@ -1288,8 +1272,7 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified EnumDeclaration.
-     * Defaults to do nothing.
+     * Visits the specified EnumDeclaration. Defaults to do nothing.
      *
      * @param x the comment to visit.
      */
@@ -1298,8 +1281,7 @@ public abstract class SourceVisitor {
     }
 
     /**
-     * Visits the specified TypeArgument.
-     * Defaults to do nothing.
+     * Visits the specified TypeArgument. Defaults to do nothing.
      *
      * @param x the TypeArgument to visit.
      */

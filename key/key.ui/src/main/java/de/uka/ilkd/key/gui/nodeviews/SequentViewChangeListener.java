@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.event.ComponentEvent;
@@ -9,7 +12,8 @@ import java.beans.PropertyChangeListener;
 
 import de.uka.ilkd.key.gui.MainWindow;
 
-class SequentViewChangeListener implements ComponentListener, PropertyChangeListener, HierarchyBoundsListener {
+class SequentViewChangeListener
+        implements ComponentListener, PropertyChangeListener, HierarchyBoundsListener {
 
     private final SequentView sequentView;
 
@@ -21,7 +25,8 @@ class SequentViewChangeListener implements ComponentListener, PropertyChangeList
         // reprint sequent
         int lw = sequentView.computeLineWidth();
         if (lw != SequentView.getLineWidth()) {
-            // When switching sequents, ancestorResized is called while the sequentView has an empty rect
+            // When switching sequents, ancestorResized is called while the sequentView has an empty
+            // rect
             // Skip this repaint
             if (!sequentView.getVisibleRect().isEmpty()) {
                 SequentView.setLineWidth(lw);
