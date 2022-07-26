@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.gui.sourceview;
 
 import de.uka.ilkd.key.gui.colors.ColorSettings;
+import de.uka.ilkd.key.settings.SettingsListener;
 
 import java.awt.Color;
 import java.util.*;
@@ -258,6 +259,7 @@ public class JavaDocument extends DefaultStyledDocument {
      *  Stores the current comment state of the parser to recognize comments/comment ends.
      */
     private JavaDocument.CommentState state = CommentState.NO;
+    private SettingsListener listener = e -> updateStyles();
 
     /**
      * Creates a new JavaDocument and sets the syntax highlighting styles
@@ -265,13 +267,17 @@ public class JavaDocument extends DefaultStyledDocument {
      */
     public JavaDocument () {
         updateStyles();
-        ColorSettings.getInstance().addSettingsListener(e -> updateStyles());
+        ColorSettings.getInstance().addSettingsListener(listener);
         // workaround for #1641: typing "enter" key shall insert only "\n", even on Windows
         putProperty(DefaultEditorKit.EndOfLineStringProperty, "\n");
 
         // fill the keyword hash sets
         keywords.addAll(Arrays.asList(KEYWORDS));
         jmlkeywords.addAll(Arrays.asList(JMLKEYWORDS));
+    }
+
+    public void dispose() {
+        ColorSettings.getInstance().removeSettingsListener(listener);
     }
 
     private void updateStyles() {
