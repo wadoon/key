@@ -82,6 +82,8 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
             treeModelExploration.setRoot(rootNode);
             List<Node> explorationNodes = collectAllExplorationSteps(root, treeModelExploration, rootNode);
             explorationNodes.forEach(listModelExploration::addElement);
+        } else {
+            treeModelExploration.setRoot(null);
         }
         updateLabel();
     }
@@ -113,7 +115,7 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
      * During collection of the nodes, the nodes are grouped in the given TreeModel {@code dtm}
      * </p>
      *
-     * @param n      start node of exploration
+     * @param node   start node of exploration
      *               indow, KeYMediator mediator) {
      *               if (leftPanel == null) leftPanel = new ExplorationStepsList(window);
      *               return Collections.singleton(leftPanel);

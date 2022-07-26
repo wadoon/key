@@ -17,6 +17,8 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeListener;
+import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
+import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import org.key_project.exploration.actions.*;
 import org.key_project.exploration.ui.ExplorationStepsList;
 
@@ -44,7 +46,8 @@ public class ExplorationExtension implements KeYGuiExtension,
         KeYGuiExtension.Startup,
         KeYGuiExtension.Toolbar,
         KeYGuiExtension.MainMenu,
-        KeYGuiExtension.LeftPanel, KeYGuiExtension.StatusLine {
+        KeYGuiExtension.LeftPanel, KeYGuiExtension.StatusLine,
+        ProofDisposedListener {
     private final ExplorationModeModel model = new ExplorationModeModel();
 
     private JToolBar explorationToolbar;
@@ -93,6 +96,7 @@ public class ExplorationExtension implements KeYGuiExtension,
     @Override
     public void init(MainWindow window, KeYMediator mediator) {
         mediator.register(model, ExplorationModeModel.class);
+        var self = this;
         mediator.addKeYSelectionListener(new KeYSelectionListener() {
             @Override
             public void selectedNodeChanged(KeYSelectionEvent e) {
@@ -110,6 +114,7 @@ public class ExplorationExtension implements KeYGuiExtension,
                     }
                     if (newProof != null) {
                         newProof.addProofTreeListener(proofTreeListener);
+                        newProof.addProofDisposedListener(self);
                     }
                 }
             }
@@ -137,6 +142,18 @@ public class ExplorationExtension implements KeYGuiExtension,
         return Arrays.asList(
                 new ToggleExplorationAction(model, mainWindow),
                 new ShowInteractiveBranchesAction(model, mainWindow));
+    }
+
+    @Override
+    public void proofDisposing(ProofDisposedEvent e) {
+        if (e.getSource() == leftPanel.getProof()) {
+            leftPanel.setProof(null);
+        }
+    }
+
+    @Override
+    public void proofDisposed(ProofDisposedEvent e) {
+
     }
 }
 

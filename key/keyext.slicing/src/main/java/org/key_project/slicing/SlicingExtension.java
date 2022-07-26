@@ -16,6 +16,8 @@ import org.key_project.slicing.ui.ShowCreatedByAction;
 import org.key_project.slicing.ui.ShowGraphAction;
 import org.key_project.slicing.ui.ShowNodeInfoAction;
 import org.key_project.slicing.ui.SlicingLeftPanel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.swing.*;
@@ -37,9 +39,10 @@ public class SlicingExtension implements KeYGuiExtension,
         KeYGuiExtension.LeftPanel,
         KeYSelectionListener,
         ProofDisposedListener {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SlicingExtension.class);
 
     /**
-     * Collection of dependency trackers.
+     * Collection of dependency trackers attached to proofs.
      */
     public final Map<Proof, DependencyTracker> trackers = new IdentityHashMap<>();
     /**
@@ -128,7 +131,13 @@ public class SlicingExtension implements KeYGuiExtension,
 
     @Override
     public void proofDisposing(ProofDisposedEvent e) {
+        LOGGER.info("disposing proof {} ({}), previously had {} trackers",
+                e.getSource().name(), e.getSource().hashCode(), trackers.size());
+        trackers.put(e.getSource(), null);
         trackers.remove(e.getSource());
+        if (leftPanel != null) {
+            leftPanel.proofDisposed(e.getSource());
+        }
     }
 
     @Override

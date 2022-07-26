@@ -1214,7 +1214,11 @@ public class Proof implements Named {
             result.append("unnamed");
         }
         result.append("\nProoftree:\n");
-        result.append(root.toString());
+        if (countNodes() < 50) {
+            result.append(root.toString());
+        } else {
+            result.append("<too large to include>");
+        }
         return result.toString();
     }
 

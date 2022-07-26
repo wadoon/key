@@ -17,6 +17,7 @@ class SequentViewPanel extends JPanel {
 
     protected SequentViewPanel(SequentView sequentView) {
 
+        System.out.println("constructing new sequent view panel for " + sequentView);
         setLayout(new GridBagLayout());
         setBackground(sequentView.getBackground());
 

@@ -20,6 +20,8 @@ import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.TermProgramVariableCollector;
+import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
+import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
@@ -32,7 +34,7 @@ import org.key_project.util.lookup.Lookup;
  * include information on the underlying Java model and a converter to
  * transform Java program elements to logic (where possible) and back.
  */
-public class Services implements TermServices {
+public class Services implements TermServices, ProofDisposedListener {
    /**
      * the proof
      */
@@ -302,6 +304,9 @@ public class Services implements TermServices {
           throw new IllegalStateException("Services are already owned by another proof:" + proof.name());
        }
        proof = p_proof;
+       if (proof != null) {
+           proof.addProofDisposedListener(this);
+       }
     }
     
    
@@ -356,6 +361,16 @@ public class Services implements TermServices {
      */
     public Proof getProof() {
 	return proof;
+    }
+
+    @Override
+    public void proofDisposing(ProofDisposedEvent e) {
+        proof = null;
+    }
+
+    @Override
+    public void proofDisposed(ProofDisposedEvent e) {
+        proof = null;
     }
 
     public interface ITermProgramVariableCollectorFactory{
@@ -435,26 +450,4 @@ public class Services implements TermServices {
       assert this.javaModel == null;
       this.javaModel = javaModel;
    }
-
-    public Lookup createLookup() {
-        Lookup lookup = new Lookup();
-        lookup.register(getJavaInfo());
-        lookup.register(getJavaModel());
-        lookup.register(getProfile());
-        lookup.register(getProof());
-        lookup.register(getNamespaces());
-        lookup.register(getTermBuilder());
-        lookup.register(getNameRecorder());
-        lookup.register(getVariableNamer());
-        return lookup;
-    }
-
-    /**
-     * Resets all counters to zero.
-     *
-     * @see #getCounter(String)
-     */
-    public void resetCounters() {
-       counters.clear();
-    }
 }

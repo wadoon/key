@@ -47,6 +47,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
     private final transient KeYMediator mediator;
     private final transient SlicingExtension extension;
     private transient Proof currentProof = null;
+    private final JLabel memoryStats;
     private final JLabel graphNodes;
     private final JLabel graphEdges;
     private final JLabel totalSteps;
@@ -62,6 +63,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
     private int graphEdgesNr = 0;
     private boolean updateGraphLabels = false;
     private Timer updateGraphLabelsTimer;
+    private Timer updateHeapMemoryTimer;
 
     public SlicingLeftPanel(KeYMediator mediator, SlicingExtension extension) {
         super();
@@ -88,6 +90,11 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         button3.addActionListener(this::analyzeProof);
         var button4 = new JButton("Slice proof");
         button4.addActionListener(this::sliceProof);
+        var button6 = new JButton("call System.gc()");
+        button6.addActionListener(e -> {
+            System.gc();
+            Runtime.getRuntime().gc();
+        });
         var button5 = new JButton("Show rule statistics");
         button5.addActionListener(this::showRuleStatistics);
         graphNodes = new JLabel();
@@ -127,13 +134,19 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         timings.setBorder(new TitledBorder("Execution timings"));
         timings.setVisible(false);
 
+        memoryStats = new JLabel("Java Heap Usage: ?");
+
         panel1.setAlignmentX(Component.LEFT_ALIGNMENT);
         panel2.setAlignmentX(Component.LEFT_ALIGNMENT);
         button4.setAlignmentX(Component.LEFT_ALIGNMENT);
+        button6.setAlignmentX(Component.LEFT_ALIGNMENT);
+        memoryStats.setAlignmentX(Component.LEFT_ALIGNMENT);
         timings.setAlignmentX(Component.LEFT_ALIGNMENT);
         mainPanel.add(panel1);
         mainPanel.add(panel2);
         mainPanel.add(button4);
+        mainPanel.add(button6);
+        mainPanel.add(memoryStats);
         mainPanel.add(timings);
 
         setLayout(new BorderLayout());
@@ -151,6 +164,14 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
                 updateGraphLabelsTimer.stop();
             }
         });
+        updateHeapMemoryTimer = new Timer(100, e -> {
+            var runtime = Runtime.getRuntime();
+            var total = runtime.totalMemory();
+            var used = total - runtime.freeMemory();
+            memoryStats.setText(String.format(
+                    "Java Heap Usage: %d MB / %d MB", used / 1024 / 1024, total / 1024 / 1024));
+        });
+        updateHeapMemoryTimer.start();
     }
 
     private void exportDot(ActionEvent e) {
@@ -310,5 +331,11 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         graphEdgesNr = tracker.getDependencyGraph().countEdges();
         updateGraphLabels = true;
         updateGraphLabelsTimer.start();
+    }
+
+    public void proofDisposed(Proof proof) {
+        if (proof == currentProof) {
+            currentProof = null;
+        }
     }
 }

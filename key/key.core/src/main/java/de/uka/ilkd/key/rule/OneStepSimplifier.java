@@ -50,7 +50,7 @@ public final class OneStepSimplifier implements BuiltInRule {
     private static final int APPLICABILITY_CACHE_SIZE = 1000;
     private static final int DEFAULT_CACHE_SIZE = 10000;
 
-    public final static class Protocol extends ArrayList<RuleApp> {
+    public static final class Protocol extends ArrayList<RuleApp> {
         private static final long serialVersionUID = 8788009073806993077L;
     }
 

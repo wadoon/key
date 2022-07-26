@@ -247,6 +247,10 @@ public abstract class SequentView extends JEditorPane {
 
     @Override
     protected void finalize() {
+        dispose();
+    }
+
+    public void dispose() {
         try {
             unregisterListener();
         } catch (Throwable e) {

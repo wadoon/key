@@ -35,6 +35,17 @@ public final class MainFrame extends JPanel {
         if (component instanceof SequentView) {
             SequentView sequentView = (SequentView) component;
             Point oldSequentViewPosition = scrollPane.getViewport().getViewPosition();
+            // clean up old view
+            var oldView = scrollPane.getViewport().getView();
+            if (oldView instanceof SequentViewPanel) {
+                var panel = ((SequentViewPanel) oldView);
+                for (var c : panel.getComponents()) {
+                    if (c instanceof SequentView) {
+                        System.out.println("disposing old sequent view");
+                        ((SequentView) c).dispose();
+                    }
+                }
+            }
             scrollPane.setViewportView(new SequentViewPanel(sequentView));
             scrollPane.getViewport().setViewPosition(oldSequentViewPosition);
 

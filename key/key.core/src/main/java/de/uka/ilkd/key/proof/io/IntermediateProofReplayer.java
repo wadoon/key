@@ -181,7 +181,7 @@ public class IntermediateProofReplayer {
             reportInterval = Math.max(1, Integer.highestOneBit(max / 256));
         }
         var mapping = new HashMap<Integer, NodeIntermediate>();
-        if (!queue.isEmpty()) {
+        if (GeneralSettings.slicing && !queue.isEmpty()) {
             final int[] i = {0};
             if (queue.peekFirst().second != null) {
                 queue.peekFirst().second.depthFirstVisit(node -> {
@@ -207,7 +207,7 @@ public class IntermediateProofReplayer {
             int finalStepIndex = stepIdxOverrides.isEmpty() ? stepIndex : stepIdxOverrides.pollFirst();
             if (GeneralSettings.slicing && GeneralSettings.branchStacks.containsKey(finalStepIndex)) {
                 var list = GeneralSettings.branchStacks.get(finalStepIndex);
-                LOGGER.info("found branch stack @ {} with {} nodes", currGoal.node().serialNr(), list.size());
+                LOGGER.trace("found branch stack @ {} with {} nodes", currGoal.node().serialNr(), list.size());
                 for (int i = list.size() - 1; i >= 0; i--) {
                     queue.addFirst(new Pair<>(queue.peekFirst().first, mapping.get(list.get(i))));
                     stepIdxOverrides.addFirst(list.get(i));
@@ -464,7 +464,11 @@ public class IntermediateProofReplayer {
             }
         }
         GeneralSettings.slicing = false;
-        GeneralSettings.usefulSteps = Set.of();
+        GeneralSettings.branchStacks = null;
+        GeneralSettings.serialNrToIfInsts = null;
+        GeneralSettings.serialNrToPos = null;
+        GeneralSettings.stepIdxtoName = null;
+        GeneralSettings.stepIndexToDynamicRule = null;
         LOGGER.info("replay time: {} ms", System.currentTimeMillis() - startTime);
         return new Result(status, errors, currGoal);
     }
