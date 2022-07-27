@@ -43,7 +43,6 @@ public class ProofTreePopupFactory {
             new ArrayList<Function<ProofTreeContext, Component>>();
 
     protected ProofTreePopupFactory() {
-        System.out.println("new ProofTreePopupFactory");
         addAction(RunStrategyOnNode::new);
         addAction(Prune::new);
         add(this::getMacroMenu);
