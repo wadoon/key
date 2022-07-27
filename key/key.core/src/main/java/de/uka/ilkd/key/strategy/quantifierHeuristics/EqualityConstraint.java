@@ -530,7 +530,8 @@ public class EqualityConstraint implements Constraint {
             return Constraint.TOP;
 
         // metavariable instantiations must not contain free variables
-        if (t.freeVars().size() != 0 || (modifyThis ? hasCycle(mv, t) : hasCycleByInst(mv, t))) // cycle
+        if (t.freeVars().size() != 0 || (modifyThis ? hasCycle(mv, t) : hasCycleByInst(mv, t)))
+            // cycle
             return Constraint.TOP;
         else if (map.containsKey(mv))
             return unifyHelp(valueOf(mv), t, modifyThis, services);

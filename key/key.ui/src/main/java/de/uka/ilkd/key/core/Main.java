@@ -263,8 +263,8 @@ public final class Main {
         cl.addTextPart("--K-help", "display help for technical/debug parameters\n", true);
         cl.addOption(SHOW_PROPERTIES, null, "list all Java properties and exit");
         cl.addOption(LAST, null, "start prover with last loaded problem (only possible with GUI)");
-        cl.addOption(AUTOSAVE, "<number>",
-            "save intermediate proof states each n proof steps to a temporary location (default: 0 = off)");
+        cl.addOption(AUTOSAVE, "<number>", "save intermediate proof states each n proof steps to a"
+            + " temporary location (default: 0 = off)");
         cl.addOption(EXPERIMENTAL, null, "switch experimental features on");
         cl.addOption(NO_PRUNING_CLOSED, null,
             "disables pruning and goal back in closed branches (saves memory)");
@@ -290,8 +290,8 @@ public final class Main {
             "timeout for each automatic proof of a problem in ms (default: "
                 + LemmataAutoModeOptions.DEFAULT_TIMEOUT + ", i.e., no timeout)");
         cl.addSection("Options for justify rules:");
-        cl.addOption(JUSTIFY_RULES, "<filename>",
-            "autoprove taclets (options always with prefix --jr) needs the path to the rule file as argument");
+        cl.addOption(JUSTIFY_RULES, "<filename>", "autoprove taclets "
+            + "(options always with prefix --jr) needs the path to the rule file as argument");
         cl.addText("\n", true);
         cl.addText(
             "The '" + JUSTIFY_RULES + "' option has a number of additional parameters you can set.",

@@ -205,9 +205,8 @@ public final class IssueDialog extends JDialog {
         if (critical) {
             head = "The following exception occurred:";
         } else {
-            head = String.format(
-                "The following non-fatal problems occurred when translating your %s specifications:",
-                SLEnvInput.getLanguage());
+            head = String.format("The following non-fatal problems occurred when translating your "
+                + "%s specifications:", SLEnvInput.getLanguage());
         }
         JLabel label = new JLabel(head);
         label.setBorder(BorderFactory.createEmptyBorder(5, 5, 2, 5));

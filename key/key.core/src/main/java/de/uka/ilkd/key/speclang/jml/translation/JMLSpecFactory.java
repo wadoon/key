@@ -1165,9 +1165,8 @@ public class JMLSpecFactory {
 
         final JmlParser.Merge_point_statementContext ctx = mergePointDecl.getMergeProc();
 
-        final String mergeProcStr = ctx.proc == null ? MergeByIfThenElse.instance().toString() // default
-                                                                                               // merge
-                                                                                               // procedure
+        // MergeByIfThenElse is default merge procedure
+        final String mergeProcStr = ctx.proc == null ? MergeByIfThenElse.instance().toString()
                 : ctx.proc.getText().replaceAll("\"", "");
 
         MergeProcedure mergeProc = MergeProcedure.getProcedureByName(mergeProcStr);
@@ -1186,8 +1185,8 @@ public class JMLSpecFactory {
         } else if (mergeProc instanceof ParametricMergeProcedure) { // arguments expected looking
                                                                     // for params
             if (!(mergeProc instanceof MergeWithPredicateAbstraction))
-                throw new IllegalStateException(
-                    "Currently, MergeWithPredicateAbstraction(Factory) is the only supported ParametricMergeProcedure");
+                throw new IllegalStateException("Currently, MergeWithPredicateAbstraction(Factory) "
+                    + "is the only supported ParametricMergeProcedure");
 
             // @formatter:off
             // Expected merge params structure:
@@ -1219,8 +1218,8 @@ public class JMLSpecFactory {
             result = result.add(new PredicateAbstractionMergeContract(mps, atPres, kjt,
                 specs.getLatticeType(), abstractionPredicates));
         } else {
-            throw new IllegalStateException(
-                "MergeProcedures should either be an UnparametricMergeProcedure or a ParametricMergeProcedure");
+            throw new IllegalStateException("MergeProcedures should either be an "
+                + "UnparametricMergeProcedure or a ParametricMergeProcedure");
         }
         return result;
     }
@@ -1339,16 +1338,11 @@ public class JMLSpecFactory {
         }
         final ImmutableList<ProgramVariable> paramVars =
             append(collectLocalVariablesVisibleTo(jmlAssert, pm), parameters);
-        final ProgramVariableCollection pv = new ProgramVariableCollection(
-            tb.selfVar(pm, pm.getContainerType(), false), paramVars, tb.resultVar(pm, false),
-            tb.excVar(pm, false), atPreVars, termify(atPreVars), Collections.emptyMap(), // should
-                                                                                         // be the
-                                                                                         // pre-state
-                                                                                         // of the
-                                                                                         // enclosing
-                                                                                         // contract
-            Collections.emptyMap() // ignore for now
-        );
+        final ProgramVariableCollection pv =
+            new ProgramVariableCollection(tb.selfVar(pm, pm.getContainerType(), false), paramVars,
+                tb.resultVar(pm, false), tb.excVar(pm, false), atPreVars, termify(atPreVars),
+                Collections.emptyMap(), Collections.emptyMap() // ignore for now
+            );
         jmlAssert.translateCondition(jmlIo.classType(pm.getContainerType()), pv);
     }
 

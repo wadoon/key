@@ -516,12 +516,14 @@ public class SendFeedbackAction extends AbstractAction {
         labels.setBackground(UIManager.getColor("Label.background"));
         labels.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         labels.setText(
-            "<html>The report feature can be used to send information about your current state of KeY to report a bug or to ask for advice from the KeY team.<br>"
-                + "You can either store the information in a zip locally (and then e.g. send that via e-mail to "
-                + FEEDBACK_RECIPIENT + ") or send directly to our server.<br>"
-                + "Please select the information that you want to include from the list on the right.<br>"
-                + "If you send the information directly, <b>please make sure to indicate your e-mail address</b> "
-                + "in the message below such that the team can respond.");
+            "<html>The report feature can be used to send information about your current state of "
+                + "KeY to report a bug or to ask for advice from the KeY team.<br>"
+                + "You can either store the information in a zip locally (and then e.g. send that "
+                + "via e-mail to " + FEEDBACK_RECIPIENT + ") or send directly to our server.<br>"
+                + "Please select the information that you want to include from the list on the "
+                + "right.<br>"
+                + "If you send the information directly, <b>please make sure to indicate your "
+                + "e-mail address</b> " + "in the message below such that the team can respond.");
         Container container = dialog.getContentPane();
         container.setLayout(new BorderLayout());
         container.add(labels, BorderLayout.NORTH);

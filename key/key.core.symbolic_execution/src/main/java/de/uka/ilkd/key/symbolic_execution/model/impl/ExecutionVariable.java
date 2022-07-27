@@ -131,19 +131,10 @@ public class ExecutionVariable extends AbstractExecutionVariable {
     protected ExecutionValue[] lazyComputeValues() throws ProofInputException {
         InitConfig initConfig = getInitConfig();
         if (initConfig != null) { // Otherwise proof is disposed.
+            // New OneStepSimplifier is required because it has an internal state and the default
+            // instance can't be used parallel.
             final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil
-                    .cloneProofEnvironmentWithOwnOneStepSimplifier(initConfig, true); // New
-                                                                                      // OneStepSimplifier
-                                                                                      // is required
-                                                                                      // because it
-                                                                                      // has an
-                                                                                      // internal
-                                                                                      // state and
-                                                                                      // the default
-                                                                                      // instance
-                                                                                      // can't be
-                                                                                      // used
-                                                                                      // parallel.
+                    .cloneProofEnvironmentWithOwnOneStepSimplifier(initConfig, true);
             final Services services = sideProofEnv.getServicesForEnvironment();
             final TermBuilder tb = services.getTermBuilder();
             // Start site proof to extract the value of the result variable.
@@ -276,14 +267,15 @@ public class ExecutionVariable extends AbstractExecutionVariable {
             boolean unknownValue = false;
             if (siteProofSelectTerm != null) {
                 if (SymbolicExecutionUtil.isNullSort(value.sort(), services)) {
+                    // Check if the symbolic value is not null, if it fails the value is treated as
+                    // unknown
                     unknownValue = SymbolicExecutionUtil.isNull(getProofNode(), siteProofCondition,
-                        siteProofSelectTerm); // Check if the symbolic value is not null, if it
-                                              // fails the value is treated as unknown
+                        siteProofSelectTerm);
                 } else {
+                    // Check if the symbolic value is not null, if it fails the value is treated as
+                    // unknown
                     unknownValue = SymbolicExecutionUtil.isNotNull(getProofNode(),
-                        siteProofCondition, siteProofSelectTerm); // Check if the symbolic value is
-                                                                  // not null, if it fails the value
-                                                                  // is treated as unknown
+                        siteProofCondition, siteProofSelectTerm);
                 }
             }
             // Add to result list

@@ -123,9 +123,9 @@ public class QueryExpand implements BuiltInRule {
         // LogicVariable logicResultQV = new LogicVariable(new
         // Name("res_"+method.getName()),query.sort())
 
-        KeYJavaType calleeType = services.getJavaInfo().getKeYJavaType(query.arity() == 1 ? // static
-                                                                                            // query
-                query.sort() : query.sub(1).sort());
+        // query.arity() == 1 means static query
+        KeYJavaType calleeType = services.getJavaInfo()
+                .getKeYJavaType(query.arity() == 1 ? query.sort() : query.sub(1).sort());
         KeYJavaType progResultType = method.getReturnType();
 
 
@@ -164,8 +164,8 @@ public class QueryExpand implements BuiltInRule {
             }
             ImmutableArray<Sort> imArrlvSorts = new ImmutableArray<>(lvSorts);
             placeHolderResult = new Function(new Name(logicResultName), query.sort(), imArrlvSorts);
-            placeHolderResultTrm = tb.func(placeHolderResult, lvTrms, null); // I'm not sure about
-                                                                             // the third parameter!
+            // I'm not sure about the third parameter!
+            placeHolderResultTrm = tb.func(placeHolderResult, lvTrms, null);
         }
 
         services.getNamespaces().functions().addSafely(placeHolderResult);

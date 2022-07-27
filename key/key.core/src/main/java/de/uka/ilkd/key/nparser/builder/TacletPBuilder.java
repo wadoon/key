@@ -476,17 +476,16 @@ public class TacletPBuilder extends ExpressionBuilder {
                 if (rwObj instanceof Sequent) {
                     gt = new AntecSuccTacletGoalTemplate(addSeq, addRList, (Sequent) rwObj, pvs);
                 } else {
-                    semanticError(ctx, // new UnfittingReplacewithException
-                        "Replacewith in a Antec-or SuccTaclet has to contain a sequent (not a term)");
+                    semanticError(ctx, "Replacewith in a Antec-or SuccTaclet has to contain a "
+                        + "sequent (not a term)");
 
                 }
             } else if (b instanceof RewriteTacletBuilder) {
                 if (rwObj instanceof Term) {
                     gt = new RewriteTacletGoalTemplate(addSeq, addRList, (Term) rwObj, pvs);
                 } else {
-                    // throwEx(/new UnfittingReplacewithException
-                    semanticError(ctx,
-                        "Replacewith in a RewriteTaclet has to contain a term (not a sequent)");
+                    semanticError(ctx, "Replacewith in a RewriteTaclet has to contain a term (not "
+                        + "a sequent)");
                 }
             }
         }

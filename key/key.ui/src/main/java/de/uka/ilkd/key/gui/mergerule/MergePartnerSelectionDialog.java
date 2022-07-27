@@ -79,8 +79,8 @@ public class MergePartnerSelectionDialog extends JDialog {
 
     /** The tooltip for the OK button */
     private static final String CHOOSE_ALL_BTN_TOOLTIP_TXT =
-        "Select all proposed goals as merge partners. "
-            + "Only enabled if the merge is applicable for all goals and the chosen merge procedure.";
+        "Select all proposed goals as merge partners. Only enabled if the merge is applicable for "
+            + "all goals and the chosen merge procedure.";
     /** The tooltip for the choose-all button */
     private static final String OK_BTN_TOOLTIP_TXT = "Select the chosen goals as merge partners. "
         + "Only enabled if at least one goal is chosen and the merge is applicable for the "

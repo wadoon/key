@@ -16,8 +16,9 @@ import de.uka.ilkd.key.settings.SettingsListener;
 public class MinimizeInteraction extends KeYMenuCheckBox {
     public static final String NAME = "Minimize Interaction";
     public static final String TOOL_TIP =
-        "If ticked and automated strategy (play button) is used, the prover tries to minimize user interaction, "
-            + "e.g., if the prover can find instantiations by itself, it will not ask the user to provide them.";
+        "If ticked and automated strategy (play button) is used, the prover tries to minimize user "
+            + "interaction, e.g., if the prover can find instantiations by itself, it will not ask "
+            + "the user to provide them.";
 
     /**
      *

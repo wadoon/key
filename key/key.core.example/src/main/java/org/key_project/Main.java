@@ -62,13 +62,9 @@ public class Main {
             newSettings.putAll(MiscTools.getDefaultTacletOptions());
             choiceSettings.setDefaultChoices(newSettings);
             // Load source code
+            // env.getLoadedProof() returns performed proof if a *.proof file is loaded
             KeYEnvironment<?> env =
-                KeYEnvironment.load(location, classPaths, bootClassPath, includes); // env.getLoadedProof()
-                                                                                    // returns
-                                                                                    // performed
-                                                                                    // proof if a
-                                                                                    // *.proof file
-                                                                                    // is loaded
+                KeYEnvironment.load(location, classPaths, bootClassPath, includes);
             try {
                 // List all specifications of all types in the source location (not classPaths and
                 // bootClassPath)

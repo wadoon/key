@@ -1710,24 +1710,6 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                     // add the function to the used ones
                     this.addSpecialFunction(fun);
                     // return the final translation
-
-                    /*
-                     * TODO WP: not needed anymore with the modern SMT solvers we support -> remove
-                     */
-                    /*
-                     * if (isComplexMultiplication(services, term.sub(0), term.sub(1)) &&
-                     * config.supportsOnlySimpleMultiplication) { if
-                     * (smtSettings.useUninterpretedMultiplicationIfNecessary()) { Function
-                     * unin_mult = getMultiplicationFunction(services); return
-                     * this.translateAsUninterpretedFunction( unin_mult, quantifiedVars,
-                     * term.subs(), services); } else { String mult = LogicPrinter
-                     * .quickPrintTerm(term, services); throw new IllegalFormulaException(
-                     * "The multiplication " + mult + " is not" +
-                     * " supported by this solver.\nThe problem can be" +
-                     * " handled by using uninterpreted functions.\nFor more information see the settings of"
-                     * + " the SMT integration: Options/SMT Settings/Translation."); } }
-                     */
-
                     return this.translateIntegerMult(arg1, arg2);
                 } else if (fun == services.getTypeConverter().getIntegerLDT().getDiv()) {
                     StringBuilder arg1 = translateTerm(term.sub(0), quantifiedVars, services);
@@ -1741,21 +1723,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                     long num = NumberTranslation.translate(term.sub(0)).longValue();
                     StringBuilder numVal;
 
-                    /*
-                     * TODO WP: not needed anymore with the modern SMT solvers we support -> remove
-                     */
-                    /*
-                     * if (hasNumberLimit() && (num < getMinNumber() || num > getMaxNumber())) { if
-                     * (smtSettings.useAssumptionsForBigSmallIntegers()) { numVal =
-                     * buildUniqueConstant( num, services); } else { throw new
-                     * IllegalNumberException( "The number " + num + " is not supported" +
-                     * " by this solver. Either it is too big or too small.\nThe problem can be" +
-                     * " handled by using uninterpreted constants. For more information see the settings of"
-                     * + " the SMT integration: Options/SMT Settings/Translation."); }
-                     */
-                    // } else {
                     numVal = translateIntegerValue(num);
-                    // }
 
                     // add the type predicate for this
                     // constant

@@ -579,7 +579,8 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                             if (abbreviation != null) {
                                 if (!validAbbreviation(abbreviation)) {
                                     JOptionPane.showMessageDialog(new JFrame(),
-                                        "Only letters, numbers and '_' are allowed for Abbreviations",
+                                        "Only letters, numbers and '_' are allowed for"
+                                            + " Abbreviations",
                                         "Sorry", JOptionPane.INFORMATION_MESSAGE);
                                 } else {
                                     mediator.getNotationInfo().getAbbrevMap().put(occ.subTerm(),

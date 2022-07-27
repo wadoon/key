@@ -390,9 +390,8 @@ public abstract class AbstractProofControl implements ProofControl {
 
         ImmutableSet<IBuiltInRuleApp> set = getBuiltInRuleApp(goal, rule, pos);
         if (set.size() > 1) {
-            LOGGER.warn(
-                "Expected a single app. If it is OK that there are more than one built-in rule apps. "
-                    + "You have to add a selection dialog here");
+            LOGGER.warn("Expected a single app. If it is OK that there are more than one built-in "
+                + "rule apps. You have to add a selection dialog here");
             LOGGER.warn("Ambiguous applications, taking the first in list.");
         }
 
@@ -658,7 +657,7 @@ public abstract class AbstractProofControl implements ProofControl {
                 final AutomatedRuleApplicationManager ruleAppManager = goal.getRuleAppManager();
                 if (ruleAppManager instanceof FocussedRuleApplicationManager
                         || ruleAppManager instanceof FocussedBreakpointRuleApplicationManager) {
-                    final DelegationBasedAutomatedRuleApplicationManager focusManager = //
+                    final DelegationBasedAutomatedRuleApplicationManager focusManager =
                         (DelegationBasedAutomatedRuleApplicationManager) ruleAppManager;
                     goal.setRuleAppManager(null);
                     final AutomatedRuleApplicationManager realManager = focusManager.getDelegate();

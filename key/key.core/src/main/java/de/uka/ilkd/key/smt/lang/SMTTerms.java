@@ -50,8 +50,8 @@ public class SMTTerms extends SMTTerm {
     /** {@inheritDoc} */
     @Override
     public SMTSort sort() {
-        throw new RuntimeException(
-            "Unexpected: Sort of a term list. The Method <sort()> don't support instances of <Terms>");
+        throw new RuntimeException("Unexpected: Sort of a term list. The Method <sort()> don't "
+            + "support instances of <Terms>");
     }
 
     /*

@@ -78,8 +78,9 @@ public class EnumClassDeclaration extends ClassDeclaration {
      */
     private static final String ENUM_NAMES = "<enumConstantNames>";
 
-    private static final String VALUE_OF_PROTO =
-        "public static $E valueOf(String string) { for($E e : values()) { if(e.name().equals(string)) return e; } throw new IllegalArgumentException(); }";
+    private static final String VALUE_OF_PROTO = "public static $E valueOf(String string) { "
+        + "for($E e : values()) { if(e.name().equals(string)) return e; } "
+        + "throw new IllegalArgumentException(); }";
     private static final String VALUES_PROTO =
         "public static $E[] values() { return new $E[] { $consts }; }";
     private static final String NAME_PROTO =

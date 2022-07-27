@@ -72,9 +72,8 @@ public class ThinBackwardSlicer extends AbstractBackwardSlicer {
                 Term loopConditionModalityTerm =
                     SymbolicExecutionUtil.posInOccurrenceInOtherNode(node, pio, previousChild);
                 if (loopConditionModalityTerm.op() != UpdateApplication.UPDATE_APPLICATION) {
-                    throw new IllegalStateException(
-                        "Use Loop Invariant/Operation Contract rule implementation has changed at node "
-                            + node.serialNr() + ".");
+                    throw new IllegalStateException("Use Loop Invariant/Operation Contract rule "
+                        + "implementation has changed at node " + node.serialNr() + ".");
                 }
                 Term updateTerm = UpdateApplication.getTarget(loopConditionModalityTerm);
                 while (updateTerm.op() == UpdateApplication.UPDATE_APPLICATION) {

@@ -166,8 +166,8 @@ public class ExecutionNodeReader {
                             throw new SAXException("Can't find completed block entry \""
                                 + pair.first + "\" in parsed symbolic execution tree.");
                         } else if (!(returnEntry instanceof IExecutionBlockStartNode<?>)) {
-                            throw new SAXException(
-                                "Found completed block entry is not an instance of IExecutionBlockStartNode.");
+                            throw new SAXException("Found completed block entry is not an instance "
+                                + "of IExecutionBlockStartNode.");
                         }
                         entry.getKey().addCompletedBlock((IExecutionBlockStartNode<?>) returnEntry,
                             pair.second);

@@ -31,13 +31,14 @@ public class InformationWindow extends JDialog {
         + "\n\n"
         + "- Shows a bounded model which satisfies the negation of the selected proof obligation"
         + "\n" + "- Only proof obligations without modalities are supported" + "\n"
-        + "- The OneStepSimplifier neeeds to be activated, otherwise updates need to be handled manually beforehand"
-        + "\n"
+        + "- The OneStepSimplifier neeeds to be activated, otherwise updates need to be handled "
+        + "manually beforehand" + "\n"
         + "- Double click ond location set, sequence and object nodes(inside a heap) to extend them"
         + "\n" + "- Choose bit sizes in Options -> SMT Solvers" + "\n"
         + "- We have identified the following sources for spurious counterexample:" + "\n"
-        + "   - Chosen bit sizes too small. Example: Bit size of Integer is 3 but literal 9 appears in proof obligation."
-        + "\n" + "   - Finite type instances: Example: There is no maximum integer." + "\n"
+        + "   - Chosen bit sizes too small. Example: Bit size of Integer is 3 but literal 9 appears"
+        + " in proof obligation." + "\n"
+        + "   - Finite type instances: Example: There is no maximum integer." + "\n"
         + "   - Removal of axioms. Example: There is a location set which contains location (o, f)";
 
 

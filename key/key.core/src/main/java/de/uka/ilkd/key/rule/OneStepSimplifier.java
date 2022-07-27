@@ -321,23 +321,11 @@ public final class OneStepSimplifier implements BuiltInRule {
             }
             Term result =
                 pos.isInAntec() ? services.getTermBuilder().tt() : services.getTermBuilder().ff();
+            // TODO: pos.subTerm() == in should be true which is currently not the case (labels are
+            // missing)
             ImmutableArray<TermLabel> labels =
-                TermLabelManager.instantiateLabels(new TermLabelState(), services, in, pos, // TODO:
-                                                                                            // pos.subTerm()
-                                                                                            // == in
-                                                                                            // should
-                                                                                            // be
-                                                                                            // true
-                                                                                            // which
-                                                                                            // is
-                                                                                            // currently
-                                                                                            // not
-                                                                                            // the
-                                                                                            // case
-                                                                                            // (labels
-                                                                                            // are
-                                                                                            // missing)
-                    this, ruleApp, goal, null, null, result.op(), result.subs(), result.boundVars(),
+                TermLabelManager.instantiateLabels(new TermLabelState(), services, in, pos, this,
+                    ruleApp, goal, null, null, result.op(), result.subs(), result.boundVars(),
                     result.javaBlock(), result.getLabels());
             if (labels != null && !labels.isEmpty()) {
                 result = services.getTermBuilder().label(result, labels);
@@ -406,14 +394,11 @@ public final class OneStepSimplifier implements BuiltInRule {
         FormulaSV sv = SchemaVariableFactory.createFormulaSV(new Name("b"));
         svi.add(sv, pio.sequentFormula().formula(), lastProof.getServices());
 
+        // It is required to create a new PosInOccurrence because formula and
+        // pio.constrainedFormula().formula() are only equals module renamings and term labels
+        // TODO: Should be the precise sub term instead of PosInTerm.getTopLevel().
         PosInOccurrence applicatinPIO =
-            new PosInOccurrence(new SequentFormula(formula), PosInTerm.getTopLevel(), // TODO: This
-                                                                                      // should be
-                                                                                      // the precise
-                                                                                      // sub term
-                inAntecedent); // It is required to create a new PosInOccurrence because formula and
-                               // pio.constrainedFormula().formula() are only equals module
-                               // renamings and term labels
+            new PosInOccurrence(new SequentFormula(formula), PosInTerm.getTopLevel(), inAntecedent);
         ImmutableList<IfFormulaInstantiation> ifInst = ImmutableSLList.nil();
         ifInst = ifInst.append(new IfFormulaInstDirect(pio.sequentFormula()));
         TacletApp ta = PosTacletApp.createPosTacletApp(taclet, svi, ifInst, applicatinPIO,

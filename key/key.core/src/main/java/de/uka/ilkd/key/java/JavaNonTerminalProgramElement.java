@@ -101,7 +101,7 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement
     public MatchConditions match(SourceData source, MatchConditions matchCond) {
         final ProgramElement src = source.getSource();
 
-        LOGGER.debug("Program match start (template {}, source {})", this, src); // this.toString().equals("e")
+        LOGGER.debug("Program match start (template {}, source {})", this, src);
 
         if (src == null) {
             return null;

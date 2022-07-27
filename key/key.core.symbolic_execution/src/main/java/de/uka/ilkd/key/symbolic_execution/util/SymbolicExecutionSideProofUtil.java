@@ -460,49 +460,14 @@ public final class SymbolicExecutionSideProofUtil {
      */
     public static boolean isIrrelevantCondition(Services services, Sequent initialSequent,
             Set<Operator> relevantThingsInSequentToProve, SequentFormula sf) {
-        return initialSequent.antecedent().contains(sf) || // Conditions which already exist in the
-                                                           // initial sequent are irrelevant
-                initialSequent.succedent().contains(sf) || // Conditions which already exist in the
-                                                           // initial sequent are irrelevant
-                // isInOrOfAntecedent(initialSequent, sf) ||
-                containsModalityOrQuery(sf) || // Conditions with modalities or queries are
-                                               // irrelevant
-                containsIrrelevantThings(services, sf, relevantThingsInSequentToProve); // Conditions
-                                                                                        // which
-                                                                                        // contains
-                                                                                        // not
-                                                                                        // relevant
-                                                                                        // things
-                                                                                        // are
-                                                                                        // irrelevant
+        /*
+         * a condition is irrelevant iff: - it already exists in the initial sequent or - it
+         * contains modalities or queries or - it contains irrelevant things
+         */
+        return initialSequent.antecedent().contains(sf) || initialSequent.succedent().contains(sf)
+                || containsModalityOrQuery(sf)
+                || containsIrrelevantThings(services, sf, relevantThingsInSequentToProve);
     }
-
-    // public static boolean isInOrOfAntecedent(Sequent initialSequent, SequentFormula sf) {
-    // Term term = sf.formula();
-    // boolean result = false;
-    // Iterator<SequentFormula> iter = initialSequent.antecedent().iterator();
-    // while (!result && iter.hasNext()) {
-    // SequentFormula next = iter.next();
-    // if (isInOr(next.formula(), term)) {
-    // result = true;
-    // }
-    // }
-    // return result;
-    // }
-    //
-    // public static boolean isInOr(Term term, Term toCheck) {
-    // if (term.op() == Junctor.OR) {
-    // boolean result = false;
-    // Iterator<Term> iter = term.subs().iterator();
-    // while (!result && iter.hasNext()) {
-    // result = isInOr(iter.next(), toCheck);
-    // }
-    // return result;
-    // }
-    // else {
-    // return term == toCheck;
-    // }
-    // }
 
     /**
      * Checks if the given {@link SequentFormula} contains irrelevant things (things which are not
@@ -523,8 +488,7 @@ public final class SymbolicExecutionSideProofUtil {
     }
 
     /**
-     * Utility class used by
-     * {@link QuerySideProofRule#containsIrrelevantThings(Services, SequentFormula, Set)}.
+     * Utility class used by {@link #containsIrrelevantThings(Services, SequentFormula, Set)}.
      *
      * @author Martin Hentschel
      */
@@ -555,9 +519,6 @@ public final class SymbolicExecutionSideProofUtil {
             this.relevantThings = relevantThings;
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public void visit(Term visited) {
             if (isRelevantThing(services, visited)) {
@@ -791,25 +752,12 @@ public final class SymbolicExecutionSideProofUtil {
                     if (sourceProfile instanceof SymbolicExecutionJavaProfile) {
                         ImmutableList<TermLabelConfiguration> result =
                             super.computeTermLabelConfiguration();
+                        // Make sure that the term labels of symbolic execution are also supported
+                        // by the new environment.
                         result = result.prepend(SymbolicExecutionJavaProfile
                                 .getSymbolicExecutionTermLabelConfigurations(
                                     SymbolicExecutionJavaProfile
-                                            .isTruthValueEvaluationEnabled(sourceInitConfig))); // Make
-                                                                                                // sure
-                                                                                                // that
-                                                                                                // the
-                                                                                                // term
-                                                                                                // labels
-                                                                                                // of
-                                                                                                // symbolic
-                                                                                                // execution
-                                                                                                // are
-                                                                                                // also
-                                                                                                // supported
-                                                                                                // by
-                                                                                                // the
-                                                                                                // new
-                                                                                                // environment.
+                                            .isTruthValueEvaluationEnabled(sourceInitConfig)));
                         return result;
                     } else {
                         return super.computeTermLabelConfiguration();
@@ -824,25 +772,12 @@ public final class SymbolicExecutionSideProofUtil {
                     if (sourceProfile instanceof SymbolicExecutionJavaProfile) {
                         ImmutableList<TermLabelConfiguration> result =
                             super.computeTermLabelConfiguration();
+                        // Make sure that the term labels of symbolic execution are also supported
+                        // by the new environment.
                         result = result.prepend(SymbolicExecutionJavaProfile
                                 .getSymbolicExecutionTermLabelConfigurations(
                                     SymbolicExecutionJavaProfile
-                                            .isTruthValueEvaluationEnabled(sourceInitConfig))); // Make
-                                                                                                // sure
-                                                                                                // that
-                                                                                                // the
-                                                                                                // term
-                                                                                                // labels
-                                                                                                // of
-                                                                                                // symbolic
-                                                                                                // execution
-                                                                                                // are
-                                                                                                // also
-                                                                                                // supported
-                                                                                                // by
-                                                                                                // the
-                                                                                                // new
-                                                                                                // environment.
+                                            .isTruthValueEvaluationEnabled(sourceInitConfig)));
                         return result;
                     } else {
                         return super.computeTermLabelConfiguration();

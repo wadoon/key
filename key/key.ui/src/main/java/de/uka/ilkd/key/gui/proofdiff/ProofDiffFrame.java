@@ -150,8 +150,8 @@ public class ProofDiffFrame extends JFrame {
             }
             {
                 JButton last = new JButton("Show Selected Node");
-                last.setToolTipText(
-                    "Show difference introduced by the rule application leading to the selected node");
+                last.setToolTipText("Show difference introduced by the rule application leading to"
+                    + " the selected node");
                 last.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {

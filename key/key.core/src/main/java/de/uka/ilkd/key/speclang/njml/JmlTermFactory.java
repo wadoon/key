@@ -860,7 +860,8 @@ public final class JmlTermFactory {
                         // this case may happen with local variables
                         exc.addIgnoreWarning("local variable in assignable clause");
                         LOGGER.debug("Can't create a locset from local variable " + t + ".\n"
-                            + "In this version of KeY, you do not need to put them in assignable clauses.");
+                            + "In this version of KeY, you do not need to put them in assignable "
+                            + "clauses.");
                     } else {
                         throw exc.createException0("Can't create a locset from " + t + ".");
                     }

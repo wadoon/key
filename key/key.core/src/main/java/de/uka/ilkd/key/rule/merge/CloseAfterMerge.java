@@ -96,8 +96,8 @@ public class CloseAfterMerge implements BuiltInRule {
             final RuleApp ruleApp) throws RuleAbortException {
         final TermLabelState termLabelState = new TermLabelState();
 
-        assert ruleApp instanceof CloseAfterMergeRuleBuiltInRuleApp : //
-                "Rule app for CloseAfterMerge has to be an instance of CloseAfterMergeRuleBuiltInRuleApp";
+        assert ruleApp instanceof CloseAfterMergeRuleBuiltInRuleApp : "Rule app for CloseAfterMerge"
+            + " has to be an instance of CloseAfterMergeRuleBuiltInRuleApp";
 
         CloseAfterMergeRuleBuiltInRuleApp closeApp = (CloseAfterMergeRuleBuiltInRuleApp) ruleApp;
 

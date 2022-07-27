@@ -232,8 +232,8 @@ public class Recoder2KeYTypeConverter {
             KeYJavaType serializableType = getKeYJavaType("java.io.Serializable");
             // I may not use JavaInfo here because the classes may not yet be cached!
             if (objectType == null || cloneableType == null || serializableType == null) {
-                throw new RuntimeException(
-                    "Missing core classes: java.lang.Object, java.lang.Cloneable, java.io.Serializable must always be present");
+                throw new RuntimeException("Missing core classes: java.lang.Object, "
+                    + "java.lang.Cloneable, java.io.Serializable must always be present");
             }
 
             // I may not use JavaInfo here because the classes may not yet be cached!

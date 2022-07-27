@@ -75,9 +75,8 @@ public class LemmataAutoModeOptions {
                     generatePath(cl.getString(Main.JPATH_OF_RESULT, null), pathOfRuleFile);
             }
         } catch (CommandLineException cle) {
-            LOGGER.info(
-                "There was a problem reading the command line options. An argument is missing either for option "
-                    + Main.JTIMEOUT + " or " + Main.JMAX_RULES + ".");
+            LOGGER.info("There was a problem reading the command line options. An argument is "
+                + "missing either for option " + Main.JTIMEOUT + " or " + Main.JMAX_RULES + ".");
         }
         this.internalVersion = internalVersion;
         checkForValidity();// throws an exception if a parameter is not

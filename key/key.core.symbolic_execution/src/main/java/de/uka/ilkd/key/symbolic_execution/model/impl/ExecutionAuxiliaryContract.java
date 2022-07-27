@@ -113,10 +113,8 @@ public class ExecutionAuxiliaryContract extends AbstractExecutionNode<SourceElem
         StatementBlock sb = mf != null ? mf.getBody()
                 : (StatementBlock) validitiyModalityTerm.javaBlock().program();
         AuxiliaryContract.Variables variables = getContract().getVariables();
-        int statementIndex = variables.breakFlags.size() + variables.continueFlags.size(); // Skip
-                                                                                           // break
-                                                                                           // and
-                                                                                           // continues
+        // Skip break and continues
+        int statementIndex = variables.breakFlags.size() + variables.continueFlags.size();
         Term returnFlag = null;
         Term result = null;
         if (variables.returnFlag != null) {
@@ -131,15 +129,10 @@ public class ExecutionAuxiliaryContract extends AbstractExecutionNode<SourceElem
         if (variables.exception != null) {
             exception = declaredVariableAsTerm(sb, statementIndex);
         }
-        AuxiliaryContract.Terms terms = new AuxiliaryContract.Terms(self, null, // breakFlags are
-                                                                                // not used by
-                                                                                // getPlainText()
-            null, // continueFlags are not used by getPlainText()
-            returnFlag, // returnFlag are not used by getPlainText()
-            result, exception, remembranceHeaps, remembranceLocalVariables, // remembranceLocalVariables
-                                                                            // are not used by
-                                                                            // getPlainText()
-            null, null); // outerRemembranceVariables are not used by getPlainText()
+        // breakFlags, continueFlags, returnFlag, remembranceLocalVariables, and
+        // outerRemembranceVariables are not used by getPlainText()
+        AuxiliaryContract.Terms terms = new AuxiliaryContract.Terms(self, null, null, returnFlag,
+            result, exception, remembranceHeaps, remembranceLocalVariables, null, null);
 
         // Compute text
         return getContract().getPlainText(getServices(), terms);

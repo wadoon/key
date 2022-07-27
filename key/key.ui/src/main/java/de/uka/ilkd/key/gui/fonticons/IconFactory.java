@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.fonticons;
 
-import de.uka.ilkd.key.util.Debug;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,8 +33,8 @@ public final class IconFactory {
         new IconFontProvider(FontAwesomeSolid.PLAY, Color.GREEN);
     public static final IconFontProvider STOP =
         new IconFontProvider(FontAwesomeSolid.STOP, Color.RED);
-    public static final IconFontProvider CLOSE = new IconFontProvider(FontAwesomeSolid.TIMES); // OR
-                                                                                               // TIMES_CIRCLE
+    // possible alternative: TIMES_CIRCLE
+    public static final IconFontProvider CLOSE = new IconFontProvider(FontAwesomeSolid.TIMES);
     public static final IconFontProvider CONFIGURE_MENU =
         new IconFontProvider(FontAwesomeSolid.SORT_DOWN);
     public static final IconFontProvider OPEN_MOST_RECENT =
@@ -66,19 +65,18 @@ public final class IconFactory {
         new IconFontProvider(FontAwesomeSolid.ARROW_RIGHT);
     public static final IconFontProvider EXPERIMENTAL_EXTENSION =
         new IconFontProvider(FontAwesomeSolid.FLASK);
+    // possible alternative: BUG or BOLT
     public static final IconFontProvider COUNTER_EXAMPLE =
-        new IconFontProvider(FontAwesomeSolid.BOMB); // OR BUG or BOLT
+        new IconFontProvider(FontAwesomeSolid.BOMB);
+    // possible alternative: VIAL
     public static final IconFontProvider TEST_CASE_GENERATION =
-        new IconFontProvider(FontAwesomeSolid.VIALS); // OR VIAL
+        new IconFontProvider(FontAwesomeSolid.VIALS);
     public static final IconFontProvider ORIGIN_HIGHLIGHT_ICON =
         new IconFontProvider(FontAwesomeSolid.HIGHLIGHTER);
     public static final IconFontProvider ORIGIN_ICON = new IconFontProvider(FontAwesomeSolid.ROUTE);
     public static final IconFontProvider WINDOW_ICON =
         new IconFontProvider(FontAwesomeSolid.WINDOW_RESTORE);
 
-    /**
-     * PLUS SQUARED
-     */
     public static final IconProvider PLUS_SQUARED =
         new IconFontProvider(FontAwesomeSolid.PLUS_SQUARE);
 
@@ -95,8 +93,8 @@ public final class IconFactory {
         new IconFontProvider(FontAwesomeSolid.STOP_CIRCLE, ERROR_COLOR);
     public static final IconProvider PROOF_SEARCH_STRATEGY =
         new IconFontProvider(FontAwesomeSolid.COG);
-    public static final IconProvider PROOF_TREE = new IconFontProvider(FontAwesomeSolid.SITEMAP); // OR
-                                                                                                  // CODE_BRANCH
+    // possible alternative: CODE_BRANCH
+    public static final IconProvider PROOF_TREE = new IconFontProvider(FontAwesomeSolid.SITEMAP);
     public static final IconProvider INFO_VIEW = new IconFontProvider(FontAwesomeSolid.INFO_CIRCLE);
     public static final IconProvider TREE_NODE_EXPANDED =
         new IconFontProvider(FontAwesomeSolid.CARET_DOWN);

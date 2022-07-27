@@ -341,11 +341,8 @@ public class KeYProgModelInfo {
         recoder.abstraction.ClassType rcontext =
             (recoder.abstraction.ClassType) rec2key().toRecoder(context);
 
-        return rct.getProgramModelInfo().getMethods(rct, m, getRecoderTypes(signature), null, // no
-                                                                                              // generic
-                                                                                              // type
-                                                                                              // variables
-                                                                                              // yet
+        // null to typeArgs: no generic type variables yet
+        return rct.getProgramModelInfo().getMethods(rct, m, getRecoderTypes(signature), null,
             rcontext);
     }
 

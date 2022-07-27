@@ -43,7 +43,8 @@ public final class ArraySort extends AbstractSort {
 
         if (extendsSorts.isEmpty()) {
             throw new IllegalArgumentException("An ArraySort extends typically three sorts"
-                + " (java.lang.Object, java.lang.Serializable, java.lang.Cloneable). You gave 0 sorts.");
+                + " (java.lang.Object, java.lang.Serializable, java.lang.Cloneable). You gave 0"
+                + " sorts.");
         }
 
         if (sk.elemSort instanceof GenericSort) {

@@ -74,15 +74,15 @@ import de.uka.ilkd.key.util.ProofStarter;
  * <pre>
  * <code>
  * public class Example {
- *    private int value;
+ *   private int value;
  *
- *    private Example next;
+ *   private Example next;
  *
- *    public static int main(Example e) {
- *       e.value = 1;
- *       e.next.value = 2;
- *       return e.value + e.next.value; // Current node in KeY's proof tree
- *    }
+ *   public static int main(Example e) {
+ *     e.value = 1;
+ *     e.next.value = 2;
+ *     return e.value + e.next.value; // Current node in KeY's proof tree
+ *   }
  * }
  * </code>
  * </pre>
@@ -100,9 +100,9 @@ import de.uka.ilkd.key.util.ProofStarter;
  * SymbolicLayoutExtractor e = new SymbolicLayoutExtractor(node);
  * e.analyse();
  * for (int i = 0; i < e.getLayoutsCount(); i++) {
- *    ImmutableList&lt;ISymbolicEquivalenceClass&gt; equivalenceClasses = e.getEquivalenceClasses(i);
- *    ISymbolicLayout initial = e.getInitialLayout(i);
- *    ISymbolicLayout current = e.getCurrentLayout(i);
+ *   ImmutableList&lt;ISymbolicEquivalenceClass&gt; equivalenceClasses = e.getEquivalenceClasses(i);
+ *   ISymbolicLayout initial = e.getInitialLayout(i);
+ *   ISymbolicLayout current = e.getCurrentLayout(i);
  * }
  * </code>
  * </pre>
@@ -236,100 +236,48 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
         synchronized (this) {
             if (!isAnalysed()) {
                 // Get path condition
-                Term pathCondition = SymbolicExecutionUtil.computePathCondition(node, true, // Path
-                                                                                            // condition
-                                                                                            // needs
-                                                                                            // always
-                                                                                            // to be
-                                                                                            // simplified,
-                                                                                            // because
-                                                                                            // otherwise
-                                                                                            // additinal
-                                                                                            // symbolic
-                                                                                            // values
-                                                                                            // might
-                                                                                            // be
-                                                                                            // introduced.
-                    false);
+                // Path condition needs always to be simplified, because otherwise additinal
+                // symbolic values might be introduced.
+                Term pathCondition = SymbolicExecutionUtil.computePathCondition(node, true, false);
                 pathCondition = removeImplicitSubTermsFromPathCondition(pathCondition);
                 // Compute all locations used in path conditions and updates. The values of the
                 // locations will be later computed in the state computation (and finally shown in a
                 // memory layout).
-                Set<ExtractLocationParameter> temporaryCurrentLocations =
-                    new LinkedHashSet<ExtractLocationParameter>();
-                objectsToIgnore = computeInitialObjectsToIgnore(false, false); // Contains all
-                                                                               // objects which
-                                                                               // should be ignored,
-                                                                               // like exc of the
-                                                                               // proof obligation.
-                Set<Term> updateCreatedObjects = new LinkedHashSet<Term>(); // Contains all objects
-                                                                            // which are created
-                                                                            // during symbolic
-                                                                            // execution
-                Set<Term> updateValueObjects = new LinkedHashSet<Term>(); // Contains all objects
-                                                                          // which are the value of
-                                                                          // an update
+                Set<ExtractLocationParameter> temporaryCurrentLocations = new LinkedHashSet<>();
+                // Contains all objects which should be ignored, like exc of the proof obligation.
+                objectsToIgnore = computeInitialObjectsToIgnore(false, false);
+                // Contains all objects which are created during symbolic execution
+                Set<Term> updateCreatedObjects = new LinkedHashSet<>();
+                // Contains all objects which are the value of an update
+                Set<Term> updateValueObjects = new LinkedHashSet<>();
                 collectLocationsFromUpdates(node.sequent(), temporaryCurrentLocations,
                     updateCreatedObjects, updateValueObjects, objectsToIgnore);
                 objectsToIgnore.addAll(updateCreatedObjects);
                 initialLocations = extractLocationsFromTerm(pathCondition, objectsToIgnore);
                 initialLocations
                         .addAll(extractLocationsFromSequent(node.sequent(), objectsToIgnore));
-                currentLocations = new LinkedHashSet<ExtractLocationParameter>(initialLocations);
+                currentLocations = new LinkedHashSet<>(initialLocations);
                 currentLocations.addAll(temporaryCurrentLocations);
                 // Compute objects for equivalence check.
-                Set<Term> symbolicObjectsResultingInCurrentState = new LinkedHashSet<Term>();
+                Set<Term> symbolicObjectsResultingInCurrentState = new LinkedHashSet<>();
                 symbolicObjectsResultingInCurrentState
                         .addAll(filterOutObjectsToIgnore(updateValueObjects, objectsToIgnore));
                 symbolicObjectsResultingInCurrentState
                         .addAll(collectObjectsFromSequent(node.sequent(), objectsToIgnore));
+                // Sort terms alphabetically. This guarantees that in equivalence classes the
+                // representative term is for instance self.next and not self.next.next.
                 symbolicObjectsResultingInCurrentState =
-                    sortTerms(symbolicObjectsResultingInCurrentState); // Sort terms alphabetically.
-                                                                       // This guarantees that in
-                                                                       // equivalence classes the
-                                                                       // representative term is for
-                                                                       // instance self.next and not
-                                                                       // self.next.next.
-                symbolicObjectsResultingInCurrentState.add(getServices().getTermBuilder().NULL()); // Add
-                                                                                                   // null
-                                                                                                   // because
-                                                                                                   // it
-                                                                                                   // can
-                                                                                                   // happen
-                                                                                                   // that
-                                                                                                   // a
-                                                                                                   // object
-                                                                                                   // is
-                                                                                                   // null
-                                                                                                   // and
-                                                                                                   // this
-                                                                                                   // option
-                                                                                                   // must
-                                                                                                   // be
-                                                                                                   // included
-                                                                                                   // in
-                                                                                                   // equivalence
-                                                                                                   // class
-                                                                                                   // computation
+                    sortTerms(symbolicObjectsResultingInCurrentState);
+                // Add null because it can happen that a object is null and this option must be
+                // included in equivalence class computation
+                symbolicObjectsResultingInCurrentState.add(getServices().getTermBuilder().NULL());
                 // Find updates
                 updates = extractInitialUpdates();
                 // Compute a Sequent with the initial conditions of the proof without modality
+                // New OneStepSimplifier is required because it has an internal state and the
+                // default instance can't be used parallel.
                 final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil
-                        .cloneProofEnvironmentWithOwnOneStepSimplifier(getProof(), true); // New
-                                                                                          // OneStepSimplifier
-                                                                                          // is
-                                                                                          // required
-                                                                                          // because
-                                                                                          // it has
-                                                                                          // an
-                                                                                          // internal
-                                                                                          // state
-                                                                                          // and the
-                                                                                          // default
-                                                                                          // instance
-                                                                                          // can't
-                                                                                          // be used
-                                                                                          // parallel.
+                        .cloneProofEnvironmentWithOwnOneStepSimplifier(getProof(), true);
                 Sequent initialConditionsSequent = createSequentForEquivalenceClassComputation();
                 ApplyStrategyInfo info = null;
                 try {
@@ -350,12 +298,9 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
                     appliedCutsPerLayout =
                         extractAppliedCutsFromGoals(equivalentClassesProofStarter.getProof());
                     // Create memory layout maps which are filled lazily
-                    initialLayouts =
-                        new LinkedHashMap<Integer, ISymbolicLayout>(appliedCutsPerLayout.size());
-                    currentLayouts =
-                        new LinkedHashMap<Integer, ISymbolicLayout>(appliedCutsPerLayout.size());
-                    layoutsEquivalentClasses =
-                        new LinkedHashMap<Integer, ImmutableList<ISymbolicEquivalenceClass>>();
+                    initialLayouts = new LinkedHashMap<>(appliedCutsPerLayout.size());
+                    currentLayouts = new LinkedHashMap<>(appliedCutsPerLayout.size());
+                    layoutsEquivalentClasses = new LinkedHashMap<>();
                 } finally {
                     SymbolicExecutionSideProofUtil.disposeOrStore(
                         "Equivalence class computation on node " + node.serialNr() + ".", info);

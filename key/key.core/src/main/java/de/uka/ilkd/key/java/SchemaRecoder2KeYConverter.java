@@ -457,7 +457,7 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
         if (f.getInitializers() != null && f.getInitializers()
                 .get(0) instanceof de.uka.ilkd.key.java.recoderext.ExpressionSVWrapper) {
             de.uka.ilkd.key.java.recoderext.ExpressionSVWrapper esvw =
-                (de.uka.ilkd.key.java.recoderext.ExpressionSVWrapper) f.getInitializers().get(0); // brrrr!
+                (de.uka.ilkd.key.java.recoderext.ExpressionSVWrapper) f.getInitializers().get(0);
             li = (ProgramSV) esvw.getSV();
         } else {
             li = convertLoopInitializers(f);

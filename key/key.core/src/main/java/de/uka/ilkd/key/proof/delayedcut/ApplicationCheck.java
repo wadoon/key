@@ -47,10 +47,11 @@ public interface ApplicationCheck {
             "The formula contains symbols that have been introduced below Node ";
         private static final String ADD_INFORMATION =
             "The formula that you specify at this point will be introduced at the inner node %i\n"
-                + "of the proof tree by using a cut. Afterwards, the sub-trees of that node will be replayed.\n"
-                + "In order to sustain the correctness of the proof, the formula must therefore not contain symbols\n"
-                + "that have been introduced in the sub-trees of Node %i. In particular this restriction ensures\n"
-                + "that symbols that are introduced within the subtrees of Node %i are actually new symbols\n"
+                + "of the proof tree by using a cut. Afterwards, the sub-trees of that node will "
+                + "be replayed.\nIn order to sustain the correctness of the proof, the formula "
+                + "must therefore not contain symbols\nthat have been introduced in the sub-trees "
+                + "of Node %i. In particular this restriction ensures\nthat symbols that are "
+                + "introduced within the subtrees of Node %i are actually new symbols\n"
                 + "as required by the corresponding rule definitions.";
 
         @Override

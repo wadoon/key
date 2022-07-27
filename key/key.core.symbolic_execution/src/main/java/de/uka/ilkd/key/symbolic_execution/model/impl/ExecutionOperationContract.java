@@ -113,14 +113,14 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
                     selfTerm = searchConstructorSelfDefinition(search.getWorkingTerm(),
                         inst.staticType, services);
                     if (selfTerm == null) {
-                        throw new ProofInputException(
-                            "Can't find self term, implementation of UseOperationContractRule might has changed!");
+                        throw new ProofInputException("Can't find self term, implementation of "
+                            + "UseOperationContractRule might have changed!");
                     }
                     KeYJavaType selfType = services.getJavaInfo().getKeYJavaType(selfTerm.sort());
                     if (inst.staticType != selfType) {
                         throw new ProofInputException("Type \"" + inst.staticType
                             + "\" expected but found \"" + selfType
-                            + "\", implementation of UseOperationContractRule might has changed!");
+                            + "\", implementation of UseOperationContractRule might have changed!");
                     }
                 } else {
                     selfTerm = UseOperationContractRule.computeSelf(baseHeapTerm, atPres, baseHeap,

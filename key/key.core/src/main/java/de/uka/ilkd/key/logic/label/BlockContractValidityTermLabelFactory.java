@@ -27,12 +27,14 @@ public class BlockContractValidityTermLabelFactory
             TermServices services) throws TermLabelException {
         if (parameters == null || parameters.size() != 1) {
             throw new TermLabelException("Label " + BlockContractValidityTermLabel.NAME
-                + " requires exactly one String-Parameter with the name of the exception variable.");
+                + " requires exactly one String-Parameter with the name of the exception"
+                + " variable.");
         }
         String val = ObjectUtil.toString(parameters.get(0));
         if (StringUtil.isTrimmedEmpty(val)) {
             throw new TermLabelException("Label " + BlockContractValidityTermLabel.NAME
-                + " requires exactly one String-Parameter with the name of the exception variable.");
+                + " requires exactly one String-Parameter with the name of the exception"
+                + " variable.");
         }
         return new BlockContractValidityTermLabel(
             (ProgramVariable) services.getNamespaces().programVariables().lookup(val));

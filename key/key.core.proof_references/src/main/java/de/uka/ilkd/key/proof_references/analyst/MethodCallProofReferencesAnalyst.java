@@ -117,8 +117,8 @@ public class MethodCallProofReferencesAnalyst implements IProofReferencesAnalyst
             if (!"staticMethodCallStaticWithAssignmentViaTypereference"
                     .equals(MiscTools.getRuleName(node))) {
                 throw new IllegalArgumentException(
-                    "Rule \"staticMethodCallStaticWithAssignmentViaTypereference\" expected, but is \""
-                        + MiscTools.getRuleName(node) + "\".");
+                    "Rule \"staticMethodCallStaticWithAssignmentViaTypereference\" expected,"
+                        + " but is \"" + MiscTools.getRuleName(node) + "\".");
             }
             PosTacletApp app = (PosTacletApp) node.getAppliedRuleApp();
             SchemaVariable methodSV = app.instantiations().lookupVar(new Name("#mn"));

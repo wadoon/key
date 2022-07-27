@@ -582,10 +582,8 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
         }
         if (ty == null) {
             if (!typeString.contains("."))
-                throw new UnresolvedReferenceException(
-                    "Type references to undefined classes may only appear if they are fully qualified: "
-                        + tyref.toSource(),
-                    tyref);
+                throw new UnresolvedReferenceException("Type references to undefined classes may "
+                    + "only appear if they are fully qualified: " + tyref.toSource(), tyref);
 
             recoder.java.CompilationUnit cu;
             try {

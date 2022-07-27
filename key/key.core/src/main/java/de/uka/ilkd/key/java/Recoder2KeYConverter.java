@@ -531,16 +531,16 @@ public class Recoder2KeYConverter {
     private Class<?> getKeYClass(Class<? extends recoder.java.JavaProgramElement> recoderClass) {
         String className = getKeYName(recoderClass);
         try {
-            return Class.forName(className); // Classes are always in this component;
-                                             // ClassLoaderUtil#getClassforName(String) does not
-                                             // need to be used.
+            // Classes are always in this component; ClassLoaderUtil#getClassforName(String) does
+            // not need to be used.
+            return Class.forName(className);
         } catch (ClassNotFoundException cnfe) {
             LOGGER.debug("There is an AST class " + className + " missing at KeY.", cnfe);
             throw new ConvertException(
                 "Recoder2KeYConverter could not find a conversion from RecodeR "
-                    + recoderClass.getClass() + ".\n"
-                    + "Maybe you have added a class to package key.java.recoderext and did not add the equivalent to key.java.expression or its subpackages."
-                    + "\nAt least there is no class named " + className + ".",
+                    + recoderClass.getClass() + ".\nMaybe you have added a class to package "
+                    + "key.java.recoderext and did not add the equivalent to key.java.expression or"
+                    + " its subpackages.\nAt least there is no class named " + className + ".",
                 cnfe);
         } catch (ExceptionInInitializerError initErr) {
             LOGGER.debug("recoder2key: Failed initializing class.", initErr);
@@ -769,9 +769,9 @@ public class Recoder2KeYConverter {
                 int closing = doc.indexOf(')', pos);
 
                 if (closing < 0) {
-                    throw new ConvertException(format(
-                        "Forgotten closing parenthesis on @defaultValue annotation for sort '%s' in '%s'",
-                        sortName, sort.getOrigin()));
+                    throw new ConvertException(
+                        format("Forgotten closing parenthesis on @defaultValue annotation for"
+                            + " sort '%s' in '%s'", sortName, sort.getOrigin()));
                 }
 
                 // set this as the function name, as the user had written \dl_XXX

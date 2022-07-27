@@ -262,8 +262,8 @@ public class IntermediateProofReplayer {
                                     MergeRuleBuiltInRuleApp joinApp = instantiateJoinApp(
                                         joinAppInterm, currNode, partnerNodesInfo, services);
 
-                                    assert joinApp.complete()
-                                            : "Join app should be automatically completed in replay";
+                                    assert joinApp.complete() : "Join app should be automatically "
+                                        + "completed in replay";
 
                                     currGoal.apply(joinApp);
 

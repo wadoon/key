@@ -107,7 +107,8 @@ public class RunAllProofsAction extends MainWindowAction {
 
         setName("Run all proofs");
         setTooltip(
-            "Open and run a pre-defined set of proofs for GUI testing. Enabled with KeY debug flag");
+            "Open and run a pre-defined set of proofs for GUI testing. Enabled with KeY debug "
+                + "flag");
     }
 
     @Override
