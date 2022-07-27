@@ -308,6 +308,7 @@ public final class DependencyAnalyzer {
                         idxB++;
                         continue;
                     }
+                    var consumesInput = edgeA.consumesInput; // equal to edgeB.consumesInput
                     var stepA = edgeA.proofStep;
                     var stepB = edgeB.proofStep;
                     //LOGGER.info("considering {} {}", stepA.serialNr(), stepB.serialNr());
@@ -320,17 +321,24 @@ public final class DependencyAnalyzer {
                         continue;
                     }
                     var mergeBase = BranchLocation.commonPrefix(locA, locB);
-                    // search for conflicting rule apps
-                    // are any of the inputs consumed by any other edge?
-                    var hasConflict = Stream.concat(
+                    // verify that all inputs are present at the merge base
+                    var mergeValid = Stream.concat(
                             graph.inputsOf(stepA), graph.inputsOf(stepB)
-                    ).anyMatch(
-                            graphNode -> graph
-                                    .edgesConsuming(graphNode)
-                                    .filter(edgeX -> edgeX.proofStep.branchLocation().hasPrefix(mergeBase))
-                                    .anyMatch(edgeX ->
-                                            edgeX.proofStep != stepA && edgeX.proofStep != stepB));
-                    if (hasConflict) {
+                    ).allMatch(graphNode -> mergeBase.hasPrefix(graphNode.getBranchLocation()));
+                    // search for conflicting rule apps
+                    // (only relevant if the rule apps consume the input)
+                    boolean hasConflict = false;
+                    if (consumesInput && mergeValid) {
+                        // are any of the inputs used by any other edge?
+                        hasConflict = Stream.concat(
+                                graph.inputsOf(stepA), graph.inputsOf(stepB)
+                        ).anyMatch(graphNode -> graph
+                                .edgesUsing(graphNode)
+                                .filter(edgeX -> edgeX.proofStep.branchLocation().hasPrefix(mergeBase))
+                                .anyMatch(edgeX ->
+                                        edgeX.proofStep != stepA && edgeX.proofStep != stepB));
+                    }
+                    if (hasConflict || !mergeValid) {
                         // can't merge => proceed with next pair
                         idxA++;
                         idxB++;

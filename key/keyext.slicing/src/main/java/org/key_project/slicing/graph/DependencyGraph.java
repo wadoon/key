@@ -191,8 +191,8 @@ public class DependencyGraph {
         return edgesOf(proofStep).stream().map(this::inputOf);
     }
 
-    public Stream<AnnotatedEdge> edgesConsuming(GraphNode node) {
-        return outgoingGraphEdgesOf(node).filter(it -> it.third.consumesInput).map(it -> it.third);
+    public Stream<AnnotatedEdge> edgesUsing(GraphNode node) {
+        return outgoingGraphEdgesOf(node).map(it -> it.third);
     }
 
     public int countNodes() {
