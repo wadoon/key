@@ -1,8 +1,11 @@
 package de.uka.ilkd.key.rule.match.vm;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
+import de.uka.ilkd.key.rule.IfFormulaInstSeq;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
@@ -182,7 +185,12 @@ public class VMTacletMatcher implements TacletMatcher {
 
         final Iterator<SequentFormula>     itIfSequent   = assumesSequent .iterator ();
 
-        ImmutableList<MatchConditions>            newMC;   
+        ImmutableList<MatchConditions>            newMC;
+
+        /* part of the fix for #1716: ensure that position of "assumes" part (antecedent/succedent)
+         * matches the polarity specified in taclet defintion.
+         */
+        p_toMatch = filterForCorrectPolarity(p_toMatch, p_matchCond, p_services);
 
         for (final IfFormulaInstantiation candidateInst: p_toMatch) {
             assert itIfSequent.hasNext() : "p_toMatch and assumes sequent must have same number of elements";
@@ -197,7 +205,11 @@ public class VMTacletMatcher implements TacletMatcher {
 
             p_matchCond = newMC.head ();
         }
-        assert !itIfSequent.hasNext() : "p_toMatch and assumes sequent must have same number of elements";
+
+        if (itIfSequent.hasNext()) {
+            // some of the given "assume" instantiations do not match the expected polarity
+            return null;
+        }
 
         return p_matchCond;
     }
@@ -364,5 +376,46 @@ public class VMTacletMatcher implements TacletMatcher {
        
        return matchCond;
     }
-    
+
+    private Iterable<IfFormulaInstantiation> filterForCorrectPolarity(Iterable<IfFormulaInstantiation> instCandidates,
+                                                                      MatchConditions p_matchCond,
+                                                                      Services p_services) {
+        List<IfFormulaInstantiation> filtered = new ArrayList<>();
+        for (final SequentFormula sf : assumesSequent.antecedent()) {
+            instCandidates.forEach(ifinst -> {
+                if (matchIf(ImmutableSLList.<IfFormulaInstantiation>nil().prepend(ifinst),
+                        sf.formula(), p_matchCond, p_services).getMatchConditions() != null) {
+                    if (ifinst instanceof IfFormulaInstSeq) {
+                        if (((IfFormulaInstSeq) ifinst).inAntec()) {
+                            filtered.add(ifinst);
+                        } else {
+                            //   this one has wrong polarity and will be filtered out!
+                            return;
+                        }
+                    } else {
+                        filtered.add(ifinst);
+                    }
+                }
+            });
+        }
+
+        for (final SequentFormula sf : assumesSequent.succedent()) {
+            instCandidates.forEach(ifinst -> {
+                if (matchIf(ImmutableSLList.<IfFormulaInstantiation>nil().prepend(ifinst),
+                        sf.formula(), p_matchCond, p_services).getMatchConditions() != null) {
+                    if (ifinst instanceof IfFormulaInstSeq) {
+                        if (!((IfFormulaInstSeq) ifinst).inAntec()) {
+                            filtered.add(ifinst);
+                        } else {
+                            //   this one has wrong polarity and will be filtered out!
+                            return;
+                        }
+                    } else {
+                        filtered.add(ifinst);
+                    }
+                }
+            });
+        }
+        return filtered;
+    }
 }

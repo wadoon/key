@@ -40,6 +40,7 @@ import de.uka.ilkd.key.proof.io.intermediate.MergePartnerAppIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.NodeIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.TacletAppIntermediate;
 import de.uka.ilkd.key.rule.AbstractContractRuleApp;
+import de.uka.ilkd.key.rule.AntecTaclet;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.IfFormulaInstDirect;
@@ -47,6 +48,7 @@ import de.uka.ilkd.key.rule.IfFormulaInstSeq;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
+import de.uka.ilkd.key.rule.SuccTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
@@ -604,7 +606,18 @@ public class IntermediateProofReplayer {
                         LOGGER.error("failed to find new formula @ rule name {}, serial nr {}", tacletName, stepIndex);
                     }
                 }
-                    ourApp = ((NoPosTacletApp) ourApp).matchFind(pos, services);
+                /* part of the fix for #1716: ensure that position of find term
+                 * (antecedent/succedent) matches the kind of the taclet.
+                 */
+                Taclet taclet = ourApp.taclet();
+                if (taclet instanceof AntecTaclet && !pos.isInAntec()) {
+                    throw new TacletAppConstructionException("The taclet " + taclet.name()
+                            + " can not be applied to a formula/term in succedent.");
+                } else if (taclet instanceof SuccTaclet && pos.isInAntec()) {
+                    throw new TacletAppConstructionException("The taclet " + taclet.name()
+                            + " can not be applied to a formula/term in antecedent.");
+                }
+                ourApp = ((NoPosTacletApp) ourApp).matchFind(pos, services);
                     ourApp = ourApp.setPosInOccurrence(pos, services);
             } catch (Exception e) {
                 throw (TacletAppConstructionException)new TacletAppConstructionException(
