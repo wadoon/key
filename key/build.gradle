@@ -353,6 +353,9 @@ subprojects {
             // We ignore the build folder to avoid double checks and checks of generated code.
             targetExclude 'build/**'
 
+            // allows us to use spotless:off / spotless:on to keep pre-formatted sections
+            toggleOffOn()
+
             eclipse().configFile("$rootDir/scripts/tools/checkstyle/keyCodeStyle.xml")
             trimTrailingWhitespace()        // not sure how to set this in the xml file ...
             //googleJavaFormat().aosp().reflowLongStrings()
