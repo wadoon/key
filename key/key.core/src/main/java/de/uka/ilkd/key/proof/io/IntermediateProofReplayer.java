@@ -245,8 +245,10 @@ public class IntermediateProofReplayer {
                     if (GeneralSettings.slicing) {
                         var name = currInterm.getIntermediateRuleApp().getRuleName();
                         wasSMT = name.equals("SMTRule");
-                        LOGGER.debug("slicing @ {} [{}] {} (apply = {}, line = {}, original app = {})", finalStepIndex, currNode.serialNr(), name, apply, currInterm.getIntermediateRuleApp().getLineNr(), GeneralSettings.stepIdxtoName.get(finalStepIndex));
-                        if (!name.equals(GeneralSettings.stepIdxtoName.get(finalStepIndex))) {
+                        LOGGER.debug("slicing @ {} [{}] {} (apply = {}, line = {}, original app = {})",
+                                finalStepIndex, currNode.serialNr(), name,
+                                apply, currInterm.getIntermediateRuleApp().getLineNr(), GeneralSettings.stepIdxToName.get(finalStepIndex));
+                        if (!name.equals(GeneralSettings.stepIdxToName.get(finalStepIndex))) {
                             LOGGER.error("names do not match");
                         }
                     }
@@ -465,9 +467,9 @@ public class IntermediateProofReplayer {
         }
         GeneralSettings.slicing = false;
         GeneralSettings.branchStacks = null;
-        GeneralSettings.serialNrToIfInsts = null;
-        GeneralSettings.serialNrToPos = null;
-        GeneralSettings.stepIdxtoName = null;
+        GeneralSettings.stepIdxToIfInsts = null;
+        GeneralSettings.stepIdxToPos = null;
+        GeneralSettings.stepIdxToName = null;
         GeneralSettings.stepIndexToDynamicRule = null;
         LOGGER.info("replay time: {} ms", System.currentTimeMillis() - startTime);
         return new Result(status, errors, currGoal);
@@ -544,7 +546,7 @@ public class IntermediateProofReplayer {
      *             In case of an error during construction.
      */
     private TacletApp constructTacletApp(TacletAppIntermediate currInterm,
-            Goal currGoal, int serialNr) throws TacletAppConstructionException {
+            Goal currGoal, int stepIndex) throws TacletAppConstructionException {
 
         final String tacletName = currInterm.getRuleName();
         final int currFormula = currInterm.getPosInfo().first;
@@ -558,8 +560,8 @@ public class IntermediateProofReplayer {
                 .lookupActiveTaclet(new Name(tacletName));
         if (t == null) {
             LOGGER.trace("using taclet index @ {}", tacletName);
-            if (GeneralSettings.slicing && GeneralSettings.stepIndexToDynamicRule.containsKey(serialNr)) {
-                var idx = GeneralSettings.stepIndexToDynamicRule.get(serialNr);
+            if (GeneralSettings.slicing && GeneralSettings.stepIndexToDynamicRule.containsKey(stepIndex)) {
+                var idx = GeneralSettings.stepIndexToDynamicRule.get(stepIndex);
                 // find the correct rule app
                 boolean done = false;
                 for (var partialApp : currGoal.indexOfTaclets().getPartialInstantiatedApps()) {
@@ -587,7 +589,7 @@ public class IntermediateProofReplayer {
                     pos = PosInOccurrence.findInSequent(currGoal.sequent(),
                             currFormula, currPosInTerm);
                 } else {
-                    var oldPos = GeneralSettings.serialNrToPos.get(serialNr);
+                    var oldPos = GeneralSettings.stepIdxToPos.get(stepIndex);
                     var oldFormula = oldPos.sequentFormula();
                     var semiSeq = oldPos.isInAntec() ? currGoal.sequent().antecedent() : currGoal.sequent().succedent();
                     var done = false;
@@ -599,7 +601,7 @@ public class IntermediateProofReplayer {
                         }
                     }
                     if (!done) {
-                        LOGGER.error("failed to find new formula @ rule name {}, serial nr {}", tacletName, serialNr);
+                        LOGGER.error("failed to find new formula @ rule name {}, serial nr {}", tacletName, stepIndex);
                     }
                 }
                     ourApp = ((NoPosTacletApp) ourApp).matchFind(pos, services);
@@ -621,7 +623,7 @@ public class IntermediateProofReplayer {
                         new IfFormulaInstSeq(seq, Integer.parseInt(ifFormulaStr)));
             }
         } else {
-            for (var oldFormulaPio : GeneralSettings.serialNrToIfInsts.get(serialNr)) {
+            for (var oldFormulaPio : GeneralSettings.stepIdxToIfInsts.get(stepIndex)) {
                 var semiSeq = oldFormulaPio.isInAntec() ? currGoal.sequent().antecedent() : currGoal.sequent().succedent();
                 var done = false;
                 SequentFormula oldFormula = oldFormulaPio.sequentFormula();
@@ -635,7 +637,7 @@ public class IntermediateProofReplayer {
                     }
                 }
                 if (!done) {
-                    LOGGER.error("did not locate ifInst during slicing @ rule name {}, serial nr {}", tacletName, serialNr);
+                    LOGGER.error("did not locate ifInst during slicing @ rule name {}, serial nr {}", tacletName, stepIndex);
                 }
             }
 
@@ -672,7 +674,12 @@ public class IntermediateProofReplayer {
         // TODO: In certain cases, the below method call returns null and
         // induces follow-up NullPointerExceptions. This was encountered
         // in a proof of the TimSort method binarySort with several joins.
+        // TODO: when replaying certain rule apps (e.g. narrowSelectArrayType)
+        // the order of the ifFormulaList matters?!
         ourApp = ourApp.setIfFormulaInstantiations(ifFormulaList, services);
+        if (ourApp == null) {
+            LOGGER.error("encountered null rule app of {} after instantiating ifInsts", tacletName);
+        }
 
         if (!ourApp.complete()) {
             ourApp = ourApp.tryToInstantiate(proof.getServices());
@@ -746,7 +753,7 @@ public class IntermediateProofReplayer {
                     }
                 }
             } else {
-                for (var oldFormulaPio : GeneralSettings.serialNrToIfInsts.get(stepIndex)) {
+                for (var oldFormulaPio : GeneralSettings.stepIdxToIfInsts.get(stepIndex)) {
                     var semiSeq = oldFormulaPio.isInAntec() ? currGoal.sequent().antecedent() : currGoal.sequent().succedent();
                     var done = false;
                     SequentFormula oldFormula = oldFormulaPio.sequentFormula();
@@ -758,7 +765,7 @@ public class IntermediateProofReplayer {
                         }
                     }
                     if (!done) {
-                        LOGGER.error("did not locate built-in ifInst during slicing @ rule name {}, serial nr {}", ruleName, stepIndex);
+                        LOGGER.error("did not locate built-in ifInst during slicing @ rule name {}, step index {}", ruleName, stepIndex);
                     }
                 }
             }
@@ -808,7 +815,7 @@ public class IntermediateProofReplayer {
                             "Wrong position information.", e);
                 }
             } else {
-                var oldPos = GeneralSettings.serialNrToPos.get(stepIndex);
+                var oldPos = GeneralSettings.stepIdxToPos.get(stepIndex);
                 var oldFormula = oldPos.sequentFormula();
                 var semiSeq = oldPos.isInAntec() ? currGoal.sequent().antecedent() : currGoal.sequent().succedent();
                 var done = false;

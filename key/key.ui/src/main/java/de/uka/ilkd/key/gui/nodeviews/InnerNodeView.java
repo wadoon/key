@@ -61,7 +61,6 @@ public final class InnerNodeView extends SequentView {
 
     public InnerNodeView(Node node, MainWindow mainWindow) {
         super(mainWindow);
-        LOGGER.info("constructing node view of {}", node.serialNr());
         this.node = node;
         this.listener = new InnerNodeViewListener(this);
 

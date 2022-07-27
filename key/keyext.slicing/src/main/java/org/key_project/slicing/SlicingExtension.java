@@ -131,8 +131,6 @@ public class SlicingExtension implements KeYGuiExtension,
 
     @Override
     public void proofDisposing(ProofDisposedEvent e) {
-        LOGGER.info("disposing proof {} ({}), previously had {} trackers",
-                e.getSource().name(), e.getSource().hashCode(), trackers.size());
         trackers.put(e.getSource(), null);
         trackers.remove(e.getSource());
         if (leftPanel != null) {

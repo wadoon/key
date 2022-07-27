@@ -48,10 +48,10 @@ public class GeneralSettings implements Settings, Cloneable {
     // TODO(slicing): remove these fields
     public static boolean slicing = false;
     public static Set<Integer> usefulSteps = Set.of();
-    public static Map<Integer, PosInOccurrence> serialNrToPos = Map.of();
-    public static Map<Integer, Set<PosInOccurrence>> serialNrToIfInsts = Map.of();
+    public static Map<Integer, PosInOccurrence> stepIdxToPos = Map.of();
+    public static Map<Integer, Set<PosInOccurrence>> stepIdxToIfInsts = Map.of();
     public static Map<Integer, Integer> stepIndexToDynamicRule = Map.of();
-    public static Map<Integer, String> stepIdxtoName = Map.of();
+    public static Map<Integer, String> stepIdxToName = Map.of();
     public static Map<Integer, List<Integer>> branchStacks = Map.of();
 
     private static final String TACLET_FILTER = "[General]StupidMode";

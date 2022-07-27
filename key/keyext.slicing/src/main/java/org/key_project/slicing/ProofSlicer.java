@@ -48,14 +48,14 @@ public final class ProofSlicer {
         }
         GeneralSettings.slicing = true;
         GeneralSettings.usefulSteps = analysisResults.usefulSteps.stream().map(node -> node.stepIndex).collect(Collectors.toSet());
-        GeneralSettings.serialNrToPos = analysisResults
+        GeneralSettings.stepIdxToPos = analysisResults
                 .usefulSteps.stream()
                 .map(node ->
                         new Pair<>(node.stepIndex, node.getAppliedRuleApp().posInOccurrence()))
                 .filter(it -> it.second != null)
                 .collect(Collectors.toMap(it -> it.first, it -> it.second));
-        GeneralSettings.stepIdxtoName = toName;
-        GeneralSettings.serialNrToIfInsts = analysisResults
+        GeneralSettings.stepIdxToName = toName;
+        GeneralSettings.stepIdxToIfInsts = analysisResults
                 .usefulSteps.stream()
                 .map(node ->
                         new Pair<>(node.stepIndex, DependencyTracker.ifInstsOfRuleApp(node.getAppliedRuleApp(), node)))

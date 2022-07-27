@@ -41,7 +41,6 @@ public final class MainFrame extends JPanel {
                 var panel = ((SequentViewPanel) oldView);
                 for (var c : panel.getComponents()) {
                     if (c instanceof SequentView) {
-                        System.out.println("disposing old sequent view");
                         ((SequentView) c).dispose();
                     }
                 }

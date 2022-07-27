@@ -1510,7 +1510,6 @@ public final class SpecificationRepository {
      * Registers the passed proof.
      */
     public void registerProof(ProofOblInput po, Proof proof) {
-        LOGGER.info("{}: registering new proof {}", hashCode(), proof.hashCode());
         proofs.put(po, getProofs(po).add(proof));
     }
 
@@ -1518,20 +1517,16 @@ public final class SpecificationRepository {
      * Unregisters the passed proof.
      */
     public void removeProof(Proof proof) {
-        LOGGER.info("{}: removing proof {}", hashCode(), proof.hashCode());
         for (Map.Entry<ProofOblInput, ImmutableSet<Proof>> entry : proofs
                 .entrySet()) {
             ImmutableSet<Proof> sop = entry.getValue();
             if (sop.contains(proof)) {
                 sop = sop.remove(proof);
                 if (sop.size() == 0) {
-                    LOGGER.info("removing proofs entry");
                     proofs.remove(entry.getKey());
                 } else {
-                    LOGGER.info("trimming proofs entry");
                     proofs.put(entry.getKey(), sop);
                 }
-                LOGGER.info("new proofs size {}", proofs.size());
                 return;
             }
         }

@@ -35,6 +35,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -67,7 +68,8 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
     }
 
     public static Set<PosInOccurrence> ifInstsOfRuleApp(RuleApp ruleApp, Node node) {
-        var inputs = new HashSet<PosInOccurrence>();
+        // replayer requires that ifInsts are provided in order (!)
+        var inputs = new LinkedHashSet<PosInOccurrence>();
         // taclets with \find or similar
         if (ruleApp instanceof PosTacletApp) {
             var posTacletApp = (PosTacletApp) ruleApp;
