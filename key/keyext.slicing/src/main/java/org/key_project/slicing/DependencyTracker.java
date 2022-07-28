@@ -88,11 +88,14 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
             var oss = (OneStepSimplifierRuleApp) ruleApp;
             oss.ifInsts().forEach(inputs::add);
         }
+
         // State Merging: add all formulas as inputs
         // TODO: this is not enough, as the State Merge processes every formula in the sequent
         // (-> if more formulas are present after slicing, a different result will be produced!)
+
         // SMT application: add all formulas as inputs
         // TODO: this may be too much (see unsat core)
+
         if (ruleApp instanceof MergeRuleBuiltInRuleApp
                 || ruleApp instanceof CloseAfterMergeRuleBuiltInRuleApp
                 || ruleApp instanceof RuleAppSMT) {

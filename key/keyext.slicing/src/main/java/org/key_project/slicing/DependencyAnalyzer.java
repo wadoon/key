@@ -5,6 +5,8 @@ import de.uka.ilkd.key.proof.BranchLocation;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.merge.CloseAfterMergeRuleBuiltInRuleApp;
+import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.smt.RuleAppSMT;
 import de.uka.ilkd.key.util.Triple;
@@ -31,18 +33,18 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Implementation of the dependency analysis algorithm.
+ * Implementation of both dependency analysis algorithms.
  *
  * @author Arne Keller
  */
 public final class DependencyAnalyzer {
-    public static final String TOTAL_WORK = "0 (total time)";
-    public static final String DEPENDENCY_ANALYSIS = "1 Dependency Analysis";
-    public static final String DEPENDENCY_ANALYSIS2 = "1a Dependency Analysis: search starting @ closed goals";
-    public static final String DEPENDENCY_ANALYSIS3 = "1b Dependency Analysis: analyze branching nodes";
-    public static final String DEPENDENCY_ANALYSIS4 = "1c Dependency Analysis: final mark of useless steps";
-    public static final String DUPLICATE_ANALYSIS = "2 Duplicate Analysis";
-    public static final String DUPLICATE_ANALYSIS_SETUP = "~ Duplicate Analysis setup";
+    private static final String TOTAL_WORK = "0 (total time)";
+    private static final String DEPENDENCY_ANALYSIS = "1 Dependency Analysis";
+    private static final String DEPENDENCY_ANALYSIS2 = "1a Dependency Analysis: search starting @ closed goals";
+    private static final String DEPENDENCY_ANALYSIS3 = "1b Dependency Analysis: analyze branching nodes";
+    private static final String DEPENDENCY_ANALYSIS4 = "1c Dependency Analysis: final mark of useless steps";
+    private static final String DUPLICATE_ANALYSIS = "2 Duplicate Analysis";
+    private static final String DUPLICATE_ANALYSIS_SETUP = "~ Duplicate Analysis setup";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DependencyAnalyzer.class);
     private final boolean doDependencyAnalysis;
@@ -172,6 +174,12 @@ public final class DependencyAnalyzer {
         executionTime.start(DEPENDENCY_ANALYSIS2);
         while (!queue.isEmpty()) {
             var node = queue.pop();
+            // handle State Merging
+            if (node.getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp
+                || node.getAppliedRuleApp() instanceof CloseAfterMergeRuleBuiltInRuleApp) {
+                throw new IllegalStateException("tried to analyze proof featuring state merging!");
+            }
+
             // closed goal & has previous step
             // => mark output (closed goal) of parent node as useful
             var considerOutputs = false;
@@ -265,6 +273,13 @@ public final class DependencyAnalyzer {
             var foundDupes = new HashMap<NoHashCode<Triple<RuleApp, SequentFormula, Boolean>>, List<AnnotatedEdge>>();
             graph.outgoingGraphEdgesOf(node).forEach(t -> {
                 var proofNode = t.first;
+
+                // handle State Merging
+                if (proofNode.getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp
+                        || proofNode.getAppliedRuleApp() instanceof CloseAfterMergeRuleBuiltInRuleApp) {
+                    throw new IllegalStateException("tried to analyze proof featuring state merging!");
+                }
+
                 if (proofNode.childrenCount() > 1) {
                     return; // do not deduplicate branching steps
                 }
