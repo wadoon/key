@@ -187,12 +187,30 @@ public class DependencyGraph {
         return graph.getEdgeSource(edge);
     }
 
+    /**
+     * @param edge a graph edge
+     * @return target node of this edge
+     */
+    public GraphNode outputOf(AnnotatedEdge edge) {
+        return graph.getEdgeTarget(edge);
+    }
+
     public Stream<GraphNode> inputsOf(Node proofStep) {
         return edgesOf(proofStep).stream().map(this::inputOf);
     }
 
+    public Stream<GraphNode> outputsOf(Node proofStep) {
+        return edgesOf(proofStep).stream().map(this::outputOf);
+    }
+
     public Stream<AnnotatedEdge> edgesUsing(GraphNode node) {
         return outgoingGraphEdgesOf(node).map(it -> it.third);
+    }
+
+    public Stream<AnnotatedEdge> edgesConsuming(GraphNode node) {
+        return outgoingGraphEdgesOf(node)
+                .filter(it -> it.third.consumesInput)
+                .map(it -> it.third);
     }
 
     public int countNodes() {

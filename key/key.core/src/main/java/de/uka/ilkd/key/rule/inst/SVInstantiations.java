@@ -2,6 +2,7 @@ package de.uka.ilkd.key.rule.inst;
 
 import java.util.Iterator;
 
+import de.uka.ilkd.key.logic.TermImpl;
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -645,9 +646,7 @@ public class SVInstantiations {
     }
 
     /**
-     * returns true if the given object and this one have the same mappings
-     * 
-     * @return true if the given object and this one have the same mappings
+     * @return whether the given object and this one have the same mappings
      */
     public boolean equals(Object obj) {
         final SVInstantiations cmp;
@@ -656,22 +655,26 @@ public class SVInstantiations {
         } else {
             cmp = (SVInstantiations) obj;
         }
-        if (size() != cmp.size() || 
+        if (size() != cmp.size() ||
                 !getUpdateContext().equals(cmp.getUpdateContext())) {
             return false;
         }
-      
+
         final Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>>> it = pairIterator();
         while (it.hasNext()) {
             final ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>> e = it.next();
-            final Object inst = e.value().getInstantiation();
+            final var inst = e.value().getInstantiation();
             assert inst != null : "Illegal null instantiation.";
-            if (!inst.equals(cmp.getInstantiation(e.key()))) {
+            if (inst instanceof TermImpl) {
+                if (!((TermImpl) inst).equalsModIrrelevantTermLabels(cmp.getInstantiation(e.key()))) {
+                    return false;
+                }
+            } else if (!inst.equals(cmp.getInstantiation(e.key()))) {
                 return false;
             }
         }
         return true;
-        
+
     }
 
     public int hashCode() {
@@ -680,6 +683,12 @@ public class SVInstantiations {
                 pairIterator();
         while (it.hasNext()) {
             final ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>> e = it.next();
+            if (e.value().getInstantiation() instanceof TermLabel) {
+                TermLabel termLabel = (TermLabel) e.value().getInstantiation();
+                if (!termLabel.isProofRelevant()) {
+                    continue;
+                }
+            }
             result = 37 * result + e.value().getInstantiation().hashCode() + 
                     e.key().hashCode();
         }

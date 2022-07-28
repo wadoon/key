@@ -14,6 +14,7 @@ import org.key_project.slicing.graph.DependencyGraph;
 import org.key_project.slicing.graph.GraphNode;
 import org.key_project.slicing.graph.TrackedFormula;
 import org.key_project.slicing.util.ExecutionTime;
+import org.key_project.slicing.util.NoHashCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +24,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -111,8 +114,10 @@ public final class DependencyAnalyzer {
         queue.add(proof.root());
         while (!queue.isEmpty()) {
             var node = queue.pop();
-            if (!usefulSteps.contains(node) && node.getNodeInfo().getNotes() == null) {
+            if (!usefulSteps.contains(node)) {
                 node.getNodeInfo().setNotes("useless");
+            } else if (Objects.equals(node.getNodeInfo().getNotes(), "useless")) {
+                node.getNodeInfo().setNotes(null);
             }
             node.childrenIterator().forEachRemaining(queue::add);
         }
@@ -245,6 +250,8 @@ public final class DependencyAnalyzer {
     }
 
     private void deduplicateRuleApps() {
+        var alreadyRebasedSerialNrs = new HashSet<Integer>();
+        var alreadyMergedSerialNrs = new HashSet<Integer>();
         // search for duplicate rule applications
         graph.nodes().forEach(node -> {
             // debugging filter:
@@ -255,7 +262,7 @@ public final class DependencyAnalyzer {
              */
 
             // groups rule apps on this node by their rule (+ their output formula + inAntec)
-            var foundDupes = new HashMap<Triple<RuleApp, SequentFormula, Boolean>, List<AnnotatedEdge>>();
+            var foundDupes = new HashMap<NoHashCode<Triple<RuleApp, SequentFormula, Boolean>>, List<AnnotatedEdge>>();
             graph.outgoingGraphEdgesOf(node).forEach(t -> {
                 var proofNode = t.first;
                 if (proofNode.childrenCount() > 1) {
@@ -269,10 +276,10 @@ public final class DependencyAnalyzer {
                     return; // only try to deduplicate the addition of new formulas
                 }
                 var formula = (TrackedFormula) produced;
-                foundDupes.computeIfAbsent(new Triple<>(
+                foundDupes.computeIfAbsent(new NoHashCode<>(new Triple<>(
                                         proofNode.getAppliedRuleApp(),
-                                        formula.formula,
-                                        formula.inAntec),
+                                        null,
+                                        formula.inAntec)),
                                 _a -> new ArrayList<>())
                         .add(t.third);
             });
@@ -284,7 +291,7 @@ public final class DependencyAnalyzer {
                 }
                 // try merging "adjacent" rule apps
                 // (rule apps are sorted by serial nr ≈ location in the proof tree)
-                LOGGER.debug("input {} found duplicate; attempt to merge:", node.toString(true, false));
+                LOGGER.info("input {} found duplicate; attempt to merge:", node.toString(false, false));
                 var apps = new ArrayList<>(steps);
                 var locs = steps.stream()
                         .map(e -> e.proofStep.branchLocation())
@@ -292,7 +299,7 @@ public final class DependencyAnalyzer {
                 var idxA = 0;
                 var idxB = 1;
                 while (idxB < steps.size()) {
-                    LOGGER.trace("idxes {} {}", idxA, idxB);
+                    LOGGER.info("idxes {} {}", idxA, idxB);
                     if (idxA >= idxB) {
                         idxB++;
                         continue;
@@ -311,7 +318,17 @@ public final class DependencyAnalyzer {
                     var consumesInput = edgeA.consumesInput; // equal to edgeB.consumesInput
                     var stepA = edgeA.proofStep;
                     var stepB = edgeB.proofStep;
-                    //LOGGER.info("considering {} {}", stepA.serialNr(), stepB.serialNr());
+                    if (alreadyMergedSerialNrs.contains(stepA.serialNr())
+                            || (idxA == idxB - 1 && alreadyRebasedSerialNrs.contains(stepA.serialNr()))) {
+                        idxA++;
+                        continue;
+                    }
+                    if (alreadyMergedSerialNrs.contains(stepB.serialNr())
+                            || alreadyRebasedSerialNrs.contains(stepB.serialNr())) {
+                        idxB++;
+                        continue;
+                    }
+                    LOGGER.info("considering {} {}", stepA.serialNr(), stepB.serialNr());
                     var locA = locs.get(idxA);
                     var locB = locs.get(idxB);
                     if (locA.equals(locB)) {
@@ -338,15 +355,36 @@ public final class DependencyAnalyzer {
                                 .anyMatch(edgeX ->
                                         edgeX.proofStep != stepA && edgeX.proofStep != stepB));
                     }
-                    if (hasConflict || !mergeValid) {
+                    // search for conflicting consumers of the output formulas
+                    boolean hasConflictOut = false;
+                    if (mergeValid && !hasConflict) {
+                        var usedInBranchesA = graph.outputsOf(stepA)
+                                .flatMap(n -> graph
+                                        .edgesConsuming(n)
+                                        .map(e -> e.proofStep.branchLocation()))
+                                .reduce(BranchLocation::commonPrefix);
+                        var usedInBranchesB = graph.outputsOf(stepB)
+                                .flatMap(n -> graph
+                                        .edgesConsuming(n)
+                                        .map(e -> e.proofStep.branchLocation()))
+                                .reduce(BranchLocation::commonPrefix);
+                        if (usedInBranchesA.isPresent() && usedInBranchesB.isPresent()) {
+                            var branchA = usedInBranchesA.get();
+                            var branchB = usedInBranchesB.get();
+                            hasConflictOut = branchA.equals(branchB);
+                        }
+                    }
+                    if (hasConflict || hasConflictOut || !mergeValid) {
                         // can't merge => proceed with next pair
                         idxA++;
                         idxB++;
                     } else {
                         // merge step B into step A
-                        LOGGER.trace("merging {} and {}", stepA.serialNr(), stepB.serialNr());
+                        LOGGER.info("merging {} and {}", stepA.serialNr(), stepB.serialNr());
                         locs.set(idxA, mergeBase);
+                        alreadyRebasedSerialNrs.add(stepA.serialNr());
                         apps.set(idxB, null);
+                        alreadyMergedSerialNrs.add(stepB.serialNr());
                         idxB++;
                     }
                 }

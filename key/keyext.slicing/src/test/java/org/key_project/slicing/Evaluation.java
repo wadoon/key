@@ -30,7 +30,9 @@ class Evaluation {
     public static final File testCaseDirectory = new File("/home/arne/Documents/KIT/BA/Evaluation/");
 
     // commented out file = doesn't load
+    /* commented out file = already evaluated */
     private static final String[] FILES = new String[]{
+            /*
             "01_Contraposition.key",
             "02_Liarsville.key",
             "03_AuntAgatha.key",
@@ -45,11 +47,13 @@ class Evaluation {
             "09_SITA2.zproof",
             "09_SITA3.zproof",
             "10_SimpleArrayReversal.zproof",
+             */
             "11_PermutedSum_manual.zproof",
-            // broke recently: "12_Quicksort_scripted.zproof",
+            "12_Quicksort_scripted.zproof",
 //            "IdentityHashMap/01_KEY_IHM/KeY-proof-files/VerifiedIdentityHashMap/java.util.VerifiedIdentityHashMap(java.util.VerifiedIdentityHashMap__VerifiedIdentityHashMap()).JML normal_behavior operation contract.0.proof.gz",
             "IdentityHashMap/01_KEY_IHM/KeY-proof-files/VerifiedIdentityHashMap/java.util.VerifiedIdentityHashMap(java.util.VerifiedIdentityHashMap__capacity(int)).JML normal_behavior operation contract.0.proof.gz",
             "IdentityHashMap/01_KEY_IHM/KeY-proof-files/VerifiedIdentityHashMap/java.util.VerifiedIdentityHashMap(java.util.VerifiedIdentityHashMap__capacity(int)).JML normal_behavior operation contract.1.proof.gz",
+            /*
             "IdentityHashMap/01_KEY_IHM/KeY-proof-files/VerifiedIdentityHashMap/java.util.VerifiedIdentityHashMap(java.util.VerifiedIdentityHashMap__capacity(int)).JML normal_behavior operation contract.2.proof.gz",
 //            "IdentityHashMap/01_KEY_IHM/KeY-proof-files/VerifiedIdentityHashMap/java.util.VerifiedIdentityHashMap(java.util.VerifiedIdentityHashMap__clear()).JML normal_behavior operation contract.0.proof.gz",
 //            "IdentityHashMap/01_KEY_IHM/KeY-proof-files/VerifiedIdentityHashMap/java.util.VerifiedIdentityHashMap(java.util.VerifiedIdentityHashMap__containsKey(java.lang.Object)).JML normal_behavior operation contract.0.proof.gz",
@@ -71,10 +75,14 @@ class Evaluation {
             "IdentityHashMap/01_KEY_IHM/KeY-proof-files/VerifiedIdentityHashMap/java.util.VerifiedIdentityHashMap(java.util.VerifiedIdentityHashMap__size()).JML normal_behavior operation contract.0.proof.gz",
             "IdentityHashMap/01_KEY_IHM/KeY-proof-files/VerifiedIdentityHashMap/java.util.VerifiedIdentityHashMap(java.util.VerifiedIdentityHashMap__unmaskNull(java.lang.Object)).JML normal_behavior operation contract.0.proof.gz",
 //            "DualPivot_KeY_Proofs/overflow/DualPivotQuicksort/DualPivotQuicksort(DualPivotQuicksort__eInsertionSort((I,int,int,int,int,int,int,int)).JML normal_behavior operation contract.0.proof",
+             */
             "DualPivot_KeY_Proofs/overflow/DualPivotQuicksort/DualPivotQuicksort(DualPivotQuicksort__loop_body((I,int,int,int,int,int)).JML normal_behavior operation contract.0.proof",
+            /*
             "DualPivot_KeY_Proofs/overflow/DualPivotQuicksort/DualPivotQuicksort(DualPivotQuicksort__move_great_left((I,int,int,int)).JML normal_behavior operation contract.0.proof",
             "DualPivot_KeY_Proofs/overflow/DualPivotQuicksort/DualPivotQuicksort(DualPivotQuicksort__move_great_left_in_loop((I,int,int,int,int)).JML normal_behavior operation contract.0.proof",
+             */
             "DualPivot_KeY_Proofs/overflow/DualPivotQuicksort/DualPivotQuicksort(DualPivotQuicksort__move_less_right((I,int,int,int)).JML normal_behavior operation contract.0.proof",
+            /*
             "DualPivot_KeY_Proofs/overflow/DualPivotQuicksort/DualPivotQuicksort(DualPivotQuicksort__prepare_indices((I,int,int)).JML normal_behavior operation contract.0.proof",
             "DualPivot_KeY_Proofs/overflow/DualPivotQuicksort/DualPivotQuicksort(DualPivotQuicksort__sort((I)).JML normal_behavior operation contract.0.proof",
             // these two 'proofs' still have open goals:
@@ -98,10 +106,14 @@ class Evaluation {
 
             "DualPivot_KeY_Proofs/sort/DualPivotQuicksort/calcE.proof",
             "DualPivot_KeY_Proofs/sort/DualPivotQuicksort/eInsertionSort_SavedAgain.proof",
+             */
             "DualPivot_KeY_Proofs/sort/DualPivotQuicksort/loop_body.proof",
+            /*
             "DualPivot_KeY_Proofs/sort/DualPivotQuicksort/move_great_left.proof",
             "DualPivot_KeY_Proofs/sort/DualPivotQuicksort/move_great_left_in_loop.proof",
+             */
             "DualPivot_KeY_Proofs/sort/DualPivotQuicksort/move_less_right.proof",
+            /*
             "DualPivot_KeY_Proofs/sort/DualPivotQuicksort/prepare_indices.proof",
             "DualPivot_KeY_Proofs/sort/DualPivotQuicksort/sort_I.proof",
             "DualPivot_KeY_Proofs/sort/DualPivotQuicksort/sort_I_int_int.proof",
@@ -111,6 +123,7 @@ class Evaluation {
 //            "DualPivot_KeY_Proofs/sort/SinglePivotPartition/sort_I_int_int.proof",
             "DualPivot_KeY_Proofs/sort/SwapValues/move_great_left.proof",
             "DualPivot_KeY_Proofs/sort/SwapValues/move_less_right.proof",
+             */
             "DualPivot_KeY_Proofs/sort/SwapValues/swap_values.proof",
     };
     // Sizes:
@@ -162,7 +175,7 @@ class Evaluation {
                 }
                 var origSize = proof1.second.countNodes();
                 var origBranches = proof1.second.countBranches();
-                var numberOfSMT = proof1.second.allGoals().stream().filter(goal -> goal.node().parent().getAppliedRuleApp() != null && goal.node().parent().getAppliedRuleApp() instanceof RuleAppSMT).count();
+                var numberOfSMT = proof1.second.allGoals().stream().filter(goal -> goal.node().getAppliedRuleApp() != null && goal.node().getAppliedRuleApp() instanceof RuleAppSMT).count();
                 proof1.first.dispose();
                 var time2 = System.currentTimeMillis();
 
@@ -170,7 +183,7 @@ class Evaluation {
                 var time3 = System.currentTimeMillis();
 
                 try {
-                    var proof2 = sliceProof(filename).first;
+                    var proof2 = sliceProof(filename, true, false).first;
                     var sliceSize = proof2.countNodes();
                     var sliceBranches = proof2.countBranches();
                     var numberOfSMT2 = proof2.allGoals().stream().filter(goal -> goal.node().getAppliedRuleApp() != null && goal.node().getAppliedRuleApp() instanceof RuleAppSMT).count();
@@ -183,6 +196,7 @@ class Evaluation {
                         output.printf("%s;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d\n", filename, time2 - time1, time3 - time2, analyzeTime, time4 - time3, origSize, sliceSize, origBranches, sliceBranches, numberOfSMT, numberOfSMT2);
                     }
                 } catch (Exception e) {
+                    e.printStackTrace();
                     failures.add(filename);
                 }
             }
@@ -198,6 +212,8 @@ class Evaluation {
     @Test
     @Ignore("used during evaluation")
     void sliceEachToFixedPoint() throws Exception {
+        var depAnalysis = false;
+        var dupAnalysis = true;
         GeneralSettings.noPruningClosed = false;
         // run with: -Xmx4096m
         // warm up taclet index etc.
@@ -209,6 +225,10 @@ class Evaluation {
 
         for (var filename : FILES) {
             LOGGER.info("loading {}", filename);
+            var runtime = Runtime.getRuntime();
+            var total = runtime.totalMemory();
+            var used = total - runtime.freeMemory();
+            LOGGER.info("Java Heap Usage: {} MB / {} MB", used / 1024 / 1024, total / 1024 / 1024);
             var iterations = 1;
             for (int i = 0; i < iterations; i++) {
                 var time1 = System.currentTimeMillis();
@@ -230,13 +250,13 @@ class Evaluation {
 
                 var furtherSliceUseful = true;
                 try {
-                    var pair = sliceProof(filename);
+                    var pair = sliceProof(filename, depAnalysis, dupAnalysis);
                     while (furtherSliceUseful) {
                         var proof2 = pair.first;
                         var sliceSize = proof2.countNodes();
                         var sliceBranches = proof2.countBranches();
                         var numberOfSMT2 = proof2.allGoals().stream().filter(goal -> goal.node().getAppliedRuleApp() != null && goal.node().getAppliedRuleApp() instanceof RuleAppSMT).count();
-                        var results = pair.second.analyze(true, false);
+                        var results = pair.second.analyze(depAnalysis, dupAnalysis);
                         furtherSliceUseful = results.totalSteps != results.usefulStepsNr;
                         var time4 = System.currentTimeMillis();
                         if (furtherSliceUseful) {
@@ -398,7 +418,7 @@ class Evaluation {
         }
     }
 
-    private Pair<Proof, DependencyTracker> sliceProof(String filename) throws Exception {
+    private Pair<Proof, DependencyTracker> sliceProof(String filename, boolean doDependencyAnalysis, boolean doDeduplicateRuleApps) throws Exception {
         boolean oldValue = GeneralSettings.noPruningClosed;
         GeneralSettings.noPruningClosed = false;
         // load proof
@@ -421,7 +441,7 @@ class Evaluation {
             }
             // analyze proof
             var time1 = System.currentTimeMillis();
-            var results = tracker.analyze(true, false);
+            var results = tracker.analyze(doDependencyAnalysis, doDeduplicateRuleApps);
             analyzeTime = System.currentTimeMillis() - time1;
             // slice proof
             var path = tracker.sliceProof();
