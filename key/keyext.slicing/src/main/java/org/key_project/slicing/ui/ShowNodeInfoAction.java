@@ -15,6 +15,7 @@ import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -62,8 +63,8 @@ public class ShowNodeInfoAction extends MainWindowAction {
                 .incomingGraphEdgesOf(node).map(nodeToTableRow).collect(Collectors.toList());
         var outgoing = tracker.getDependencyGraph()
                 .outgoingGraphEdgesOf(node).map(nodeToTableRow).collect(Collectors.toList());
-        var html1 = HtmlFactory.generateTable(headers1, clickable, incoming, idxFactory);
-        var html2 = HtmlFactory.generateTable(headers2, clickable, outgoing, idxFactory);
+        var html1 = HtmlFactory.generateTable(headers1, clickable, Optional.empty(), incoming, idxFactory);
+        var html2 = HtmlFactory.generateTable(headers2, clickable, Optional.empty(), outgoing, idxFactory);
         var useful = analysisResults != null ? tracker.getDependencyGraph().outgoingGraphEdgesOf(node).filter(t -> analysisResults.usefulSteps.contains(t.first)).count() : -1;
         var extraInfo = useful != -1 ? "<h2>" + useful + " useful rule apps</h2>" : "";
         var html = "<h1>Produced by</h1>" + html1

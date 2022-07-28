@@ -10,8 +10,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -124,50 +127,30 @@ public class RuleStatisticsDialog extends JDialog {
     }
 
     private String genTable(List<Quadruple<String, Integer, Integer, Integer>> rules) {
-        StringBuilder stats = new StringBuilder("<table><thead>");
-        for (var a : new String[] { "Rule name", "Total applications", "Useless applications", "Initial useless applications" }) {
-            stats.append("<td>").append(a).append("</td>");
-        }
-        stats.append("</thead><tbody>");
+        var columns = List.of("Rule name", "Total applications", "Useless applications", "Initial useless applications");
 
+        var rows = new ArrayList<Collection<String>>();
         // summary row
         var uniqueRules = rules.size();
         var totalSteps = rules.stream().mapToInt(it -> it.second).sum();
         var uselessSteps = rules.stream().mapToInt(it -> it.third).sum();
         var initialUseless = rules.stream().mapToInt(it -> it.fourth).sum();
-        stats.append("<tr>");
-        stats.append("<td>").append(String.format("(all %d rules)", uniqueRules)).append("</td>");
-        stats.append("<td>").append(totalSteps).append("</td>");
-        stats.append("<td>").append(uselessSteps).append("</td>");
-        stats.append("<td>").append(initialUseless).append("</td>");
-        stats.append("</tr>");
+        rows.add(List.of(String.format("(all %d rules)", uniqueRules), Integer.toString(totalSteps), Integer.toString(uselessSteps), Integer.toString(initialUseless)));
         // next summary row
         var rulesBranching = rules.stream().filter(it -> statistics.branches(it.first)).collect(Collectors.toList());
         var uniqueRules2 = rulesBranching.size();
-        var totalSteps2 = rulesBranching.stream().mapToInt(it -> it.second).sum();
-        var uselessSteps2 = rulesBranching.stream().mapToInt(it -> it.third).sum();
-        var initialUseless2 = rulesBranching.stream().mapToInt(it -> it.fourth).sum();
-        stats.append("<tr>");
-        stats.append("<td>").append(String.format("(%d branching rules)", uniqueRules2)).append("</td>");
-        stats.append("<td>").append(totalSteps2).append("</td>");
-        stats.append("<td>").append(uselessSteps2).append("</td>");
-        stats.append("<td>").append(initialUseless2).append("</td>");
-        stats.append("</tr>");
+        totalSteps = rulesBranching.stream().mapToInt(it -> it.second).sum();
+        uselessSteps = rulesBranching.stream().mapToInt(it -> it.third).sum();
+        initialUseless = rulesBranching.stream().mapToInt(it -> it.fourth).sum();
+        rows.add(List.of(String.format("(%d branching rules)", uniqueRules2), Integer.toString(totalSteps), Integer.toString(uselessSteps), Integer.toString(initialUseless)));
         rules.forEach(a -> {
             var name = a.first;
             var all = a.second;
             var useless = a.third;
             var iua = a.fourth;
-            stats.append("<tr>");
-            stats.append("<td>").append(name).append("</td>");
-            stats.append("<td>").append(all).append("</td>");
-            stats.append("<td>").append(useless).append("</td>");
-            stats.append("<td>").append(iua).append("</td>");
-            stats.append("</tr>");
+            rows.add(List.of(name, all.toString(), useless.toString(), iua.toString()));
         });
 
-        stats.append("</tbody></table>");
-
-        return stats.toString();
+        return HtmlFactory.generateTable(columns, new boolean[] { false, false, false, false }, Optional.of(new String[] { null, "right", "right", "right" }), rows, null);
     }
 }

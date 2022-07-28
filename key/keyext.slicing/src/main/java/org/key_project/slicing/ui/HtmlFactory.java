@@ -4,6 +4,7 @@ import org.apache.commons.text.StringEscapeUtils;
 
 import javax.swing.*;
 import java.util.Collection;
+import java.util.Optional;
 
 public final class HtmlFactory {
     private HtmlFactory() { }
@@ -11,6 +12,7 @@ public final class HtmlFactory {
     /**
      * @param columnNames
      * @param clickable
+     * @param alignment text alignment of each column
      * @param rows
      * @param indexFactory only required if any entry in clickable is true
      * @return
@@ -18,6 +20,7 @@ public final class HtmlFactory {
     public static String generateTable(
             Collection<String> columnNames,
             boolean[] clickable,
+            Optional<String[]> alignment,
             Collection<Collection<String>> rows,
             IndexFactory indexFactory
     ) {
@@ -35,7 +38,16 @@ public final class HtmlFactory {
             stats.append("<tr>");
             var i = 0;
             for (var cell : row) {
-                stats.append("<td>");
+                stats.append("<td");
+                if (alignment.isPresent()) {
+                    var align = alignment.get()[i];
+                    if (align != null) {
+                        stats.append(" style='text-align:")
+                                .append(align)
+                                .append("'");
+                    }
+                }
+                stats.append(">");
                 if (clickable[i]) {
                     stats.append("<a href='#");
                     stats.append(indexFactory.nextIndex());

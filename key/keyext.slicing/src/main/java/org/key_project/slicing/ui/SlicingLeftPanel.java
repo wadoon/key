@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionListener {
@@ -272,6 +273,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         var html = HtmlFactory.generateTable(
                 List.of("Algorithm", "Time"),
                 new boolean[] { false, false },
+                Optional.empty(),
                 coll,
                 null
         );
