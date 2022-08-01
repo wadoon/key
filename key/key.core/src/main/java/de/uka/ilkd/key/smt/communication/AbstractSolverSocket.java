@@ -4,6 +4,7 @@ import de.uka.ilkd.key.smt.ModelExtractor;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.IOException;
 
 /**
@@ -69,8 +70,35 @@ public abstract class AbstractSolverSocket {
      * @param msg the message as String
      * @throws IOException if an I/O error occurs
      */
-    public abstract void messageIncoming(@Nonnull Pipe pipe, @Nonnull String msg)
+    protected abstract void handleMessage(@Nonnull Pipe pipe, @Nonnull String msg)
             throws IOException;
+
+    /**
+     * Send an SMT problem to the process linked to the given pipe and communicate with the process
+     * via that pipe.
+     *
+     * By default, this just sends the message via the pipe and reads the answer as long as the
+     * answer is not null.
+     * This might not work for some solvers, see for example {@link VampireSocket} where the input
+     * stream of the process needs to be closed for an answer.
+     *
+     * @param pipe the {@link Pipe} linked to the solver process that receives the SMT problem
+     * @param problem the SMT problem as a String
+     * @throws IOException if reading the solver's answer fails
+     * @throws InterruptedException if the pipe is interrupted while waiting for the solver's answer
+     */
+    public @Nullable void communicate(Pipe pipe, String problem)
+            throws IOException, InterruptedException {
+        pipe.sendMessage(problem);
+        String solverAnswer = pipe.readMessage();
+        while (solverAnswer != null) {
+            handleMessage(pipe, solverAnswer);
+            solverAnswer = pipe.readMessage();
+        }
+        // Close the pipe (destroys the process).
+        pipe.close();
+    }
+
 
     /**
      * Modify an SMT problem String in some way (e.g. prepend some SMT commands).

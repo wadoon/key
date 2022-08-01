@@ -263,14 +263,11 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
         // Thirdly: start the external process.
         try {
             processLauncher.launch(commands);
-            processLauncher.getPipe().sendMessage(type.modifyProblem(problemString));
-            //processLauncher.getPipe().sendEOF();
-
-            String msg = processLauncher.getPipe().readMessage();
-            while (msg != null) {
-                socket.messageIncoming(processLauncher.getPipe(), msg);
-                msg = processLauncher.getPipe().readMessage();
-            }
+            /*
+            Send the modified problem to the solver process' pipe and let
+            the socket communicate with the pipe/process.
+            */
+            socket.communicate(processLauncher.getPipe(), type.modifyProblem(problemString));
         } catch (IllegalStateException | IOException | InterruptedException e) {
             interruptionOccurred(e);
             Thread.currentThread().interrupt();

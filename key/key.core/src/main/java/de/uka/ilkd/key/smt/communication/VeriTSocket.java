@@ -29,7 +29,7 @@ public class VeriTSocket extends AbstractSolverSocket {
     public VeriTSocket(String name, ModelExtractor query) {super(name, query);}
 
     @Override
-    public void messageIncoming(@Nonnull Pipe pipe, @Nonnull String msg) throws IOException {
+    protected void handleMessage(@Nonnull Pipe pipe, @Nonnull String msg) throws IOException {
         SolverCommunication sc = pipe.getSolverCommunication();
         // Ignore whitespaces:
         msg = msg.trim();

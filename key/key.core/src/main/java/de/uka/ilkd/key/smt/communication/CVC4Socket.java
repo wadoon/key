@@ -26,7 +26,7 @@ public class CVC4Socket extends AbstractSolverSocket {
     }
 
     @Override
-    public void messageIncoming(@Nonnull Pipe pipe, @Nonnull String msg) throws IOException {
+    protected void handleMessage(@Nonnull Pipe pipe, @Nonnull String msg) throws IOException {
         SolverCommunication sc = pipe.getSolverCommunication();
         if ("".equals(msg.trim())) {
             return;
