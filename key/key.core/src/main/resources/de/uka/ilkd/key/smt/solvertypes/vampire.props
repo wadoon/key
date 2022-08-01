@@ -1,11 +1,9 @@
-name=veriT
-info=veriT solver, experimental interactive version.
-minVersion=This is veriT, version 2021.06-39-g72ab0b0-rmx
-command=veriT
-params=--input=smtlib2 --output=smtlib2 --disable-banner
+name=Vampire
+info=Vampire Theorem Prover.
+command=vampire
+params=--input_syntax smtlib2 --output_mode smtlib2
 version=--version
-socketClass=de.uka.ilkd.key.smt.communication.VeriTSocket
-preamble=veriT_preamble.smt2
+socketClass=de.uka.ilkd.key.smt.communication.VampireSocket
 handlers=de.uka.ilkd.key.smt.newsmt2.BooleanConnectiveHandler,\
 de.uka.ilkd.key.smt.newsmt2.PolymorphicHandler,\
 de.uka.ilkd.key.smt.newsmt2.QuantifierHandler,\
