@@ -28,7 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -371,7 +372,7 @@ public final class DependencyAnalyzer {
                                         edgeX.proofStep != stepA && edgeX.proofStep != stepB));
                     }
                     // search for conflicting consumers of the output formulas
-                    boolean hasConflictOut = false;
+                    AtomicBoolean hasConflictOut = new AtomicBoolean(false);
                     if (mergeValid && !hasConflict) {
                         var usedInBranchesA = graph.outputsOf(stepA)
                                 .flatMap(n -> graph
@@ -386,10 +387,57 @@ public final class DependencyAnalyzer {
                         if (usedInBranchesA.isPresent() && usedInBranchesB.isPresent()) {
                             var branchA = usedInBranchesA.get();
                             var branchB = usedInBranchesB.get();
-                            hasConflictOut = branchA.equals(branchB);
+                            hasConflictOut.set(branchA.equals(branchB));
                         }
                     }
-                    if (hasConflict || hasConflictOut || !mergeValid) {
+                    // search for conflicts concerning multiple derivations of the same formula in a branch
+                    if (mergeValid && !hasConflict && !hasConflictOut.get()) {
+                        graph.outputsOf(stepA).forEach(graphNode -> {
+                            // check whether other rule apps also produce this node, and whether it is consumed before we need it
+                            var createIdx = stepA.stepIndex;
+                            AtomicInteger prevCreateIdx = new AtomicInteger(-1);
+                            AtomicInteger prevConsumeIdx = new AtomicInteger(-1);
+                            AtomicInteger plannedConsumeIdx = new AtomicInteger(-1);
+                            graph.outgoingGraphEdgesOf(graphNode).forEach(triple -> {
+                                var idx = triple.first.stepIndex;
+                                if (triple.third.consumesInput) {
+                                    if (idx > createIdx && (plannedConsumeIdx.get() == -1 || idx < plannedConsumeIdx.get())) {
+                                        plannedConsumeIdx.set(idx);
+                                    }
+                                    if (idx < createIdx && (prevConsumeIdx.get() == -1 || idx > prevConsumeIdx.get())) {
+                                        prevConsumeIdx.set(idx);
+                                    }
+                                }
+                            });
+                            graph.incomingGraphEdgesOf(graphNode).forEach(triple -> {
+                                var idx = triple.first.stepIndex;
+                                if (idx < createIdx && (prevCreateIdx.get() == -1 || idx > prevCreateIdx.get())) {
+                                    prevCreateIdx.set(idx);
+                                }
+                            });
+                            hasConflictOut.set(hasConflictOut.get() || (plannedConsumeIdx.get() != -1 && prevConsumeIdx.get() != -1));
+                            /*
+                            var createdTwice = graph.incomingEdgesOf(graphNode).anyMatch(edge -> edge != edgeA.proofStep);
+                            var consumedTwice = false;
+                            var consumers = graph.edgesConsuming(graphNode).collect(Collectors.toList());
+                            for (int i = 0; i < consumers.size(); i++) {
+                                for (int j = i + 1; j < consumers.size(); j++) {
+                                    var branchA = consumers.get(i).proofStep.branchLocation();
+                                    var branchB = consumers.get(j).proofStep.branchLocation();
+                                    consumedTwice = branchA.hasPrefix(branchB) || branchB.hasPrefix(branchA);
+                                    if (consumedTwice) {
+                                        break;
+                                    }
+                                }
+                                if (consumedTwice) {
+                                    break;
+                                }
+                            }
+                            hasConflictOut.set(hasConflictOut.get() || createdTwice && consumedTwice);
+                             */
+                        });
+                    }
+                    if (hasConflict || hasConflictOut.get() || !mergeValid) {
                         // can't merge => proceed with next pair
                         idxA++;
                         idxB++;
