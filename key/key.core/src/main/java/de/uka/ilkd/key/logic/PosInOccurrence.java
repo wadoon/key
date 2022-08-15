@@ -75,7 +75,10 @@ public final class PosInOccurrence {
     
     /** 
      * compares this PosInOccurrence with another PosInOccurrence
-     * and returns true if both describe the same occurrence 
+     * and returns true if both describe the same occurrence
+	 *
+	 * This would usually be done in {@link PosInOccurrence#equals(Object)},
+	 * but we only do it here!
      */
     public boolean eqEquals(Object obj) {
 	if (!(obj instanceof PosInOccurrence)) {

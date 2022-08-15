@@ -97,9 +97,8 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
             return false;
         }
         final IfFormulaInstSeq other = (IfFormulaInstSeq)p_obj;
-        return seq == other.seq
-                && cf == other.cf
-                && antec == other.antec;
+        return cf == other.cf
+                && antec == other.antec; // don't compare the sequents used!
     }
 
     @Override

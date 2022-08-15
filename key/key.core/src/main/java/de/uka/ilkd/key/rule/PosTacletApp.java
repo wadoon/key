@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.rule;
 
 import java.util.Iterator;
+import java.util.Objects;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -361,7 +362,15 @@ public class PosTacletApp extends TacletApp {
        if (!super.equals(o)) {
           return false;
        }
-       return ((PosTacletApp)o).posInOccurrence().equals(posInOccurrence());
+	   var posA = ((PosTacletApp)o).pos;
+	   var posB = pos;
+		if (posA == null && posB == null) {
+			return true;
+		} else if (posA == null || posB == null) {
+		   return false;
+	   } else {
+			return posA.eqEquals(posB);
+		}
     }
 
     @Override

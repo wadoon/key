@@ -24,6 +24,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -270,8 +271,8 @@ public final class DependencyAnalyzer {
             }
              */
 
-            // groups rule apps on this node by their rule (+ their output formula + inAntec)
-            var foundDupes = new HashMap<NoHashCode<Triple<RuleApp, SequentFormula, Boolean>>, List<AnnotatedEdge>>();
+            // groups rule apps on this node by their rule
+            var foundDupes = new HashMap<NoHashCode<RuleApp>, Set<AnnotatedEdge>>();
             graph.outgoingGraphEdgesOf(node).forEach(t -> {
                 var proofNode = t.first;
 
@@ -291,17 +292,13 @@ public final class DependencyAnalyzer {
                 if (!(produced instanceof TrackedFormula)) {
                     return; // only try to deduplicate the addition of new formulas
                 }
-                var formula = (TrackedFormula) produced;
-                foundDupes.computeIfAbsent(new NoHashCode<>(new Triple<>(
-                                        proofNode.getAppliedRuleApp(),
-                                        null,
-                                        formula.inAntec)),
-                                _a -> new ArrayList<>())
+                foundDupes.computeIfAbsent(new NoHashCode<>(proofNode.getAppliedRuleApp()),
+                                _a -> new LinkedHashSet<>())
                         .add(t.third);
             });
 
             for (var entry : foundDupes.entrySet()) {
-                var steps = entry.getValue();
+                var steps = new ArrayList<>(entry.getValue());
                 if (steps.size() <= 1) {
                     continue;
                 }
@@ -331,6 +328,7 @@ public final class DependencyAnalyzer {
                         idxB++;
                         continue;
                     }
+                    LOGGER.info("idxes updated {} {}", idxA, idxB);
                     var consumesInput = edgeA.consumesInput; // equal to edgeB.consumesInput
                     var stepA = edgeA.proofStep;
                     var stepB = edgeB.proofStep;
@@ -391,7 +389,7 @@ public final class DependencyAnalyzer {
                         }
                     }
                     // search for conflicts concerning multiple derivations of the same formula in a branch
-                    if (mergeValid && !hasConflict && !hasConflictOut.get()) {
+                    if (false && mergeValid && !hasConflict && !hasConflictOut.get()) {
                         graph.outputsOf(stepA).forEach(graphNode -> {
                             // check whether other rule apps also produce this node, and whether it is consumed before we need it
                             var createIdx = stepA.stepIndex;

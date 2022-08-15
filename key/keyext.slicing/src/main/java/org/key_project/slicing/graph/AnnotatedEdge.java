@@ -11,4 +11,28 @@ public class AnnotatedEdge extends DefaultEdge {
         this.proofStep = proofStep;
         this.consumesInput = consumesInput;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        AnnotatedEdge that = (AnnotatedEdge) o;
+
+        if (consumesInput != that.consumesInput) {
+            return false;
+        }
+        return proofStep.equals(that.proofStep);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = proofStep.hashCode();
+        result = 31 * result + (consumesInput ? 1 : 0);
+        return result;
+    }
 }
