@@ -213,6 +213,10 @@ public class DependencyGraph {
         return edgesOf(proofStep).stream().map(this::outputOf);
     }
 
+    public Stream<GraphNode> inputsConsumedBy(Node proofStep) {
+        return edgesOf(proofStep).stream().filter(edge -> edge.consumesInput).map(this::inputOf);
+    }
+
     public Stream<AnnotatedEdge> edgesUsing(GraphNode node) {
         return outgoingGraphEdgesOf(node).map(it -> it.third);
     }
