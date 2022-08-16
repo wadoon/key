@@ -2,6 +2,7 @@ package de.uka.ilkd.key.logic;
 
 import javax.annotation.Nullable;
 
+import de.uka.ilkd.key.util.EqualsModProofIrrelevancy;
 import org.key_project.util.RealEquals;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
@@ -43,7 +44,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * currently supported: {@link Term#execPostOrder(Visitor)} and
  * {@link Term#execPreOrder(Visitor)}.
  */
-public interface Term extends SVSubstitute, Sorted, RealEquals {
+public interface Term extends SVSubstitute, Sorted, RealEquals, EqualsModProofIrrelevancy {
 
     /**
      * The top operator (e.g., in "A and B" this is "and", in f(x,y) it is "f").

@@ -18,10 +18,14 @@ public abstract class GraphNode {
     }
 
     /**
-     * @return the branch location of this node (empty if not applicable)
+     * @return the branch location of this node (empty if not applicable / necessary)
      */
     public BranchLocation getBranchLocation() {
         return branchLocation;
+    }
+
+    public GraphNode popLastBranchID() {
+        return this;
     }
 
     /**

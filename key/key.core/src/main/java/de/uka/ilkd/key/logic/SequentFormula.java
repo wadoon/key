@@ -2,6 +2,7 @@ package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.util.EqualsModProofIrrelevancy;
 import org.key_project.util.RealEquals;
 
 
@@ -15,11 +16,12 @@ import org.key_project.util.RealEquals;
  * by providing a way to add additional annotations or to cache local information
  * about the formula.
  */
-public class SequentFormula implements RealEquals {
+public class SequentFormula implements EqualsModProofIrrelevancy, RealEquals {
 
     private final Term term;
 
     private final int hashCode;
+    private final int hashCode2;
 
     /** creates a new SequentFormula
      * @param term a Term of sort Sort.FORMULA
@@ -30,6 +32,7 @@ public class SequentFormula implements RealEquals {
 	}
 	this.term = term;
 	this.hashCode = term.hashCode () * 13;
+    this.hashCode2 = term.hashCodeModProofIrrelevancy();
     }
 
     /** @return the stored Term */
@@ -59,13 +62,31 @@ public class SequentFormula implements RealEquals {
     }
 
     @Override
+    public boolean equalsModProofIrrelevancy(Object obj) {
+        if (this == obj) { return true; }
+        if (obj instanceof SequentFormula) {
+            SequentFormula cmp=(SequentFormula)obj;
+            if (term.equalsModProofIrrelevancy(cmp.formula())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCodeModProofIrrelevancy() {
+        return hashCode2;
+    }
+
+    @Override
     public boolean realEquals(Object obj) {
         if (this == obj) {
             return true;
         }
-        if (!(obj instanceof SequentFormula)) {
-            return false;
+        if (obj instanceof SequentFormula) {
+            var that = (SequentFormula) obj;
+            return that.term.realEquals(term);
         }
-        return term.realEquals(((SequentFormula) obj).term);
+        return false;
     }
 }

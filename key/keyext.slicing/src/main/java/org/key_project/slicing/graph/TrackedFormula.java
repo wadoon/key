@@ -4,6 +4,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.BranchLocation;
+import de.uka.ilkd.key.util.EqualsModProofIrrelevancy;
+import de.uka.ilkd.key.util.EqualsModProofIrrelevancyWrapper;
 
 import java.util.Objects;
 
@@ -48,6 +50,11 @@ public class TrackedFormula extends GraphNode {
     }
 
     @Override
+    public GraphNode popLastBranchID() {
+        return new TrackedFormula(formula, branchLocation.removeLast(), inAntec, services);
+    }
+
+    @Override
     public String toString(boolean abbreviated, boolean omitBranch) {
         if (abbreviated) {
             return Integer.toHexString(hashCode());
@@ -76,12 +83,13 @@ public class TrackedFormula extends GraphNode {
         }
         TrackedFormula that = (TrackedFormula) o;
         return inAntec == that.inAntec
-                && Objects.equals(formula, that.formula)
+                && Objects.equals(new EqualsModProofIrrelevancyWrapper<>(formula),
+                    new EqualsModProofIrrelevancyWrapper<>(that.formula))
                 && Objects.equals(branchLocation, that.branchLocation);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(formula, branchLocation, inAntec);
+        return Objects.hash(new EqualsModProofIrrelevancyWrapper<>(formula), branchLocation, inAntec);
     }
 }

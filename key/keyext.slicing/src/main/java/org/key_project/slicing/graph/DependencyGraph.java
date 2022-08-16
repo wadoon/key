@@ -49,6 +49,7 @@ public class DependencyGraph {
      * @param output outputs produced by this proof step
      */
     public void addRuleApplication(Node node, Collection<Pair<GraphNode, Boolean>> input, Collection<GraphNode> output) {
+        var i = 0;
         for (var in : input) {
             for (var out : output) {
                 graph.addVertex(in.first);
@@ -58,7 +59,8 @@ public class DependencyGraph {
                     continue;
                 }
                  */
-                var edge = new AnnotatedEdge(node, in.second);
+                var edge = new AnnotatedEdge(node, in.second, i);
+                i++;
                 graph.addEdge(in.first, out, edge);
                 edgeData.put(edge, node);
                 edgeDataReversed.computeIfAbsent(node, n -> new ArrayList<>()).add(edge);

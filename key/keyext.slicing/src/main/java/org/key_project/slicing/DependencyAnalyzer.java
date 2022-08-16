@@ -329,7 +329,8 @@ public final class DependencyAnalyzer {
                         continue;
                     }
                     LOGGER.info("idxes updated {} {}", idxA, idxB);
-                    var consumesInput = edgeA.consumesInput; // equal to edgeB.consumesInput
+                    // check whether this rule app consumes a formula
+                    var consumesInput = graph.edgesOf(apps.get(idxA).proofStep).stream().anyMatch(it -> it.consumesInput);
                     var stepA = edgeA.proofStep;
                     var stepB = edgeB.proofStep;
                     if (alreadyMergedSerialNrs.contains(stepA.serialNr())
@@ -343,6 +344,9 @@ public final class DependencyAnalyzer {
                         continue;
                     }
                     LOGGER.info("considering {} {}", stepA.serialNr(), stepB.serialNr());
+                    if (stepA.serialNr() == 1018 && stepB.serialNr() == 7615) {
+                        LOGGER.info("interesting case");
+                    }
                     var locA = locs.get(idxA);
                     var locB = locs.get(idxB);
                     if (locA.equals(locB)) {
@@ -356,6 +360,10 @@ public final class DependencyAnalyzer {
                     var mergeValid = Stream.concat(
                             graph.inputsOf(stepA), graph.inputsOf(stepB)
                     ).allMatch(graphNode -> mergeBase.hasPrefix(graphNode.getBranchLocation()));
+                    // verify that they actually use the same inputs...
+                    var inputsA = graph.inputsOf(stepA).collect(Collectors.toSet());
+                    var inputsB = graph.inputsOf(stepB).collect(Collectors.toSet());
+                    mergeValid = mergeValid && inputsA.containsAll(inputsB) && inputsB.containsAll(inputsA);
                     // search for conflicting rule apps
                     // (only relevant if the rule apps consume the input)
                     boolean hasConflict = false;
@@ -368,6 +376,7 @@ public final class DependencyAnalyzer {
                                 .filter(edgeX -> edgeX.proofStep.branchLocation().hasPrefix(mergeBase))
                                 .anyMatch(edgeX ->
                                         edgeX.proofStep != stepA && edgeX.proofStep != stepB));
+                        LOGGER.info("hasConflict = {}", hasConflict);
                     }
                     // search for conflicting consumers of the output formulas
                     AtomicBoolean hasConflictOut = new AtomicBoolean(false);
@@ -389,51 +398,37 @@ public final class DependencyAnalyzer {
                         }
                     }
                     // search for conflicts concerning multiple derivations of the same formula in a branch
-                    if (false && mergeValid && !hasConflict && !hasConflictOut.get()) {
-                        graph.outputsOf(stepA).forEach(graphNode -> {
-                            // check whether other rule apps also produce this node, and whether it is consumed before we need it
-                            var createIdx = stepA.stepIndex;
-                            AtomicInteger prevCreateIdx = new AtomicInteger(-1);
-                            AtomicInteger prevConsumeIdx = new AtomicInteger(-1);
-                            AtomicInteger plannedConsumeIdx = new AtomicInteger(-1);
-                            graph.outgoingGraphEdgesOf(graphNode).forEach(triple -> {
-                                var idx = triple.first.stepIndex;
-                                if (triple.third.consumesInput) {
-                                    if (idx > createIdx && (plannedConsumeIdx.get() == -1 || idx < plannedConsumeIdx.get())) {
-                                        plannedConsumeIdx.set(idx);
-                                    }
-                                    if (idx < createIdx && (prevConsumeIdx.get() == -1 || idx > prevConsumeIdx.get())) {
-                                        prevConsumeIdx.set(idx);
-                                    }
+                    if (mergeValid && !hasConflict && !hasConflictOut.get()) {
+                        for (var stepAB : new Node[] { stepA, stepB }) {
+                            graph.outputsOf(stepAB).forEach(graphNode -> {
+                                // check whether other rule apps also produce this node, and whether it is consumed before we need it
+                                var createIdx = stepAB.stepIndex;
+                                AtomicInteger prevCreateIdx = new AtomicInteger(-1);
+                                AtomicInteger prevConsumeIdx = new AtomicInteger(-1);
+                                AtomicInteger plannedConsumeIdx = new AtomicInteger(-1);
+                                while (graphNode.getBranchLocation().size() >= mergeBase.size()) {
+                                    graph.outgoingGraphEdgesOf(graphNode).forEach(triple -> {
+                                        var idx = triple.first.stepIndex;
+                                        if (triple.third.consumesInput) {
+                                            if (idx > createIdx && (plannedConsumeIdx.get() == -1 || idx < plannedConsumeIdx.get())) {
+                                                plannedConsumeIdx.set(idx);
+                                            }
+                                            if (idx < createIdx && (prevConsumeIdx.get() == -1 || idx > prevConsumeIdx.get())) {
+                                                prevConsumeIdx.set(idx);
+                                            }
+                                        }
+                                    });
+                                    graph.incomingGraphEdgesOf(graphNode).forEach(triple -> {
+                                        var idx = triple.first.stepIndex;
+                                        if (idx < createIdx && (prevCreateIdx.get() == -1 || idx > prevCreateIdx.get())) {
+                                            prevCreateIdx.set(idx);
+                                        }
+                                    });
+                                    graphNode = graphNode.popLastBranchID();
                                 }
+                                hasConflictOut.set(hasConflictOut.get() || (plannedConsumeIdx.get() != -1 && prevConsumeIdx.get() != -1 && prevCreateIdx.get() < prevConsumeIdx.get()));
                             });
-                            graph.incomingGraphEdgesOf(graphNode).forEach(triple -> {
-                                var idx = triple.first.stepIndex;
-                                if (idx < createIdx && (prevCreateIdx.get() == -1 || idx > prevCreateIdx.get())) {
-                                    prevCreateIdx.set(idx);
-                                }
-                            });
-                            hasConflictOut.set(hasConflictOut.get() || (plannedConsumeIdx.get() != -1 && prevConsumeIdx.get() != -1));
-                            /*
-                            var createdTwice = graph.incomingEdgesOf(graphNode).anyMatch(edge -> edge != edgeA.proofStep);
-                            var consumedTwice = false;
-                            var consumers = graph.edgesConsuming(graphNode).collect(Collectors.toList());
-                            for (int i = 0; i < consumers.size(); i++) {
-                                for (int j = i + 1; j < consumers.size(); j++) {
-                                    var branchA = consumers.get(i).proofStep.branchLocation();
-                                    var branchB = consumers.get(j).proofStep.branchLocation();
-                                    consumedTwice = branchA.hasPrefix(branchB) || branchB.hasPrefix(branchA);
-                                    if (consumedTwice) {
-                                        break;
-                                    }
-                                }
-                                if (consumedTwice) {
-                                    break;
-                                }
-                            }
-                            hasConflictOut.set(hasConflictOut.get() || createdTwice && consumedTwice);
-                             */
-                        });
+                        }
                     }
                     if (hasConflict || hasConflictOut.get() || !mergeValid) {
                         // can't merge => proceed with next pair
@@ -453,9 +448,12 @@ public final class DependencyAnalyzer {
                     var keep = apps.get(i) != null;
                     var originalLoc = steps.get(i).proofStep.branchLocation();
                     LOGGER.trace("step {} kept? {}", steps.get(i).proofStep.serialNr(), keep);
-                    if (keep && locs.get(i) != originalLoc) {
+                    if (keep && !locs.get(i).equals(originalLoc)) {
                         var differingSuffix = originalLoc.stripPrefix(locs.get(i));
                         LOGGER.trace("should be done before branching node {}", differingSuffix);
+                        if (differingSuffix.isEmpty()) {
+                            LOGGER.error("oh no");
+                        }
                         branchStacks.computeIfAbsent(
                                         differingSuffix.getNode(0),
                                         _node -> new ArrayList<>())

@@ -67,8 +67,17 @@ public class ShowNodeInfoAction extends MainWindowAction {
         var html2 = HtmlFactory.generateTable(headers2, clickable, Optional.empty(), outgoing, idxFactory);
         var useful = analysisResults != null ? tracker.getDependencyGraph().outgoingGraphEdgesOf(node).filter(t -> analysisResults.usefulSteps.contains(t.first)).count() : -1;
         var extraInfo = useful != -1 ? "<h2>" + useful + " useful rule apps</h2>" : "";
+        var previousDerivations = 0;
+        var graphNode = node;
+        while (!graphNode.getBranchLocation().isEmpty()) {
+            graphNode = graphNode.popLastBranchID();
+            if (tracker.getDependencyGraph().containsNode(graphNode)) {
+                previousDerivations++;
+            }
+        }
         var html = "<h1>Produced by</h1>" + html1
                 + "<h1>This node</h1>" + "<p>" + node.toString(false, false) + "</p>"
+                + "<p><small>" + previousDerivations + "x derived in previous branches" + "</small></p>"
                 + "<h1>Used by</h1>"
                 + extraInfo
                 + html2

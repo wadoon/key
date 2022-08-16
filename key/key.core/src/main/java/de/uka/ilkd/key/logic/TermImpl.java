@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.logic;
 
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.Nullable;
@@ -62,6 +63,7 @@ public class TermImpl implements Term {
     private ThreeValuedTruth rigid = ThreeValuedTruth.UNKNOWN;
     private ImmutableSet<QuantifiableVariable> freeVars = null;
     private int hashcode = -1;
+    private int hashcode2 = -1;
 
     /**
      * This flag indicates that the {@link Term} itself or one
@@ -564,6 +566,22 @@ public class TermImpl implements Term {
         return true;
     }
 
+    @Override
+    public boolean equalsModProofIrrelevancy(Object obj) {
+        return equalsModIrrelevantTermLabels(obj);
+    }
+
+    @Override
+    public int hashCodeModProofIrrelevancy() {
+        if(hashcode2 == -1) {
+            // compute into local variable first to be thread-safe.
+            this.hashcode2 = Objects.hash(op()); // TODO
+            if (hashcode2 == -1) {
+                hashcode2 = 0;
+            }
+        }
+        return hashcode2;
+    }
 
     @Override
     public final int hashCode(){
