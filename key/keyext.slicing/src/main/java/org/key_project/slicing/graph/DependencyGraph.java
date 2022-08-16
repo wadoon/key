@@ -12,6 +12,7 @@ import org.key_project.slicing.DependencyNodeData;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -40,6 +41,8 @@ public class DependencyGraph {
      */
     private final Map<Node, Collection<AnnotatedEdge>> edgeDataReversed = new IdentityHashMap<>();
 
+    private final Map<GraphNode, GraphNode> nodeToNode = new HashMap<>();
+
     /**
      * Add a rule application to the dependency graph.
      *
@@ -52,13 +55,18 @@ public class DependencyGraph {
         var i = 0;
         for (var in : input) {
             for (var out : output) {
-                graph.addVertex(in.first);
-                graph.addVertex(out);
-                /*
-                if (graph.containsEdge(in, out)) {
-                    continue;
+                if (!nodeToNode.containsKey(in.first)) {
+                    graph.addVertex(in.first);
+                    nodeToNode.put(in.first, in.first);
+                } else {
+                    in = new Pair<>(nodeToNode.get(in.first), in.second);
                 }
-                 */
+                if (!nodeToNode.containsKey(out)) {
+                    graph.addVertex(out);
+                    nodeToNode.put(out, out);
+                } else {
+                    out = nodeToNode.get(out);
+                }
                 var edge = new AnnotatedEdge(node, in.second, i);
                 i++;
                 graph.addEdge(in.first, out, edge);

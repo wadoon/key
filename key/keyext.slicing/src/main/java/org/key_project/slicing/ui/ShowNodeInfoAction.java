@@ -78,6 +78,7 @@ public class ShowNodeInfoAction extends MainWindowAction {
         var html = "<h1>Produced by</h1>" + html1
                 + "<h1>This node</h1>" + "<p>" + node.toString(false, false) + "</p>"
                 + "<p><small>" + previousDerivations + "x derived in previous branches" + "</small></p>"
+                + "<p><small>" + "Identity: " + System.identityHashCode(node) + "</small></p>"
                 + "<h1>Used by</h1>"
                 + extraInfo
                 + html2

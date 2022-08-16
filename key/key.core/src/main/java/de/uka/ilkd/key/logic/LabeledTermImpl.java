@@ -142,7 +142,7 @@ class LabeledTermImpl extends TermImpl implements EqualsModProofIrrelevancy {
             }
             return false;
         } else {
-            return false;
+            return o.getClass() == TermImpl.class;
         }
     }
 
