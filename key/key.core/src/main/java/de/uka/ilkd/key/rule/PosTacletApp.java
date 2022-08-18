@@ -378,7 +378,17 @@ public class PosTacletApp extends TacletApp {
     	return super.hashCode() + 13 * posInOccurrence().hashCode();
     }
 
-    @Override
+	@Override
+	public boolean equalsModProofIrrelevancy(Object obj) {
+		return equals(obj); // hopefully
+	}
+
+	@Override
+	public int hashCodeModProofIrrelevancy() {
+		return rule().hashCode(); // TODO
+	}
+
+	@Override
     public String toString() {
         return super.toString() + " at " + posInOccurrence();
     }

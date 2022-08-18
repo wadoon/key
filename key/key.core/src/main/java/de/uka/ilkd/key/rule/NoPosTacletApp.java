@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.rule;
 
 import java.util.Iterator;
+import java.util.Objects;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -433,5 +434,19 @@ public class NoPosTacletApp extends TacletApp {
 	return 
 	    instantiations.getUpdateContext ()
 	    .equals ( p_mc.getInstantiations ().getUpdateContext () );
-    }    
+    }
+
+	@Override
+	public boolean equalsModProofIrrelevancy(Object obj) {
+		if (!(obj instanceof NoPosTacletApp)) {
+			return false;
+		}
+		var that = (NoPosTacletApp) obj;
+		return Objects.equals(rule(), that.rule()) && updateContextFixed == that.updateContextFixed; // TODO: use the proper method
+	}
+
+	@Override
+	public int hashCodeModProofIrrelevancy() {
+		return rule().hashCode(); // TODO: use proper method
+	}
 }

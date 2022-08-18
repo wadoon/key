@@ -9,6 +9,7 @@ import de.uka.ilkd.key.rule.merge.CloseAfterMergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.smt.RuleAppSMT;
+import de.uka.ilkd.key.util.EqualsModProofIrrelevancyWrapper;
 import de.uka.ilkd.key.util.Triple;
 import org.key_project.slicing.graph.AnnotatedEdge;
 import org.key_project.slicing.graph.ClosedGoal;
@@ -22,6 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -271,8 +273,9 @@ public final class DependencyAnalyzer {
             }
              */
 
-            // groups rule apps on this node by their rule
-            var foundDupes = new HashMap<NoHashCode<RuleApp>, Set<Node>>();
+            // groups proof steps that act upon this graph node by their rule app
+            // (for obvious reasons, we don't care about origin labels here -> wrapper)
+            var foundDupes = new HashMap<EqualsModProofIrrelevancyWrapper<RuleApp>, Set<Node>>();
             graph.outgoingGraphEdgesOf(node).forEach(t -> {
                 var proofNode = t.first;
 
@@ -292,7 +295,7 @@ public final class DependencyAnalyzer {
                 if (!(produced instanceof TrackedFormula)) {
                     return; // only try to deduplicate the addition of new formulas
                 }
-                foundDupes.computeIfAbsent(new NoHashCode<>(proofNode.getAppliedRuleApp()),
+                foundDupes.computeIfAbsent(new EqualsModProofIrrelevancyWrapper<>(proofNode.getAppliedRuleApp()),
                                 _a -> new LinkedHashSet<>())
                         .add(t.third.proofStep);
             });
@@ -302,8 +305,9 @@ public final class DependencyAnalyzer {
                 if (steps.size() <= 1) {
                     continue;
                 }
+                steps.sort(Comparator.comparing(it -> it.stepIndex));
                 // try merging "adjacent" rule apps
-                // (rule apps are sorted by serial nr ≈ location in the proof tree)
+                // (rule apps are sorted by step index = linear location in the proof tree)
                 LOGGER.info("input {} found duplicate; attempt to merge:", node.toString(false, false));
                 var apps = new ArrayList<>(steps);
                 var locs = steps.stream()
@@ -317,13 +321,13 @@ public final class DependencyAnalyzer {
                         idxB++;
                         continue;
                     }
-                    var edgeA = apps.get(idxA);
-                    if (edgeA == null) {
+                    var stepA = apps.get(idxA);
+                    if (stepA == null) {
                         idxA++;
                         continue;
                     }
-                    var edgeB = apps.get(idxB);
-                    if (edgeB == null) {
+                    var stepB = apps.get(idxB);
+                    if (stepB == null) {
                         // TODO does this actually happen?
                         idxB++;
                         continue;
@@ -331,33 +335,33 @@ public final class DependencyAnalyzer {
                     LOGGER.info("idxes updated {} {}", idxA, idxB);
                     // check whether this rule app consumes a formula
                     var consumesInput = graph.edgesOf(apps.get(idxA)).stream().anyMatch(it -> it.consumesInput);
-                    if (alreadyMergedSerialNrs.contains(edgeA.serialNr())
-                            || (idxA == idxB - 1 && alreadyRebasedSerialNrs.contains(edgeA.serialNr()))) {
+                    if (alreadyMergedSerialNrs.contains(stepA.serialNr())
+                            || (idxA == idxB - 1 && alreadyRebasedSerialNrs.contains(stepA.serialNr()))) {
                         idxA++;
                         continue;
                     }
-                    if (alreadyMergedSerialNrs.contains(edgeB.serialNr())
-                            || alreadyRebasedSerialNrs.contains(edgeB.serialNr())) {
+                    // can't merge/rebase a step twice!
+                    if (alreadyMergedSerialNrs.contains(stepB.serialNr())
+                            || alreadyRebasedSerialNrs.contains(stepB.serialNr())) {
                         idxB++;
                         continue;
                     }
-                    LOGGER.info("considering {} {}", edgeA.serialNr(), edgeB.serialNr());
+                    LOGGER.info("considering {} {}", stepA.serialNr(), stepB.serialNr());
                     var locA = locs.get(idxA);
                     var locB = locs.get(idxB);
                     if (locA.equals(locB)) {
                         // skip duplicates in the same branch...
-                        idxA += 2;
-                        idxB += 2;
+                        idxB++;
                         continue;
                     }
                     var mergeBase = BranchLocation.commonPrefix(locA, locB);
-                    // verify that all inputs are present at the merge base
+                    // verify that *all* inputs are present at the merge base
                     var mergeValid = Stream.concat(
-                            graph.inputsOf(edgeA), graph.inputsOf(edgeB)
+                            graph.inputsOf(stepA), graph.inputsOf(stepB)
                     ).allMatch(graphNode -> mergeBase.hasPrefix(graphNode.getBranchLocation()));
                     // verify that they actually use the same inputs...
-                    var inputsA = graph.inputsOf(edgeA).collect(Collectors.toSet());
-                    var inputsB = graph.inputsOf(edgeB).collect(Collectors.toSet());
+                    var inputsA = graph.inputsOf(stepA).collect(Collectors.toSet());
+                    var inputsB = graph.inputsOf(stepB).collect(Collectors.toSet());
                     mergeValid = mergeValid && inputsA.containsAll(inputsB) && inputsB.containsAll(inputsA);
                     // search for conflicting rule apps
                     // (only relevant if the rule apps consume the input)
@@ -365,23 +369,24 @@ public final class DependencyAnalyzer {
                     if (consumesInput && mergeValid) {
                         // are any of the inputs used by any other edge?
                         hasConflict = Stream.concat(
-                                graph.inputsConsumedBy(edgeA), graph.inputsConsumedBy(edgeB)
+                                graph.inputsConsumedBy(stepA), graph.inputsConsumedBy(stepB)
                         ).anyMatch(graphNode -> graph
                                 .edgesUsing(graphNode)
+                                // TODO: does this filter ever return false?
                                 .filter(edgeX -> edgeX.proofStep.branchLocation().hasPrefix(mergeBase))
                                 .anyMatch(edgeX ->
-                                        edgeX.proofStep != edgeA && edgeX.proofStep != edgeB));
+                                        edgeX.proofStep != stepA && edgeX.proofStep != stepB));
                         LOGGER.info("hasConflict = {}", hasConflict);
                     }
                     // search for conflicting consumers of the output formulas
                     AtomicBoolean hasConflictOut = new AtomicBoolean(false);
                     if (mergeValid && !hasConflict) {
-                        var usedInBranchesA = graph.outputsOf(edgeA)
+                        var usedInBranchesA = graph.outputsOf(stepA)
                                 .flatMap(n -> graph
                                         .edgesConsuming(n)
                                         .map(e -> e.proofStep.branchLocation()))
                                 .reduce(BranchLocation::commonPrefix);
-                        var usedInBranchesB = graph.outputsOf(edgeB)
+                        var usedInBranchesB = graph.outputsOf(stepB)
                                 .flatMap(n -> graph
                                         .edgesConsuming(n)
                                         .map(e -> e.proofStep.branchLocation()))
@@ -389,12 +394,15 @@ public final class DependencyAnalyzer {
                         if (usedInBranchesA.isPresent() && usedInBranchesB.isPresent()) {
                             var branchA = usedInBranchesA.get();
                             var branchB = usedInBranchesB.get();
+                            if (branchA.equals(branchB)) {
+                                throw new IllegalStateException("duplicate analyzer found impossible situation!");
+                            }
                             hasConflictOut.set(branchA.equals(branchB));
                         }
                     }
                     // search for conflicts concerning multiple derivations of the same formula in a branch
                     if (mergeValid && !hasConflict && !hasConflictOut.get()) {
-                        for (var stepAB : new Node[] {edgeA, edgeB}) {
+                        for (var stepAB : new Node[] {stepA, stepB}) {
                             graph.outputsOf(stepAB).forEach(graphNode -> {
                                 // check whether other rule apps also produce this node, and whether it is consumed before we need it
                                 var createIdx = stepAB.stepIndex;
@@ -434,11 +442,11 @@ public final class DependencyAnalyzer {
                         idxB++;
                     } else {
                         // merge step B into step A
-                        LOGGER.info("merging {} and {}", edgeA.serialNr(), edgeB.serialNr());
+                        LOGGER.info("merging {} and {}", stepA.serialNr(), stepB.serialNr());
                         locs.set(idxA, mergeBase);
-                        alreadyRebasedSerialNrs.add(edgeA.serialNr());
+                        alreadyRebasedSerialNrs.add(stepA.serialNr());
                         apps.set(idxB, null);
-                        alreadyMergedSerialNrs.add(edgeB.serialNr());
+                        alreadyMergedSerialNrs.add(stepB.serialNr());
                         idxB++;
                     }
                 }

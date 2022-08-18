@@ -44,6 +44,11 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
      * Logger of this class.
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(SlicingLeftPanel.class);
+    /**
+     * If set to true, the panel will include information on the current usage of the Java Heap
+     * and a button that calls {@link System#gc()}.
+     */
+    private static final boolean ENABLE_DEBUGGING_UI = false;
 
     private final transient KeYMediator mediator;
     private final transient SlicingExtension extension;
@@ -146,8 +151,10 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         mainPanel.add(panel1);
         mainPanel.add(panel2);
         mainPanel.add(button4);
-        mainPanel.add(button6);
-        mainPanel.add(memoryStats);
+        if (ENABLE_DEBUGGING_UI) {
+            mainPanel.add(button6);
+            mainPanel.add(memoryStats);
+        }
         mainPanel.add(timings);
 
         setLayout(new BorderLayout());

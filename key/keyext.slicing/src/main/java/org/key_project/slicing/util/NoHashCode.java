@@ -2,6 +2,14 @@ package org.key_project.slicing.util;
 
 import java.util.Objects;
 
+/**
+ * This wrapper class can be used to always return a {@link #hashCode()} of 0.
+ * {@link #equals(Object)} works as expected.
+ * Only use this wrapper if you (for some reason) can't use the original hashCode method!
+ *
+ * @param <T> the type to be wrapped
+ * @author Arne Keller
+ */
 public final class NoHashCode<T> {
     private final T inner;
 
