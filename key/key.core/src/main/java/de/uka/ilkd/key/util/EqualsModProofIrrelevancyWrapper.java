@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.util;
 
+import org.key_project.util.EqualsModProofIrrelevancy;
+
 public class EqualsModProofIrrelevancyWrapper<T extends EqualsModProofIrrelevancy> {
     public final T inner;
 

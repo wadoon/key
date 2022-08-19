@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.util;
+package org.key_project.util;
 
 public interface EqualsModProofIrrelevancy {
     boolean equalsModProofIrrelevancy(Object obj);

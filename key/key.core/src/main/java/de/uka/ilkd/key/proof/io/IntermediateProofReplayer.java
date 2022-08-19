@@ -209,7 +209,7 @@ public class IntermediateProofReplayer {
             int finalStepIndex = stepIdxOverrides.isEmpty() ? stepIndex : stepIdxOverrides.pollFirst();
             if (GeneralSettings.slicing && GeneralSettings.branchStacks.containsKey(finalStepIndex)) {
                 var list = GeneralSettings.branchStacks.get(finalStepIndex);
-                LOGGER.trace("found branch stack @ {} with {} nodes", currGoal.node().serialNr(), list.size());
+                LOGGER.info("found branch stack @ {} with {} nodes", currGoal.node().serialNr(), list.size());
                 for (int i = list.size() - 1; i >= 0; i--) {
                     queue.addFirst(new Pair<>(queue.peekFirst().first, mapping.get(list.get(i))));
                     stepIdxOverrides.addFirst(list.get(i));
@@ -247,9 +247,9 @@ public class IntermediateProofReplayer {
                     if (GeneralSettings.slicing) {
                         var name = currInterm.getIntermediateRuleApp().getRuleName();
                         wasSMT = name.equals("SMTRule");
-                        LOGGER.debug("slicing @ {} [{}] {} (apply = {}, line = {}, original app = {})",
+                        LOGGER.info("slicing @ {} [{}] {} (apply = {}, line = {}, original app = {}, override = {})",
                                 finalStepIndex, currNode.serialNr(), name,
-                                apply, currInterm.getIntermediateRuleApp().getLineNr(), GeneralSettings.stepIdxToName.get(finalStepIndex));
+                                apply, currInterm.getIntermediateRuleApp().getLineNr(), GeneralSettings.stepIdxToName.get(finalStepIndex), overridenStep);
                         if (!name.equals(GeneralSettings.stepIdxToName.get(finalStepIndex))) {
                             LOGGER.error("names do not match");
                         }
@@ -417,13 +417,14 @@ public class IntermediateProofReplayer {
                                     currNodeInterm));
                         } else {
                             try {
+                                Goal newGoal = null;
                                 if (apply) {
                                     IBuiltInRuleApp app = constructBuiltinApp(
                                             appInterm, currGoal, finalStepIndex);
                                     if (!app.complete()) {
                                         app = app.tryToInstantiate(currGoal);
                                     }
-                                    currGoal.apply(app);
+                                    newGoal = currGoal.apply(app).head();
                                 }
 
                                 final Iterator<Node> children = currNode
@@ -433,6 +434,8 @@ public class IntermediateProofReplayer {
 
                                 if (!overridenStep) {
                                     addChildren(currNode, !apply, children, intermChildren);
+                                } else {
+                                    overrideGoal = newGoal;
                                 }
                             } catch (SkipSMTRuleException e) {
                                 // silently continue; status will be reported

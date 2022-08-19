@@ -2,7 +2,7 @@ package de.uka.ilkd.key.logic;
 
 import java.util.stream.Collectors;
 
-import de.uka.ilkd.key.util.EqualsModProofIrrelevancy;
+import org.key_project.util.EqualsModProofIrrelevancy;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;

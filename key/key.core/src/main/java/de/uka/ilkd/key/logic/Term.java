@@ -2,7 +2,7 @@ package de.uka.ilkd.key.logic;
 
 import javax.annotation.Nullable;
 
-import de.uka.ilkd.key.util.EqualsModProofIrrelevancy;
+import org.key_project.util.EqualsModProofIrrelevancy;
 import org.key_project.util.RealEquals;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;

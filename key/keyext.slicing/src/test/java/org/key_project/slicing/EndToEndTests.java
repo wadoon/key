@@ -21,7 +21,7 @@ import java.nio.file.Path;
 class EndToEndTests {
     public static final File testCaseDirectory = FindResources.getTestCasesDirectory();
 
-    // TODO tests for: proof pruning, dot export, getNodeThatProduced, the entire second algorithm...
+    // TODO tests for: proof pruning, dot export, getNodeThatProduced, running both algorithms...
 
     @Test
     void sliceAgatha() throws Exception {

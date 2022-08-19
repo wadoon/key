@@ -4,7 +4,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.BranchLocation;
-import de.uka.ilkd.key.util.EqualsModProofIrrelevancy;
 import de.uka.ilkd.key.util.EqualsModProofIrrelevancyWrapper;
 
 import java.util.Objects;

@@ -4,6 +4,8 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.Nullable;
+
+import de.uka.ilkd.key.util.EqualsModProofIrrelevancyWrapper;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -575,7 +577,7 @@ public class TermImpl implements Term {
     public int hashCodeModProofIrrelevancy() {
         if(hashcode2 == -1) {
             // compute into local variable first to be thread-safe.
-            this.hashcode2 = Objects.hash(op()); // TODO
+            this.hashcode2 = Objects.hash(op(), subs().hashCodeModProofIrrelevancy(), boundVars().hashCodeModProofIrrelevancy(), javaBlock());
             if (hashcode2 == -1) {
                 hashcode2 = 0;
             }

@@ -222,24 +222,24 @@ public final class DependencyAnalyzer {
                 return;
             }
             usefulSteps.remove(node);
-            var completelyUseless = data.outputs.stream().noneMatch(usefulFormulas::contains);
-            var counter = node.childrenCount() - 1;
             // mark sub-proof as useless, if necessary
-            for (var output : data.outputs) {
-                if (!usefulFormulas.contains(output) && !completelyUseless) {
+            var branchesToSkip = data.outputs.stream()
+                    .filter(usefulFormulas::contains)
+                    .map(GraphNode::getBranchLocation)
+                    .collect(Collectors.toSet());
+            var keptSomeBranch = false;
+            for (var i = 0; i < node.childrenCount(); i++) {
+                var branch = node.child(i);
+                // need to keep exactly one branch
+                // TODO: perhaps keep the "smallest" branch?
+                if (!keptSomeBranch && !branchesToSkip.contains(branch.branchLocation())) {
+                    keptSomeBranch = true;
                     continue;
                 }
-                // TODO: pick the "smallest" sub-proof?
-                if (completelyUseless && counter == 0) {
-                    continue;
-                }
-                if (completelyUseless) {
-                    counter--;
-                }
-                uselessBranches.add(output.getBranchLocation());
-                // TODO: mark inputs as useless, if possible
-                // TODO: process newly useless nodes somehow (-> to mark more edges as useless..)
-                // otherwise further branch eliminations are only done in the next iteration
+                uselessBranches.add(branch.branchLocation());
+            }
+            if (!keptSomeBranch) {
+                throw new IllegalStateException("dependency analyzer failed to analyze branching proof step!");
             }
         });
         executionTime.end(DEPENDENCY_ANALYSIS3);

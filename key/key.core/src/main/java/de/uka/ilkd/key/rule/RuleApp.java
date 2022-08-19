@@ -4,7 +4,7 @@
  */
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.util.EqualsModProofIrrelevancy;
+import org.key_project.util.EqualsModProofIrrelevancy;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.Services;
