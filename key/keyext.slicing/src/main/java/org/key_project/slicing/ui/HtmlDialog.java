@@ -1,15 +1,18 @@
 package org.key_project.slicing.ui;
 
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.util.Pair;
 
 import javax.swing.*;
+import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.util.function.Consumer;
 
 public class HtmlDialog extends JDialog {
 
-    public HtmlDialog(Window window, String title, String html, HyperlinkListener linkPressedCallback) {
+    public HtmlDialog(Window window, String title, String html, Consumer<Pair<Integer, Integer>> linkPressedCallback) {
         super(window, title);
 
         setLayout(new BorderLayout());
@@ -23,7 +26,15 @@ public class HtmlDialog extends JDialog {
         htmlContent.setPreferredSize(
                 new Dimension(Math.min(800, htmlContent.getPreferredSize().width + 15), 360));
         if (linkPressedCallback != null) {
-            htmlContent.addHyperlinkListener(linkPressedCallback);
+            htmlContent.addHyperlinkListener(event -> {
+                if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                    var descriptor = event.getDescription().substring(1);
+                    var parts = descriptor.split("_");
+                    var column = Integer.parseInt(parts[0]);
+                    var idx = Integer.parseInt(parts[1]);
+                    linkPressedCallback.accept(new Pair<>(column, idx));
+                }
+            });
         }
 
         JScrollPane scrollPane = new JScrollPane(htmlContent);

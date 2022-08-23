@@ -50,6 +50,8 @@ public final class HtmlFactory {
                 stats.append(">");
                 if (clickable[i]) {
                     stats.append("<a href='#");
+                    stats.append(i);
+                    stats.append("_");
                     stats.append(indexFactory.nextIndex());
                     stats.append("'>");
                 }

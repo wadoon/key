@@ -24,9 +24,7 @@ public abstract class GraphNode {
         return branchLocation;
     }
 
-    public GraphNode popLastBranchID() {
-        return this;
-    }
+    public abstract GraphNode popLastBranchID();
 
     /**
      * Construct a human-friendly representation of this graph node.

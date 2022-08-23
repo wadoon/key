@@ -3,6 +3,7 @@ package org.key_project.slicing.ui;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 import org.key_project.slicing.DependencyTracker;
 import org.key_project.slicing.graph.AnnotatedEdge;
@@ -44,8 +45,10 @@ public class ShowNodeInfoAction extends MainWindowAction {
 
     private void showDialog(Window parentWindow) {
         var graphNodes = new ArrayList<GraphNode>();
+        var proofSteps = new ArrayList<Node>();
         var analysisResults = tracker.getAnalysisResults();
         Function<Triple<Node, GraphNode, AnnotatedEdge>, Collection<String>> nodeToTableRow = n -> {
+            proofSteps.add(n.first);
             graphNodes.add(n.second);
             var ruleName = n.first.getAppliedRuleApp().rule().displayName();
             return List.of(
@@ -58,7 +61,7 @@ public class ShowNodeInfoAction extends MainWindowAction {
 
         var headers1 = List.of("Serial Nr.", "Rule name", "Consumed", "Used formula");
         var headers2 = List.of("Serial Nr.", "Rule name", "Consumed", "Produced formula");
-        var clickable = new boolean[] { false, false, false, true };
+        var clickable = new boolean[] { false, true, false, true };
         var incoming = tracker.getDependencyGraph()
                 .incomingGraphEdgesOf(node).map(nodeToTableRow).collect(Collectors.toList());
         var outgoing = tracker.getDependencyGraph()
@@ -85,11 +88,67 @@ public class ShowNodeInfoAction extends MainWindowAction {
                 + "<p>strikethrough rule name = useless rule app</p>";
         new HtmlDialog(parentWindow,
                 "Dependency graph node info", html, event -> {
-            if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-                var idx = Integer.parseInt(event.getDescription().substring(1));
-                new ShowNodeInfoAction(mainWindow, tracker, graphNodes.get(idx))
-                        .showDialog(SwingUtilities.getWindowAncestor((JComponent) event.getSource()));
+            if (event.first == 1) {
+                showDialogForStep(parentWindow, proofSteps.get(event.second / 2));
+            } else {
+                new ShowNodeInfoAction(mainWindow, tracker, graphNodes.get(event.second / 2))
+                        .showDialog(parentWindow);
             }
+        });
+    }
+
+    private void showDialogForStep(Window parentWindow, Node proofStep) {
+        var graphNodes = new ArrayList<GraphNode>();
+        var analysisResults = tracker.getAnalysisResults();
+        var idxFactory = new IndexFactory();
+
+        var headers1 = List.of("Consumed", "Used formula");
+        var headers2 = List.of("Produced formula");
+        var clickable = new boolean[] { false, true };
+        var clickable2 = new boolean[] { true };
+        var depGraph = tracker.getDependencyGraph();
+        var inputs = depGraph
+                .edgesOf(proofStep)
+                .stream()
+                .map(x -> new Pair<>(depGraph.inputOf(x), x.consumesInput))
+                .collect(Collectors.toSet())
+                .stream()
+                .map(n -> {
+                    graphNodes.add(n.first);
+                    var label = n.first.toString(false, false);
+                    return (Collection<String>) List.of(
+                            n.second.toString(),
+                            analysisResults != null && !analysisResults.usefulNodes.contains(n.first) ? "<strike>" + label + "</strike>" : label
+                    );
+                })
+                .collect(Collectors.toList());
+        var outputs = depGraph
+                .edgesOf(proofStep)
+                .stream()
+                .map(x -> new Pair<>(depGraph.outputOf(x), x.consumesInput))
+                .collect(Collectors.toSet())
+                .stream()
+                .map(n -> {
+                    graphNodes.add(n.first);
+                    var label = n.first.toString(false, false);
+                    return (Collection<String>) List.of(
+                            analysisResults != null && !analysisResults.usefulNodes.contains(n.first) ? "<strike>" + label + "</strike>" : label
+                    );
+                })
+                .collect(Collectors.toList());
+        var html1 = HtmlFactory.generateTable(headers1, clickable, Optional.empty(), inputs, idxFactory);
+        var html2 = HtmlFactory.generateTable(headers2, clickable2, Optional.empty(), outputs, idxFactory);
+        var html = "<h1>Inputs</h1>"
+                + html1
+                + "<h1>This step</h1>" + "<p>" + proofStep.getAppliedRuleApp().rule().displayName() + "</p>"
+                // TODO: useful / useless / unknown
+                + "<h1>Outputs</h1>"
+                + html2
+                + "<p>strikethrough label = useless node</p>";
+        new HtmlDialog(parentWindow,
+                "Dependency graph edge info", html, event -> {
+            new ShowNodeInfoAction(mainWindow, tracker, graphNodes.get(event.second))
+                        .showDialog(parentWindow);
         });
     }
 }

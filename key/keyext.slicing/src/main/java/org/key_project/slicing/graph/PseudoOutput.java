@@ -14,6 +14,11 @@ public class PseudoOutput extends GraphNode {
     }
 
     @Override
+    public GraphNode popLastBranchID() {
+        return this;
+    }
+
+    @Override
     public String toString(boolean abbreviated, boolean omitBranch) {
         return "pseudo output " + Integer.toHexString(hashCode());
     }

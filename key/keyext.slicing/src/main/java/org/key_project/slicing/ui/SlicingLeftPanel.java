@@ -52,6 +52,9 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
 
     private final transient KeYMediator mediator;
     private final transient SlicingExtension extension;
+    private final JButton sliceProof;
+    private final JButton runAnalysis;
+    private final JButton showRuleStatistics;
     private transient Proof currentProof = null;
     private final JLabel memoryStats;
     private final JLabel graphNodes;
@@ -88,21 +91,21 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         panel2.setBorder(new TitledBorder("Dependency analysis"));
 
         abbreviateFormulas = new JCheckBox("Abbreviate formulas");
-        var button = new JButton("Export .dot");
+        var button = new JButton("Export as DOT");
         button.addActionListener(this::exportDot);
-        var button2 = new JButton("View formula graph");
+        var button2 = new JButton("Show rendering of graph");
         button2.addActionListener(this::previewGraph);
-        var button3 = new JButton("Run analysis");
-        button3.addActionListener(this::analyzeProof);
-        var button4 = new JButton("Slice proof");
-        button4.addActionListener(this::sliceProof);
+        runAnalysis = new JButton("Run analysis");
+        runAnalysis.addActionListener(this::analyzeProof);
+        sliceProof = new JButton("Slice proof");
+        sliceProof.addActionListener(this::sliceProof);
         var button6 = new JButton("call System.gc()");
         button6.addActionListener(e -> {
             System.gc();
             Runtime.getRuntime().gc();
         });
-        var button5 = new JButton("Show rule statistics");
-        button5.addActionListener(this::showRuleStatistics);
+        showRuleStatistics = new JButton("Show rule statistics");
+        showRuleStatistics.addActionListener(this::showRuleStatistics);
         graphNodes = new JLabel();
         graphEdges = new JLabel();
         resetGraphLabels();
@@ -132,8 +135,8 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         panel2.add(usefulBranches);
         panel2.add(doDependencyAnalysis);
         panel2.add(doDeduplicateRuleApps);
-        panel2.add(button3);
-        panel2.add(button5);
+        panel2.add(runAnalysis);
+        panel2.add(showRuleStatistics);
 
         timings = new JPanel();
         timings.setLayout(new BoxLayout(timings, BoxLayout.Y_AXIS));
@@ -144,13 +147,13 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
 
         panel1.setAlignmentX(Component.LEFT_ALIGNMENT);
         panel2.setAlignmentX(Component.LEFT_ALIGNMENT);
-        button4.setAlignmentX(Component.LEFT_ALIGNMENT);
+        sliceProof.setAlignmentX(Component.LEFT_ALIGNMENT);
         button6.setAlignmentX(Component.LEFT_ALIGNMENT);
         memoryStats.setAlignmentX(Component.LEFT_ALIGNMENT);
         timings.setAlignmentX(Component.LEFT_ALIGNMENT);
         mainPanel.add(panel1);
         mainPanel.add(panel2);
-        mainPanel.add(button4);
+        mainPanel.add(sliceProof);
         if (ENABLE_DEBUGGING_UI) {
             mainPanel.add(button6);
             mainPanel.add(memoryStats);
@@ -262,6 +265,11 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         usefulSteps.setText("Useful steps: ?");
         totalBranches.setText("Total branches: ?");
         usefulBranches.setText("Useful branches: ?");
+        showRuleStatistics.setEnabled(false);
+        var algoSelectionSane = doDependencyAnalysis.isSelected()
+                || doDeduplicateRuleApps.isSelected();
+        runAnalysis.setEnabled(algoSelectionSane);
+        sliceProof.setEnabled(algoSelectionSane);
         timings.setVisible(false);
         timings.removeAll();
     }
@@ -272,6 +280,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         totalBranches.setText("Total branches: " + results.proof.countBranches());
         usefulBranches.setText("Useful branches: "
                 + (results.proof.countBranches() - results.uselessBranches.size()));
+        showRuleStatistics.setEnabled(true);
         timings.removeAll();
         var coll = results.executionTime.executionTimes()
                 .map(action -> (Collection<String>)
@@ -280,7 +289,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         var html = HtmlFactory.generateTable(
                 List.of("Algorithm", "Time"),
                 new boolean[] { false, false },
-                Optional.empty(),
+                Optional.of(new String[] { null, "right" }),
                 coll,
                 null
         );

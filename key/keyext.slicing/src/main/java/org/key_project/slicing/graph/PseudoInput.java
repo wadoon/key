@@ -14,6 +14,11 @@ public class PseudoInput extends GraphNode {
     }
 
     @Override
+    public GraphNode popLastBranchID() {
+        return this;
+    }
+
+    @Override
     public String toString(boolean abbreviated, boolean omitBranch) {
         return "pseudo input " + Integer.toHexString(hashCode());
     }

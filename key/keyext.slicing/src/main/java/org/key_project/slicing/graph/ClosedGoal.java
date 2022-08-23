@@ -21,6 +21,11 @@ public class ClosedGoal extends GraphNode {
     }
 
     @Override
+    public GraphNode popLastBranchID() {
+        return new ClosedGoal(serialNr, branchLocation.removeLast());
+    }
+
+    @Override
     public String toString(boolean abbreviated, boolean omitBranch) {
         return "closed goal " + serialNr;
     }

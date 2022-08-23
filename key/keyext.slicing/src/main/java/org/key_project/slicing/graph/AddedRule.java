@@ -21,6 +21,11 @@ public class AddedRule extends GraphNode {
     }
 
     @Override
+    public GraphNode popLastBranchID() {
+        return this;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
