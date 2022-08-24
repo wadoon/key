@@ -76,7 +76,7 @@ public class InformationWindow extends JDialog {
 
     public InformationWindow(SMTSolver solver, Collection<Information> information,
                              String title) {
-        super(parent);
+        super();
         this.setTitle(title);
         initModel(solver);
         for (Information el : information) {
