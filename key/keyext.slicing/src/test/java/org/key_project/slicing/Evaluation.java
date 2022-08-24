@@ -32,10 +32,10 @@ class Evaluation {
     // commented out file = doesn't load
     /* commented out file = already evaluated */
     private static final String[] FILES = new String[]{
-            "01_Contraposition.key",
-            "02_Liarsville.key",
-            "03_AuntAgatha.key",
-            "04_TransitivityOfSubset.key",
+            "01_Contraposition.proof",
+            "02_Liarsville.proof",
+            "03_AuntAgatha.proof",
+            "04_TransitivityOfSubset.proof",
             "05_SumAndMax.zproof",
             "06_BinarySearch.zproof",
             "07_EnhancedFor.zproof",
@@ -200,13 +200,13 @@ class Evaluation {
     @Test
     @Ignore("used during evaluation")
     void sliceEachToFixedPoint() throws Exception {
-        var depAnalysis = false;
+        var depAnalysis = true;
         var dupAnalysis = true;
         GeneralSettings.noPruningClosed = false;
         // run with: -Xmx4096m
         // warm up taclet index etc.
         //loadProof("DualPivot_KeY_Proofs/sort/DualPivotQuicksort/eInsertionSort_SavedAgain.proof", true).first.dispose();
-        var output = new PrintStream(new FileOutputStream("/tmp/log_fixedpoint_dups_new_implementation.txt"));
+        var output = new PrintStream(new FileOutputStream("/tmp/log_fixedpoint_both.txt"));
         output.println("Proof;Load time;Load time with tracker;Analyze time;Slice time;Number of steps;Number of steps in slice;Branches;Branches in slice;Number of SMT goals;Number of SMT in slice");
 
         var failures = new ArrayList<>();

@@ -209,7 +209,7 @@ public class IntermediateProofReplayer {
             int finalStepIndex = stepIdxOverrides.isEmpty() ? stepIndex : stepIdxOverrides.pollFirst();
             if (GeneralSettings.slicing && GeneralSettings.branchStacks.containsKey(finalStepIndex)) {
                 var list = GeneralSettings.branchStacks.get(finalStepIndex);
-                LOGGER.info("found branch stack @ {} with {} nodes", currGoal.node().serialNr(), list.size());
+                LOGGER.trace("found branch stack @ {} with {} nodes", currGoal.node().serialNr(), list.size());
                 for (int i = list.size() - 1; i >= 0; i--) {
                     queue.addFirst(new Pair<>(queue.peekFirst().first, mapping.get(list.get(i))));
                     stepIdxOverrides.addFirst(list.get(i));
@@ -247,7 +247,7 @@ public class IntermediateProofReplayer {
                     if (GeneralSettings.slicing) {
                         var name = currInterm.getIntermediateRuleApp().getRuleName();
                         wasSMT = name.equals("SMTRule");
-                        LOGGER.info("slicing @ {} [{}] {} (apply = {}, line = {}, original app = {}, override = {})",
+                        LOGGER.trace("slicing @ {} [{}] {} (apply = {}, line = {}, original app = {}, override = {})",
                                 finalStepIndex, currNode.serialNr(), name,
                                 apply, currInterm.getIntermediateRuleApp().getLineNr(), GeneralSettings.stepIdxToName.get(finalStepIndex), overridenStep);
                         if (!name.equals(GeneralSettings.stepIdxToName.get(finalStepIndex))) {
