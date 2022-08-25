@@ -1,0 +1,159 @@
+package org.key_project.slicing.ui;
+
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.KeYSelectionEvent;
+import de.uka.ilkd.key.core.KeYSelectionListener;
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.configuration.Config;
+import de.uka.ilkd.key.proof.Proof;
+import org.key_project.slicing.AnalysisResults;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.UnaryOperator;
+
+public class SliceToFixedPointDialog extends JDialog implements KeYSelectionListener {
+    private final KeYMediator mediator;
+    private final JButton closeButton;
+    private JEditorPane logPane = null;
+    private boolean cancelled = false;
+    private boolean done = false;
+
+    private Function<Void, AnalysisResults> analyzeButton;
+    private Runnable sliceButton;
+    private SliceToFixedPointWorker worker;
+
+    private Collection<Collection<String>> tableRows = new ArrayList<>();
+
+    public SliceToFixedPointDialog(KeYMediator mediator, Window window,
+                                   Function<Void, AnalysisResults> analyzeCallback,
+                                   Runnable sliceButton) {
+        super(window, "Slice to fixed point");
+
+        this.mediator = mediator;
+        this.analyzeButton = x -> {
+            System.out.println("in analyze, using callback");
+            var results = analyzeCallback.apply(null);
+            if (results != null) {
+                System.out.println("expanding table");
+                try {
+                    var filename = results.proof.getProofFile();
+                    var label = filename != null ? filename.getName() : results.proof.name().toString();
+                    tableRows.add(List.of(
+                            label,
+                            "" + results.totalSteps,
+                            "" + results.usefulStepsNr,
+                            "" + results.proof.countBranches(),
+                            "" + (results.proof.countBranches() - results.uselessBranches.size())));
+                    SwingUtilities.invokeLater(this::updateTable);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            System.out.println("returning results");
+            if (cancelled) {
+                return null;
+            } else {
+                return results;
+            }
+        };
+        this.sliceButton = sliceButton;
+
+        logPane = new JEditorPane("text/html", "");
+        logPane.setEditable(false);
+        logPane.setBorder(BorderFactory.createEmptyBorder());
+        logPane.setCaretPosition(0);
+        logPane.setBackground(MainWindow.getInstance().getBackground());
+        logPane.setSize(new Dimension(10, 360));
+        logPane.setPreferredSize(
+                new Dimension(logPane.getPreferredSize().width + 15, 360));
+
+        JScrollPane scrollPane = new JScrollPane(logPane);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+
+        Font myFont = UIManager.getFont(Config.KEY_FONT_PROOF_TREE);
+        if (myFont != null) {
+            logPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES,
+                    Boolean.TRUE);
+            logPane.setFont(myFont);
+        }
+
+        JPanel buttonPane = new JPanel();
+
+        closeButton = new JButton("Close");
+        closeButton.setEnabled(false);
+        closeButton.addActionListener(event -> dispose());
+        JButton cancel = new JButton("Cancel");
+        cancel.addActionListener(event -> {
+            cancel.setEnabled(false);
+            mediator.removeKeYSelectionListener(this);
+            cancelled = true;
+        });
+
+        buttonPane.add(cancel);
+        buttonPane.add(closeButton);
+
+        getRootPane().setDefaultButton(closeButton);
+
+        setLayout(new BorderLayout());
+        add(scrollPane, BorderLayout.CENTER);
+        add(buttonPane, BorderLayout.PAGE_END);
+
+        this.updateTable();
+        setMinimumSize(new Dimension(800, 600));
+        setLocationRelativeTo(window);
+
+        setVisible(true);
+    }
+
+    private void updateTable() {
+        var html = HtmlFactory.generateTable(
+                List.of("Filename", "Total steps", "Useful steps", "Total branches", "Useful branches"),
+                new boolean[]{false, false, false, false, false},
+                Optional.of(new String[]{null, "right", "right", "right", "right"}),
+                tableRows,
+                null
+        );
+        logPane.setText(html);
+    }
+
+    public void start(Proof proof) {
+        worker = new SliceToFixedPointWorker(proof, null, closeButton, analyzeButton, sliceButton, this::done);
+        worker.execute();
+    }
+
+    private void done() {
+        done = true;
+        SwingUtilities.invokeLater(() ->
+                closeButton.setEnabled(true)
+        );
+    }
+
+    @Override
+    public void selectedProofChanged(KeYSelectionEvent e) {
+        if (done) {
+            SwingUtilities.invokeLater(() ->
+                    mediator.removeKeYSelectionListener(this)
+            );
+            return;
+        }
+        System.out.println("selection changed");
+        if (e.getSource().getSelectedProof() != null
+                && e.getSource().getSelectedProof().closed()) {
+            if (e.getSource().getSelectedProof() == worker.proof) {
+                return;
+            }
+            if (cancelled) {
+                closeButton.setEnabled(true);
+            }
+            worker = new SliceToFixedPointWorker(e.getSource().getSelectedProof(), worker.proof, closeButton, analyzeButton, sliceButton, this::done);
+            worker.execute();
+        }
+    }
+}

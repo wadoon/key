@@ -626,6 +626,16 @@ public class Proof implements Named {
         return root.isClosed() && openGoals.isEmpty();
     }
 
+    public void setStepIndices() {
+        var stepIndex = 0;
+        var nodeIterator = this.root().subtreeIterator();
+        while (nodeIterator.hasNext()) {
+            var node = nodeIterator.next();
+            node.stepIndex = stepIndex;
+            stepIndex++;
+        }
+    }
+
 
     /**
      * This class is responsible for pruning a proof tree at a certain cutting point.

@@ -50,7 +50,6 @@ public final class AnalysisResults {
     public AnalysisResults(
             Proof proof,
             int totalSteps,
-            int usefulStepsNr,
             RuleStatistics ruleStatistics,
             Set<Node> usefulSteps,
             Set<GraphNode> usefulNodes,
@@ -62,7 +61,7 @@ public final class AnalysisResults {
     ) {
         this.proof = proof;
         this.totalSteps = totalSteps;
-        this.usefulStepsNr = usefulStepsNr;
+        this.usefulStepsNr = usefulSteps.size();
         this.ruleStatistics = ruleStatistics;
         this.usefulSteps = Collections.unmodifiableSet(usefulSteps);
         this.usefulNodes = Collections.unmodifiableSet(usefulNodes);

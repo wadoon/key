@@ -53,6 +53,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
     private final transient KeYMediator mediator;
     private final transient SlicingExtension extension;
     private final JButton sliceProof;
+    private final JButton sliceProofFixedPoint;
     private final JButton runAnalysis;
     private final JButton showRuleStatistics;
     private transient Proof currentProof = null;
@@ -96,9 +97,17 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         var button2 = new JButton("Show rendering of graph");
         button2.addActionListener(this::previewGraph);
         runAnalysis = new JButton("Run analysis");
-        runAnalysis.addActionListener(this::analyzeProof);
+        runAnalysis.addActionListener(event -> analyzeProof());
         sliceProof = new JButton("Slice proof");
-        sliceProof.addActionListener(this::sliceProof);
+        sliceProof.addActionListener(event -> sliceProof());
+        sliceProofFixedPoint = new JButton("Slice proof to fixed point");
+        sliceProofFixedPoint.addActionListener(event -> {
+            if (currentProof != null) {
+                var dialog = new SliceToFixedPointDialog(mediator, SwingUtilities.getWindowAncestor(sliceProofFixedPoint), x -> this.analyzeProof(), this::sliceProof);
+                mediator.addKeYSelectionListener(dialog);
+                dialog.start(currentProof);
+            }
+        });
         var button6 = new JButton("call System.gc()");
         button6.addActionListener(e -> {
             System.gc();
@@ -148,12 +157,14 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         panel1.setAlignmentX(Component.LEFT_ALIGNMENT);
         panel2.setAlignmentX(Component.LEFT_ALIGNMENT);
         sliceProof.setAlignmentX(Component.LEFT_ALIGNMENT);
+        sliceProofFixedPoint.setAlignmentX(Component.LEFT_ALIGNMENT);
         button6.setAlignmentX(Component.LEFT_ALIGNMENT);
         memoryStats.setAlignmentX(Component.LEFT_ALIGNMENT);
         timings.setAlignmentX(Component.LEFT_ALIGNMENT);
         mainPanel.add(panel1);
         mainPanel.add(panel2);
         mainPanel.add(sliceProof);
+        mainPanel.add(sliceProofFixedPoint);
         if (ENABLE_DEBUGGING_UI) {
             mainPanel.add(button6);
             mainPanel.add(memoryStats);
@@ -213,7 +224,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         if (currentProof == null) {
             return;
         }
-        var results = this.analyzeProof(e);
+        var results = this.analyzeProof();
         if (results != null) {
             new RuleStatisticsDialog(
                     SwingUtilities.getWindowAncestor((JComponent) e.getSource()),
@@ -232,7 +243,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         new PreviewDialog(SwingUtilities.getWindowAncestor((JComponent) e.getSource()), text);
     }
 
-    private AnalysisResults analyzeProof(ActionEvent e) {
+    private AnalysisResults analyzeProof() {
         if (currentProof == null) {
             return null;
         }
@@ -244,11 +255,11 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         return results;
     }
 
-    private void sliceProof(ActionEvent event) {
+    private void sliceProof() {
         if (currentProof == null) {
             return;
         }
-        analyzeProof(event);
+        analyzeProof();
         try {
             var path = extension.trackers.get(currentProof).sliceProof();
             SwingUtilities.invokeLater(() -> mediator.getUI().loadProblem(path.toFile()));

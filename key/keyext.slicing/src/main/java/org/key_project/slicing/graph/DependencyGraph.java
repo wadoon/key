@@ -227,11 +227,28 @@ public class DependencyGraph {
                 .map(it -> it.third);
     }
 
+    public Stream<AnnotatedEdge> edgesProducing(GraphNode node) {
+        return incomingGraphEdgesOf(node)
+                .map(it -> it.third);
+    }
+
     public int countNodes() {
         return graph.vertexSet().size();
     }
 
     public int countEdges() {
         return graph.edgeSet().size();
+    }
+
+    public Collection<GraphNode> nodeAndPreviousDerivations(GraphNode node) {
+        var all = new ArrayList<GraphNode>();
+        all.add(node);
+        while (!node.getBranchLocation().isEmpty()) {
+            node = node.popLastBranchID();
+            if (containsNode(node)) {
+                all.add(node);
+            }
+        }
+        return all;
     }
 }

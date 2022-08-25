@@ -200,13 +200,13 @@ class Evaluation {
     @Test
     @Ignore("used during evaluation")
     void sliceEachToFixedPoint() throws Exception {
-        var depAnalysis = true;
+        var depAnalysis = false;
         var dupAnalysis = true;
         GeneralSettings.noPruningClosed = false;
         // run with: -Xmx4096m
         // warm up taclet index etc.
         //loadProof("DualPivot_KeY_Proofs/sort/DualPivotQuicksort/eInsertionSort_SavedAgain.proof", true).first.dispose();
-        var output = new PrintStream(new FileOutputStream("/tmp/log_fixedpoint_both.txt"));
+        var output = new PrintStream(new FileOutputStream("/tmp/log_fixedpoint_dups_once_again.txt"));
         output.println("Proof;Load time;Load time with tracker;Analyze time;Slice time;Number of steps;Number of steps in slice;Branches;Branches in slice;Number of SMT goals;Number of SMT in slice");
 
         var failures = new ArrayList<>();

@@ -19,7 +19,7 @@ public final class ExecutionTime {
         startTimes.put(activity, System.currentTimeMillis());
     }
 
-    public void end(String activity) {
+    public void stop(String activity) {
         if (!startTimes.containsKey(activity)) {
             throw new IllegalStateException("tried to end unknown activity!");
         }

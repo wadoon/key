@@ -1,6 +1,5 @@
 package org.key_project.slicing;
 
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.proof.BranchLocation;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -10,14 +9,12 @@ import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.smt.RuleAppSMT;
 import de.uka.ilkd.key.util.EqualsModProofIrrelevancyWrapper;
-import de.uka.ilkd.key.util.Triple;
-import org.key_project.slicing.graph.AnnotatedEdge;
+import de.uka.ilkd.key.util.Pair;
 import org.key_project.slicing.graph.ClosedGoal;
 import org.key_project.slicing.graph.DependencyGraph;
 import org.key_project.slicing.graph.GraphNode;
 import org.key_project.slicing.graph.TrackedFormula;
 import org.key_project.slicing.util.ExecutionTime;
-import org.key_project.slicing.util.NoHashCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +29,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -88,10 +85,13 @@ public final class DependencyAnalyzer {
         if (doDependencyAnalysis) {
             executionTime.start(DEPENDENCY_ANALYSIS);
             analyzeDependencies();
-            executionTime.end(DEPENDENCY_ANALYSIS);
+            executionTime.stop(DEPENDENCY_ANALYSIS);
+        }
+
+        if (doDeduplicateRuleApps) {
+            executionTime.start(DUPLICATE_ANALYSIS_SETUP);
         }
         if (!doDependencyAnalysis && doDeduplicateRuleApps) {
-            executionTime.start(DUPLICATE_ANALYSIS_SETUP);
             // mark everything as 'useful' to evaluate the second algorithm in isolation
             proof.breadthFirstSearch(proof.root(), ((proof1, visitedNode) -> {
                 if (visitedNode.getAppliedRuleApp() == null) {
@@ -105,12 +105,17 @@ public final class DependencyAnalyzer {
                 data.inputs.stream().map(it -> it.first).forEach(usefulFormulas::add);
                 usefulFormulas.addAll(data.outputs);
             }));
-            executionTime.end(DUPLICATE_ANALYSIS_SETUP);
+            executionTime.stop(DUPLICATE_ANALYSIS_SETUP);
         }
+        if (doDeduplicateRuleApps) {
+            proof.setStepIndices();
+            executionTime.stop(DUPLICATE_ANALYSIS_SETUP);
+        }
+
         if (doDeduplicateRuleApps) {
             executionTime.start(DUPLICATE_ANALYSIS);
             deduplicateRuleApps();
-            executionTime.end(DUPLICATE_ANALYSIS);
+            executionTime.stop(DUPLICATE_ANALYSIS);
         }
 
 
@@ -151,12 +156,11 @@ public final class DependencyAnalyzer {
                 }
             }
         });
-        executionTime.end(TOTAL_WORK);
+        executionTime.stop(TOTAL_WORK);
 
         return new AnalysisResults(
                 proof,
                 steps,
-                usefulSteps.size(),
                 rules,
                 usefulSteps,
                 usefulFormulas,
@@ -180,7 +184,7 @@ public final class DependencyAnalyzer {
             var node = queue.pop();
             // handle State Merging
             if (node.getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp
-                || node.getAppliedRuleApp() instanceof CloseAfterMergeRuleBuiltInRuleApp) {
+                    || node.getAppliedRuleApp() instanceof CloseAfterMergeRuleBuiltInRuleApp) {
                 throw new IllegalStateException("tried to analyze proof featuring state merging!");
             }
 
@@ -205,7 +209,7 @@ public final class DependencyAnalyzer {
                 data.outputs.stream().filter(ClosedGoal.class::isInstance).forEach(usefulFormulas::add);
             }
         }
-        executionTime.end(DEPENDENCY_ANALYSIS2);
+        executionTime.stop(DEPENDENCY_ANALYSIS2);
 
         // analyze cuts: they are only useful if all of their outputs were used
         executionTime.start(DEPENDENCY_ANALYSIS3);
@@ -242,7 +246,7 @@ public final class DependencyAnalyzer {
                 throw new IllegalStateException("dependency analyzer failed to analyze branching proof step!");
             }
         });
-        executionTime.end(DEPENDENCY_ANALYSIS3);
+        executionTime.stop(DEPENDENCY_ANALYSIS3);
 
         // unmark all 'useful' steps in useless branches
         executionTime.start(DEPENDENCY_ANALYSIS4);
@@ -258,7 +262,7 @@ public final class DependencyAnalyzer {
                 }
             }
         });
-        executionTime.end(DEPENDENCY_ANALYSIS4);
+        executionTime.stop(DEPENDENCY_ANALYSIS4);
     }
 
     private void deduplicateRuleApps() {
@@ -308,7 +312,7 @@ public final class DependencyAnalyzer {
                 steps.sort(Comparator.comparing(it -> it.stepIndex));
                 // try merging "adjacent" rule apps
                 // (rule apps are sorted by step index = linear location in the proof tree)
-                LOGGER.info("input {} found duplicate; attempt to merge:", node.toString(false, false));
+                LOGGER.trace("input {} found duplicate; attempt to merge:", node.toString(false, false));
                 var apps = new ArrayList<>(steps);
                 var locs = steps.stream()
                         .map(Node::branchLocation)
@@ -316,7 +320,7 @@ public final class DependencyAnalyzer {
                 var idxA = 0;
                 var idxB = 1;
                 while (idxB < steps.size()) {
-                    LOGGER.info("idxes {} {}", idxA, idxB);
+                    LOGGER.trace("idxes {} {}", idxA, idxB);
                     if (idxA >= idxB) {
                         idxB++;
                         continue;
@@ -332,7 +336,7 @@ public final class DependencyAnalyzer {
                         idxB++;
                         continue;
                     }
-                    LOGGER.info("idxes updated {} {}", idxA, idxB);
+                    LOGGER.trace("idxes updated {} {}", idxA, idxB);
                     // check whether this rule app consumes a formula
                     var consumesInput = graph.edgesOf(apps.get(idxA)).stream().anyMatch(it -> it.consumesInput);
                     if (alreadyMergedSerialNrs.contains(stepA.serialNr())
@@ -346,7 +350,7 @@ public final class DependencyAnalyzer {
                         idxB++;
                         continue;
                     }
-                    LOGGER.info("considering {} {}", stepA.serialNr(), stepB.serialNr());
+                    LOGGER.trace("considering {} {}", stepA.serialNr(), stepB.serialNr());
                     var locA = locs.get(idxA);
                     var locB = locs.get(idxB);
                     if (locA.equals(locB)) {
@@ -355,6 +359,8 @@ public final class DependencyAnalyzer {
                         continue;
                     }
                     var mergeBase = BranchLocation.commonPrefix(locA, locB);
+                    var differingSuffix = locA.size() == mergeBase.size() ? locB : locA;
+                    var newStepIdx = differingSuffix.stripPrefix(mergeBase).getNode(0).stepIndex - 1;
                     // verify that *all* inputs are present at the merge base
                     var mergeValid = Stream.concat(
                             graph.inputsOf(stepA), graph.inputsOf(stepB)
@@ -376,7 +382,7 @@ public final class DependencyAnalyzer {
                                 .filter(edgeX -> edgeX.proofStep.branchLocation().hasPrefix(mergeBase))
                                 .anyMatch(edgeX ->
                                         edgeX.proofStep != stepA && edgeX.proofStep != stepB));
-                        LOGGER.info("hasConflict = {}", hasConflict);
+                        LOGGER.trace("hasConflict = {}", hasConflict);
                     }
                     // search for conflicting consumers of the output formulas
                     AtomicBoolean hasConflictOut = new AtomicBoolean(false);
@@ -404,35 +410,49 @@ public final class DependencyAnalyzer {
                     if (mergeValid && !hasConflict && !hasConflictOut.get()) {
                         for (var stepAB : new Node[] {stepA, stepB}) {
                             graph.outputsOf(stepAB).forEach(graphNode -> {
-                                // check whether other rule apps also produce this node, and whether it is consumed before we need it
-                                var createIdx = stepAB.stepIndex;
-                                AtomicInteger prevCreateIdx = new AtomicInteger(-1);
-                                AtomicInteger prevConsumeIdx = new AtomicInteger(-1);
-                                AtomicInteger plannedConsumeIdx = new AtomicInteger(-1);
-                                while (graphNode.getBranchLocation().size() >= mergeBase.size()) {
-                                    graph.outgoingGraphEdgesOf(graphNode).forEach(triple -> {
-                                        var idx = triple.first.stepIndex;
-                                        if (triple.third.consumesInput) {
-                                            if (idx > createIdx && (plannedConsumeIdx.get() == -1 || idx < plannedConsumeIdx.get())) {
-                                                plannedConsumeIdx.set(idx);
-                                            }
-                                            if (idx < createIdx && (prevConsumeIdx.get() == -1 || idx > prevConsumeIdx.get())) {
-                                                prevConsumeIdx.set(idx);
-                                            }
-                                        }
-                                    });
-                                    graph.incomingGraphEdgesOf(graphNode).forEach(triple -> {
-                                        var idx = triple.first.stepIndex;
-                                        if (idx < createIdx && (prevCreateIdx.get() == -1 || idx > prevCreateIdx.get())) {
-                                            prevCreateIdx.set(idx);
-                                        }
-                                    });
-                                    if (graphNode.getBranchLocation().isEmpty()) {
-                                        break;
-                                    }
-                                    graphNode = graphNode.popLastBranchID();
+                                // get all equivalent graph nodes in this branch
+                                var allNodes = graph.nodeAndPreviousDerivations(graphNode);
+                                // get all steps that produce these / consume these
+                                var producers = allNodes.stream()
+                                        .flatMap(graph::edgesProducing);
+                                var consumers = allNodes.stream()
+                                        .flatMap(graph::edgesConsuming)
+                                        .filter(x -> stepAB.branchLocation().hasPrefix(x.proofStep.branchLocation()));
+                                // list of (step index, produces / consumes)
+                                var bySerialNr = Comparator.<Pair<Integer, Boolean>>comparingInt(x -> x.first);
+                                var list = Stream.concat(
+                                                producers.map(x -> new Pair<>(x.proofStep.stepIndex, true)),
+                                                consumers.map(x -> new Pair<>(x.proofStep.stepIndex, false))
+                                        ).distinct()
+                                        .sorted(bySerialNr)
+                                        .collect(Collectors.toList());
+                                if (stepAB.serialNr() == 84) {
+                                    System.out.println("hmm");
                                 }
-                                hasConflictOut.set(hasConflictOut.get() || (plannedConsumeIdx.get() != -1 && prevConsumeIdx.get() != -1 && prevCreateIdx.get() < prevConsumeIdx.get()));
+                                // verify that the list satisfies the correctness criteria
+                                Predicate<List<Pair<Integer, Boolean>>> isCorrect = l -> {
+                                    var formulaAvailable = false;
+                                    for (var pair : l) {
+                                        if (pair.second) {
+                                            formulaAvailable = true;
+                                        } else if (!formulaAvailable) {
+                                            return false;
+                                        } else {
+                                            formulaAvailable = false;
+                                        }
+                                    }
+                                    return true;
+                                };
+                                if (!isCorrect.test(list)) {
+                                    throw new IllegalStateException("analyzer failed to gather correct proof step list");
+                                }
+                                // reorder one proof step to simulate the merged proof
+                                list.remove(new Pair<>(stepAB.stepIndex, true));
+                                list.add(new Pair<>(newStepIdx, true));
+                                list.sort(bySerialNr);
+                                if (!isCorrect.test(list)) {
+                                    hasConflictOut.set(true);
+                                }
                             });
                         }
                     }

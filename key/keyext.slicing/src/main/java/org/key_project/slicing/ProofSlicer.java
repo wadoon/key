@@ -37,14 +37,12 @@ public final class ProofSlicer {
             MainWindow.getInstance().setStatusLine(
                     "Slicing proof", analysisResults.usefulSteps.size());
         }
-        var stepIndex = 0;
+        proof.setStepIndices();
         var nodeIterator = proof.root().subtreeIterator();
         var toName = new HashMap<Integer, String>();
         while (nodeIterator.hasNext()) {
             var node = nodeIterator.next();
-            node.stepIndex = stepIndex;
             toName.put(node.stepIndex, node.getAppliedRuleApp() != null ? node.getAppliedRuleApp().rule().name().toString() : "none");
-            stepIndex++;
         }
         GeneralSettings.slicing = true;
         GeneralSettings.usefulSteps = analysisResults.usefulSteps.stream().map(node -> node.stepIndex).collect(Collectors.toSet());
