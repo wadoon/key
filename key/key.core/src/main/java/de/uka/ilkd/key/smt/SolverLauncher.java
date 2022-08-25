@@ -269,6 +269,7 @@ public class SolverLauncher implements SolverListener {
         var futures = new ArrayList<Future<SMTSolverResult>>();
         synchronized (submittedTasks) {
             for (var it : solvers) {
+                // Solvers are scheduled/started by the executorService:
                 final var future = executorService.submit(createSolverTask(it, cancelCallback));
                 submittedTasks.computeIfAbsent(it.getProblem(), k -> new ArrayList<>(4)).add(future);
                 futures.add(future);
@@ -278,11 +279,13 @@ public class SolverLauncher implements SolverListener {
         for (int i = 0; i < solvers.size(); i++) {
             long currentTimeout = solvers.get(i).getTimeout();
             final var startTime = solvers.get(i).getStartTime();
-            long waitTime = currentTimeout +
-                    startTime < 0 ? 0 /* not started, just wait the timeout */
-                    : Math.min(0, startTime) - System.currentTimeMillis(); // time wasted between start and get() call.
             var future = futures.get(i);
             try {
+                /* Wait <waitTime> [ms] from now (current time) for the future result
+                (until startTime + currentTimeout).
+                If the solver has not been started yet, just wait <currentTimeout>.
+                 */
+                long waitTime = currentTimeout + (startTime < 0 ? 0 : (startTime - System.currentTimeMillis()));
                 future.get(waitTime, TimeUnit.MILLISECONDS);
             } catch (InterruptedException e) {
                 LOGGER.warn("Waiting for termination of SMTSolver got interrupted. Cancel all submitted tasks!", e);

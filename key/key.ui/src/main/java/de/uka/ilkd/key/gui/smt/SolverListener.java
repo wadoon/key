@@ -125,7 +125,7 @@ public class SolverListener implements SolverLauncherListener {
                     .getExceptionsOfTacletTranslation();
             if (!exceptionsOfTacletTranslation.isEmpty()) {
                 StringBuilder exceptionText = new StringBuilder(
-                        "The following exceptions have ocurred while translating the taclets:\n\n");
+                        "The following exceptions have occurred while translating the taclets:\n\n");
                 int i = 1;
                 for (Throwable e : exceptionsOfTacletTranslation) {
                     exceptionText.append(i).append(". ").append(e.getMessage());
@@ -319,19 +319,30 @@ public class SolverListener implements SolverLauncherListener {
         }
     }
 
+    /*
+    Careful:
+    Calling this before the solver has been started does not yield a
+    meaningful result because the startTime will just be -1.
+     */
     private long calculateProgress(InternSMTProblem problem) {
         long maxTime = problem.solver.getTimeout();
         long startTime = problem.solver.getStartTime();
         long currentTime = System.currentTimeMillis();
 
-        return RESOLUTION - ((startTime - currentTime) * RESOLUTION)
-                / maxTime;
+        return ((currentTime - startTime) * RESOLUTION) / maxTime;
     }
 
+    /*
+    Careful:
+    Calling this before the solver has been started does not yield a
+    meaningful result because the startTime will just be -1.
+     */
     private double calculateRemainingTime(InternSMTProblem problem) {
         long startTime = problem.solver.getStartTime();
+        long endTime = startTime + problem.solver.getTimeout();
         long currentTime = System.currentTimeMillis();
-        long temp = (startTime - currentTime) / 100;
+        // remaining time before solver timeout [seconds]
+        long temp = (endTime - currentTime) / 100;
         return Math.max(temp / 10.0, 0.0);
     }
 
@@ -395,13 +406,10 @@ public class SolverListener implements SolverLauncherListener {
         if (problem.solver.wasInterrupted()) {
             interrupted(problem);
         } else if (problem.solver.getFinalResult().isValid() == ThreeValuedTruth.VALID) {
-
             successfullyStopped(problem, x, y);
         } else if (problem.solver.getFinalResult().isValid() == ThreeValuedTruth.FALSIFIABLE) {
-
             unsuccessfullyStopped(problem, x, y);
         } else {
-
             unknownStopped(x, y);
         }
 
@@ -417,19 +425,22 @@ public class SolverListener implements SolverLauncherListener {
                 progressModel.setProgress(0, x, y);
                 progressModel.setTextColor(RED.get(), x, y);
                 progressModel.setText("Exception!", x, y);
-
-
                 break;
+
             case NO_INTERRUPTION:
                 throw new IllegalStateException("This position should not be reachable!");
 
             case TIMEOUT:
                 progressModel.setProgress(0, x, y);
                 progressModel.setText("Timeout.", x, y);
-
                 break;
+
             case USER:
                 progressModel.setText("Interrupted by user.", x, y);
+                break;
+
+            case LOSER:
+                progressModel.setText("Another solver was faster.", x, y);
                 break;
         }
     }
