@@ -198,7 +198,12 @@ public final class DependencyAnalyzer {
             data.inputs.forEach(it -> usefulFormulas.add(it.first));
 
             for (var in : data.inputs) {
-                graph.incomingEdgesOf(in.first).forEach(queue::add);
+                var thisProofStep = node;
+                graph
+                        .incomingEdgesOf(in.first)
+                        // we don't care about steps done to derive the same formula again!
+                        .filter(step -> step.stepIndex < thisProofStep.stepIndex)
+                        .forEach(queue::add);
             }
             if (considerOutputs) {
                 data.outputs.stream().filter(ClosedGoal.class::isInstance).forEach(usefulFormulas::add);

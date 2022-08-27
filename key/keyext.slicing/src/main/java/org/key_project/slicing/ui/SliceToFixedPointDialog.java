@@ -59,13 +59,14 @@ public class SliceToFixedPointDialog extends JDialog implements KeYSelectionList
                 }
                 try {
                     var filename = results.proof.getProofFile();
-                    var label = filename != null ? filename.getName() : results.proof.name().toString();
+                    var label = filename != null ?
+                            filename.getName() : results.proof.name().toString();
                     tableRows.add(List.of(
                             label,
                             "" + results.totalSteps,
                             "" + results.usefulStepsNr,
                             "" + results.proof.countBranches(),
-                            "" + (results.proof.countBranches() - results.uselessBranches.size())));
+                            "" + results.usefulBranchesNr));
                     SwingUtilities.invokeLater(this::updateTable);
                 } catch (Exception e) {
                     e.printStackTrace();

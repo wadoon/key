@@ -41,6 +41,7 @@ public final class AnalysisResults {
      */
     public final Set<GraphNode> usefulNodes;
     public final Set<BranchLocation> uselessBranches;
+    public final int usefulBranchesNr;
     public final Map<Node, List<Node>> branchStacks;
 
     public final boolean didDependencyAnalysis;
@@ -70,6 +71,10 @@ public final class AnalysisResults {
         this.didDependencyAnalysis = didDependencyAnalysis;
         this.didDeduplicateRuleApps = didDeduplicateRuleApps;
         this.executionTime = executionTime;
+        this.usefulBranchesNr = (int) proof.allGoals().stream()
+                .map(x -> x.node().branchLocation())
+                .filter(this::branchIsUseful)
+                .count();
     }
 
     public boolean branchIsUseful(BranchLocation branchLocation) {

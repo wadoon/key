@@ -289,8 +289,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         totalSteps.setText("Total steps: " + results.totalSteps);
         usefulSteps.setText("Useful steps: " + results.usefulStepsNr);
         totalBranches.setText("Total branches: " + results.proof.countBranches());
-        usefulBranches.setText("Useful branches: "
-                + (results.proof.countBranches() - results.uselessBranches.size()));
+        usefulBranches.setText("Useful branches: " + results.usefulBranchesNr);
         showRuleStatistics.setEnabled(true);
         timings.removeAll();
         var coll = results.executionTime.executionTimes()
