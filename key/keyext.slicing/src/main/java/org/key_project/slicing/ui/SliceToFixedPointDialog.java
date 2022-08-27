@@ -10,13 +10,16 @@ import org.key_project.slicing.AnalysisResults;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
 
 public class SliceToFixedPointDialog extends JDialog implements KeYSelectionListener {
     private final KeYMediator mediator;
@@ -30,6 +33,7 @@ public class SliceToFixedPointDialog extends JDialog implements KeYSelectionList
     private SliceToFixedPointWorker worker;
 
     private Collection<Collection<String>> tableRows = new ArrayList<>();
+    private Map<String, Integer> slicedAway = new HashMap<>();
 
     public SliceToFixedPointDialog(KeYMediator mediator, Window window,
                                    Function<Void, AnalysisResults> analyzeCallback,
@@ -38,10 +42,21 @@ public class SliceToFixedPointDialog extends JDialog implements KeYSelectionList
 
         this.mediator = mediator;
         this.analyzeButton = x -> {
-            System.out.println("in analyze, using callback");
             var results = analyzeCallback.apply(null);
             if (results != null) {
-                System.out.println("expanding table");
+                // record useless rule applications in map
+                var queue = new ArrayDeque<>(List.of(results.proof.root()));
+                while (!queue.isEmpty()) {
+                    var node = queue.pop();
+                    node.childrenIterator().forEachRemaining(queue::add);
+                    if (node.getAppliedRuleApp() == null || results.usefulSteps.contains(node)) {
+                        continue;
+                    }
+                    slicedAway.compute(
+                            node.getAppliedRuleApp().rule().displayName(),
+                            (k, v) -> v == null ? 1 : v + 1
+                    );
+                }
                 try {
                     var filename = results.proof.getProofFile();
                     var label = filename != null ? filename.getName() : results.proof.name().toString();
@@ -56,8 +71,8 @@ public class SliceToFixedPointDialog extends JDialog implements KeYSelectionList
                     e.printStackTrace();
                 }
             }
-            System.out.println("returning results");
             if (cancelled) {
+                done();
                 return null;
             } else {
                 return results;
@@ -120,7 +135,20 @@ public class SliceToFixedPointDialog extends JDialog implements KeYSelectionList
                 tableRows,
                 null
         );
-        logPane.setText(html);
+        var data = slicedAway
+                .entrySet().stream()
+                // sort inferences rule sliced away most to the start
+                .sorted(Comparator.comparing(x -> -x.getValue()))
+                .map(x -> (Collection<String>) List.of(x.getKey(), x.getValue().toString()))
+                .collect(Collectors.toList());
+        var html2 = HtmlFactory.generateTable(
+                List.of("Inference rule", "Times sliced away"),
+                new boolean[]{false, false},
+                Optional.of(new String[]{null, "right"}),
+                data,
+                null
+        );
+        logPane.setText(html + "<hr/>" + html2);
     }
 
     public void start(Proof proof) {

@@ -606,7 +606,11 @@ public class IntermediateProofReplayer {
                         }
                     }
                     if (!done) {
-                        LOGGER.error("failed to find new formula @ rule name {}, step idx {}, added by {}, required formula {}", tacletName, stepIndex, GeneralSettings.stepIndexToDynamicRule.getOrDefault(stepIndex, -1), oldFormula);
+                        LOGGER.error("failed to find new formula @ rule name {}, step idx {}, added by {}, required formula {}",
+                                tacletName,
+                                stepIndex,
+                                GeneralSettings.stepIndexToDynamicRule.getOrDefault(stepIndex, -1),
+                                oldFormula);
                     }
                 }
                 /* part of the fix for #1716: ensure that position of find term
