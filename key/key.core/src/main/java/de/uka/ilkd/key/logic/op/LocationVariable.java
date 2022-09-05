@@ -4,6 +4,9 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.util.EqualsModProofIrrelevancy;
+
+import java.util.Objects;
 
 /**
  * This class represents proper program variables, which are not program
@@ -11,7 +14,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * more information.
  */
 public final class LocationVariable extends ProgramVariable
-			            implements UpdateableOperator {
+			            implements UpdateableOperator, EqualsModProofIrrelevancy {
     public LocationVariable(ProgramElementName name,
                         KeYJavaType        t,
                         KeYJavaType        containingType,
@@ -64,5 +67,29 @@ public final class LocationVariable extends ProgramVariable
         } else {
             return new LocationVariable(new ProgramElementName(name.toString()), sort());
         }
+    }
+
+    @Override
+    public boolean equalsModProofIrrelevancy(Object obj) {
+        if (!(obj instanceof LocationVariable)) {
+            return false;
+        }
+        var that = (LocationVariable) obj;
+        return getKeYJavaType().equals(that.getKeYJavaType())
+                && isStatic() == that.isStatic()
+                && isModel() == that.isModel()
+                && isGhost() == that.isGhost()
+                && isFinal() == that.isFinal()
+                && sort().equals(that.sort())
+                && argSorts().equalsModProofIrrelevancy(that.argSorts())
+                && name().toString().equals(that.name().toString())
+                && arity() == that.arity()
+                && Objects.equals(whereToBind(), that.whereToBind())
+                && isRigid() == that.isRigid();
+    }
+
+    @Override
+    public int hashCodeModProofIrrelevancy() {
+        throw new IllegalStateException("unreachable code");
     }
 }

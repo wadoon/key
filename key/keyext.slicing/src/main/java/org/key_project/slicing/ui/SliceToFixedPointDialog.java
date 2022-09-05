@@ -42,22 +42,33 @@ public class SliceToFixedPointDialog extends JDialog implements KeYSelectionList
 
         this.mediator = mediator;
         this.analyzeButton = x -> {
-            var results = analyzeCallback.apply(null);
+            System.out.println("intermediate callback requests analysis");
+            AnalysisResults results = null;
+            try {
+                results = analyzeCallback.apply(null);
+            } catch (Throwable t) {
+                t.printStackTrace();
+            }
+            System.out.println("intermediate callback has results");
             if (results != null) {
-                // record useless rule applications in map
-                var queue = new ArrayDeque<>(List.of(results.proof.root()));
-                while (!queue.isEmpty()) {
-                    var node = queue.pop();
-                    node.childrenIterator().forEachRemaining(queue::add);
-                    if (node.getAppliedRuleApp() == null || results.usefulSteps.contains(node)) {
-                        continue;
-                    }
-                    slicedAway.compute(
-                            node.getAppliedRuleApp().rule().displayName(),
-                            (k, v) -> v == null ? 1 : v + 1
-                    );
-                }
                 try {
+                    // record useless rule applications in map
+                    var queue = new ArrayDeque<>(List.of(results.proof.root()));
+                    while (!queue.isEmpty()) {
+                        var node = queue.pop();
+                        node.childrenIterator().forEachRemaining(queue::add);
+                        if (node.getAppliedRuleApp() == null || results.usefulSteps.contains(node)) {
+                            continue;
+                        }
+                        var name = node.getAppliedRuleApp().rule().displayName();
+                        if (node.childrenCount() > 1) {
+                            name = name + "*";
+                        }
+                        slicedAway.compute(
+                                name,
+                                (k, v) -> v == null ? 1 : v + 1
+                        );
+                    }
                     var filename = results.proof.getProofFile();
                     var label = filename != null ?
                             filename.getName() : results.proof.name().toString();
@@ -72,6 +83,7 @@ public class SliceToFixedPointDialog extends JDialog implements KeYSelectionList
                     e.printStackTrace();
                 }
             }
+            System.out.println("forwarding");
             if (cancelled) {
                 done();
                 return null;
@@ -179,7 +191,8 @@ public class SliceToFixedPointDialog extends JDialog implements KeYSelectionList
                 return;
             }
             if (cancelled) {
-                closeButton.setEnabled(true);
+                done();
+                return;
             }
             worker = new SliceToFixedPointWorker(e.getSource().getSelectedProof(), worker.proof, closeButton, analyzeButton, sliceButton, this::done);
             worker.execute();

@@ -6,6 +6,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.util.EqualsModProofIrrelevancyWrapper;
+import org.key_project.util.EqualsModProofIrrelevancy;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -513,7 +514,8 @@ public class TermImpl implements Term {
 
         final TermImpl t = (TermImpl) o;
 
-        if (!(op.equals(t.op)
+        boolean opResult = op instanceof EqualsModProofIrrelevancy ? ((EqualsModProofIrrelevancy) op).equalsModProofIrrelevancy(t.op) : op.equals(t.op);
+        if (!(opResult
                 && boundVars.equals(t.boundVars)
                 && javaBlock.equals(t.javaBlock))) {
             return false;

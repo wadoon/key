@@ -46,6 +46,7 @@ public final class DependencyAnalyzer {
     private static final String DEPENDENCY_ANALYSIS4 = "1c Dependency Analysis: final mark of useless steps";
     private static final String DUPLICATE_ANALYSIS = "2 Duplicate Analysis";
     private static final String DUPLICATE_ANALYSIS_SETUP = "~ Duplicate Analysis setup";
+    private static final boolean DUPLICATES_SAFE_MODE = true;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DependencyAnalyzer.class);
     private final boolean doDependencyAnalysis;
@@ -265,11 +266,16 @@ public final class DependencyAnalyzer {
         executionTime.stop(DEPENDENCY_ANALYSIS4);
     }
 
+    private boolean mergedAnything = false;
+
     private void deduplicateRuleApps() {
         var alreadyRebasedSerialNrs = new HashSet<Integer>();
         var alreadyMergedSerialNrs = new HashSet<Integer>();
         // search for duplicate rule applications
         graph.nodes().forEach(node -> {
+            if (mergedAnything) {
+                return;
+            }
             // groups proof steps that act upon this graph node by their rule app
             // (for obvious reasons, we don't care about origin labels here -> wrapper)
             var foundDupes = new HashMap<EqualsModProofIrrelevancyWrapper<RuleApp>, Set<Node>>();
@@ -298,6 +304,9 @@ public final class DependencyAnalyzer {
             });
 
             for (var entry : foundDupes.entrySet()) {
+                if (mergedAnything) {
+                    continue;
+                }
                 var steps = new ArrayList<>(entry.getValue());
                 if (steps.size() <= 1) {
                     continue;
@@ -314,11 +323,17 @@ public final class DependencyAnalyzer {
                 //var idxB = 1;
                 //while (idxB < steps.size()) {
                 for (int idxA = 0; idxA < steps.size() - 1; idxA++) {
+                    if (mergedAnything) {
+                        continue;
+                    }
                     var stepA = apps.get(idxA);
                     if (stepA == null) {
                         continue;
                     }
                     for (int idxB = idxA + 1; idxB < steps.size(); idxB++) {
+                        if (mergedAnything) {
+                            continue;
+                        }
                         LOGGER.trace("idxes {} {}", idxA, idxB);
                         var stepB = apps.get(idxB);
                         if (stepB == null) {
@@ -404,13 +419,22 @@ public final class DependencyAnalyzer {
                                     var consumers = allNodes.stream()
                                             .flatMap(graph::edgesConsuming)
                                             .filter(x -> stepAB.branchLocation().hasPrefix(x.proofStep.branchLocation()));
+                                    var lastConsumer = allNodes.stream()
+                                            .flatMap(graph::edgesConsuming)
+                                            .filter(edge -> !stepAB.branchLocation().hasPrefix(edge.proofStep.branchLocation())
+                                                    && edge.proofStep.stepIndex > stepAB.stepIndex
+                                                    && edge.proofStep.branchLocation().hasPrefix(stepAB.branchLocation()))
+                                            .findFirst();
+                                    if (lastConsumer.isPresent()) {
+                                        consumers = Stream.concat(consumers, Stream.of(lastConsumer.get()));
+                                    }
                                     // list of (step index, produces / consumes)
-                                    var bySerialNr = Comparator.<Pair<Integer, Boolean>>comparingInt(x -> x.first);
+                                    var byStepIndex = Comparator.<Pair<Integer, Boolean>>comparingInt(x -> x.first);
                                     var list = Stream.concat(
                                                     producers.map(x -> new Pair<>(x.proofStep.stepIndex, true)),
                                                     consumers.map(x -> new Pair<>(x.proofStep.stepIndex, false))
                                             ).distinct()
-                                            .sorted(bySerialNr)
+                                            .sorted(byStepIndex)
                                             .collect(Collectors.toList());
                                     // verify that the list satisfies the correctness criteria
                                     Predicate<List<Pair<Integer, Boolean>>> isCorrect = l -> {
@@ -432,7 +456,7 @@ public final class DependencyAnalyzer {
                                     // reorder one proof step to simulate the merged proof
                                     list.remove(new Pair<>(stepAB.stepIndex, true));
                                     list.add(new Pair<>(newStepIdx, true));
-                                    list.sort(bySerialNr);
+                                    list.sort(byStepIndex);
                                     if (!isCorrect.test(list)) {
                                         hasConflictOut.set(true);
                                     }
@@ -446,6 +470,7 @@ public final class DependencyAnalyzer {
                             alreadyRebasedSerialNrs.add(stepA.serialNr());
                             apps.set(idxB, null);
                             alreadyMergedSerialNrs.add(stepB.serialNr());
+                            mergedAnything = DUPLICATES_SAFE_MODE;
                         }
                     }
                 }

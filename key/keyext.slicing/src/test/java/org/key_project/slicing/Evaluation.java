@@ -32,6 +32,9 @@ class Evaluation {
     // commented out file = doesn't load
     /* commented out file = already evaluated */
     private static final String[] FILES = new String[]{
+    //        "13_quadraticInEq9_focused_goals.proof"
+    //};
+    //private static final String[] FILES2 = new String[]{
             "01_Contraposition.proof",
             "02_Liarsville.proof",
             "03_AuntAgatha.proof",
@@ -200,13 +203,14 @@ class Evaluation {
     @Test
     @Ignore("used during evaluation")
     void sliceEachToFixedPoint() throws Exception {
-        var depAnalysis = false;
-        var dupAnalysis = true;
+        LOGGER.info("evaluating {} proofs", FILES.length);
+        var depAnalysis = true;
+        var dupAnalysis = false;
         GeneralSettings.noPruningClosed = false;
         // run with: -Xmx4096m
         // warm up taclet index etc.
         //loadProof("DualPivot_KeY_Proofs/sort/DualPivotQuicksort/eInsertionSort_SavedAgain.proof", true).first.dispose();
-        var output = new PrintStream(new FileOutputStream("/tmp/log_fixedpoint_dups_one_last_time.txt"));
+        var output = new PrintStream(new FileOutputStream("/tmp/log_fixedpoint_dep_final.txt"));
         output.println("Proof;Load time;Load time with tracker;Analyze time;Slice time;Number of steps;Number of steps in slice;Branches;Branches in slice;Number of SMT goals;Number of SMT in slice");
 
         var failures = new ArrayList<>();

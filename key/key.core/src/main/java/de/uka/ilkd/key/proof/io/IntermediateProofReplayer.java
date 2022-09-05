@@ -599,7 +599,7 @@ public class IntermediateProofReplayer {
                     var semiSeq = oldPos.isInAntec() ? currGoal.sequent().antecedent() : currGoal.sequent().succedent();
                     var done = false;
                     for (var newFormula : semiSeq.asList()) {
-                        if (newFormula.realEquals(oldFormula)) {
+                        if (newFormula.realEquals(oldFormula) || newFormula.equalsModProofIrrelevancy(oldFormula)) {
                             pos = oldPos.replaceConstrainedFormula(newFormula);
                             done = true;
                             break;
@@ -648,7 +648,7 @@ public class IntermediateProofReplayer {
                 var done = false;
                 SequentFormula oldFormula = oldFormulaPio.sequentFormula();
                 for (SequentFormula newFormula : semiSeq) {
-                    if (newFormula.realEquals(oldFormula)) {
+                    if (newFormula.realEquals(oldFormula) || newFormula.equalsModProofIrrelevancy(oldFormula)) {
                         ifFormulaList = ifFormulaList.append(
                                 new IfFormulaInstSeq(currGoal.sequent(), oldFormulaPio.isInAntec(), newFormula)
                         );
@@ -778,7 +778,7 @@ public class IntermediateProofReplayer {
                     var done = false;
                     SequentFormula oldFormula = oldFormulaPio.sequentFormula();
                     for (SequentFormula newFormula : semiSeq) {
-                        if (newFormula.realEquals(oldFormula)) {
+                        if (newFormula.realEquals(oldFormula) || newFormula.equalsModProofIrrelevancy(oldFormula)) {
                             builtinIfInsts = builtinIfInsts.append(new PosInOccurrence(newFormula, oldFormulaPio.posInTerm(), oldFormulaPio.isInAntec()));
                             done = true;
                             break;
@@ -840,7 +840,7 @@ public class IntermediateProofReplayer {
                 var semiSeq = oldPos.isInAntec() ? currGoal.sequent().antecedent() : currGoal.sequent().succedent();
                 var done = false;
                 for (var newFormula : semiSeq.asList()) {
-                    if (newFormula.realEquals(oldFormula)) {
+                    if (newFormula.realEquals(oldFormula) || newFormula.equalsModProofIrrelevancy(oldFormula)) {
                         pos = oldPos.replaceConstrainedFormula(newFormula);
                         done = true;
                         break;
