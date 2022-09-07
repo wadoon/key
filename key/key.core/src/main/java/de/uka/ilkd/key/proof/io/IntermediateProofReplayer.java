@@ -444,7 +444,7 @@ public class IntermediateProofReplayer {
                                 if (GeneralSettings.slicing) {
                                     LOGGER.trace("slicing: skipping SMT");
                                     // TODO(slicing): remove this
-                                    currGoal.apply(new RuleAppSMT(RuleAppSMT.rule, PosInOccurrence.findInSequent(currGoal.sequent(), 1, PosInTerm.getTopLevel())));
+                                    //currGoal.apply(new RuleAppSMT(RuleAppSMT.rule, PosInOccurrence.findInSequent(currGoal.sequent(), 1, PosInTerm.getTopLevel())));
                                 }
                             } catch (BuiltInConstructionException | RuntimeException | AssertionError e) {
                                 reportError(ERROR_LOADING_PROOF_LINE + "Line "
@@ -792,6 +792,9 @@ public class IntermediateProofReplayer {
         }
 
         if (RuleAppSMT.rule.name().toString().equals(ruleName)) {
+            status = SMT_NOT_RUN;
+            throw new SkipSMTRuleException();
+            /*
             boolean error = false;
             final SMTProblem smtProblem = new SMTProblem(currGoal);
             try {
@@ -815,11 +818,12 @@ public class IntermediateProofReplayer {
                     .isValid() != ThreeValuedTruth.VALID) {
                 status = SMT_NOT_RUN;
                 // TODO(slicing): remove this
-                return RuleAppSMT.rule.createApp(null, proof.getServices());
-                //throw new SkipSMTRuleException();
+                //return RuleAppSMT.rule.createApp(null, proof.getServices());
+                throw new SkipSMTRuleException();
             } else {
                 return RuleAppSMT.rule.createApp(null, proof.getServices());
             }
+             */
         }
 
         IBuiltInRuleApp ourApp = null;

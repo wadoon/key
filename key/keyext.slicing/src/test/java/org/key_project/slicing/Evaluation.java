@@ -51,6 +51,7 @@ class Evaluation {
             "10_SimpleArrayReversal.zproof",
             "11_PermutedSum_manual.zproof",
             "12_Quicksort_scripted.zproof",
+            "13_quadraticInEq9_focused_goals.proof",
 //            "IdentityHashMap/01_KEY_IHM/KeY-proof-files/VerifiedIdentityHashMap/java.util.VerifiedIdentityHashMap(java.util.VerifiedIdentityHashMap__VerifiedIdentityHashMap()).JML normal_behavior operation contract.0.proof.gz",
             "IdentityHashMap/01_KEY_IHM/KeY-proof-files/VerifiedIdentityHashMap/java.util.VerifiedIdentityHashMap(java.util.VerifiedIdentityHashMap__capacity(int)).JML normal_behavior operation contract.0.proof.gz",
             "IdentityHashMap/01_KEY_IHM/KeY-proof-files/VerifiedIdentityHashMap/java.util.VerifiedIdentityHashMap(java.util.VerifiedIdentityHashMap__capacity(int)).JML normal_behavior operation contract.1.proof.gz",
@@ -147,8 +148,8 @@ class Evaluation {
         // run with: -Xmx4096m
         // warm up taclet index etc.
         loadProof("DualPivot_KeY_Proofs/sort/DualPivotQuicksort/eInsertionSort_SavedAgain.proof", true, false).first.dispose();
-        var output = new PrintStream(new FileOutputStream("/tmp/log.txt"));
-        output.println("Proof;Load time;Load time with tracker;Analyze time;Slice time;Number of steps;Number of steps in slice;Branches;Branches in slice;Number of SMT goals;Number of SMT in slice");
+        var output = new PrintStream(new FileOutputStream("/tmp/log_dups.txt"));
+        output.println("Proof;Load time;Load time with tracker;Analyze time with marking;Analyze time;Slice time;Number of steps;Number of steps in slice;Branches;Branches in slice;Number of SMT goals;Number of SMT in slice");
 
         var failures = new ArrayList<>();
 
@@ -174,17 +175,20 @@ class Evaluation {
                 var time3 = System.currentTimeMillis();
 
                 try {
-                    var proof2 = sliceProof(filename, true, false).first;
+                    var result = sliceProof(filename, false, true);
+                    var proof2 = result.first;
                     var sliceSize = proof2.countNodes();
                     var sliceBranches = proof2.countBranches();
                     var numberOfSMT2 = proof2.allGoals().stream().filter(goal -> goal.node().getAppliedRuleApp() != null && goal.node().getAppliedRuleApp() instanceof RuleAppSMT).count();
                     proof2.dispose();
                     var time4 = System.currentTimeMillis();
 
+                    var timings = result.third.executionTime.executionTimesMap();
+                    var pureAnalyze = 0;//timings.get(DependencyAnalyzer.DEPENDENCY_ANALYSIS2) + timings.get(DependencyAnalyzer.DEPENDENCY_ANALYSIS3);
                     if (i < iterations - 1) {
-                        System.err.printf("%s;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d\n", filename, time2 - time1, time3 - time2, analyzeTime, time4 - time3, origSize, sliceSize, origBranches, sliceBranches, numberOfSMT, numberOfSMT2);
+                        System.err.printf("%s;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d\n", filename, time2 - time1, time3 - time2, analyzeTime, pureAnalyze, time4 - time3, origSize, sliceSize, origBranches, sliceBranches, numberOfSMT, numberOfSMT2);
                     } else {
-                        output.printf("%s;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d\n", filename, time2 - time1, time3 - time2, analyzeTime, time4 - time3, origSize, sliceSize, origBranches, sliceBranches, numberOfSMT, numberOfSMT2);
+                        output.printf("%s;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d\n", filename, time2 - time1, time3 - time2, analyzeTime, pureAnalyze, time4 - time3, origSize, sliceSize, origBranches, sliceBranches, numberOfSMT, numberOfSMT2);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -253,7 +257,7 @@ class Evaluation {
                         var nextPath = pair.second.sliceProof();
                         LOGGER.info("loading {}", nextPath.toString());
                         var nextProof = loadProof(nextPath.toString(), true, true);
-                        pair = new Pair<>(nextProof.second, nextProof.third);
+                        pair = new Triple<>(nextProof.second, nextProof.third, null);
                     }
                     proof2.dispose();
 
@@ -407,7 +411,7 @@ class Evaluation {
         }
     }
 
-    private Pair<Proof, DependencyTracker> sliceProof(String filename, boolean doDependencyAnalysis, boolean doDeduplicateRuleApps) throws Exception {
+    private Triple<Proof, DependencyTracker, AnalysisResults> sliceProof(String filename, boolean doDependencyAnalysis, boolean doDeduplicateRuleApps) throws Exception {
         boolean oldValue = GeneralSettings.noPruningClosed;
         GeneralSettings.noPruningClosed = false;
         // load proof
@@ -467,7 +471,7 @@ class Evaluation {
 
             //Files.delete(tempFile);
 
-            return new Pair<>(slicedProof, tracker2);
+            return new Triple<>(slicedProof, tracker2, results);
         } finally {
             environment.dispose();
             GeneralSettings.noPruningClosed = oldValue;

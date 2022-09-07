@@ -34,18 +34,22 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Implementation of both dependency analysis algorithms.
+ * Implementation of both proof analysis algorithms.
  *
  * @author Arne Keller
  */
 public final class DependencyAnalyzer {
     private static final String TOTAL_WORK = "0 (total time)";
+    private static final String STATISTICS = "~ Statistical data gathering";
     private static final String DEPENDENCY_ANALYSIS = "1 Dependency Analysis";
-    private static final String DEPENDENCY_ANALYSIS2 = "1a Dependency Analysis: search starting @ closed goals";
-    private static final String DEPENDENCY_ANALYSIS3 = "1b Dependency Analysis: analyze branching nodes";
+    public static final String DEPENDENCY_ANALYSIS2 = "1a Dependency Analysis: search starting @ closed goals";
+    public static final String DEPENDENCY_ANALYSIS3 = "1b Dependency Analysis: analyze branching nodes";
     private static final String DEPENDENCY_ANALYSIS4 = "1c Dependency Analysis: final mark of useless steps";
     private static final String DUPLICATE_ANALYSIS = "2 Duplicate Analysis";
     private static final String DUPLICATE_ANALYSIS_SETUP = "~ Duplicate Analysis setup";
+    /**
+     * If set to false, the duplicate analysis algorithm will process more than one candidate.
+     */
     private static final boolean DUPLICATES_SAFE_MODE = true;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DependencyAnalyzer.class);
@@ -129,6 +133,7 @@ public final class DependencyAnalyzer {
             node.childrenIterator().forEachRemaining(queue::add);
         }
 
+        executionTime.start(STATISTICS);
         var steps = proof.countNodes() - proof.closedGoals().size()
                 + (int) proof.closedGoals()
                 .stream().filter(it -> it.node().getAppliedRuleApp() instanceof RuleAppSMT).count();
@@ -152,6 +157,7 @@ public final class DependencyAnalyzer {
                 }
             }
         });
+        executionTime.stop(STATISTICS);
         executionTime.stop(TOTAL_WORK);
 
         return new AnalysisResults(

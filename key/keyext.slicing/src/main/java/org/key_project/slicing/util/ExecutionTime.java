@@ -4,6 +4,7 @@ import de.uka.ilkd.key.util.Pair;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public final class ExecutionTime {
@@ -30,5 +31,12 @@ public final class ExecutionTime {
         return startTimes.entrySet().stream()
                 .filter(e -> endTimes.containsKey(e.getKey()))
                 .map(e -> new Pair<>(e.getKey(), endTimes.get(e.getKey()) - e.getValue()));
+    }
+
+    public Map<String, Long> executionTimesMap() {
+        return startTimes.entrySet().stream()
+                .filter(e -> endTimes.containsKey(e.getKey()))
+                .map(e -> new Pair<>(e.getKey(), endTimes.get(e.getKey()) - e.getValue()))
+                .collect(Collectors.toUnmodifiableMap(x -> x.first, x -> x.second));
     }
 }
