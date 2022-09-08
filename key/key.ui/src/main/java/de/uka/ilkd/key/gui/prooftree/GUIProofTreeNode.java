@@ -42,11 +42,12 @@ class GUIProofTreeNode extends GUIAbstractTreeNode {
     }
 
     public String toString() {
-	// changed to serial:name for searching
+	    // changed to serial:name for searching
+        // changed to stepIndex:name for consistency with thesis text
         // the proof tree in ProofTreeView.java
         Node n = getNode();
         if (n != null) {
-            return n.stepIndex + ";" + n.serialNr() + ":" + n.name();
+            return n.stepIndex + ":" + n.name();
         } else {
             return "Invalid WeakReference";
         }

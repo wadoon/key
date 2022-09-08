@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -225,8 +226,10 @@ public final class DependencyAnalyzer {
                 return;
             }
             var data = node.lookup(DependencyNodeData.class);
-            var groupedOutputs = data.outputs
-                    .stream().collect(Collectors.groupingBy(GraphNode::getBranchLocation));
+            var groupedOutputs = new HashMap<BranchLocation, Collection<GraphNode>>();
+            node.childrenIterator().forEachRemaining(
+                    x -> groupedOutputs.put(x.branchLocation(), new ArrayList<>()));
+            data.outputs.forEach(n -> groupedOutputs.get(n.getBranchLocation()).add(n));
             var cutWasUseful = groupedOutputs.values().stream()
                     .allMatch(l -> l.stream().anyMatch(usefulFormulas::contains));
             if (cutWasUseful) {
