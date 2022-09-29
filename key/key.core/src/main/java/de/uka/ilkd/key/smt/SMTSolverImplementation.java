@@ -92,7 +92,7 @@ public final class SMTSolverImplementation implements SMTSolver {
     /**
      * stores the reason for interruption if present (e.g. User, Timeout, Exception)
      */
-    private ReasonOfInterruption reasonOfInterruption = ReasonOfInterruption.NO_INTERRUPTION;
+    private ReasonOfInterruption reasonOfInterruption;
 
     /**
      * the state the solver is currently in

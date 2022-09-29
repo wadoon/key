@@ -323,6 +323,16 @@ public class SolverLauncher implements SolverListener {
         }
     }
 
+    /**
+     * Parallel task that calls an SMT solver and returns its result.
+     * If the solver succeeds (proving that its linked SMTProblem is valid) and does not get
+     * interrupted by an exception, it also cancels all other SMT solver tasks using the given
+     * cancel task.
+     * @param solver the solver that is called
+     * @param cancel executed once the solver succeeded
+     *               (in order to cancel the other solvers working on the same SMT problem)
+     * @return the solver's SMTSolverResult
+     */
     private Callable<SMTSolverResult> createSolverTask(SMTSolver solver, Consumer<SMTProblem> cancel) {
         return () -> {
             session.addCurrentlyRunning(solver);
@@ -331,7 +341,10 @@ public class SolverLauncher implements SolverListener {
             var res = solver.call();
             session.removeCurrentlyRunning(solver);
             session.addFinishedSolver(solver);
-            if (res.isValid() != SMTSolverResult.ThreeValuedTruth.UNKNOWN) {
+            if (solver.getException() == null
+                    && res.isValid() == SMTSolverResult.ThreeValuedTruth.VALID) {
+                // If the solver at hand proved its SMT problem to be valid [without an exception],
+                // the problem is solved and other solvers working on it can be stopped.
                 cancel.accept(solver.getProblem());
             }
             return res;

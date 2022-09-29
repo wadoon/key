@@ -45,6 +45,18 @@ public class SolverListener implements SolverLauncherListener {
             ColorSettings.define("[solverListener]green", "",
                     new Color(43, 180, 43));
 
+    private static final ColorSettings.ColorProperty YELLOW =
+            ColorSettings.define("[solverListener]yellow", "",
+                    new Color(200, 150, 0));
+
+    private static final ColorSettings.ColorProperty BLUE =
+            ColorSettings.define("[solverListener]blue", "",
+                    Color.BLUE);
+
+    private static final ColorSettings.ColorProperty GREY =
+            ColorSettings.define("[solverListener]grey", "",
+                    new Color(100, 100, 100));
+
     //weigl: This variable is incremented very strangely on the generation of finalize path only.
     private static int fileId = 0;
 
@@ -440,7 +452,8 @@ public class SolverListener implements SolverLauncherListener {
                 break;
 
             case LOSER:
-                progressModel.setText("Another solver was faster.", x, y);
+                progressModel.setTextColor(GREY.get(), x, y);
+                progressModel.setText("(Too slow.)", x, y);
                 break;
         }
     }
@@ -467,15 +480,14 @@ public class SolverListener implements SolverLauncherListener {
             progressModel.setText("Counter Example" + timeInfo, x, y);
         } else {
             progressModel.setProgress(0, x, y);
-            Color c = new Color(200, 150, 0);
-            progressModel.setTextColor(c, x, y);
+            progressModel.setTextColor(YELLOW.get(), x, y);
             progressModel.setText("Possible Counter Example" + timeInfo, x, y);
         }
     }
 
     private void unknownStopped(int x, int y) {
         progressModel.setProgress(0, x, y);
-        progressModel.setTextColor(Color.BLUE, x, y);
+        progressModel.setTextColor(BLUE.get(), x, y);
         progressModel.setText("Unknown.", x, y);
     }
 
