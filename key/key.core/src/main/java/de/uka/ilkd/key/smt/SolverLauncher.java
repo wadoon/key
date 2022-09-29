@@ -84,10 +84,9 @@ public class SolverLauncher implements SolverListener {
 
     /**
      * {@link ExecutorService} for {@link SMTSolver} callables.
-     * Variable is initialized on first construction of {@link SolverLaunchers}
      */
     @Nonnull
-    private static ExecutorService executorService;
+    private ExecutorService executorService;
 
     /**
      * A session encapsulates some attributes that should be accessed only by
@@ -118,10 +117,8 @@ public class SolverLauncher implements SolverListener {
      */
     public SolverLauncher(SMTSettings settings) {
         this.settings = settings;
-        if (executorService == null) {
-            executorService = Executors.newFixedThreadPool(settings.getMaxConcurrentProcesses(),
+        executorService = Executors.newFixedThreadPool(settings.getMaxConcurrentProcesses(),
                     new DefaultDaemonThreadFactory());
-        }
     }
 
     /**
