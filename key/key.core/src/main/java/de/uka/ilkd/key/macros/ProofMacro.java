@@ -13,6 +13,9 @@ import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 /**
  * The interface ProofMacro is the entry point to a general strategy extension
  * system.
@@ -149,9 +152,9 @@ public interface ProofMacro {
      *
      * @return <code>true</code>, if the macro is allowed to be applied
      */
-    public boolean canApplyTo(Proof proof,
-                              ImmutableList<Goal> goals,
-                              PosInOccurrence posInOcc);
+    public boolean canApplyTo(@Nonnull Proof proof,
+                              @Nonnull ImmutableList<Goal> goals,
+                              @Nullable PosInOccurrence posInOcc);
 
     /**
      * Can this macro be applied on the given node?
@@ -175,7 +178,7 @@ public interface ProofMacro {
      * @return <code>true</code>, if the macro is allowed to be applied
      */
     public boolean canApplyTo(Node node,
-                              PosInOccurrence posInOcc);
+                              @Nullable PosInOccurrence posInOcc);
 
     /**
      * Apply this macro on the given goals.
@@ -205,11 +208,12 @@ public interface ProofMacro {
      * @throws InterruptedException
      *             if the application of the macro has been interrupted.
      */
-    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
-                                          Proof proof,
-                                          ImmutableList<Goal> goals,
-                                          PosInOccurrence posInOcc,
-                                          ProverTaskListener listener) throws InterruptedException, Exception;
+    public ProofMacroFinishedInfo applyTo(@Nonnull UserInterfaceControl uic,
+                                          @Nonnull Proof proof,
+                                          @Nonnull ImmutableList<Goal> goals,
+                                          @Nullable PosInOccurrence posInOcc,
+                                          @Nullable ProverTaskListener listener)
+            throws InterruptedException, Exception;
 
     /**
      * Apply this macro on the given node.
@@ -237,10 +241,11 @@ public interface ProofMacro {
      * @throws InterruptedException
      *             if the application of the macro has been interrupted.
      */
-    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
-                                          Node node,
-                                          PosInOccurrence posInOcc,
-                                          ProverTaskListener listener) throws InterruptedException, Exception;
+    public ProofMacroFinishedInfo applyTo(@Nonnull UserInterfaceControl uic,
+                                          @Nonnull Node node,
+                                          @Nullable PosInOccurrence posInOcc,
+                                          @Nullable ProverTaskListener listener)
+            throws InterruptedException, Exception;
 
     /**
      * This observer acts as intermediate instance between the reports by the

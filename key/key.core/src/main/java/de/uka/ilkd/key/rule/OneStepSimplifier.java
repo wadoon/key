@@ -81,7 +81,10 @@ public final class OneStepSimplifier implements BuiltInRule {
     //constructors
     //-------------------------------------------------------------------------
 
-    public OneStepSimplifier() { // Visibility must be public because it is no longer a singleton in general. Side proofs use own OneStepSimplifier instances for parallelization. This is required thanks to the internal state of this rule.
+    // Visibility must be public because it is no longer a singleton in general.
+    // Side proofs use own OneStepSimplifier instances for parallelization.
+    // This is required thanks to the internal state of this rule.
+    public OneStepSimplifier() {
         assert bottomUp.length == ruleSets.size();
     }
 
