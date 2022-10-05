@@ -1,0 +1,55 @@
+plugins {
+    id 'java'
+    id 'antlr'
+    id 'ca.coglinc.javacc' version '2.4.0'
+}
+
+group 'org.key_project'
+version '2.11.0'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
+}
+
+configurations {
+    compile {
+        extendsFrom = extendsFrom.findAll { it != configurations.antlr }
+    }
+}
+
+dependencies {
+    antlr 'org.antlr:antlr4:4.5'
+    compile "org.antlr:antlr4-runtime:4.5"
+
+    implementation 'com.github.bobbylight:RSyntaxTextArea:3.2.0'
+    implementation group: 'commons-io', name: 'commons-io', version: '2.7'
+    implementation group: 'net.java.dev.javacc', name: 'javacc', version: '4.0'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+
+    javacc group: 'net.java.dev.javacc', name: 'javacc', version: '4.0'
+}
+
+generateGrammarSource {
+    maxHeapSize = "64m"
+    arguments += ["-visitor", "-long-messages"]
+}
+
+def javaCCOutputDir = file("${buildDir}/generated-src/javacc")
+def javaCCOutputDirMain = file("$javaCCOutputDir/main")
+
+sourceSets.main.java.srcDirs(javaCCOutputDirMain, "$projectDir/build/generated-src/antlr4/main/")
+
+compileJavacc {
+    inputDirectory = file('src/main/resources/javacc')
+    outputDirectory = javaCCOutputDirMain
+}
+
+compileJava.dependsOn compileJavacc
+
+test {
+    useJUnitPlatform()
+}

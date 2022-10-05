@@ -1,0 +1,56 @@
+options {
+  STATIC = false;
+  USER_TOKEN_MANAGER = true;
+}
+
+PARSER_BEGIN(Brackets)
+
+package javacc;
+
+/**
+ * Simple brace matcher.
+ */
+public class Brackets {
+
+  /** Main entry point. */
+  public static void main(String args[]) throws ParseException {
+      Brackets parser = new Brackets(new javacc.BracketsTokenManager(new javacc.SimpleCharStream(System.console().reader(), 0, 0)));
+      parser.Input();
+  }
+
+}
+
+PARSER_END(Brackets)
+
+TOKEN : {
+    <LBRACKET: "{">
+    | <RBRACKET: "}">
+}
+
+// special token should behave like ANTLR's hidden channel
+SPECIAL_TOKEN :
+{
+    " "
+	| "\t"
+	| "\n"
+	| "\r"
+	| "\f"
+}
+
+TOKEN : {
+    <NO_MATCH: ~[]>
+}
+
+/** Root production. */
+void Input() :
+{}
+{
+  (MatchedBraces())* <EOF>
+}
+
+/** Brace matching production. */
+void MatchedBraces() :
+{}
+{
+  <LBRACKET> (MatchedBraces())* <RBRACKET>
+}
