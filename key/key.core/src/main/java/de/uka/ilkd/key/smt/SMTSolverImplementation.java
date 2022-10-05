@@ -366,7 +366,9 @@ public final class SMTSolverImplementation implements SMTSolver {
 
     @Override
     public SMTSolverResult getFinalResult() {
-        return isRunning() ? null : solverCommunication.getFinalResult();
+        return (isRunning() || getReasonOfInterruption() != ReasonOfInterruption.NO_INTERRUPTION)
+                ? null
+                : solverCommunication.getFinalResult();
     }
 
     @Override
