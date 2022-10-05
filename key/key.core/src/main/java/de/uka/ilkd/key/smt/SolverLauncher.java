@@ -251,7 +251,6 @@ public class SolverLauncher implements SolverListener {
         Consumer<SMTProblem> cancelCallback = smtProblem -> {
             synchronized (submittedTasks) {
                 if (submittedTasks.containsKey(smtProblem)) {
-                    smtProblem.getSolvers().forEach(it -> it.interrupt(ReasonOfInterruption.LOSER));
                     submittedTasks.get(smtProblem).forEach(it -> {
                         try {
                             it.cancel(true);
@@ -259,6 +258,7 @@ public class SolverLauncher implements SolverListener {
                             //ignore: Task is already finished. No actions needed.
                         }
                     });
+                    smtProblem.getSolvers().forEach(it -> it.interrupt(ReasonOfInterruption.LOSER));
                 }
             }
         };
@@ -292,7 +292,7 @@ public class SolverLauncher implements SolverListener {
                 LOGGER.warn("Exception during the execution of an SMTSolver", e);
                 solvers.get(i).interrupt(ReasonOfInterruption.EXCEPTION);
             } catch (TimeoutException e) {
-                LOGGER.warn("Timout ({} ms) hit by SMTSolver. SMTSolver will be killed.", currentTimeout);
+                LOGGER.warn("Timeout ({} ms) hit by SMTSolver. SMTSolver will be killed.", currentTimeout);
                 future.cancel(true);
                 solvers.get(i).interrupt(ReasonOfInterruption.TIMEOUT);
             } catch (CancellationException e) {
@@ -401,6 +401,10 @@ public class SolverLauncher implements SolverListener {
 
     @Override
     public void processUser(SMTSolver solver, SMTProblem problem) {
+    }
+
+    @Override
+    public void processLoser(SMTSolver solver, SMTProblem problem) {
     }
 
 }

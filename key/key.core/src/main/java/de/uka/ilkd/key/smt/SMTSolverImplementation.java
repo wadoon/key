@@ -161,7 +161,8 @@ public final class SMTSolverImplementation implements SMTSolver {
 
     @Override
     public ReasonOfInterruption getReasonOfInterruption() {
-        return isRunning() ? ReasonOfInterruption.NO_INTERRUPTION : reasonOfInterruption;
+        return (isRunning() || reasonOfInterruption == null)
+                ? ReasonOfInterruption.NO_INTERRUPTION : reasonOfInterruption;
     }
 
     public Throwable getException() {
@@ -275,7 +276,6 @@ public final class SMTSolverImplementation implements SMTSolver {
 
     private void interruptionOccurred(Throwable e) {
         ReasonOfInterruption reason = getReasonOfInterruption();
-        setReasonOfInterruption(ReasonOfInterruption.EXCEPTION, e);
         switch (reason) {
             case EXCEPTION:
             case NO_INTERRUPTION:
@@ -287,6 +287,9 @@ public final class SMTSolverImplementation implements SMTSolver {
                 break;
             case USER:
                 listener.processUser(this, problem);
+                break;
+            case LOSER:
+                listener.processLoser(this, problem);
                 break;
         }
     }

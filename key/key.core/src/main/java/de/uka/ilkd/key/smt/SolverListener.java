@@ -10,4 +10,6 @@ public interface SolverListener {
     void processTimeout(SMTSolver solver, SMTProblem problem);
 
     void processUser(SMTSolver solver, SMTProblem problem);
+
+    void processLoser(SMTSolver solver, SMTProblem problem);
 }
