@@ -260,7 +260,11 @@ public final class SMTSolverImplementation implements SMTSolver {
             String msg = processLauncher.getPipe().readMessage();
             while (msg != null) {
                 socket.messageIncoming(processLauncher.getPipe(), msg);
-                msg = processLauncher.getPipe().readMessage();
+                synchronized (processLauncher) {
+                    if (!Thread.currentThread().isInterrupted()) {
+                        msg = processLauncher.getPipe().readMessage();
+                    }
+                }
             }
             setReasonOfInterruption(ReasonOfInterruption.NO_INTERRUPTION);
         } catch (IllegalStateException | IOException | InterruptedException e) {
@@ -289,6 +293,7 @@ public final class SMTSolverImplementation implements SMTSolver {
                 listener.processUser(this, problem);
                 break;
             case LOSER:
+                setReasonOfInterruption(ReasonOfInterruption.EXCEPTION, e);
                 listener.processLoser(this, problem);
                 break;
         }

@@ -72,7 +72,7 @@ public class SolverCommunication {
      * messages are interwoven but in order.
      * @return all messages sent in both directions
      */
-    public Iterable<Message> getMessages() {
+    public synchronized Iterable<Message> getMessages() {
         // wrap into an unmodifiable list to prohibit changes to the messages list
         return Collections.unmodifiableList(messages);
     }
@@ -83,7 +83,7 @@ public class SolverCommunication {
      * @param type the type to filter the messages for
      * @return a new Iterable containing all messages of the given type
      */
-    public Iterable<Message> getMessages(MessageType type) {
+    public synchronized Iterable<Message> getMessages(MessageType type) {
         // since we stream from a list, the original order is maintained
         return messages.stream()
             .sequential()
@@ -97,7 +97,7 @@ public class SolverCommunication {
      * containing all the output messages sent by the solver (including error messages!).
      * @return a new Iterable containing all output messages of the solver
      */
-    public Iterable<Message> getOutMessages() {
+    public synchronized Iterable<Message> getOutMessages() {
         // since we stream from a list, the original order is maintained
         return messages.stream()
             .sequential()
