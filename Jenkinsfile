@@ -1,7 +1,7 @@
 pipeline {
     agent {
         docker {
-            label "Gentzen || BW Cloud Neu || Hilbert || Goedel"
+            label "bwcloud"
             image 'wadoon/key-test-docker:jdk11'
         }
     }
@@ -28,13 +28,13 @@ pipeline {
             steps {
                 sh 'cd key && ./gradlew --continue test'
             }
-        }*/
+        }
 
         stage('Test: testProveRules') {
             steps {
                 sh 'cd key && ./gradlew --continue testProveRules'
             }
-        }
+        }*/
 
         stage('Test: testRunAllFunProofs') {
             steps {
