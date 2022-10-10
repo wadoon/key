@@ -1,6 +1,7 @@
 pipeline {
     agent {
         docker {
+            label "Gentzen || BW Cloud Neu || Hilbert || Goedel"
             image 'wadoon/key-test-docker:jdk11'
         }
     }
