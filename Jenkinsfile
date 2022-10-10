@@ -23,11 +23,11 @@ pipeline {
             }
         }
 
-        stage('Test: JUnit') {
+        /*stage('Test: JUnit') {
             steps {
                 sh 'cd key && ./gradlew --continue test'
             }
-        }
+        }*/
 
         stage('Test: testProveRules') {
             steps {

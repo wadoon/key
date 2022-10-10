@@ -87,7 +87,7 @@ public class SolverLauncher implements SolverListener {
      * Variable is initialized on first construction of {@link SolverLaunchers}
      */
     @Nonnull
-    private static ExecutorService executorService;
+    private final ForkJoinPool executorService = ForkJoinPool.commonPool();
 
     /**
      * A session encapsulates some attributes that should be accessed only by
@@ -118,10 +118,6 @@ public class SolverLauncher implements SolverListener {
      */
     public SolverLauncher(SMTSettings settings) {
         this.settings = settings;
-        if (executorService == null) {
-            executorService = Executors.newFixedThreadPool(settings.getMaxConcurrentProcesses(),
-                    new DefaultDaemonThreadFactory());
-        }
     }
 
     /**
@@ -176,7 +172,8 @@ public class SolverLauncher implements SolverListener {
      * Stops the execution of all previously submitted {@link SMTSolver} task.
      */
     public void stop(ReasonOfInterruption reason) {
-        synchronized (submittedTasks) { //can only be called from a different than the thread that called launch"
+        //can only be called from a different than the thread that called launch"
+        synchronized (submittedTasks) {
             submittedTasks.forEach((k, v) -> {
                 for (Future<SMTSolverResult> submittedTask : v) {
                     submittedTask.cancel(true);
@@ -243,23 +240,27 @@ public class SolverLauncher implements SolverListener {
     }
 
     private void launchSolvers(List<SMTSolver> solvers,
-                               Collection<SMTProblem> problems, Collection<SolverType> solverTypes) {
+                               Collection<SMTProblem> problems,
+                               Collection<SolverType> solverTypes) {
         //Show progress dialog
         notifyListenersOfStart(problems, solverTypes);
 
         // sorting by timeout to maintain a increasing waiting time list
         solvers.sort(Comparator.comparing(SMTSolver::getTimeout));
 
-        // callback to cancelCallback all known solvers on the same sub-problem
+        // callback to cancel all known solvers on the same sub-problem
         Consumer<SMTProblem> cancelCallback = smtProblem -> {
             synchronized (submittedTasks) {
                 if (submittedTasks.containsKey(smtProblem)) {
                     smtProblem.getSolvers().forEach(it -> it.interrupt(ReasonOfInterruption.LOSER));
                     submittedTasks.get(smtProblem).forEach(it -> {
                         try {
-                            it.cancel(true);
+                            if(!it.isCancelled() && ! it.isDone()) {
+                                it.cancel(true);
+                            }
                         } catch (CompletionException ignore) {
-                            //ignore: Task is already finished. No actions needed.
+                            //ignore: Task is already finished or result is irrelevant.
+                            // No actions needed.
                         }
                     });
                 }
@@ -270,17 +271,40 @@ public class SolverLauncher implements SolverListener {
         synchronized (submittedTasks) {
             for (var it : solvers) {
                 final var future = executorService.submit(createSolverTask(it, cancelCallback));
-                submittedTasks.computeIfAbsent(it.getProblem(), k -> new ArrayList<>(4)).add(future);
+                submittedTasks.computeIfAbsent(it.getProblem(), k -> new ArrayList<>(4))
+                        .add(future);
                 futures.add(future);
             }
         }
 
+        waitForTermination(solvers, futures);
+
+        // kill remaining tasks!
+        synchronized (submittedTasks) {
+            for (var entries : submittedTasks.entrySet()) {
+                for (var submittedTask : entries.getValue()) {
+                    submittedTask.cancel(true);
+                }
+            }
+        }
+
+        for (SMTSolver solver : solvers) {
+            solver.interrupt(ReasonOfInterruption.USER);
+        }
+
+        notifyListenersOfStop();
+    }
+
+    private void waitForTermination(List<SMTSolver> solvers, ArrayList<Future<SMTSolverResult>> futures) {
         for (int i = 0; i < solvers.size(); i++) {
             long currentTimeout = solvers.get(i).getTimeout();
             final var startTime = solvers.get(i).getStartTime();
             long waitTime = currentTimeout +
-                    startTime < 0 ? 0 /* not started, just wait the timeout */
-                    : Math.min(0, startTime) - System.currentTimeMillis(); // time wasted between start and get() call.
+                    startTime < 0
+                    /* not started, just wait the timeout */
+                    ? 0
+                    // time wasted between start and get() call.
+                    : Math.min(0, startTime) - System.currentTimeMillis();
             var future = futures.get(i);
             try {
                 future.get(waitTime, TimeUnit.MILLISECONDS);
@@ -299,19 +323,6 @@ public class SolverLauncher implements SolverListener {
                 LOGGER.info("SMT solver was cancelled while we wait on termination.");
             }
         }
-
-        // kill remaining tasks!
-        for (var entries : submittedTasks.entrySet()) {
-            for (var submittedTask : entries.getValue()) {
-                submittedTask.cancel(true);
-            }
-        }
-
-        for (SMTSolver solver : solvers) {
-            solver.interrupt(ReasonOfInterruption.USER);
-        }
-
-        notifyListenersOfStop();
     }
 
     private void notifyListenersOfStart(Collection<SMTProblem> problems, Collection<SolverType> solverTypes) {
@@ -459,30 +470,4 @@ class Session {
         }
     }
 
-}
-
-/**
- * An adoption of the original {@link java.util.concurrent.Executors.DefaultThreadFactory} for creating daemon threads.
- * Using this thread factory in {@link ExecutorService} does prevent them from blocking regular termination by
- * reaching the end of main entry point.
- */
-class DefaultDaemonThreadFactory implements ThreadFactory {
-    private static final AtomicInteger poolNumber = new AtomicInteger(1);
-    private final ThreadGroup group;
-    private final AtomicInteger threadNumber = new AtomicInteger(1);
-    private final String namePrefix;
-
-    DefaultDaemonThreadFactory() {
-        SecurityManager s = System.getSecurityManager();
-        group = (s != null) ? s.getThreadGroup() : Thread.currentThread().getThreadGroup();
-        namePrefix = "solver-launcher-pool-" + poolNumber.getAndIncrement() + "-thread-";
-    }
-
-    public Thread newThread(@Nonnull Runnable r) {
-        Thread t = new Thread(group, r, namePrefix + threadNumber.getAndIncrement(), 0);
-        t.setDaemon(true);
-        if (t.getPriority() != Thread.NORM_PRIORITY)
-            t.setPriority(Thread.NORM_PRIORITY);
-        return t;
-    }
 }
