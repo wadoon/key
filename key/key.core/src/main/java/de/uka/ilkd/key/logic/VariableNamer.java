@@ -552,37 +552,7 @@ public abstract class VariableNamer implements InstantiationProposer {
     public static ProgramElementName parseName(String name,
     					       NameCreationInfo creationInfo,
 					       Comment[] comments) {
-    	ProgramElementName result;
-
-	int sepPos = name.lastIndexOf(TempIndProgramElementName.SEPARATOR);
-	if(sepPos > 0) {
-	    String basename = name.substring(0, sepPos);
-	    int index = Integer.parseInt(name.substring(sepPos + 1));
-	    result = new TempIndProgramElementName(basename,
-	    					   index,
-						   creationInfo,
-						   comments);
-	} else {
-	    sepPos = name.lastIndexOf(PermIndProgramElementName.SEPARATOR);
-	    if(sepPos > 0) {
-	    	try {
-		    String basename = name.substring(0, sepPos);
-		    int index = Integer.parseInt(name.substring(sepPos + 1));
-		    result = new PermIndProgramElementName(basename,
-		    					   index,
-							   creationInfo,
-							   comments);
-	    	} catch(NumberFormatException e) {
-		    result = new ProgramElementName(name,
-		    				    creationInfo,
-						    comments);
-	    	}
-	    } else {
-	    	result = new ProgramElementName(name, creationInfo, comments);
-	    }
-    	}
-
-	return result;
+		return new ProgramElementName(name, creationInfo, comments);
     }
 
 
