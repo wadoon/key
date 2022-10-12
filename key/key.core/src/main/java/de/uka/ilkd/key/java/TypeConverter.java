@@ -181,6 +181,13 @@ public final class TypeConverter {
                 KeYJavaType kjt = tr.getKeYJavaType();
                 return findThisForSortExact(kjt.getSort(), ec);
             }
+            var inst = ec.getRuntimeInstance();
+            if (inst == null) {
+                LOGGER.warn("Used 'this' in a static context: {} {}",
+                        prefix, prefix.getClass());
+                throw new IllegalArgumentException("TypeConverter failed to convert "
+                        + prefix);
+            }
             return convertToLogicElement(ec.getRuntimeInstance());
         } else {
             LOGGER.debug("WARNING: unknown reference prefix: {} {}",
