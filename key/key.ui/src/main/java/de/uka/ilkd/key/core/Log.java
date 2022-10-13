@@ -28,12 +28,12 @@ public class Log {
 
 
     public static void configureLogging(Verbosity verbosity) {
-        ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger)
+        /*ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger)
                 LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
         Appender<ILoggingEvent> consoleAppender = root.getAppender("STDOUT");
         var filter = new ThresholdFilter();
         consoleAppender.addFilter(filter);
         filter.setLevel("WARN");
-        filter.setLevel(verbosity.name());
+        filter.setLevel(verbosity.name());*/
     }
 }
