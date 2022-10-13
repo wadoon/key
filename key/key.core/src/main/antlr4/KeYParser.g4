@@ -1,21 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License.
-// See LICENSE.TXT for details.
-//
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License.
-// See LICENSE.TXT for details.
-//
-//
-
 parser grammar KeYParser;
 
 @header {
@@ -711,8 +693,18 @@ option
 option_list
 :
   LPAREN
-    option (COMMA option)*
+    ( (option (COMMA option)*)
+      | option_expr)
   RPAREN
+;
+
+option_expr
+:
+    option_expr AND option_expr #option_expr_and
+  | option_expr OR option_expr  #option_expr_or
+  | NOT option_expr             #option_expr_not
+  | LPAREN option_expr RPAREN   #option_expr_paren
+  | option                      #option_expr_prop
 ;
 
 goalspec

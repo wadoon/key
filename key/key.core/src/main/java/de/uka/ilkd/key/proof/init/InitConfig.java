@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.proof.init;
 
 import java.util.*;
@@ -273,12 +260,13 @@ public class InitConfig {
           return;
        }
        final LinkedHashMap<Name,Taclet> tacletCache = new LinkedHashMap<Name, Taclet>();
+       var choices = Collections.unmodifiableSet(activatedChoices.toSet());
        for (Taclet t : taclets) {
           TacletBuilder<? extends Taclet> b = taclet2Builder.get(t);
 
-          if(t.getChoices().subset(activatedChoices)){
+          if(t.getChoices().eval(choices)){
              if (b != null && b.getGoal2Choices() != null){
-                t = b.getTacletWithoutInactiveGoalTemplates(activatedChoices);
+                t = b.getTacletWithoutInactiveGoalTemplates(choices);
              }
 
              if (t != null) {

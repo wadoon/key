@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.gui;
 
 import java.awt.BorderLayout;
@@ -34,18 +21,7 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.Map;
 
-import javax.swing.BoxLayout;
-import javax.swing.DefaultCellEditor;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTable;
-import javax.swing.JTextArea;
-import javax.swing.ScrollPaneConstants;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
@@ -123,6 +99,26 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 		setLocationRelativeTo(parent);
 
 		setVisible(true);
+
+		this.focusFirstEditableCell();
+	}
+
+	private void focusFirstEditableCell() {
+		for (int i = 0; i < model.length; i++) {
+			if (model[i] != null) {
+				var table = dataTable[i];
+				for (int row = 0; row < table.getRowCount(); ++row) {
+					for (int column = 0; column < table.getColumnCount(); ++column) {
+						if (table.isCellEditable(row, column)) {
+							table.editCellAt(row, column);
+							table.changeSelection(row, column, false, false);
+							((PositionSettable) table.getCellEditor(row, column)).requestFocus();
+							return;
+						}
+					}
+				}
+			}
+		}
 	}
 
 

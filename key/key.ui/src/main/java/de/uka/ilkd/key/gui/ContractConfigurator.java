@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.gui;
 
 import java.awt.Dimension;
@@ -18,17 +5,15 @@ import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
-import javax.swing.KeyStroke;
 
+import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.speclang.Contract;
 
@@ -136,18 +121,7 @@ public class ContractConfigurator extends JDialog {
             }
         });
         buttonPanel.add(cancelButton);
-        ActionListener escapeListener = new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                if(event.getActionCommand().equals("ESC")) {
-                    cancelButton.doClick();
-                }
-            }
-        };
-        cancelButton.registerKeyboardAction(
-                            escapeListener,
-                            "ESC",
-                            KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                            JComponent.WHEN_IN_FOCUSED_WINDOW);
+        GuiUtilities.attachClickOnEscListener(cancelButton);
 
         
         //show

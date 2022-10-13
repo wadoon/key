@@ -1,18 +1,6 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.gui;
 
+import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import org.key_project.util.java.IOUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,8 +12,6 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import java.awt.*;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
@@ -307,16 +293,7 @@ public final class ExampleChooser extends JDialog {
             setVisible(false);
         });
         buttonPanel.add(cancelButton);
-        ActionListener escapeListener = event -> {
-            if (event.getActionCommand().equals("ESC")) {
-                cancelButton.doClick();
-            }
-        };
-        cancelButton.registerKeyboardAction(
-                escapeListener,
-                "ESC",
-                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                JComponent.WHEN_IN_FOCUSED_WINDOW);
+        GuiUtilities.attachClickOnEscListener(cancelButton);
 
         // select first example
         DefaultMutableTreeNode firstLeaf = ((DefaultMutableTreeNode) model.getRoot()).getFirstLeaf();

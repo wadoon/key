@@ -1,29 +1,11 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.rule;
 
+import de.uka.ilkd.key.logic.*;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.PIOPathIterator;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
@@ -118,7 +100,7 @@ public class RewriteTaclet extends FindTaclet {
 			 Term                      find,
 			 ImmutableMap<SchemaVariable,TacletPrefix> prefixMap, 
 			 int                       p_applicationRestriction,
-			 ImmutableSet<Choice> choices,
+             ChoiceExpr choices,
 			 ImmutableSet<TacletAnnotation> tacletAnnotations){
         this(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap,
              p_applicationRestriction, choices, false,
@@ -132,7 +114,7 @@ public class RewriteTaclet extends FindTaclet {
 			 Term                      find,
 			 ImmutableMap<SchemaVariable,TacletPrefix> prefixMap, 
 			 int                       p_applicationRestriction,
-			 ImmutableSet<Choice> choices,
+			 ChoiceExpr choices,
              boolean surviveSymbExec,
              ImmutableSet<TacletAnnotation> tacletAnnotations){
 	super(name, applPart, goalTemplates, ruleSets, attrs,

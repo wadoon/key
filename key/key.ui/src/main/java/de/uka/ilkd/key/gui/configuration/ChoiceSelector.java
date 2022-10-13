@@ -1,22 +1,7 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.gui.configuration;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,7 +12,6 @@ import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JList;
@@ -35,17 +19,16 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.TitledBorder;
 
+import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.settings.ChoiceSettings;
-import de.uka.ilkd.key.settings.ProofSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -176,16 +159,7 @@ public class ChoiceSelector extends JDialog {
                 setVisible(false);
                 dispose();
             });
-            ActionListener escapeListener = event -> {
-                if(event.getActionCommand().equals("ESC")) {
-                    cancelButton.doClick();
-                }
-            };
-            cancelButton.registerKeyboardAction(
-                    escapeListener,
-                    "ESC",
-                    KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                    JComponent.WHEN_IN_FOCUSED_WINDOW);
+            GuiUtilities.attachClickOnEscListener(cancelButton);
             buttonPanel.add(cancelButton);
         }
 

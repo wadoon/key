@@ -1,26 +1,10 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.rule;
 
+import de.uka.ilkd.key.logic.*;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.logic.BoundVarsVisitor;
-import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
@@ -73,7 +57,7 @@ public abstract class FindTaclet extends Taclet {
                       TacletAttributes attrs,
                       Term find,
                       ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
-                      ImmutableSet<Choice> choices,
+                      ChoiceExpr choices,
                       boolean surviveSymbExec,
                       ImmutableSet<TacletAnnotation> tacletAnnotations) {
         super(name, applPart, goalTemplates, ruleSets, attrs, prefixMap,
@@ -102,7 +86,7 @@ public abstract class FindTaclet extends Taclet {
 		      ImmutableList<RuleSet> ruleSets,
 		      TacletAttributes attrs, Term find,
 		      ImmutableMap<SchemaVariable,TacletPrefix> prefixMap,
-		      ImmutableSet<Choice> choices,
+		      ChoiceExpr choices,
 		      ImmutableSet<TacletAnnotation> tacletAnnotations){
 	this(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap,
              choices, false, tacletAnnotations);

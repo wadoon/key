@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.rule.tacletbuilder;
 
 import java.util.ArrayList;
@@ -21,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import de.uka.ilkd.key.logic.*;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -34,17 +22,6 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.OpCollector;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -224,13 +201,14 @@ public class TacletGenerator {
                                               findTerm);
         
         // choices, rule set
-        Choice choice = new Choice(satisfiabilityGuard? "showSatisfiability" : "treatAsAxiom", "modelFields");
+        var choice = ChoiceExpr.variable("modelFields",
+                satisfiabilityGuard ? "showSatisfiability" : "treatAsAxiom");
         final RuleSet ruleSet = new RuleSet(new Name(
                 satisfiabilityGuard? "inReachableStateImplication" : "classAxiom"));
 
         //create taclet
         tacletBuilder.setName(tacletName);
-        tacletBuilder.setChoices(DefaultImmutableSet.<Choice>nil().add(choice));
+        tacletBuilder.setChoices(choice);
         tacletBuilder.setFind(findTerm);
         tacletBuilder.addTacletGoalTemplate(axiomTemplate);
         tacletBuilder.addVarsNotFreeIn(schemaAxiom.boundVars, selfSV);
@@ -403,9 +381,8 @@ public class TacletGenerator {
                 tacletBuilder.addVarsNotFreeIn(boundSV, paramSV);
             }
         }
-        Choice c = new Choice(satisfiability? "showSatisfiability" : "treatAsAxiom",
-                "modelFields");
-        tacletBuilder.setChoices(DefaultImmutableSet.<Choice>nil().add(c));
+        var c = ChoiceExpr.variable("modelFields", satisfiability ? "showSatisfiability" : "treatAsAxiom");
+        tacletBuilder.setChoices(c);
 
         if (satisfiability)
             functionalRepresentsAddSatisfiabilityBranch(target, services, heapSVs,
@@ -511,7 +488,9 @@ public class TacletGenerator {
     public ImmutableSet<Taclet> generateContractAxiomTaclets(
             Name name,
             Term originalPre,
+            Term originalFreePre,
             Term originalPost,
+            Term originalFreePost,
             Term originalMby,
             KeYJavaType kjt,
             IObserverFunction target,
@@ -588,25 +567,25 @@ public class TacletGenerator {
         final Term find =TB.func(target, subs);
 
         //build taclet
-        Term addForumlaTerm = originalPre;
+        Term addFormulaTerm = originalPre;
         if(wfFormula != null) {
-            addForumlaTerm = TB.and(addForumlaTerm, wfFormula);
+            addFormulaTerm = TB.and(addFormulaTerm, wfFormula);
         }
         if(createdFormula != null) {
-            addForumlaTerm = TB.and(addForumlaTerm, createdFormula);
+            addFormulaTerm = TB.and(addFormulaTerm, createdFormula);
         }
         if(selfNull != null) {
-            addForumlaTerm = TB.and(addForumlaTerm, TB.not(selfNull));
+            addFormulaTerm = TB.and(addFormulaTerm, TB.not(selfNull));
         }
         if(mbyOK != null) {
-            addForumlaTerm = TB.and(addForumlaTerm, mbyOK);
+            addFormulaTerm = TB.and(addFormulaTerm, mbyOK);
         }
 
         pvs = pvs.append(originalSelfVar).append(originalParamVars); // .append(originalResultVar)
         svs = svs.append(selfSV).append(paramSVs); // .append(resultSV)
         final TermAndBoundVarPair schemaAdd =
-               createSchemaTerm(TB.imp(addForumlaTerm, OpReplacer.replace(TB.var(originalResultVar), 
-                       find, originalPost, services.getTermFactory())), pvs, svs, services);
+               createSchemaTerm(TB.imp(addFormulaTerm, OpReplacer.replace(TB.var(originalResultVar), 
+                       find, TB.and(originalPost, originalFreePost), services.getTermFactory())), pvs, svs, services);
 
         final Term addedFormula = schemaAdd.term;
         final SequentFormula addedCf = new SequentFormula(addedFormula);

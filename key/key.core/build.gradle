@@ -79,7 +79,33 @@ task generateSMTListings {
     }
 }
 
+task generateSolverPropsList {
+    def pack = "de/uka/ilkd/key/smt/solvertypes"
+    def resourcesDir = "${project.projectDir}/src/main/resources"
+    def outputDir = resourcesDir // in the future that should be "${project.buildDir}/resources/main"
+    // ${project.buildDir}
+    doLast {
+        def list = []
+        def dir = new File("$outputDir/$pack/")
+        dir.eachFileRecurse({ file ->
+            if (file.name.endsWith(".props")) {
+                list.add(file.name)
+            }
+        })
+        if (!file("$outputDir/$pack/solvers.txt").exists()) {
+            String files = ''
+            for (String propsFile : list) {
+                files += propsFile + System.lineSeparator()
+            }
+            new File("$outputDir/$pack/solvers.txt").withWriter { listSolvers ->
+                listSolvers.write files
+            }
+        }
+    }
+}
+
 classes.dependsOn << generateSMTListings
+classes.dependsOn << generateSolverPropsList
 
 
 tasks.withType(Test) {
@@ -94,14 +120,22 @@ task testProveRules(type: Test) {
     //useJUnitPlatform() {includeTags "testProveRules"    }
 }
 
-task testRunAllProofs(type: Test) {
+task testRunAllFunProofs(type: Test) {
+    description 'Prove/reload all keyfiles tagged for regression testing'
+    group "verification"
+    filter {
+        includeTestsMatching "RunAllProofsFunctional"
+    }
+}
+
+task testRunAllInfProofs(type: Test) {
     description 'Prove/reload all keyfiles tagged for regression testing'
     group "verification"
     filter {
         includeTestsMatching "RunAllProofsInfFlow"
-        includeTestsMatching "RunAllProofsFunctional"
     }
 }
+
 
 task testProveSMTLemmas(type: Test) {
     description 'Prove (or load proofs for) lemmas used in the SMT translation'

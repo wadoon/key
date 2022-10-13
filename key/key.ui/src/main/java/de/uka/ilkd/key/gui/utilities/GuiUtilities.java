@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.gui.utilities;
 
 import java.awt.Color;
@@ -18,9 +5,10 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Toolkit;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 
-import javax.swing.JComponent;
-import javax.swing.JScrollPane;
+import javax.swing.*;
 import javax.swing.border.TitledBorder;
 
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
@@ -99,5 +87,24 @@ public final class GuiUtilities {
         } else {
             setCenter(comp);
         }
+    }
+
+    private static final String ESC_COMMAND = "ESC";
+
+    /**
+     * Adds a listener to the esc button that clicks the button.
+     * @param button the button to click
+     */
+    public static void attachClickOnEscListener(JButton button) {
+        ActionListener escapeListener = event -> {
+            if (event.getActionCommand().equals(ESC_COMMAND)) {
+                button.doClick();
+            }
+        };
+        button.registerKeyboardAction(
+                escapeListener,
+                ESC_COMMAND,
+                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+                JComponent.WHEN_IN_FOCUSED_WINDOW);
     }
 }
