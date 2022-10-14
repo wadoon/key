@@ -28,13 +28,13 @@ pipeline {
             steps {
                 sh 'cd key && ./gradlew --continue test'
             }
-        }*/
+        }
 
         stage('Test: testProveRules') {
             steps {
                 sh 'cd key && ./gradlew --continue testProveRules'
             }
-        }
+        }*/
 
         stage('Test: testRunAllFunProofs') {
             steps {
@@ -55,7 +55,7 @@ pipeline {
 
             withCredentials([string(credentialsId: 'jenkins_publish_results', variable: 'DEPLOY_TOKEN')]) {
                 //set SECRET with the credential content
-                sh 'cd key && ./upload_rap_statistics.sh'
+                sh 'cd key && bash ./scripts/tools/upload_rap_statistics.sh'
             }
         }
     }

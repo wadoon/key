@@ -1,13 +1,4 @@
-#!/usr/bin/python3
-
-import sys
-import os
-import re
-import urllib
-import json
-import pprint
-import requests
-
+#!/usr/bin/sh 
 
 HOST="https://git.key-project.org/api/v4"
 PROJECT_ID=58 # see https://git.key-project.org/key/key-stats/edit
@@ -31,7 +22,13 @@ set > env.sh
 
 ## Statistic files
 FUN_CSV=key.core/build/reports/runallproofs/runStatistics.csv
-IF_CSV=key.core/build/reports/runallproofs/runStatistics_infflow.csv
+
+# file does not exists
+#IF_CSV=key.core/build/reports/runallproofs/runStatistics_infflow.csv
+#     --form "actions[][action]=create" \
+#     --form "actions[][file_path]=$TARGET_FOLDER/run_infflow_stats.csv" \
+#     --form "actions[][content]=<$IF_CSV" \
+#     \
 
 curl --request POST \
      --form "branch=master" \
@@ -45,10 +42,6 @@ curl --request POST \
      --form "actions[][action]=create" \
      --form "actions[][file_path]=$TARGET_FOLDER/run_functional_stats.csv" \
      --form "actions[][content]=<$FUN_CSV" \
-     \
-     --form "actions[][action]=create" \
-     --form "actions[][file_path]=$TARGET_FOLDER/run_infflow_stats.csv" \
-     --form "actions[][content]=<$IF_CSV" \
      \
      --header "PRIVATE-TOKEN: $DEPLOY_TOKEN" \
      "$HOST/projects/$PROJECT_ID/repository/commits"
