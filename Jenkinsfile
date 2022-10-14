@@ -24,7 +24,7 @@ pipeline {
             }
         }
 
-        /*stage('Test: JUnit') {
+        stage('Test: JUnit') {
             steps {
                 sh 'cd key && ./gradlew --continue test'
             }
@@ -34,7 +34,7 @@ pipeline {
             steps {
                 sh 'cd key && ./gradlew --continue testProveRules'
             }
-        }*/
+        }
 
         stage('Test: testRunAllFunProofs') {
             steps {
