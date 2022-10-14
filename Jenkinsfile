@@ -24,11 +24,11 @@ pipeline {
             }
         }
 
-        stage('Test: JUnit') {
+        /*stage('Test: JUnit') {
             steps {
                 sh 'cd key && ./gradlew --continue test'
             }
-        }
+        }*/
 
         stage('Test: testProveRules') {
             steps {
@@ -68,7 +68,7 @@ pipeline {
             withCredentials([string(credentialsId: 'jenkins_publish_results', variable: 'DEPLOY_TOKEN')]) {
                 //set SECRET with the credential content
                 echo "My secret text is '${SECRET}'"
-                
+
             }
 
         }
