@@ -64,6 +64,13 @@ pipeline {
     post {
         always {
             junit(testResults: 'key/*/build/test-results/*/*.xml', allowEmptyResults: true, healthScaleFactor: 1)
+
+            withCredentials([string(credentialsId: 'jenkins_publish_results', variable: 'DEPLOY_TOKEN')]) {
+                //set SECRET with the credential content
+                echo "My secret text is '${SECRET}'"
+                
+            }
+
         }
     }
 }
