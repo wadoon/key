@@ -31,9 +31,8 @@ FUN_CSV=key.core/build/reports/runallproofs/runStatistics.csv
 #     \
 
 curl --request POST \
-     --form "branch=master" \
+     --form "branch=main" \
      --form "commit_message=$MESSAGE" \
-     --form "start_branch=master" \
      \
      --form "actions[][action]=create" \
      --form "actions[][file_path]=$TARGET_FOLDER/env.sh" \

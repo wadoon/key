@@ -55,7 +55,7 @@ pipeline {
 
             withCredentials([string(credentialsId: 'jenkins_publish_results', variable: 'DEPLOY_TOKEN')]) {
                 //set SECRET with the credential content
-                sh 'cd key && bash ./scripts/tools/upload_rap_statistics.sh'
+                sh 'cd key && bash -x ./scripts/tools/upload_rap_statistics.sh'
             }
         }
     }
