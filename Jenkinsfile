@@ -47,18 +47,6 @@ pipeline {
                 sh 'cd key && ./gradlew --continue testRunAllInfProofs'
             }
         }
-
-        stage('Check Formatting') {
-            steps {
-                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    sh 'cd key && ./gradlew --continue spotlessCheck'
-                }
-            }
-        }
-
-        stage('Docs') {
-            steps{ sh 'key/scripts/jenkins/generateDoc.sh'}
-        }
     }
 
     post {
@@ -68,9 +56,7 @@ pipeline {
             withCredentials([string(credentialsId: 'jenkins_publish_results', variable: 'DEPLOY_TOKEN')]) {
                 //set SECRET with the credential content
                 echo "My secret text is '${SECRET}'"
-
             }
-
         }
     }
 }
