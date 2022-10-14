@@ -55,7 +55,7 @@ pipeline {
 
             withCredentials([string(credentialsId: 'jenkins_publish_results', variable: 'DEPLOY_TOKEN')]) {
                 //set SECRET with the credential content
-                echo "My secret text is '${SECRET}'"
+                sh 'cd key && ./upload_rap_statistics.sh'
             }
         }
     }
