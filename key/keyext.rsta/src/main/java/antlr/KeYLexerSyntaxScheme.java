@@ -5,11 +5,11 @@ import org.fife.ui.rsyntaxtextarea.SyntaxScheme;
 
 import java.awt.*;
 
-import static antlr.KeYLexer.*;
+import static de.uka.ilkd.key.nparser.KeYLexer.*;
 
-public class KeYSyntaxScheme extends SyntaxScheme {
+public class KeYLexerSyntaxScheme extends SyntaxScheme {
 
-    public KeYSyntaxScheme() {
+    public KeYLexerSyntaxScheme() {
         super(true);
     }
 

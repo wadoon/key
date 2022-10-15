@@ -7,16 +7,17 @@ import org.fife.ui.rtextarea.RTextScrollPane;
 import javax.swing.*;
 import java.awt.*;
 
-public class TextEditor extends JFrame {
+public class TextEditor extends JDialog {
 
     private JTabbedPane tabs;
 
-    public TextEditor() {
+    public TextEditor(Dialog parent) {
+        super(parent);
         tabs = new JTabbedPane();
         tabs.setPreferredSize(new Dimension(400, 400));
         setContentPane(tabs);
         setTitle("Text Editor");
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         pack();
         setLocationRelativeTo(null);
     }

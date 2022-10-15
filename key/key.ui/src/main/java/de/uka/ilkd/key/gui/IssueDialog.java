@@ -3,10 +3,13 @@ package de.uka.ilkd.key.gui;
 import de.uka.ilkd.key.gui.actions.EditSourceFileAction;
 import de.uka.ilkd.key.gui.actions.SendFeedbackAction;
 import de.uka.ilkd.key.gui.configuration.Config;
+import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
+import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.sourceview.JavaDocument;
 import de.uka.ilkd.key.gui.sourceview.TextLineNumber;
 import de.uka.ilkd.key.gui.utilities.SquigglyUnderlinePainter;
 import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.nparser.KeYLexer;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.speclang.PositionedString;
@@ -95,6 +98,11 @@ public final class IssueDialog extends JDialog {
     /** flag to switch between dialog for warnings and critical issues where parsing is aborted.
      * In the latter case only a single exception is show, which can also not be ignored */
     private final boolean critical;
+
+
+
+    private Class<?> issueGrammarClass;
+
 
     /** Reacts to selection events to the "Show details" checkbox (fold/unfold stacktrace).
      * Performs some calculations to make the dialog only expand/collapse the stacktrace panel, but
@@ -214,6 +222,7 @@ public final class IssueDialog extends JDialog {
 
         JScrollPane scrWarnings = createWarningsPane(font);
         splitCenter.setTopComponent(scrWarnings);
+
 
         JPanel sourcePanel = createSourcePanel(font);
         splitCenter.setBottomComponent(sourcePanel);
@@ -435,6 +444,9 @@ public final class IssueDialog extends JDialog {
         txtSource.setEditable(false);
         txtSource.setFont(font);
 
+        JPanel sourcePanel = new JPanel(new BorderLayout());
+        JPanel locPanel = new JPanel();
+
         // workaround to disable automatic line wrapping and enable horizontal scrollbar instead
         JPanel nowrap = new JPanel(new BorderLayout());
         nowrap.add(txtSource);
@@ -464,6 +476,17 @@ public final class IssueDialog extends JDialog {
         pButtons.add(btnSendFeedback);
         pButtons.add(chkDetails);
 
+        Collection<KeYGuiExtension.EditorExtension> ext = KeYGuiExtensionFacade.getEditorExtensions();
+        ext.forEach(it -> {
+            JButton but = new JButton(
+                    it.getEditorAction(issueGrammarClass,
+                            txtSource.getText(),
+                            MainWindow.getInstance(),
+                            this));
+            but.setText("rsta");
+            pButtons.add(but);
+        });
+
         chkDetails.addItemListener(detailsBoxListener);
 
         EditSourceFileAction action = new EditSourceFileAction(this, throwable);
@@ -486,9 +509,6 @@ public final class IssueDialog extends JDialog {
         }
         pSouth.add(pButtons);
         getRootPane().setDefaultButton(btnOK);
-
-        JPanel sourcePanel = new JPanel(new BorderLayout());
-        JPanel locPanel = new JPanel();
 
         fTextField.setEditable(false);
         lTextField.setEditable(false);
@@ -650,6 +670,8 @@ public final class IssueDialog extends JDialog {
                 }
             });
 
+            issueGrammarClass = getIssueGrammarClass(issue.fileName);
+
             if (isJava(issue.fileName)) {
                 showJavaSourceCode(source);
             } else {
@@ -714,6 +736,13 @@ public final class IssueDialog extends JDialog {
 
     private boolean isJava(String fileName) {
         return fileName.endsWith(".java");
+    }
+
+    private @Nullable Class<?> getIssueGrammarClass(String fileName) {
+        if (fileName.endsWith(".proof")) {
+            return KeYLexer.class;
+        }
+        return null;
     }
 
     public static int getOffsetFromLineColumn(String source, Position pos) {

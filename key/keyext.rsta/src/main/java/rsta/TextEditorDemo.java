@@ -1,5 +1,7 @@
 package rsta;
 
+import de.uka.ilkd.key.nparser.KeYLexer;
+
 import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,7 +13,7 @@ public class TextEditorDemo {
     private static final long serialVersionUID = 1L;
 
     private static final String inputFile = "brackets.txt";
-    private static final String grammarName = "Brackets.g4";
+    private static final Class<?> grammarClass = KeYLexer.class;
 
     public static void main(String[] args) {
         // Start all Swing applications on the EDT.
@@ -29,7 +31,7 @@ public class TextEditorDemo {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                InputDisplay.display(text.toString(), grammarName);
+                InputDisplay.display(text.toString(), grammarClass, new JDialog()).setVisible(true);
             }
         });
     }

@@ -8,27 +8,47 @@ import javacc.TokenManager;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Lexer;
-import org.antlr.v4.runtime.misc.Nullable;
+import org.antlr.v4.runtime.Parser;
 import org.fife.ui.rsyntaxtextarea.SyntaxScheme;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.awt.*;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Optional;
 
 public class InputDisplay {
 
-    public static void display(String text, String grammarName) {
-        TextEditor textEditor = new TextEditor();
+    private static final Class<Lexer> antlrLexerClass = Lexer.class;
 
-        textEditor.addPanel(text.toString(), createLanguageSupport(grammarName));
+    public static TextEditor display(String text, Class<?> lexerClass, Dialog parent) {
+        TextEditor textEditor = new TextEditor(parent);
 
-        textEditor.setVisible(true);
+        LanguageSupport languageSupport = createLanguageSupport(lexerClass);
+
+        if(languageSupport != null) {
+            textEditor.addPanel(text.toString(), languageSupport);
+        }
+
+        return textEditor;
     }
 
-    private static @Nullable LanguageSupport createLanguageSupport(String grammarName) {
-        if (grammarName.endsWith(".g4")) {
-            return createANTLRSupport("antlr." + grammarName.substring(0, grammarName.length() - 3));
-        } else if (grammarName.endsWith(".jj")) {
-            return createJavaCCSupport("javacc." + grammarName.substring(0, grammarName.length() - 3));
+    private static @Nullable LanguageSupport createLanguageSupport(Class<?> lexerClass) {
+        if (antlrLexerClass.isAssignableFrom(lexerClass)) {
+            return createANTLRSupport((Class<Lexer>) lexerClass);
+        }
+        return null;
+    }
+
+    private static SyntaxScheme createSyntaxScheme(String grammarName) {
+        try {
+            Class<SyntaxScheme> syntaxSchemeClass
+                    = (Class<SyntaxScheme>) Class.forName(grammarName + "SyntaxScheme");
+            return syntaxSchemeClass.getConstructor().newInstance();
+        } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException |
+                 IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
         }
         return null;
     }
@@ -62,43 +82,40 @@ public class InputDisplay {
         return null;
     }
 
-    private static @Nullable LanguageSupport createANTLRSupport(String grammarName) {
-        SyntaxScheme scheme = createSyntaxScheme(grammarName);
+    private static @Nullable LanguageSupport createANTLRSupport(Class<Lexer> lexerClass) {
+        SyntaxScheme scheme;
         try {
-            Class<Lexer> lexerClass
-                    = (Class<Lexer>) Class.forName(grammarName + "Lexer");
-            ANTLRLexerFactory factory = new ANTLRLexerFactory() {
-                @Override
-                public Lexer create(String input) {
-                    try {
-                        return lexerClass
-                                .getConstructor(CharStream.class)
-                                .newInstance(new ANTLRInputStream(input));
-                    } catch (InvocationTargetException | InstantiationException
-                             | IllegalAccessException | NoSuchMethodException e) {
-                        e.printStackTrace();
-                    }
-                    return null;
-                }
-            };
-            return new LanguageSupport(scheme, factory);
-        } catch (ClassNotFoundException e) {
+            String antlrGrammarFileName
+                    = "antlr." + makeLexer(lexerClass, "").getGrammarFileName();
+            scheme = createSyntaxScheme(
+                    antlrGrammarFileName.substring(0, antlrGrammarFileName.length() - 3)
+            );
+        } catch (NoSuchMethodException | InvocationTargetException
+                 | InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
+            return null;
         }
-        return null;
+        ANTLRLexerFactory factory = new ANTLRLexerFactory() {
+            @Override
+            public Lexer create(String input) {
+                try {
+                    return makeLexer(lexerClass, input);
+                } catch (NoSuchMethodException | InvocationTargetException |
+                         InstantiationException | IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+        };
+        return new LanguageSupport(scheme, factory);
     }
 
-    private static SyntaxScheme createSyntaxScheme(String grammarName) {
-        try {
-            Class<SyntaxScheme> syntaxSchemeClass
-                    = (Class<SyntaxScheme>) Class.forName(grammarName + "SyntaxScheme");
-            SyntaxScheme scheme = syntaxSchemeClass.getConstructor().newInstance();
-            return scheme;
-        } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException |
-                 IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return null;
+    private static Lexer makeLexer(Class<Lexer> lexerClass, String input)
+            throws NoSuchMethodException, InvocationTargetException,
+            InstantiationException, IllegalAccessException {
+        return lexerClass
+                    .getConstructor(CharStream.class)
+                    .newInstance(new ANTLRInputStream(input));
     }
 
 }

@@ -1,14 +1,12 @@
 package de.uka.ilkd.key.gui.extension.api;
 
+import java.awt.*;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.Collection;
 import java.util.List;
 
-import javax.swing.Action;
-import javax.swing.JComponent;
-import javax.swing.JMenu;
-import javax.swing.JToolBar;
+import javax.swing.*;
 
 import javax.annotation.Nonnull;
 
@@ -17,6 +15,7 @@ import de.uka.ilkd.key.gui.GoalList;
 import de.uka.ilkd.key.gui.InfoView;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.StrategySelectionView;
+import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
@@ -255,5 +254,9 @@ public interface KeYGuiExtension {
         default int getTermLabelPriority() {
             return 0;
         }
+    }
+
+    interface EditorExtension {
+        MainWindowAction getEditorAction(Class<?> grammarClass, String input, MainWindow window, Dialog parent);
     }
 }

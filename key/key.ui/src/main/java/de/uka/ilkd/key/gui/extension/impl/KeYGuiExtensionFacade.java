@@ -457,4 +457,9 @@ public final class KeYGuiExtensionFacade {
             return 0;
         }
     }
+
+    public static Collection<KeYGuiExtension.EditorExtension> getEditorExtensions() {
+        return getExtensionInstances(KeYGuiExtension.EditorExtension.class);
+    }
+
 }
