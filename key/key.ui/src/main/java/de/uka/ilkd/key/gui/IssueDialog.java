@@ -7,6 +7,7 @@ import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.sourceview.JavaDocument;
 import de.uka.ilkd.key.gui.sourceview.TextLineNumber;
+import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.gui.utilities.SquigglyUnderlinePainter;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.nparser.KeYLexer;
@@ -14,7 +15,6 @@ import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.SLEnvInput;
-import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExceptionTools;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.IOUtil;
@@ -32,7 +32,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 import java.util.*;
@@ -492,15 +491,7 @@ public final class IssueDialog extends JDialog {
         EditSourceFileAction action = new EditSourceFileAction(this, throwable);
         btnEditFile.setAction(action);
 
-        btnOK.registerKeyboardAction(
-            event -> {
-                if (event.getActionCommand().equals("ESC")) {
-                    btnOK.doClick();
-                }
-            },
-            "ESC",
-            KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-            JComponent.WHEN_IN_FOCUSED_WINDOW);
+        GuiUtilities.attachClickOnEscListener(btnOK);
 
         // by default, do not ignore any warnings
         chkIgnoreWarnings.setSelected(false);
