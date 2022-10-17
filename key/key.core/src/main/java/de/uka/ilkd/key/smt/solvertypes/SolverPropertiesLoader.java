@@ -3,6 +3,7 @@ package de.uka.ilkd.key.smt.solvertypes;
 import de.uka.ilkd.key.settings.SettingsConverter;
 import de.uka.ilkd.key.smt.communication.Z3Socket;
 import de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator;
+import org.key_project.util.Streams;
 import org.key_project.util.reflection.ClassLoaderUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -289,8 +290,19 @@ public class SolverPropertiesLoader {
         handlerOptions = SettingsConverter.readRawStringList(props,
                 SolverPropertiesLoader.HANDLER_OPTIONS, SPLIT, new String[0]);
 
-        // the solver specific preamble, may be null
-        preamble = SettingsConverter.readFile(props, PREAMBLE_FILE, null);
+        String preambleName = SettingsConverter.readRawString(props, PREAMBLE_FILE, null);
+        if (preambleName == null) {
+            preamble = null;
+        } else {
+            // the solver specific preamble, may be null
+            try {
+                InputStream preambleContent = SolverPropertiesLoader.class.getClassLoader()
+                        .getResourceAsStream(PACKAGE_PATH + preambleName);
+                preamble = preambleContent == null ? null : Streams.toString(preambleContent);
+            } catch (IOException e) {
+                preamble = null;
+            }
+        }
 
         // create the solver type
         return new SolverTypeImplementation(name, info, params, command, version, minVersion,

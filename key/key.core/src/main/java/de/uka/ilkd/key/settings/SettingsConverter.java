@@ -3,8 +3,12 @@ package de.uka.ilkd.key.settings;
 import de.uka.ilkd.key.smt.solvertypes.SolverPropertiesLoader;
 import org.key_project.util.Streams;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Properties;
 
 public final class SettingsConverter {
@@ -75,23 +79,6 @@ public final class SettingsConverter {
             return defaultValue;
         }
         return value.split(split);
-    }
-
-
-    public static String readFile(Properties props, String key, String defaultValue) {
-        String filePath = props.getProperty(key);
-        if (filePath == null) {
-            return defaultValue;
-        }
-        InputStream fileContent = SolverPropertiesLoader.class.getResourceAsStream(filePath);
-        if (fileContent == null) {
-            return defaultValue;
-        }
-        try {
-            return Streams.toString(fileContent);
-        } catch (IOException e) {
-            return defaultValue;
-        }
     }
 
     public static int read(Properties props, String key, int defaultVal) {
