@@ -4,6 +4,7 @@ import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.MiscTools;
 import org.antlr.runtime.RecognitionException;
+import org.antlr.v4.runtime.IntStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,7 +76,7 @@ public final class Location {
             // ANTLR starts lines in column 0, files in line 1.
             return new Location(re.input.getSourceName(), re.line, re.charPositionInLine + 1);
         } catch (MalformedURLException e) {
-            LOGGER.debug("Location could not be created from String: " + re.input.getSourceName(), e);
+            LOGGER.error("Location could not be created from String: {}", re.input.getSourceName(), e);
             return null;
         }
     }
@@ -105,6 +106,7 @@ public final class Location {
     /** Internal string representation. Do not rely on format! */
     @Override
     public String toString() {
-        return "[" + fileUrl + ":" + line + "," + column + "]";
+        var url = fileUrl == null ? IntStream.UNKNOWN_SOURCE_NAME : fileUrl.toString();
+        return "[" + url + ":" + line + "," + column + "]";
     }
 }
