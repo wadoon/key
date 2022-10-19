@@ -1781,7 +1781,7 @@ public class Recoder2KeYConverter {
         return new CopyAssignment(collectChildrenAndComments(arg));
     }
 
-    public CopyAssignment convert(de.uka.ilkd.key.java.recoderext.SetStatement arg) {
+    public SetStatement convert(de.uka.ilkd.key.java.recoderext.SetStatement arg) {
         return new SetStatement(collectChildrenAndComments(arg), arg.getParserContext());
     }
 

@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.java.expression.operator;
+package de.uka.ilkd.key.java.statement;
 
 import de.uka.ilkd.key.speclang.njml.JmlParser;
 import org.key_project.util.ExtList;
