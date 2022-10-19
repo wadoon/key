@@ -10,7 +10,9 @@ import de.uka.ilkd.key.java.declaration.modifier.Private;
 import de.uka.ilkd.key.java.declaration.modifier.Protected;
 import de.uka.ilkd.key.java.declaration.modifier.Public;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.java.expression.operator.SetStatement;
 import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
@@ -44,6 +46,7 @@ import org.antlr.v4.runtime.Token;
 import org.key_project.util.collection.*;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -1317,13 +1320,8 @@ public class JMLSpecFactory {
                     .create();
     }
 
-    /**
-     * Translates the condition Term of a JmlAssert statement.
-     *
-     * @param jmlAssert the statement to create the condition for
-     * @param pm the enclosing method
-     */
-    public void translateJmlAssertCondition(final JmlAssert jmlAssert, final IProgramMethod pm) {
+    private ProgramVariableCollection createProgramVariablesForStatement(Statement statement,
+            IProgramMethod pm) {
         final Map<LocationVariable, LocationVariable> atPreVars = new LinkedHashMap<>();
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
             atPreVars.put(heap, tb.atPreVar(heap.toString(), heap.sort(), true));
@@ -1334,12 +1332,67 @@ public class JMLSpecFactory {
                 tb.atPreVar(parameter.toString(), parameter.getKeYJavaType(), true));
         }
         final ImmutableList<ProgramVariable> paramVars =
-            append(collectLocalVariablesVisibleTo(jmlAssert, pm), parameters);
-        final ProgramVariableCollection pv =
-            new ProgramVariableCollection(tb.selfVar(pm, pm.getContainerType(), false), paramVars,
-                tb.resultVar(pm, false), tb.excVar(pm, false), atPreVars, termify(atPreVars),
-                Collections.emptyMap(), Collections.emptyMap());
+            append(collectLocalVariablesVisibleTo(statement, pm), parameters);
+        return new ProgramVariableCollection(tb.selfVar(pm, pm.getContainerType(), false),
+            paramVars, tb.resultVar(pm, false), tb.excVar(pm, false), atPreVars, termify(atPreVars),
+            Collections.emptyMap(), // should be the pre-state of the enclosing contract
+            Collections.emptyMap() // ignore for now
+        );
+    }
+
+    /**
+     * Translates the condition Term of a JmlAssert statement.
+     *
+     * @param jmlAssert the statement to create the condition for
+     * @param pm the enclosing method
+     */
+    public void translateJmlAssertCondition(final JmlAssert jmlAssert, final IProgramMethod pm) {
+        final var pv = createProgramVariablesForStatement(jmlAssert, pm);
         jmlAssert.translateCondition(jmlIo.classType(pm.getContainerType()), pv);
+    }
+
+    private @Nullable String checkSetStatementAssignee(Term assignee) {
+        if (services.getTypeConverter().getHeapLDT().isSelectOp(assignee.op())) {
+            var field = assignee.subs().last();
+            var op = field.op();
+            var split = HeapLDT.trySplitFieldName(op);
+            if (split != null) {
+                var attribute =
+                    services.getJavaInfo().getAttribute(split.attributeName, split.className);
+                if (attribute.isGhost()) {
+                    return null;
+                } else {
+                    return op + " is not a ghost field";
+                }
+            } else if (op.equals(services.getTypeConverter().getHeapLDT().getArr())) {
+                return "Arrays are not writeable using set statements";
+            } else {
+                return op + " is not a class field";
+            }
+        } else {
+            return "Not a field access";
+        }
+    }
+
+    /**
+     * Translates a set statement.
+     *
+     * @param statement the set statement
+     * @param pm the enclosing method
+     */
+    public void translateSetStatement(final SetStatement statement, final IProgramMethod pm)
+            throws SLTranslationException {
+        final var pv = createProgramVariablesForStatement(statement, pm);
+        jmlIo.clear().classType(pm.getContainerType()).selfVar(pv.selfVar).parameters(pv.paramVars)
+                .resultVariable(pv.resultVar).exceptionVariable(pv.excVar).atPres(pv.atPres)
+                .atBefore(pv.atBefores);
+        var context = statement.takeParserContext();
+        var assignee = jmlIo.translateTerm(context.assignee);
+        String error = checkSetStatementAssignee(assignee);
+        if (error != null) {
+            throw new SLTranslationException(
+                "Invalid assignment target for set statement: " + error, context);
+        }
     }
 
     /**
