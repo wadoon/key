@@ -1352,7 +1352,14 @@ public class JMLSpecFactory {
     }
 
     private @Nullable String checkSetStatementAssignee(Term assignee) {
-        if (services.getTypeConverter().getHeapLDT().isSelectOp(assignee.op())) {
+        if (assignee.op() instanceof LocationVariable) {
+            var variable = (LocationVariable) assignee.op();
+            if (variable.isGhost()) {
+                return null;
+            } else {
+                return variable + " is not a ghost variable";
+            }
+        } else if (services.getTypeConverter().getHeapLDT().isSelectOp(assignee.op())) {
             var field = assignee.subs().last();
             var op = field.op();
             var split = HeapLDT.trySplitFieldName(op);
@@ -1370,7 +1377,7 @@ public class JMLSpecFactory {
                 return op + " is not a class field";
             }
         } else {
-            return "Not a field access";
+            return "Neither a field access nor a local variable access";
         }
     }
 
