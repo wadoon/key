@@ -30,6 +30,8 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 
+import javax.annotation.Nullable;
+
 
 /**
  * LDT responsible for the "Heap" sort, and the associated "Field" sort. Besides offering the usual
@@ -148,6 +150,39 @@ public final class HeapLDT extends LDT {
     // -------------------------------------------------------------------------
     // public interface
     // -------------------------------------------------------------------------
+
+    public static final class SplitFieldName {
+        public final String className;
+        public final String attributeName;
+
+        public SplitFieldName(String className, String attributeName) {
+            this.className = className;
+            this.attributeName = attributeName;
+        }
+    }
+
+    public static @Nullable SplitFieldName trySplitFieldName(Named symbol) {
+        var name = symbol.name().toString();
+        // check for normal attribute
+        int endOfClassName = name.indexOf("::$");
+
+        int startAttributeName = endOfClassName + 3;
+
+
+        if (endOfClassName < 0) {
+            // not a normal attribute, maybe an implicit attribute like <created>?
+            endOfClassName = name.indexOf("::<");
+            startAttributeName = endOfClassName + 2;
+        }
+
+        if (endOfClassName < 0) {
+            return null;
+        }
+
+        String className = name.substring(0, endOfClassName);
+        String attributeName = name.substring(startAttributeName);
+        return new SplitFieldName(className, attributeName);
+    }
 
     /**
      * Given a constant symbol representing a field, this method returns a simplified name of the
