@@ -105,6 +105,8 @@ public final class IntegerLDT extends LDT {
     private final Function binaryAnd;
     private final Function orJint;
     private final Function orJlong;
+    private final Function bitwiseNegateJint;
+    private final Function bitwiseNegateJlong;
     private final Function andJint;
     private final Function andJlong;
     private final Function xorJint;
@@ -116,7 +118,8 @@ public final class IntegerLDT extends LDT {
     private final Function moduloChar;
     private final Function javaUnaryMinusInt;
     private final Function javaUnaryMinusLong;
-    private final Function javaBitwiseNegation;
+    private final Function javaBitwiseNegationInt;
+    private final Function javaBitwiseNegationLong;
     private final Function javaAddInt;
     private final Function javaAddLong;
     private final Function javaSubInt;
@@ -164,7 +167,6 @@ public final class IntegerLDT extends LDT {
 
     public IntegerLDT(Services services) {
 	super(NAME, services);
-
         //initialise caches for function symbols from integerHeader.key 
         sharp               = addFunction(services, "#");
         for(int i = 0; i < 10; i++) {
@@ -211,6 +213,8 @@ public final class IntegerLDT extends LDT {
         binaryOr            = addFunction(services, "binaryOr");
         binaryAnd           = addFunction(services, "binaryAnd");
         binaryXOr           = addFunction(services, "binaryXOr");
+        bitwiseNegateJint   = addFunction(services, "bitwiseNegateJint");
+        bitwiseNegateJlong  = addFunction(services, "bitwiseNegateJlong");
         orJint              = addFunction(services, "orJint");
         orJlong             = addFunction(services, "orJlong");
         andJint             = addFunction(services, "andJint");
@@ -224,7 +228,8 @@ public final class IntegerLDT extends LDT {
         moduloChar          = addFunction(services, "moduloChar");
         javaUnaryMinusInt   = addFunction(services, "javaUnaryMinusInt");
         javaUnaryMinusLong  = addFunction(services, "javaUnaryMinusLong");
-        javaBitwiseNegation = addFunction(services, "javaBitwiseNegation");
+        javaBitwiseNegationInt = addFunction(services, "javaBitwiseNegationInt");
+        javaBitwiseNegationLong = addFunction(services, "javaBitwiseNegationLong");
         javaAddInt          = addFunction(services, "javaAddInt");
         javaAddLong         = addFunction(services, "javaAddLong");
         javaSubInt          = addFunction(services, "javaSubInt");
@@ -383,8 +388,16 @@ public final class IntegerLDT extends LDT {
     
     public Function getLessOrEquals() {
         return lessOrEquals;
-    }    
-    
+    }
+
+    public Function getBitwiseNegateJint() {
+        return bitwiseNegateJint;
+    }
+
+    public Function getBitwiseNegateJlong() {
+        return bitwiseNegateJlong;
+    }
+
     /** Placeholder  for the loop index variable in an enhanced for loop over arrays.
      * Follows the proposal by David Cok to adapt JML to Java5.
      * @return
@@ -470,7 +483,7 @@ public final class IntegerLDT extends LDT {
         } else if (op instanceof BinaryAnd) {
             return isLong ? getJavaBitwiseAndLong() : getJavaBitwiseAndInt();
         } else if (op instanceof BinaryNot) {
-            return getJavaBitwiseNegation();
+            return isLong ? getJavaBitwiseNegationInt() : getJavaBitwiseNegationLong();
         } else if (op instanceof BinaryOr) {
             return isLong ? getJavaBitwiseOrLong() : getJavaBitwiseOrInt();
         } else if (op instanceof BinaryXOr) {
@@ -619,7 +632,8 @@ public final class IntegerLDT extends LDT {
            || op == javaUnsignedShiftRightInt
            || op == javaBitwiseOrInt
            || op == javaBitwiseAndInt
-           || op == javaBitwiseXOrInt) {
+           || op == javaBitwiseXOrInt
+           || op == javaBitwiseNegationInt) {
 	    return PrimitiveType.JAVA_INT;
 	} else if(op == javaUnaryMinusLong
 		   || op == javaAddLong
@@ -631,9 +645,10 @@ public final class IntegerLDT extends LDT {
 		   || op == javaUnsignedShiftRightLong
 		   || op == javaBitwiseOrLong
 		   || op == javaBitwiseAndLong
-		   || op == javaBitwiseXOrLong) {
+		   || op == javaBitwiseXOrLong
+           || op == javaBitwiseNegationLong) {
 	    return PrimitiveType.JAVA_LONG;
-	} else if(op == javaBitwiseNegation || op == javaMod) {
+	} else if(op == javaMod) {
 	    return getType(t.sub(0));
 	} else if(op == javaCastByte) {
 	    return PrimitiveType.JAVA_BYTE;
@@ -776,8 +791,16 @@ public final class IntegerLDT extends LDT {
      * the function representing the Java operator <code>~</code>
      * @return function representing the generic Java operator function
      */
-    public Function getJavaBitwiseNegation() {
-        return javaBitwiseNegation;
+    public Function getJavaBitwiseNegationInt() {
+        return javaBitwiseNegationInt;
+    }
+
+    /**
+     * the function representing the Java operator <code>~</code>
+     * @return function representing the generic Java operator function
+     */
+    public Function getJavaBitwiseNegationLong() {
+        return javaBitwiseNegationLong;
     }
 
     /**
