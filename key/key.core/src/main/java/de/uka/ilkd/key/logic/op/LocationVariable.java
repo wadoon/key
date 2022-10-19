@@ -50,9 +50,15 @@ public final class LocationVariable extends ProgramVariable implements Updateabl
     public UpdateableOperator rename(Name name) {
         if (getKeYJavaType() != null) {
             return new LocationVariable(new ProgramElementName(name.toString()), getKeYJavaType(),
-                getContainerType(), isStatic(), isModel());
+                getContainerType(), isStatic(), isModel(), isGhost(), isFinal());
         } else {
             return new LocationVariable(new ProgramElementName(name.toString()), sort());
         }
+    }
+
+    public static LocationVariable fromProgramVariable(ProgramVariable variable,
+            ProgramElementName name) {
+        return new LocationVariable(name, variable.getKeYJavaType(), variable.getContainerType(),
+            variable.isStatic(), variable.isModel(), variable.isGhost(), variable.isFinal());
     }
 }
