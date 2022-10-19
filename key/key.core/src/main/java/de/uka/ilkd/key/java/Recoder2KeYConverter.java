@@ -1123,8 +1123,12 @@ public class Recoder2KeYConverter {
 
             final ProgramElementName name =
                 VariableNamer.parseName(makeAdmissibleName(recoderVarSpec.getName()));
+            var isGhost = containsModifier(recoderVarSpec.getParent(),
+                de.uka.ilkd.key.java.recoderext.Ghost.class);
+            var isFinal = recoderVarSpec.isFinal();
+
             final ProgramVariable pv =
-                new LocationVariable(name, getKeYJavaType(recoderType), recoderVarSpec.isFinal());
+                new LocationVariable(name, getKeYJavaType(recoderType), isGhost, isFinal);
             varSpec = new VariableSpecification(collectChildren(recoderVarSpec), pv,
                 recoderVarSpec.getDimensions(), pv.getKeYJavaType());
 
@@ -1226,9 +1230,9 @@ public class Recoder2KeYConverter {
         return varSpec;
     }
 
-    private static boolean containsModifier(recoder.java.declaration.FieldSpecification fs,
+    private static boolean containsModifier(recoder.java.declaration.JavaDeclaration fs,
             Class<? extends DeclarationSpecifier> cls) {
-        var specifiers = fs.getParent().getDeclarationSpecifiers();
+        var specifiers = fs.getDeclarationSpecifiers();
         int s = (specifiers == null) ? 0 : specifiers.size();
         for (int i = 0; i < s; i += 1) {
             if (cls.isInstance(specifiers.get(i))) {
@@ -1264,11 +1268,11 @@ public class Recoder2KeYConverter {
                 final Literal compileTimeConstant =
                     getCompileTimeConstantInitializer(recoderVarSpec);
 
-                boolean isModel =
-                    containsModifier(recoderVarSpec, de.uka.ilkd.key.java.recoderext.Model.class);
+                boolean isModel = containsModifier(recoderVarSpec.getParent(),
+                    de.uka.ilkd.key.java.recoderext.Model.class);
                 boolean isFinal = recoderVarSpec.isFinal();
-                boolean isGhost =
-                    containsModifier(recoderVarSpec, de.uka.ilkd.key.java.recoderext.Ghost.class);
+                boolean isGhost = containsModifier(recoderVarSpec.getParent(),
+                    de.uka.ilkd.key.java.recoderext.Ghost.class);
 
                 if (compileTimeConstant == null) {
                     pv = new LocationVariable(pen, getKeYJavaType(recoderType),
