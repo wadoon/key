@@ -9,7 +9,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
-import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -32,7 +31,6 @@ import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.VariableNamer;
@@ -54,6 +52,7 @@ import recoder.abstraction.ClassType;
 import recoder.abstraction.Type;
 import recoder.io.DataLocation;
 import recoder.java.NonTerminalProgramElement;
+import recoder.java.declaration.DeclarationSpecifier;
 import recoder.java.declaration.TypeDeclaration;
 import recoder.list.generic.ASTList;
 
@@ -1227,6 +1226,18 @@ public class Recoder2KeYConverter {
         return varSpec;
     }
 
+    private static boolean containsModifier(recoder.java.declaration.FieldSpecification fs,
+            Class<? extends DeclarationSpecifier> cls) {
+        var specifiers = fs.getParent().getDeclarationSpecifiers();
+        int s = (specifiers == null) ? 0 : specifiers.size();
+        for (int i = 0; i < s; i += 1) {
+            if (cls.isInstance(specifiers.get(i))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * this is needed by #convert(FieldSpecification).
      */
@@ -1253,20 +1264,16 @@ public class Recoder2KeYConverter {
                 final Literal compileTimeConstant =
                     getCompileTimeConstantInitializer(recoderVarSpec);
 
-                boolean isModel = false;
+                boolean isModel =
+                    containsModifier(recoderVarSpec, de.uka.ilkd.key.java.recoderext.Model.class);
                 boolean isFinal = recoderVarSpec.isFinal();
-                for (recoder.java.declaration.Modifier mod : recoderVarSpec.getParent()
-                        .getModifiers()) {
-                    if (mod instanceof de.uka.ilkd.key.java.recoderext.Model) {
-                        isModel = true;
-                        break;
-                    }
-                }
+                boolean isGhost =
+                    containsModifier(recoderVarSpec, de.uka.ilkd.key.java.recoderext.Ghost.class);
 
                 if (compileTimeConstant == null) {
                     pv = new LocationVariable(pen, getKeYJavaType(recoderType),
                         getKeYJavaType(recContainingClassType), recoderVarSpec.isStatic(), isModel,
-                        false, isFinal);
+                        isGhost, isFinal);
                 } else {
                     pv = new ProgramConstant(pen, getKeYJavaType(recoderType),
                         getKeYJavaType(recContainingClassType), recoderVarSpec.isStatic(),
