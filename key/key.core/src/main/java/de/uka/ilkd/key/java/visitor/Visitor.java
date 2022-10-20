@@ -181,6 +181,8 @@ public interface Visitor {
 
     void performActionOnCopyAssignment(CopyAssignment x);
 
+    void performActionOnSetStatement(SetStatement x);
+
     void performActionOnDivideAssignment(DivideAssignment x);
 
     void performActionOnMinusAssignment(MinusAssignment x);
