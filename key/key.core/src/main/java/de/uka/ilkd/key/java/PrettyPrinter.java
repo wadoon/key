@@ -1228,6 +1228,33 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
+    public void printSetStatement(SetStatement x) throws java.io.IOException {
+        printHeader(x);
+        writeInternalIndentation(x);
+
+        markStart(0, x);
+
+        markKeywordStart();
+        write("@set");
+        markKeywordEnd();
+        write(" ");
+
+        boolean beforeNoLineFeed = noLinefeed;
+        noLinefeed = true;
+        writeElement(0, x.getArguments().get(0));
+        writeToken(0, "=", x);
+        output();
+        writeElement(0, x.getArguments().get(1));
+        noLinefeed = beforeNoLineFeed;
+
+        write(";");
+
+        output();
+        markEnd(0, x);
+
+        printFooter(x);
+    }
+
     public void printAssert(Assert x) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);

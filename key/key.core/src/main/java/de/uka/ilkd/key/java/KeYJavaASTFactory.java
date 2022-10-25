@@ -70,18 +70,15 @@ public abstract class KeYJavaASTFactory {
         return assignment;
     }
 
-	/**
-	 * Create an assignment.
-	 *
-	 * @param parameters
-	 *            the assignment parameters (variable, expression) as
-	 *            {@link ExtList}
-	 * @return a new {@link CopyAssignment} as defined by
-	 *         <code>parameters</code>
-	 */
-	public static SetStatement setStatement(final ExtList parameters) {
-		return new SetStatement(parameters);
-	}
+    /**
+     * Create an assignment.
+     *
+     * @param parameters the assignment parameters (variable, expression) as {@link ExtList}
+     * @return a new {@link CopyAssignment} as defined by <code>parameters</code>
+     */
+    public static SetStatement setStatement(final ExtList parameters) {
+        return new SetStatement(parameters);
+    }
 
     /**
      * creates an attribute access <code>prefix.field </code>

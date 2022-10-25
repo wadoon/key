@@ -11,12 +11,13 @@ import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 
+import javax.annotation.Nullable;
+
 /**
  * Miscellaneous static methods related to Java blocks or statements in KeY. Mostly moved from
  * key.util.MiscTools here.
  *
  * @author bruns
- *
  */
 public final class JavaTools {
 
@@ -46,6 +47,15 @@ public final class JavaTools {
     public static JavaBlock removeActiveStatement(JavaBlock jb, Services services) {
         assert jb.program() != null;
         final SourceElement activeStatement = JavaTools.getActiveStatement(jb);
+        return replaceStatement(jb, services, activeStatement, null);
+    }
+
+    /**
+     * Returns the passed java block with its active statement replaced.
+     */
+    public static JavaBlock replaceStatement(JavaBlock jb, Services services,
+            SourceElement statement, @Nullable SourceElement with) {
+        assert jb.program() != null;
         Statement newProg = (Statement) (new CreatingASTVisitor(jb.program(), false, services) {
             private boolean done = false;
 
@@ -58,9 +68,12 @@ public final class JavaTools {
 
             @Override
             public void doAction(ProgramElement node) {
-                if (!done && node == activeStatement) {
+                if (!done && node == statement) {
                     done = true;
                     stack.pop();
+                    if (with != null) {
+                        addToTopOfStack(with);
+                    }
                     changed();
                 } else {
                     super.doAction(node);

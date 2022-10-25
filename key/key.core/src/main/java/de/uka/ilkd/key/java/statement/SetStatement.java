@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.java.statement;
 
+import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.speclang.njml.JmlParser;
@@ -26,5 +27,9 @@ public class SetStatement extends CopyAssignment {
     @Override
     public void visit(Visitor v) {
         v.performActionOnSetStatement(this);
+    }
+
+    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
+        p.printSetStatement(this);
     }
 }
