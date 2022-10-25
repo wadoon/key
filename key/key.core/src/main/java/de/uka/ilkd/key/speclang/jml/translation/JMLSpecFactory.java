@@ -1351,7 +1351,7 @@ public class JMLSpecFactory {
         jmlAssert.translateCondition(jmlIo.classType(pm.getContainerType()), pv);
     }
 
-    private @Nullable String checkSetStatementAssignee(Term assignee) {
+    public @Nullable String checkSetStatementAssignee(Term assignee) {
         if (assignee.op() instanceof LocationVariable) {
             var variable = (LocationVariable) assignee.op();
             if (variable.isGhost()) {
