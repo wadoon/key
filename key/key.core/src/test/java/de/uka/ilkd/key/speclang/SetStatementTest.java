@@ -33,9 +33,8 @@ public class SetStatementTest {
     /**
      * the filename of the key file which is needed to create Services and JavaInfo
      */
-    private static final String TEST_FILE = HelperClassForTests.TESTCASE_DIRECTORY
-            + File.separator + "setStatements"
-            + File.separator + "testFile.key";
+    private static final String TEST_FILE = HelperClassForTests.TESTCASE_DIRECTORY + File.separator
+        + "setStatements" + File.separator + "testFile.key";
 
     /**
      * JavaInfo containing information about the available datatypes and methods
@@ -63,25 +62,19 @@ public class SetStatementTest {
     @BeforeEach
     public synchronized void setUp() {
         if (javaInfo == null) {
-            javaInfo = new HelperClassForTests().parse(new File(TEST_FILE))
-                    .getFirstProof().getJavaInfo();
+            javaInfo =
+                new HelperClassForTests().parse(new File(TEST_FILE)).getFirstProof().getJavaInfo();
             services = javaInfo.getServices();
             testClassType = javaInfo.getKeYJavaType("testPackage.TestClass");
         }
         var selfVar = new LocationVariable(new ProgramElementName("self"), testClassType);
 
-        var normalLocal = new LocationVariable(new ProgramElementName("normalLocal"), javaInfo.getKeYJavaType(PrimitiveType.JAVA_INT));
-        var ghostLocal = new LocationVariable(
-                new ProgramElementName("ghostLocal"),
-                javaInfo.getKeYJavaType(PrimitiveType.JAVA_INT),
-                true,
-                false
-        );
+        var normalLocal = new LocationVariable(new ProgramElementName("normalLocal"),
+            javaInfo.getKeYJavaType(PrimitiveType.JAVA_INT));
+        var ghostLocal = new LocationVariable(new ProgramElementName("ghostLocal"),
+            javaInfo.getKeYJavaType(PrimitiveType.JAVA_INT), true, false);
 
-        jmlIO = new JmlIO()
-                .services(services)
-                .classType(testClassType)
-                .selfVar(selfVar)
+        jmlIO = new JmlIO().services(services).classType(testClassType).selfVar(selfVar)
                 .parameters(ImmutableSLList.<ProgramVariable>nil().append(ghostLocal, normalLocal));
     }
 
@@ -96,16 +89,19 @@ public class SetStatementTest {
     }
 
     private void testError(String statement, String reason) {
-        assertNotNull(parseAndCheck(statement), "'" + statement + "' should produce an error: " + reason);
+        assertNotNull(parseAndCheck(statement),
+            "'" + statement + "' should produce an error: " + reason);
     }
 
     private void testNoError(String statement, String reason) {
-        assertNull(parseAndCheck(statement), "'" + statement + "' should not produce an error: " + reason);
+        assertNull(parseAndCheck(statement),
+            "'" + statement + "' should not produce an error: " + reason);
     }
 
     private String parseAndCheck(String statementText) {
         JMLSpecFactory jsf = new JMLSpecFactory(services);
-        ImmutableList<TextualJMLConstruct> constructs = jmlIO.parseMethodLevel(statementText, "TestClass.java", new Position(0, 0));
+        ImmutableList<TextualJMLConstruct> constructs =
+            jmlIO.parseMethodLevel(statementText, "TestClass.java", new Position(0, 0));
         assertEquals(constructs.size(), 1);
         assertInstanceOf(TextualJMLSetStatement.class, constructs.head());
         var statement = (TextualJMLSetStatement) constructs.head();

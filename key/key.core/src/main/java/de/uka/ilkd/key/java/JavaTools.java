@@ -51,7 +51,11 @@ public final class JavaTools {
     }
 
     /**
-     * Returns the passed java block with its active statement replaced.
+     * Returns the passed java block with `statement` replaced with `with`.
+     * @param jb the block
+     * @param statement the statement to replace
+     * @param with what to replace with. If this is null, the statement will be removed
+     * @return the modified block
      */
     public static JavaBlock replaceStatement(JavaBlock jb, Services services,
             SourceElement statement, @Nullable SourceElement with) {
