@@ -14,16 +14,13 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
 /**
- * The TermFactory is the <em>only</em> way to create terms using constructors
- * of class Term or any of its subclasses. It is the only class that implements
- * and may exploit knowledge about sub classes of {@link Term}. All other
- * classes of the system only know about terms what the {@link Term} class
- * offers them.
+ * The TermFactory is the <em>only</em> way to create terms using constructors of class Term or any
+ * of its subclasses. It is the only class that implements and may exploit knowledge about sub
+ * classes of {@link Term}. All other classes of the system only know about terms what the
+ * {@link Term} class offers them.
  *
- * This class is used to encapsulate knowledge about the internal term
- * structures.
- * See {@link de.uka.ilkd.key.logic.TermBuilder} for more convenient methods to
- * create terms.
+ * This class is used to encapsulate knowledge about the internal term structures. See
+ * {@link de.uka.ilkd.key.logic.TermBuilder} for more convenient methods to create terms.
  */
 public final class TermFactory {
 
@@ -32,9 +29,9 @@ public final class TermFactory {
     private final Map<Term, Term> cache;
 
 
-    //-------------------------------------------------------------------------
-    //constructors
-    //-------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+    // constructors
+    // -------------------------------------------------------------------------
 
 
     public TermFactory() {
@@ -45,22 +42,19 @@ public final class TermFactory {
         this.cache = cache;
     }
 
-    //-------------------------------------------------------------------------
-    //public interface
-    //-------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+    // public interface
+    // -------------------------------------------------------------------------
 
 
     /**
-     * Master method for term creation. Should be the only place where terms
-     * are created in the entire system.
+     * Master method for term creation. Should be the only place where terms are created in the
+     * entire system.
      */
-    public Term createTerm(Operator op,
-                           ImmutableArray<Term> subs,
-                           ImmutableArray<QuantifiableVariable> boundVars,
-                           JavaBlock javaBlock,
-                           ImmutableArray<TermLabel> labels,
-                           OriginRef originref) {
-        if(op == null) {
+    public Term createTerm(Operator op, ImmutableArray<Term> subs,
+            ImmutableArray<QuantifiableVariable> boundVars, JavaBlock javaBlock,
+            ImmutableArray<TermLabel> labels, OriginRef originref) {
+        if (op == null) {
             throw new TermCreationException("Given operator is null.");
         }
 
@@ -71,22 +65,16 @@ public final class TermFactory {
         return doCreateTerm(op, subs, boundVars, javaBlock, labels, originref);
     }
 
-    public Term createTerm(Operator op,
-	                   ImmutableArray<Term> subs,
-	                   ImmutableArray<QuantifiableVariable> boundVars,
-	                   JavaBlock javaBlock,
-                           OriginRef originref) {
+    public Term createTerm(Operator op, ImmutableArray<Term> subs,
+            ImmutableArray<QuantifiableVariable> boundVars, JavaBlock javaBlock, OriginRef originref) {
 
-    	return createTerm(op, subs, boundVars, javaBlock, null, originref);
+        return createTerm(op, subs, boundVars, javaBlock, null, originref);
     }
 
 
-    public Term createTerm(Operator op,
-                           Term[] subs,
-                           ImmutableArray<QuantifiableVariable> boundVars,
-                           JavaBlock javaBlock,
-                           OriginRef originref) {
-	return createTerm(op, createSubtermArray(subs), boundVars, javaBlock, null, originref);
+    public Term createTerm(Operator op, Term[] subs, ImmutableArray<QuantifiableVariable> boundVars,
+            JavaBlock javaBlock, OriginRef originref) {
+        return createTerm(op, createSubtermArray(subs), boundVars, javaBlock, null, originref);
     }
 
 
@@ -94,22 +82,35 @@ public final class TermFactory {
         return doCreateTerm(op, createSubtermArray(subs), null, null, null, null);
     }
 
-    public Term createTerm(Operator op,
-                           Term[] subs,
-                           ImmutableArray<QuantifiableVariable> boundVars,
-                           JavaBlock javaBlock,
-                           ImmutableArray<TermLabel> labels,
-                           OriginRef originref) {
+    public Term createTerm(Operator op, Term[] subs, ImmutableArray<QuantifiableVariable> boundVars,
+            JavaBlock javaBlock, ImmutableArray<TermLabel> labels, OriginRef originref) {
         return createTerm(op, createSubtermArray(subs), boundVars, javaBlock, labels, originref);
     }
 
-    public Term createTerm(Operator op, Term sub1, Term sub2, ImmutableArray<TermLabel> labels, OriginRef originref) {
-    	return createTerm(op, new Term[]{sub1, sub2}, null, null, labels, originref);
+    public Term createTerm(Operator op, Term[] subs, ImmutableArray<QuantifiableVariable> boundVars,
+            JavaBlock javaBlock, TermLabel label, OriginRef originref) {
+        return createTerm(op, createSubtermArray(subs), boundVars, javaBlock,
+            new ImmutableArray<TermLabel>(label), originref);
     }
 
+    public Term createTerm(Operator op, Term[] subs, TermLabel label, OriginRef originref) {
+        return createTerm(op, subs, null, null, label, originref);
+    }
+
+    public Term createTerm(Operator op, Term[] subs, ImmutableArray<TermLabel> labels, OriginRef originref) {
+        return createTerm(op, createSubtermArray(subs), null, null, labels, originref);
+    }
+
+    public Term createTerm(Operator op, Term sub, ImmutableArray<TermLabel> labels, OriginRef originref) {
+        return createTerm(op, new ImmutableArray<Term>(sub), null, null, labels, originref);
+    }
+
+    public Term createTerm(Operator op, Term sub1, Term sub2, ImmutableArray<TermLabel> labels, OriginRef originref) {
+        return createTerm(op, new Term[] { sub1, sub2 }, null, null, labels, originref);
+    }
 
     public Term createTerm(Operator op, ImmutableArray<TermLabel> labels, OriginRef originref) {
-    	return createTerm(op, NO_SUBTERMS, null, null, labels, originref);
+        return createTerm(op, NO_SUBTERMS, null, null, labels, originref);
     }
 
     public @Nonnull Term setOriginRef(Term base, OriginRef origref) {
@@ -197,63 +198,54 @@ public final class TermFactory {
                t.subs().stream().anyMatch(this::termHasAtomChilds);
     }
 
-    //-------------------------------------------------------------------------
-    //private interface
-    //-------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+    // private interface
+    // -------------------------------------------------------------------------
 
     private ImmutableArray<Term> createSubtermArray(Term[] subs) {
-        return subs == null || subs.length == 0 ?
-                NO_SUBTERMS : new ImmutableArray<Term>(subs);
+        return subs == null || subs.length == 0 ? NO_SUBTERMS : new ImmutableArray<Term>(subs);
     }
 
-    private Term doCreateTerm(Operator op,
-                              ImmutableArray<Term> subs,
-                              ImmutableArray<QuantifiableVariable> boundVars,
-                              JavaBlock javaBlock,
-                              ImmutableArray<TermLabel> labels,
-                              OriginRef originref) {
-
-        final Term newTerm
-            = (labels == null || labels.isEmpty() ?
-                    new TermImpl(op, subs, boundVars, javaBlock, originref) :
-                new LabeledTermImpl(op, subs, boundVars, javaBlock, labels, originref)).checked();
+    private Term doCreateTerm(Operator op, ImmutableArray<Term> subs,
+            ImmutableArray<QuantifiableVariable> boundVars, JavaBlock javaBlock,
+            ImmutableArray<TermLabel> labels, OriginRef originref) {
+        final Term newTerm =
+            (labels == null || labels.isEmpty() ? new TermImpl(op, subs, boundVars, javaBlock, originref)
+                    : new LabeledTermImpl(op, subs, boundVars, javaBlock, labels, originref)).checked();
         // Check if caching is possible. It is not possible if a non empty JavaBlock is available
         // in the term or in one of its children because the meta information like PositionInfos
         // may be different.
         if (cache != null && !newTerm.containsJavaBlockRecursive()) {
-           Term term;
-           synchronized(cache) {
-               term = cache.get(newTerm);
-           }
-           if(term == null) {
-               term = newTerm;
-               synchronized(cache) {
-                   cache.put(term, term);
-               }
-           }
-           return term;
-        }
-        else {
-           return newTerm;
+            Term term;
+            synchronized (cache) {
+                term = cache.get(newTerm);
+            }
+            if (term == null) {
+                term = newTerm;
+                synchronized (cache) {
+                    cache.put(term, term);
+                }
+            }
+            return term;
+        } else {
+            return newTerm;
         }
     }
 
     /**
-     * Reduce the given list of terms into a one term by using the operator.
-     * The reduction is left-associative. e.g., the result is
-     * {@code ((a op b) op c) op d }.
+     * Reduce the given list of terms into a one term by using the operator. The reduction is
+     * left-associative. e.g., the result is {@code ((a op b) op c) op d }.
      *
      * @param junctor the left-associative operator to combine the terms together
      * @param terms a list of non-null temrs
      */
-    public @Nonnull Term createTerm(@Nonnull  Operator junctor, @Nonnull List<Term> terms) {
-        if(terms.size()==1)
+    public @Nonnull Term createTerm(@Nonnull Operator junctor, @Nonnull List<Term> terms) {
+        if (terms.size() == 1)
             return terms.get(0);
         else if (terms.size() == 2)
             return createTerm(junctor, terms.get(0), terms.get(1));
-        final Optional<Term> reduce = terms.stream()
-                .reduce((a, b) -> createTerm(junctor, a, b));
-        if(reduce.isPresent())
+        final Optional<Term> reduce = terms.stream().reduce((a, b) -> createTerm(junctor, a, b));
+        if (reduce.isPresent())
             return reduce.get();
         throw new IllegalArgumentException("list of terms is empty.");
     }

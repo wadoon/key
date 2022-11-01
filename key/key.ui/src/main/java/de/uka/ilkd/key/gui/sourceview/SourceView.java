@@ -55,15 +55,14 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
- * This class is responsible for showing the source code and visualizing the symbolic execution
- * path of the currently selected node. This is done by adding tabs containing the source code and
+ * This class is responsible for showing the source code and visualizing the symbolic execution path
+ * of the currently selected node. This is done by adding tabs containing the source code and
  * highlighting the lines which were symbolically executed in the path from the root node down to
- * the current node.
- * In addition, by clicking on such a highlighted line the user can jump to the first node in the
- * proof tree where a statement from this line is symbolically executed.
+ * the current node. In addition, by clicking on such a highlighted line the user can jump to the
+ * first node in the proof tree where a statement from this line is symbolically executed.
  *
- * Editing the source code in the tabs is currently not implemented
- * (not supported by {@link JavaDocument}).
+ * Editing the source code in the tabs is currently not implemented (not supported by
+ * {@link JavaDocument}).
  *
  * @author Wolfram Pfeifer, lanzinger
  */
@@ -80,8 +79,8 @@ public final class SourceView extends JComponent {
     /**
      * ToolTip for the textPanes containing the source code.
      */
-    private static final String TEXTPANE_HIGHLIGHTED_TOOLTIP = "Jump upwards to the most recent" +
-        " occurrence of this line in symbolic execution.";
+    private static final String TEXTPANE_HIGHLIGHTED_TOOLTIP =
+        "Jump upwards to the most recent" + " occurrence of this line in symbolic execution.";
 
     /**
      * String to display in an empty source code textPane.
@@ -97,7 +96,7 @@ public final class SourceView extends JComponent {
      * The color of normal highlights in source code (light green).
      */
     private static final ColorSettings.ColorProperty NORMAL_HIGHLIGHT_COLOR =
-            ColorSettings.define("[SourceView]normalHighlight",
+        ColorSettings.define("[SourceView]normalHighlight",
             "Color for highlighting symbolically executed lines in source view",
             new Color(194, 245, 194));
 
@@ -105,19 +104,17 @@ public final class SourceView extends JComponent {
      * The color of the most recent highlight in source code (green).
      */
     private static final ColorSettings.ColorProperty MOST_RECENT_HIGHLIGHT_COLOR =
-            ColorSettings.define("[SourceView]mostRecentHighlight",
-                    "Color for highlighting most recently"
-                    + " symbolically executed line in source view",
-                    new Color(57, 210, 81));
+        ColorSettings.define("[SourceView]mostRecentHighlight",
+            "Color for highlighting most recently" + " symbolically executed line in source view",
+            new Color(57, 210, 81));
 
     /**
      * The color of the most recent highlight in source code (green).
      */
     private static final ColorSettings.ColorProperty TAB_HIGHLIGHT_COLOR =
-            ColorSettings.define("[SourceView]tabHighlight",
-                    "Color for highlighting source view tabs"
-                    + " whose files contain highlighted lines.",
-                    new Color(57, 210, 81));
+        ColorSettings.define("[SourceView]tabHighlight",
+            "Color for highlighting source view tabs" + " whose files contain highlighted lines.",
+            new Color(57, 210, 81));
 
     /**
      * The main window of KeY (needed to get the mediator).
@@ -154,6 +151,7 @@ public final class SourceView extends JComponent {
 
     /**
      * Creates a new JComponent with the given MainWindow and adds change listeners.
+     *
      * @param mainWindow the MainWindow of the GUI
      */
     private SourceView(MainWindow mainWindow) {
@@ -182,7 +180,7 @@ public final class SourceView extends JComponent {
 
         // add extra height to make the status bar more noticeable
         sourceStatusBar.setPreferredSize(
-                new Dimension(0, getFontMetrics(sourceStatusBar.getFont()).getHeight() + 6));
+            new Dimension(0, getFontMetrics(sourceStatusBar.getFont()).getHeight() + 6));
         sourceStatusBar.setHorizontalAlignment(SwingConstants.CENTER);
 
         setLayout(new BorderLayout());
@@ -212,13 +210,14 @@ public final class SourceView extends JComponent {
             }
         });
 
-        KeYGuiExtensionFacade.installKeyboardShortcuts(null,
-                this, KeYGuiExtension.KeyboardShortcuts.SOURCE_VIEW);
+        KeYGuiExtensionFacade.installKeyboardShortcuts(null, this,
+            KeYGuiExtension.KeyboardShortcuts.SOURCE_VIEW);
 
     }
 
     /**
      * Returns the singleton instance of the SourceView.
+     *
      * @param mainWindow KeY's main window
      * @return the component responsible for showing source code and symbolic execution information
      */
@@ -230,14 +229,20 @@ public final class SourceView extends JComponent {
     }
 
     /**
-     * <p> Creates a new highlight. </p>
+     * <p>
+     * Creates a new highlight.
+     * </p>
      *
-     * <p> If the are multiple highlights for a given line, they are drawn on top of each other,
-     *  starting with the one with the lowest level. </p>
+     * <p>
+     * If the are multiple highlights for a given line, they are drawn on top of each other,
+     * starting with the one with the lowest level.
+     * </p>
      *
-     * <p> The highlights added by the {@code SourceView} itself have level {@code 0},
-     *  except for the highlight that appears when the user moves the mouse over a line,
-     *  which has level {@code Integer.maxValue() - 1}. </p>
+     * <p>
+     * The highlights added by the {@code SourceView} itself have level {@code 0}, except for the
+     * highlight that appears when the user moves the mouse over a line, which has level
+     * {@code Integer.maxValue() - 1}.
+     * </p>
      *
      * @param fileURI the URI of the file in which to create the highlight.
      * @param sourceLine the line to highlight.
@@ -323,11 +328,14 @@ public final class SourceView extends JComponent {
     }
 
     /**
-     * <p> Creates a new set of highlights for a range of lines starting with {@code firstLine}.
+     * <p>
+     * Creates a new set of highlights for a range of lines starting with {@code firstLine}.
      * </p>
      *
-     * <p> This method applies a heuristic to try and highlight the complete JML statement
-     *  starting in {@code firstLine}. </p>
+     * <p>
+     * This method applies a heuristic to try and highlight the complete JML statement starting in
+     * {@code firstLine}.
+     * </p>
      *
      * @param fileURI the URI of the file in which to create the highlights.
      * @param firstLine the first line to highlight.
@@ -353,8 +361,7 @@ public final class SourceView extends JComponent {
         if (0 < lines.length && lines[firstLine - 1].trim().startsWith("@")) {
             int parens = 0;
 
-            outer_loop:
-            for (int i = firstLine; i <= lines.length; ++i) {
+            outer_loop: for (int i = firstLine; i <= lines.length; ++i) {
                 for (int j = 0; j < lines[i - 1].length(); ++j) {
                     if (lines[i - 1].charAt(j) == '(') {
                         ++parens;
@@ -464,8 +471,8 @@ public final class SourceView extends JComponent {
      * Removes a highlight.
      *
      * @param highlight the highlight to remove.
-     * @return {@code true} iff
-     *      this {@code SourceView} previously contained the specified highlight.
+     * @return {@code true} iff this {@code SourceView} previously contained the specified
+     *         highlight.
      */
     public boolean removeHighlight(SourceViewHighlight highlight) {
         Tab tab = tabs.get(highlight.getFileURI());
@@ -547,7 +554,8 @@ public final class SourceView extends JComponent {
         for (URI fileURI : fileURIs) {
             if (addFile(fileURI)) {
                 updateNecessary = true;
-                mainWindow.getMediator().getSelectedProof().lookup(ProofJavaSourceCollection.class).addRelevantFile(fileURI);
+                mainWindow.getMediator().getSelectedProof().lookup(ProofJavaSourceCollection.class)
+                        .addRelevantFile(fileURI);
             }
         }
 
@@ -558,6 +566,7 @@ public final class SourceView extends JComponent {
 
     /**
      * Replaces each tab in the given String by TAB_SIZE spaces.
+     *
      * @param s the String to replace
      * @return the resulting String (without tabs)
      */
@@ -577,6 +586,7 @@ public final class SourceView extends JComponent {
      * active tab. Due to technical restrictions of the method viewToModel(Point), the result is a
      * little bit imprecise: The last char in a line is not detected as highlighted, this method
      * wrongly returns false.
+     *
      * @param point the point to check, usually the position of the mouse cursor
      * @return true iff the point is on a highlight
      */
@@ -601,8 +611,8 @@ public final class SourceView extends JComponent {
      * @see NodeInfo#getRelevantFiles()
      */
     private void addFiles() throws IOException {
-        ImmutableSet<URI> fileURIs =
-                mainWindow.getMediator().getSelectedProof().lookup(ProofJavaSourceCollection.class).getRelevantFiles();
+        ImmutableSet<URI> fileURIs = mainWindow.getMediator().getSelectedProof()
+                .lookup(ProofJavaSourceCollection.class).getRelevantFiles();
 
         Iterator<URI> it = tabs.keySet().iterator();
 
@@ -662,10 +672,10 @@ public final class SourceView extends JComponent {
     /**
      * Performs an update of the GUI:
      * <ul>
-     *      <li>updates the TabbedPane with the source files used</li>
-     *      <li>highlights the symbolically executed lines</li>
-     *      <li>updates the source status bar of the main window with information about the current
-     *          branch</li>
+     * <li>updates the TabbedPane with the source files used</li>
+     * <li>highlights the symbolically executed lines</li>
+     * <li>updates the source status bar of the main window with information about the current
+     * branch</li>
      * </ul>
      */
     private void updateGUI() {
@@ -729,9 +739,10 @@ public final class SourceView extends JComponent {
 
     /**
      * Collects the set of lines to highlight starting from the given node in the proof tree.
+     *
      * @param node the given node
-     * @return a linked list of pairs of PositionInfo objects containing the start and end
-     * positions for the highlighting and Nodes.
+     * @return a linked list of pairs of PositionInfo objects containing the start and end positions
+     *         for the highlighting and Nodes.
      */
     private LinkedList<Pair<Node, PositionInfo>> constructLinesSet(Node node) {
         LinkedList<Pair<Node, PositionInfo>> list = new LinkedList<>();
@@ -757,8 +768,8 @@ public final class SourceView extends JComponent {
             // This is a hack to make sure that the file containing the method which the current
             // proof obligation belongs to is always loaded.
 
-            node.sequent().forEach(formula ->
-                formula.formula().execPostOrder(new de.uka.ilkd.key.logic.Visitor() {
+            node.sequent().forEach(
+                formula -> formula.formula().execPostOrder(new de.uka.ilkd.key.logic.Visitor() {
 
                     @Override
                     public boolean visitSubtree(Term visited) {
@@ -766,52 +777,59 @@ public final class SourceView extends JComponent {
                     }
 
                     @Override
-                    public void visit(Term visited) { }
+                    public void visit(Term visited) {}
 
                     @Override
-                    public void subtreeLeft(Term subtreeRoot) { }
+                    public void subtreeLeft(Term subtreeRoot) {}
 
                     @Override
                     public void subtreeEntered(Term subtreeRoot) {
                         if (subtreeRoot.javaBlock() != null) {
-                            JavaASTVisitor visitor = new JavaASTVisitor(
-                                    subtreeRoot.javaBlock().program(),
+                            JavaASTVisitor visitor =
+                                new JavaASTVisitor(subtreeRoot.javaBlock().program(),
                                     mainWindow.getMediator().getServices()) {
 
-                                @Override
-                                protected void doDefaultAction(SourceElement el) {
-                                    if (el instanceof MethodBodyStatement) {
-                                        MethodBodyStatement mb = (MethodBodyStatement) el;
-                                        Statement body = mb.getBody(services);
-                                        PositionInfo posInf = null;
-                                        // try to find position information of the source element
-                                        if (body != null) {
-                                            posInf = body.getPositionInfo();
-                                        } else {
-                                            // the method is declared without a body
-                                            // -> we try to show the file either way
-                                            IProgramMethod pm = mb.getProgramMethod(services);
-                                            if (pm != null) {
-                                                posInf = pm.getPositionInfo();
+                                    @Override
+                                    protected void doDefaultAction(SourceElement el) {
+                                        if (el instanceof MethodBodyStatement) {
+                                            MethodBodyStatement mb = (MethodBodyStatement) el;
+                                            Statement body = mb.getBody(services);
+                                            PositionInfo posInf = null;
+                                            // try to find position information of the source
+                                            // element
+                                            if (body != null) {
+                                                posInf = body.getPositionInfo();
+                                            } else {
+                                                // the method is declared without a body
+                                                // -> we try to show the file either way
+                                                IProgramMethod pm = mb.getProgramMethod(services);
+                                                if (pm != null) {
+                                                    posInf = pm.getPositionInfo();
+                                                }
                                             }
-                                        }
-                                        if (posInf != null && posInf.getURI() != null) {
-                                            // sometimes the useful file info is only stored in
-                                            // parentClassURI for some reason ...
-                                            if (!posInf.getURI().equals(PositionInfo.UNKNOWN_URI)) {
-                                                node.proof().lookup(ProofJavaSourceCollection.class).addRelevantFile(posInf.getURI());
-                                            } else if (!posInf.getParentClassURI().equals(PositionInfo.UNKNOWN_URI)) {
-                                                node.proof().lookup(ProofJavaSourceCollection.class).addRelevantFile(posInf.getParentClassURI());
+                                            if (posInf != null && posInf.getURI() != null) {
+                                                // sometimes the useful file info is only stored in
+                                                // parentClassURI for some reason ...
+                                                if (!posInf.getURI()
+                                                        .equals(PositionInfo.UNKNOWN_URI)) {
+                                                    node.proof()
+                                                            .lookup(ProofJavaSourceCollection.class)
+                                                            .addRelevantFile(posInf.getURI());
+                                                } else if (!posInf.getParentClassURI()
+                                                        .equals(PositionInfo.UNKNOWN_URI)) {
+                                                    node.proof()
+                                                            .lookup(ProofJavaSourceCollection.class)
+                                                            .addRelevantFile(
+                                                                posInf.getParentClassURI());
+                                                }
                                             }
                                         }
                                     }
-                                }
-                            };
+                                };
                             visitor.start();
                         }
                     }
-                })
-            );
+                }));
         }
 
         return list;
@@ -898,19 +916,19 @@ public final class SourceView extends JComponent {
 
     /**
      * Joins all PositionInfo objects of the given SourceElement and its children.
+     *
      * @param se the given SourceElement
-     * @return a new PositionInfo starting at the minimum of all the contained positions and
-     * ending at the maximum position
+     * @return a new PositionInfo starting at the minimum of all the contained positions and ending
+     *         at the maximum position
      */
     private static PositionInfo joinPositionsRec(SourceElement se) {
         if (se instanceof NonTerminalProgramElement) {
-            if (se instanceof If
-                    || se instanceof Then
-                    || se instanceof Else) { // TODO: additional elements, e.g. code inside if
+            // TODO: additional elements, e.g. code inside if
+            if (se instanceof If || se instanceof Then || se instanceof Else) {
                 return PositionInfo.UNDEFINED;
             }
 
-            NonTerminalProgramElement ntpe = (NonTerminalProgramElement)se;
+            NonTerminalProgramElement ntpe = (NonTerminalProgramElement) se;
             PositionInfo pos = se.getPositionInfo();
 
             for (int i = 0; i < ntpe.getChildCount(); i++) {
@@ -926,11 +944,12 @@ public final class SourceView extends JComponent {
     /**
      * Collects the information from the tree to which branch the current node belongs:
      * <ul>
-     *      <li>Invariant Initially Valid</li>
-     *      <li>Body Preserves Invariant</li>
-     *      <li>Use Case</li>
-     *      <li>...</li>
+     * <li>Invariant Initially Valid</li>
+     * <li>Body Preserves Invariant</li>
+     * <li>Use Case</li>
+     * <li>...</li>
      * </ul>
+     *
      * @param node the current node
      * @return a String containing the path information to display
      */
@@ -938,22 +957,18 @@ public final class SourceView extends JComponent {
         while (node != null) {
             if (node.getNodeInfo() != null && node.getNodeInfo().getBranchLabel() != null) {
                 String label = node.getNodeInfo().getBranchLabel();
-                /* Are there other interesting labels?
-                 * Please feel free to add them here. */
+                /*
+                 * Are there other interesting labels? Please feel free to add them here.
+                 */
                 if (label.equals("Invariant Initially Valid")
                         || label.equals("Invariant Preserved and Used") // for loop scope invariant
-                        || label.equals("Body Preserves Invariant")
-                        || label.equals("Use Case")
-                        || label.equals("Show Axiom Satisfiability")
-                        || label.startsWith("Pre (")                // precondition of a method
-                        || label.startsWith("Exceptional Post (")   // exceptional postcondition
-                        || label.startsWith("Post (")               // postcondition of a method
-                        || label.contains("Normal Execution")
-                        || label.contains("Null Reference")
-                        || label.contains("Index Out of Bounds")
-                        || label.contains("Validity")
-                        || label.contains("Precondition")
-                        || label.contains("Usage")) {
+                        || label.equals("Body Preserves Invariant") || label.equals("Use Case")
+                        || label.equals("Show Axiom Satisfiability") || label.startsWith("Pre (")
+                        || label.startsWith("Exceptional Post (") // exceptional postcondition
+                        || label.startsWith("Post (") // postcondition of a method
+                        || label.contains("Normal Execution") || label.contains("Null Reference")
+                        || label.contains("Index Out of Bounds") || label.contains("Validity")
+                        || label.contains("Precondition") || label.contains("Usage")) {
                     return label;
                 }
             }
@@ -1067,7 +1082,7 @@ public final class SourceView extends JComponent {
 
         private Tab(URI fileURI, InputStream stream) {
             this.absoluteFileName = fileURI;
-            this.simpleFileName  = extractFileName(fileURI);
+            this.simpleFileName = extractFileName(fileURI);
 
             String fsource = "";
 
@@ -1103,7 +1118,7 @@ public final class SourceView extends JComponent {
             String s = uri.toString();
             int index = s.lastIndexOf("/");
             if (index < 0) {
-                return s;                       // fallback: return whole URI
+                return s; // fallback: return whole URI
             } else {
                 return s.substring(index + 1);
             }
@@ -1114,7 +1129,7 @@ public final class SourceView extends JComponent {
                 InputStream inStream = new ByteArrayInputStream(fsource.getBytes());
                 lineInformation = IOUtil.computeLineInformation(inStream);
             } catch (IOException e) {
-                LOGGER.debug("Error while computing line information from " + absoluteFileName, e);
+                LOGGER.debug("Error while computing line information from {}", absoluteFileName, e);
             }
         }
 
@@ -1246,27 +1261,21 @@ public final class SourceView extends JComponent {
 
         private void markTabComponent() {
             if (highlights.isEmpty()) {
-                tabPane.setForegroundAt(
-                        tabPane.indexOfComponent(this),
-                        UIManager.getColor("TabbedPane.foreground"));
-                tabPane.setBackgroundAt(
-                        tabPane.indexOfComponent(this),
-                        UIManager.getColor("TabbedPane.background"));
+                tabPane.setForegroundAt(tabPane.indexOfComponent(this),
+                    UIManager.getColor("TabbedPane.foreground"));
+                tabPane.setBackgroundAt(tabPane.indexOfComponent(this),
+                    UIManager.getColor("TabbedPane.background"));
             } else {
                 if (isSelected(this)) {
-                    tabPane.setForegroundAt(
-                            tabPane.indexOfComponent(this),
-                            TAB_HIGHLIGHT_COLOR.get());
-                    tabPane.setBackgroundAt(
-                            tabPane.indexOfComponent(this),
-                            UIManager.getColor("TabbedPane.background"));
+                    tabPane.setForegroundAt(tabPane.indexOfComponent(this),
+                        TAB_HIGHLIGHT_COLOR.get());
+                    tabPane.setBackgroundAt(tabPane.indexOfComponent(this),
+                        UIManager.getColor("TabbedPane.background"));
                 } else {
-                    tabPane.setForegroundAt(
-                            tabPane.indexOfComponent(this),
-                            UIManager.getColor("TabbedPane.foreground"));
-                    tabPane.setBackgroundAt(
-                            tabPane.indexOfComponent(this),
-                            TAB_HIGHLIGHT_COLOR.get());
+                    tabPane.setForegroundAt(tabPane.indexOfComponent(this),
+                        UIManager.getColor("TabbedPane.foreground"));
+                    tabPane.setBackgroundAt(tabPane.indexOfComponent(this),
+                        TAB_HIGHLIGHT_COLOR.get());
                 }
             }
         }
@@ -1299,10 +1308,8 @@ public final class SourceView extends JComponent {
                     int alpha = set.size() == 1 ? c.getAlpha() : 256 / set.size();
                     Color color = new Color(c.getRed(), c.getGreen(), c.getBlue(), alpha);
 
-                    highlight.setTag(textPane.getHighlighter().addHighlight(
-                            range.start(),
-                            range.end(),
-                            new DefaultHighlightPainter(color)));
+                    highlight.setTag(textPane.getHighlighter().addHighlight(range.start(),
+                        range.end(), new DefaultHighlightPainter(color)));
                 }
             }
 
@@ -1356,6 +1363,7 @@ public final class SourceView extends JComponent {
 
         /**
          * Paints the highlight for the line where the mouse pointer currently points to.
+         *
          * @param p the current position of the mouse pointer
          * @param highlight the highlight to change
          */

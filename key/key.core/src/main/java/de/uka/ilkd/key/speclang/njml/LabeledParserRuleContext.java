@@ -26,7 +26,8 @@ public class LabeledParserRuleContext {
     public final OriginRefType origin;
 
     public LabeledParserRuleContext(ParserRuleContext first, TermLabel second) {
-        if (first == null) throw new IllegalArgumentException("ParserRuleContext is null");
+        if (first == null)
+            throw new IllegalArgumentException("ParserRuleContext is null");
         this.first = first;
         this.second = second;
         this.origin = null;
@@ -34,7 +35,8 @@ public class LabeledParserRuleContext {
 
 
     public LabeledParserRuleContext(ParserRuleContext first) {
-        if (first == null) throw new IllegalArgumentException("ParserRuleContext is null");
+        if (first == null)
+            throw new IllegalArgumentException("ParserRuleContext is null");
         this.first = first;
         this.second = null;
         this.origin = null;
@@ -54,7 +56,8 @@ public class LabeledParserRuleContext {
         this.origin = refType;
     }
 
-    private static TermLabel constructTermLabel(ParserRuleContext ctx, OriginTermLabel.SpecType specType) {
+    private static TermLabel constructTermLabel(ParserRuleContext ctx,
+            OriginTermLabel.SpecType specType) {
         String filename = ctx.start.getTokenSource().getSourceName();
         int line = ctx.start.getLine();
         OriginTermLabel.Origin origin = new OriginTermLabel.FileOrigin(specType, filename, line);
