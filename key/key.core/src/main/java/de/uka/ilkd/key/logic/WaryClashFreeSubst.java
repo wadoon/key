@@ -172,7 +172,8 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
         final boolean addSubst = subTermChanges(t.varsBoundHere(targetPos), target);
         newSubterms[targetPos] = addSubst ? substWithNewVar(target) : target;
 
-        return tb.tf().createTerm(t.op(), newSubterms, getSingleArray(newBoundVars), t.javaBlock(), t.getOriginRef());
+        return tb.tf().createTerm(t.op(), newSubterms, getSingleArray(newBoundVars), t.javaBlock(),
+            t.getOriginRef());
     }
 
     /**

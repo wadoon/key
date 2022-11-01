@@ -3153,9 +3153,9 @@ public final class SymbolicExecutionUtil {
                     List<Term> newSubs = new LinkedList<Term>();
                     newSubs.add(definition);
                     newSubs.add(skolem);
-                    Term newEquality =
-                        factory.createTerm(equality.op(), new ImmutableArray<Term>(newSubs),
-                            equality.boundVars(), equality.javaBlock(), equality.getLabels(), equality.getOriginRef());
+                    Term newEquality = factory.createTerm(equality.op(),
+                        new ImmutableArray<Term>(newSubs), equality.boundVars(),
+                        equality.javaBlock(), equality.getLabels(), equality.getOriginRef());
                     sequent = sequent.changeFormula(new SequentFormula(newEquality),
                         new PosInOccurrence(sf, PosInTerm.getTopLevel(), true)).sequent();
                 }
@@ -3169,9 +3169,9 @@ public final class SymbolicExecutionUtil {
                     List<Term> newSubs = new LinkedList<Term>();
                     newSubs.add(definition);
                     newSubs.add(skolem);
-                    Term newEquality =
-                        factory.createTerm(equality.op(), new ImmutableArray<Term>(newSubs),
-                            equality.boundVars(), equality.javaBlock(), equality.getLabels(), equality.getOriginRef());
+                    Term newEquality = factory.createTerm(equality.op(),
+                        new ImmutableArray<Term>(newSubs), equality.boundVars(),
+                        equality.javaBlock(), equality.getLabels(), equality.getOriginRef());
                     sequent = sequent.changeFormula(new SequentFormula(newEquality),
                         new PosInOccurrence(sf, PosInTerm.getTopLevel(), true)).sequent();
                 }

@@ -62,9 +62,8 @@ public class TruthValuePOExtension implements POExtension {
                         subsChanged = true;
                     }
                 }
-                term = subsChanged
-                        ? tf.createTerm(term.op(), new ImmutableArray<Term>(newSubs),
-                            term.boundVars(), term.javaBlock(), term.getLabels(), term.getOriginRef())
+                term = subsChanged ? tf.createTerm(term.op(), new ImmutableArray<Term>(newSubs),
+                    term.boundVars(), term.javaBlock(), term.getLabels(), term.getOriginRef())
                         : term;
             }
             ImmutableArray<TermLabel> oldLabels = term.getLabels();

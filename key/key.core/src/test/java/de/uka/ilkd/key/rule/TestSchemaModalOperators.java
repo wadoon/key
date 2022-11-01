@@ -118,7 +118,8 @@ public class TestSchemaModalOperators {
             Sort.FORMULA, modalities);
         Term tpost = TB.tf().createTerm(fsv);
 
-        Term find = TB.tf().createTerm(osv, new Term[] { tpost }, null, JavaBlock.EMPTY_JAVABLOCK, null);
+        Term find =
+            TB.tf().createTerm(osv, new Term[] { tpost }, null, JavaBlock.EMPTY_JAVABLOCK, null);
 
         Term replace =
             TB.tf().createTerm(osv, new Term[] { TB.tt() }, null, JavaBlock.EMPTY_JAVABLOCK, null);

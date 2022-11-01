@@ -29,13 +29,14 @@ public class OriginRef {
     public final Term SourceTerm;
 
     private String sourceStringCache = null;
-    private boolean cached= false;
+    private boolean cached = false;
 
     public OriginRef(OriginRefType type, boolean isatom, boolean isbool, Term t) {
         this(null, 0, 0, 0, 0, type, isatom, isbool, t);
     }
 
-    public OriginRef(String file, int lineStart, int lineEnd, int colStart, int colEnd, OriginRefType type, boolean isatom, boolean isbool, Term term) {
+    public OriginRef(String file, int lineStart, int lineEnd, int colStart, int colEnd,
+            OriginRefType type, boolean isatom, boolean isbool, Term term) {
         if (file == null || file.isEmpty() || file.equals("no file") || file.equals("<unknown>")) {
             File = null;
             LineStart = 0;
@@ -58,22 +59,21 @@ public class OriginRef {
 
     @Override
     public boolean equals(Object o) {
-        if (o.getClass() != this.getClass()) return false;
+        if (o.getClass() != this.getClass())
+            return false;
 
         final OriginRef cmp = (OriginRef) o;
 
-        return this.Type        ==  cmp.Type        &&
-               this.LineStart   ==  cmp.LineStart   &&
-               this.LineEnd     ==  cmp.LineEnd     &&
-               this.ColumnStart ==  cmp.ColumnStart &&
-               this.ColumnEnd   ==  cmp.ColumnEnd;
+        return this.Type == cmp.Type && this.LineStart == cmp.LineStart
+                && this.LineEnd == cmp.LineEnd && this.ColumnStart == cmp.ColumnStart
+                && this.ColumnEnd == cmp.ColumnEnd;
     }
 
     private int hashcode = -1;
 
     @Override
-    public final int hashCode(){
-        if(hashcode == -1) {
+    public final int hashCode() {
+        if (hashcode == -1) {
             // compute into local variable first to be thread-safe.
             this.hashcode = computeHashCode();
         }
@@ -116,7 +116,7 @@ public class OriginRef {
 
                     StringBuilder r = new StringBuilder();
                     for (int i = LineStart; i <= LineEnd; i++) {
-                        if (i-1 < lines.size()) {
+                        if (i - 1 < lines.size()) {
                             String line = lines.get(i - 1);
                             if (i == LineStart && i == LineEnd) {
                                 r.append(safeSubstring(line, ColumnStart, ColumnEnd));
@@ -157,7 +157,7 @@ public class OriginRef {
     @Override
     public String toString() {
 
-        String flags = "[" + ( IsAtom ? "A" : " " ) + "|" + ( IsBooleanTerm ? "B" : " " ) + "]";
+        String flags = "[" + (IsAtom ? "A" : " ") + "|" + (IsBooleanTerm ? "B" : " ") + "]";
 
         String padType = String.format("%-17s", Type);
 
@@ -170,23 +170,23 @@ public class OriginRef {
             if (f.contains(":")) {
                 int idx = f.indexOf(":");
                 fprefix = f.substring(0, idx);
-                f = f.substring(idx+1);
+                f = f.substring(idx + 1);
             }
             String main = f;
             if (f.contains("/")) {
-                main = f.substring(f.lastIndexOf("/")+1);
+                main = f.substring(f.lastIndexOf("/") + 1);
             } else if (f.contains("\\")) {
-                main = f.substring(f.lastIndexOf("\\")+1);
+                main = f.substring(f.lastIndexOf("\\") + 1);
             }
 
-            String line = ""+LineStart;
+            String line = "" + LineStart;
             if (LineStart != LineEnd) {
-                line = LineStart+"-"+LineEnd;
+                line = LineStart + "-" + LineEnd;
             }
 
-            String pos = ""+ ColumnStart;
+            String pos = "" + ColumnStart;
             if (ColumnStart != ColumnEnd) {
-                pos = ColumnStart +"-"+ ColumnEnd;
+                pos = ColumnStart + "-" + ColumnEnd;
             }
 
             fileStr = fprefix + main + ":" + line + " [" + pos + "]";
@@ -197,14 +197,17 @@ public class OriginRef {
     }
 
     public OriginRef WithType(OriginRefType t) {
-        return new OriginRef(File, LineStart, LineEnd, ColumnStart, ColumnEnd, t, IsAtom, IsBooleanTerm, SourceTerm);
+        return new OriginRef(File, LineStart, LineEnd, ColumnStart, ColumnEnd, t, IsAtom,
+            IsBooleanTerm, SourceTerm);
     }
 
     public OriginRef WithIsAtom(boolean a) {
-        return new OriginRef(File, LineStart, LineEnd, ColumnStart, ColumnEnd, Type, a, IsBooleanTerm, SourceTerm);
+        return new OriginRef(File, LineStart, LineEnd, ColumnStart, ColumnEnd, Type, a,
+            IsBooleanTerm, SourceTerm);
     }
 
     public OriginRef WithMetadata(boolean atom, boolean booltype) {
-        return new OriginRef(File, LineStart, LineEnd, ColumnStart, ColumnEnd, Type, atom, booltype, SourceTerm);
+        return new OriginRef(File, LineStart, LineEnd, ColumnStart, ColumnEnd, Type, atom, booltype,
+            SourceTerm);
     }
 }

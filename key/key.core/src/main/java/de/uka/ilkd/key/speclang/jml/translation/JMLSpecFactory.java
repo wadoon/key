@@ -460,7 +460,8 @@ public class JMLSpecFactory {
             final ImmutableList<LabeledParserRuleContext> mod, ContractClauses clauses)
             throws SLTranslationException {
 
-        Pair<Boolean, OriginRef> strictlyPure = translateStrictlyPure(pm, progVars.selfVar, progVars.paramVars, mod);
+        Pair<Boolean, OriginRef> strictlyPure =
+            translateStrictlyPure(pm, progVars.selfVar, progVars.paramVars, mod);
 
         clauses.hasMod.put(heap, !strictlyPure.first);
 
@@ -470,20 +471,25 @@ public class JMLSpecFactory {
             if (strictlyPure.first) {
                 // assignable strictly_nothing is set
 
-                final ImmutableList<LabeledParserRuleContext> assignableNothing = ImmutableSLList.<LabeledParserRuleContext>nil().append(getAssignableNothing());
-                Term term = translateAssignable(pm, progVars.selfVar, progVars.paramVars, progVars.atPres, progVars.atBefores, assignableNothing);
+                final ImmutableList<LabeledParserRuleContext> assignableNothing =
+                    ImmutableSLList.<LabeledParserRuleContext>nil().append(getAssignableNothing());
+                Term term = translateAssignable(pm, progVars.selfVar, progVars.paramVars,
+                    progVars.atPres, progVars.atBefores, assignableNothing);
                 term = tb.tf().setOriginRefTypeRecursive(term, OriginRefType.JML_ASSIGNABLE, true);
                 clauses.assignables.put(heap, term);
             } else if (mod.isEmpty()) {
                 // no assignable clauses exist
 
-                Term term = translateAssignable(pm, progVars.selfVar, progVars.paramVars, progVars.atPres, progVars.atBefores, mod);
-                term = tb.tf().setOriginRefTypeRecursive(term, OriginRefType.IMPLICIT_ENSURES_ASSIGNABLE, true);
+                Term term = translateAssignable(pm, progVars.selfVar, progVars.paramVars,
+                    progVars.atPres, progVars.atBefores, mod);
+                term = tb.tf().setOriginRefTypeRecursive(term,
+                    OriginRefType.IMPLICIT_ENSURES_ASSIGNABLE, true);
                 clauses.assignables.put(heap, term);
             } else {
                 // some assignable clauses are set
 
-                Term term = translateAssignable(pm, progVars.selfVar, progVars.paramVars, progVars.atPres, progVars.atBefores, mod);
+                Term term = translateAssignable(pm, progVars.selfVar, progVars.paramVars,
+                    progVars.atPres, progVars.atBefores, mod);
                 term = tb.tf().setOriginRefTypeRecursive(term, OriginRefType.JML_ASSIGNABLE, true);
                 clauses.assignables.put(heap, term);
             }
@@ -720,8 +726,8 @@ public class JMLSpecFactory {
         }
     }
 
-    private Pair<Boolean, OriginRef> translateStrictlyPure(IProgramMethod pm, ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars,
+    private Pair<Boolean, OriginRef> translateStrictlyPure(IProgramMethod pm,
+            ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars,
             ImmutableList<LabeledParserRuleContext> assignableClauses) {
 
         for (LabeledParserRuleContext expr : assignableClauses) {
@@ -803,9 +809,11 @@ public class JMLSpecFactory {
                         (tb.label(tb.equals(tb.var(progVars.excVar), tb.NULL()),
                             ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL)),
                         new OriginTermLabel(new Origin(SpecType.ENSURES)));
-                    excNull = tb.addLabelToAllSubs(excNull, new OriginTermLabel(new Origin(SpecType.ENSURES)));
+                    excNull = tb.addLabelToAllSubs(excNull,
+                        new OriginTermLabel(new Origin(SpecType.ENSURES)));
                     excNull = tb.tf().atomize(excNull);
-                    excNull = tb.tf().setOriginRefTypeRecursive(excNull, OriginRefType.IMPLICIT_ENSURES_EXCNULL, true);
+                    excNull = tb.tf().setOriginRefTypeRecursive(excNull,
+                        OriginRefType.IMPLICIT_ENSURES_EXCNULL, true);
 
                     Term post1 = (originalBehavior == Behavior.NORMAL_BEHAVIOR
                             ? tb.convertToFormula(clauses.ensures.get(heap))
@@ -1622,7 +1630,8 @@ public class JMLSpecFactory {
 
         final String invariantFor = "\\invariant_for(this)";
         final LabeledParserRuleContext ctxFor = new LabeledParserRuleContext(
-            JmlFacade.parseExpr(invariantFor), ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL, OriginRefType.IMPLICIT_ENSURES_SELFINVARIANT);
+            JmlFacade.parseExpr(invariantFor), ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL,
+            OriginRefType.IMPLICIT_ENSURES_SELFINVARIANT);
 
         specCase.addClause(ENSURES, ctxFor);
         specCase.addClause(ENSURES, ini.getOriginalSpec());

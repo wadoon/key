@@ -121,7 +121,7 @@ public abstract class AbstractSortedOperator extends AbstractOperator
         hashcode = hashcode * 17 + sort.hashCode();
         hashcode = hashcode * 17 + argSorts.hashCode();
 
-        if(hashcode == -1) {
+        if (hashcode == -1) {
             hashcode = 0;
         }
         return hashcode;

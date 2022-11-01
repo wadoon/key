@@ -136,7 +136,8 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
                     for (int i = 0; i < subs.size(); i++)
                         newSubs[i] = replace(subs.get(i));
                     return tb.tf().createTerm(visited.op(), new ImmutableArray<Term>(newSubs),
-                        visited.boundVars(), visited.javaBlock(), visited.getLabels(), visited.getOriginRef());
+                        visited.boundVars(), visited.javaBlock(), visited.getLabels(),
+                        visited.getOriginRef());
                 }
             }
         }
@@ -165,7 +166,8 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
                     for (int i = 0; i < subs.size(); i++)
                         newSubs[i] = replace(subs.get(i));
                     return tb.tf().createTerm(visited.op(), new ImmutableArray<Term>(newSubs),
-                        visited.boundVars(), visited.javaBlock(), visited.getLabels(), visited.getOriginRef());
+                        visited.boundVars(), visited.javaBlock(), visited.getLabels(),
+                        visited.getOriginRef());
                 }
             }
         }

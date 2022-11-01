@@ -635,7 +635,8 @@ public class TacletGenerator {
 
         final Term replaceTerm =
             TB.apply(TB.elementary(TB.var(resultProgSV), TB.func(target, updateSubs)),
-                TB.tf().createTerm(modalitySV, new Term[] { TB.var(postSV) }, null, replaceBlock, null));
+                TB.tf().createTerm(modalitySV, new Term[] { TB.var(postSV) }, null, replaceBlock,
+                    null));
 
         final RewriteTacletBuilder<RewriteTaclet> replaceTacletBuilder =
             new RewriteTacletBuilder<>();
@@ -894,7 +895,8 @@ public class TacletGenerator {
             newTerm = t;
         } else {
             newTerm = services.getTermBuilder().tf().createTerm(t.op(), newSubs,
-                new ImmutableArray<QuantifiableVariable>(newBoundVars), t.javaBlock(), t.getOriginRef());
+                new ImmutableArray<QuantifiableVariable>(newBoundVars), t.javaBlock(),
+                t.getOriginRef());
         }
 
         return new TermAndBoundVarPair(newTerm, svs);
@@ -929,8 +931,8 @@ public class TacletGenerator {
         }
 
         // reassemble, return
-        final Term term =
-            services.getTermBuilder().tf().createTerm(newOp, subs, t.boundVars(), t.javaBlock(), t.getOriginRef());
+        final Term term = services.getTermBuilder().tf().createTerm(newOp, subs, t.boundVars(),
+            t.javaBlock(), t.getOriginRef());
         return new Pair<Term, ImmutableSet<Taclet>>(term, taclets);
     }
 

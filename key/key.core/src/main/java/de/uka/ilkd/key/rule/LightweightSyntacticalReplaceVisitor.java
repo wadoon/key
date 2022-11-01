@@ -259,8 +259,8 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
             final Term[] neededsubs = neededSubs(newOp.arity());
             if (boundVars != visited.boundVars() || jblockChanged || (newOp != visitedOp)
                     || (!subStack.empty() && subStack.peek() == newMarker)) {
-                final Term newTerm =
-                    tb.tf().createTerm(newOp, neededsubs, boundVars, jb, visited.getLabels(), visited.getOriginRef());
+                final Term newTerm = tb.tf().createTerm(newOp, neededsubs, boundVars, jb,
+                    visited.getLabels(), visited.getOriginRef());
                 pushNew(resolveSubst(newTerm));
             } else {
                 Term t = resolveSubst(visited);

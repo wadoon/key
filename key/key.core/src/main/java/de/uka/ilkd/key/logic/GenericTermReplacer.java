@@ -25,6 +25,7 @@ public class GenericTermReplacer {
                     .collect(Collectors.toList()).toArray(new Term[0]);
 
         return services.getTermFactory().createTerm(newTopLevelTerm.op(), newSubs,
-            newTopLevelTerm.boundVars(), newTopLevelTerm.javaBlock(), newTopLevelTerm.getLabels(), newTopLevelTerm.getOriginRef());
+            newTopLevelTerm.boundVars(), newTopLevelTerm.javaBlock(), newTopLevelTerm.getLabels(),
+            newTopLevelTerm.getOriginRef());
     }
 }

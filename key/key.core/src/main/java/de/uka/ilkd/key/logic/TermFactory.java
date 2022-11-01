@@ -66,7 +66,8 @@ public final class TermFactory {
     }
 
     public Term createTerm(Operator op, ImmutableArray<Term> subs,
-            ImmutableArray<QuantifiableVariable> boundVars, JavaBlock javaBlock, OriginRef originref) {
+            ImmutableArray<QuantifiableVariable> boundVars, JavaBlock javaBlock,
+            OriginRef originref) {
 
         return createTerm(op, subs, boundVars, javaBlock, null, originref);
     }
@@ -97,15 +98,18 @@ public final class TermFactory {
         return createTerm(op, subs, null, null, label, originref);
     }
 
-    public Term createTerm(Operator op, Term[] subs, ImmutableArray<TermLabel> labels, OriginRef originref) {
+    public Term createTerm(Operator op, Term[] subs, ImmutableArray<TermLabel> labels,
+            OriginRef originref) {
         return createTerm(op, createSubtermArray(subs), null, null, labels, originref);
     }
 
-    public Term createTerm(Operator op, Term sub, ImmutableArray<TermLabel> labels, OriginRef originref) {
+    public Term createTerm(Operator op, Term sub, ImmutableArray<TermLabel> labels,
+            OriginRef originref) {
         return createTerm(op, new ImmutableArray<Term>(sub), null, null, labels, originref);
     }
 
-    public Term createTerm(Operator op, Term sub1, Term sub2, ImmutableArray<TermLabel> labels, OriginRef originref) {
+    public Term createTerm(Operator op, Term sub1, Term sub2, ImmutableArray<TermLabel> labels,
+            OriginRef originref) {
         return createTerm(op, new Term[] { sub1, sub2 }, null, null, labels, originref);
     }
 
@@ -114,15 +118,11 @@ public final class TermFactory {
     }
 
     public @Nonnull Term setOriginRef(Term base, OriginRef origref) {
-        Term newTerm = doCreateTerm(base.op(),
-                base.subs(),
-                base.boundVars(),
-                base.javaBlock(),
-                base.getLabels(),
-                origref);
+        Term newTerm = doCreateTerm(base.op(), base.subs(), base.boundVars(), base.javaBlock(),
+            base.getLabels(), origref);
 
         if (newTerm instanceof TermImpl && base instanceof TermImpl) {
-            ((TermImpl)newTerm).setOrigin(base.getOrigin());
+            ((TermImpl) newTerm).setOrigin(base.getOrigin());
         }
 
         return newTerm;
@@ -143,17 +143,14 @@ public final class TermFactory {
 
         subs.replaceAll(term -> setOriginRefTypeRecursive(term, t, false));
 
-        return doCreateTerm(base.op(),
-                new ImmutableArray<>(subs),
-                base.boundVars(),
-                base.javaBlock(),
-                base.getLabels(),
-                origref);
+        return doCreateTerm(base.op(), new ImmutableArray<>(subs), base.boundVars(),
+            base.javaBlock(), base.getLabels(), origref);
     }
 
     /***
-     * ensure that the OriginRefs of teh term and all subterms are set and have the correct IsAtom / IsBooleanTerm flags
-     * This does happen autom. on normal parsed JML but can be neccessary on manually created terms
+     * ensure that the OriginRefs of teh term and all subterms are set and have the correct IsAtom /
+     * IsBooleanTerm flags This does happen autom. on normal parsed JML but can be neccessary on
+     * manually created terms
      */
     public @Nonnull Term atomize(Term term) {
 
@@ -164,13 +161,8 @@ public final class TermFactory {
         List<Term> subs = term.subs().toList();
         subs.replaceAll(this::atomize);
 
-        term = doCreateTerm(
-                term.op(),
-                createSubtermArray(subs.toArray(new Term[0])),
-                term.boundVars(),
-                term.javaBlock(),
-                term.getLabels(),
-                term.getOriginRef());
+        term = doCreateTerm(term.op(), createSubtermArray(subs.toArray(new Term[0])),
+            term.boundVars(), term.javaBlock(), term.getLabels(), term.getOriginRef());
 
         boolean hasAtomChilds = termHasAtomChilds(term);
 
@@ -188,14 +180,15 @@ public final class TermFactory {
 
         } else {
 
-            return setOriginRef(term, new OriginRef(OriginRefType.UNKNOWN, shouldBeAtom, boolterm, term));
+            return setOriginRef(term,
+                new OriginRef(OriginRefType.UNKNOWN, shouldBeAtom, boolterm, term));
 
         }
     }
 
     private boolean termHasAtomChilds(Term t) {
-        return t.subs().stream().anyMatch(p -> p.getOriginRef() != null && p.getOriginRef().IsAtom) ||
-               t.subs().stream().anyMatch(this::termHasAtomChilds);
+        return t.subs().stream().anyMatch(p -> p.getOriginRef() != null && p.getOriginRef().IsAtom)
+                || t.subs().stream().anyMatch(this::termHasAtomChilds);
     }
 
     // -------------------------------------------------------------------------
@@ -209,9 +202,9 @@ public final class TermFactory {
     private Term doCreateTerm(Operator op, ImmutableArray<Term> subs,
             ImmutableArray<QuantifiableVariable> boundVars, JavaBlock javaBlock,
             ImmutableArray<TermLabel> labels, OriginRef originref) {
-        final Term newTerm =
-            (labels == null || labels.isEmpty() ? new TermImpl(op, subs, boundVars, javaBlock, originref)
-                    : new LabeledTermImpl(op, subs, boundVars, javaBlock, labels, originref)).checked();
+        final Term newTerm = (labels == null || labels.isEmpty()
+                ? new TermImpl(op, subs, boundVars, javaBlock, originref)
+                : new LabeledTermImpl(op, subs, boundVars, javaBlock, labels, originref)).checked();
         // Check if caching is possible. It is not possible if a non empty JavaBlock is available
         // in the term or in one of its children because the meta information like PositionInfos
         // may be different.

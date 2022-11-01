@@ -198,11 +198,13 @@ public interface TermLabel extends Named {
      * @see #isProofRelevant()
      */
     static Term removeIrrelevantLabels(Term term, TermFactory tf) {
-        return tf.createTerm(term.op(),
-            new ImmutableArray<>(term.subs().stream().map(t -> removeIrrelevantLabels(t, tf))
-                    .collect(Collectors.toList())),
-            term.boundVars(), term.javaBlock(), new ImmutableArray<>(term.getLabels().stream()
-                    .filter(TermLabel::isProofRelevant).collect(Collectors.toList())),
+        return tf
+                .createTerm(term.op(),
+                    new ImmutableArray<>(term.subs().stream()
+                            .map(t -> removeIrrelevantLabels(t, tf)).collect(Collectors.toList())),
+                    term.boundVars(), term.javaBlock(),
+                    new ImmutableArray<>(term.getLabels().stream()
+                            .filter(TermLabel::isProofRelevant).collect(Collectors.toList())),
                     term.getOriginRef());
     }
 

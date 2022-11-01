@@ -113,12 +113,12 @@ abstract class AbstractOperator implements Operator {
 
         hashcode = hashcode * 17 + name.hashCode();
         hashcode = hashcode * 17 + arity;
-        hashcode = hashcode * 17 + (whereToBind==null ? 0 : whereToBind.hashCode());
+        hashcode = hashcode * 17 + (whereToBind == null ? 0 : whereToBind.hashCode());
         hashcode = hashcode * 17 + (isRigid ? 1 : 0);
         hashcode = hashcode * 17 + (isRigid ? 1 : 0);
 
 
-        if(hashcode == -1) {
+        if (hashcode == -1) {
             hashcode = 0;
         }
         return hashcode;

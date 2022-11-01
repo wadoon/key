@@ -1721,9 +1721,11 @@ public class TermLabelManager {
                     changed = true;
                 }
             }
-            newApplicationTerm = changed ? tf.createTerm(newApplicationTerm.op(), newSubs,
-                newApplicationTerm.boundVars(), newApplicationTerm.javaBlock(),
-                newApplicationTerm.getLabels(), newApplicationTerm.getOriginRef()) : applicationTerm;
+            newApplicationTerm = changed
+                    ? tf.createTerm(newApplicationTerm.op(), newSubs,
+                        newApplicationTerm.boundVars(), newApplicationTerm.javaBlock(),
+                        newApplicationTerm.getLabels(), newApplicationTerm.getOriginRef())
+                    : applicationTerm;
         }
         return newApplicationTerm;
     }
@@ -1760,8 +1762,9 @@ public class TermLabelManager {
                 applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm,
                 pair.second, refactorings.getBelowUpdatesRefactorings());
             if (!newLabels.equals(pair.second.getLabels())) {
-                Term newModality = tf.createTerm(pair.second.op(), pair.second.subs(),
-                    pair.second.boundVars(), pair.second.javaBlock(), newLabels, pair.second.getOriginRef());
+                Term newModality =
+                    tf.createTerm(pair.second.op(), pair.second.subs(), pair.second.boundVars(),
+                        pair.second.javaBlock(), newLabels, pair.second.getOriginRef());
                 ImmutableArray<TermLabel> applicationLabels = newApplicationTerm.getLabels();
                 newApplicationTerm =
                     services.getTermBuilder().applyParallel(pair.first, newModality);
@@ -1813,9 +1816,11 @@ public class TermLabelManager {
                     changed = true;
                 }
             }
-            newApplicationTerm = changed ? tf.createTerm(newApplicationTerm.op(), newSubs,
-                newApplicationTerm.boundVars(), newApplicationTerm.javaBlock(),
-                newApplicationTerm.getLabels(), newApplicationTerm.getOriginRef()) : newApplicationTerm;
+            newApplicationTerm = changed
+                    ? tf.createTerm(newApplicationTerm.op(), newSubs,
+                        newApplicationTerm.boundVars(), newApplicationTerm.javaBlock(),
+                        newApplicationTerm.getLabels(), newApplicationTerm.getOriginRef())
+                    : newApplicationTerm;
         }
         return newApplicationTerm;
     }
@@ -1932,8 +1937,9 @@ public class TermLabelManager {
         ImmutableArray<TermLabel> newLabels =
             performRefactoring(state, services, applicationPosInOccurrence, applicationTerm, rule,
                 goal, hint, tacletTerm, term, activeRefactorings);
-        return subsChanged || !newLabels.equals(term.getLabels()) ? services.getTermFactory()
-                .createTerm(term.op(), newSubs, term.boundVars(), term.javaBlock(), newLabels, term.getOriginRef())
+        return subsChanged || !newLabels.equals(term.getLabels())
+                ? services.getTermFactory().createTerm(term.op(), newSubs, term.boundVars(),
+                    term.javaBlock(), newLabels, term.getOriginRef())
                 : term;
     }
 

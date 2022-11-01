@@ -1031,7 +1031,8 @@ public class TermBuilder {
         } else if (target.equals(tt())) {
             return tt();
         } else {
-            return tf.createTerm(UpdateApplication.UPDATE_APPLICATION, update, target, labels, null);
+            return tf.createTerm(UpdateApplication.UPDATE_APPLICATION, update, target, labels,
+                null);
         }
     }
 
@@ -1612,8 +1613,8 @@ public class TermBuilder {
         }
 
 
-        Term result =
-            tf.createTerm(term.op(), newSubs, term.boundVars(), term.javaBlock(), term.getLabels(), term.getOriginRef());
+        Term result = tf.createTerm(term.op(), newSubs, term.boundVars(), term.javaBlock(),
+            term.getLabels(), term.getOriginRef());
         result = addLabel(result, labels);
         return result;
     }
@@ -1644,8 +1645,8 @@ public class TermBuilder {
         if ((labels == null || labels.isEmpty()) && !term.hasLabels()) {
             return term;
         } else if (!term.hasLabels()) {
-            return tf.createTerm(term.op(), term.subs(), term.boundVars(), term.javaBlock(),
-                labels, term.getOriginRef());
+            return tf.createTerm(term.op(), term.subs(), term.boundVars(), term.javaBlock(), labels,
+                term.getOriginRef());
         } else {
             List<TermLabel> newLabelList = term.getLabels().toList();
 
@@ -1690,8 +1691,8 @@ public class TermBuilder {
         if ((labels == null || labels.isEmpty())) {
             return term;
         } else {
-            return tf.createTerm(term.op(), term.subs(), term.boundVars(), term.javaBlock(),
-                labels, term.getOriginRef());
+            return tf.createTerm(term.op(), term.subs(), term.boundVars(), term.javaBlock(), labels,
+                term.getOriginRef());
         }
     }
 
@@ -1715,7 +1716,8 @@ public class TermBuilder {
     }
 
     public Term unlabel(Term term) {
-        return tf.createTerm(term.op(), term.subs(), term.boundVars(), term.javaBlock(), null, null);
+        return tf.createTerm(term.op(), term.subs(), term.boundVars(), term.javaBlock(), null,
+            null);
     }
 
     public Term unlabelRecursive(Term term) {

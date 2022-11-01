@@ -489,19 +489,22 @@ public class KeYMediator {
     }
 
     public synchronized void fireTermHover(PosInSequent pos, Term term) {
-        for (SequentInteractionListener listener : listenerList.getListeners(SequentInteractionListener.class)) {
+        for (SequentInteractionListener listener : listenerList
+                .getListeners(SequentInteractionListener.class)) {
             listener.hover(pos, term);
         }
     }
 
     public synchronized void fireTermLeaveHover() {
-        for (SequentInteractionListener listener : listenerList.getListeners(SequentInteractionListener.class)) {
+        for (SequentInteractionListener listener : listenerList
+                .getListeners(SequentInteractionListener.class)) {
             listener.leaveHover();
         }
     }
 
     public synchronized void fireTermClicked(PosInSequent pos, Term term) {
-        for (SequentInteractionListener listener : listenerList.getListeners(SequentInteractionListener.class)) {
+        for (SequentInteractionListener listener : listenerList
+                .getListeners(SequentInteractionListener.class)) {
             listener.click(pos, term);
         }
     }

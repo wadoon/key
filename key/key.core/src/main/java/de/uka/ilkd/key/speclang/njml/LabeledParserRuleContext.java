@@ -42,15 +42,19 @@ public class LabeledParserRuleContext {
         this.origin = null;
     }
 
-    public LabeledParserRuleContext(ParserRuleContext ctx, OriginTermLabel.SpecType specType, OriginRefType refType) {
-        if (ctx == null) throw new IllegalArgumentException("ParserRuleContext is null");
+    public LabeledParserRuleContext(ParserRuleContext ctx, OriginTermLabel.SpecType specType,
+            OriginRefType refType) {
+        if (ctx == null)
+            throw new IllegalArgumentException("ParserRuleContext is null");
         this.first = ctx;
         this.second = constructTermLabel(ctx, specType);
         this.origin = refType;
     }
 
-    public LabeledParserRuleContext(ParserRuleContext ctx, TermLabel second, OriginRefType refType) {
-        if (ctx == null) throw new IllegalArgumentException("ParserRuleContext is null");
+    public LabeledParserRuleContext(ParserRuleContext ctx, TermLabel second,
+            OriginRefType refType) {
+        if (ctx == null)
+            throw new IllegalArgumentException("ParserRuleContext is null");
         this.first = ctx;
         this.second = second;
         this.origin = refType;

@@ -129,7 +129,8 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
         Point point = e.getPoint();
         PosInSequent pis = sequentView.getPosInSequent(point);
 
-        if (SwingUtilities.isMiddleMouseButton(e) || e.isControlDown() && SwingUtilities.isLeftMouseButton(e)) {
+        if (SwingUtilities.isMiddleMouseButton(e)
+                || e.isControlDown() && SwingUtilities.isLeftMouseButton(e)) {
             if (pis == null || pis.isSequent() || sequentView.isInUserSelectionHighlight(point)) {
                 sequentView.removeUserSelectionHighlight();
             } else {
@@ -192,20 +193,14 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
 
         try {
             if (origin != null) {
-                sourceView.addHighlightsForJMLStatement(
-                        origin.fileName,
-                        origin.line,
-                        ORIGIN_HIGHLIGHT_COLOR.get(),
-                        20);
+                sourceView.addHighlightsForJMLStatement(origin.fileName, origin.line,
+                    ORIGIN_HIGHLIGHT_COLOR.get(), 20);
             }
 
             for (FileOrigin subtermOrigin : subtermOrigins) {
                 if (!subtermOrigin.equals(origin)) {
-                    sourceView.addHighlightsForJMLStatement(
-                            subtermOrigin.fileName,
-                            subtermOrigin.line,
-                            SUBTERM_ORIGIN_HIGHLIGHT_COLOR.get(),
-                            10);
+                    sourceView.addHighlightsForJMLStatement(subtermOrigin.fileName,
+                        subtermOrigin.line, SUBTERM_ORIGIN_HIGHLIGHT_COLOR.get(), 10);
                 }
             }
         } catch (BadLocationException | IOException e) {

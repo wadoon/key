@@ -96,7 +96,8 @@ public class TermImpl implements Term {
      * @param javaBlock the code block (if applicable) after which the term is evaluated
      */
     public TermImpl(Operator op, ImmutableArray<Term> subs,
-            ImmutableArray<QuantifiableVariable> boundVars, JavaBlock javaBlock, @Nullable OriginRef originRef) {
+            ImmutableArray<QuantifiableVariable> boundVars, JavaBlock javaBlock,
+            @Nullable OriginRef originRef) {
         assert op != null;
         assert subs != null;
         this.op = op;
@@ -470,39 +471,35 @@ public class TermImpl implements Term {
 
         final TermImpl t = (TermImpl) o;
 
-        if ((originRef == null) != (t.originRef == null)) return false;
-        if (originRef != null && !originRef.equals(t.originRef)) return false;
+        if ((originRef == null) != (t.originRef == null))
+            return false;
+        if (originRef != null && !originRef.equals(t.originRef))
+            return false;
 
-        return op.equals(t.op)
-                && t.hasLabels() == hasLabels()
-                && subs.equals(t.subs)
-                && boundVars.equals(t.boundVars)
-                && javaBlock.equals(t.javaBlock);
+        return op.equals(t.op) && t.hasLabels() == hasLabels() && subs.equals(t.subs)
+                && boundVars.equals(t.boundVars) && javaBlock.equals(t.javaBlock);
     }
-    
+
     public boolean equalsModOrigins(Object o) {
-        if(o == this) {
+        if (o == this) {
             return true;
         }
 
-        if(o == null || o.getClass() != getClass()) {
+        if (o == null || o.getClass() != getClass()) {
             return false;
         }
 
         final TermImpl t = (TermImpl) o;
 
-        //if (originRef.size() != t.originRef.size()) return false;
-        //for (OriginRef to : originRef) {
-        //    if (! t.originRef.contains(to)) {
-        //        return false;
-        //    }
-        //}
+        // if (originRef.size() != t.originRef.size()) return false;
+        // for (OriginRef to : originRef) {
+        // if (! t.originRef.contains(to)) {
+        // return false;
+        // }
+        // }
 
-        return op.equals(t.op)
-                && t.hasLabels() == hasLabels()
-                && subs.equals(t.subs)
-                && boundVars.equals(t.boundVars)
-                && javaBlock.equals(t.javaBlock);
+        return op.equals(t.op) && t.hasLabels() == hasLabels() && subs.equals(t.subs)
+                && boundVars.equals(t.boundVars) && javaBlock.equals(t.javaBlock);
     }
 
     @Override

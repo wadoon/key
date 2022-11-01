@@ -314,7 +314,8 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
                     || (!subStack.empty() && subStack.peek() == newMarker)) {
                 final ImmutableArray<TermLabel> labels = instantiateLabels(visited, newOp,
                     new ImmutableArray<Term>(neededsubs), boundVars, jb, visited.getLabels());
-                final Term newTerm = tb.tf().createTerm(newOp, neededsubs, boundVars, jb, labels, visited.getOriginRef());
+                final Term newTerm = tb.tf().createTerm(newOp, neededsubs, boundVars, jb, labels,
+                    visited.getOriginRef());
                 pushNew(resolveSubst(newTerm));
             } else {
                 Term t;

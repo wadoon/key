@@ -83,7 +83,7 @@ public final class Metavariable extends AbstractSortedOperator
 
         hashcode = hashcode * 17 + serial;
 
-        if(hashcode == -1) {
+        if (hashcode == -1) {
             hashcode = 0;
         }
         return hashcode;

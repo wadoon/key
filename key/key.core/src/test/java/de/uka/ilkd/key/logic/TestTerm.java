@@ -186,7 +186,8 @@ public class TestTerm {
         Term noJBWithChild = tf.createTerm(Junctor.NOT, noJB);
         JavaBlock javaBlock =
             JavaBlock.createJavaBlock(new StatementBlock(new LocalVariableDeclaration()));
-        Term withJB = tf.createTerm(Modality.DIA, new ImmutableArray<>(noJB), null, javaBlock, null);
+        Term withJB =
+            tf.createTerm(Modality.DIA, new ImmutableArray<>(noJB), null, javaBlock, null);
         Term withJBChild = tf.createTerm(Junctor.NOT, withJB);
         Term withJBChildChild = tf.createTerm(Junctor.NOT, withJBChild);
         assertFalse(noJB.containsJavaBlockRecursive());

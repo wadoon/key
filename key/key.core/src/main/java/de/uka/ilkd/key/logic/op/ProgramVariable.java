@@ -290,12 +290,12 @@ public abstract class ProgramVariable extends AbstractSortedOperator
         int hashcode = super.hashCode();
 
         hashcode = hashcode * 17 + type.hashCode();
-        hashcode = hashcode * 17 + (isStatic?1:0);
-        hashcode = hashcode * 17 + (isModel?1:0);
-        hashcode = hashcode * 17 + (isGhost?1:0);
-        hashcode = hashcode * 17 + (isFinal?1:0);
+        hashcode = hashcode * 17 + (isStatic ? 1 : 0);
+        hashcode = hashcode * 17 + (isModel ? 1 : 0);
+        hashcode = hashcode * 17 + (isGhost ? 1 : 0);
+        hashcode = hashcode * 17 + (isFinal ? 1 : 0);
 
-        if(hashcode == -1) {
+        if (hashcode == -1) {
             hashcode = 0;
         }
         return hashcode;

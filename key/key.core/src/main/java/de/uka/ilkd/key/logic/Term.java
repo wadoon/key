@@ -171,8 +171,7 @@ public interface Term extends SVSubstitute, Sorted {
     public boolean containsJavaBlockRecursive();
 
     /**
-     * Checks if {@code o} is a term syntactically equal to this one,
-     * except for OriginRefs.
+     * Checks if {@code o} is a term syntactically equal to this one, except for OriginRefs.
      */
     boolean equalsModOrigins(Object o);
 

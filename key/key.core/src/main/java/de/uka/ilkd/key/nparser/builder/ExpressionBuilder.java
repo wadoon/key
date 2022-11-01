@@ -1457,8 +1457,8 @@ public class ExpressionBuilder extends DefaultBuilder {
                 ImmutableArray<QuantifiableVariable> finalBoundVars = boundVars;
                 // create term
                 Term[] finalArgs1 = args;
-                current = capsulateTf(ctx,
-                    () -> getTermFactory().createTerm(finalOp, finalArgs1, finalBoundVars, null, null));
+                current = capsulateTf(ctx, () -> getTermFactory().createTerm(finalOp, finalArgs1,
+                    finalBoundVars, null, null));
             }
         }
         current = handleAttributes(current, ctx.attribute());

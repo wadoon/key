@@ -256,7 +256,8 @@ public final class ProgVarReplacer {
         final ProgramVariable pv = (ProgramVariable) t.op();
         Object o = map.get(pv);
         if (o instanceof ProgramVariable) {
-            return services.getTermFactory().createTerm((ProgramVariable) o, t.getLabels(), t.getOriginRef());
+            return services.getTermFactory().createTerm((ProgramVariable) o, t.getLabels(),
+                t.getOriginRef());
         } else if (o instanceof Term) {
             return (Term) o;
         }

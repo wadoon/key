@@ -44,12 +44,12 @@ public abstract class AbstractSV extends AbstractSortedOperator implements Schem
     public int hashCode() {
         int hashcode = super.hashCode();
 
-        hashcode = hashcode * 17 + (isStrict?1:0);
+        hashcode = hashcode * 17 + (isStrict ? 1 : 0);
 
-        if(hashcode == -1) {
+        if (hashcode == -1) {
             hashcode = 0;
         }
-        
+
         return hashcode;
     }
 }

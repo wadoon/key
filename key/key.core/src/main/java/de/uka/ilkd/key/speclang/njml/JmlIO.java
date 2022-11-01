@@ -238,7 +238,8 @@ public class JmlIO {
         if (expr.second != null)
             term = services.getTermBuilder().addLabel(term, expr.second);
         else
-            term = services.getTermBuilder().addLabel(term, new OriginTermLabel(new OriginTermLabel.Origin(type)));
+            term = services.getTermBuilder().addLabel(term,
+                new OriginTermLabel(new OriginTermLabel.Origin(type)));
 
         if (expr.origin != null) {
             term = services.getTermFactory().setOriginRefTypeRecursive(term, expr.origin, false);
@@ -273,7 +274,8 @@ public class JmlIO {
         }
 
         if (condition.origin != null) {
-            term = services.getTermFactory().setOriginRefTypeRecursive(term, condition.origin, false);
+            term =
+                services.getTermFactory().setOriginRefTypeRecursive(term, condition.origin, false);
         }
 
         return term;

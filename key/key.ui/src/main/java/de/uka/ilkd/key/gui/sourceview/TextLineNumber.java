@@ -87,12 +87,10 @@ public class TextLineNumber extends JPanel
     /**
      * Create a line number component for a text component.
      *
-     * @param component
-     *            the related text component
-     * @param minimumDisplayDigits
-     *            the number of digits used to calculate the minimum width of the component
-     * @param skips
-     *            skip line numbers for these lines
+     * @param component the related text component
+     * @param minimumDisplayDigits the number of digits used to calculate the minimum width of the
+     *        component
+     * @param skips skip line numbers for these lines
      */
     public TextLineNumber(JTextComponent component, int minimumDisplayDigits, int[] skips) {
         this.component = component;
@@ -281,8 +279,8 @@ public class TextLineNumber extends JPanel
         if (line.getStartOffset() == rowStartOffset) {
 
             int skipOffset = 0;
-            for (int i = 0; i < skipLines.length && skipLines[i] <= index+1; i++) {
-                if (skipLines[i] == index+1) {
+            for (int i = 0; i < skipLines.length && skipLines[i] <= index + 1; i++) {
+                if (skipLines[i] == index + 1) {
                     return ""; // skipped
                 }
                 skipOffset++;

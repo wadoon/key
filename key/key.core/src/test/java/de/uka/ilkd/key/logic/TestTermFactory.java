@@ -121,7 +121,8 @@ public class TestTermFactory {
     @Test
     public void testWithInvalidSubformulae() {
         Term invalidBuilt = new TermImpl(p,
-            new ImmutableArray<>(new TermImpl(y, new ImmutableArray<>(), null, null, null)), null, null, null);
+            new ImmutableArray<>(new TermImpl(y, new ImmutableArray<>(), null, null, null)), null,
+            null, null);
         try {
             Term t_px_or_py = tf.createTerm(Junctor.OR, invalidBuilt, t1());
         } catch (Exception e) {
@@ -152,21 +153,24 @@ public class TestTermFactory {
     @Test
     public void testNegationTerm() {
         Term t_not_ryw = tf.createTerm(Junctor.NOT, t2());
-        assertEquals(t_not_ryw, new TermImpl(Junctor.NOT, new ImmutableArray<>(t2()), null, null, null));
+        assertEquals(t_not_ryw,
+            new TermImpl(Junctor.NOT, new ImmutableArray<>(t2()), null, null, null));
     }
 
     @Test
     public void testDiamondTerm() {
         JavaBlock jb = JavaBlock.EMPTY_JAVABLOCK;
         Term t_dia_ryw = tf.createTerm(Modality.DIA, new Term[] { t2() }, null, jb, null);
-        assertEquals(t_dia_ryw, new TermImpl(Modality.DIA, new ImmutableArray<>(t2()), null, jb, null));
+        assertEquals(t_dia_ryw,
+            new TermImpl(Modality.DIA, new ImmutableArray<>(t2()), null, jb, null));
     }
 
     @Test
     public void testBoxTerm() {
         JavaBlock jb = JavaBlock.EMPTY_JAVABLOCK;
         Term t_dia_ryw = tf.createTerm(Modality.BOX, new ImmutableArray<>(t2()), null, jb, null);
-        assertEquals(t_dia_ryw, new TermImpl(Modality.BOX, new ImmutableArray<>(t2()), null, jb, null));
+        assertEquals(t_dia_ryw,
+            new TermImpl(Modality.BOX, new ImmutableArray<>(t2()), null, jb, null));
     }
 
     @Test
@@ -311,7 +315,8 @@ public class TestTermFactory {
         Term noJBWithChild = tf.createTerm(Junctor.NOT, noJB);
         JavaBlock javaBlock =
             JavaBlock.createJavaBlock(new StatementBlock(new LocalVariableDeclaration()));
-        Term withJB = tf.createTerm(Modality.DIA, new ImmutableArray<>(noJB), null, javaBlock, null);
+        Term withJB =
+            tf.createTerm(Modality.DIA, new ImmutableArray<>(noJB), null, javaBlock, null);
         Term withJBChild = tf.createTerm(Junctor.NOT, withJB);
         Term withJBChildChild = tf.createTerm(Junctor.NOT, withJBChild);
         // Create Same terms again
