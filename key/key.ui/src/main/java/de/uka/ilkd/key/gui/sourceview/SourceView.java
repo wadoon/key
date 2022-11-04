@@ -17,6 +17,7 @@ import de.uka.ilkd.key.java.statement.Then;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.nparser.KeYLexer;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
@@ -24,6 +25,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofJavaSourceCollection;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.speclang.njml.JmlLexer;
 import de.uka.ilkd.key.util.Pair;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.IOUtil;
@@ -163,10 +165,10 @@ public final class SourceView extends JComponent {
         tabPane.setBorder(new TitledBorder(NO_SOURCE));
 
         tabPane.addChangeListener(e -> {
-            if (tabPane.getSelectedTab() == null) {
+            if (tabPane.getSelectedTab() == null || !(tabPane.getSelectedTab() instanceof Tab)) {
                 selectedFile = null;
             } else {
-                selectedFile = tabPane.getSelectedTab().absoluteFileName;
+                selectedFile = ((Tab) tabPane.getSelectedTab()).absoluteFileName;
             }
 
             // Mark tabs that contain highlights.
@@ -525,8 +527,13 @@ public final class SourceView extends JComponent {
      * @see NodeInfo#getRelevantFiles()
      */
     private void addFiles() throws IOException {
-        ImmutableSet<URI> fileURIs =
-                mainWindow.getMediator().getSelectedProof().lookup(ProofJavaSourceCollection.class).getRelevantFiles();
+        Set<URI> fileURIs = new HashSet<>();
+        for (URI file: mainWindow.getMediator().getSelectedProof().lookup(ProofJavaSourceCollection.class).getRelevantFiles()) {
+            fileURIs.add(file);
+        };
+
+        // Add non-java-source as well?
+        fileURIs.add(mainWindow.getMediator().getSelectedProof().getProofFile().toURI());
 
         Iterator<URI> it = tabs.keySet().iterator();
 
@@ -565,6 +572,19 @@ public final class SourceView extends JComponent {
                 if (is != null) {
                     Tab tab = new Tab(fileURI, is);
                     tabs.put(fileURI, tab);
+
+                    InputStream text = repo.getInputStream(fileURI.toURL());
+                    Collection<KeYGuiExtension.EditorExtension> ext = KeYGuiExtensionFacade.getEditorExtensions();
+                    ext.forEach(it -> {
+                        Component rstaTab = null;
+                        try {
+                            rstaTab = it.getPanel(getGrammarClass(tab.simpleFileName), IOUtil.readFrom(text), null);
+                        } catch (IOException e) {
+                            LOGGER.error("Cannot create RSTA view: " + e.getMessage());
+                        }
+                        tabPane.addTab("rsta" + tab.simpleFileName, rstaTab);
+                    });
+
                     // filename as tab title, complete file URI as tooltip
                     tabPane.addTab(tab.simpleFileName, tab);
                     int index = tabPane.indexOfComponent(tab);
@@ -575,6 +595,13 @@ public final class SourceView extends JComponent {
             }
         }
         throw new IOException("Could not open file: " + fileURI);
+    }
+
+    private Class<?> getGrammarClass(String simpleFileName) {
+        if (simpleFileName.endsWith(".java")) {
+            return JmlLexer.class;
+        }
+        return KeYLexer.class;
     }
 
     private void clear() {
@@ -818,8 +845,8 @@ public final class SourceView extends JComponent {
     private final static class TabbedPane extends JTabbedPane {
         private static final long serialVersionUID = -5438740208669700183L;
 
-        Tab getSelectedTab() {
-            return (Tab) getSelectedComponent();
+        Component getSelectedTab() {
+            return getSelectedComponent();
         }
     }
 

@@ -258,5 +258,7 @@ public interface KeYGuiExtension {
 
     interface EditorExtension {
         MainWindowAction getEditorAction(Class<?> grammarClass, String input, MainWindow window, Dialog parent);
+
+        Component getPanel(Class<?> grammarClass, String input, Dialog parent);
     }
 }

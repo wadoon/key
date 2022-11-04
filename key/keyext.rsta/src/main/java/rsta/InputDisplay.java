@@ -118,4 +118,15 @@ public class InputDisplay {
                     .newInstance(new ANTLRInputStream(input));
     }
 
+    public static Component panel(String text, Class<?>  lexerClass, Dialog parent) {
+        TextEditor textEditor = new TextEditor(parent);
+
+        LanguageSupport languageSupport = createLanguageSupport(lexerClass);
+
+        if(languageSupport != null) {
+            textEditor.addPanel(text.toString(), languageSupport);
+        }
+
+        return textEditor.getContentPane();
+    }
 }

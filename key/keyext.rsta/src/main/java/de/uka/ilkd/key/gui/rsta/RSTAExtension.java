@@ -3,7 +3,9 @@ package de.uka.ilkd.key.gui.rsta;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
+import rsta.InputDisplay;
 
+import javax.swing.*;
 import java.awt.*;
 
 @KeYGuiExtension.Info(name = "RSTAExtension",
@@ -20,4 +22,8 @@ public class RSTAExtension implements KeYGuiExtension, KeYGuiExtension.EditorExt
         return new EditorAction(grammarClass, input, window, parent);
     }
 
+    @Override
+    public Component getPanel(Class<?> grammarClass, String input, Dialog parent) {
+        return InputDisplay.panel(input, grammarClass, parent);
+    }
 }
