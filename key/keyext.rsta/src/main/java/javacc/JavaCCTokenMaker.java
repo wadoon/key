@@ -1,7 +1,6 @@
 package javacc;
 
 import javacc.Token;
-import javacc.TokenManager;
 import org.fife.ui.rsyntaxtextarea.TokenImpl;
 import org.fife.ui.rsyntaxtextarea.TokenMakerBase;
 

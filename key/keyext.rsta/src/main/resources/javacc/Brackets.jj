@@ -1,6 +1,5 @@
 options {
   STATIC = false;
-  USER_TOKEN_MANAGER = true;
 }
 
 PARSER_BEGIN(Brackets)

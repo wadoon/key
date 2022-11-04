@@ -21,6 +21,7 @@ import java.util.Optional;
 public class InputDisplay {
 
     private static final Class<Lexer> antlrLexerClass = Lexer.class;
+    private static final Class<TokenManager> tokenMgrClass = TokenManager.class;
 
     public static TextEditor display(String text, Class<?> lexerClass, Dialog parent) {
         TextEditor textEditor = new TextEditor(parent);
@@ -37,6 +38,8 @@ public class InputDisplay {
     private static @Nullable LanguageSupport createLanguageSupport(Class<?> lexerClass) {
         if (antlrLexerClass.isAssignableFrom(lexerClass)) {
             return createANTLRSupport((Class<Lexer>) lexerClass);
+        } else if (tokenMgrClass.isAssignableFrom(lexerClass)) {
+            return createJavaCCSupport((Class<TokenManager>) lexerClass);
         }
         return null;
     }
@@ -53,11 +56,11 @@ public class InputDisplay {
         return null;
     }
 
-    private static @Nullable LanguageSupport createJavaCCSupport(String grammarName) {
-        SyntaxScheme scheme = createSyntaxScheme(grammarName);
-        try {
-            Class<TokenManager> tokenMgrClass
-                    = (Class<TokenManager>) Class.forName(grammarName + "TokenManager");
+    private static @Nullable LanguageSupport createJavaCCSupport(Class<TokenManager> tokenMgrClass) {
+        // TODO get actual grammar file name here, instead of assuming sth. about the class name
+            SyntaxScheme scheme = createSyntaxScheme(
+                    tokenMgrClass.getName().substring(0,
+                            tokenMgrClass.getName().length() - "TokenManager".length()));
             JavaCCLexerFactory factory = new JavaCCLexerFactory() {
                 @Override
                 public PositionStream createStream(String input) {
@@ -76,10 +79,6 @@ public class InputDisplay {
                 }
             };
             return new LanguageSupport(scheme, factory);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
     private static @Nullable LanguageSupport createANTLRSupport(Class<Lexer> lexerClass) {
