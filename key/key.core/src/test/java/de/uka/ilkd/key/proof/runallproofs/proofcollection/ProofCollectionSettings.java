@@ -1,30 +1,22 @@
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
+import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
+import de.uka.ilkd.key.util.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
+import java.util.*;
 
-import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
 import static de.uka.ilkd.key.proof.runallproofs.proofcollection.TestFile.getAbsoluteFile;
-import de.uka.ilkd.key.util.LinkedHashMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Immutable settings type for proof collections. Specifies settings used during test run of
  * {@link RunAllProofsTest}.
  *
  * @author Kai Wallisch
- *
  */
 public class ProofCollectionSettings implements Serializable {
 
@@ -72,79 +64,52 @@ public class ProofCollectionSettings implements Serializable {
      * the automaticJAVADL.txt index file. RunAllProofs settings can be specified via system
      * properties by providing JVM arguments like: "-Dkey.runallproofs.forkMode=perFile"
      */
-    private static final List<Entry<String, String>> SYSTEM_PROPERTIES_ENTRIES;
+    private static final List<Pair<String, String>> SYSTEM_PROPERTIES_ENTRIES;
 
     static {
         /*
          * Iterating over all system properties to get settings entries. System properties starting
          * with "key.runallproofs." are relevant for proof collection settings.
          */
-        List<Entry<String, String>> tmp = new LinkedList<>();
-        Set<Entry<Object, Object>> entrySet = System.getProperties().entrySet();
-        for (Entry<Object, Object> entry : entrySet) {
+        List<Pair<String, String>> tmp = new LinkedList<>();
+        Set<Map.Entry<Object, Object>> entrySet = System.getProperties().entrySet();
+        for (var entry : entrySet) {
             String key = (String) entry.getKey();
             String value = (String) entry.getValue();
             if (key.startsWith("key.runallproofs.")) {
                 key = key.substring(17);// strip "key.runallproofs." from key
-                tmp.add(getSettingsEntry(key, value));
+                tmp.add(new Pair<>(key, value));
             }
         }
         SYSTEM_PROPERTIES_ENTRIES = Collections.unmodifiableList(tmp);
     }
 
     /**
-     * Converts a list of map entries to an unmodifiable map containing the specified entries and
-     * additionally default entries specified in {@link #SYSTEM_PROPERTIES_ENTRIES}.
-     */
-    private static Map<String, String> createUnmodifiableMapContainingDefaults(
-            List<Entry<String, String>> entries) {
-
-        Map<String, String> mutableMap = new LinkedHashMap<>();
-
-        /*
-         * Add specified entries.
-         */
-        for (Entry<String, String> entry : entries) {
-            mutableMap.put(entry.getKey(), entry.getValue());
-        }
-
-        /*
-         * Add entries created from system properties.
-         */
-        for (Entry<String, String> entry : SYSTEM_PROPERTIES_ENTRIES) {
-            mutableMap.put(entry.getKey(), entry.getValue());
-        }
-
-        /*
-         * Convert to an unmodifiable map and return.
-         */
-        return Collections.unmodifiableMap(mutableMap);
-    }
-
-    /**
      * Creates a {@link ProofCollectionSettings} object from the specified parameters with no parent
      * settings.
      */
-    ProofCollectionSettings(String proofCollectionFileLocation, List<Entry<String, String>> entries,
-            Date runStart) {
+    public ProofCollectionSettings(String proofCollectionFileLocation, List<Pair<String, String>> entries,
+                                   Date runStart) {
         this.runStart = runStart;
 
         /*
          * Determine source proof collection file from string location.
          */
         assert proofCollectionFileLocation != null : "Unexpected nullpointer detected - "
-            + "no proof collection source file specified.";
+                + "no proof collection source file specified.";
         sourceProofCollectionFile = new File(proofCollectionFileLocation).getParentFile();
         assert sourceProofCollectionFile.isAbsolute()
                 : "Expecting location of source proof collection "
-                    + "file to be given as absolute path.";
+                + "file to be given as absolute path.";
         assert sourceProofCollectionFile.exists()
                 : "Given source proof collection file does not exist.";
 
         /*
          * Compute immutable map containing settings entries.
          */
-        immutableSettingsMap = createUnmodifiableMapContainingDefaults(entries);
+        var settings = Pair.toMap(SYSTEM_PROPERTIES_ENTRIES);
+        settings.putAll(Pair.toMap(entries));
+        immutableSettingsMap = Collections.unmodifiableMap(settings);
 
         /*
          * Compute location of statistics file.
@@ -154,7 +119,7 @@ public class ProofCollectionSettings implements Serializable {
             statisticsFile = null;
         } else {
             statisticsFile =
-                new StatisticsFile(getAbsoluteFile(getBaseDirectory(), statisticsFileName));
+                    new StatisticsFile(getAbsoluteFile(getBaseDirectory(), statisticsFileName));
         }
     }
 
@@ -162,36 +127,17 @@ public class ProofCollectionSettings implements Serializable {
      * Creates a {@link ProofCollectionSettings} object that overrides an existing
      * {@link ProofCollectionSettings} object.
      */
-    public ProofCollectionSettings(ProofCollectionSettings parentSettings,
-            List<Entry<String, String>> entries) {
+    public ProofCollectionSettings(ProofCollectionSettings parentSettings, List<Pair<String, String>> entries) {
         this.runStart = parentSettings.runStart;
 
         /*
          * Use source proof collection from parent settings.
          */
         this.sourceProofCollectionFile = parentSettings.sourceProofCollectionFile;
-
-        /*
-         * Create new list of entries containing parent entries and local entries. Entries from
-         * parent ProofCollectionSettings are by local entries.
-         */
-        Set<String> localKeys = new LinkedHashSet<>();
-        for (Entry<String, String> entry : entries) {
-            String key = entry.getKey();
-            localKeys.add(key);
-        }
-        List<Entry<String, String>> mergedEntries = new LinkedList<>(entries);
-        for (Entry<String, String> entry : parentSettings.immutableSettingsMap.entrySet()) {
-            if (!localKeys.contains(entry.getKey())) {
-                mergedEntries.add(entry);
-            }
-        }
-        mergedEntries.addAll(entries);
-
-        /*
-         * Compute immutable map containing settings entries.
-         */
-        immutableSettingsMap = createUnmodifiableMapContainingDefaults(mergedEntries);
+        var local = Pair.toMap(entries);
+        var parent = new HashMap<>(parentSettings.immutableSettingsMap);
+        parent.putAll(local);
+        immutableSettingsMap = Collections.unmodifiableMap(parent);
 
         /*
          * Inherit statistics file from parent settings.
@@ -236,7 +182,7 @@ public class ProofCollectionSettings implements Serializable {
              * Unknown value used for fork mode. Printing out warning to the user.
              */
             LOGGER.warn("Warning: Unknown value used for runAllProofs fork mode:  {}",
-                forkModeString);
+                    forkModeString);
             LOGGER.warn("Use either of the following: noFork (default), perGroup, perFile");
             LOGGER.warn("Using default fork mode: noFork");
             LOGGER.warn("If you want to inspect source code, look up the following location:");
@@ -285,9 +231,9 @@ public class ProofCollectionSettings implements Serializable {
         String tempDirString = get(TEMP_DIR);
         if (tempDirString == null) {
             throw new IOException(
-                "No temporary directory specified in RunAllProofs configuration file. "
-                    + "Cannot run in forked mode. " + "To solve this, specify setting \"" + TEMP_DIR
-                    + "\" in file " + sourceProofCollectionFile);
+                    "No temporary directory specified in RunAllProofs configuration file. "
+                            + "Cannot run in forked mode. " + "To solve this, specify setting \"" + TEMP_DIR
+                            + "\" in file " + sourceProofCollectionFile);
         }
         File tempDir = new File(tempDirString);
         if (!tempDir.isAbsolute()) {
@@ -295,8 +241,8 @@ public class ProofCollectionSettings implements Serializable {
         }
         if (tempDir.isFile()) {
             throw new IOException("Specified temporary directory is a file: " + tempDir + "\n"
-                + "Configure temporary directory in file " + sourceProofCollectionFile
-                + " to solve this.");
+                    + "Configure temporary directory in file " + sourceProofCollectionFile
+                    + " to solve this.");
         }
         return tempDir;
     }
@@ -336,29 +282,6 @@ public class ProofCollectionSettings implements Serializable {
     }
 
     /**
-     * Static method for creation of {@link ProofCollectionSettings} entries.
-     */
-    public static Entry<String, String> getSettingsEntry(final String key, final String value) {
-        return new Entry<>() {
-            @Override
-            public String getKey() {
-                return key;
-            }
-
-            @Override
-            public String getValue() {
-                return value;
-            }
-
-            @Override
-            public String setValue(String value) {
-                throw new UnsupportedOperationException(
-                    "Proof collection settings are immutable. Changing settings values is not allowed.");
-            }
-        };
-    }
-
-    /**
      * Gets the list of groups on which the test should be run.
      *
      * <code>null</code> means all of them, otherwise a list of group names
@@ -376,7 +299,7 @@ public class ProofCollectionSettings implements Serializable {
 
     /**
      * Gets the directory for a group.
-     *
+     * <p>
      * If the groups has its own directory key, take it into consideration, return the base
      * directory otherwise
      *

@@ -1,8 +1,7 @@
 package de.uka.ilkd.key.parser;
 
-import org.antlr.runtime.RecognitionException;
-
-import antlr.Token;
+import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.Token;
 
 public class AmbigiousDeclException extends RecognitionException {
     /**

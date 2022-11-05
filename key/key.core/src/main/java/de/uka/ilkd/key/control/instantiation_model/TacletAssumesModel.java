@@ -1,14 +1,5 @@
 package de.uka.ilkd.key.control.instantiation_model;
 
-import java.util.Iterator;
-
-import javax.swing.DefaultComboBoxModel;
-
-import de.uka.ilkd.key.nparser.KeyIO;
-import org.antlr.runtime.RecognitionException;
-import org.key_project.util.collection.ImmutableList;
-
-import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -16,7 +7,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.NodeOrigin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
-import de.uka.ilkd.key.parser.ParserMode;
+import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.MissingInstantiationException;
@@ -26,6 +17,11 @@ import de.uka.ilkd.key.rule.IfFormulaInstDirect;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import org.antlr.v4.runtime.RecognitionException;
+import org.key_project.util.collection.ImmutableList;
+
+import javax.swing.*;
+import java.util.Iterator;
 
 public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiation> {
 
@@ -100,7 +96,7 @@ public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiat
      * @return the term encoded in 's'
      * @throws RecognitionException In case an exception occurs during parse.
      */
-    public Term parseFormula(String s) throws RecognitionException {
+    public Term parseFormula(String s) {
         return new KeyIO(services).parseExpression(s);
     }
 
@@ -133,7 +129,7 @@ public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiat
 
             return new IfFormulaInstDirect(new SequentFormula(term));
         } catch (RecognitionException e) {
-            throw new SVInstantiationParserException(manualInput, pos, e.charPositionInLine,
+            throw new SVInstantiationParserException(manualInput, pos, -1,
                 "Problem occured parsing a manual input" + " of an '\\assumes'-sequent.\n"
                     + e.getMessage(),
                 true).initCause(e);

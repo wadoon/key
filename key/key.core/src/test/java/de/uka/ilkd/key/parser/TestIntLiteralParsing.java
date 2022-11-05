@@ -5,7 +5,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
-import org.antlr.runtime.RecognitionException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
@@ -153,7 +152,7 @@ public class TestIntLiteralParsing extends AbstractTestTermParser {
 
 
     @Override
-    public Term parseTerm(String s) throws RecognitionException {
+    public Term parseTerm(String s)  {
         PositionedString p = new PositionedString(s);
         /*
          * containerType and self variable are not relevant for the tests currently and can be
@@ -179,7 +178,7 @@ public class TestIntLiteralParsing extends AbstractTestTermParser {
     }
 
     @TestFactory
-    public Stream<DynamicTest> testIntLiteralParsing() throws RecognitionException {
+    public Stream<DynamicTest> testIntLiteralParsing()  {
         return createTestCases(INTSTRINGS);
     }
 
@@ -195,7 +194,7 @@ public class TestIntLiteralParsing extends AbstractTestTermParser {
      * @throws RecognitionException if a parsing error occurs
      */
     @TestFactory
-    public Stream<DynamicTest> testIntRange() throws RecognitionException {
+    public Stream<DynamicTest> testIntRange()  {
         return Arrays.stream(INTRANGESTRINGS).map(it -> DynamicTest.dynamicTest(it, () -> {
             RuntimeException ex = assertThrows(RuntimeException.class, () -> parseTerm(it));
             assertTrue(ex.getCause().getMessage().startsWith("Number constant out of bounds"));

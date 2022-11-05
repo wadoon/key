@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.nparser.builder;
 
-import antlr.RecognitionException;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.*;
@@ -21,6 +20,7 @@ import de.uka.ilkd.key.rule.conditions.TypeResolver;
 import de.uka.ilkd.key.rule.tacletbuilder.*;
 import de.uka.ilkd.key.util.parsing.BuildingException;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Token;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -499,7 +499,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         } else {
             if (b instanceof NoFindTacletBuilder) {
                 // there is a replacewith without a find.
-                throwEx(new RecognitionException(""));
+                throwEx(new RuntimeException(""));
             } else if (b instanceof SuccTacletBuilder || b instanceof AntecTacletBuilder) {
                 if (rwObj instanceof Sequent) {
                     gt = new AntecSuccTacletGoalTemplate(addSeq, addRList, (Sequent) rwObj, pvs);

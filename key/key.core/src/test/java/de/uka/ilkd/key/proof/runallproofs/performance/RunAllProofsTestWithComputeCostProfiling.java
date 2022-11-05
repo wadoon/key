@@ -36,8 +36,7 @@ public class RunAllProofsTestWithComputeCostProfiling extends RunAllProofsTest {
 
     @TestFactory
     Stream<DynamicTest> data() throws Exception {
-        ProofCollection proofCollection =
-            parseIndexFile("index/automaticJAVADL.txt", DataRecordingParser::new);
+        ProofCollection proofCollection = parseIndexFile("index/automaticJAVADL.txt");
         proofCollection.getSettings().getStatisticsFile().setUp();
         initDirectories(proofCollection.getSettings().runStart);
         return data(proofCollection);

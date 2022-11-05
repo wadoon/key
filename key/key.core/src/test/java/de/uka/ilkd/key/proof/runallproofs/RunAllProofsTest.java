@@ -1,16 +1,19 @@
 package de.uka.ilkd.key.proof.runallproofs;
 
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionLexer;
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionParser;
-import org.antlr.runtime.*;
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.*;
+import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.parsing.SyntaxErrorReporter;
+import org.antlr.v4.runtime.CharStreams;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Tag;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -45,7 +48,7 @@ import java.util.stream.Stream;
  * normal "Junit test" it is required to define the system properties "key.home" and "key.lib" like:
  * {@code "-Dkey.home=D:/Forschung/GIT/KeY" "-Dkey.lib=D:/Forschung/Tools/KeY-External Libs"} .
  * </p>
- *
+ * <p>
  * This class itself does not define testcases. The class has subclasses which define test cases for
  * different run-all-proof scenarios.
  *
@@ -56,6 +59,7 @@ import java.util.stream.Stream;
 public abstract class RunAllProofsTest {
     public static final String VERBOSE_OUTPUT_KEY = "verboseOutput";
     public static final String IGNORE_KEY = "ignore";
+    private static final Logger LOGGER = LoggerFactory.getLogger(RunAllProofsTest.class);
 
 
     /**
@@ -90,22 +94,71 @@ public abstract class RunAllProofsTest {
      * received from main parser entry point.
      */
     public static ProofCollection parseIndexFile(final String index) throws IOException {
-        return parseIndexFile(index, ProofCollectionParser::new);
+        var errorReporter = new SyntaxErrorReporter(RunAllProofsTest.class);
+        var lexer = new ProofCollectionLexer(CharStreams.fromFileName(index));
+        lexer.removeErrorListeners();
+        lexer.addErrorListener(errorReporter);
+        var parser = new ProofCollectionParser(new org.antlr.v4.runtime.CommonTokenStream(lexer));
+        parser.removeErrorListeners();
+        parser.addErrorListener(errorReporter);
+        var ctx = parser.parserEntryPoint();
+        errorReporter.throwException();
+        var builder = new ProofCollectionBuilder();
+        return (ProofCollection) ctx.accept(builder);
+    }
+}
+
+class ProofCollectionBuilder extends ProofCollectionBaseVisitor<Object> {
+    private ProofCollectionSettings currentSettings;
+
+    @Override
+    public Object visitParserEntryPoint(ProofCollectionParser.ParserEntryPointContext ctx) {
+        var settings = parseSettings(ctx.settingAssignment());
+        currentSettings = new ProofCollectionSettings(ctx.start.getTokenSource().getSourceName(), settings, new Date());
+        var current = new ProofCollection(currentSettings);
+        ctx.group().forEach(it -> current.add((ProofCollectionUnit) it.accept(this)));
+        ctx.testFile().forEach(it -> current.add(new SingletonProofCollectionUnit((TestFile) it.accept(this), currentSettings)));
+        return current;
     }
 
-    public static ProofCollection parseIndexFile(final String index,
-            Function<TokenStream, ProofCollectionParser> stream2Parser) throws IOException {
-        File automaticJAVADL = new File(RunAllProofsDirectories.EXAMPLE_DIR, index);
-        CharStream charStream = new ANTLRFileStream(automaticJAVADL.getAbsolutePath());
-        ProofCollectionLexer lexer = new ProofCollectionLexer(charStream);
-        TokenStream tokenStream = new CommonTokenStream(lexer);
-        ProofCollectionParser parser = stream2Parser.apply(tokenStream);
-        try {
-            return parser.parserEntryPoint();
-        } catch (RecognitionException e) {
-            String msg = parser.getErrorMessage(e, parser.getTokenNames());
-            throw new IOException(
-                "Cannot parse " + automaticJAVADL + " at line " + e.line + ": " + msg, e);
-        }
+    @Override
+    public Object visitGroup(ProofCollectionParser.GroupContext ctx) {
+        var settings = parseSettings(ctx.settingAssignment());
+        var oldSettings = currentSettings;
+        currentSettings = new ProofCollectionSettings(oldSettings, settings);
+        List<TestFile> files = ctx.testFile().stream().map(it -> (TestFile) it.accept(this)).collect(Collectors.toList());
+        var group = new GroupedProofCollectionUnit(ctx.nameToken.getText(), currentSettings, files);
+        currentSettings = oldSettings;
+        return group;
+    }
+
+    @Override
+    public Object visitTestFile(ProofCollectionParser.TestFileContext ctx) {
+        TestProperty testProperty = null;
+        if (ctx.PROVABLE() != null)
+            testProperty = TestProperty.PROVABLE;
+        if (ctx.NOTPROVABLE() != null) testProperty = TestProperty.NOTPROVABLE;
+        if (ctx.LOADABLE() != null)
+            testProperty = TestProperty.LOADABLE;
+        if (ctx.NOTLOADABLE() != null)
+            testProperty = TestProperty.NOTLOADABLE;
+        if (testProperty == null)
+            throw new IllegalStateException("Parser should have assigned a value other that null to variable testProperty at this point.");
+        var path = (String) ctx.path.accept(this);
+        return TestFile.createInstance(testProperty, path, currentSettings);
+    }
+
+    @Override
+    public Object visitValueDeclaration(ProofCollectionParser.ValueDeclarationContext ctx) {
+        var value = ctx.getText();
+        if (ctx.QuotedString() != null)
+            return value.substring(1, value.length() - 1);
+        return value;
+    }
+
+    private List<Pair<String, String>> parseSettings(List<ProofCollectionParser.SettingAssignmentContext> settingAssignment) {
+        return settingAssignment.stream().map(it ->
+                new Pair<>(it.k.getText(), (String) it.v.accept(this))
+        ).collect(Collectors.toList());
     }
 }

@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.proof.init;
 
-import org.antlr.runtime.RecognitionException;
+import org.antlr.v4.runtime.RecognitionException;
 
 /**
  * Reading prover input failed

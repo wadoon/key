@@ -4,7 +4,6 @@ import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.parser.proofjava.ParseException;
 import de.uka.ilkd.key.parser.proofjava.Token;
 import de.uka.ilkd.key.util.parsing.HasLocation;
-import org.antlr.runtime.RecognitionException;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

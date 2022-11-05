@@ -22,11 +22,11 @@ public final class ProofCollection {
     private final List<ProofCollectionUnit> units = new LinkedList<>();
     private final ProofCollectionSettings settings;
 
-    ProofCollection(ProofCollectionSettings settings) {
+    public ProofCollection(ProofCollectionSettings settings) {
         this.settings = settings;
     }
 
-    void add(ProofCollectionUnit unit) {
+    public void add(ProofCollectionUnit unit) {
         units.add(unit);
     }
 
