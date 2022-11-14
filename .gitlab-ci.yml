@@ -31,6 +31,7 @@ stages:
     - secondary
     - ternary
     - deploy
+    - test
 
 compile:classes:
   stage: primary
@@ -47,7 +48,7 @@ compile:classes:
       - .gradle
 
 compile:testClasses:
-  dependencies:  ["compile:classes"]
+  dependencies: [ "compile:classes" ]
   stage: secondary
   image: wadoon/key-test-docker:jdk11
   script:
@@ -61,52 +62,16 @@ compile:testClasses:
       - build
       - .gradle
 
-sonarqube:
-  dependencies:  ["compile:testClasses"]
-  stage: ternary
-  image: wadoon/key-test-docker:jdk11
-  allow_failure: true
-  script:
-    - cd key
-    - ./scripts/tools/sonarqube_hint.py
-    - gradle --build-cache --continue -Dsonar.qualitygate.wait=true -DjacocoEnabled=true testFast sonarqube
-  only:
-    - merge_requests
-    - master
-  cache:
-    key: "$CI_COMMIT_REF_NAME"
-    policy: pull
-    paths:
-      - build
-      - .gradle
-  artifacts:
-    reports:
-      junit:
-        - "**/**/build/test-results/*/TEST-*.xml"
+include:
+  - template: Code-Quality.gitlab-ci.yml
 
-format:
-  stage: primary
-  image: wadoon/key-test-docker:jdk11
-  allow_failure: true
-  script:
-    - cd key
-    - gradle spotlessCheck
-
-checkstyle:
-  stage: primary
-  image: wadoon/key-test-docker:jdk11
-  allow_failure: true
-  script:
-    - (key/scripts/tools/checkstyle/runIncrementalCheckstyle.sh | tee report.txt) || true
-    - key/scripts/tools/checkstyle/translateAudit.py report.txt > report.json
+code_quality:
   artifacts:
-    name: "checkstyle-report-$CI_JOB_ID"
-    paths:
-      - report.txt
-    when: always
-    reports:
-      codequality: report.json
-    expire_in: 1 year
+    paths: [gl-code-quality-report.json]
+  services:            # Shut off Docker-in-Docker
+  tags:
+    - dind     # Set this job to only run on our new specialized runner
+
 
 deploy-nightly:
   stage: deploy
