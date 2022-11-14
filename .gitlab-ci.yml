@@ -66,8 +66,6 @@ include:
   - template: Code-Quality.gitlab-ci.yml
 
 code_quality:
-  artifacts:
-    paths: [gl-code-quality-report.json]
   services:            # Shut off Docker-in-Docker
   tags:
     - dind     # Set this job to only run on our new specialized runner

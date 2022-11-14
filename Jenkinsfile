@@ -26,32 +26,35 @@ pipeline {
 
         stage('Test: JUnit') {
             steps {
-                sh 'cd key && ./gradlew --continue test -x key.core.symbolic_execution:test -x key.core.proof_references:test'
+                sh 'echo test'
             }
         }
 
         stage('Test: testProveRules') {
             steps {
-                sh 'cd key && ./gradlew --continue testProveRules'
-            }
+                sh 'echo test'
+            }            }
         }
 
         stage('Test: testRunAllFunProofs') {
             steps {
-                sh 'cd key && ./gradlew --continue testRunAllFunProofs'
+                sh 'echo test'
+            }
             }
         }
 
         stage('Test: testRunAllInfProofs') {
             steps {
-                sh 'cd key && ./gradlew --continue testRunAllInfProofs'
+                sh 'echo test'
+            }
             }
         }
 
         stage('Test: Optional Features') {
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    sh 'cd key && ./gradlew --continue key.core.symbolic_execution:test key.core.proof_references:test'
+                   sh 'echo test'
+            }
                 }
             }
         }
@@ -59,7 +62,8 @@ pipeline {
         stage('Check Formatting') {
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    sh 'cd key && ./gradlew --continue spotlessCheck'
+                    sh 'echo test'
+            
                 }
             }
         }
