@@ -65,6 +65,24 @@ compile:testClasses:
       - build
       - .gradle
 
+
+test:
+  stage: ternary
+  script:
+    - cd key
+    - gradle --build-cache --continue :key.util:check
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: pull
+    paths:
+      - build
+      - .gradle
+  artifacts:
+    reports:
+      junit:
+        - "**/**/build/test-results/test/TEST-*.xml"
+
+
 include:
   - template: Code-Quality.gitlab-ci.yml
 
