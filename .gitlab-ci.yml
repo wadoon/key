@@ -70,7 +70,7 @@ test:
   stage: ternary
   script:
     - cd key
-    - gradle --build-cache --continue :key.util:check
+    - gradle --build-cache --continue testAggregateTestReport -x key.core.proof_references:test -x key.core.symbolic_execution:test
   cache:
     key: "$CI_COMMIT_REF_NAME"
     policy: pull
@@ -78,6 +78,10 @@ test:
       - build
       - .gradle
   artifacts:
+    when: always
+    paths:
+      - key/key.ui/build/reports/tests/unit-test/
+    expire_in: 1 month
     reports:
       junit:
         - "**/**/build/test-results/test/TEST-*.xml"
