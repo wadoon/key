@@ -110,7 +110,7 @@ my_code_quality:
     - cd key
     - gradle --build-cache --continue pmdMain
     - wget https://repo1.maven.org/maven2/se/bjurr/violations/violations-command-line/1.22.3/violations-command-line-1.22.3.jar -O violations-command-line-1.22.3.jar
-    - java -jar violations-command-line-1.22.3.jar -cc code-climate-report.json -v PMD . ".*/pmd/main\.xml$" "PMD"
+    - java -jar violations-command-line-1.22.3.jar -cc code-climate-report.json -v PMD . ".*/pmd/main\.xml$" "PMD" > /dev/null
     # -v "CHECKSTYLE" "." ".*checkstyle/main\.xml$" "Checkstyle"
   artifacts:
     reports:
