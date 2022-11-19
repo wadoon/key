@@ -84,6 +84,7 @@ subprojects {
         consoleOutput = false
         toolVersion = "6.51.0"
         incrementalAnalysis = true
+        ignoreFailures = true
         //codeclimate
         ruleSets = ["category/java/errorprone.xml", "category/java/bestpractices.xml"]
         rulesMinimumPriority = 3
