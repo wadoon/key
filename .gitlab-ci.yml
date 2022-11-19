@@ -132,12 +132,11 @@ my_code_quality:
       java -jar violations-command-line-1.22.3.jar -cc code-climate-report.json 
       -v PMD . ".*/pmd/main\.xml$" "PMD"
     # -v "CHECKSTYLE" "." ".*checkstyle/main\.xml$" "Checkstyle"
-
-#  artifacts:
-#    paths: [gl-code-quality-report.html]
-#    reports:
-#      codequality: gl-code-quality-report.json
-#    expire_in: 1 week
+  artifacts:
+    paths: [gl-code-quality-report.html]
+    reports:
+      codequality: code-climate-report.json
+    expire_in: 1 week
 
 
 
