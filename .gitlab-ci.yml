@@ -114,7 +114,7 @@ my_code_quality:
     - ls
   artifacts:
     reports:
-      codequality: code-climate-report.json
+      codequality: key/code-climate-report.json
     expire_in: 1 week
 
     # -v "CHECKSTYLE" "." ".*checkstyle/main\.xml$" "Checkstyle"
