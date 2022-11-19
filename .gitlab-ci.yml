@@ -115,25 +115,31 @@ license_scanning:
 
 
 
-include:
-  - template: Code-Quality.gitlab-ci.yml
-
-code_quality:
-  services:            # Shut off Docker-in-Docker
-  tags:
-    - dind     # Set this job to only run on our new specialized runner
+#include:
+#  - template: Code-Quality.gitlab-ci.yml
 
 #code_quality:
 #  services:            # Shut off Docker-in-Docker
 #  tags:
 #    - dind     # Set this job to only run on our new specialized runner
-#  variables:
-#    REPORT_FORMAT: html
+
+my_code_quality:
+  script:
+    - cd key
+    - gradle pmdMain
+    - wget https://search.maven.org/remotecontent?filepath=se/bjurr/violations/violations-command-line/1.22.3/violations-command-line-1.22.3.jar
+    - |
+      java -jar violations-command-line-1.22.3.jar -cc code-climate-report.json 
+      -v PMD . ".*/pmd/main\.xml$" "PMD"
+    # -v "CHECKSTYLE" "." ".*checkstyle/main\.xml$" "Checkstyle"
+
 #  artifacts:
 #    paths: [gl-code-quality-report.html]
 #    reports:
 #      codequality: gl-code-quality-report.json
 #    expire_in: 1 week
+
+
 
 
 deploy-nightly:
