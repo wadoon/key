@@ -108,7 +108,7 @@ license_scanning:
 my_code_quality:
   script:
     - cd key
-    - gradle --build-cache pmdMain
+    - gradle --build-cache --continue pmdMain
     - wget https://search.maven.org/remotecontent?filepath=se/bjurr/violations/violations-command-line/1.22.3/violations-command-line-1.22.3.jar
     - |
       java -jar violations-command-line-1.22.3.jar -cc code-climate-report.json 
