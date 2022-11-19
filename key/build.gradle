@@ -24,6 +24,8 @@ plugins {
 
     // Code formatting
     id "com.diffplug.spotless" version "6.11.0"
+
+    id 'pmd'
 }
 
 // Configure this project for use inside IntelliJ:
@@ -69,6 +71,7 @@ subprojects {
     apply plugin: "idea"
     apply plugin: "eclipse"
 
+    apply plugin: 'pmd'
     apply plugin: "com.diffplug.spotless"
 
     group = rootProject.group
@@ -76,6 +79,16 @@ subprojects {
 
     sourceCompatibility = 11
     targetCompatibility = 11
+
+    pmd {
+        consoleOutput = false
+        toolVersion = "6.51.0"
+        incrementalAnalysis = true
+        //codeclimate
+        ruleSets = ["category/java/errorprone.xml", "category/java/bestpractices.xml"]
+        rulesMinimumPriority = 3
+    }
+
 
     repositories {
         mavenCentral()
@@ -141,7 +154,6 @@ subprojects {
     }
 
 
-
     test {
         // Before we switched to JUnit 5, we used JUnit 4 with a customized discovery of test class.
         // This discovery called AutoSuite and searched in the compiled classes. AutoSuite was
@@ -188,14 +200,14 @@ subprojects {
     // The following two tasks can be used to execute main methods from the project
     // The main class is set via "gradle -DmainClass=... execute --args ..."
     // see https://stackoverflow.com/questions/21358466/gradle-to-execute-java-class-without-modifying-build-gradle
-    task execute(type:JavaExec) {
+    task execute(type: JavaExec) {
         description 'Execute main method from the project. Set main class via "gradle -DmainClass=... execute --args ..."'
         group "application"
         main = System.getProperty('mainClass')
         classpath = sourceSets.main.runtimeClasspath
     }
 
-    task executeInTests(type:JavaExec) {
+    task executeInTests(type: JavaExec) {
         description 'Execute main method from the project (tests loaded). Set main class via "gradle -DmainClass=... execute --args ..."'
         group "application"
         main = System.getProperty('mainClass')
@@ -219,7 +231,7 @@ subprojects {
     //         html.enabled = true
     //     }
     // }
-    
+
     task sourcesJar(type: Jar) {
         description = 'Create a jar file with the sources from this project'
         from sourceSets.main.allJava
@@ -269,7 +281,7 @@ subprojects {
                 name = "GitlabPackages"
                 url "https://git.key-project.org/api/v4/projects/35/packages/maven"
                 credentials(HttpHeaderCredentials) {
-                    if(System.getenv("TOKEN") != null) {
+                    if (System.getenv("TOKEN") != null) {
                         name = 'Private-Token'
                         value = System.getenv("TOKEN")
                     } else {
@@ -290,8 +302,8 @@ subprojects {
         mapping {
             //find styles here:
             // http://code.mycila.com/license-maven-plugin/#supported-comment-types
-            java="SLASHSTAR_STYLE" // DOUBLESLASH_STYLE
-            javascript="SLASHSTAR_STYLE"
+            java = "SLASHSTAR_STYLE" // DOUBLESLASH_STYLE
+            javascript = "SLASHSTAR_STYLE"
         }
         mapping("key", "SLASHSTAR_STYLE")
     }
