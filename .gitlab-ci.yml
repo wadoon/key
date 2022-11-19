@@ -12,8 +12,9 @@ cache:
   paths:
     - .gradle/wrapper
     - .gradle/caches
+    - key/**/build/
   untracked: true
-  key: ${CI_COMMIT_REF_SLUG}
+  key: $CI_COMMIT_REF_NAME
 
 variables:
   GRADLE_OPTS:  "-Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.workers.max=2 -Dorg.gradle.configureondemand=true"
@@ -31,7 +32,6 @@ before_script:
 stages:
     - primary
     - secondary
-    - ternary
     - deploy
     - test
 
@@ -42,12 +42,6 @@ compile:classes:
     - javac -version
     - cd key
     - gradle --build-cache classes
-  cache:
-    key: "$CI_COMMIT_REF_NAME"
-    policy: push
-    paths:
-      - build
-      - .gradle
 
 compile:testClasses:
   dependencies: [ "compile:classes" ]
@@ -57,25 +51,13 @@ compile:testClasses:
     - javac -version
     - cd key
     - gradle --build-cache --parallel testClasses
-  cache:
-    key: "$CI_COMMIT_REF_NAME"
-    policy: pull-push
-    paths:
-      - build
-      - .gradle
 
 
 test:
-  stage: ternary
+  stage: test
   script:
     - cd key
     - gradle --build-cache --continue testAggregateTestReport -x key.core.proof_references:test -x key.core.symbolic_execution:test
-  cache:
-    key: "$CI_COMMIT_REF_NAME"
-    policy: pull
-    paths:
-      - build
-      - .gradle
   artifacts:
     when: always
     paths:
@@ -133,17 +115,9 @@ my_code_quality:
       -v PMD . ".*/pmd/main\.xml$" "PMD"
     # -v "CHECKSTYLE" "." ".*checkstyle/main\.xml$" "Checkstyle"
   artifacts:
-    paths: [gl-code-quality-report.html]
     reports:
       codequality: code-climate-report.json
     expire_in: 1 week
-  cache:
-    policy: pull
-    paths:
-      - .gradle/wrapper
-      - .gradle/caches
-    untracked: true
-    key: ${CI_COMMIT_REF_SLUG}
 
 
 
