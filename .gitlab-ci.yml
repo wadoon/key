@@ -22,7 +22,6 @@ variables:
   TIMEOUT_SECONDS: 36000
 
 
-
 before_script:
   #  - echo `pwd` # debug
   #  - echo "$CI_BUILD_NAME, $CI_BUILD_REF_NAME $CI_BUILD_STAGE" # debug
@@ -86,14 +85,51 @@ test:
       junit:
         - "**/**/build/test-results/test/TEST-*.xml"
 
+code_intelligence_java:
+  stage: primary
+  needs: []
+  allow_failure: true
+  rules:
+    - if: $CODE_INTELLIGENCE_DISABLED
+      when: never
+#    - if: $CI_COMMIT_BRANCH
+#      exists:
+#        - '**/*.java'
+  script:
+    - cd key
+    - curl -fLo coursier https://git.io/coursier-cli
+    - chmod +x coursier
+    - ./coursier launch com.sourcegraph:scip-java_2.13:0.8.8 -- index
+    - ls
+    - cat index.scip
+  artifacts:
+    reports:
+      lsif: index.scip
 
 include:
-  - template: Code-Quality.gitlab-ci.yml
+  - template: Security/License-Scanning.gitlab-ci.yml
 
-code_quality:
-  services:            # Shut off Docker-in-Docker
-  tags:
-    - dind     # Set this job to only run on our new specialized runner
+license_scanning:
+  variables:
+    CI_DEBUG_TRACE: "true"
+
+
+
+#include:
+#  - template: Code-Quality.gitlab-ci.yml
+#
+#code_quality:
+#  services:            # Shut off Docker-in-Docker
+#  tags:
+#    - dind     # Set this job to only run on our new specialized runner
+#  variables:
+#    REPORT_FORMAT: html
+#  artifacts:
+#    paths: [gl-code-quality-report.html]
+#    reports:
+#      codequality: gl-code-quality-report.json
+#    expire_in: 1 week
+
 
 
 deploy-nightly:
