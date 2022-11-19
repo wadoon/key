@@ -126,7 +126,7 @@ license_scanning:
 my_code_quality:
   script:
     - cd key
-    - gradle pmdMain
+    - gradle --build-cache pmdMain
     - wget https://search.maven.org/remotecontent?filepath=se/bjurr/violations/violations-command-line/1.22.3/violations-command-line-1.22.3.jar
     - |
       java -jar violations-command-line-1.22.3.jar -cc code-climate-report.json 
@@ -137,6 +137,13 @@ my_code_quality:
     reports:
       codequality: code-climate-report.json
     expire_in: 1 week
+  cache:
+    policy: pull
+    paths:
+      - .gradle/wrapper
+      - .gradle/caches
+    untracked: true
+    key: ${CI_COMMIT_REF_SLUG}
 
 
 
