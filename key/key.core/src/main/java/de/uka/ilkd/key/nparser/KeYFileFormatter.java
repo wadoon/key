@@ -22,6 +22,8 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
 
     private static final boolean KEEP_ADDITIONAL_LINEBREAKS = false;
 
+    private static final String INDENT_BUFFER = " ".repeat(100);
+
     StringBuilder builder = new StringBuilder();
     final CharStream cs;
     final CommonTokenStream ts;
@@ -30,6 +32,11 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
     public KeYFileFormatter(CharStream cs, CommonTokenStream ts) {
         this.cs = cs;
         this.ts = ts;
+    }
+
+    public static String getIndent(int count) {
+        // Substrings use a shared buffer
+        return INDENT_BUFFER.substring(0, count);
     }
 
     private void lBraceBreak(Token token) {
@@ -313,7 +320,7 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
 
     private void breakAndIndent() {
         builder.append('\n');
-        builder.append(multi(INDENT_STEP * currentIndentation, " "));
+        builder.append(getIndent(INDENT_STEP * currentIndentation));
     }
 
     private void space() {
@@ -357,8 +364,8 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
     private void processIndentationInSLComment(Token t) {
         String text = t.getText();
         builder.append(text.trim());
-        builder.append('\n');       // TODO: Do SL_COMMENTs always end with a newline?
-        builder.append(multi(INDENT_STEP * currentIndentation, " "));
+        // TODO: Do SL_COMMENTs always end with a newline?
+        breakAndIndent();
     }
 
     @Override
@@ -390,10 +397,6 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
         return (int) text.chars().filter(x -> x == '\n').count();
     }
 
-    private static String multi(int count, String s) {
-        return String.join("", Collections.nCopies(count, s));
-    }
-
     public static void main(String[] args) throws IOException {
         String dirname = "/home/wolfram/Desktop/tmp/rules";
         Path ruleDir = Paths.get(dirname);
@@ -401,10 +404,11 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
     }
 
     private static void formatDirectory(Path dir) throws IOException {
+        Path outDir = dir.getParent().resolve("output");
+        outDir.toFile().mkdirs();
         try (Stream<Path> s = Files.list(dir)) {
             s.forEach(p -> {
                 try {
-                    Path outDir = dir.getParent().resolve("testoutput");
                     formatSingleFile(dir.resolve(p.getFileName()), outDir, true);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
@@ -413,13 +417,8 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
         }
     }
 
-    private static void formatSingleFile(Path input, Path outDir, boolean overwrite) throws IOException {
-        final String nameExt = input.getFileName().toString();
-        final String filename = nameExt.substring(0, nameExt.length() - 4);
-        final String extension = ".key";
-
-        CharStream cs = CharStreams.fromPath(input);
-        KeYLexer lexer = new KeYLexer(cs);
+    private static String formatFile(CharStream in) {
+        KeYLexer lexer = new KeYLexer(in);
         lexer.setTokenFactory(new CommonTokenFactory(true));
 
 //        KeYLexer lexer2 = ParsingFacade.createLexer(p);
@@ -429,13 +428,23 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
         //CommonTokenStream hidden = new CommonTokenStream(lexer, KeYLexer.HIDDEN);
         KeYParser parser = new KeYParser(tokens);
         KeYParser.FileContext ctx = parser.file();
-        KeYFileFormatter formatter = new KeYFileFormatter(cs, tokens);
+        KeYFileFormatter formatter = new KeYFileFormatter(in, tokens);
         formatter.visitFile(ctx);
+        return formatter.builder.toString();
+    }
+
+    private static void formatSingleFile(Path input, Path outDir, boolean overwrite) throws IOException {
+        final String nameExt = input.getFileName().toString();
+        final String filename = nameExt.substring(0, nameExt.length() - 4);
+        final String extension = ".key";
+        var content = Files.readString(input).replaceAll("\\r\\n?", "\n");
+        var formatted = formatFile(CharStreams.fromString(content));
 
         Path output = outDir.resolve(filename + extension);
         if (Files.exists(output) && !overwrite) {
             output = Files.createTempFile(outDir, filename, extension);
         }
-        Files.writeString(output, formatter.builder.toString());
+        var newlineReplaced = formatted.replaceAll("\n", System.lineSeparator());
+        Files.writeString(output, newlineReplaced);
     }
 }
