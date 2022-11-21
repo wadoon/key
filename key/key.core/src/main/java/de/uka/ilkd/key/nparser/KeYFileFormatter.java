@@ -21,6 +21,7 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
     private static final int INDENT_STEP = 4;
 
     private static final boolean KEEP_ADDITIONAL_LINEBREAKS = false;
+    private static final int MAX_LINES_BETWEEN = 4;
 
     private static final String INDENT_BUFFER = " ".repeat(100);
 
@@ -42,8 +43,8 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
     private void lBraceBreak(Token token) {
         builder.append('{');
         currentIndentation++;
-        processHiddenTokensAfterCurrent(token);
         breakAndIndent();
+        processHiddenTokensAfterCurrent(token);
     }
 
     private void rBrace(Token token) {
@@ -222,9 +223,9 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
         if (ctx.option_list() != null) {
             visit(ctx.option_list());
         }
-        lBraceBreak(ctx.LBRACE().getSymbol());
-
         space();
+
+        lBraceBreak(ctx.LBRACE().getSymbol());
 
         for (int i = 0; i < ctx.taclet().size(); i++) {
             visit(ctx.taclet(i));
@@ -334,11 +335,9 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
             for (Token t : list) {
                 String text = t.getText();
                 if (t.getType() == KeYLexer.WS) {
-                    int nls = countNLs(text);
-                    if (KEEP_ADDITIONAL_LINEBREAKS) {
-                        for (int k = 0; k < nls; k++) {
-                            breakAndIndent();
-                        }
+                    int nls = countNLs(text) - 1;
+                    for (int k = 0; k < Math.min(nls, MAX_LINES_BETWEEN); k++) {
+                        breakAndIndent();
                     }
                     /*if (nls > 0) {
                         int i = currentIndentation;
@@ -363,8 +362,12 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
 
     private void processIndentationInSLComment(Token t) {
         String text = t.getText();
+        // Normalize actual comment content
+        if (text.startsWith("//")) {
+            text = text.substring(2);
+            builder.append("// ");
+        }
         builder.append(text.trim());
-        // TODO: Do SL_COMMENTs always end with a newline?
         breakAndIndent();
     }
 
