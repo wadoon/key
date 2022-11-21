@@ -2,6 +2,8 @@ package de.uka.ilkd.key.nparser;
 
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.Interval;
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.io.IOException;
@@ -237,6 +239,77 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
         return null;
     }
 
+    private void visitChildren(RuleNode node, int startOffset) {
+        int n = node.getChildCount();
+        for (int i = startOffset; i < n; i++) {
+            ParseTree c = node.getChild(i);
+            c.accept(this);
+        }
+    }
+
+    @Override
+    public Void visitGoalspecs(KeYParser.GoalspecsContext ctx) {
+        for (int i = 0; i < ctx.goalspecwithoption().size(); i++) {
+            visit(ctx.goalspecwithoption(i));
+            var semi = ctx.SEMI(i);
+            if (semi != null) {
+                visit(semi);
+            }
+            breakAndIndent();
+        }
+        return null;
+    }
+
+    @Override
+    public Void visitGoalspec(KeYParser.GoalspecContext ctx) {
+        int firstChild = 0;
+        if (ctx.name != null) {
+            visit(ctx.name);
+            builder.append(": ");
+            // TODO new line and indent?
+            currentIndentation++;
+            breakAndIndent();
+            firstChild = 2;
+        }
+
+        visitChildren(ctx, firstChild);
+        if (ctx.name != null) {
+            currentIndentation--;
+        }
+        return null;
+    }
+
+    @Override
+    public Void visitModifiers(KeYParser.ModifiersContext ctx) {
+        for (int i = 0; i < ctx.getChildCount(); i++) {
+            visit(ctx.getChild(i));
+            breakAndIndent();
+        }
+        return null;
+    }
+
+    @Override
+    public Void visitVarexplist(KeYParser.VarexplistContext ctx) {
+        var varexps = ctx.varexp();
+        var commas = ctx.COMMA();
+        boolean multiline = varexps.size() > 3;
+        if (multiline) {
+            breakAndIndent();
+        }
+        for (int i = 0; i < varexps.size(); i++) {
+            visit(varexps.get(i));
+            if (i < commas.size()) {
+                visit(commas.get(i));
+                if (multiline) {
+                    breakAndIndent();
+                } else {
+                    space();
+                }
+            }
+        }
+        return null;
+    }
+
     @Override
     public Void visitTaclet(KeYParser.TacletContext ctx) {
         if (ctx.DOC_COMMENT() != null) {
@@ -300,18 +373,18 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
         }
 
         // varconds
-        for (int i = 0; i < ctx.one_schema_var_decl().size(); i++) {
-            visit(ctx.SCHEMAVAR(i));
-            space();
-            visit(ctx.one_schema_var_decl(i));
-            visit(ctx.SEMI(i));
+        for (int i = 0; i < ctx.varexplist().size(); i++) {
+            visit(ctx.VARCOND(i));
+            builder.append("(");
+            currentIndentation++;
+            visit(ctx.varexplist(i));
+            builder.append(")");
+            currentIndentation--;
             breakAndIndent();
         }
 
         visit(ctx.goalspecs());
-        breakAndIndent();
         visit(ctx.modifiers());
-        breakAndIndent();
 
         rBrace(ctx.RBRACE().getSymbol());
 
