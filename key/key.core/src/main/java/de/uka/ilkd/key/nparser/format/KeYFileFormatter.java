@@ -9,11 +9,11 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -22,8 +22,6 @@ import java.util.stream.Stream;
  */
 
 public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
-
-    private static final boolean KEEP_ADDITIONAL_LINEBREAKS = false;
     private static final int MAX_LINES_BETWEEN = 2;
 
     final Output output = new Output();
@@ -49,12 +47,7 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
     @Override
     public Void visitFile(KeYParser.FileContext ctx) {
         // include prefix (comments) before the actual content
-        List<Token> list = ts.getHiddenTokensToLeft(ctx.start.getTokenIndex());
-        if (list != null) {
-            for (Token t : list) {
-                output.token(t.getText());
-            }
-        }
+        processHiddenTokens(ts.getHiddenTokensToLeft(ctx.start.getTokenIndex()), output);
         return super.visitFile(ctx);
     }
 
@@ -87,14 +80,14 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
 
     @Override
     public Void visitSchema_var_decls(KeYParser.Schema_var_declsContext ctx) {
-        output.newLineAndIndent();
+        output.assertNewLineAndIndent();
         visit(ctx.SCHEMAVARIABLES());
         visit(ctx.LBRACE());
 
         visitChildren(ctx, 2, ctx.getChildCount() - 1);
 
         visit(ctx.RBRACE());
-        output.newLineAndIndent();
+        output.assertNewLineAndIndent();
         return null;
     }
 
@@ -188,10 +181,10 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
     @Override
     public Void visitRulesOrAxioms(KeYParser.RulesOrAxiomsContext ctx) {
         if (ctx.DOC_COMMENT() != null) {
-            output.newLineAndIndent();
+            output.assertNewLineAndIndent();
             visit(ctx.DOC_COMMENT());
         }
-        output.newLineAndIndent();
+        output.assertNewLineAndIndent();
         if (ctx.RULES() != null) {
             visit(ctx.RULES());
         } else if (ctx.AXIOMS() != null) {
@@ -208,7 +201,7 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
             visit(ctx.SEMI(i));
         }
         visit(ctx.RBRACE());
-        output.newLineAndIndent();
+        output.assertNewLineAndIndent();
 
         return null;
     }
@@ -223,7 +216,7 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
     @Override
     public Void visitGoalspec(KeYParser.GoalspecContext ctx) {
         int firstChild = 0;
-        output.newLineAndIndent();
+        output.assertNewLineAndIndent();
         if (ctx.name != null) {
             visit(ctx.name);
             output.noSpaceBeforeNext();
@@ -231,7 +224,7 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
             output.spaceBeforeNext();
             // TODO new line and indent?
             output.enterIndent();
-            output.newLineAndIndent();
+            output.assertNewLineAndIndent();
             firstChild = 2;
         }
 
@@ -255,13 +248,13 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
             if (child instanceof TerminalNode) {
                 var token = ((TerminalNode) child).getSymbol().getType();
                 if (token == KeYParser.NONINTERACTIVE) {
-                    output.newLineAndIndent();
+                    output.assertNewLineAndIndent();
                     visit(child);
                     continue;
                 }
 
                 if (token == KeYParser.DISPLAYNAME || token == KeYParser.HELPTEXT) {
-                    output.newLineAndIndent();
+                    output.assertNewLineAndIndent();
                     visit(child);
                     output.spaceBeforeNext();
                     continue;
@@ -284,7 +277,7 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
         }
         for (int i = 0; i < varexps.size(); i++) {
             if (multiline) {
-                output.newLineAndIndent();
+                output.assertNewLineAndIndent();
             }
             visit(varexps.get(i));
             if (i < commas.size()) {
@@ -297,7 +290,7 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
         }
         if (multiline) {
             output.exitIndent();
-            output.newLineAndIndent();
+            output.assertNewLineAndIndent();
         }
         output.noSpaceBeforeNext();
         output.token(')');
@@ -306,7 +299,7 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
 
     @Override
     public Void visitOne_include_statement(KeYParser.One_include_statementContext ctx) {
-        output.newLineAndIndent();
+        output.assertNewLineAndIndent();
         output.enterIndent();
         super.visitOne_include_statement(ctx);
         output.exitIndent();
@@ -316,14 +309,14 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
     @Override
     public Void visitTaclet(KeYParser.TacletContext ctx) {
         if (ctx.DOC_COMMENT() != null) {
-            output.newLineAndIndent();
+            output.assertNewLineAndIndent();
             visit(ctx.DOC_COMMENT());
         }
         if (ctx.LEMMA() != null) {
-            output.newLineAndIndent();
+            output.assertNewLineAndIndent();
             visit(ctx.LEMMA());
         }
-        output.newLineAndIndent();
+        output.assertNewLineAndIndent();
         visit(ctx.IDENT());
 
         if (ctx.option_list() != null) {
@@ -335,7 +328,7 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
 
         // schemaVarDecls
         for (int i = 0; i < ctx.one_schema_var_decl().size(); i++) {
-            output.newLineAndIndent();
+            output.assertNewLineAndIndent();
             visit(ctx.SCHEMAVAR(i));
             output.spaceBeforeNext();
             visit(ctx.one_schema_var_decl(i));
@@ -346,7 +339,7 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
 
         // assumes
         if (ctx.ifSeq != null) {
-            output.newLineAndIndent();
+            output.assertNewLineAndIndent();
             visit(ctx.ASSUMES());
             visit(ctx.LPAREN(0));
             visit(ctx.ifSeq);
@@ -355,7 +348,7 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
         }
 
         if (ctx.find != null) {
-            output.newLineAndIndent();
+            output.assertNewLineAndIndent();
             visit(ctx.FIND());
             visit(ctx.LPAREN(parenCounter));
             visit(ctx.find);
@@ -371,14 +364,14 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
             first++;
             first++;
             for (int i = first; i < first + polaritiesEtc; i++) {
-                output.newLineAndIndent();
+                output.assertNewLineAndIndent();
                 visit(ctx.getChild(i));
             }
         }
 
         // varconds
         for (int i = 0; i < ctx.varexplist().size(); i++) {
-            output.newLineAndIndent();
+            output.assertNewLineAndIndent();
             visit(ctx.VARCOND(i));
             visit(ctx.varexplist(i));
         }
@@ -386,49 +379,44 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
         visit(ctx.goalspecs());
         visit(ctx.modifiers());
 
-        output.newLine();
+        output.assertNewLine();
         visit(ctx.RBRACE());
 
         return null;
     }
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    static void processHiddenTokensAfterCurrent(Token currentToken, CommonTokenStream ts, Output output) {
-        // add hidden tokens after the current token (whitespace, comments etc.)
-        List<Token> list = ts.getHiddenTokensToRight(currentToken.getTokenIndex());
-        if (list != null) {
-            for (Token t : list) {
-                String text = t.getText();
-                if (t.getType() == KeYLexer.WS) {
-                    int nls = countNLs(text);
-                    for (int k = 0; k < Math.min(nls, MAX_LINES_BETWEEN); k++) {
-                        output.newLine();
-                    }
-                    /*if (nls > 0) {
-                        int i = currentIndentation;
-                        int cur = currentToken.getTokenIndex();
-                        if (cur < ts.size() - 1) {
-                            int nextTy = ts.get(cur + 1).getType();
-                            if (nextTy == KeYLexer.RPAREN || nextTy == KeYLexer.RBRACE)
-                                i--;
-                        }
-                        text = multi(nls, "\n") + multi(INDENT_STEP * i, " ");
-                        builder.append(text);
-                    }*/
-                } else if (t.getType() == KeYLexer.SL_COMMENT) {    // TODO: other comment types
-                    processIndentationInSLComment(t, output);
-                }/* else if (t.getType() == KeYLexer.COMMENT_END) {
-                    processIndentationInMLComment(t);
-                } */ else {
-                    output.token(text);
+    static void processHiddenTokens(@Nullable List<Token> tokens, Output output) {
+        if (tokens == null) {
+            return;
+        }
+
+        for (Token t : tokens) {
+            String text = t.getText();
+            if (t.getType() == KeYLexer.WS) {
+                int nls = countNLs(text);
+                for (int k = 0; k < Math.min(nls, MAX_LINES_BETWEEN); k++) {
+                    output.newLine();
                 }
+            } else if (t.getType() == KeYLexer.SL_COMMENT) {    // TODO: other comment types
+                processIndentationInSLComment(t, output);
+            }/* else if (t.getType() == KeYLexer.COMMENT_END) {
+                processIndentationInMLComment(t);
+            } */ else {
+                output.token(text);
             }
         }
     }
 
+    static void processHiddenTokensAfterCurrent(Token currentToken, CommonTokenStream ts, Output output) {
+        // add hidden tokens after the current token (whitespace, comments etc.)
+        List<Token> list = ts.getHiddenTokensToRight(currentToken.getTokenIndex());
+        processHiddenTokens(list, output);
+    }
+
     static void processIndentationInSLComment(Token t, Output output) {
         String text = t.getText();
-        output.newLineAndIndent();
+        output.assertNewLineAndIndent();
         // Normalize actual comment content
         if (text.startsWith("//")) {
             text = text.substring(2);
@@ -506,7 +494,7 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
         }
     }
 
-    private static String formatFile(String text) {
+    private static String format(String text) {
         var in = CharStreams.fromString(text.replaceAll("\\r\\n?", "\n"));
         KeYLexer lexer = new KeYLexer(in);
         lexer.setTokenFactory(new CommonTokenFactory(true));
@@ -535,7 +523,7 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
         final String filename = nameExt.substring(0, nameExt.length() - 4);
         final String extension = ".key";
         var content = Files.readString(input);
-        var formatted = formatFile(content);
+        var formatted = format(content);
 
         if (formatted == null) {
             System.err.println("Failed to format " + input);

@@ -66,16 +66,20 @@ public class Output {
         return isNewLine;
     }
 
-    public void newLineAndIndent() {
-        if (!this.isNewLine) {
-            output.append('\n');
-        }
+    public void assertNewLineAndIndent() {
+        assertNewLine();
         indent();
     }
 
     public void newLine() {
         this.isNewLine = true;
         output.append('\n');
+    }
+
+    public void assertNewLine() {
+        if (!this.isNewLine) {
+            newLine();
+        }
     }
 
     @Override
