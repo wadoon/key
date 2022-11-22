@@ -470,22 +470,26 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
     public static void main(String[] args) throws IOException {
         String dirname = "D:\\Code\\Java\\format\\rules";
         Path ruleDir = Paths.get(dirname);
-        try {
-            formatDirectory(ruleDir);
-        } catch (Exception e) {
-            throw e;
-        }
+        formatDirectory(ruleDir);
     }
 
     private static void formatDirectory(Path dir) throws IOException {
         Path outDir = dir.getParent().resolve("output");
         outDir.toFile().mkdirs();
-        formatSingleFile(dir.resolve("bsum.key"));
+        formatSingleFileInSameDir(dir.resolve("assertions.format.key"));
         try (Stream<Path> s = Files.list(dir)) {
             s.forEach(p -> {
                 var file = dir.resolve(p.getFileName());
                 try {
-                    formatSingleFile(file);
+                    var name = file.getFileName().toString();
+                    if (name.endsWith(".format.format.key")) {
+                        file.toFile().delete();
+                        return;
+                    }
+                    formatSingleFileInSameDir(file);
+                    if (!name.endsWith(".format.key")) {
+                        formatSingleFileTo(file, outDir);
+                    }
                 } catch (IOException e) {
                     System.err.println("Exception while processing " + file);
                     throw new RuntimeException(e);
@@ -514,14 +518,7 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
         return formatted.replaceAll("\n", System.lineSeparator());
     }
 
-    private static void formatSingleFile(Path input) throws IOException {
-        final String nameExt = input.getFileName().toString();
-        if (nameExt.endsWith(".format.key")) {
-            input.toFile().delete();
-            return;
-        }
-        final String filename = nameExt.substring(0, nameExt.length() - 4);
-        final String extension = ".key";
+    private static void formatSingleFile(Path input, Path output) throws IOException {
         var content = Files.readString(input);
         var formatted = format(content);
 
@@ -529,7 +526,22 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
             System.err.println("Failed to format " + input);
             return;
         }
-        var output = input.resolveSibling(filename + ".format" + extension);
         Files.writeString(output, formatted);
+    }
+
+    private static void formatSingleFileInSameDir(Path input) throws IOException {
+        var fileName = input.getFileName().toString();
+        if (!fileName.endsWith(".key")) {
+            System.err.println("Ignoring non key file " + input);
+            return;
+        }
+        var stem = fileName.substring(0, fileName.length() - 4);
+        var output = input.resolveSibling(stem + ".format.key");
+        formatSingleFile(input, output);
+    }
+
+    private static void formatSingleFileTo(Path input, Path outputDir) throws IOException {
+        var output = outputDir.resolve(input.getFileName());
+        formatSingleFile(input, output);
     }
 }
