@@ -399,10 +399,10 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
                     output.newLine();
                 }
             } else if (t.getType() == KeYLexer.SL_COMMENT) {    // TODO: other comment types
-                processIndentationInSLComment(t, output);
-            }/* else if (t.getType() == KeYLexer.COMMENT_END) {
-                processIndentationInMLComment(t);
-            } */ else {
+                processIndentationInSLComment(text, output);
+            } else if (t.getType() == KeYLexer.COMMENT_END) {
+                processIndentationInMLComment(text, output);
+            } else {
                 output.token(text);
             }
         }
@@ -414,15 +414,81 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
         processHiddenTokens(list, output);
     }
 
-    static void processIndentationInSLComment(Token t, Output output) {
-        String text = t.getText();
-        output.assertNewLineAndIndent();
-        // Normalize actual comment content
-        if (text.startsWith("//")) {
-            text = text.substring(2);
-            output.token("// ");
+    static void processIndentationInMLComment(String text, Output output) {
+        // Normalize and split
+        var lines = text.replaceAll("\t", Output.getIndent(1)).split("\n");
+
+        // Find minimal indent shared among all lines except the first
+        // Doc like comments start with * in every line except the first
+        int minIndent = Integer.MAX_VALUE;
+        boolean isDocLike = true;
+        for (int i = 1; i < lines.length; ++i) {
+            var line = lines[i];
+            var stripped = line.stripLeading();
+            // Empty lines are ignored for this
+            if (!stripped.isEmpty()) {
+                minIndent = Math.min(minIndent, line.length() - stripped.length());
+                isDocLike &= stripped.startsWith("*");
+            }
         }
-        output.token(text.trim());
+
+        // Remove /* and */
+        lines[0] = lines[0].substring(2).stripLeading();
+        var lastLine = lines[lines.length - 1];
+        lines[lines.length - 1] = lastLine.substring(0, lastLine.length() - 2);
+
+        output.token("/*");
+        // Skip space if we start with another *, e.g. /**
+        if (!lines[0].startsWith("*")) {
+            output.spaceBeforeNext();
+        }
+        for (int i = 0; i < lines.length; i++) {
+            String line = lines[i];
+            if (i != 0) {
+                // Watch out for empty line when removing the common indent
+                line = line.isEmpty() ? line : line.substring(minIndent);
+            } else {
+                line = line.stripLeading();
+            }
+            line = line.stripTrailing();
+
+            // Print nonempty line
+            if (!line.isEmpty()) {
+                output.assertIndented();
+                if (isDocLike && i != 0) {
+                    output.spaceBeforeNext();
+                }
+                output.token(line);
+            }
+            if (i != lines.length - 1) {
+                output.newLine();
+            } else {
+                // Add space for doc like comments
+                if (isDocLike && !line.endsWith("*")) {
+                    output.assertIndented();
+                    output.spaceBeforeNext();
+                }
+            }
+        }
+
+        output.token("*/");
+        output.spaceBeforeNext();
+    }
+
+    static void processIndentationInSLComment(String text, Output output) {
+        output.assertNewLineAndIndent();
+        var trimmed = text.stripTrailing();
+        // Normalize actual comment content
+        if (trimmed.startsWith("//")) {
+            trimmed = trimmed.substring(2);
+            output.token("//");
+            if (!trimmed.startsWith(" ")) {
+                output.spaceBeforeNext();
+            }
+        }
+        if (!trimmed.isEmpty()) {
+            output.token(trimmed);
+        }
         output.newLine();
     }
 
