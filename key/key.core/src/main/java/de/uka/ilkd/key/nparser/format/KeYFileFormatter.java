@@ -221,18 +221,6 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
     }
 
     @Override
-    public Void visitGoalspecs(KeYParser.GoalspecsContext ctx) {
-        for (int i = 0; i < ctx.goalspecwithoption().size(); i++) {
-            visit(ctx.goalspecwithoption(i));
-            var semi = ctx.SEMI(i);
-            if (semi != null) {
-                visit(semi);
-            }
-        }
-        return null;
-    }
-
-    @Override
     public Void visitGoalspec(KeYParser.GoalspecContext ctx) {
         int firstChild = 0;
         output.newLineAndIndent();
@@ -313,6 +301,15 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
         }
         output.noSpaceBeforeNext();
         output.token(')');
+        return null;
+    }
+
+    @Override
+    public Void visitOne_include_statement(KeYParser.One_include_statementContext ctx) {
+        output.newLineAndIndent();
+        output.enterIndent();
+        super.visitOne_include_statement(ctx);
+        output.exitIndent();
         return null;
     }
 
@@ -438,14 +435,16 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
             output.token("// ");
         }
         output.token(text.trim());
+        output.newLine();
     }
 
     @Override
     public Void visitTerminal(TerminalNode node) {
         var token = node.getSymbol().getType();
-        if (token == KeYLexer.LBRACE || token == KeYLexer.LPAREN || token == KeYLexer.LBRACKET) {
+
+        boolean isLBrace = token == KeYLexer.LBRACE || token == KeYLexer.LPAREN || token == KeYLexer.LBRACKET;
+        if (isLBrace) {
             output.spaceBeforeNext();
-            output.enterIndent();
         } else if (token == KeYLexer.RBRACE || token == KeYLexer.RPAREN || token == KeYLexer.RBRACKET) {
             output.noSpaceBeforeNext();
             output.exitIndent();
@@ -455,14 +454,20 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
             output.spaceBeforeNext();
         }
 
-        if (token == KeYLexer.SEMI || token == KeYLexer.COMMA || token == KeYLexer.COLON || token == KeYLexer.LPAREN || token == KeYLexer.DOT) {
+        var noSpaceAround = token == KeYLexer.COLON || token == KeYLexer.DOT || token == KeYLexer.DOUBLECOLON;
+        var noSpaceBefore = token == KeYLexer.SEMI || token == KeYLexer.COMMA || token == KeYLexer.LPAREN;
+        if (noSpaceBefore || noSpaceAround) {
             output.noSpaceBeforeNext();
         }
 
         String str = node.getSymbol().getText();
         output.token(str);
 
-        if (token != KeYLexer.LPAREN && token != KeYLexer.LBRACKET && token != KeYLexer.LBRACE && token != KeYLexer.COLON && token != KeYLexer.DOT) {
+        if (isLBrace) {
+            output.enterIndent();
+        }
+
+        if (!(isLBrace || noSpaceAround)) {
             output.spaceBeforeNext();
         }
 
