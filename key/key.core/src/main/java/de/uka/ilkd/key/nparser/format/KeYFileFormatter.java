@@ -1,5 +1,8 @@
-package de.uka.ilkd.key.nparser;
+package de.uka.ilkd.key.nparser.format;
 
+import de.uka.ilkd.key.nparser.KeYLexer;
+import de.uka.ilkd.key.nparser.KeYParser;
+import de.uka.ilkd.key.nparser.KeYParserBaseVisitor;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -21,50 +24,13 @@ import java.util.stream.Stream;
 public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
 
     private static final boolean KEEP_ADDITIONAL_LINEBREAKS = false;
-    private static final int MAX_LINES_BETWEEN = 4;
-
-    private static final int[] OPERATORS = {
-            KeYLexer.LESS,
-            KeYLexer.LESSEQUAL,
-            KeYLexer.GREATER,
-            KeYLexer.GREATEREQUAL,
-            KeYLexer.EQUALS,
-            KeYLexer.NOT_EQUALS,
-            KeYLexer.IMP,
-            KeYLexer.SEQARROW,
-            KeYLexer.NOT_EQUALS,
-            KeYLexer.AND,
-            KeYLexer.OR,
-            KeYLexer.PARALLEL,
-            KeYLexer.EXP,
-            KeYLexer.PERCENT,
-            KeYLexer.STAR,
-            KeYLexer.MINUS,
-            KeYLexer.PLUS,
-            KeYLexer.RGUILLEMETS,
-            KeYLexer.EQV,
-    };
+    private static final int MAX_LINES_BETWEEN = 2;
 
     final Output output = new Output();
-    final CharStream cs;
     final CommonTokenStream ts;
 
-    public KeYFileFormatter(CharStream cs, CommonTokenStream ts) {
-        this.cs = cs;
+    public KeYFileFormatter(CommonTokenStream ts) {
         this.ts = ts;
-    }
-
-    private void lBraceBreak(Token token) {
-        output.append('{');
-        output.enterIndent();
-        processHiddenTokensAfterCurrent(token);
-    }
-
-    private void rBrace(Token token) {
-        output.exitIndent();
-        output.newLineAndIndent();
-        output.append('}');
-        processHiddenTokensAfterCurrent(token);
     }
 
     public static String getOriginalText(ParserRuleContext ctx) {
@@ -86,7 +52,7 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
         List<Token> list = ts.getHiddenTokensToLeft(ctx.start.getTokenIndex());
         if (list != null) {
             for (Token t : list) {
-                output.append(t.getText());
+                output.token(t.getText());
             }
         }
         return super.visitFile(ctx);
@@ -100,6 +66,11 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
             }
         }
         return null;
+    }
+
+    @Override
+    public Void visitTerm(KeYParser.TermContext ctx) {
+        return new ExpressionVisitor(ts, output).visitTerm(ctx);
     }
 
     @Override
@@ -118,16 +89,12 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
     public Void visitSchema_var_decls(KeYParser.Schema_var_declsContext ctx) {
         output.newLineAndIndent();
         visit(ctx.SCHEMAVARIABLES());
-        output.space();
-        lBraceBreak(ctx.LBRACE().getSymbol());
+        visit(ctx.LBRACE());
 
-        for (int i = 0; i < ctx.one_schema_var_decl().size(); i++) {
-            output.newLineAndIndent();
-            visit(ctx.one_schema_var_decl(i));
-            visit(ctx.SEMI(i));
-        }
+        visitChildren(ctx, 2, ctx.getChildCount() - 1);
 
-        rBrace(ctx.RBRACE().getSymbol());
+        visit(ctx.RBRACE());
+        output.newLineAndIndent();
         return null;
     }
 
@@ -135,22 +102,29 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
     public Void visitOne_schema_var_decl(KeYParser.One_schema_var_declContext ctx) {
         if (ctx.MODALOPERATOR() != null) {
             // TODO
+            visitChildren(ctx);
         } else if (ctx.PROGRAM() != null) {
             // TODO
+            visitChildren(ctx);
         } else if (ctx.FORMULA() != null) {
             visit(ctx.FORMULA());
-            output.space();
+
             if (ctx.schema_modifiers() != null) {
+                output.spaceBeforeNext();
                 visit(ctx.schema_modifiers());
-                output.space();
             }
+
+            output.spaceBeforeNext();
             visit(ctx.simple_ident_comma_list());
         } else if (ctx.TERMLABEL() != null) {
             // TODO
+            visitChildren(ctx);
         } else if (ctx.UPDATE() != null) {
             // TODO
+            visitChildren(ctx);
         } else if (ctx.SKOLEMFORMULA() != null) {
             // TODO
+            visitChildren(ctx);
         } else {
             if (ctx.TERM() != null) {
                 visit(ctx.TERM());
@@ -161,13 +135,16 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
             } else if (ctx.SKOLEMTERM() != null) {
                 visit(ctx.SKOLEMTERM());
             }
-            output.space();
+
             if (ctx.schema_modifiers() != null) {
+                output.spaceBeforeNext();
                 visit(ctx.schema_modifiers());
-                output.space();
             }
+
+            output.spaceBeforeNext();
             visit(ctx.sortId());
-            output.space();
+
+            output.spaceBeforeNext();
             visit(ctx.simple_ident_comma_list());
         }
 
@@ -223,22 +200,21 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
         if (ctx.option_list() != null) {
             visit(ctx.option_list());
         }
-        output.space();
 
-        lBraceBreak(ctx.LBRACE().getSymbol());
+        visit(ctx.LBRACE());
 
         for (int i = 0; i < ctx.taclet().size(); i++) {
             visit(ctx.taclet(i));
             visit(ctx.SEMI(i));
         }
-        rBrace(ctx.RBRACE().getSymbol());
+        visit(ctx.RBRACE());
+        output.newLineAndIndent();
 
         return null;
     }
 
-    private void visitChildren(RuleNode node, int startOffset) {
-        int n = node.getChildCount();
-        for (int i = startOffset; i < n; i++) {
+    private void visitChildren(RuleNode node, int startOffset, int endOffset) {
+        for (int i = startOffset; i < endOffset; i++) {
             ParseTree c = node.getChild(i);
             c.accept(this);
         }
@@ -262,14 +238,16 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
         output.newLineAndIndent();
         if (ctx.name != null) {
             visit(ctx.name);
-            output.append(": ");
+            output.noSpaceBeforeNext();
+            output.token(":");
+            output.spaceBeforeNext();
             // TODO new line and indent?
             output.enterIndent();
             output.newLineAndIndent();
             firstChild = 2;
         }
 
-        visitChildren(ctx, firstChild);
+        visitChildren(ctx, firstChild, ctx.getChildCount());
         if (ctx.name != null) {
             output.exitIndent();
         }
@@ -297,7 +275,7 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
                 if (token == KeYParser.DISPLAYNAME || token == KeYParser.HELPTEXT) {
                     output.newLineAndIndent();
                     visit(child);
-                    output.space();
+                    output.spaceBeforeNext();
                     continue;
                 }
             }
@@ -310,7 +288,8 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
     public Void visitVarexplist(KeYParser.VarexplistContext ctx) {
         var varexps = ctx.varexp();
         var commas = ctx.COMMA();
-        output.append("(");
+        output.noSpaceBeforeNext();
+        output.token('(');
         boolean multiline = varexps.size() > 3;
         if (multiline) {
             output.enterIndent();
@@ -332,7 +311,8 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
             output.exitIndent();
             output.newLineAndIndent();
         }
-        output.append(")");
+        output.noSpaceBeforeNext();
+        output.token(')');
         return null;
     }
 
@@ -348,18 +328,19 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
         }
         output.newLineAndIndent();
         visit(ctx.IDENT());
-        output.space();
+
         if (ctx.option_list() != null) {
+            output.spaceBeforeNext();
             visit(ctx.option_list());
-            output.space();
         }
-        lBraceBreak(ctx.LBRACE().getSymbol());
+
+        visit(ctx.LBRACE());
 
         // schemaVarDecls
         for (int i = 0; i < ctx.one_schema_var_decl().size(); i++) {
             output.newLineAndIndent();
             visit(ctx.SCHEMAVAR(i));
-            output.space();
+            output.spaceBeforeNext();
             visit(ctx.one_schema_var_decl(i));
             visit(ctx.SEMI(i));
         }
@@ -393,6 +374,7 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
             first++;
             first++;
             for (int i = first; i < first + polaritiesEtc; i++) {
+                output.newLineAndIndent();
                 visit(ctx.getChild(i));
             }
         }
@@ -407,13 +389,14 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
         visit(ctx.goalspecs());
         visit(ctx.modifiers());
 
-        rBrace(ctx.RBRACE().getSymbol());
+        output.newLine();
+        visit(ctx.RBRACE());
 
         return null;
     }
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private void processHiddenTokensAfterCurrent(Token currentToken) {
+    static void processHiddenTokensAfterCurrent(Token currentToken, CommonTokenStream ts, Output output) {
         // add hidden tokens after the current token (whitespace, comments etc.)
         List<Token> list = ts.getHiddenTokensToRight(currentToken.getTokenIndex());
         if (list != null) {
@@ -436,63 +419,54 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
                         builder.append(text);
                     }*/
                 } else if (t.getType() == KeYLexer.SL_COMMENT) {    // TODO: other comment types
-                    processIndentationInSLComment(t);
-                } else {
-                    output.append(text);
+                    processIndentationInSLComment(t, output);
+                }/* else if (t.getType() == KeYLexer.COMMENT_END) {
+                    processIndentationInMLComment(t);
+                } */ else {
+                    output.token(text);
                 }
             }
         }
     }
 
-    private void processIndentationInSLComment(Token t) {
+    static void processIndentationInSLComment(Token t, Output output) {
         String text = t.getText();
         output.newLineAndIndent();
         // Normalize actual comment content
         if (text.startsWith("//")) {
             text = text.substring(2);
-            output.append("// ");
+            output.token("// ");
         }
-        output.append(text.trim());
+        output.token(text.trim());
     }
 
     @Override
     public Void visitTerminal(TerminalNode node) {
-        //builder.append(node.getText());
-
-        /*if (node.getSymbol().getTokenIndex() == KeYLexer.LBRACE) {
-            currentIndentation++;
-        } else if (node.getSymbol().getTokenIndex() == KeYLexer.RBRACE) {
-            currentIndentation--;
-        }*/
-
         var token = node.getSymbol().getType();
-
-        var isBinary = Arrays.stream(OPERATORS).anyMatch(v -> v == token);
-
-        if (token == KeYLexer.LPAREN) {
+        if (token == KeYLexer.LBRACE || token == KeYLexer.LPAREN || token == KeYLexer.LBRACKET) {
+            output.spaceBeforeNext();
             output.enterIndent();
-        } else if (token == KeYLexer.RPAREN) {
+        } else if (token == KeYLexer.RBRACE || token == KeYLexer.RPAREN || token == KeYLexer.RBRACKET) {
+            output.noSpaceBeforeNext();
             output.exitIndent();
         }
 
-        if (isBinary) {
-            output.space();
+        if (token == KeYLexer.AVOID || token == KeYLexer.SEQARROW) {
+            output.spaceBeforeNext();
+        }
+
+        if (token == KeYLexer.SEMI || token == KeYLexer.COMMA || token == KeYLexer.COLON || token == KeYLexer.LPAREN || token == KeYLexer.DOT) {
+            output.noSpaceBeforeNext();
         }
 
         String str = node.getSymbol().getText();
-        output.append(str);
+        output.token(str);
 
-        if (isBinary ||
-                token == KeYLexer.COMMA ||
-                token == KeYLexer.SUBST ||
-                token == KeYLexer.AVOID ||
-                token == KeYLexer.EXISTS ||
-                token == KeYLexer.FORALL
-        ) {
-            output.space();
+        if (token != KeYLexer.LPAREN && token != KeYLexer.LBRACKET && token != KeYLexer.LBRACE && token != KeYLexer.COLON && token != KeYLexer.DOT) {
+            output.spaceBeforeNext();
         }
 
-        processHiddenTokensAfterCurrent(node.getSymbol());
+        processHiddenTokensAfterCurrent(node.getSymbol(), ts, output);
         return super.visitTerminal(node);
     }
 
@@ -501,19 +475,26 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
     }
 
     public static void main(String[] args) throws IOException {
-        String dirname = "/home/wolfram/Desktop/tmp/rules";
+        String dirname = "D:\\Code\\Java\\format\\rules";
         Path ruleDir = Paths.get(dirname);
-        formatDirectory(ruleDir);
+        try {
+            formatDirectory(ruleDir);
+        } catch (Exception e) {
+            throw e;
+        }
     }
 
     private static void formatDirectory(Path dir) throws IOException {
         Path outDir = dir.getParent().resolve("output");
         outDir.toFile().mkdirs();
+        formatSingleFile(dir.resolve("bsum.key"));
         try (Stream<Path> s = Files.list(dir)) {
             s.forEach(p -> {
+                var file = dir.resolve(p.getFileName());
                 try {
-                    formatSingleFile(dir.resolve(p.getFileName()), outDir, true);
+                    formatSingleFile(file);
                 } catch (IOException e) {
+                    System.err.println("Exception while processing " + file);
                     throw new RuntimeException(e);
                 }
             });
@@ -525,31 +506,37 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
         KeYLexer lexer = new KeYLexer(in);
         lexer.setTokenFactory(new CommonTokenFactory(true));
 
-//        KeYLexer lexer2 = ParsingFacade.createLexer(p);
-
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         tokens.fill();
-        //CommonTokenStream hidden = new CommonTokenStream(lexer, KeYLexer.HIDDEN);
+
         KeYParser parser = new KeYParser(tokens);
         KeYParser.FileContext ctx = parser.file();
-        KeYFileFormatter formatter = new KeYFileFormatter(in, tokens);
+        if (parser.getNumberOfSyntaxErrors() > 0) {
+            return null;
+        }
+
+        KeYFileFormatter formatter = new KeYFileFormatter(tokens);
         formatter.visitFile(ctx);
-        var formatted = formatter.output.toString();
+        var formatted = formatter.output.toString().trim() + "\n";
         return formatted.replaceAll("\n", System.lineSeparator());
     }
 
-    private static void formatSingleFile(Path input, Path outDir, boolean overwrite) throws IOException {
+    private static void formatSingleFile(Path input) throws IOException {
         final String nameExt = input.getFileName().toString();
+        if (nameExt.endsWith(".format.key")) {
+            input.toFile().delete();
+            return;
+        }
         final String filename = nameExt.substring(0, nameExt.length() - 4);
         final String extension = ".key";
         var content = Files.readString(input);
         var formatted = formatFile(content);
 
-        Path output = outDir.resolve(filename + extension);
-        if (Files.exists(output) && !overwrite) {
-            output = Files.createTempFile(outDir, filename, extension);
+        if (formatted == null) {
+            System.err.println("Failed to format " + input);
+            return;
         }
-
+        var output = input.resolveSibling(filename + ".format" + extension);
         Files.writeString(output, formatted);
     }
 }
