@@ -11,7 +11,7 @@ public class Output {
 
     public static String getIndent(int count) {
         // Substrings use a shared buffer
-        return INDENT_BUFFER.substring(0, count);
+        return INDENT_BUFFER.substring(0, INDENT_STEP * count);
     }
 
     public Output() {
@@ -19,7 +19,7 @@ public class Output {
     }
 
     private void indent() {
-        output.append(getIndent(INDENT_STEP * indentLevel));
+        output.append(getIndent(indentLevel));
         this.isNewLine = false;
         this.spaceBeforeNextToken = false;
     }
@@ -69,6 +69,12 @@ public class Output {
     public void assertNewLineAndIndent() {
         assertNewLine();
         indent();
+    }
+
+    public void assertIndented() {
+        if (isNewLine) {
+            indent();
+        }
     }
 
     public void newLine() {
