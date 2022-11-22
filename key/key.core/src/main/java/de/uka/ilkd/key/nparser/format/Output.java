@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.nparser;
+package de.uka.ilkd.key.nparser.format;
 
 public class Output {
     private static final int INDENT_STEP = 4;
@@ -7,6 +7,7 @@ public class Output {
     private final StringBuilder output;
     private int indentLevel = 0;
     private boolean isNewLine = true;
+    private boolean spaceBeforeNextToken = false;
 
     public static String getIndent(int count) {
         // Substrings use a shared buffer
@@ -20,25 +21,33 @@ public class Output {
     private void indent() {
         output.append(getIndent(INDENT_STEP * indentLevel));
         this.isNewLine = false;
+        this.spaceBeforeNextToken = false;
     }
 
-    private void checkIndent() {
+    private void checkBeforeToken() {
         if (this.isNewLine) {
             indent();
+        } else if(spaceBeforeNextToken) {
+            output.append(' ');
+            this.spaceBeforeNextToken = false;
         }
     }
 
-    public void space() {
-        append(' ');
+    public void spaceBeforeNext() {
+        this.spaceBeforeNextToken = true;
     }
 
-    public void append(String value) {
-        checkIndent();
+    public void noSpaceBeforeNext() {
+        this.spaceBeforeNextToken = false;
+    }
+
+    public void token(String value) {
+        checkBeforeToken();
         output.append(value);
     }
 
-    public void append(char value) {
-        checkIndent();
+    public void token(char value) {
+        checkBeforeToken();
         output.append(value);
     }
 
