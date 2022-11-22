@@ -520,7 +520,8 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
         }
     }
 
-    private static String formatFile(CharStream in) {
+    private static String formatFile(String text) {
+        var in = CharStreams.fromString(text.replaceAll("\\r\\n?", "\n"));
         KeYLexer lexer = new KeYLexer(in);
         lexer.setTokenFactory(new CommonTokenFactory(true));
 
@@ -533,21 +534,22 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
         KeYParser.FileContext ctx = parser.file();
         KeYFileFormatter formatter = new KeYFileFormatter(in, tokens);
         formatter.visitFile(ctx);
-        return formatter.output.toString();
+        var formatted = formatter.output.toString();
+        return formatted.replaceAll("\n", System.lineSeparator());
     }
 
     private static void formatSingleFile(Path input, Path outDir, boolean overwrite) throws IOException {
         final String nameExt = input.getFileName().toString();
         final String filename = nameExt.substring(0, nameExt.length() - 4);
         final String extension = ".key";
-        var content = Files.readString(input).replaceAll("\\r\\n?", "\n");
-        var formatted = formatFile(CharStreams.fromString(content));
+        var content = Files.readString(input);
+        var formatted = formatFile(content);
 
         Path output = outDir.resolve(filename + extension);
         if (Files.exists(output) && !overwrite) {
             output = Files.createTempFile(outDir, filename, extension);
         }
-        var newlineReplaced = formatted.replaceAll("\n", System.lineSeparator());
-        Files.writeString(output, newlineReplaced);
+
+        Files.writeString(output, formatted);
     }
 }
