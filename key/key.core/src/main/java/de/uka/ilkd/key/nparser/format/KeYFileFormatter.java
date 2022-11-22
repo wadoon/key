@@ -87,7 +87,7 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
         visitChildren(ctx, 2, ctx.getChildCount() - 1);
 
         visit(ctx.RBRACE());
-        output.assertNewLineAndIndent();
+        output.assertNewLine();
         return null;
     }
 
@@ -201,7 +201,7 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
             visit(ctx.SEMI(i));
         }
         visit(ctx.RBRACE());
-        output.assertNewLineAndIndent();
+        output.assertNewLine();
 
         return null;
     }
@@ -526,6 +526,11 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
             System.err.println("Failed to format " + input);
             return;
         }
+
+        if (!formatted.equals(format(formatted))) {
+            System.err.println("Formatter is not convergent on " + input);
+        }
+
         Files.writeString(output, formatted);
     }
 
