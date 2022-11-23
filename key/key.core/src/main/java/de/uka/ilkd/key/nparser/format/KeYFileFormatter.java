@@ -273,7 +273,7 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
 
         output.token("/*");
         // Skip space if we start with another *, e.g. /**
-        if (!lines[0].startsWith("*")) {
+        if (!lines[0].startsWith("*") && !lines[0].startsWith("!")) {
             output.spaceBeforeNext();
         }
         for (int i = 0; i < lines.length; i++) {
@@ -348,8 +348,12 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
             output.noSpaceBeforeNext();
         }
 
-        String str = node.getSymbol().getText();
-        output.token(str);
+        String text = node.getSymbol().getText();
+        if (token == KeYLexer.DOC_COMMENT) {
+            processIndentationInMLComment(text, output);
+        } else {
+            output.token(text);
+        }
 
         if (isLBrace) {
             output.enterIndent();

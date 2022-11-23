@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.nparser.format;
 
 public class Output {
-    private static final int INDENT_STEP = 4;
+    public static final int INDENT_STEP = 4;
     private static final String INDENT_BUFFER = " ".repeat(100);
 
     private final StringBuilder output;
