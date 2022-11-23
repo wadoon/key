@@ -77,4 +77,24 @@ public class ExpressionVisitor extends KeYParserBaseVisitor<Void> {
         KeYFileFormatter.processHiddenTokensAfterCurrent(node.getSymbol(), ts, output);
         return super.visitTerminal(node);
     }
+
+    @Override
+    public Void visitIfThenElseTerm(KeYParser.IfThenElseTermContext ctx) {
+        for (int i = 0; i < ctx.getChildCount(); i++) {
+            var child = ctx.getChild(i);
+            if (child instanceof TerminalNode) {
+                var token = ((TerminalNode) child).getSymbol().getType();
+                if (token == KeYParser.THEN) {
+                    output.enterIndent();
+                }
+
+                if (token == KeYParser.THEN || token == KeYParser.ELSE) {
+                    output.spaceBeforeNext();
+                }
+            }
+            visit(child);
+        }
+        output.exitIndent();
+        return null;
+    }
 }
