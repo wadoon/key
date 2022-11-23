@@ -441,6 +441,12 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
             System.err.println("Formatter is not convergent on " + input);
         }
 
+        var noWhitespaceContent = content.replaceAll("\\s+", "");
+        var noWhitespaceFormatted = formatted.replaceAll("\\s+", "");
+        if (!noWhitespaceContent.equals(noWhitespaceFormatted)) {
+            System.err.println("File changed: " + input);
+        }
+
         Files.writeString(output, formatted);
     }
 
