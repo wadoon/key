@@ -394,7 +394,7 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
                     if (!name.endsWith(".format.key")) {
                         formatSingleFileTo(file, outDir);
                     }
-                } catch (IOException e) {
+                } catch (Exception e) {
                     System.err.println("Exception while processing " + file);
                     throw new RuntimeException(e);
                 }
