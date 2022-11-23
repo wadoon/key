@@ -8,9 +8,6 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.util.Arrays;
 
-/**
- * Adds spaces after terminals, in comma separated lists and breaks after semicolons
- */
 public class ExpressionVisitor extends KeYParserBaseVisitor<Void> {
     private static final int[] OPERATORS = {
             KeYLexer.LESS,

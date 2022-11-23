@@ -57,6 +57,12 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
     }
 
     @Override
+    public Void visitOption_list(KeYParser.Option_listContext ctx) {
+        output.noSpaceBeforeNext();
+        return new ExpressionVisitor(ts, output).visitOption_list(ctx);
+    }
+
+    @Override
     public Void visitSchema_var_decls(KeYParser.Schema_var_declsContext ctx) {
         for (int i = 0; i < ctx.getChildCount(); i++) {
             var child = ctx.getChild(i);
@@ -380,7 +386,7 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
     private static void formatDirectory(Path dir) throws IOException {
         Path outDir = dir.getParent().resolve("output");
         outDir.toFile().mkdirs();
-        formatSingleFileInSameDir(dir.resolve("assertions.format.key"));
+//        formatSingleFileInSameDir(dir.resolve("assertions.format.key"));
         try (Stream<Path> s = Files.list(dir)) {
             s.forEach(p -> {
                 var file = dir.resolve(p.getFileName());
