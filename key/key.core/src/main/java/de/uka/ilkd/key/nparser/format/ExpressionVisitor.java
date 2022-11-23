@@ -47,9 +47,9 @@ public class ExpressionVisitor extends KeYParserBaseVisitor<Void> {
     public Void visitTerminal(TerminalNode node) {
         var token = node.getSymbol().getType();
 
-        if (token == KeYLexer.LPAREN) {
-            output.enterIndent();
-        } else if (token == KeYLexer.RPAREN) {
+        boolean isLBrace = token == KeYLexer.LBRACE || token == KeYLexer.LPAREN || token == KeYLexer.LBRACKET;
+        if (token == KeYLexer.RBRACE || token == KeYLexer.RPAREN || token == KeYLexer.RBRACKET) {
+            output.noSpaceBeforeNext();
             output.exitIndent();
         }
 
@@ -64,14 +64,19 @@ public class ExpressionVisitor extends KeYParserBaseVisitor<Void> {
         String str = node.getSymbol().getText();
         output.token(str);
 
-        if ((isOperator && !isUnaryMinus) ||
+        if (!isLBrace && ((isOperator && !isUnaryMinus) ||
                 token == KeYLexer.COMMA ||
                 token == KeYLexer.SUBST ||
                 token == KeYLexer.AVOID ||
                 token == KeYLexer.EXISTS ||
-                token == KeYLexer.FORALL
+                token == KeYLexer.FORALL ||
+                token == KeYLexer.SEMI)
         ) {
             output.spaceBeforeNext();
+        }
+
+        if (isLBrace) {
+            output.enterIndent();
         }
 
         KeYFileFormatter.processHiddenTokensAfterCurrent(node.getSymbol(), ts, output);
