@@ -52,52 +52,36 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
     }
 
     @Override
-    public Void visitDecls(KeYParser.DeclsContext ctx) {
-        if (ctx.children != null) {
-            for (int i = 0; i < ctx.children.size(); i++) {
-                visit(ctx.getChild(i));
-            }
-        }
-        return null;
-    }
-
-    @Override
     public Void visitTerm(KeYParser.TermContext ctx) {
         return new ExpressionVisitor(ts, output).visitTerm(ctx);
     }
 
     @Override
-    public Void visitSort_decls(KeYParser.Sort_declsContext ctx) {
-        // TODO
-        return super.visitSort_decls(ctx);
-    }
-
-    @Override
-    public Void visitProg_var_decls(KeYParser.Prog_var_declsContext ctx) {
-        // TODO
-        return super.visitProg_var_decls(ctx);
-    }
-
-    @Override
     public Void visitSchema_var_decls(KeYParser.Schema_var_declsContext ctx) {
-        output.assertNewLineAndIndent();
-        visit(ctx.SCHEMAVARIABLES());
-        visit(ctx.LBRACE());
+        for (int i = 0; i < ctx.getChildCount(); i++) {
+            var child = ctx.getChild(i);
+            if (child instanceof TerminalNode) {
+                var token = ((TerminalNode) child).getSymbol().getType();
+                if (token == KeYParser.SCHEMAVARIABLES) {
+                    output.assertNewLineAndIndent();
+                } else if (token == KeYParser.RBRACE) {
+                    visit(child);
+                    output.assertNewLine();
+                    continue;
+                }
+            }
+            visit(child);
+        }
 
-        visitChildren(ctx, 2, ctx.getChildCount() - 1);
-
-        visit(ctx.RBRACE());
-        output.assertNewLine();
         return null;
     }
 
     @Override
     public Void visitOne_schema_var_decl(KeYParser.One_schema_var_declContext ctx) {
+        // TODO
         if (ctx.MODALOPERATOR() != null) {
-            // TODO
             visitChildren(ctx);
         } else if (ctx.PROGRAM() != null) {
-            // TODO
             visitChildren(ctx);
         } else if (ctx.FORMULA() != null) {
             visit(ctx.FORMULA());
@@ -110,13 +94,10 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
             output.spaceBeforeNext();
             visit(ctx.simple_ident_comma_list());
         } else if (ctx.TERMLABEL() != null) {
-            // TODO
             visitChildren(ctx);
         } else if (ctx.UPDATE() != null) {
-            // TODO
             visitChildren(ctx);
         } else if (ctx.SKOLEMFORMULA() != null) {
-            // TODO
             visitChildren(ctx);
         } else {
             if (ctx.TERM() != null) {
@@ -145,64 +126,23 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
     }
 
     @Override
-    public Void visitSimple_ident_comma_list(KeYParser.Simple_ident_comma_listContext ctx) {
-        visit(ctx.simple_ident(0));
-        for (int i = 1; i < ctx.simple_ident().size(); i++) {
-            visit(ctx.COMMA(i - 1));
-            visit(ctx.simple_ident(i));
-        }
-        return null;
-    }
-
-    @Override
-    public Void visitPred_decls(KeYParser.Pred_declsContext ctx) {
-        // TODO
-        return super.visitPred_decls(ctx);
-    }
-
-    @Override
-    public Void visitFunc_decls(KeYParser.Func_declsContext ctx) {
-        // TODO
-        return super.visitFunc_decls(ctx);
-    }
-
-    @Override
-    public Void visitTransform_decls(KeYParser.Transform_declsContext ctx) {
-        // TODO
-        return super.visitTransform_decls(ctx);
-    }
-
-    @Override
-    public Void visitRuleset_decls(KeYParser.Ruleset_declsContext ctx) {
-        // TODO
-        return super.visitRuleset_decls(ctx);
-    }
-
-    @Override
     public Void visitRulesOrAxioms(KeYParser.RulesOrAxiomsContext ctx) {
-        if (ctx.DOC_COMMENT() != null) {
-            output.assertNewLineAndIndent();
-            visit(ctx.DOC_COMMENT());
+        for (int i = 0; i < ctx.getChildCount(); i++) {
+            var child = ctx.getChild(i);
+            if (child instanceof TerminalNode) {
+                var token = ((TerminalNode) child).getSymbol().getType();
+                if (token == KeYParser.DOC_COMMENT ||
+                        token == KeYParser.RULES ||
+                        token == KeYParser.AXIOMS) {
+                    output.assertNewLineAndIndent();
+                } else if (token == KeYParser.RBRACE) {
+                    visit(child);
+                    output.assertNewLine();
+                    continue;
+                }
+            }
+            visit(child);
         }
-        output.assertNewLineAndIndent();
-        if (ctx.RULES() != null) {
-            visit(ctx.RULES());
-        } else if (ctx.AXIOMS() != null) {
-            visit(ctx.AXIOMS());
-        }
-        if (ctx.option_list() != null) {
-            visit(ctx.option_list());
-        }
-
-        visit(ctx.LBRACE());
-
-        for (int i = 0; i < ctx.taclet().size(); i++) {
-            visit(ctx.taclet(i));
-            visit(ctx.SEMI(i));
-        }
-        visit(ctx.RBRACE());
-        output.assertNewLine();
-
         return null;
     }
 
@@ -219,10 +159,8 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
         output.assertNewLineAndIndent();
         if (ctx.name != null) {
             visit(ctx.name);
-            output.noSpaceBeforeNext();
-            output.token(":");
+            visit(ctx.COLON());
             output.spaceBeforeNext();
-            // TODO new line and indent?
             output.enterIndent();
             output.assertNewLineAndIndent();
             firstChild = 2;
@@ -269,12 +207,7 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
     public Void visitVarexplist(KeYParser.VarexplistContext ctx) {
         var varexps = ctx.varexp();
         var commas = ctx.COMMA();
-        output.noSpaceBeforeNext();
-        output.token('(');
         boolean multiline = varexps.size() > 3;
-        if (multiline) {
-            output.enterIndent();
-        }
         for (int i = 0; i < varexps.size(); i++) {
             if (multiline) {
                 output.assertNewLineAndIndent();
@@ -284,16 +217,9 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
                 visit(commas.get(i));
                 if (!multiline && output.isNewLine()) {
                     multiline = true;
-                    output.enterIndent();
                 }
             }
         }
-        if (multiline) {
-            output.exitIndent();
-            output.assertNewLineAndIndent();
-        }
-        output.noSpaceBeforeNext();
-        output.token(')');
         return null;
     }
 
@@ -308,79 +234,39 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
 
     @Override
     public Void visitTaclet(KeYParser.TacletContext ctx) {
-        if (ctx.DOC_COMMENT() != null) {
-            output.assertNewLineAndIndent();
-            visit(ctx.DOC_COMMENT());
-        }
-        if (ctx.LEMMA() != null) {
-            output.assertNewLineAndIndent();
-            visit(ctx.LEMMA());
-        }
-        output.assertNewLineAndIndent();
-        visit(ctx.IDENT());
-
-        if (ctx.option_list() != null) {
-            output.spaceBeforeNext();
-            visit(ctx.option_list());
-        }
-
-        visit(ctx.LBRACE());
-
-        // schemaVarDecls
-        for (int i = 0; i < ctx.one_schema_var_decl().size(); i++) {
-            output.assertNewLineAndIndent();
-            visit(ctx.SCHEMAVAR(i));
-            output.spaceBeforeNext();
-            visit(ctx.one_schema_var_decl(i));
-            visit(ctx.SEMI(i));
-        }
-
-        int parenCounter = 0;   // necessary to be able to process the correct hidden tokens
-
-        // assumes
-        if (ctx.ifSeq != null) {
-            output.assertNewLineAndIndent();
-            visit(ctx.ASSUMES());
-            visit(ctx.LPAREN(0));
-            visit(ctx.ifSeq);
-            visit(ctx.RPAREN(0));
-            parenCounter++;
-        }
-
-        if (ctx.find != null) {
-            output.assertNewLineAndIndent();
-            visit(ctx.FIND());
-            visit(ctx.LPAREN(parenCounter));
-            visit(ctx.find);
-            visit(ctx.RPAREN(parenCounter));
-
-            // visit further polarity restrictions etc.
-            int polaritiesEtc = ctx.SAMEUPDATELEVEL().size() + ctx.INSEQUENTSTATE().size()
-                    + ctx.ANTECEDENTPOLARITY().size() + ctx.SUCCEDENTPOLARITY().size();
-            int first = 0;
-            while (ctx.getChild(first) != ctx.find) {
-                first++;
+        var n = ctx.getChildCount();
+        for (int i = 0; i < n; ++i) {
+            var child = ctx.getChild(i);
+            if (child instanceof TerminalNode) {
+                var token = ((TerminalNode) child).getSymbol().getType();
+                if (token == KeYLexer.DOC_COMMENT ||
+                        token == KeYLexer.LEMMA ||
+                        token == KeYLexer.IDENT ||
+                        token == KeYLexer.ASSUMES ||
+                        token == KeYLexer.FIND ||
+                        token == KeYLexer.SAMEUPDATELEVEL ||
+                        token == KeYLexer.ANTECEDENTPOLARITY ||
+                        token == KeYLexer.SUCCEDENTPOLARITY ||
+                        token == KeYLexer.INSEQUENTSTATE ||
+                        token == KeYLexer.VARCOND
+                ) {
+                    output.assertNewLineAndIndent();
+                } else if (token == KeYParser.SCHEMAVAR) {
+                    output.assertNewLineAndIndent();
+                    visit(child);
+                    output.spaceBeforeNext();
+                    continue;
+                } else if (token == KeYLexer.RBRACE) {
+                    output.assertNewLine();
+                }
+            } else if (child instanceof RuleContext) {
+                if (child instanceof KeYParser.Option_listContext) {
+                    output.spaceBeforeNext();
+                }
             }
-            first++;
-            first++;
-            for (int i = first; i < first + polaritiesEtc; i++) {
-                output.assertNewLineAndIndent();
-                visit(ctx.getChild(i));
-            }
+
+            visit(child);
         }
-
-        // varconds
-        for (int i = 0; i < ctx.varexplist().size(); i++) {
-            output.assertNewLineAndIndent();
-            visit(ctx.VARCOND(i));
-            visit(ctx.varexplist(i));
-        }
-
-        visit(ctx.goalspecs());
-        visit(ctx.modifiers());
-
-        output.assertNewLine();
-        visit(ctx.RBRACE());
 
         return null;
     }
@@ -482,7 +368,7 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
         if (trimmed.startsWith("//")) {
             trimmed = trimmed.substring(2);
             output.token("//");
-            if (!trimmed.startsWith(" ")) {
+            if (!trimmed.startsWith(" ") && !trimmed.startsWith("/")) {
                 output.spaceBeforeNext();
             }
         }

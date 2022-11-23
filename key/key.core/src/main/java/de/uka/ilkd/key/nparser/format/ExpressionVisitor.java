@@ -31,14 +31,15 @@ public class ExpressionVisitor extends KeYParserBaseVisitor<Void> {
             KeYLexer.PLUS,
             KeYLexer.RGUILLEMETS,
             KeYLexer.EQV,
+            KeYLexer.ASSIGN,
     };
 
     private final CommonTokenStream ts;
     private final Output output;
 
     public ExpressionVisitor(CommonTokenStream ts, Output output) {
-        this.output = output;
         this.ts = ts;
+        this.output = output;
     }
 
     @Override
