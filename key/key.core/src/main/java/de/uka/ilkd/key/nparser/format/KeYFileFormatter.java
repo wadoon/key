@@ -284,12 +284,15 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
                 for (int k = 0; k < Math.min(nls, MAX_LINES_BETWEEN); k++) {
                     output.newLine();
                 }
-            } else if (t.getType() == KeYLexer.SL_COMMENT) {    // TODO: other comment types
-                processIndentationInSLComment(text, output);
-            } else if (t.getType() == KeYLexer.COMMENT_END) {
-                processIndentationInMLComment(text, output);
             } else {
-                output.token(text);
+                var normalized = text.replaceAll("\t", Output.getIndent(1));
+                if (t.getType() == KeYLexer.SL_COMMENT) {    // TODO: other comment types
+                    processIndentationInSLComment(normalized, output);
+                } else if (t.getType() == KeYLexer.COMMENT_END) {
+                    processIndentationInMLComment(normalized, output);
+                } else {
+                    output.token(normalized);
+                }
             }
         }
     }
@@ -302,7 +305,7 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
 
     static void processIndentationInMLComment(String text, Output output) {
         // Normalize and split
-        var lines = text.replaceAll("\t", Output.getIndent(1)).split("\n");
+        var lines = text.split("\n");
 
         // Find minimal indent shared among all lines except the first
         // Doc like comments start with * in every line except the first
