@@ -47,23 +47,23 @@ public class ExpressionVisitor extends KeYParserBaseVisitor<Void> {
     public Void visitTerminal(TerminalNode node) {
         var token = node.getSymbol().getType();
 
-        var isOperator = Arrays.stream(OPERATORS).anyMatch(v -> v == token);
-
         if (token == KeYLexer.LPAREN) {
             output.enterIndent();
         } else if (token == KeYLexer.RPAREN) {
             output.exitIndent();
         }
 
-        if (isOperator || token == KeYLexer.AVOID) {
+        var isOperator = Arrays.stream(OPERATORS).anyMatch(v -> v == token);
+        var isUnaryMinus = token == KeYLexer.MINUS &&
+                node.getParent() instanceof KeYParser.Unary_minus_termContext;
+        // Unary minus has a "soft" leading space, we allow it if the token before wants it but don't require it
+        if ((isOperator && !isUnaryMinus) || token == KeYLexer.AVOID) {
             output.spaceBeforeNext();
         }
 
         String str = node.getSymbol().getText();
         output.token(str);
 
-        var isUnaryMinus = token == KeYLexer.MINUS &&
-                node.getParent() instanceof KeYParser.Unary_minus_termContext;
         if ((isOperator && !isUnaryMinus) ||
                 token == KeYLexer.COMMA ||
                 token == KeYLexer.SUBST ||
