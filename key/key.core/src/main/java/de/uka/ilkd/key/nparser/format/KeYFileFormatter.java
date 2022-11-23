@@ -77,55 +77,6 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
     }
 
     @Override
-    public Void visitOne_schema_var_decl(KeYParser.One_schema_var_declContext ctx) {
-        // TODO
-        if (ctx.MODALOPERATOR() != null) {
-            visitChildren(ctx);
-        } else if (ctx.PROGRAM() != null) {
-            visitChildren(ctx);
-        } else if (ctx.FORMULA() != null) {
-            visit(ctx.FORMULA());
-
-            if (ctx.schema_modifiers() != null) {
-                output.spaceBeforeNext();
-                visit(ctx.schema_modifiers());
-            }
-
-            output.spaceBeforeNext();
-            visit(ctx.simple_ident_comma_list());
-        } else if (ctx.TERMLABEL() != null) {
-            visitChildren(ctx);
-        } else if (ctx.UPDATE() != null) {
-            visitChildren(ctx);
-        } else if (ctx.SKOLEMFORMULA() != null) {
-            visitChildren(ctx);
-        } else {
-            if (ctx.TERM() != null) {
-                visit(ctx.TERM());
-            } else if (ctx.VARIABLES() != null) {
-                visit(ctx.VARIABLES());
-            } else if (ctx.VARIABLE() != null) {
-                visit(ctx.VARIABLE());
-            } else if (ctx.SKOLEMTERM() != null) {
-                visit(ctx.SKOLEMTERM());
-            }
-
-            if (ctx.schema_modifiers() != null) {
-                output.spaceBeforeNext();
-                visit(ctx.schema_modifiers());
-            }
-
-            output.spaceBeforeNext();
-            visit(ctx.sortId());
-
-            output.spaceBeforeNext();
-            visit(ctx.simple_ident_comma_list());
-        }
-
-        return null;
-    }
-
-    @Override
     public Void visitRulesOrAxioms(KeYParser.RulesOrAxiomsContext ctx) {
         for (int i = 0; i < ctx.getChildCount(); i++) {
             var child = ctx.getChild(i);
@@ -171,12 +122,6 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
             output.exitIndent();
         }
         return null;
-    }
-
-    @Override
-    public Void visitTriggers(KeYParser.TriggersContext ctx) {
-
-        return super.visitTriggers(ctx);
     }
 
     @Override
