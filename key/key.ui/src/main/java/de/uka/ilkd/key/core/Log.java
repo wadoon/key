@@ -1,9 +1,5 @@
 package de.uka.ilkd.key.core;
 
-import ch.qos.logback.classic.filter.ThresholdFilter;
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.Appender;
-import ch.qos.logback.core.FileAppender;
 import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.ui.Verbosity;
 import org.slf4j.Logger;
@@ -37,15 +33,17 @@ public class Log {
     private static final Logger LOGGER = LoggerFactory.getLogger(Log.class);
 
     public static Path getCurrentLogFile() {
-        ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger)
+        /*ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger)
                 LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
         FileAppender<?> fileAppend = (FileAppender<?>) root.getAppender("FILE");
         return Paths.get(fileAppend.getFile());
+         */
+        return null;
     }
 
     public static void configureLogging(int verbosity) {
         Runtime.getRuntime().addShutdownHook(new Thread(Log::cleanOldLogFiles));
-        ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
+        /*ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
         Appender<ILoggingEvent> consoleAppender = root.getAppender("STDOUT");
         consoleAppender.clearAllFilters();
         var filter = new ThresholdFilter();
@@ -70,7 +68,7 @@ public class Log {
                 filter.setLevel("WARN");
                 break;
         }
-        filter.start();
+        filter.start();*/
     }
 
     private static void cleanOldLogFiles() {
