@@ -43,6 +43,36 @@ public class ExpressionVisitor extends KeYParserBaseVisitor<Void> {
         this.output = output;
     }
 
+    private static void outputModality(String text, Output output) {
+        var normalized = text.replaceAll("\t", Output.getIndent(1));
+        var lines = normalized.split("\n");
+        lines[0] = lines[0].trim();
+
+        // Find the smallest indent of all lines except the first
+        int minIndent = Integer.MAX_VALUE;
+        for (int i = 1; i < lines.length; i++) {
+            var line = lines[i];
+            lines[i] = line.stripTrailing();
+            var indent = line.length() - line.stripLeading().length();
+            minIndent = Math.min(minIndent, indent);
+        }
+
+        output.token(lines[0]);
+        if (lines.length > 1) {
+            output.enterIndent();
+
+            for (int i = 1; i < lines.length; i++) {
+                output.newLine();
+                var line = lines[i];
+                if (!line.isEmpty()) {
+                    output.token(line.substring(minIndent));
+                }
+            }
+            output.exitIndent();
+        }
+        output.spaceBeforeNext();
+    }
+
     @Override
     public Void visitTerminal(TerminalNode node) {
         var token = node.getSymbol().getType();
@@ -61,8 +91,12 @@ public class ExpressionVisitor extends KeYParserBaseVisitor<Void> {
             output.spaceBeforeNext();
         }
 
-        String str = node.getSymbol().getText();
-        output.token(str);
+        String text = node.getSymbol().getText();
+        if (token == KeYLexer.MODALITY) {
+            outputModality(text, output);
+        } else {
+            output.token(text);
+        }
 
         if (!isLBrace && ((isOperator && !isUnaryMinus) ||
                 token == KeYLexer.COMMA ||
