@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.nparser.format;
 
 import de.uka.ilkd.key.nparser.KeYLexer;
+import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.KeYParserBaseVisitor;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -46,7 +47,7 @@ public class ExpressionVisitor extends KeYParserBaseVisitor<Void> {
     public Void visitTerminal(TerminalNode node) {
         var token = node.getSymbol().getType();
 
-        var isBinary = Arrays.stream(OPERATORS).anyMatch(v -> v == token);
+        var isOperator = Arrays.stream(OPERATORS).anyMatch(v -> v == token);
 
         if (token == KeYLexer.LPAREN) {
             output.enterIndent();
@@ -54,14 +55,16 @@ public class ExpressionVisitor extends KeYParserBaseVisitor<Void> {
             output.exitIndent();
         }
 
-        if (isBinary || token == KeYLexer.AVOID) {
+        if (isOperator || token == KeYLexer.AVOID) {
             output.spaceBeforeNext();
         }
 
         String str = node.getSymbol().getText();
         output.token(str);
 
-        if (isBinary ||
+        var isUnaryMinus = token == KeYLexer.MINUS &&
+                node.getParent() instanceof KeYParser.Unary_minus_termContext;
+        if ((isOperator && !isUnaryMinus) ||
                 token == KeYLexer.COMMA ||
                 token == KeYLexer.SUBST ||
                 token == KeYLexer.AVOID ||
