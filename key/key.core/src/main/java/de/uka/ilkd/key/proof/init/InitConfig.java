@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.proof.init;
 
+import java.net.URI;
 import java.util.*;
 
 import de.uka.ilkd.key.rule.*;
@@ -77,7 +78,7 @@ public class InitConfig {
     /** the fileRepo which is responsible for consistency between source code and proof */
     private FileRepo fileRepo;
 
-    private String originalKeYFileName;
+    private URI originalKeYFileURI;
 
     private ProofSettings settings;
 
@@ -395,6 +396,10 @@ public class InitConfig {
         this.settings = newSettings;
     }
 
+    public void setOriginalKeYFileURI(URI fileURI) {
+        this.originalKeYFileURI = fileURI;
+    }
+
 
     public ProofSettings getSettings() {
         return settings;
@@ -433,7 +438,7 @@ public class InitConfig {
         ic.setTaclet2Builder(
                 (HashMap<Taclet, TacletBuilder<? extends Taclet>>) taclet2Builder.clone());
         ic.taclets = taclets;
-        ic.originalKeYFileName = originalKeYFileName;
+        ic.originalKeYFileURI = originalKeYFileURI;
         ic.justifInfo = justifInfo.copy();
         ic.fileRepo = fileRepo;     // TODO: copy instead? delete via dispose method?
         return ic;
@@ -452,6 +457,10 @@ public class InitConfig {
 
     public FileRepo getFileRepo() {
         return fileRepo;
+    }
+
+    public URI getOriginalKeYFileURI() {
+        return originalKeYFileURI;
     }
 
     public void setFileRepo(FileRepo fileRepo) {

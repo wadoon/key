@@ -54,6 +54,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.*;
+import java.util.List;
 
 /**
  * This class is responsible for showing the source code and visualizing the symbolic execution
@@ -533,7 +534,7 @@ public final class SourceView extends JComponent {
         };
 
         // Add non-java-source as well?
-        fileURIs.add(mainWindow.getMediator().getSelectedProof().getProofFile().toURI());
+        fileURIs.add(mainWindow.getMediator().getSelectedProof().getInitConfig().getOriginalKeYFileURI());
 
         Iterator<URI> it = tabs.keySet().iterator();
 
@@ -572,24 +573,31 @@ public final class SourceView extends JComponent {
                 if (is != null) {
                     Tab tab = new Tab(fileURI, is);
                     tabs.put(fileURI, tab);
-
-                    InputStream text = repo.getInputStream(fileURI.toURL());
-                    Collection<KeYGuiExtension.EditorExtension> ext = KeYGuiExtensionFacade.getEditorExtensions();
-                    ext.forEach(it -> {
-                        Component rstaTab = null;
-                        try {
-                            rstaTab = it.getPanel(getGrammarClass(tab.simpleFileName), IOUtil.readFrom(text), null);
-                        } catch (IOException e) {
-                            LOGGER.error("Cannot create RSTA view: " + e.getMessage());
-                        }
-                        tabPane.addTab("rsta" + tab.simpleFileName, rstaTab);
-                    });
-
                     // filename as tab title, complete file URI as tooltip
                     tabPane.addTab(tab.simpleFileName, tab);
                     int index = tabPane.indexOfComponent(tab);
                     tabPane.setToolTipTextAt(index, tab.absoluteFileName.toString());
                     tab.paintSymbExHighlights();
+
+                    /*
+                    Add EditorExtension tabs for the current tab's file
+                    (currently only used for the RSTAExtension).
+                     */
+                    InputStream text = repo.getInputStream(fileURI.toURL());
+                    Collection<KeYGuiExtension.EditorExtension> ext = KeYGuiExtensionFacade.getEditorExtensions();
+                    ext.forEach(it -> {
+                        Component rstaTab = null;
+                        try {
+                            rstaTab = it.getPanel(
+                                    getGrammarClass(tab.simpleFileName),
+                                    IOUtil.readFrom(text),
+                                    null);
+                        } catch (IOException e) {
+                            LOGGER.error("Cannot create RSTA view: " + e.getMessage());
+                        }
+                        tabPane.addTab("rsta_" + tab.simpleFileName, rstaTab);
+                    });
+
                     return true;
                 }
             }
@@ -597,6 +605,9 @@ public final class SourceView extends JComponent {
         throw new IOException("Could not open file: " + fileURI);
     }
 
+    /*
+    Get grammar class to create the rsta view.
+     */
     private Class<?> getGrammarClass(String simpleFileName) {
         if (simpleFileName.endsWith(".java")) {
             return JmlLexer.class;

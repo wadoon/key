@@ -279,6 +279,7 @@ public abstract class AbstractProblemLoader {
         problemInitializer = createProblemInitializer(fileRepo);
         initConfig = createInitConfig();
         initConfig.setFileRepo(fileRepo);
+        initConfig.setOriginalKeYFileURI(file.toURI());
         if (!problemInitializer.getWarnings().isEmpty()) {
             control.reportWarnings(problemInitializer.getWarnings());
         }
@@ -601,8 +602,6 @@ public abstract class AbstractProblemLoader {
             initConfig.getServices().getSpecificationRepository()
                                     .registerProof(poContainer.getProofOblInput(), p);
             initConfig.getFileRepo().registerProof(p);
-            // I do not know what I'm doing
-            p.setProofFile(file);
         }
 
         return proofList;
