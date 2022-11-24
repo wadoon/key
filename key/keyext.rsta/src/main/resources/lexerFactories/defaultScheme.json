@@ -1,0 +1,173 @@
+{
+
+  "category_identifier": {
+    "color": {
+      "r": 255,
+      "g": 140,
+      "b": 255
+    },
+    "contained_tokens": [
+      "IDENT"
+    ]
+  },
+
+  "category_boolean_operator": {
+    "color": {
+      "r": 100,
+      "g": 0,
+      "b": 255
+    },
+    "contained_tokens": [
+      "AND", "OR", "NOT", "IMP", "EQUALS", "NOT_EQUALS", "EQV"
+    ]
+  },
+
+  "category_math_operator": {
+    "color": {
+      "r": 255,
+      "g": 255,
+      "b": 0
+    },
+    "font": {
+      "style": 1
+    },
+    "contained_tokens": [
+      "EXP", "TILDE", "PLUS", "MINUS", "PERCENT", "STAR", "GREATER", "GREATEREQUAL"
+    ]
+  },
+
+  "SEQARROW": {
+    "color": {
+      "r": 0,
+      "g": 255,
+      "b": 0
+    }
+  },
+
+  "category_key_keyword": {
+    "color": {
+      "r": 0,
+      "g": 0,
+      "b": 255
+    },
+    "font": {
+      "style": 2
+    },
+    "contained_tokens": [
+      "SORTS", "GENERIC", "PROXY", "EXTENDS", "ONEOF", "ABSTRACT", "SCHEMAVARIABLES", "SCHEMAVAR",
+      "MODALOPERATOR"
+    ]
+  },
+
+  "category_java_keyword": {
+    "color": {
+      "r": 255,
+      "g": 170,
+      "b": 0
+    },
+    "contained_tokens": [
+      "BOOLEAN", "BYTE", "FALSE", "INSTANCEOF", "INT", "LONG", "NEW", "NULL", "SHORT", "SUPER", "THIS",
+      "TRUE", "VOID"
+    ]
+  },
+
+  "category_jml_key_extension": {
+    "color": {
+      "r": 0,
+      "g": 150,
+      "b": 255
+    },
+    "contained_tokens": [
+      "DISJOINT"
+    ]
+  },
+
+  "category_jml_keyword": {
+    "color": {
+      "r": 0,
+      "g": 0,
+      "b": 255
+    },
+    "contained_tokens": [
+      "ACCESSIBLE",
+      "ASSIGNABLE",
+      "BREAKS",
+      "CONTINUES",
+      "DECREASES",
+      "DETERMINES",
+      "ENSURES",
+      "ENSURES_FREE",
+      "MODEL_METHOD_AXIOM",
+      "MERGE_PARAMS",
+      "NON_NULL",
+      "NULLABLE",
+      "REPRESENTS",
+      "REQUIRES",
+      "REQUIRES_FREE",
+      "RETURNS",
+      "SEPARATES",
+      "SIGNALS",
+      "SIGNALS_ONLY",
+      "ALLFIELDS",
+      "ALLOBJECTS",
+      "BACKUP",
+      "BEFORE",
+      "BIGINT",
+      "BSUM",
+      "BY",
+      "DECLASSIFIES",
+      "DISJOINT",
+      "DOMAIN_IMPLIES_CREATED",
+      "DURATION",
+      "ELEMTYPE",
+      "EMPTYSET",
+      "ERASES",
+      "EVERYTHING",
+      "EXCEPTION",
+      "EXISTS",
+      "FORALL",
+      "FP_ABS",
+      "FP_INFINITE",
+      "FP_NAN",
+      "FP_NEGATIVE",
+      "FP_NICE",
+      "FP_NORMAL",
+      "FP_POSITIVE",
+      "FP_SUBNORMAL",
+      "FP_ZERO",
+      "FREE",
+      "FRESH",
+      "INDEX",
+      "INDEXOF",
+      "INTERSECT",
+      "INTO",
+      "INV",
+      "INVARIANT_FOR",
+      "IN_DOMAIN",
+      "IS_FINITE",
+      "IS_INITIALIZED",
+      "ITSELF",
+      "LBLNEG",
+      "LBLPOS",
+      "LOCKSET",
+      "LOCSET",
+      "STOREREF",
+      "MAP",
+      "MAPEMPTY",
+      "MAP_GET",
+      "MAP_OVERRIDE",
+      "MAP_REMOVE",
+      "MAP_SINGLETON",
+      "MAP_SIZE",
+      "MAP_UPDATE",
+      "MAX",
+      "E_MEASURED_BY",
+      "MIN",
+      "NEWELEMSFRESH",
+      "NEW_OBJECTS",
+      "NONNULLELEMENTS",
+      "NOTHING"
+    ]
+  }
+
+}
