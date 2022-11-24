@@ -90,6 +90,7 @@ code_intelligence_java:
 
 include:
   - template: Security/License-Scanning.gitlab-ci.yml
+  - template: Security/SAST.gitlab-ci.yml
 
 license_scanning:
   variables:
@@ -118,6 +119,12 @@ my_code_quality:
     expire_in: 1 week
 
     # -v "CHECKSTYLE" "." ".*checkstyle/main\.xml$" "Checkstyle"
+
+
+
+
+sast:
+  stage: test
 
 
 
