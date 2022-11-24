@@ -12,7 +12,7 @@ public class TextEditorDemo {
 
     private static final long serialVersionUID = 1L;
 
-    private static final String inputFile = "brackets.txt";
+    private static final String inputFile = "contraposition.txt";
     private static final Class<?> grammarClass = KeYLexer.class;
 
     public static void main(String[] args) {

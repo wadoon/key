@@ -1,27 +1,20 @@
 package rsta;
 
-import antlr.ANTLRLexerFactory;
-import javacc.JavaCCLexerFactory;
-import javacc.PositionStream;
-import javacc.SimpleCharStream;
-import javacc.TokenManager;
-import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.CharStream;
+import lexerFactories.ANTLRLanguageSupportFactory;
+import lexerFactories.JavaCCLanguageSupportFactory;
 import org.antlr.v4.runtime.Lexer;
-import org.antlr.v4.runtime.Parser;
+import org.fife.ui.rsyntaxtextarea.RSyntaxDocument;
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxScheme;
+import org.fife.ui.rtextarea.RTextScrollPane;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.awt.*;
-import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Optional;
 
 public class InputDisplay {
 
     private static final Class<Lexer> antlrLexerClass = Lexer.class;
-    private static final Class<TokenManager> tokenMgrClass = TokenManager.class;
 
     public static TextEditor display(String text, Class<?> lexerClass, Dialog parent) {
         TextEditor textEditor = new TextEditor(parent);
@@ -36,12 +29,13 @@ public class InputDisplay {
     }
 
     private static @Nullable LanguageSupport createLanguageSupport(Class<?> lexerClass) {
+        LanguageSupportFactory factory;
         if (antlrLexerClass.isAssignableFrom(lexerClass)) {
-            return createANTLRSupport((Class<Lexer>) lexerClass);
-        } else if (tokenMgrClass.isAssignableFrom(lexerClass)) {
-            return createJavaCCSupport((Class<TokenManager>) lexerClass);
+            factory = createANTLRSupport((Class<Lexer>) lexerClass);
+        } else {
+            factory = createJavaCCSupport(lexerClass);
         }
-        return null;
+        return new LanguageSupport(factory.getSyntaxScheme(), new LexerTokenMaker(factory));
     }
 
     private static SyntaxScheme createSyntaxScheme(String grammarName) {
@@ -56,76 +50,26 @@ public class InputDisplay {
         return null;
     }
 
-    private static @Nullable LanguageSupport createJavaCCSupport(Class<TokenManager> tokenMgrClass) {
-        // TODO get actual grammar file name here, instead of assuming sth. about the class name
-            SyntaxScheme scheme = createSyntaxScheme(
-                    tokenMgrClass.getName().substring(0,
-                            tokenMgrClass.getName().length() - "TokenManager".length()));
-            JavaCCLexerFactory factory = new JavaCCLexerFactory() {
-                @Override
-                public PositionStream createStream(String input) {
-                    return new SimpleCharStream(new StringReader(input), 0, 0);
-                }
-
-                @Override
-                public TokenManager create(PositionStream stream) {
-                    try {
-                        return tokenMgrClass.getConstructor(SimpleCharStream.class).newInstance(stream);
-                    } catch (NoSuchMethodException | InstantiationException |
-                             IllegalAccessException | InvocationTargetException e) {
-                        e.printStackTrace();
-                        return null;
-                    }
-                }
-            };
-            return new LanguageSupport(scheme, factory);
+    private static @Nullable LanguageSupportFactory createJavaCCSupport(Class<?> tokenMgrClass) {
+        return new JavaCCLanguageSupportFactory(tokenMgrClass);
     }
 
-    private static @Nullable LanguageSupport createANTLRSupport(Class<Lexer> lexerClass) {
-        SyntaxScheme scheme;
-        try {
-            String antlrGrammarFileName
-                    = "antlr." + makeLexer(lexerClass, "").getGrammarFileName();
-            scheme = createSyntaxScheme(
-                    antlrGrammarFileName.substring(0, antlrGrammarFileName.length() - 3)
-            );
-        } catch (NoSuchMethodException | InvocationTargetException
-                 | InstantiationException | IllegalAccessException e) {
-            e.printStackTrace();
-            return null;
-        }
-        ANTLRLexerFactory factory = new ANTLRLexerFactory() {
-            @Override
-            public Lexer create(String input) {
-                try {
-                    return makeLexer(lexerClass, input);
-                } catch (NoSuchMethodException | InvocationTargetException |
-                         InstantiationException | IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-                return null;
-            }
-        };
-        return new LanguageSupport(scheme, factory);
+    private static @Nullable LanguageSupportFactory createANTLRSupport(Class<Lexer> lexerClass) {
+        return new ANTLRLanguageSupportFactory(lexerClass);
     }
 
-    private static Lexer makeLexer(Class<Lexer> lexerClass, String input)
-            throws NoSuchMethodException, InvocationTargetException,
-            InstantiationException, IllegalAccessException {
-        return lexerClass
-                    .getConstructor(CharStream.class)
-                    .newInstance(new ANTLRInputStream(input));
-    }
+    public static Component panel(String text, Class<?> lexerClass, Dialog parent) {
+        LanguageSupport lang = createLanguageSupport(lexerClass);
+        RSyntaxTextArea textArea = new RSyntaxTextArea();
+        RSyntaxDocument doc = (RSyntaxDocument) textArea.getDocument();
+        // Set the token maker used to create RSTA tokens out of the input stream.
+        doc.setSyntaxStyle(lang.tokenMaker);
+        // Set the syntax scheme which defines how to display different types of tokens.
+        textArea.setSyntaxScheme(lang.syntaxScheme);
+        textArea.setText(text);
+        textArea.setEditable(false);
 
-    public static Component panel(String text, Class<?>  lexerClass, Dialog parent) {
-        TextEditor textEditor = new TextEditor(parent);
-
-        LanguageSupport languageSupport = createLanguageSupport(lexerClass);
-
-        if(languageSupport != null) {
-            textEditor.addPanel(text.toString(), languageSupport);
-        }
-
-        return textEditor.getContentPane();
+        RTextScrollPane sp = new RTextScrollPane(textArea);
+        return sp;
     }
 }
