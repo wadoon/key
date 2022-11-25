@@ -10,26 +10,26 @@ import java.util.Arrays;
 
 public class ExpressionVisitor extends KeYParserBaseVisitor<Void> {
     private static final int[] OPERATORS = {
-            KeYLexer.LESS,
-            KeYLexer.LESSEQUAL,
-            KeYLexer.GREATER,
-            KeYLexer.GREATEREQUAL,
-            KeYLexer.EQUALS,
-            KeYLexer.NOT_EQUALS,
-            KeYLexer.IMP,
-            KeYLexer.SEQARROW,
-            KeYLexer.NOT_EQUALS,
-            KeYLexer.AND,
-            KeYLexer.OR,
-            KeYLexer.PARALLEL,
-            KeYLexer.EXP,
-            KeYLexer.PERCENT,
-            KeYLexer.STAR,
-            KeYLexer.MINUS,
-            KeYLexer.PLUS,
-            KeYLexer.RGUILLEMETS,
-            KeYLexer.EQV,
-            KeYLexer.ASSIGN,
+        KeYLexer.LESS,
+        KeYLexer.LESSEQUAL,
+        KeYLexer.GREATER,
+        KeYLexer.GREATEREQUAL,
+        KeYLexer.EQUALS,
+        KeYLexer.NOT_EQUALS,
+        KeYLexer.IMP,
+        KeYLexer.SEQARROW,
+        KeYLexer.NOT_EQUALS,
+        KeYLexer.AND,
+        KeYLexer.OR,
+        KeYLexer.PARALLEL,
+        KeYLexer.EXP,
+        KeYLexer.PERCENT,
+        KeYLexer.STAR,
+        KeYLexer.MINUS,
+        KeYLexer.PLUS,
+        KeYLexer.RGUILLEMETS,
+        KeYLexer.EQV,
+        KeYLexer.ASSIGN,
     };
 
     private final CommonTokenStream ts;
@@ -74,7 +74,8 @@ public class ExpressionVisitor extends KeYParserBaseVisitor<Void> {
     public Void visitTerminal(TerminalNode node) {
         var token = node.getSymbol().getType();
 
-        boolean isLBrace = token == KeYLexer.LBRACE || token == KeYLexer.LPAREN || token == KeYLexer.LBRACKET;
+        boolean isLBrace =
+            token == KeYLexer.LBRACE || token == KeYLexer.LPAREN || token == KeYLexer.LBRACKET;
         if (token == KeYLexer.RBRACE || token == KeYLexer.RPAREN || token == KeYLexer.RBRACKET) {
             output.noSpaceBeforeNext();
             output.exitIndent();
@@ -83,7 +84,8 @@ public class ExpressionVisitor extends KeYParserBaseVisitor<Void> {
         var isOperator = Arrays.stream(OPERATORS).anyMatch(v -> v == token);
         var isUnaryMinus = token == KeYLexer.MINUS &&
                 node.getParent() instanceof KeYParser.Unary_minus_termContext;
-        // Unary minus has a "soft" leading space, we allow it if the token before wants it but don't require it
+        // Unary minus has a "soft" leading space, we allow it if the token before wants it but
+        // don't require it
         if ((isOperator && !isUnaryMinus) || token == KeYLexer.AVOID) {
             output.spaceBeforeNext();
         }
@@ -101,8 +103,7 @@ public class ExpressionVisitor extends KeYParserBaseVisitor<Void> {
                 token == KeYLexer.AVOID ||
                 token == KeYLexer.EXISTS ||
                 token == KeYLexer.FORALL ||
-                token == KeYLexer.SEMI)
-        ) {
+                token == KeYLexer.SEMI)) {
             output.spaceBeforeNext();
         }
 

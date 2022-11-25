@@ -27,7 +27,7 @@ public class Output {
     private void checkBeforeToken() {
         if (this.isNewLine) {
             indent();
-        } else if(spaceBeforeNextToken) {
+        } else if (spaceBeforeNextToken) {
             output.append(' ');
             this.spaceBeforeNextToken = false;
         }

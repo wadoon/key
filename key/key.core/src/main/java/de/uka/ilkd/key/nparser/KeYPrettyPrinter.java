@@ -34,35 +34,36 @@ public class KeYPrettyPrinter {
         for (Token token : tokens) {
             String text = token.getText();
             switch (token.getType()) {
-                case KeYLexer.LPAREN:
-                case KeYLexer.LBRACE:
-                    indent++;
-                    break;
-                case KeYLexer.RPAREN:
-                case KeYLexer.RBRACE:
-                    if (indent == 0) {
-                        System.err.printf("Mmmh. Mismatched parentheses/braces at %d/%d.", token.getLine(), token.getCharPositionInLine());
-                    } else {
-                        indent--;
+            case KeYLexer.LPAREN:
+            case KeYLexer.LBRACE:
+                indent++;
+                break;
+            case KeYLexer.RPAREN:
+            case KeYLexer.RBRACE:
+                if (indent == 0) {
+                    System.err.printf("Mmmh. Mismatched parentheses/braces at %d/%d.",
+                        token.getLine(), token.getCharPositionInLine());
+                } else {
+                    indent--;
+                }
+                break;
+            case KeYLexer.WS:
+                int nls = countNLs(text);
+                if (nls > 0) {
+                    int i = indent;
+                    if (cur < tokens.size() - 1) {
+                        int nextTy = tokens.get(cur + 1).getType();
+                        if (nextTy == KeYLexer.RPAREN || nextTy == KeYLexer.RBRACE)
+                            i--;
                     }
-                    break;
-                case KeYLexer.WS:
-                    int nls = countNLs(text);
-                    if (nls > 0) {
-                        int i = indent;
-                        if(cur < tokens.size() - 1) {
-                            int nextTy = tokens.get(cur + 1).getType();
-                            if (nextTy == KeYLexer.RPAREN || nextTy == KeYLexer.RBRACE)
-                                i--;
-                        }
-                        text = multi(nls, "\n") + multi(INDENT_STEP * i, " ");
-                    }
-                    break;
-                //case KeYLexer.SL_COMMENT:    // TODO: other comment types
-                //    text = processIndentationInSLComment(token, indent);
+                    text = multi(nls, "\n") + multi(INDENT_STEP * i, " ");
+                }
+                break;
+            // case KeYLexer.SL_COMMENT: // TODO: other comment types
+            // text = processIndentationInSLComment(token, indent);
             }
             builder.append(text);
-            cur ++;
+            cur++;
         }
         return builder;
     }

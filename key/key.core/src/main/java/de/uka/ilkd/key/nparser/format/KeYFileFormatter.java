@@ -13,15 +13,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-/* global invariant: the "cursor" is always placed at the correctly indented next position to write
- * (similar to an IDE)
- */
 
 public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
     private static final int MAX_LINES_BETWEEN = 3;
@@ -190,8 +185,7 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
                         token == KeYLexer.ANTECEDENTPOLARITY ||
                         token == KeYLexer.SUCCEDENTPOLARITY ||
                         token == KeYLexer.INSEQUENTSTATE ||
-                        token == KeYLexer.VARCOND
-                ) {
+                        token == KeYLexer.VARCOND) {
                     output.assertNewLineAndIndent();
                 } else if (token == KeYParser.SCHEMAVAR) {
                     output.assertNewLineAndIndent();
@@ -239,7 +233,8 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
         }
     }
 
-    static void processHiddenTokensAfterCurrent(Token currentToken, CommonTokenStream ts, Output output) {
+    static void processHiddenTokensAfterCurrent(Token currentToken, CommonTokenStream ts,
+            Output output) {
         // add hidden tokens after the current token (whitespace, comments etc.)
         List<Token> list = ts.getHiddenTokensToRight(currentToken.getTokenIndex());
         processHiddenTokens(list, output);
@@ -327,10 +322,12 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
     public Void visitTerminal(TerminalNode node) {
         var token = node.getSymbol().getType();
 
-        boolean isLBrace = token == KeYLexer.LBRACE || token == KeYLexer.LPAREN || token == KeYLexer.LBRACKET;
+        boolean isLBrace =
+            token == KeYLexer.LBRACE || token == KeYLexer.LPAREN || token == KeYLexer.LBRACKET;
         if (isLBrace) {
             output.spaceBeforeNext();
-        } else if (token == KeYLexer.RBRACE || token == KeYLexer.RPAREN || token == KeYLexer.RBRACKET) {
+        } else if (token == KeYLexer.RBRACE || token == KeYLexer.RPAREN
+                || token == KeYLexer.RBRACKET) {
             output.noSpaceBeforeNext();
             output.exitIndent();
         }
@@ -339,8 +336,10 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
             output.spaceBeforeNext();
         }
 
-        var noSpaceAround = token == KeYLexer.COLON || token == KeYLexer.DOT || token == KeYLexer.DOUBLECOLON;
-        var noSpaceBefore = token == KeYLexer.SEMI || token == KeYLexer.COMMA || token == KeYLexer.LPAREN;
+        var noSpaceAround =
+            token == KeYLexer.COLON || token == KeYLexer.DOT || token == KeYLexer.DOUBLECOLON;
+        var noSpaceBefore =
+            token == KeYLexer.SEMI || token == KeYLexer.COMMA || token == KeYLexer.LPAREN;
         if (noSpaceBefore || noSpaceAround) {
             output.noSpaceBeforeNext();
         }
@@ -370,7 +369,8 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
 
     /**
      * Entry level method to the formatter.
-     * The formatter uses System.lineSeparator as line separator and accepts any line separator as input.
+     * The formatter uses System.lineSeparator as line separator and accepts any line separator as
+     * input.
      *
      * @param text the input text
      * @return the formatted text *or null*, if the input was not parseable
@@ -438,7 +438,7 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
     @SuppressWarnings("unused")
     private static void formatDirectoryTest(Path dir) throws IOException {
         Path outDir = dir.getParent().resolve("output");
-        //noinspection ResultOfMethodCallIgnored
+        // noinspection ResultOfMethodCallIgnored
         outDir.toFile().mkdirs();
         try (Stream<Path> s = Files.list(dir)) {
             s.forEach(p -> {
@@ -446,7 +446,7 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
                 try {
                     var name = file.getFileName().toString();
                     if (name.endsWith(".format.format.key")) {
-                        //noinspection ResultOfMethodCallIgnored
+                        // noinspection ResultOfMethodCallIgnored
                         file.toFile().delete();
                         return;
                     }
@@ -508,7 +508,7 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
 
         List<Path> files;
         if (file.isDirectory()) {
-            try(Stream<Path> s = Files.list(path)) {
+            try (Stream<Path> s = Files.list(path)) {
                 files = s.collect(Collectors.toList());
             }
         } else {
