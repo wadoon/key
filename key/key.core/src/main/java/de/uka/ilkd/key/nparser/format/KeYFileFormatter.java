@@ -4,7 +4,6 @@ import de.uka.ilkd.key.nparser.KeYLexer;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.KeYParserBaseVisitor;
 import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -14,7 +13,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /* global invariant: the "cursor" is always placed at the correctly indented next position to write
@@ -29,17 +31,6 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
 
     public KeYFileFormatter(CommonTokenStream ts) {
         this.ts = ts;
-    }
-
-    public static String getOriginalText(ParserRuleContext ctx) {
-        if (ctx.start == null || ctx.start.getStartIndex() < 0
-                || ctx.stop == null || ctx.stop.getStopIndex() < 0) {
-            // fallback
-            return ctx.getText();
-        }
-        int start = ctx.start.getStartIndex();
-        int end = ctx.stop.getStopIndex();
-        return ctx.start.getInputStream().getText(Interval.of(start, end));
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -237,12 +228,12 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
                 }
             } else {
                 var normalized = text.replaceAll("\t", Output.getIndent(1));
-                if (t.getType() == KeYLexer.SL_COMMENT) {    // TODO: other comment types
+                if (t.getType() == KeYLexer.SL_COMMENT) {
                     processIndentationInSLComment(normalized, output);
                 } else if (t.getType() == KeYLexer.COMMENT_END) {
                     processIndentationInMLComment(normalized, output);
                 } else {
-                    output.token(normalized);
+                    throw new IllegalStateException("unexpected hidden token type " + t.getType());
                 }
             }
         }
@@ -377,38 +368,14 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
         return (int) text.chars().filter(x -> x == '\n').count();
     }
 
-    public static void main(String[] args) throws IOException {
-        String dirname = "D:\\Code\\Java\\format\\rules";
-        Path ruleDir = Paths.get(dirname);
-        formatDirectory(ruleDir);
-    }
-
-    private static void formatDirectory(Path dir) throws IOException {
-        Path outDir = dir.getParent().resolve("output");
-        outDir.toFile().mkdirs();
-//        formatSingleFileInSameDir(dir.resolve("assertions.format.key"));
-        try (Stream<Path> s = Files.list(dir)) {
-            s.forEach(p -> {
-                var file = dir.resolve(p.getFileName());
-                try {
-                    var name = file.getFileName().toString();
-                    if (name.endsWith(".format.format.key")) {
-                        file.toFile().delete();
-                        return;
-                    }
-                    formatSingleFileInSameDir(file);
-                    if (!name.endsWith(".format.key")) {
-                        formatSingleFileTo(file, outDir);
-                    }
-                } catch (Exception e) {
-                    System.err.println("Exception while processing " + file);
-                    throw new RuntimeException(e);
-                }
-            });
-        }
-    }
-
-    private static String format(String text) {
+    /**
+     * Entry level method to the formatter.
+     * The formatter uses System.lineSeparator as line separator and accepts any line separator as input.
+     *
+     * @param text the input text
+     * @return the formatted text *or null*, if the input was not parseable
+     */
+    public static @Nullable String format(String text) {
         var in = CharStreams.fromString(text.replaceAll("\\r\\n?", "\n"));
         KeYLexer lexer = new KeYLexer(in);
         lexer.setTokenFactory(new CommonTokenFactory(true));
@@ -427,6 +394,8 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
         var formatted = formatter.output.toString().trim() + "\n";
         return formatted.replaceAll("\n", System.lineSeparator());
     }
+
+    ////// Test functions below //////
 
     private static void formatSingleFile(Path input, Path output) throws IOException {
         var content = Files.readString(input);
@@ -464,5 +433,95 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
     private static void formatSingleFileTo(Path input, Path outputDir) throws IOException {
         var output = outputDir.resolve(input.getFileName());
         formatSingleFile(input, output);
+    }
+
+    @SuppressWarnings("unused")
+    private static void formatDirectoryTest(Path dir) throws IOException {
+        Path outDir = dir.getParent().resolve("output");
+        //noinspection ResultOfMethodCallIgnored
+        outDir.toFile().mkdirs();
+        try (Stream<Path> s = Files.list(dir)) {
+            s.forEach(p -> {
+                var file = dir.resolve(p.getFileName());
+                try {
+                    var name = file.getFileName().toString();
+                    if (name.endsWith(".format.format.key")) {
+                        //noinspection ResultOfMethodCallIgnored
+                        file.toFile().delete();
+                        return;
+                    }
+                    formatSingleFileInSameDir(file);
+                    if (!name.endsWith(".format.key")) {
+                        formatSingleFileTo(file, outDir);
+                    }
+                } catch (Exception e) {
+                    System.err.println("Exception while processing " + file);
+                    throw new RuntimeException(e);
+                }
+            });
+        }
+    }
+
+    private static boolean formatOrCheckInPlace(Path file, boolean format) {
+        try {
+            var content = Files.readString(file);
+            var formatted = format(content);
+            if (formatted == null) {
+                System.err.println("Failed to format " + file);
+                return false;
+            }
+
+            var differs = !content.equals(formatted);
+            if (differs) {
+                if (format) {
+                    Files.writeString(file, formatted);
+                } else {
+                    System.err.println(file + " is not formatted correctly");
+                    return false;
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Exception while processing " + file);
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
+    public static void main(String[] args) throws IOException {
+        if (args.length != 2 || (!args[0].equals("format") && !args[0].equals("check"))) {
+            System.err.println("Usage:");
+            System.err.println("* format a directory or a file: format <path>");
+            System.err.println("* check a directory or a file: check <path>");
+            System.exit(3);
+            return;
+        }
+
+        var format = args[0].equals("format");
+        var path = Paths.get(args[1]);
+        var file = path.toFile();
+        if (!file.exists()) {
+            System.err.println("Input path does not exist");
+            System.exit(2);
+            return;
+        }
+
+        List<Path> files;
+        if (file.isDirectory()) {
+            try(Stream<Path> s = Files.list(path)) {
+                files = s.collect(Collectors.toList());
+            }
+        } else {
+            files = Collections.singletonList(path);
+        }
+
+        var valid = true;
+        for (Path f : files) {
+            valid &= formatOrCheckInPlace(f, format);
+        }
+
+        if (!valid) {
+            System.exit(1);
+        }
     }
 }
