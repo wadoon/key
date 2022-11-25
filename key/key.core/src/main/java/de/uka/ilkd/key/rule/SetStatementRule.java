@@ -21,6 +21,7 @@ import java.util.Optional;
 
 /**
  * A rule for set statements. This unwraps the contained CopyAssignment
+ * @author Julian Wiesler
  */
 public final class SetStatementRule implements BuiltInRule {
 

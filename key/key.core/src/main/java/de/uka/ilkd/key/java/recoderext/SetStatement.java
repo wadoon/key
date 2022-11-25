@@ -4,7 +4,10 @@ import de.uka.ilkd.key.speclang.njml.JmlParser;
 import recoder.java.Expression;
 import recoder.java.expression.operator.CopyAssignment;
 
-
+/**
+ * Wrapper for JML set statements which lifts the contained parse tree to the Translator.
+ * @author Julian Wiesler
+ */
 public class SetStatement extends CopyAssignment {
     /**
      * Parser context of the assignment
@@ -32,6 +35,7 @@ public class SetStatement extends CopyAssignment {
 
     /**
      * Gets the contained parser context
+     * @return the parser context
      */
     public JmlParser.Set_statementContext getParserContext() {
         return context;

@@ -8,6 +8,7 @@ import java.util.Objects;
 
 /**
  * The rule application for {@link de.uka.ilkd.key.java.statement.SetStatement}
+ * @author Julian Wiesler
  */
 public class SetStatementBuiltInRuleApp extends AbstractBuiltInRuleApp {
     /**
