@@ -22,7 +22,7 @@ import java.util.stream.Stream;
  */
 
 public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
-    private static final int MAX_LINES_BETWEEN = 2;
+    private static final int MAX_LINES_BETWEEN = 3;
 
     final Output output = new Output();
     final CommonTokenStream ts;
