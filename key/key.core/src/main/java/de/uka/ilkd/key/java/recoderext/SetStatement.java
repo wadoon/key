@@ -13,6 +13,7 @@ public class SetStatement extends CopyAssignment {
 
     /**
      * Primary constructor
+     *
      * @param proto the copy assignment
      * @param context the context of the assignment
      */

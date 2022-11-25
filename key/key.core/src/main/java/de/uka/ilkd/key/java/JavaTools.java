@@ -52,6 +52,7 @@ public final class JavaTools {
 
     /**
      * Returns the passed java block with `statement` replaced with `with`.
+     *
      * @param jb the block
      * @param statement the statement to replace
      * @param with what to replace with. If this is null, the statement will be removed
