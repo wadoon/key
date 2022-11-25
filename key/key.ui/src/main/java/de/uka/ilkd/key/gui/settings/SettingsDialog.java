@@ -89,9 +89,8 @@ public class SettingsDialog extends JDialog {
         if (!apply.isEmpty()) {
             String msg = apply.stream().map(Throwable::getMessage)
                     .collect(Collectors.joining("<br>", "<html>", "</html>"));
-            JOptionPane.showMessageDialog(this, msg,
-                    "Error in Settings",
-                    JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, msg, "Error in Settings",
+                JOptionPane.ERROR_MESSAGE);
             return false;
         }
         return true;
@@ -114,7 +113,7 @@ public class SettingsDialog extends JDialog {
         private static final long serialVersionUID = -4975054687458772222L;
 
         public AcceptAction() {
-            setName("Accept");
+            setName("OK");
         }
 
         @Override

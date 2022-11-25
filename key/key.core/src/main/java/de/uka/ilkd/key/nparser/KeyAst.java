@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.nparser;
 
+import de.uka.ilkd.key.nparser.builder.BuilderHelpers;
 import de.uka.ilkd.key.nparser.builder.ChoiceFinder;
 import de.uka.ilkd.key.nparser.builder.FindProblemInformation;
 import de.uka.ilkd.key.nparser.builder.IncludeFinder;
@@ -18,9 +19,8 @@ import javax.annotation.Nullable;
 import java.net.URL;
 
 /**
- * This is a monad around the parse tree.
- * We use this class to hide the {@link org.antlr.v4.runtime.ParserRuleContext}
- * from the rest of the Key system.
+ * This is a monad around the parse tree. We use this class to hide the
+ * {@link org.antlr.v4.runtime.ParserRuleContext} from the rest of the Key system.
  *
  * <p>
  * To obtain an KeYAst use the {@link ParsingFacade#getParseRuleContext(KeyAst)}.
@@ -41,29 +41,32 @@ public abstract class KeyAst<T extends ParserRuleContext> {
         return ctx.accept(visitor);
     }
 
+    @Override
+    public String toString() {
+        return getClass().getName() + ": " + BuilderHelpers.getPosition(ctx);
+    }
+
     public static class File extends KeyAst<KeYParser.FileContext> {
         File(KeYParser.FileContext ctx) {
             super(ctx);
         }
 
-        public @Nullable
-        ProofSettings findProofSettings() {
+        public @Nullable ProofSettings findProofSettings() {
             ProofSettings settings = new ProofSettings(ProofSettings.DEFAULT_SETTINGS);
             if (ctx.decls() != null && ctx.decls().pref != null) {
-                String text = StringUtil.trim(ctx.decls().pref.s.getText(), '"')
-                        .replace("\\\\:", ":");
+                String text =
+                    StringUtil.trim(ctx.decls().pref.s.getText(), '"').replace("\\\\:", ":");
                 settings.loadSettingsFromString(text);
             }
             return settings;
         }
 
-        public @Nullable
-        Triple<String, Integer, Integer> findProofScript() {
+        public @Nullable Triple<String, Integer, Integer> findProofScript() {
             if (ctx.problem() != null && ctx.problem().proofScript() != null) {
                 KeYParser.ProofScriptContext pctx = ctx.problem().proofScript();
                 String text = pctx.ps.getText();
-                return new Triple<>(StringUtil.trim(text, '"'),
-                        pctx.ps.getLine(), pctx.ps.getCharPositionInLine());
+                return new Triple<>(StringUtil.trim(text, '"'), pctx.ps.getLine(),
+                    pctx.ps.getCharPositionInLine());
             }
             return null;
         }
@@ -94,8 +97,8 @@ public abstract class KeyAst<T extends ParserRuleContext> {
         }
 
         /**
-         * Extracts the decls and taclets into a string.
-         * This method is required for saving and loading proofs.
+         * Extracts the decls and taclets into a string. This method is required for saving and
+         * loading proofs.
          */
         public String getProblemHeader() {
             final KeYParser.DeclsContext decls = ctx.decls();

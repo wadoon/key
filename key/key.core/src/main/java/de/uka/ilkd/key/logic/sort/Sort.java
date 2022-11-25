@@ -1,18 +1,6 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.logic.sort;
 
+import de.uka.ilkd.key.rule.HasOrigin;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
@@ -21,8 +9,10 @@ import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 
+import javax.annotation.Nullable;
 
-public interface Sort extends Named {
+
+public interface Sort extends Named, HasOrigin {
 
     /**
      * Formulas are represented as "terms" of this sort.
@@ -73,8 +63,7 @@ public interface Sort extends Named {
 
     /**
      * @param s some sort.
-     * @return whether the given sort is a reflexive, transitive subsort of this
-     * sort.
+     * @return whether the given sort is a reflexive, transitive subsort of this sort.
      */
     boolean extendsTrans(Sort s);
 
@@ -102,4 +91,11 @@ public interface Sort extends Named {
     SortDependingFunction getExactInstanceofSymbol(TermServices services);
 
     String declarationString();
+
+    /**
+     * Returns an human explainable text describing this sort. This field is typical set by the
+     * parser, who captures the documentation comments.
+     */
+    @Nullable
+    default String getDocumentation() { return null; }
 }

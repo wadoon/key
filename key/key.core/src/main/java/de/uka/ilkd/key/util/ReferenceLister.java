@@ -1,23 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.util;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.DefaultServiceConfiguration;
 import recoder.ParserException;
@@ -31,23 +21,20 @@ import recoder.service.SourceInfo;
 import de.uka.ilkd.key.java.recoderext.ProofJavaProgramFactory;
 
 /**
- * Find out for a collection of Java files which referenced types are not defined
- * within the source directory. Stubs using empty method or constructor bodies
- * are allowed.
- * 
+ * Find out for a collection of Java files which referenced types are not defined within the source
+ * directory. Stubs using empty method or constructor bodies are allowed.
+ *
  * @author MU
- * 
+ *
  */
 public class ReferenceLister {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReferenceLister.class);
 
     private static DefaultServiceConfiguration sc;
 
     public static void main(String[] args) throws ParserException, IOException {
-
-        System.err
-                .println("Use this program to print unresolved type references.");
-        System.err
-                .println("Call with one argument: The directory to read java files from (recursively).");
+        LOGGER.info("Use this program to print unresolved type references.");
+        LOGGER.info("Call with one argument: The directory to read java files from (recursively).");
 
         sc = new RefSolverServiceConfiguration();
 
@@ -65,10 +52,8 @@ public class ReferenceLister {
                 ProgramElement pe = walker.getProgramElement();
                 if (pe instanceof TypeReference) {
                     TypeReference typeRef = (TypeReference) pe;
-                    if (si.getType(typeRef) == null
-                            && !typeRef.getName().equals("void"))
-                        System.out.println("Unresolvable type: "
-                                + typeRef.toSource());
+                    if (si.getType(typeRef) == null && !typeRef.getName().equals("void"))
+                        LOGGER.info("Unresolvable type: {}", typeRef.toSource());
                 }
             }
         }
@@ -77,7 +62,7 @@ public class ReferenceLister {
     private static void handleDir(File dir) throws ParserException, IOException {
         assert dir.isDirectory();
         File[] files = dir.listFiles();
-        for (File file : files) {
+        for (File file : Objects.requireNonNull(files)) {
             if (file.isDirectory())
                 handleDir(file);
             else
@@ -89,13 +74,13 @@ public class ReferenceLister {
         if (!file.getName().toLowerCase().endsWith(".java"))
             return;
 
-        System.err.println("Parsing: " + file);
+        LOGGER.warn("Parsing: {}", file);
 
         ProgramFactory factory = sc.getProgramFactory();
         FileReader fileReader = new FileReader(file);
         final CompilationUnit cu;
-        try { 
-           cu = factory.parseCompilationUnit(fileReader);
+        try {
+            cu = factory.parseCompilationUnit(fileReader);
         } finally {
             fileReader.close();
         }
@@ -105,7 +90,9 @@ public class ReferenceLister {
 
 }
 
+
 class RefSolverServiceConfiguration extends CrossReferenceServiceConfiguration {
+    @Override
     protected ProgramFactory makeProgramFactory() {
         return ProofJavaProgramFactory.getInstance();
     }

@@ -5,6 +5,8 @@
 # Jenkins runs are triggered from somewhere else.
 #
 
+image: wadoon/key-test-docker:jdk11
+
 cache:
   policy: pull-push
   paths:
@@ -16,17 +18,19 @@ cache:
 variables:
   GRADLE_OPTS:  "-Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.workers.max=2 -Dorg.gradle.configureondemand=true"
   GIT_DEPTH: 0
-  # SONAR_TOKEN: configured in gitlab-ci web ui. Ask <weigl@kit.edu> if you need this token.
+  SONAR_SCANNER_OPTS: -Xmx8G
 
 before_script:
   #  - echo `pwd` # debug
   #  - echo "$CI_BUILD_NAME, $CI_BUILD_REF_NAME $CI_BUILD_STAGE" # debug
   - export GRADLE_USER_HOME=`pwd`/.gradle
+  - export SONAR_SCANNER_OPTS="-Xmx8G"
 
 stages:
     - primary
     - secondary
     - ternary
+    - deploy
 
 compile:classes:
   stage: primary
@@ -57,15 +61,6 @@ compile:testClasses:
       - build
       - .gradle
 
-compile:testClasses8:
-  dependencies:  []
-  stage: secondary
-  image: wadoon/key-test-docker:jdk8
-  script:
-    - javac -version
-    - cd key
-    - gradle --parallel clean classes testClasses
-
 sonarqube:
   dependencies:  ["compile:testClasses"]
   stage: ternary
@@ -89,6 +84,14 @@ sonarqube:
       junit:
         - "**/**/build/test-results/*/TEST-*.xml"
 
+format:
+  stage: primary
+  image: wadoon/key-test-docker:jdk11
+  allow_failure: true
+  script:
+    - cd key
+    - gradle spotlessCheck
+
 checkstyle:
   stage: primary
   image: wadoon/key-test-docker:jdk11
@@ -104,3 +107,20 @@ checkstyle:
     reports:
       codequality: report.json
     expire_in: 1 year
+
+deploy-nightly:
+  stage: deploy
+  script:
+    - cd key
+    - BUILD_NUMBER=SNAPSHOT gradle publish
+  only:
+    - stable
+
+deploy-release:
+  when: manual
+  stage: deploy
+  script:
+    - cd key
+    - gradle publish
+  only:
+    - /^KeY-.*$/

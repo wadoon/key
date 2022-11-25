@@ -9,8 +9,8 @@ import de.uka.ilkd.key.nparser.ParsingFacade;
 import javax.annotation.Nullable;
 
 /**
- * This visitor finds the problem information (problemTerm, choosedContract, and proofObligation)
- * of a {@link de.uka.ilkd.key.nparser.KeyAst.File}.
+ * This visitor finds the problem information (problemTerm, choosedContract, and proofObligation) of
+ * a {@link de.uka.ilkd.key.nparser.KeyAst.File}.
  *
  * @author weigl
  */
@@ -38,15 +38,15 @@ public class ProblemFinder extends ExpressionBuilder {
     public Term visitProblem(KeYParser.ProblemContext ctx) {
         if (ctx.CHOOSECONTRACT() != null) {
             if (ctx.chooseContract != null)
-                chooseContract = ParsingFacade.getValue(ctx.chooseContract);
-                //.replace("\\\\:", ":");
+                chooseContract = ParsingFacade.getValueDocumentation(ctx.chooseContract);
+            // .replace("\\\\:", ":");
             else
                 chooseContract = "";
         }
         if (ctx.PROOFOBLIGATION() != null) {
             if (ctx.proofObligation != null)
-                proofObligation = ParsingFacade.getValue(ctx.proofObligation);
-                //.replace("\\\\:", ":");
+                proofObligation = ParsingFacade.getValueDocumentation(ctx.proofObligation);
+            // .replace("\\\\:", ":");
             else
                 proofObligation = "";
         }

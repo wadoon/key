@@ -5,14 +5,11 @@ import java.awt.Container;
 import java.awt.Dialog.ModalityType;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.List;
-import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
@@ -37,10 +34,13 @@ import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.macros.scripts.ScriptException;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
 import de.uka.ilkd.key.util.Debug;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class ProofScriptWorker extends SwingWorker<Object, Object>
-        implements InterruptListener {
+public class ProofScriptWorker extends SwingWorker<Object, Object> implements InterruptListener {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProofScriptWorker.class);
 
     private final KeYMediator mediator;
     private final String script;
@@ -54,15 +54,9 @@ public class ProofScriptWorker extends SwingWorker<Object, Object>
     private JDialog monitor;
     private JTextArea logArea;
 
-    private final Observer observer = new Observer() {
-        @Override
-        public void update(Observable o, Object arg) {
-            publish(arg);
-        }
-    };
+    private final Observer observer = (o, arg) -> publish(arg);
 
-    public ProofScriptWorker(KeYMediator mediator, File file)
-            throws IOException {
+    public ProofScriptWorker(KeYMediator mediator, File file) throws IOException {
         this.initialLocation = new Location(file.toURI().toURL(), 1, 1);
         this.script = new String(Files.readAllBytes(file.toPath()));
         this.mediator = mediator;
@@ -76,8 +70,7 @@ public class ProofScriptWorker extends SwingWorker<Object, Object>
      * @param script the script
      * @param location the location
      */
-    public ProofScriptWorker(KeYMediator mediator, String script,
-                             Location location) {
+    public ProofScriptWorker(KeYMediator mediator, String script, Location location) {
         this(mediator, script, location, null);
     }
 
@@ -89,8 +82,8 @@ public class ProofScriptWorker extends SwingWorker<Object, Object>
      * @param location the location
      * @param initiallySelectedGoal the initially selected goal
      */
-    public ProofScriptWorker(KeYMediator mediator, String script,
-                             Location location, Goal initiallySelectedGoal) {
+    public ProofScriptWorker(KeYMediator mediator, String script, Location location,
+            Goal initiallySelectedGoal) {
         this.mediator = mediator;
         this.script = script;
         this.initialLocation = location;
@@ -100,13 +93,11 @@ public class ProofScriptWorker extends SwingWorker<Object, Object>
     @Override
     protected Object doInBackground() throws Exception {
         try {
-            engine = new ProofScriptEngine(
-                    script, initialLocation, initiallySelectedGoal);
+            engine = new ProofScriptEngine(script, initialLocation, initiallySelectedGoal);
             engine.setCommandMonitor(observer);
             engine.execute(mediator.getUI(), mediator.getSelectedProof());
         } catch (InterruptedException ex) {
-            Debug.out("Proof macro has been interrupted:");
-            Debug.out(ex);
+            LOGGER.debug("Proof macro has been interrupted:", ex);
         }
         return null;
     }
@@ -119,8 +110,8 @@ public class ProofScriptWorker extends SwingWorker<Object, Object>
             return;
         }
 
-        JDialog dlg = new JDialog(MainWindow.getInstance(),
-                "Running Script ...", ModalityType.MODELESS);
+        JDialog dlg =
+            new JDialog(MainWindow.getInstance(), "Running Script ...", ModalityType.MODELESS);
         Container cp = dlg.getContentPane();
         logArea = new JTextArea();
         logArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
@@ -128,15 +119,10 @@ public class ProofScriptWorker extends SwingWorker<Object, Object>
         logArea.setText("Running script from URL '" + url + "':\n");
         cp.add(new JScrollPane(logArea), BorderLayout.CENTER);
 
-        JButton cancel = new JButton("Cancel");
-        cancel.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                interruptionPerformed();
-            }
-        });
+        JButton cancelButton = new JButton("Cancel");
+        cancelButton.addActionListener(e -> interruptionPerformed());
         JPanel panel = new JPanel(new FlowLayout());
-        panel.add(cancel);
+        panel.add(cancelButton);
         cp.add(panel, BorderLayout.SOUTH);
 
         dlg.setSize(750, 400);
@@ -155,8 +141,7 @@ public class ProofScriptWorker extends SwingWorker<Object, Object>
                 if (!((String) chunk).startsWith("'")) {
                     doc.insertString(doc.getLength(), "\n---\n" + chunk, null);
                 } else if (!((String) chunk).startsWith("'echo ")) {
-                    doc.insertString(doc.getLength(),
-                            "\n---\nExecuting: " + chunk, null);
+                    doc.insertString(doc.getLength(), "\n---\nExecuting: " + chunk, null);
                 }
             } catch (BadLocationException e) {
                 e.printStackTrace();
@@ -187,10 +172,9 @@ public class ProofScriptWorker extends SwingWorker<Object, Object>
         try {
             get();
         } catch (CancellationException ex) {
-            System.err.println("Scripting was cancelled.");
-            Debug.printStackTrace(ex);
+            LOGGER.info("Scripting was cancelled.", ex);
         } catch (Throwable ex) {
-            ExceptionDialog.showDialog(MainWindow.getInstance(), ex);
+            IssueDialog.showExceptionDialog(MainWindow.getInstance(), ex);
         }
 
         mediator.removeInterruptedListener(this);
@@ -203,10 +187,12 @@ public class ProofScriptWorker extends SwingWorker<Object, Object>
 
         try {
             if (!mediator.getSelectedProof().closed()) {
-                mediator.getSelectionModel().setSelectedGoal(
-                        engine.getStateMap().getFirstOpenAutomaticGoal());
+                mediator.getSelectionModel()
+                        .setSelectedGoal(engine.getStateMap().getFirstOpenAutomaticGoal());
             }
-        } catch (ScriptException e) { }
+        } catch (ScriptException e) {
+            LOGGER.warn("", e);
+        }
 
         mediator.setInteractive(true);
     }
@@ -217,13 +203,11 @@ public class ProofScriptWorker extends SwingWorker<Object, Object>
         executor.shutdown();
         try {
             future.get(1000, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException | ExecutionException
-                | TimeoutException e) {
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
             /*
-             * NOTE (DS, 2019-02-08): There are some problems in starting the
-             * automode... We will just don't do anything here and hope that
-             * everything works fine (which it did for my tests). Any
-             * Java-multithreading experts around? ;)
+             * NOTE (DS, 2019-02-08): There are some problems in starting the automode... We will
+             * just don't do anything here and hope that everything works fine (which it did for my
+             * tests). Any Java-multithreading experts around? ;)
              */
         }
     }

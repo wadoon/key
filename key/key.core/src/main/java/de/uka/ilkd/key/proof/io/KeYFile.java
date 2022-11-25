@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.proof.io;
 
 import de.uka.ilkd.key.nparser.*;
@@ -21,6 +8,7 @@ import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.Taclet;
@@ -28,24 +16,28 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ProgressMonitor;
-import org.antlr.v4.runtime.ParserRuleContext;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 
 /**
  * Represents an input from a .key file producing an environment.
  */
 public class KeYFile implements EnvInput {
+    private static final Logger LOGGER = LoggerFactory.getLogger(KeYFile.class);
+
     /**
      * the RuleSource delivering the input stream for the file.
      */
@@ -57,7 +49,7 @@ public class KeYFile implements EnvInput {
     private final String name;
     private final Profile profile;
     protected InitConfig initConfig;
-    private KeyAst.File ctx = null;
+    private KeyAst.File fileCtx = null;
     @Nullable
     private ProblemFinder problemFinder = null;
     @Nullable
@@ -70,103 +62,71 @@ public class KeYFile implements EnvInput {
     private FileRepo fileRepo;
 
     /**
-     * creates a new representation for a given file by indicating a name
-     * and a RuleSource representing the physical source of the .key file.
+     * creates a new representation for a given file by indicating a name and a RuleSource
+     * representing the physical source of the .key file.
      */
-    public KeYFile(String name,
-                   RuleSource file,
-                   ProgressMonitor monitor,
-                   Profile profile) {
-        assert name != null;
-        assert file != null;
-        assert profile != null;
-        this.name = name;
-        this.file = file;
+    public KeYFile(String name, RuleSource file, ProgressMonitor monitor, Profile profile) {
+        this.name = Objects.requireNonNull(name);
+        this.file = Objects.requireNonNull(file);
         this.monitor = monitor;
-        this.profile = profile;
+        this.profile = Objects.requireNonNull(profile);
     }
 
 
     /**
-     * creates a new representation for a given file by indicating a name
-     * and a RuleSource representing the physical source of the .key file.
+     * creates a new representation for a given file by indicating a name and a RuleSource
+     * representing the physical source of the .key file.
      *
-     * @param name     the name of the file
-     * @param file     the physical rule source of the .key file
-     * @param monitor  monitor for reporting progress
-     * @param profile  the profile
+     * @param name the name of the file
+     * @param file the physical rule source of the .key file
+     * @param monitor monitor for reporting progress
+     * @param profile the profile
      * @param fileRepo the FileRepo which will store the file
      */
-    public KeYFile(String name,
-                   RuleSource file,
-                   ProgressMonitor monitor,
-                   Profile profile,
-                   FileRepo fileRepo) {
+    public KeYFile(String name, RuleSource file, ProgressMonitor monitor, Profile profile,
+            FileRepo fileRepo) {
         this(name, file, monitor, profile);
         this.fileRepo = fileRepo;
     }
 
     /**
-     * creates a new representation for a given file by indicating a name
-     * and a file representing the physical source of the .key file.
+     * creates a new representation for a given file by indicating a name and a file representing
+     * the physical source of the .key file.
      */
-    public KeYFile(String name,
-                   File file,
-                   ProgressMonitor monitor,
-                   Profile profile) {
+    public KeYFile(String name, File file, ProgressMonitor monitor, Profile profile) {
         this(name, file, monitor, profile, false);
     }
 
     /**
-     * Creates a new representation for a given file by indicating a name and a
-     * file representing the physical source of the .key file.
+     * Creates a new representation for a given file by indicating a name and a file representing
+     * the physical source of the .key file.
      *
-     * @param name       the name of the resource
-     * @param file       the file to find it
-     * @param monitor    a possibly null reference to a monitor for the loading
-     *                   progress
-     * @param profile    the KeY profile under which the file is to be load
+     * @param name the name of the resource
+     * @param file the file to find it
+     * @param monitor a possibly null reference to a monitor for the loading progress
+     * @param profile the KeY profile under which the file is to be load
      * @param compressed <code>true</code> iff the file has compressed content
      */
-    public KeYFile(String name,
-                   File file,
-                   ProgressMonitor monitor,
-                   Profile profile,
-                   boolean compressed) {
+    public KeYFile(String name, File file, ProgressMonitor monitor, Profile profile,
+            boolean compressed) {
         this(name, RuleSourceFactory.initRuleFile(file, compressed), monitor, profile);
     }
 
-    /*
-    private KeYParserF createDeclParser(InputStream is) throws IOException {
-        return new KeYParserF(ParserMode.DECLARATION,
-                             new KeYLexerF(is,
-                                          file.toString()),
-                             initConfig.getServices(),
-                             initConfig.namespaces());
-    }
-    */
 
     /**
-     * Creates a new representation for a given file by indicating a name and a
-     * file representing the physical source of the .key file.
+     * Creates a new representation for a given file by indicating a name and a file representing
+     * the physical source of the .key file.
      *
-     * @param name       the name of the resource
-     * @param file       the file to find it
-     * @param fileRepo   the FileRepo which will store the file
-     * @param monitor    a possibly null reference to a monitor for the loading
-     *                   progress
-     * @param profile    the KeY profile under which the file is to be load
+     * @param name the name of the resource
+     * @param file the file to find it
+     * @param fileRepo the FileRepo which will store the file
+     * @param monitor a possibly null reference to a monitor for the loading progress
+     * @param profile the KeY profile under which the file is to be load
      * @param compressed <code>true</code> iff the file has compressed content
      */
-    public KeYFile(String name,
-                   File file,
-                   FileRepo fileRepo,
-                   ProgressMonitor monitor,
-                   Profile profile,
-                   boolean compressed) {
-        this(name,
-                RuleSourceFactory.initRuleFile(file, compressed),
-                monitor, profile);
+    public KeYFile(String name, File file, FileRepo fileRepo, ProgressMonitor monitor,
+            Profile profile, boolean compressed) {
+        this(name, RuleSourceFactory.initRuleFile(file, compressed), monitor, profile);
         this.fileRepo = fileRepo;
     }
 
@@ -194,17 +154,17 @@ public class KeYFile implements EnvInput {
     }
 
     protected KeyAst.File getParseContext() {
-        if (ctx == null) {
+        if (fileCtx == null) {
             try {
-                ctx = ParsingFacade.parseFile(file.getCharStream());
+                fileCtx = ParsingFacade.parseFile(file.getCharStream());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
-        return ctx;
+        return fileCtx;
     }
 
-    protected ProofSettings getPreferences() throws ProofInputException {
+    protected ProofSettings getPreferences() {
         if (initConfig.getSettings() == null) {
             return readPreferences();
         } else {
@@ -212,7 +172,7 @@ public class KeYFile implements EnvInput {
         }
     }
 
-    public ProofSettings readPreferences() throws ProofInputException {
+    public ProofSettings readPreferences() {
         if (file.isDirectory()) {
             return null;
         }
@@ -242,8 +202,9 @@ public class KeYFile implements EnvInput {
     public Includes readIncludes() throws ProofInputException {
         if (includes == null) {
             try {
-                KeyAst.File  ctx = getParseContext();
-                includes = ctx.getIncludes(file.file().getParentFile().toURI().toURL());
+                KeyAst.File ctx = getParseContext();
+                includes =
+                    ctx.getIncludes(file.file().getAbsoluteFile().getParentFile().toURI().toURL());
             } catch (Exception e) {
                 throw new ProofInputException(e);
             }
@@ -254,9 +215,11 @@ public class KeYFile implements EnvInput {
 
     @Override
     public File readBootClassPath() {
-        @Nonnull ProblemInformation pi = getProblemInformation();
+        @Nonnull
+        ProblemInformation pi = getProblemInformation();
         String bootClassPath = pi.getBootClassPath();
-        if (bootClassPath == null) return null;
+        if (bootClassPath == null)
+            return null;
         File bootClassPathFile = new File(bootClassPath);
         if (!bootClassPathFile.isAbsolute()) {
             // convert to absolute by resolving against the parent path of the parsed file
@@ -279,7 +242,8 @@ public class KeYFile implements EnvInput {
     @Nonnull
     @Override
     public List<File> readClassPath() {
-        @Nonnull ProblemInformation pi = getProblemInformation();
+        @Nonnull
+        ProblemInformation pi = getProblemInformation();
         String parentDirectory = file.file().getParent();
         List<File> fileList = new ArrayList<>();
         for (String cp : pi.getClasspath()) {
@@ -298,7 +262,8 @@ public class KeYFile implements EnvInput {
 
     @Override
     public String readJavaPath() throws ProofInputException {
-        @Nonnull ProblemInformation pi = getProblemInformation();
+        @Nonnull
+        ProblemInformation pi = getProblemInformation();
         String javaPath = pi.getJavaSource();
         if (javaPath != null) {
             File absFile = new File(javaPath);
@@ -308,7 +273,8 @@ public class KeYFile implements EnvInput {
                 absFile = new File(parent, javaPath);
             }
             if (!absFile.exists()) {
-                throw new ProofInputException(String.format("Declared Java source %s not found.", javaPath));
+                throw new ProofInputException(
+                    String.format("Declared Java source %s not found.", javaPath));
             }
             return absFile.getAbsolutePath();
         }
@@ -323,21 +289,21 @@ public class KeYFile implements EnvInput {
             throw new IllegalStateException("KeYFile: InitConfig not set.");
         }
 
-        //read .key file
-        Debug.out("Reading KeY file", file);
+        // read .key file
+        LOGGER.debug("Reading KeY file {}", file);
         ChoiceInformation ci = getParseContext().getChoices();
         initConfig.addCategory2DefaultChoices(ci.getDefaultOptions());
 
         readSorts();
         readFuncAndPred();
         readRules();
-        SpecificationRepository specRepos
-                = initConfig.getServices().getSpecificationRepository();
-        ContractsAndInvariantsFinder cinvs = new ContractsAndInvariantsFinder(initConfig.getServices(), initConfig.namespaces());
+        SpecificationRepository specRepos = initConfig.getServices().getSpecificationRepository();
+        ContractsAndInvariantsFinder cinvs =
+            new ContractsAndInvariantsFinder(initConfig.getServices(), initConfig.namespaces());
         getParseContext().accept(cinvs);
         specRepos.addContracts(ImmutableSet.fromCollection(cinvs.getContracts()));
         specRepos.addClassInvariants(ImmutableSet.fromCollection(cinvs.getInvariants()));
-        Debug.out("Read KeY file   ", file);
+        LOGGER.debug("Read KeY file {}", file);
         return warnings;
     }
 
@@ -352,26 +318,26 @@ public class KeYFile implements EnvInput {
 
 
     /**
-     * reads the sorts declaration of the .key file only,
-     * modifying the sort namespace
-     * of the initial configuration
+     * reads the sorts declaration of the .key file only, modifying the sort namespace of the
+     * initial configuration
      */
-    public void readSorts() throws ProofInputException {
-        KeyAst.File  ctx = getParseContext();
+    public void readSorts() {
+        KeyAst.File ctx = getParseContext();
         KeyIO io = new KeyIO(initConfig.getServices(), initConfig.namespaces());
         io.evalDeclarations(ctx);
         ChoiceInformation choice = getParseContext().getChoices();
-        //we ignore the namespace of choice finder.
+        // we ignore the namespace of choice finder.
         initConfig.addCategory2DefaultChoices(choice.getDefaultOptions());
     }
 
 
     /**
-     * reads the functions and predicates declared in the .key file only,
-     * modifying the function namespaces of the respective taclet options.
+     * reads the functions and predicates declared in the .key file only, modifying the function
+     * namespaces of the respective taclet options.
      */
-    public void readFuncAndPred() throws ProofInputException {
-        if (file == null) return;
+    public void readFuncAndPred() {
+        if (file == null)
+            return;
         KeyAst.File ctx = getParseContext();
         KeyIO io = new KeyIO(initConfig.getServices(), initConfig.namespaces());
         io.evalFuncAndPred(ctx);
@@ -379,24 +345,21 @@ public class KeYFile implements EnvInput {
 
 
     /**
-     * reads the rules and problems declared in the .key file only,
-     * modifying the set of rules
-     * of the initial configuration
+     * reads the rules and problems declared in the .key file only, modifying the set of rules of
+     * the initial configuration
      */
-    public void readRules() throws ProofInputException {
-        KeyIO io = new KeyIO(initConfig.getServices(), initConfig.namespaces());
+    public void readRules() {
         KeyAst.File ctx = getParseContext();
-        TacletPBuilder visitor = new TacletPBuilder(initConfig.getServices(), initConfig.namespaces(),
-                initConfig.getTaclet2Builder());
+        TacletPBuilder visitor = new TacletPBuilder(initConfig.getServices(),
+            initConfig.namespaces(), initConfig.getTaclet2Builder());
         ctx.accept(visitor);
         List<Taclet> taclets = visitor.getTopLevelTaclets();
-        //System.out.format("Found taclets (%s): %d%n", file, taclets.size());
         initConfig.addTaclets(taclets);
     }
 
 
     public void close() {
-        ctx = null;
+        fileCtx = null;
         problemFinder = null;
         problemInformation = null;
     }

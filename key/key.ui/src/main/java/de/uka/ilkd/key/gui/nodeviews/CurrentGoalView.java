@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.Color;
@@ -42,12 +29,13 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.Debug;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * This sequent view displays the sequent of an open goal and allows selection
- * of formulas as well as the application of rules. It offers services for
- * highlighting formulas, selecting applicable rules (in particular taclets) and
- * drag'n drop instantiation of taclets.
+ * This sequent view displays the sequent of an open goal and allows selection of formulas as well
+ * as the application of rules. It offers services for highlighting formulas, selecting applicable
+ * rules (in particular taclets) and drag'n drop instantiation of taclets.
  */
 public final class CurrentGoalView extends SequentView implements Autoscroll {
 
@@ -57,20 +45,18 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
     private static final long serialVersionUID = 8494000234215913553L;
 
     public static final ColorSettings.ColorProperty DEFAULT_HIGHLIGHT_COLOR =
-            ColorSettings.define("[currentGoal]defaultHighlight", "",
-                    new Color(70, 100, 170, 76));
+        ColorSettings.define("[currentGoal]defaultHighlight", "", new Color(70, 100, 170, 76));
 
     public static final ColorSettings.ColorProperty ADDITIONAL_HIGHLIGHT_COLOR =
-            ColorSettings.define("[currentGoal]addtionalHighlight", "",
-                    new Color(0, 0, 0, 38));
+        ColorSettings.define("[currentGoal]addtionalHighlight", "", new Color(0, 0, 0, 38));
 
     private static final ColorSettings.ColorProperty UPDATE_HIGHLIGHT_COLOR =
-            ColorSettings.define("[currentGoal]updateHighlight", "",
-                    new Color(0, 150, 130, 38));
+        ColorSettings.define("[currentGoal]updateHighlight", "", new Color(0, 150, 130, 38));
 
     public static final ColorSettings.ColorProperty DND_HIGHLIGHT_COLOR =
-            ColorSettings.define("[currentGoal]dndHighlight", "",
-                    new Color(0, 150, 130, 104));
+        ColorSettings.define("[currentGoal]dndHighlight", "", new Color(0, 150, 130, 104));
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CurrentGoalView.class);
 
 
     // the mediator
@@ -80,7 +66,7 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
     private final CurrentGoalViewListener listener;
 
     // enables this component to be a Drag Source
-    private DragSource dragSource = null;
+    private DragSource dragSource;
 
     private static final Insets autoScrollSensitiveRegion = new Insets(20, 20, 20, 20);
 
@@ -89,8 +75,7 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
     /**
      * creates a viewer for a sequent
      *
-     * @param mainWindow the MainWindow allowing access to the current system
-     * status
+     * @param mainWindow the MainWindow allowing access to the current system status
      */
     public CurrentGoalView(MainWindow mainWindow) {
         super(mainWindow);
@@ -158,13 +143,13 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
         // add listener to KeY GUI events
         getMediator().addGUIListener(guiListener);
 
-        updateHighlights = new LinkedList<Object>();
+        updateHighlights = new LinkedList<>();
 
     }
 
     /**
-     * updates all updateHighlights. Firstly removes all displayed ones and then
-     * gets a new list of updates to highlight
+     * updates all updateHighlights. Firstly removes all displayed ones and then gets a new list of
+     * updates to highlight
      */
     void updateUpdateHighlights() {
         if (getLogicPrinter() == null) {
@@ -197,8 +182,8 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
 
 
     /**
-     * given a node and a sequent formula, returns the first node
-     * among the node's parents that contains the sequent formula @form.
+     * given a node and a sequent formula, returns the first node among the node's parents that
+     * contains the sequent formula @form.
      */
     public Node jumpToIntroduction(Node node, SequentFormula form) {
         while (node.parent() != null && node.sequent().contains(form)) {
@@ -221,12 +206,7 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
         if (SwingUtilities.isEventDispatchThread()) {
             printSequentImmediately();
         } else {
-            Runnable sequentUpdater = new Runnable() {
-                @Override
-                public void run() {
-                    printSequentImmediately();
-                }
-            };
+            Runnable sequentUpdater = this::printSequentImmediately;
             SwingUtilities.invokeLater(sequentUpdater);
         }
     }
@@ -235,6 +215,12 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
      * sets the text being printed
      */
     synchronized void printSequentImmediately() {
+        if (getMainWindow().getMediator().getSelectedNode() == null) {
+            // only print when a node is selected
+            // (avoids NPE when no proof is loaded and font size is changed)
+            return;
+        }
+
         removeMouseListener(listener);
 
         setLineWidth(computeLineWidth());
@@ -245,12 +231,10 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
             do {
                 errorocc = false;
                 try {
-                    setText(getSyntaxHighlighter().process(
-                            getLogicPrinter().toString(),
-                            getMainWindow().getMediator().getSelectedNode()));
+                    setText(getSyntaxHighlighter().process(getLogicPrinter().toString(),
+                        getMainWindow().getMediator().getSelectedNode()));
                 } catch (Error e) {
-                    System.err.println("Error occurred while printing Sequent!");
-                    e.printStackTrace();
+                    LOGGER.error("Error occurred while printing Sequent!", e);
                     errorocc = true;
                 }
             } while (errorocc);
@@ -286,9 +270,7 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
     public void setPrinter(Goal goal) {
         getFilter().setSequent(goal.sequent());
         setLogicPrinter(new SequentViewLogicPrinter(new ProgramPrinter(null),
-                                                    getMediator().getNotationInfo(),
-                                                    mediator.getServices(),
-                                                    getVisibleTermLabels()));
+            getMediator().getNotationInfo(), mediator.getServices(), getVisibleTermLabels()));
     }
 
     protected SequentPrintFilter getSequentPrintFilter() {
@@ -308,12 +290,12 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
      * selected rule to apply
      *
      * @param taclet the selected Taclet
-     * @param pos the PosInSequent describes the position where to apply the
-     * rule
+     * @param pos the PosInSequent describes the position where to apply the rule
      */
     void selectedTaclet(TacletApp taclet, PosInSequent pos) {
         KeYMediator r = getMediator();
-      // This method delegates the request only to the UserInterfaceControl which implements the functionality.
+        // This method delegates the request only to the UserInterfaceControl which implements the
+        // functionality.
         // No functionality is allowed in this method body!
         Goal goal = r.getSelectedGoal();
         Debug.assertTrue(goal != null);
@@ -330,8 +312,8 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
     }
 
     /**
-     * Checks whether drag'n'drop of highlighted subterms in the sequent window
-     * currently is enabled..
+     * Checks whether drag'n'drop of highlighted subterms in the sequent window currently is
+     * enabled..
      *
      * @return true iff drag'n'drop is enabled.
      */
@@ -349,22 +331,20 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
     }
 
     /**
-     * used for autoscrolling when performing drag and drop actions. Computes
-     * the rectangle to be made visible.
+     * used for autoscrolling when performing drag and drop actions. Computes the rectangle to be
+     * made visible.
      */
     @Override
     public void autoscroll(Point loc) {
         final Insets insets = getAutoscrollInsets();
         final Rectangle outer = getVisibleRect();
-        final Rectangle inner = new Rectangle(outer.x + insets.left,
-                outer.y + insets.top,
-                outer.width - (insets.left + insets.right),
-                outer.height - (insets.top + insets.bottom));
+        final Rectangle inner = new Rectangle(outer.x + insets.left, outer.y + insets.top,
+            outer.width - (insets.left + insets.right),
+            outer.height - (insets.top + insets.bottom));
 
         if (!inner.contains(loc)) {
-            Rectangle scrollRect = new Rectangle(loc.x - insets.left,
-                    loc.y - insets.top, insets.left + insets.right,
-                    insets.top + insets.bottom);
+            Rectangle scrollRect = new Rectangle(loc.x - insets.left, loc.y - insets.top,
+                insets.left + insets.right, insets.top + insets.bottom);
             scrollRectToVisible(scrollRect);
         }
     }

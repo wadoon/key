@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.BorderLayout;
@@ -45,19 +32,25 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
+import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.Debug;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public abstract class InsertionTacletBrowserMenuItem extends JMenu
- implements TacletMenuItem {
+public abstract class InsertionTacletBrowserMenuItem extends JMenu implements TacletMenuItem {
+    private static final Logger LOGGER =
+        LoggerFactory.getLogger(InsertionTacletBrowserMenuItem.class);
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 1874640339950617746L;
-    /** The number of items that are to be shown in the dialog before a message referring to
-     * the dialog is issued. There are always "Open Dialog" and a {@link JSeparator}" */
+    /**
+     * The number of items that are to be shown in the dialog before a message referring to the
+     * dialog is issued. There are always "Open Dialog" and a {@link JSeparator}"
+     */
     private static final int MAX_ITEM_NUMBER = 30;
     /** all taclet apps the user can choose from */
     private Collection<TacletAppListItem> insertionTaclets;
@@ -71,86 +64,72 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu
     private TacletApp selectedTaclet;
     /** the services */
     protected Services services;
-    
+
     /** the base title; used title = basetitle + ( nrOfItems ) */
     private String baseTitle;
 
-    public InsertionTacletBrowserMenuItem(String title, JFrame parent, 
-            NotationInfo notInfo, Services services) {
-        
+    public InsertionTacletBrowserMenuItem(String title, JFrame parent, NotationInfo notInfo,
+            Services services) {
+
         super(title);
         this.baseTitle = title;
         this.parent = parent;
         this.notInfo = notInfo;
         this.services = services;
-        
-        insertionTaclets = createInsertionList();
-        
-        final JMenuItem menuItem = new JMenuItem("Open Dialog");
-        menuItem.addActionListener(new ActionListener() {
 
-            public void actionPerformed(ActionEvent e) {              
-                    openDialog();
-            }
-            
-        });                  
-        
+        insertionTaclets = createInsertionList();
+
+        final JMenuItem menuItem = new JMenuItem("Open Dialog");
+        menuItem.addActionListener(e -> openDialog());
+
         menuItem.setToolTipText("Browse applicable taclets.");
-        
+
         add(menuItem);
         addSeparator();
     }
 
     /**
-     * returns the list where the tacletappItems are stored
-     * (allows easy exchange for e.g. a sorted list)
-     * default: is filo
+     * @return the list where the tacletappItems are stored (allows easy exchange for e.g. a sorted
+     *         list) default: is filo
      */
     protected Collection<TacletAppListItem> createInsertionList() {
-        return new LinkedList<TacletAppListItem>();
+        return new LinkedList<>();
     }
-    
-    
+
     /**
-     * adds a new taclet to be displayed by this component
-     * it is assumed that the app has been tested before by 
-     * {@link #isResponsible}  
+     * Adds a new taclet to be displayed by this component it is assumed that the app has been
+     * tested before by {@link #isResponsible}.
+     *
      * @param app the TacletApp to be added
      */
     public void add(TacletApp app) {
         insertionTaclets.add(createListItem(app));
 
-        if(getItemCount() >= MAX_ITEM_NUMBER) {
-            if(getItemCount() == MAX_ITEM_NUMBER) {
+        if (getItemCount() >= MAX_ITEM_NUMBER) {
+            if (getItemCount() == MAX_ITEM_NUMBER) {
                 JLabel l = new JLabel("For more hidden formulas, see 'Open Dialog'");
                 l.setFont(l.getFont().deriveFont(Font.ITALIC));
                 add(l);
             }
-return;
+            return;
         }
 
-        final DefaultTacletMenuItem appItem = 
+        final DefaultTacletMenuItem appItem =
             new DefaultTacletMenuItem(this, app, notInfo, services);
-        appItem.addActionListener(new ActionListener() {
-    
-            public void actionPerformed(ActionEvent e) {
-                processTacletSelected(e);
-            }
-            
-        });
+        appItem.addActionListener(this::processTacletSelected);
         add(appItem);
-        setText(baseTitle + " (" + getAppSize() + (getAppSize() != 1 ? " items" : " item") +")");
+        setText(baseTitle + " (" + getAppSize() + (getAppSize() != 1 ? " items" : " item") + ")");
     }
 
-
+    @Override
     public void addActionListener(ActionListener listener) {
         listenerList.add(listener);
     }
 
     protected abstract Sequent checkTaclet(Taclet t);
 
-    /** returns the selected taclet to be applied */
-    public TacletApp connectedTo() {        
+    /** @return the selected taclet to be applied */
+    public TacletApp connectedTo() {
         return selectedTaclet;
     }
 
@@ -160,6 +139,7 @@ return;
 
     /**
      * tests if this class is responsible for the given taclet
+     *
      * @param t the Taclet to be checked
      * @return true if this item implementation shall be used
      */
@@ -168,123 +148,110 @@ return;
     }
 
     /**
-     * opens the selection dialog displaying all hidden formulas
-     * in a list and allowing the user to select the one to be added     
+     * opens the selection dialog displaying all hidden formulas in a list and allowing the user to
+     * select the one to be added
      */
     public void openDialog() {
-            final JDialog dialog      = 
-                new JDialog(parent, getText(), true);
-            
-            final JList<TacletAppListItem> selectionList = 
-                    new JList<>(insertionTaclets.toArray(new TacletAppListItem[insertionTaclets.size()]));
-            
-            final JScrollPane scrollPane = 
-                new JScrollPane(selectionList, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, 
-                        ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-            scrollPane.setPreferredSize(new Dimension(300,100));
-            scrollPane.setMinimumSize(new Dimension(150,50));
-           
-            
-            selectionList.
-                setSelectionMode(ListSelectionModel.SINGLE_SELECTION);  
-                 
-            if (getAppSize()>0) { // should always be true
-                selectionList.setSelectedIndex(0);
-            }
-            
-            
-            final JTextArea displayHiddenFormula = new JTextArea();
+        final JDialog dialog = new JDialog(parent, getText(), true);
 
-            final Object selectedValue = selectionList.getSelectedValue();
-            displayHiddenFormula.
-              setText(selectedValue == null ? "" :                  
-                          ((TacletAppListItem)selectedValue).longDescription());
-    
-            displayHiddenFormula.setCaretPosition(0);
-            
-            displayHiddenFormula.setEditable(false);
-            
-            selectionList.addListSelectionListener(new ListSelectionListener()
-            {
-                public void valueChanged(ListSelectionEvent e) {                       
-                    if (e.getSource() instanceof JList) {
-                        final JList<?> list = (JList<?>)e.getSource();
-                        if (list.getSelectedIndex()>=0) {           
-                            if (list.getSelectedValue() instanceof TacletAppListItem) {
-                                displayHiddenFormula.
-                                setText(((TacletAppListItem)list.getSelectedValue()).
-                                        longDescription());
-                            }                                   
-                        } else {
-                            displayHiddenFormula.setText("");
-                        }
-                        displayHiddenFormula.setCaretPosition(0);
+        final JList<TacletAppListItem> selectionList =
+            new JList<>(insertionTaclets.toArray(new TacletAppListItem[0]));
+
+        final JScrollPane scrollPane =
+            new JScrollPane(selectionList, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setPreferredSize(new Dimension(300, 100));
+        scrollPane.setMinimumSize(new Dimension(150, 50));
+
+
+        selectionList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        if (getAppSize() > 0) { // should always be true
+            selectionList.setSelectedIndex(0);
+        }
+
+
+        final JTextArea displayHiddenFormula = new JTextArea();
+
+        final TacletAppListItem selectedValue = selectionList.getSelectedValue();
+        displayHiddenFormula.setText(selectedValue == null ? "" : selectedValue.longDescription());
+
+        displayHiddenFormula.setCaretPosition(0);
+
+        displayHiddenFormula.setEditable(false);
+
+        selectionList.addListSelectionListener(e -> {
+            if (e.getSource() instanceof JList) {
+                final JList<?> list = (JList<?>) e.getSource();
+                if (list.getSelectedIndex() >= 0) {
+                    if (list.getSelectedValue() instanceof TacletAppListItem) {
+                        displayHiddenFormula.setText(
+                            ((TacletAppListItem) list.getSelectedValue()).longDescription());
                     }
+                } else {
+                    displayHiddenFormula.setText("");
                 }
+                displayHiddenFormula.setCaretPosition(0);
+            }
+        });
 
-            });
-            
-            final JScrollPane formulaDisplaySP = new JScrollPane(displayHiddenFormula);
-            
-            final JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-                         scrollPane, formulaDisplaySP) {
+        final JScrollPane formulaDisplaySP = new JScrollPane(displayHiddenFormula);
+
+        final JSplitPane split =
+            new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollPane, formulaDisplaySP) {
                 /**
-                             * 
-                             */
-                            private static final long serialVersionUID = -6688343484818325411L;
+                 *
+                 */
+                private static final long serialVersionUID = -6688343484818325411L;
 
                 public void setUI(javax.swing.plaf.SplitPaneUI ui) {
-                    try{ super.setUI(ui); } catch(NullPointerException e) 
-                    {Debug.out("Exception thrown by class Main at setUI"); }
-                }
-            }; // work around bug in 
-    //      com.togethersoft.util.ui.plaf.metal.OIMetalSplitPaneUI
-            selectedTaclet = null;
-                                   
-            final JButton cancel = new JButton("Cancel");
-            cancel.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    selectedTaclet = null;
-                    dialog.setVisible(false);
-                    dialog.dispose();
-                }          
-            });
-                        
-            final JButton apply  = new JButton("Apply");
-            apply.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {                
-                    final TacletAppListItem selectedItem = 
-                        selectionList.getSelectedValue();
-                    
-                    if (selectedItem == null) { // should never be true
-                        selectedTaclet = null;
-                    } else {
-                        selectedTaclet = selectedItem.getTacletApp();
+                    try {
+                        super.setUI(ui);
+                    } catch (NullPointerException e) {
+                        LOGGER.debug("Exception thrown by class Main at setUI");
                     }
-                    
-                    dialog.setVisible(false);
-                    dialog.dispose();
-                    processTacletSelected(new ActionEvent
-                            (InsertionTacletBrowserMenuItem.this, 0, ""));
-                }           
-            });
-            
-            final JPanel buttonPanel = new JPanel();
-            buttonPanel.setLayout(new FlowLayout());
-            
-            buttonPanel.add(apply);
-            buttonPanel.add(cancel);
-    
-            dialog.getContentPane().setLayout(new BorderLayout());
-            
-            dialog.getContentPane().add(split, BorderLayout.CENTER);
-            dialog.getContentPane().add(buttonPanel, BorderLayout.SOUTH);                
-                   
-            dialog.setSize(500, 250);
-           
-            dialog.setVisible(true); 
-            
-        }
+                }
+            }; // work around bug in
+               // com.togethersoft.util.ui.plaf.metal.OIMetalSplitPaneUI
+        selectedTaclet = null;
+
+        final JButton cancelButton = new JButton("Cancel");
+        cancelButton.addActionListener(e -> {
+            selectedTaclet = null;
+            dialog.setVisible(false);
+            dialog.dispose();
+        });
+
+        final JButton applyButton = new JButton("Apply");
+        applyButton.addActionListener(e -> {
+            final TacletAppListItem selectedItem = selectionList.getSelectedValue();
+
+            if (selectedItem == null) { // should never be true
+                selectedTaclet = null;
+            } else {
+                selectedTaclet = selectedItem.getTacletApp();
+            }
+
+            dialog.setVisible(false);
+            dialog.dispose();
+            processTacletSelected(new ActionEvent(InsertionTacletBrowserMenuItem.this, 0, ""));
+        });
+
+        final JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new FlowLayout());
+
+        buttonPanel.add(applyButton);
+        buttonPanel.add(cancelButton);
+
+        dialog.getContentPane().setLayout(new BorderLayout());
+
+        dialog.getContentPane().add(split, BorderLayout.CENTER);
+        dialog.getContentPane().add(buttonPanel, BorderLayout.SOUTH);
+
+        dialog.setSize(500, 250);
+
+        dialog.setVisible(true);
+    }
 
     protected void processTacletSelected(ActionEvent e) {
         for (final ActionListener al : listenerList) {
@@ -292,15 +259,15 @@ return;
         }
     }
 
+    @Override
     public void removeActionListener(ActionListener listener) {
         listenerList.remove(listener);
     }
-    
+
     public TacletAppListItem createListItem(TacletApp app) {
-        return new TacletAppListItem(app, checkTaclet(app.taclet()), 
-                notInfo, services);
+        return new TacletAppListItem(app, checkTaclet(app.taclet()), notInfo, services);
     }
-    
+
     /**
      * inner class to pretty print the formulas to be added
      */
@@ -309,33 +276,34 @@ return;
         private final NotationInfo notInfo;
         private final Services services;
         private final Sequent seq;
-        
-        public TacletAppListItem(TacletApp app, Sequent seq, NotationInfo notInfo, 
+
+        public TacletAppListItem(TacletApp app, Sequent seq, NotationInfo notInfo,
                 Services services) {
-            this.app      = app;
+            this.app = app;
             this.seq = seq;
-            this.notInfo  =  notInfo;
-            this.services =  services;
+            this.notInfo = notInfo;
+            this.services = services;
         }
-        
+
         public TacletApp getTacletApp() {
             return app;
         }
-        
+
         public String shortDescription() {
             return longDescription();
         }
 
         public String longDescription() {
-            final LogicPrinter printer = 
+            final LogicPrinter printer =
                 new LogicPrinter(new ProgramPrinter(), notInfo, services, true);
             printer.setInstantiation(app.instantiations());
             printer.printSequent(seq);
             return printer.toString();
         }
 
+        @Override
         public String toString() {
-            return longDescription();            
+            return longDescription();
         }
     }
 

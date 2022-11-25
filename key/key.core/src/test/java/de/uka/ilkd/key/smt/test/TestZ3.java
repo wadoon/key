@@ -1,80 +1,84 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.smt.test;
 
-import org.junit.Assert;
+import de.uka.ilkd.key.smt.solvertypes.SolverType;
+import de.uka.ilkd.key.smt.solvertypes.SolverTypeImplementation;
+import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
+import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import de.uka.ilkd.key.smt.SolverType;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 public class TestZ3 extends TestSMTSolver {
 
 
     public static final String SYSTEM_PROPERTY_SOLVER_PATH = "z3SolverPath";
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestZ3.class);
 
     private static boolean isInstalled = false;
     private static boolean installChecked = false;
-    
-    
+
+    private static final SolverType Z3_SOLVER = SolverTypes.getSolverTypes().stream()
+            .filter(it -> it.getClass().equals(SolverTypeImplementation.class)
+                    && it.getName().equals("Z3 (Legacy Translation)"))
+            .findFirst().orElse(null);
+
     @Override
     public boolean toolNotInstalled() {
-    	if (!installChecked) {    
-    		isInstalled = getSolverType().isInstalled(true);
-    		installChecked = true;
-    		if(!isInstalled) {
-    			System.out.println("Warning: " + getSolverType().getName() + " is not installed, tests skipped.");
-            System.out.println("Maybe use JVM system property \"" + SYSTEM_PROPERTY_SOLVER_PATH + "\" to define the path to the Z3 command.");
-    		}	  
-    		
-    		if(isInstalled &&!getSolverType().supportHasBeenChecked()){
-    			if(!getSolverType().checkForSupport()){
-    				System.out.println("Warning: " + "The version of the solver "+ getSolverType().getName() + " used for the following tests may not be supported.");
-    			}    			
-    		}
-    	}
+        if (!installChecked) {
+            isInstalled = getSolverType().isInstalled(true);
+            installChecked = true;
+            if (!isInstalled) {
+                LOGGER.warn("Warning: {} is not installed, tests skipped.",
+                    getSolverType().getName());
+                LOGGER.warn(
+                    "Maybe use JVM system property \"{}\" to define the path to the Z3 command.",
+                    SYSTEM_PROPERTY_SOLVER_PATH);
+            }
 
-    	
-    	
+            if (isInstalled && !getSolverType().supportHasBeenChecked()) {
+                if (!getSolverType().checkForSupport()) {
+                    LOGGER.warn("Warning: " + "The version of the solver {} used for the "
+                        + "following tests may not be supported.", getSolverType().getName());
+                }
+            }
+        }
+
+
 
         return !isInstalled;
     }
-    
+
     @Override
     public SolverType getSolverType() {
-       SolverType type = SolverType.Z3_SOLVER;
-       String solverPathProperty = System.getProperty(SYSTEM_PROPERTY_SOLVER_PATH);
-       if (solverPathProperty != null && !solverPathProperty.isEmpty()) {
-          type.setSolverCommand(solverPathProperty);
-       }
-       return type;
+        SolverType type = Z3_SOLVER;
+        String solverPathProperty = System.getProperty(SYSTEM_PROPERTY_SOLVER_PATH);
+        if (solverPathProperty != null && !solverPathProperty.isEmpty()) {
+            type.setSolverCommand(solverPathProperty);
+        }
+        return type;
     }
-    
-    //These testcases are z3 specific, because other solver don't support integer division.
+
+    // These testcases are z3 specific, because other solvers don't support integer division.
+    @Test
     public void testDiv1() throws Exception {
-        Assert.assertTrue(correctResult(testFile + "div1.key", true));
+        assertTrue(correctResult(testFile + "div1.key", true));
     }
-    
+
+    @Test
     public void testDiv3() throws Exception {
-        Assert.assertTrue(correctResult(testFile + "div3.key", true));
+        assertTrue(correctResult(testFile + "div3.key", true));
     }
-    
+
+    @Test
     public void testDiv5() throws Exception {
-        Assert.assertTrue(correctResult(testFile + "div5.key", false));
+        assertTrue(correctResult(testFile + "div5.key", false));
     }
-    
+
+    @Test
     public void testDiv6() throws Exception {
-        Assert.assertTrue(correctResult(testFile + "div6.key", false));
+        assertTrue(correctResult(testFile + "div6.key", false));
     }
-    
+
 }

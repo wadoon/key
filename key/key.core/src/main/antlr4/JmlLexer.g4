@@ -8,13 +8,16 @@ import java.util.stream.Collectors;
 }
 
 @members{
+   // needed for double literals and ".."
+   private int _lex_pos;
+
    private int parenthesisLevel = 0;
-   private void incrParen() { parenthesisLevel++;}// System.err.println("LVL U: "+parenthesisLevel);}
-   private void decrParen() { parenthesisLevel--;}// System.err.println("LVL D: "+parenthesisLevel);}
+   private void incrParen() { parenthesisLevel++;}
+   private void decrParen() { parenthesisLevel--;}
 
    private int bracesLevel = 0;
-   private void incrBrace() { bracesLevel++;}// System.err.println("LVL U: "+parenthesisLevel);}
-   private void decrBrace() { bracesLevel--;}// System.err.println("LVL D: "+parenthesisLevel);}
+   private void incrBrace() { bracesLevel++;}
+   private void decrBrace() { bracesLevel--;}
 
    private int bracketLevel = 0;
    private void incrBracket() { bracketLevel++;}
@@ -22,104 +25,7 @@ import java.util.stream.Collectors;
 
    boolean semicolonOnToplevel() { return bracketLevel==0 && bracesLevel == 0 && parenthesisLevel==0; }
 
-
-    Pattern keyForbidden = Pattern.compile("-key($|[+-])");
-    public void setCommentMarkers(Collection<String> str) {
-    		String p = "(" + str.stream().collect(Collectors.joining("|")) + ")($|[+-])";
-    		keyForbidden = Pattern.compile(p);
-    }
-
-        /**
-         * Lookahead for determining if we are at the start of comment and not a "JML starter".
-         * <p>
-         * This method reads from the input stream to check the annotation markers between the
-         * comment start and the "@"
-         * This method returns true for starter "//" if we the comment begins with
-         * <ul>
-         * <li> "//" + End-of-line
-         * <li> "// "
-         * <li> "// @"
-         * <li> "//+"
-         * <li> "//-"
-         * <li> "//-key+openjml@"  (or similar)
-         * </ul>
-         * <p>
-         * (same for "/*")
-         * <p>
-         * It returns true if starter is followed by a sequence of "+", "-" or Java identifier
-         * characters, and then "@" and the sequence does not contain "-key".
-         * <p>
-         * It implements JML Ref Manual 4.4:
-         * <quote>
-         * An annotation-key is a + or - sign followed by an ident (see section 4.6 Tokens). Note that
-         * no white space can appear within, before, or after the annotation-key. Tools will provide a
-         * way to enable a selection of annotation-key identifiers. These identifiers, hereafter called
-         * "keys" provide for conditional inclusion of JML annotations as follows:
-         * <ul>
-         * <li> a JML annotation with no keys is always included,
-         * <li> a JML annotation with at least one positive-key is only included if at least one of
-         * these positive keys is enabled and there are no negative-keys in the annotation that have
-         * enabled keys, and
-         * <li> a JML annotation with an enabled negative-key is ignored (even if there are enabled
-         * positive-keys).
-         * </ul>
-         * </quote>
-         * <p>
-         * This method resets the position on the input stream (mark/rewind).
-         */
-        private boolean isComment(String starter) {
-            int mark = _input.mark();
-            int startPos = _input.index();
-            try {
-                // matching the starter string
-                for (int i = 0; i < starter.length(); i++) {
-                    if (_input.LA(1) == starter.charAt(i)) {
-                        _input.consume();
-                    } else {
-                        return false;
-                    }
-                }
-                StringBuilder markerBuilder = new StringBuilder();
-                while (true) {
-                    final char point = (char) _input.LA(1);
-                    if (point == '@') { // annotation marker finished
-                        if (markerBuilder.length() == 0) {
-                            // no markers --> active
-                            return false;
-                        }
-                        String[] markers = markerBuilder.toString().split("(?=[+-])");
-                        boolean plusFound = false;
-                        boolean plusKeyFound = false;
-                        for (int i = 0; i < markers.length; i++) {
-                            String marker = markers[i];
-                            if (marker.equalsIgnoreCase("-key") ||
-                                    marker.length() < 2 ||
-                                    !marker.matches("[+-].+")) {
-                                // 1) -key
-                                // 2) + or - alone
-                                // 3) identifier w/o +/-
-                                // means: this is a comment
-                                return true;
-                            } else if (marker.equalsIgnoreCase("+key")) {
-                                plusKeyFound = true;
-                            } else if (marker.startsWith("+")) {
-                                plusFound = true;
-                            }
-                        }
-                        // it is only a comment if "+" encountered, but not "+key"
-                        return plusFound && !plusKeyFound;
-                    } else if (Character.isJavaIdentifierPart(point) || point == '-' || point == '+') {
-                        markerBuilder.append(point);
-                        _input.consume();
-                    } else {
-                        return true;
-                    }
-                }
-            } finally {
-                _input.seek(startPos);
-                _input.release(mark);
-            }
-        }
+   private JmlMarkerDecision jmlMarkerDecision = new JmlMarkerDecision(this);
 }
 
 tokens {BODY, COMMENT, STRING_LITERAL}
@@ -215,6 +121,7 @@ MONITORS_FOR: 'monitors_for' -> pushMode(expr);
 READABLE: 'readable';
 REPRESENTS: 'represents' Pred -> pushMode(expr);
 REQUIRES: ('requires' (Pfree|Pred) | 'pre' Pred) -> pushMode(expr);
+RETURN: 'return' -> pushMode(expr);
 RETURNS: 'returns' -> pushMode(expr);
 RESPECTS: 'respects' -> pushMode(expr);
 SEPARATES: 'separates' -> pushMode(expr);
@@ -232,7 +139,8 @@ NEST_END: '|}' ;
 C_RBRACKET: ']' -> type(RBRACKET);
 C_LBRACKET: '[' -> type(LBRACKET);
 SEMICOLON : ';' -> type(SEMI_TOPLEVEL);
-BODY_START: '{' -> more, pushMode(body);
+C_LBRACE: '{' -> type(LBRACE);
+C_RBRACE: '}' -> type(RBRACE);
 C_EQUAL: '=' -> type(EQUAL_SINGLE), pushMode(expr);
 C_LPAREN: '(' -> type(LPAREN);
 C_RPAREN: ')' -> type(RPAREN);
@@ -242,11 +150,11 @@ C_COLON: ':' -> type(COLON);
 C_DOT: '.' -> type(DOT);
 C_COMMA: ',' -> type(COMMA);
 
-SL_COMMENT: {isComment("//")}? ('//' ('\n'|'\r'|EOF) | '//' ~'@' ~('\n'|'\r')*) -> channel(HIDDEN);
-ML_COMMENT: {isComment("/*")}? '/*' -> more, pushMode(mlComment);
+SL_COMMENT: {jmlMarkerDecision.isComment("//")}? ('//' ('\n'|'\r'|EOF) | '//' ~'@' ~('\n'|'\r')*) -> channel(HIDDEN);
+ML_COMMENT: {jmlMarkerDecision.isComment("/*")}? '/*' -> more, pushMode(mlComment);
 
-JML_SL_START: '//' ([+-] [a-zA-Z_0-9]*)* '@' -> channel(HIDDEN);
-JML_ML_START: '/*' ([+-] [a-zA-Z_0-9]*)* '@' -> channel(HIDDEN);
+JML_SL_START: {!jmlMarkerDecision.isComment("//")}? '//' ([+-] [a-zA-Z_0-9]*)* '@' -> channel(HIDDEN);
+JML_ML_START: {!jmlMarkerDecision.isComment("/*")}?'/*' ([+-] [a-zA-Z_0-9]*)* '@' -> channel(HIDDEN);
 
 ERROR_CHAR: .;
 
@@ -313,6 +221,15 @@ EVERYTHING: '\\everything';
 EXCEPTION: '\\exception';
 EXISTS: '\\exists';
 FORALL: '\\forall';
+FP_ABS: '\\fp_abs';  //KeY extension, not official JML
+FP_INFINITE : '\\fp_infinite';   //KeY extension, not official JML
+FP_NAN: '\\fp_nan';   //KeY extension, not official JML
+FP_NEGATIVE: '\\fp_negative';   //KeY extension, not official JML
+FP_NICE: '\\fp_nice'; //KeY syntactic sugar
+FP_NORMAL: '\\fp_normal';   //KeY extension, not official JML
+FP_POSITIVE: '\\fp_positive';   //KeY extension, not official JML
+FP_SUBNORMAL: '\\fp_subnormal';   //KeY extension, not official JML
+FP_ZERO: '\\fp_zero';   //KeY extension, not official JML
 FREE: '\\free';  //KeY extension, not official JML
 FRESH: '\\fresh';
 INDEX: '\\index';
@@ -391,12 +308,11 @@ WORKINGSPACE: '\\working_space';
 // ONLY_CALLED: '\\only_called';
 // ONLY_CAPTURED: '\\only_captured';
 
-
 E_JML_SL_START: '//@' -> type(JML_SL_START), channel(HIDDEN);
 E_JML_ML_START: '/*@' -> type(JML_ML_START), channel(HIDDEN);
 E_JML_ML_END: '*/' -> channel(HIDDEN);
-E_SL_COMMENT: {isComment("//")}? ('//' ('\n'|'\r'|EOF) | '//' ~'@' ~('\n'|'\r')*) -> type(COMMENT), channel(HIDDEN);
-E_ML_COMMENT: {isComment("/*")}? '/*' -> more, pushMode(mlComment);
+E_SL_COMMENT: {jmlMarkerDecision.isComment("//")}? ('//' ('\n'|'\r'|EOF) | '//' ~'@' ~('\n'|'\r')*) -> type(COMMENT), channel(HIDDEN);
+E_ML_COMMENT: {jmlMarkerDecision.isComment("/*")}? '/*' -> more, pushMode(mlComment);
 
 AND: '&';
 BITWISENOT: '~';
@@ -456,10 +372,64 @@ fragment BINPREFIX: '0' ('b'|'B');
 fragment OCTPREFIX: '0';
 fragment HEXPREFIX: '0' ('x'|'X');
 fragment LONGSUFFIX: 'l' | 'L';
+
 BINLITERAL: BINPREFIX BINDIGIT ((BINDIGIT | '_')* BINDIGIT)? LONGSUFFIX?;
 OCTLITERAL: OCTPREFIX OCTDIGIT ((OCTDIGIT | '_')* OCTDIGIT)? LONGSUFFIX?;
 DECLITERAL: ('0' | (NONZERODECDIGIT ((DECDIGIT | '_')* DECDIGIT)?)) LONGSUFFIX?;
 HEXLITERAL: HEXPREFIX ((HEXDIGIT | '_')* HEXDIGIT)? LONGSUFFIX?;
+
+fragment
+FractionalNumber
+    :   DIGIT+ '.' DIGIT* Exponent?
+    |   '.' DIGIT+ Exponent?
+    |   DIGIT+ Exponent?
+    ;
+
+fragment
+Exponent
+    :   ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+
+    ;
+
+fragment
+FloatSuffix
+    :   'f' | 'F'
+    ;
+
+fragment
+DoubleSuffix
+    :   'd' | 'D'
+    ;
+
+fragment
+RealSuffix
+    :   'r' | 'R'
+    ;
+
+FLOAT_LITERAL
+    :   FractionalNumber FloatSuffix
+    ;
+
+REAL_LITERAL
+    :   FractionalNumber RealSuffix
+    ;
+
+DOUBLE_LITERAL
+    :  /*  MU2018: DIGITS was removed, the following was not accessible.
+        *  It is strange anyway ...
+        *  MU2019: But necessary, since otherwise 1..x would be parsed as (1.).x
+        *  MU2021: Brought to ANTLR4 as by
+        *     https://stackoverflow.com/questions/35724082/syntactic-predicates-in-antlr-lexer-rules
+        */
+        DIGIT+ '.' DIGIT+ Exponent? DoubleSuffix?
+    |   DIGIT+ '.'? Exponent DoubleSuffix?
+    |   DIGIT+ '.' DoubleSuffix
+    |   '.' DIGIT+ Exponent? DoubleSuffix?
+    |   DIGIT+ Exponent DoubleSuffix?
+    |   DIGIT+  { _lex_pos=_input.index(); setType(DECLITERAL); emit(); }
+         '.' '.' { _input.seek(_lex_pos); }
+    |   DIGIT+ '.'
+    ;
+
 
 fragment
 LETTERORDIGIT: LETTER | DIGIT;
@@ -504,16 +474,7 @@ INFORMAL_DESCRIPTION: '(*'  ( '*' ~')' | ~'*' )* '*)';
 DOC_COMMENT: '/**' -> pushMode(mlComment);
 fragment PRAGMA: '\\nowarn';
 
-E_BODY_START: '{' -> more, pushMode(body);
 E_ERROR_CHAR: . -> type(ERROR_CHAR);
-
-mode body;
-BRACE: '{' ->  more, pushMode(body);
-END_BODY: {_modeStack.peek() != body}? '}' -> popMode, type(BODY);
-END_BRACE: '}' -> more, popMode;
-//S: '"' ~('"') '"' -> more;
-//not working, IGNORE: '@' -> skip, more;
-ANY_CHAR: . -> more;
 
 mode mlComment;
 ML_COMMENT_END: ('*/'|EOF) -> type(COMMENT), channel(HIDDEN), popMode;

@@ -11,14 +11,12 @@ import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.match.legacy.LegacyTacletMatcher;
-import org.antlr.runtime.RecognitionException;
 import org.antlr.v4.runtime.CharStreams;
 import org.key_project.util.collection.ImmutableList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Matcher to deal with matching a string pattern against a sequent
@@ -26,107 +24,95 @@ import java.util.stream.Collectors;
  * @author S.Grebing
  */
 public class Matcher {
-
-    private ProofApi api;
+    private static final Logger LOGGER = LoggerFactory.getLogger(Matcher.class);
+    private final ProofApi api;
 
     /**
+     * Creates a new matcher for the given proof and environment.
+     *
      * @param api reference to proof api in order to get access to the key environment
      */
     public Matcher(ProofApi api) {
-
         this.api = api;
     }
 
     /**
-     * Matches a sequent against a sequent pattern (a schematic sequent) returns a list of Nodes containing matching
-     * results from where the information about instantiated schema variables can be extracted. If no match was possible the list is exmpt.
+     * Matches a sequent against a sequent pattern (a schematic sequent) returns a list of Nodes
+     * containing matching results from where the information about instantiated schema variables
+     * can be extracted. If no match was possible the list is exmpt.
      *
-     * @param pattern     a string representation of the pattern sequent against which the current sequent should be matched
-     * @param currentSeq  current concrete sequent
-     * @param assignments variables appearing in the pattern as schemavariables with their corresponding type in KeY
+     * @param pattern a string representation of the pattern sequent against which the current
+     *        sequent should be matched
+     * @param currentSeq current concrete sequent
+     * @param assignments variables appearing in the pattern as schemavariables with their
+     *        corresponding type in KeY
      * @return List of VariableAssignments (possibly empty if no match was found)
      */
-    //List of VarAssignment
-    public List<VariableAssignments> matchPattern(String pattern, Sequent currentSeq, VariableAssignments assignments) {
-        //copy services in order to not accidently set assignments and namespace for environment
-
+    // List of VarAssignment
+    public List<VariableAssignments> matchPattern(String pattern, Sequent currentSeq,
+            VariableAssignments assignments) {
+        // copy services in order to not accidently set assignments and namespace for environment
         Services copyServices = api.getEnv().getServices().copy(false);
-        //services.copy(false);
-        //Aufbau der Deklarationen fuer den NameSpace
+        // Aufbau der Deklarationen fuer den NameSpace
         buildNameSpace(assignments, copyServices);
-        //Zusammenbau des Pseudotaclets
-        //Parsen des Taclets
+        // Zusammenbau des Pseudotaclets
+        // Parsen des Taclets
         String patternString = "matchPattern{\\assumes(" + pattern + ") \\find (==>)  \\add (==>)}";
 
-        Taclet t = null;
-        try {
-            t = parseTaclet(patternString, copyServices);
-        } catch (RecognitionException e) {
-            e.printStackTrace();
-        }
+        Taclet t = parseTaclet(patternString, copyServices);
 
-        //Build Matcher for Matchpattern
+        // Build Matcher for Matchpattern
         LegacyTacletMatcher ltm = new LegacyTacletMatcher(t);
 
-
-        //patternSequent should not be null, as we have created it
+        // patternSequent should not be null, as we have created it
         assert t.ifSequent() != null;
         Sequent patternSeq = t.ifSequent();
         int asize = patternSeq.antecedent().size();
         int size = asize + patternSeq.succedent().size();
-        //Iterator durch die Pattern-Sequent
+        // Iterator durch die Pattern-Sequent
 
         List<SearchNode> finalCandidates = new ArrayList<>(100);
         if (size > 0) {
-            //Iteratoren durch die Sequent
+            // Iteratoren durch die Sequent
             ImmutableList<IfFormulaInstantiation> antecCand =
-                    IfFormulaInstSeq.createList(currentSeq, true, copyServices);
+                IfFormulaInstSeq.createList(currentSeq, true, copyServices);
             ImmutableList<IfFormulaInstantiation> succCand =
-                    IfFormulaInstSeq.createList(currentSeq, false, copyServices);
+                IfFormulaInstSeq.createList(currentSeq, false, copyServices);
 
             SequentFormula[] patternArray = new SequentFormula[patternSeq.size()];
-            {
-                int i = 0;
-                for (SequentFormula fm : patternSeq)
-                    patternArray[i++] = fm;
-            }
+            int i = 0;
+            for (SequentFormula fm : patternSeq)
+                patternArray[i++] = fm;
 
 
             Queue<SearchNode> queue = new LinkedList<>();
-            //init
+            // init
             queue.add(new SearchNode(patternArray, asize, antecCand, succCand));
 
 
             while (!queue.isEmpty()) {
                 SearchNode node = queue.remove();
                 boolean inAntecedent = node.isAntecedent();
-                //System.out.println(inAntecedent ? "In Antec: " : "In Succ");
+                LOGGER.debug(inAntecedent ? "In Antec: " : "In Succ");
 
-                IfMatchResult ma = ltm.matchIf((inAntecedent ?
-                        antecCand : succCand), node.getPatternTerm(), node.mc, copyServices);
+                IfMatchResult ma = ltm.matchIf((inAntecedent ? antecCand : succCand),
+                    node.getPatternTerm(), node.mc, copyServices);
 
                 if (!ma.getMatchConditions().isEmpty()) {
                     ImmutableList<MatchConditions> testma = ma.getMatchConditions();
 
-                    Iterator<MatchConditions> iter = testma.iterator();
-                    while (iter.hasNext()) {
-                        SearchNode sn = new SearchNode(node, iter.next());
-
+                    for (MatchConditions matchConditions : testma) {
+                        SearchNode sn = new SearchNode(node, matchConditions);
                         if (sn.isFinished()) {
                             finalCandidates.add(sn);
                         } else {
                             queue.add(sn);
                         }
                     }
-
-
                 } else {
-                    //System.out.println("Pattern Empty");
+                    LOGGER.debug("Pattern Empty");
                 }
             }
-            /*for (SearchNode finalCandidate : finalCandidates) {
-                System.out.println(finalCandidate.mc.getInstantiations());
-            }*/
         }
         List<VariableAssignments> matches = new ArrayList<>();
         if (!finalCandidates.isEmpty()) {
@@ -151,7 +137,7 @@ public class Matcher {
         for (String varName : varNames) {
             SchemaVariable sv = insts.lookupVar(new Name(varName));
             Object value = insts.getInstantiation(sv);
-            va.addAssignmentWithType(varName, value, (VariableAssignments.VarType) assignments.getTypeMap().get(varName));
+            va.addAssignmentWithType(varName, value, assignments.getTypeMap().get(varName));
         }
         return va;
 
@@ -161,7 +147,6 @@ public class Matcher {
      * Adds the variables of VariableAssignments to the namespace
      *
      * @param assignments VariabelAssignments containing variable names and types
-     * @param services
      */
     private void buildNameSpace(VariableAssignments assignments, Services services) {
         String decalarations = buildDecls(assignments);
@@ -172,7 +157,8 @@ public class Matcher {
     /**
      * Builds a string that is used to create a new schemavariable declaration for the matchpattern
      *
-     * @param assignments varaiables appearing as schema varaibels in the match pattern and their types (in KeY)
+     * @param assignments varaiables appearing as schema varaibels in the match pattern and their
+     *        types (in KeY)
      * @return a String representing the declaration part of a taclet for teh matchpattern
      */
     private String buildDecls(VariableAssignments assignments) {
@@ -181,9 +167,9 @@ public class Matcher {
         final List<String> strn = new ArrayList<>();
 
         typeMap.forEach((id, type) -> strn.add(toDecl(id, type)));
-        schemaVars += strn.stream().collect(Collectors.joining("\n"));
+        schemaVars += String.join("\n", strn);
         schemaVars += "}";
-        //System.out.println(schemaVars);
+        LOGGER.debug("Schema Variables: {}", schemaVars);
         return schemaVars;
     }
 
@@ -201,17 +187,12 @@ public class Matcher {
             KeyIO io = new KeyIO(services);
             KeyAst.File ctx = ParsingFacade.parseFile(CharStreams.fromString(s));
             io.evalDeclarations(ctx);
-            //KeYParserF p = stringDeclParser(s, services);
-            //p.decls();
         } catch (Exception e) {
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            e.printStackTrace(pw);
-            throw new RuntimeException("Exc while Parsing:\n" + sw);
+            LOGGER.error("Exception while Parsing.", e);
         }
     }
 
-    private Taclet parseTaclet(String s, Services services) throws RecognitionException {
+    private Taclet parseTaclet(String s, Services services) {
         KeyIO io = new KeyIO(services);
         KeyAst.File ctx = ParsingFacade.parseFile(CharStreams.fromString(s));
         io.evalDeclarations(ctx);

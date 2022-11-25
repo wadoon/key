@@ -14,16 +14,15 @@ import java.awt.event.ActionEvent;
 
 
 /**
- * Action which generates test cases for all open nodes. If the proof is closed,
- * test cases will be generated for nodes on which the emptyModality rule was
- * applied.
+ * Action which generates test cases for all open nodes. If the proof is closed, test cases will be
+ * generated for nodes on which the emptyModality rule was applied.
  *
  * @author mihai
  */
 public class TestGenerationAction extends MainWindowAction {
     private static final long serialVersionUID = -4911859008849602897L;
 
-    private static final String NAME = "Generate Testcases";
+    private static final String NAME = "Generate Testcases...";
     private static final String TOOLTIP = "Generate test cases for open goals";
 
     public TestGenerationAction(MainWindow mainWindow) {
@@ -44,9 +43,8 @@ public class TestGenerationAction extends MainWindowAction {
 
 
     /**
-     * Registers the action at some listeners to update its status in a correct
-     * fashion. This method has to be invoked after the Main class has been
-     * initialised with the KeYMediator.
+     * Registers the action at some listeners to update its status in a correct fashion. This method
+     * has to be invoked after the Main class has been initialised with the KeYMediator.
      */
     public void init() {
         final KeYSelectionListener selListener = new KeYSelectionListener() {
@@ -62,7 +60,8 @@ public class TestGenerationAction extends MainWindowAction {
             }
         };
         getMediator().addKeYSelectionListener(selListener);
-        // This method delegates the request only to the UserInterfaceControl which implements the functionality.
+        // This method delegates the request only to the UserInterfaceControl which implements the
+        // functionality.
         // No functionality is allowed in this method body!
         getMediator().getUI().getProofControl().addAutoModeListener(new AutoModeListener() {
             @Override
@@ -76,7 +75,6 @@ public class TestGenerationAction extends MainWindowAction {
                 getMediator().addKeYSelectionListener(selListener);
             }
         });
-        selListener.selectedNodeChanged(new KeYSelectionEvent(getMediator()
-                .getSelectionModel()));
+        selListener.selectedNodeChanged(new KeYSelectionEvent(getMediator().getSelectionModel()));
     }
 }

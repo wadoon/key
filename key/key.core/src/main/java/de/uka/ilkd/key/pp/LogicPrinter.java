@@ -1,28 +1,4 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.pp;
-
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.Stack;
-import java.util.StringTokenizer;
-
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.java.JavaInfo;
@@ -35,80 +11,63 @@ import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.ModalOperatorSV;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.logic.op.UpdateJunctor;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.AbstractSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.Notation.HeapConstructorNotation;
 import de.uka.ilkd.key.pp.Notation.ObserverNotation;
-import de.uka.ilkd.key.rule.AntecTaclet;
-import de.uka.ilkd.key.rule.FindTaclet;
-import de.uka.ilkd.key.rule.NewDependingOn;
-import de.uka.ilkd.key.rule.NewVarcond;
-import de.uka.ilkd.key.rule.NotFreeIn;
-import de.uka.ilkd.key.rule.RewriteTaclet;
-import de.uka.ilkd.key.rule.RuleSet;
-import de.uka.ilkd.key.rule.SuccTaclet;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.VariableCondition;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
-import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.UnicodeHelper;
 import de.uka.ilkd.key.util.pp.Backend;
 import de.uka.ilkd.key.util.pp.Layouter;
 import de.uka.ilkd.key.util.pp.StringBackend;
 import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.Stack;
+import java.util.StringTokenizer;
+
 
 /**
- * The front end for the Sequent pretty-printer. It prints a sequent and its
- * parts and computes the PositionTable, which is needed for highlighting.
+ * The front end for the Sequent pretty-printer. It prints a sequent and its parts and computes the
+ * PositionTable, which is needed for highlighting.
  *
- * <P>
- * The actual layouting/formatting is done using the
- * {@link de.uka.ilkd.key.util.pp.Layouter} class. The concrete syntax for
- * operators is given by an instance of {@link NotationInfo}. The LogicPrinter
- * is responsible for the concrete <em>layout</em>, e.g. how terms with infix
- * operators are indented, and it binds the various needed components together.
+ * <p>
+ * The actual layouting/formatting is done using the {@link de.uka.ilkd.key.util.pp.Layouter} class.
+ * The concrete syntax for operators is given by an instance of {@link NotationInfo}. The
+ * LogicPrinter is responsible for the concrete <em>layout</em>, e.g. how terms with infix operators
+ * are indented, and it binds the various needed components together.
  *
  * @see NotationInfo
  * @see Notation
  * @see de.uka.ilkd.key.util.pp.Layouter
- *
- *
  */
 public class LogicPrinter {
+    private static final Logger LOGGER = LoggerFactory.getLogger(LogicPrinter.class);
 
     /**
-     * The default and minimal value of the max. number of characters to put in one
-     * line
+     * The default and minimal value of the max. number of characters to put in one line
      */
     public static final int DEFAULT_LINE_WIDTH = 55;
 
-    /** The max. number of characters to put in one line */
+    /**
+     * The max. number of characters to put in one line
+     */
     private int lineWidth = DEFAULT_LINE_WIDTH;
 
     /**
@@ -116,19 +75,29 @@ public class LogicPrinter {
      */
     private final ProgramPrinter prgPrinter;
 
-    /** Contains information on the concrete syntax of operators. */
+    /**
+     * Contains information on the concrete syntax of operators.
+     */
     protected final NotationInfo notationInfo;
 
-    /** the services object */
+    /**
+     * the services object
+     */
     protected final Services services;
 
-    /** This chooses the layout. */
+    /**
+     * This chooses the layout.
+     */
     protected Layouter layouter;
 
-    /** The backend <code>layouter</code> will write to. */
+    /**
+     * The backend <code>layouter</code> will write to.
+     */
     private Backend backend;
 
-    /** If pure is true the PositionTable will not be calculated */
+    /**
+     * If pure is true the PositionTable will not be calculated
+     */
     private boolean pure = false;
 
     private SVInstantiations instantiations = SVInstantiations.EMPTY_SVINSTANTIATIONS;
@@ -137,24 +106,22 @@ public class LogicPrinter {
     private final StorePrinter storePrinter = new StorePrinter(this);
 
     private QuantifiableVariablePrintMode quantifiableVariablePrintMode =
-            QuantifiableVariablePrintMode.NORMAL;
+        QuantifiableVariablePrintMode.NORMAL;
 
     private enum QuantifiableVariablePrintMode {
         NORMAL, WITH_OUT_DECLARATION
     }
 
     /**
-     * Creates a LogicPrinter. Sets the sequent to be printed, as well as a
-     * ProgramPrinter to print Java programs and a NotationInfo which determines the
-     * concrete syntax.
+     * Creates a LogicPrinter. Sets the sequent to be printed, as well as a ProgramPrinter to print
+     * Java programs and a NotationInfo which determines the concrete syntax.
      *
-     * @param prgPrinter   the ProgramPrinter that pretty-prints Java programs
+     * @param prgPrinter the ProgramPrinter that pretty-prints Java programs
      * @param notationInfo the NotationInfo for the concrete syntax
-     * @param backend      the Backend for the output
-     * @param services     services.
-     * @param purePrint    if true the PositionTable will not be calculated
-     *                     (simulates the behaviour of the former
-     *                     PureSequentPrinter)
+     * @param backend the Backend for the output
+     * @param services services.
+     * @param purePrint if true the PositionTable will not be calculated (simulates the behaviour of
+     *        the former PureSequentPrinter)
      */
     public LogicPrinter(ProgramPrinter prgPrinter, NotationInfo notationInfo, Backend backend,
             Services services, boolean purePrint) {
@@ -170,35 +137,32 @@ public class LogicPrinter {
     }
 
     /**
-     * Creates a LogicPrinter. Sets the sequent to be printed, as well as a
-     * ProgramPrinter to print Java programs and a NotationInfo which determines the
-     * concrete syntax.
+     * Creates a LogicPrinter. Sets the sequent to be printed, as well as a ProgramPrinter to print
+     * Java programs and a NotationInfo which determines the concrete syntax.
      *
-     * @param prgPrinter   the ProgramPrinter that pretty-prints Java programs
+     * @param prgPrinter the ProgramPrinter that pretty-prints Java programs
      * @param notationInfo the NotationInfo for the concrete syntax
-     * @param services     The Services object
+     * @param services The Services object
      */
     public LogicPrinter(ProgramPrinter prgPrinter, NotationInfo notationInfo, Services services) {
         this(prgPrinter, notationInfo, new PosTableStringBackend(DEFAULT_LINE_WIDTH), services,
-                false);
+            false);
     }
 
     /**
-     * Creates a LogicPrinter. Sets the sequent to be printed, as well as a
-     * ProgramPrinter to print Java programs and a NotationInfo which determines the
-     * concrete syntax.
+     * Creates a LogicPrinter. Sets the sequent to be printed, as well as a ProgramPrinter to print
+     * Java programs and a NotationInfo which determines the concrete syntax.
      *
-     * @param prgPrinter   the ProgramPrinter that pretty-prints Java programs
+     * @param prgPrinter the ProgramPrinter that pretty-prints Java programs
      * @param notationInfo the NotationInfo for the concrete syntax
-     * @param purePrint    if true the PositionTable will not be calculated
-     *                     (simulates the behaviour of the former
-     *                     PureSequentPrinter)
-     * @param services     the Services object
+     * @param purePrint if true the PositionTable will not be calculated (simulates the behaviour of
+     *        the former PureSequentPrinter)
+     * @param services the Services object
      */
     public LogicPrinter(ProgramPrinter prgPrinter, NotationInfo notationInfo, Services services,
             boolean purePrint) {
         this(prgPrinter, notationInfo, new PosTableStringBackend(DEFAULT_LINE_WIDTH), services,
-                purePrint);
+            purePrint);
     }
 
     /**
@@ -210,7 +174,7 @@ public class LogicPrinter {
      */
     public static String quickPrintTerm(Term t, Services services) {
         return quickPrintTerm(t, services, NotationInfo.DEFAULT_PRETTY_SYNTAX,
-                NotationInfo.DEFAULT_UNICODE_ENABLED);
+            NotationInfo.DEFAULT_UNICODE_ENABLED);
     }
 
     /**
@@ -233,7 +197,7 @@ public class LogicPrinter {
         // because the SequentViewLogicPrinter respects default TermLabel visibility
         // settings.
         LogicPrinter p = new SequentViewLogicPrinter(new ProgramPrinter(), ni, services,
-                new TermLabelVisibilityManager());
+            new TermLabelVisibilityManager());
 
         try {
             p.printTerm(t);
@@ -260,7 +224,7 @@ public class LogicPrinter {
         // because the SequentViewLogicPrinter respects default TermLabel visibility
         // settings.
         LogicPrinter p = new SequentViewLogicPrinter(new ProgramPrinter(), ni, services,
-                new TermLabelVisibilityManager());
+            new TermLabelVisibilityManager());
 
         try {
             p.printSemisequent(s);
@@ -287,7 +251,7 @@ public class LogicPrinter {
         // because the SequentViewLogicPrinter respects default TermLabel visibility
         // settings.
         LogicPrinter p = new SequentViewLogicPrinter(new ProgramPrinter(), ni, services,
-                new TermLabelVisibilityManager());
+            new TermLabelVisibilityManager());
 
         p.printSequent(s);
         return p.result().toString();
@@ -301,8 +265,7 @@ public class LogicPrinter {
     }
 
     /**
-     * Resets the Backend, the Layouter and (if applicable) the ProgramPrinter of
-     * this Object.
+     * Resets the Backend, the Layouter and (if applicable) the ProgramPrinter of this Object.
      */
     public void reset() {
         backend = new PosTableStringBackend(lineWidth);
@@ -313,9 +276,8 @@ public class LogicPrinter {
     }
 
     /**
-     * sets the line width to the new value but does <em>not</em> reprint the
-     * sequent. The actual set line width is the maximum of
-     * {@link LogicPrinter#DEFAULT_LINE_WIDTH} and the given value
+     * sets the line width to the new value but does <em>not</em> reprint the sequent. The actual
+     * set line width is the maximum of {@link LogicPrinter#DEFAULT_LINE_WIDTH} and the given value
      *
      * @param lineWidth the max. number of character to put on one line
      * @return the actual set line width
@@ -326,13 +288,12 @@ public class LogicPrinter {
     }
 
     /**
-     * Reprints the sequent. This can be useful if settings like
-     * PresentationFeatures or abbreviations have changed.
+     * Reprints the sequent. This can be useful if settings like PresentationFeatures or
+     * abbreviations have changed.
      *
-     * @param filter    The SequentPrintFilter for seq
-     * @param lineWidth the max. number of character to put on one line (the actual
-     *                  taken linewidth is the max of
-     *                  {@link LogicPrinter#DEFAULT_LINE_WIDTH} and the given value
+     * @param filter The SequentPrintFilter for seq
+     * @param lineWidth the max. number of character to put on one line (the actual taken linewidth
+     *        is the max of {@link LogicPrinter#DEFAULT_LINE_WIDTH} and the given value
      */
     public void update(SequentPrintFilter filter, int lineWidth) {
         setLineWidth(lineWidth);
@@ -350,19 +311,17 @@ public class LogicPrinter {
     /**
      * Pretty-print a taclet. Line-breaks are taken care of.
      *
-     * @param taclet            The Taclet to be pretty-printed.
-     * @param sv                The instantiations of the SchemaVariables
-     * @param showWholeTaclet   Should the find, varcond and heuristic part be
-     *                          pretty-printed?
-     * @param declareSchemaVars Should declarations for the schema variables used in
-     *                          the taclet be pretty-printed?
+     * @param taclet The Taclet to be pretty-printed.
+     * @param sv The instantiations of the SchemaVariables
+     * @param showWholeTaclet Should the find, varcond and heuristic part be pretty-printed?
+     * @param declareSchemaVars Should declarations for the schema variables used in the taclet be
+     *        pretty-printed?
      */
     public void printTaclet(Taclet taclet, SVInstantiations sv, boolean showWholeTaclet,
             boolean declareSchemaVars) {
         instantiations = sv;
         quantifiableVariablePrintMode = QuantifiableVariablePrintMode.WITH_OUT_DECLARATION;
         try {
-            Debug.log4jDebug(taclet.name().toString(), LogicPrinter.class.getName());
             if (showWholeTaclet) {
                 layouter.beginC(2).print(taclet.name().toString()).print(" {");
             } else {
@@ -398,16 +357,14 @@ public class LogicPrinter {
             }
             layouter.end();
         } catch (java.io.IOException e) {
-            Debug.log4jWarn("xxx exception occurred during printTaclet",
-                    LogicPrinter.class.getName());
+            LOGGER.error("Exception occurred during printTaclet", e);
         }
         instantiations = SVInstantiations.EMPTY_SVINSTANTIATIONS;
         quantifiableVariablePrintMode = QuantifiableVariablePrintMode.NORMAL;
     }
 
     /**
-     * Pretty-print a taclet. Line-breaks are taken care of. No instantiation is
-     * applied.
+     * Pretty-print a taclet. Line-breaks are taken care of. No instantiation is applied.
      *
      * @param taclet The Taclet to be pretty-printed.
      */
@@ -619,7 +576,7 @@ public class LogicPrinter {
         }
         if (tgt instanceof AntecSuccTacletGoalTemplate) {
             printTextSequent(((AntecSuccTacletGoalTemplate) tgt).replaceWith(), "\\replacewith",
-                    true);
+                true);
         }
         if (tgt instanceof RewriteTacletGoalTemplate) {
             layouter.brk();
@@ -684,8 +641,7 @@ public class LogicPrinter {
             } else if (o instanceof ProgramElement) {
                 printProgramElement((ProgramElement) o);
             } else {
-                Debug.log4jWarn("Unknown instantiation type of " + o + "; class is "
-                        + o.getClass().getName(), LogicPrinter.class.getName());
+                LOGGER.error("Unknown instantiation type of {}; class is ", o.getClass().getName());
                 printConstant(sv.name().toString());
             }
         }
@@ -709,14 +665,14 @@ public class LogicPrinter {
     }
 
     /**
-     * Pretty-Prints a ProgramVariable in the logic, not in Java blocks. Prints out
-     * the full (logic) name, so if A.b is private, it becomes a.A::b .
+     * Pretty-Prints a ProgramVariable in the logic, not in Java blocks. Prints out the full (logic)
+     * name, so if A.b is private, it becomes a.A::b .
      *
      * @param pv The ProgramVariable in the logic
      * @throws IOException
      */
     public void printProgramVariable(ProgramVariable pv) throws IOException {
-        Debug.log4jDebug("PP PV " + pv.name(), LogicPrinter.class.getName());
+        LOGGER.debug("PP PV {}", pv.name());
         layouter.beginC().print(pv.name().toString()).end();
     }
 
@@ -797,10 +753,10 @@ public class LogicPrinter {
     }
 
     /**
-     * Pretty-print a sequent. The sequent arrow is rendered as <code>=&gt;</code>.
-     * If the sequent doesn't fit in one line, a line break is inserted after each
-     * formula, the sequent arrow is on a line of its own, and formulae are indented
-     * w.r.t. the arrow. A line-break is printed after the Sequent.
+     * Pretty-print a sequent. The sequent arrow is rendered as <code>=&gt;</code>. If the sequent
+     * doesn't fit in one line, a line break is inserted after each formula, the sequent arrow is on
+     * a line of its own, and formulae are indented w.r.t. the arrow. A line-break is printed after
+     * the Sequent.
      *
      * @param filter The SequentPrintFilter for seq
      */
@@ -811,11 +767,10 @@ public class LogicPrinter {
     }
 
     /**
-     * Pretty-print a sequent. The sequent arrow is rendered as <code>=&gt;</code>.
-     * If the sequent doesn't fit in one line, a line break is inserted after each
-     * formula, the sequent arrow is on a line of its own, and formulae are indented
-     * w.r.t. the arrow. A line-break is printed after the Sequent. No filtering is
-     * done.
+     * Pretty-print a sequent. The sequent arrow is rendered as <code>=&gt;</code>. If the sequent
+     * doesn't fit in one line, a line break is inserted after each formula, the sequent arrow is on
+     * a line of its own, and formulae are indented w.r.t. the arrow. A line-break is printed after
+     * the Sequent. No filtering is done.
      *
      * @param seq The Sequent to be pretty-printed
      */
@@ -827,7 +782,6 @@ public class LogicPrinter {
      * Pretty-prints a Semisequent. Formulae are separated by commas.
      *
      * @param semiseq the semisequent to be printed
-     *
      * @throws IOException if the semisequent cannot be printed.
      */
     public void printSemisequent(Semisequent semiseq) throws IOException {
@@ -858,11 +812,9 @@ public class LogicPrinter {
     }
 
     /**
-     * Pretty-prints a constrained formula. The constraint "Constraint.BOTTOM" is
-     * suppressed
+     * Pretty-prints a constrained formula. The constraint "Constraint.BOTTOM" is suppressed
      *
      * @param cfma the constrained formula to be printed
-     *
      * @throws IOException if the formula cannot be printed.
      */
     public void printConstrainedFormula(SequentFormula cfma) throws IOException {
@@ -870,11 +822,10 @@ public class LogicPrinter {
     }
 
     /**
-     * Pretty-prints a term or formula. How it is rendered depends on the
-     * NotationInfo given to the constructor.
+     * Pretty-prints a term or formula. How it is rendered depends on the NotationInfo given to the
+     * constructor.
      *
      * @param t the Term to be printed
-     *
      * @throws IOException if the term cannot be printed.
      */
     public void printTerm(Term t) throws IOException {
@@ -898,15 +849,14 @@ public class LogicPrinter {
     }
 
     /**
-     * Determine the Set of labels that will be printed out for a specific
-     * {@link Term}. The class {@link SequentViewLogicPrinter} overrides this
-     * method. {@link TermLabel} visibility can be configured via GUI, see
-     * {@link de.uka.ilkd.key.gui.actions.TermLabelMenu}. Default is to print all
-     * TermLabels.
+     * Determine the Set of labels that will be printed out for a specific {@link Term}. The class
+     * {@link SequentViewLogicPrinter} overrides this method. {@link TermLabel} visibility can be
+     * configured via GUI, see {@link de.uka.ilkd.key.gui.actions.TermLabelMenu}. Default is to
+     * print all TermLabels.
      *
      * @param t {@link Term} whose visible {@link TermLabel}s will be determined.
-     * @return List of visible {@link TermLabel}s, i.e. labels that are
-     *         syntactically added to a {@link Term} while printing.
+     * @return List of visible {@link TermLabel}s, i.e. labels that are syntactically added to a
+     *         {@link Term} while printing.
      */
     protected ImmutableArray<TermLabel> getVisibleTermLabels(Term t) {
         return t.getLabels();
@@ -965,24 +915,22 @@ public class LogicPrinter {
     }
 
     /**
-     * Pretty-prints a term or formula in the same block. How it is rendered depends
-     * on the NotationInfo given to the constructor. `In the same block' means that
-     * no extra indentation will be added if line breaks are necessary. A formula
-     * <code>a &amp; (b
-     * &amp; c)</code> would print <code>a &amp; b &amp; c</code>, omitting the
-     * redundant parentheses. The subformula <code>b &amp; c</code> is printed using
-     * this method to get a layout of
+     * Pretty-prints a term or formula in the same block. How it is rendered depends on the
+     * NotationInfo given to the constructor. `In the same block' means that no extra indentation
+     * will be added if line breaks are necessary. A formula <code>a &amp; (b
+     * &amp; c)</code> would print <code>a &amp; b &amp; c</code>, omitting the redundant
+     * parentheses. The subformula <code>b &amp; c</code> is printed using this method to get a
+     * layout of
      *
      * <pre>
      * a &amp; b &amp; c
      * </pre>
-     *
+     * <p>
      * instead of
      *
      * <pre>
      * a &amp; b &amp; c
      * </pre>
-     *
      *
      * @param t the Term to be printed
      */
@@ -1002,10 +950,9 @@ public class LogicPrinter {
     }
 
     /**
-     * Print a term in <code>f(t1,...tn)</code> style. If the operator has arity 0,
-     * no parentheses are printed, i.e. <code>f</code> instead of <code>f()</code>.
-     * If the term doesn't fit on one line, <code>t2...tn</code> are aligned below
-     * <code>t1</code>.
+     * Print a term in <code>f(t1,...tn)</code> style. If the operator has arity 0, no parentheses
+     * are printed, i.e. <code>f</code> instead of <code>f()</code>. If the term doesn't fit on one
+     * line, <code>t2...tn</code> are aligned below <code>t1</code>.
      *
      * @param t the term to be printed.
      */
@@ -1286,9 +1233,9 @@ public class LogicPrinter {
                     KeYJavaType keYJavaType = javaInfo.getKeYJavaType(object.sort());
                     String p;
                     try {
-                        boolean canonical = obs.isStatic() || ((obs instanceof IProgramMethod)
-                                && javaInfo.isCanonicalProgramMethod((IProgramMethod) obs,
-                                        keYJavaType));
+                        boolean canonical =
+                            obs.isStatic() || ((obs instanceof IProgramMethod) && javaInfo
+                                    .isCanonicalProgramMethod((IProgramMethod) obs, keYJavaType));
                         if (canonical) {
                             p = fieldName;
                         } else {
@@ -1432,13 +1379,13 @@ public class LogicPrinter {
     }
 
     /**
-     * Print a unary term in prefix style. For instance <code>!a</code>. No line
-     * breaks are possible.
+     * Print a unary term in prefix style. For instance <code>!a</code>. No line breaks are
+     * possible.
      *
      * @param name the prefix operator
-     * @param t    whole term
-     * @param sub  the subterm to be printed
-     * @param ass  the associativity for the subterm
+     * @param t whole term
+     * @param sub the subterm to be printed
+     * @param ass the associativity for the subterm
      * @throws IOException if the term cannot be printed.
      */
     public void printPrefixTerm(String name, Term t, Term sub, int ass) throws IOException {
@@ -1454,12 +1401,12 @@ public class LogicPrinter {
     }
 
     /**
-     * Print a unary term in postfix style. For instance <code>t.a</code>, where
-     * <code>.a</code> is the postfix operator. No line breaks are possible.
+     * Print a unary term in postfix style. For instance <code>t.a</code>, where <code>.a</code> is
+     * the postfix operator. No line breaks are possible.
      *
      * @param name the postfix operator
-     * @param t    the subterm to be printed
-     * @param ass  the associativity for the subterm
+     * @param t the subterm to be printed
+     * @param ass the associativity for the subterm
      * @throws IOException if the term cannot be printed.
      */
     public void printPostfixTerm(Term t, int ass, String name) throws IOException {
@@ -1470,20 +1417,20 @@ public class LogicPrinter {
 
     /**
      * Print a binary term in infix style. For instance <code>p
-      * &amp; q</code>, where <code>&amp;</code> is the infix operator. If line
-     * breaks are necessary, the format is like
+     * &amp; q</code>, where <code>&amp;</code> is the infix operator. If line breaks are necessary,
+     * the format is like
      *
      * <pre>
      * p & q
      * </pre>
-     *
+     * <p>
      * The subterms are printed using {@link #printTermContinuingBlock(Term)}.
      *
-     * @param l        the left subterm
-     * @param assLeft  associativity for left subterm
-     * @param name     the infix operator
-     * @param t        whole term
-     * @param r        the right subterm
+     * @param l the left subterm
+     * @param assLeft associativity for left subterm
+     * @param name the infix operator
+     * @param t whole term
+     * @param r the right subterm
      * @param assRight associativity for right subterm
      * @throws IOException if the term cannot be printed.
      */
@@ -1498,13 +1445,13 @@ public class LogicPrinter {
     /**
      * Print a binary term in infix style, continuing a containing block. See
      * {@link #printTermContinuingBlock(Term)} for the idea. Otherwise like
-     * {@link #printInfixTerm(Term,int,String,Term,int)}.
+     * {@link #printInfixTerm(Term, int, String, Term, int)}.
      *
-     * @param l        the left subterm
-     * @param assLeft  associativity for left subterm
-     * @param name     the infix operator
-     * @param t        whole term
-     * @param r        the right subterm
+     * @param l the left subterm
+     * @param assLeft associativity for left subterm
+     * @param name the infix operator
+     * @param t whole term
+     * @param r the right subterm
      * @param assRight associativity for right subterm
      * @throws IOException if the term cannot be printed.
      */
@@ -1533,17 +1480,17 @@ public class LogicPrinter {
     }
 
     /**
-     * Print a term with an update. This looks like <code>{u} t</code>. If line
-     * breaks are necessary, the format is
+     * Print a term with an update. This looks like <code>{u} t</code>. If line breaks are
+     * necessary, the format is
      *
      * <pre>
      * {u}
      *   t
      * </pre>
      *
-     * @param l    the left brace
-     * @param r    the right brace
-     * @param t    the update term
+     * @param l the left brace
+     * @param r the right brace
+     * @param t the update term
      * @param ass3 associativity for phi
      * @throws IOException if the term cannot be printed.
      */
@@ -1690,26 +1637,26 @@ public class LogicPrinter {
     }
 
     /**
-     * Print a substitution term. This looks like <code>{var/t}s</code>. If line
-     * breaks are necessary, the format is
+     * Print a substitution term. This looks like <code>{var/t}s</code>. If line breaks are
+     * necessary, the format is
      *
      * <pre>
      * {var/t}
      *   s
      * </pre>
      *
-     * @param l    the String used as left brace symbol
-     * @param v    the {@link QuantifiableVariable} to be substituted
-     * @param t    the Term to be used as new value
+     * @param l the String used as left brace symbol
+     * @param v the {@link QuantifiableVariable} to be substituted
+     * @param t the Term to be used as new value
      * @param ass2 the int defining the associativity for the new value
-     * @param r    the String used as right brace symbol
-     * @param phi  the substituted term/formula
+     * @param r the String used as right brace symbol
+     * @param phi the substituted term/formula
      * @param ass3 the int defining the associativity for phi
      */
     public void printSubstTerm(String l, QuantifiableVariable v, Term t, int ass2, String r,
             Term phi, int ass3) throws IOException {
         layouter.beginC(2).print(l);
-        printVariables(new ImmutableArray<QuantifiableVariable>(v), quantifiableVariablePrintMode);
+        printVariables(new ImmutableArray<>(v), quantifiableVariablePrintMode);
         startTerm(2);
         maybeParens(t, ass2);
         layouter.print(r).brk(0);
@@ -1718,21 +1665,21 @@ public class LogicPrinter {
     }
 
     /**
-     * Print a quantified term. Normally, this looks like <code>all x:s.phi</code>.
-     * If line breaks are necessary, the format is
+     * Print a quantified term. Normally, this looks like <code>all x:s.phi</code>. If line breaks
+     * are necessary, the format is
      *
      * <pre>
      * all x:s.
      *   phi
      * </pre>
-     *
-     * Note that the parameter <code>var</code> has to contain the variable name
-     * with colon and sort.
+     * <p>
+     * Note that the parameter <code>var</code> has to contain the variable name with colon and
+     * sort.
      *
      * @param name the name of the quantifier
      * @param vars the quantified variables (+colon and sort)
-     * @param phi  the quantified formula
-     * @param ass  associativity for phi
+     * @param phi the quantified formula
+     * @param ass associativity for phi
      */
     public void printQuantifierTerm(String name, ImmutableArray<QuantifiableVariable> vars,
             Term phi, int ass) throws IOException {
@@ -1749,8 +1696,7 @@ public class LogicPrinter {
     }
 
     /**
-     * Print a constant. This just prints the string <code>s</code> and marks it as
-     * a nullary term.
+     * Print a constant. This just prints the string <code>s</code> and marks it as a nullary term.
      *
      * @param s the constant
      */
@@ -1760,8 +1706,7 @@ public class LogicPrinter {
     }
 
     /**
-     * Print a constant. This just prints the string <code>s</code> and marks it as
-     * a nullary term.
+     * Print a constant. This just prints the string <code>s</code> and marks it as a nullary term.
      *
      * @param t constant as term to be printed
      * @param s name of the constant
@@ -1784,9 +1729,9 @@ public class LogicPrinter {
     }
 
     /**
-     * Print a Java block. This is formatted using the ProgramPrinter given to the
-     * constructor. The result is indented according to the surrounding material.
-     * The first `executable' statement is marked for highlighting.
+     * Print a Java block. This is formatted using the ProgramPrinter given to the constructor. The
+     * result is indented according to the surrounding material. The first `executable' statement is
+     * marked for highlighting.
      *
      * @param j the Java block to be printed
      */
@@ -1800,7 +1745,7 @@ public class LogicPrinter {
             r = prgPrinter.getRangeOfFirstExecutableStatement();
         } catch (java.io.IOException e) {
             layouter.print("ERROR");
-            System.err.println("Error while printing Java program \n" + e);
+            LOGGER.error("Error while printing Java program \n" + e);
             throw new RuntimeException("Error while printing Java program \n" + e);
         }
         // send first executable statement range
@@ -1809,15 +1754,14 @@ public class LogicPrinter {
     }
 
     /**
-     * Print a string marking a range as first statement. The range <code>r</code>
-     * indicates the `first statement' character range in string <code>s</code>.
-     * This is sent to the layouter by decomposing <code>s</code> into parts and
-     * using the appropriate {@link de.uka.ilkd.key.util.pp.Layouter#mark(Object)}
-     * calls. This solves the problem that the material in <code>s</code> might be
-     * further indented.
+     * Print a string marking a range as first statement. The range <code>r</code> indicates the
+     * `first statement' character range in string <code>s</code>. This is sent to the layouter by
+     * decomposing <code>s</code> into parts and using the appropriate
+     * {@link de.uka.ilkd.key.util.pp.Layouter#mark(Object)} calls. This solves the problem that the
+     * material in <code>s</code> might be further indented.
      *
-     * @param s        the string containing a program
-     * @param r        the range of the first statement
+     * @param s the string containing a program
+     * @param r the range of the first statement
      * @param keywords the ranges of the java keywords in this program
      */
     private void printMarkingFirstStatement(String s, Range r, Range[] keywords)
@@ -1856,8 +1800,8 @@ public class LogicPrinter {
             if (keyword.start() >= iStart && keyword.end() <= iEnd) {
                 int printed = startTotal + (firstTotal - firstStmt.length());
                 String beforeKeyword = firstStmt.substring(0, keyword.start() - printed);
-                String key = firstStmt.substring(keyword.start() - printed,
-                        keyword.end() - printed);
+                String key =
+                    firstStmt.substring(keyword.start() - printed, keyword.end() - printed);
                 firstStmt = firstStmt.substring(keyword.end() - printed);
                 printVerbatim(beforeKeyword);
                 markStartKeyword();
@@ -1902,12 +1846,11 @@ public class LogicPrinter {
     }
 
     /**
-     * Print a DL modality formula. <code>phi</code> is the whole modality formula,
-     * not just the subformula inside the modality. Normally, this looks like
-     * <code>&lt;Program&gt;psi</code>, where <code>psi = phi.sub(0)</code>. No line
-     * breaks are inserted, as the program itself is always broken. In case of a
-     * program modality with arity greater than 1, the subformulae are listed
-     * between parens, like <code>&lt;Program&gt;(psi1,psi2)</code>
+     * Print a DL modality formula. <code>phi</code> is the whole modality formula, not just the
+     * subformula inside the modality. Normally, this looks like <code>&lt;Program&gt;psi</code>,
+     * where <code>psi = phi.sub(0)</code>. No line breaks are inserted, as the program itself is
+     * always broken. In case of a program modality with arity greater than 1, the subformulae are
+     * listed between parens, like <code>&lt;Program&gt;(psi1,psi2)</code>
      */
 
     public void printModalityTerm(String left, JavaBlock jb, String right, Term phi, int ass)
@@ -1917,16 +1860,13 @@ public class LogicPrinter {
         if (phi.op() instanceof ModalOperatorSV) {
             Object o = getInstantiations().getInstantiation((ModalOperatorSV) phi.op());
             if (o == null) {
-                Debug.log4jDebug("PMT  NO  " + phi + " @[ " + phi.op() + " ]@ " + " is : "
-                        + phi.getClass().getName() + " @[" + phi.op().getClass().getName()
-                        + "]@ known", LogicPrinter.class.getName());
+                LOGGER.debug("PMT  NO  {} @[ {} ]@  is : {} @[{}]@ known", phi, phi.op(),
+                    phi.getClass().getName(), phi.op().getClass().getName());
             } else {
                 // logger.debug("Instantiation of " + phi + " @[" + phi.op() + "]@" + " is : " +
                 // o + o.getClass().getName());
                 // logger.debug(getInstantiations());
-                Debug.log4jDebug(
-                        "PMT YES " + phi.op() + " -> " + o + " @[" + o.getClass().getName() + "]@",
-                        LogicPrinter.class.getName());
+                LOGGER.debug("PMT YES {} -> {} @[{}]@", phi.op(), o, o.getClass().getName());
 
                 if (notationInfo.getAbbrevMap().isEnabled(phi)) {
                     startTerm(0);
@@ -1937,7 +1877,7 @@ public class LogicPrinter {
                         ta[i] = phi.sub(i);
                     }
                     Term term = services.getTermFactory().createTerm((Modality) o, ta,
-                            phi.boundVars(), phi.javaBlock());
+                        phi.boundVars(), phi.javaBlock());
                     notationInfo.getNotation((Modality) o).print(term, this);
                     return;
                 }
@@ -1969,8 +1909,8 @@ public class LogicPrinter {
     }
 
     /**
-     * Returns the pretty-printed sequent. This should only be called after a
-     * <tt>printSequent</tt> invocation returns.
+     * Returns the pretty-printed sequent. This should only be called after a <tt>printSequent</tt>
+     * invocation returns.
      *
      * @return the pretty-printed sequent.
      */
@@ -1985,8 +1925,8 @@ public class LogicPrinter {
     }
 
     /**
-     * Returns the pretty-printed sequent in a StringBuffer. This should only be
-     * called after a <tt>printSequent</tt> invocation returns.
+     * Returns the pretty-printed sequent in a StringBuffer. This should only be called after a
+     * <tt>printSequent</tt> invocation returns.
      *
      * @return the pretty-printed sequent.
      */
@@ -2007,14 +1947,14 @@ public class LogicPrinter {
         if (pure) {
             return null;
         } else {
-            return layouter.mark(new Pair<MarkType, Integer>(type, parameter));
+            return layouter.mark(new Pair<>(type, parameter));
         }
     }
 
     /**
-     * returns the PositionTable representing position information on the sequent of
-     * this LogicPrinter. Subclasses may overwrite this method with a null returning
-     * body if position information is not computed there.
+     * returns the PositionTable representing position information on the sequent of this
+     * LogicPrinter. Subclasses may overwrite this method with a null returning body if position
+     * information is not computed there.
      */
     public PositionTable getPositionTable() {
         if (pure) {
@@ -2024,9 +1964,9 @@ public class LogicPrinter {
     }
 
     /**
-     * returns the PositionTable representing position information on the sequent of
-     * this LogicPrinter. Subclasses may overwrite this method with a null returning
-     * body if position information is not computed there.
+     * returns the PositionTable representing position information on the sequent of this
+     * LogicPrinter. Subclasses may overwrite this method with a null returning body if position
+     * information is not computed there.
      */
     public InitialPositionTable getInitialPositionTable() {
         if (pure) {
@@ -2054,16 +1994,16 @@ public class LogicPrinter {
     }
 
     /**
-     * Prints a subterm, if needed with parentheses. Each subterm has a Priority. If
-     * the priority is less than the associativity for that subterm fixed by the
-     * Notation/NotationInfo, parentheses are needed.
+     * Prints a subterm, if needed with parentheses. Each subterm has a Priority. If the priority is
+     * less than the associativity for that subterm fixed by the Notation/NotationInfo, parentheses
+     * are needed.
      *
      * <p>
      * If prio and associativity are equal, the subterm is printed using
-     * {@link #printTermContinuingBlock(Term)}. This currently only makes a
-     * difference for infix operators.
+     * {@link #printTermContinuingBlock(Term)}. This currently only makes a difference for infix
+     * operators.
      *
-     * @param t   the the subterm to print
+     * @param t the the subterm to print
      * @param ass the associativity for this subterm
      */
     protected void maybeParens(Term t, int ass) throws IOException {
@@ -2105,51 +2045,66 @@ public class LogicPrinter {
     }
 
     private static enum MarkType {
-        /** Mark the beginning of a term */
+        /**
+         * Mark the beginning of a term
+         */
         MARK_START_TERM,
-        /** Mark the start of a subterm. Needed for PositionTable construction. */
+        /**
+         * Mark the start of a subterm. Needed for PositionTable construction.
+         */
         MARK_START_SUB,
-        /** Mark the end of a subterm. Needed for PositionTable construction. */
+        /**
+         * Mark the end of a subterm. Needed for PositionTable construction.
+         */
         MARK_END_SUB,
         /**
-         * Mark the start of the first executable statement. Needed for PositionTable
-         * construction.
+         * Mark the start of the first executable statement. Needed for PositionTable construction.
          */
         MARK_START_FIRST_STMT,
         /**
-         * Mark the end of the first executable statement. Needed for PositionTable
-         * construction.
+         * Mark the end of the first executable statement. Needed for PositionTable construction.
          */
         MARK_END_FIRST_STMT,
         /**
-         * Mark the need for a ModalityPositionTable. The next startTerm mark will
-         * construct a ModalityPositionTable instead of the usual PositionTable. Needed
-         * for PositionTable construction.
+         * Mark the need for a ModalityPositionTable. The next startTerm mark will construct a
+         * ModalityPositionTable instead of the usual PositionTable. Needed for PositionTable
+         * construction.
          */
         MARK_MODPOSTBL,
-        /** Mark the start of an update. */
+        /**
+         * Mark the start of an update.
+         */
         MARK_START_UPDATE,
-        /** Mark the end of an update. */
+        /**
+         * Mark the end of an update.
+         */
         MARK_END_UPDATE,
-        /** Mark the beginning of a keyword. */
+        /**
+         * Mark the beginning of a keyword.
+         */
         MARK_START_KEYWORD,
-        /** Mark the end of a keyword. */
+        /**
+         * Mark the end of a keyword.
+         */
         MARK_END_KEYWORD,
-        /** Mark the beginning of a java block. */
+        /**
+         * Mark the beginning of a java block.
+         */
         MARK_START_JAVABLOCK,
-        /** Mark the end of a java block. */
+        /**
+         * Mark the end of a java block.
+         */
         MARK_END_JAVABLOCK,
     }
 
     private final boolean createPositionTable = true;
 
     /**
-     * Called before a substring is printed that has its own entry in a position
-     * table. The method sends a mark to the layouter, which will make the backend
-     * set a start entry in posTbl, push a new StackEntry with the current posTbl
-     * and current pos on the stack and set the current pos to the length of the
-     * current string result. Subclasses may overwrite this method with an empty
-     * body if position information is not needed there.
+     * Called before a substring is printed that has its own entry in a position table. The method
+     * sends a mark to the layouter, which will make the backend set a start entry in posTbl, push a
+     * new StackEntry with the current posTbl and current pos on the stack and set the current pos
+     * to the length of the current string result. Subclasses may overwrite this method with an
+     * empty body if position information is not needed there.
      */
     protected void markStartSub() {
         if (createPositionTable) {
@@ -2167,11 +2122,10 @@ public class LogicPrinter {
     }
 
     /**
-     * Called after a substring is printed that has its own entry in a position
-     * table. The backend will finishes the position table on the top of the stack
-     * and set the entry on the top of the stack to be the current position/position
-     * table. Subclasses may overwrite this method with an empty body if position
-     * information is not needed there.
+     * Called after a substring is printed that has its own entry in a position table. The backend
+     * will finishes the position table on the top of the stack and set the entry on the top of the
+     * stack to be the current position/position table. Subclasses may overwrite this method with an
+     * empty body if position information is not needed there.
      */
     protected void markEndSub() {
         if (createPositionTable) {
@@ -2216,10 +2170,9 @@ public class LogicPrinter {
     }
 
     /**
-     * Start a term with subterms. The backend will set the current posTbl to a
-     * newly created position table with the given number of rows. Subclasses may
-     * overwrite this method with an empty body if position information is not
-     * needed there.
+     * Start a term with subterms. The backend will set the current posTbl to a newly created
+     * position table with the given number of rows. Subclasses may overwrite this method with an
+     * empty body if position information is not needed there.
      *
      * @param size the number of rows of the new position table
      */
@@ -2230,12 +2183,11 @@ public class LogicPrinter {
     }
 
     /**
-     * returns true if an attribute term shall be printed in short form. In opposite
-     * to the other <tt>printInShortForm</tt> methods it takes care of meta variable
-     * instantiations
+     * returns true if an attribute term shall be printed in short form. In opposite to the other
+     * <tt>printInShortForm</tt> methods it takes care of meta variable instantiations
      *
      * @param attributeProgramName the String of the attribute's program name
-     * @param t                    the Term used as reference prefix
+     * @param t the Term used as reference prefix
      * @return true if an attribute term shall be printed in short form.
      */
     public boolean printInShortForm(String attributeProgramName, Term t) {
@@ -2245,12 +2197,11 @@ public class LogicPrinter {
     }
 
     /**
-     * tests if the program name together with the prefix sort determines the
-     * attribute in a unique way
+     * tests if the program name together with the prefix sort determines the attribute in a unique
+     * way
      *
      * @param programName the String denoting the program name of the attribute
-     * @param sort        the ObjectSort in whose reachable hierarchy we test for
-     *                    uniqueness
+     * @param sort the ObjectSort in whose reachable hierarchy we test for uniqueness
      * @return true if the attribute is uniquely determined
      */
     public boolean printInShortForm(String programName, Sort sort) {
@@ -2320,13 +2271,12 @@ public class LogicPrinter {
     }
 
     /**
-     * tests if the program name together with the prefix sort determines the
-     * attribute in a unique way
+     * tests if the program name together with the prefix sort determines the attribute in a unique
+     * way
      *
      * @param programName the String denoting the program name of the attribute
-     * @param sort        the ObjectSort specifying the hierarchy where to test for
-     *                    uniqueness
-     * @param services    the Services class used to access the type hierarchy
+     * @param sort the ObjectSort specifying the hierarchy where to test for uniqueness
+     * @param services the Services class used to access the type hierarchy
      * @return true if the attribute is uniquely determined
      */
     public static boolean printInShortForm(String programName, Sort sort, Services services) {
@@ -2339,8 +2289,8 @@ public class LogicPrinter {
     }
 
     /**
-     * Utility class for stack entries containing the position table and the
-     * position of the start of the subterm in the result.
+     * Utility class for stack entries containing the position table and the position of the start
+     * of the subterm in the result.
      */
     private static class StackEntry {
 
@@ -2363,27 +2313,32 @@ public class LogicPrinter {
     }
 
     /**
-     * A {@link de.uka.ilkd.key.util.pp.Backend} which puts its result in a
-     * StringBuffer and builds a PositionTable. Position table construction is done
-     * using the {@link de.uka.ilkd.key.util.pp.Layouter#mark(Object)} facility of
-     * the layouter with the various static <code>MARK_</code> objects declared
-     * {@link LogicPrinter}.
+     * A {@link de.uka.ilkd.key.util.pp.Backend} which puts its result in a StringBuffer and builds
+     * a PositionTable. Position table construction is done using the
+     * {@link de.uka.ilkd.key.util.pp.Layouter#mark(Object)} facility of the layouter with the
+     * various static <code>MARK_</code> objects declared {@link LogicPrinter}.
      */
     private static class PosTableStringBackend extends StringBackend {
 
-        /** The top PositionTable */
+        /**
+         * The top PositionTable
+         */
         private final InitialPositionTable initPosTbl = new InitialPositionTable();
 
-        /** The resulting position table or an intermediate result */
+        /**
+         * The resulting position table or an intermediate result
+         */
         private PositionTable posTbl = initPosTbl;
 
-        /** The position in result where the current subterm starts */
+        /**
+         * The position in result where the current subterm starts
+         */
         private int pos = 0;
 
         /**
          * The stack of StackEntry representing the nodes above the current subterm
          */
-        private final Stack<StackEntry> stack = new Stack<StackEntry>();
+        private final Stack<StackEntry> stack = new Stack<>();
 
         /**
          * If this is set, a ModalityPositionTable will be built next.
@@ -2391,20 +2346,26 @@ public class LogicPrinter {
         private boolean need_modPosTable = false;
 
         /**
-         * These two remember the range corresponding to the first executable statement
-         * in a JavaBlock
+         * These two remember the range corresponding to the first executable statement in a
+         * JavaBlock
          */
         private int firstStmtStart;
         private Range firstStmtRange;
 
-        /** Remembers the start of an update to create a range */
-        private final Stack<Integer> updateStarts = new Stack<Integer>();
+        /**
+         * Remembers the start of an update to create a range
+         */
+        private final Stack<Integer> updateStarts = new Stack<>();
 
-        /** Remembers the start of a keyword to create a range. */
-        private final Stack<Integer> keywordStarts = new Stack<Integer>();
+        /**
+         * Remembers the start of a keyword to create a range.
+         */
+        private final Stack<Integer> keywordStarts = new Stack<>();
 
-        /** Remembers the start of a java block to create a range. */
-        private final Stack<Integer> javaBlockStarts = new Stack<Integer>();
+        /**
+         * Remembers the start of a java block to create a range.
+         */
+        private final Stack<Integer> javaBlockStarts = new Stack<>();
 
         PosTableStringBackend(int lineWidth) {
             super(lineWidth);
@@ -2526,7 +2487,7 @@ public class LogicPrinter {
                 break;
 
             default:
-                System.err.println("Unexpected LogicPrinter mark: " + markType);
+                LOGGER.error("Unexpected LogicPrinter mark: {}", markType);
             }
         }
     }

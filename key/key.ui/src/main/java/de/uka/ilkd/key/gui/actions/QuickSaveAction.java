@@ -1,22 +1,10 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 
+import de.uka.ilkd.key.gui.TaskTree;
 import org.key_project.util.java.IOUtil;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -24,14 +12,17 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Immediately saves the currently selected proof to a temporaly location. This
- * feature can be conveniently accessed with the F5 key.
+ * Immediately saves the currently selected proof to a temporaly location. This feature can be
+ * conveniently accessed with the F5 key.
  *
  * @author bruns
  */
 public final class QuickSaveAction extends MainWindowAction {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TaskTree.class);
     private static final long serialVersionUID = -7084304175671744403L;
 
     /** The OS's tmp directory. */
@@ -65,12 +56,12 @@ public final class QuickSaveAction extends MainWindowAction {
                 new ProofSaver(proof, filename, KeYConstants.INTERNAL_VERSION).save();
                 final String status = "File quicksaved: " + filename;
                 mainWindow.setStatusLine(status);
-                Debug.out(status);
+                LOGGER.debug(status);
             } catch (IOException x) {
                 mainWindow.popupWarning(
-                        "Quicksaving file " + filename + " failed:\n" + x.getMessage(),
-                        "Quicksave failed");
-                Debug.out("Quicksaving file " + filename + " failed.", x);
+                    "Quicksaving file " + filename + " failed:\n" + x.getMessage(),
+                    "Quicksave failed");
+                LOGGER.debug("Quicksaving file {} failed.", filename, x);
             }
         } else {
             mainWindow.popupWarning("No proof.", "Oops...");

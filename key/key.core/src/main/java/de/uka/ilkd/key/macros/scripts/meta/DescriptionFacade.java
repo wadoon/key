@@ -1,6 +1,8 @@
 package de.uka.ilkd.key.macros.scripts.meta;
 
 import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Properties;
@@ -19,6 +21,7 @@ public final class DescriptionFacade {
      * The filename of the XML properties containing the documentation of proof script commands.
      */
     private static final String COMMANDS_DESCRIPTION = "commands_description.xml";
+    private static final Logger LOGGER = LoggerFactory.getLogger(DescriptionFacade.class);
 
     /**
      * Lazy-loaded properties
@@ -40,7 +43,7 @@ public final class DescriptionFacade {
             if (properties == null) {
                 properties = new Properties();
                 properties.loadFromXML(
-                        DescriptionFacade.class.getResourceAsStream(COMMANDS_DESCRIPTION));
+                    DescriptionFacade.class.getResourceAsStream(COMMANDS_DESCRIPTION));
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -49,8 +52,8 @@ public final class DescriptionFacade {
     }
 
     /**
-     * Looks up the documentation for the given command in the properties file.
-     * If no documentation is available an empty string is returned.
+     * Looks up the documentation for the given command in the properties file. If no documentation
+     * is available an empty string is returned.
      *
      * @param cmd non-null proof script command
      * @return a non-null string
@@ -61,15 +64,15 @@ public final class DescriptionFacade {
     }
 
     /**
-     * Looks up the documentation for the given proof script argument.
-     * If no documentation is available an empty string is returned.
+     * Looks up the documentation for the given proof script argument. If no documentation is
+     * available an empty string is returned.
      *
      * @param arg non-null proof script argument
      * @return a string or null, if {@code arg} is null or {@code arg.getCommand} returns null
      * @see ProofScriptArgument#getDocumentation()
      */
     public static String getDocumentation(ProofScriptArgument<?> arg) {
-        if(arg==null || arg.getCommand() == null) {
+        if (arg == null || arg.getCommand() == null) {
             return null;
         }
         String key = arg.getCommand().getName() + "." + arg.getName();
@@ -77,7 +80,7 @@ public final class DescriptionFacade {
     }
 
     /**
-     * Helper function for look ups in the property file.
+     * Helper function for look-ups in the property file.
      *
      * @param key look up key
      * @return a non-null string
@@ -85,8 +88,7 @@ public final class DescriptionFacade {
     private static String getString(String key) {
         String property = getProperties().getProperty(key);
         if (null == property) {
-            System.err.format("No documentation entry found for %s in %s%n",
-                    key, COMMANDS_DESCRIPTION);
+            LOGGER.warn("No documentation entry found for {} in {}", key, COMMANDS_DESCRIPTION);
             return "";
         }
         return property;

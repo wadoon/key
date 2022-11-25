@@ -1,20 +1,8 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.logic.op;
 
 import java.io.IOException;
 
+import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -48,19 +36,21 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.util.Debug;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * The program method represents a (pure) method in the logic. In case of a
- * non-static method the first argument represents the object on which the
- * method is invoked.
+ * The program method represents a (pure) method in the logic. In case of a non-static method the
+ * first argument represents the object on which the method is invoked.
  */
 public final class ProgramMethod extends ObserverFunction
         implements ProgramInLogic, IProgramMethod {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProgramMethod.class);
+
     private final MethodDeclaration method;
     /**
-     * Return type of the method. Must not be null. Use KeYJavaType.VOID_TYPE
-     * for void methods.
+     * Return type of the method. Must not be null. Use KeYJavaType.VOID_TYPE for void methods.
      */
     private final KeYJavaType returnType;
     private final PositionInfo pi;
@@ -68,16 +58,15 @@ public final class ProgramMethod extends ObserverFunction
     // -------------------------------------------------------------------------
     // constructors
     // -------------------------------------------------------------------------
-    public ProgramMethod(MethodDeclaration method, KeYJavaType container,
-            KeYJavaType kjt, PositionInfo pi, final Sort heapSort) {
+    public ProgramMethod(MethodDeclaration method, KeYJavaType container, KeYJavaType kjt,
+            PositionInfo pi, final Sort heapSort) {
         this(method, container, kjt, pi, heapSort, 1);
     }
 
-    public ProgramMethod(MethodDeclaration method, KeYJavaType container,
-            KeYJavaType kjt, PositionInfo pi, Sort heapSort, int heapCount) {
-        super(method.getProgramElementName().toString(), kjt.getSort(), kjt,
-                heapSort, container, method.isStatic(), getParamTypes(method),
-                heapCount, method.getStateCount());
+    public ProgramMethod(MethodDeclaration method, KeYJavaType container, KeYJavaType kjt,
+            PositionInfo pi, Sort heapSort, int heapCount) {
+        super(method.getProgramElementName().toString(), kjt.getSort(), kjt, heapSort, container,
+            method.isStatic(), getParamTypes(method), heapCount, method.getStateCount());
         this.method = method;
         this.returnType = kjt;
         this.pi = pi;
@@ -87,14 +76,11 @@ public final class ProgramMethod extends ObserverFunction
     // internal methods
     // -------------------------------------------------------------------------
 
-    private static ImmutableArray<KeYJavaType> getParamTypes(
-            MethodDeclaration md) {
-        KeYJavaType[] result = new KeYJavaType[md
-                .getParameterDeclarationCount()];
+    private static ImmutableArray<KeYJavaType> getParamTypes(MethodDeclaration md) {
+        KeYJavaType[] result = new KeYJavaType[md.getParameterDeclarationCount()];
         for (int i = 0; i < result.length; i++) {
-            result[i] = md.getParameterDeclarationAt(i)
-                    .getVariableSpecification().getProgramVariable()
-                    .getKeYJavaType();
+            result[i] = md.getParameterDeclarationAt(i).getVariableSpecification()
+                    .getProgramVariable().getKeYJavaType();
         }
         return new ImmutableArray<KeYJavaType>(result);
     }
@@ -109,7 +95,7 @@ public final class ProgramMethod extends ObserverFunction
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.uka.ilkd.key.logic.op.IProgramMethod#getMethodDeclaration()
      */
     @Override
@@ -119,18 +105,18 @@ public final class ProgramMethod extends ObserverFunction
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.uka.ilkd.key.logic.op.IProgramMethod#getParameterType(int)
      */
     @Override
     public KeYJavaType getParameterType(int i) {
-        return method.getParameterDeclarationAt(i).getVariableSpecification()
-                .getProgramVariable().getKeYJavaType();
+        return method.getParameterDeclarationAt(i).getVariableSpecification().getProgramVariable()
+                .getKeYJavaType();
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.uka.ilkd.key.logic.op.IProgramMethod#getBody()
      */
     @Override
@@ -164,11 +150,10 @@ public final class ProgramMethod extends ObserverFunction
     }
 
     /**
-     * calls the corresponding method of a visitor in order to perform some
-     * action/transformation on this element
-     * 
-     * @param v
-     *            the Visitor
+     * calls the corresponding method of a visitor in order to perform some action/transformation on
+     * this element
+     *
+     * @param v the Visitor
      */
     @Override
     public void visit(Visitor v) {
@@ -176,10 +161,9 @@ public final class ProgramMethod extends ObserverFunction
     }
 
     /**
-     * Returns the start position of the primary token of this element. To get
-     * the start position of the syntactical first token, call the corresponding
-     * method of <CODE>getFirstElement()</CODE>.
-     * 
+     * Returns the start position of the primary token of this element. To get the start position of
+     * the syntactical first token, call the corresponding method of <CODE>getFirstElement()</CODE>.
+     *
      * @return the start position of the primary token.
      */
     @Override
@@ -188,10 +172,9 @@ public final class ProgramMethod extends ObserverFunction
     }
 
     /**
-     * Returns the end position of the primary token of this element. To get the
-     * end position of the syntactical first token, call the corresponding
-     * method of <CODE>getLastElement()</CODE>.
-     * 
+     * Returns the end position of the primary token of this element. To get the end position of the
+     * syntactical first token, call the corresponding method of <CODE>getLastElement()</CODE>.
+     *
      * @return the end position of the primary token.
      */
     @Override
@@ -200,11 +183,10 @@ public final class ProgramMethod extends ObserverFunction
     }
 
     /**
-     * Returns the relative position (number of blank heading lines and columns)
-     * of the primary token of this element. To get the relative position of the
-     * syntactical first token, call the corresponding method of
-     * <CODE>getFirstElement()</CODE>.
-     * 
+     * Returns the relative position (number of blank heading lines and columns) of the primary
+     * token of this element. To get the relative position of the syntactical first token, call the
+     * corresponding method of <CODE>getFirstElement()</CODE>.
+     *
      * @return the relative position of the primary token.
      */
     @Override
@@ -243,7 +225,7 @@ public final class ProgramMethod extends ObserverFunction
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.uka.ilkd.key.logic.op.IProgramMethod#isConstructor()
      */
     @Override
@@ -253,7 +235,7 @@ public final class ProgramMethod extends ObserverFunction
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.uka.ilkd.key.logic.op.IProgramMethod#isModel()
      */
     @Override
@@ -271,7 +253,7 @@ public final class ProgramMethod extends ObserverFunction
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.uka.ilkd.key.logic.op.IProgramMethod#isVoid()
      */
     @Override
@@ -298,8 +280,7 @@ public final class ProgramMethod extends ObserverFunction
      * equals modulo renaming is described in class SourceElement.
      */
     @Override
-    public boolean equalsModRenaming(SourceElement se,
-            NameAbstractionTable nat) {
+    public boolean equalsModRenaming(SourceElement se, NameAbstractionTable nat) {
         if (se == null || !(se instanceof IProgramMethod)) {
             return false;
         }
@@ -314,7 +295,7 @@ public final class ProgramMethod extends ObserverFunction
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.uka.ilkd.key.logic.op.IProgramMethod#getReturnType()
      */
     @Override
@@ -331,13 +312,12 @@ public final class ProgramMethod extends ObserverFunction
             called = (ProgramElement) l.get(0);
             l.remove(0);
         }
-        return new MethodReference(l, getProgramElementName(),
-                (ReferencePrefix) called);
+        return new MethodReference(l, getProgramElementName(), (ReferencePrefix) called);
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.uka.ilkd.key.logic.op.IProgramMethod#getProgramElementName()
      */
     @Override
@@ -347,20 +327,20 @@ public final class ProgramMethod extends ObserverFunction
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.uka.ilkd.key.logic.op.IProgramMethod#getUniqueName()
      */
     @Override
     public String getUniqueName() {
         return getName() + "_"
-                + Math.abs(ContractFactory.generateContractTypeName("",
-                        getContainerType(), this, getContainerType())
-                        .hashCode());
+            + Math.abs(ContractFactory
+                    .generateContractTypeName("", getContainerType(), this, getContainerType())
+                    .hashCode());
     } // Included HashCode to make IF-Predicates unique and still reproducible
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.uka.ilkd.key.logic.op.IProgramMethod#getFullName()
      */
     @Override
@@ -370,7 +350,7 @@ public final class ProgramMethod extends ObserverFunction
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.uka.ilkd.key.logic.op.IProgramMethod#getName()
      */
     @Override
@@ -380,7 +360,7 @@ public final class ProgramMethod extends ObserverFunction
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.uka.ilkd.key.logic.op.IProgramMethod#isAbstract()
      */
     @Override
@@ -390,7 +370,7 @@ public final class ProgramMethod extends ObserverFunction
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.uka.ilkd.key.logic.op.IProgramMethod#isImplicit()
      */
     @Override
@@ -400,7 +380,7 @@ public final class ProgramMethod extends ObserverFunction
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.uka.ilkd.key.logic.op.IProgramMethod#isNative()
      */
     @Override
@@ -410,7 +390,7 @@ public final class ProgramMethod extends ObserverFunction
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.uka.ilkd.key.logic.op.IProgramMethod#isFinal()
      */
     @Override
@@ -420,7 +400,7 @@ public final class ProgramMethod extends ObserverFunction
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.uka.ilkd.key.logic.op.IProgramMethod#isSynchronized()
      */
     @Override
@@ -430,7 +410,7 @@ public final class ProgramMethod extends ObserverFunction
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.uka.ilkd.key.logic.op.IProgramMethod#getThrown()
      */
     @Override
@@ -440,9 +420,8 @@ public final class ProgramMethod extends ObserverFunction
 
     /*
      * (non-Javadoc)
-     * 
-     * @see
-     * de.uka.ilkd.key.logic.op.IProgramMethod#getParameterDeclarationAt(int)
+     *
+     * @see de.uka.ilkd.key.logic.op.IProgramMethod#getParameterDeclarationAt(int)
      */
     @Override
     public ParameterDeclaration getParameterDeclarationAt(int index) {
@@ -451,21 +430,18 @@ public final class ProgramMethod extends ObserverFunction
 
     /*
      * (non-Javadoc)
-     * 
-     * @see
-     * de.uka.ilkd.key.logic.op.IProgramMethod#getVariableSpecification(int)
+     *
+     * @see de.uka.ilkd.key.logic.op.IProgramMethod#getVariableSpecification(int)
      */
     @Override
     public VariableSpecification getVariableSpecification(int index) {
-        return method.getParameterDeclarationAt(index)
-                .getVariableSpecification();
+        return method.getParameterDeclarationAt(index).getVariableSpecification();
     }
 
     /*
      * (non-Javadoc)
-     * 
-     * @see
-     * de.uka.ilkd.key.logic.op.IProgramMethod#getParameterDeclarationCount()
+     *
+     * @see de.uka.ilkd.key.logic.op.IProgramMethod#getParameterDeclarationCount()
      */
     @Override
     public int getParameterDeclarationCount() {
@@ -474,7 +450,7 @@ public final class ProgramMethod extends ObserverFunction
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.uka.ilkd.key.logic.op.IProgramMethod#getParameters()
      */
     @Override
@@ -489,21 +465,20 @@ public final class ProgramMethod extends ObserverFunction
             source.next();
             return matchCond;
         } else {
-            Debug.out("Program match failed (pattern, source)", this, src);
+            LOGGER.debug("Program match failed (pattern {}, source {})", this, src);
             return null;
         }
     }
 
     @Override
     public ImmutableList<LocationVariable> collectParameters() {
-        ImmutableList<LocationVariable> paramVars = ImmutableSLList
-                .<LocationVariable> nil();
+        ImmutableList<LocationVariable> paramVars = ImmutableSLList.<LocationVariable>nil();
         int numParams = getParameterDeclarationCount();
         for (int i = numParams - 1; i >= 0; i--) {
             ParameterDeclaration pd = getParameterDeclarationAt(i);
-            IProgramVariable paramProgVar = pd.getVariableSpecification()
-                    .getProgramVariable();
-            assert paramProgVar instanceof LocationVariable : "Parameter declaration expected to be location var!";
+            IProgramVariable paramProgVar = pd.getVariableSpecification().getProgramVariable();
+            assert paramProgVar instanceof LocationVariable
+                    : "Parameter declaration expected to be location var!";
             LocationVariable paramLocVar = (LocationVariable) paramProgVar;
             paramVars = paramVars.prepend(paramLocVar);
         }

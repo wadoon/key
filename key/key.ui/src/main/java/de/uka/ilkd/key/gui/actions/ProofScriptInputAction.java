@@ -51,14 +51,11 @@ public class ProofScriptInputAction extends AbstractAction {
             super(mainWindow, "Enter proof script");
 
             JTextArea textArea = new JTextArea();
-            JButton confirmButton = new JButton("Ok");
+            JButton okButton = new JButton("OK");
 
-            confirmButton.addActionListener(event -> {
-                ProofScriptWorker psw = new ProofScriptWorker(
-                        mediator,
-                        textArea.getText(),
-                        new Location((URL) null, 0, 0),
-                        mediator.getSelectedGoal());
+            okButton.addActionListener(event -> {
+                ProofScriptWorker psw = new ProofScriptWorker(mediator, textArea.getText(),
+                    new Location((URL) null, 0, 0), mediator.getSelectedGoal());
 
                 dispose();
 
@@ -68,7 +65,7 @@ public class ProofScriptInputAction extends AbstractAction {
 
             setLayout(new BorderLayout());
             add(textArea, BorderLayout.CENTER);
-            add(confirmButton, BorderLayout.PAGE_END);
+            add(okButton, BorderLayout.PAGE_END);
 
             setSize(new Dimension(mainWindow.getWidth() / 3, mainWindow.getHeight() / 2));
             setLocationRelativeTo(mainWindow);

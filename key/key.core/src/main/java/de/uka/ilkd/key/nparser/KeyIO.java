@@ -15,9 +15,11 @@ import de.uka.ilkd.key.util.parsing.BuildingException;
 import de.uka.ilkd.key.util.parsing.BuildingIssue;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -30,8 +32,8 @@ import java.util.stream.Collectors;
 import static de.uka.ilkd.key.nparser.ParsingFacade.parseFiles;
 
 /**
- * This facade provides high level access to parse and
- * interpret key files or input strings into declarations, proof, problem, terms.
+ * This facade provides high level access to parse and interpret key files or input strings into
+ * declarations, proof, problem, terms.
  * <p>
  * This classes encapsulates the {@link Services}, {@link NamespaceSet} for {@link SchemaVariable}s.
  * <b>It also modifies them during interpretation.</b>
@@ -40,11 +42,16 @@ import static de.uka.ilkd.key.nparser.ParsingFacade.parseFiles;
  * @version 1 (17.10.19)
  */
 public class KeyIO {
+    private static final Logger LOGGER = LoggerFactory.getLogger(KeyIO.class);
+
     private final Services services;
     private final NamespaceSet nss;
-    private @Nullable Namespace<SchemaVariable> schemaNamespace;
-    private @Nullable List<BuildingIssue> warnings;
+    @Nullable
+    private Namespace<SchemaVariable> schemaNamespace;
+    @Nullable
+    private List<BuildingIssue> warnings;
     private AbbrevMap abbrevMap;
+
 
     public KeyIO(@Nonnull Services services, @Nonnull NamespaceSet nss) {
         this.services = services;
@@ -185,9 +192,21 @@ public class KeyIO {
         return abbrevMap;
     }
 
+    @Nullable
+    public List<BuildingIssue> getWarnings() {
+        return warnings;
+    }
+
+    @Nullable
+    public List<BuildingIssue> resetWarnings() {
+        var w = warnings;
+        warnings = new LinkedList<>();
+        return w;
+    }
+
     /**
-     * Loading of complete KeY files into the given schema.
-     * Supports recursive loading, but does not provide support for Java and Java type informations.
+     * Loading of complete KeY files into the given schema. Supports recursive loading, but does not
+     * provide support for Java and Java type informations.
      * <p>
      * Little sister of {@link ProblemInitializer}.
      */
@@ -211,7 +230,8 @@ public class KeyIO {
         }
 
         public List<Taclet> loadComplete() throws IOException {
-            if (ctx.isEmpty()) parseFile();
+            if (ctx.isEmpty())
+                parseFile();
             loadDeclarations();
             loadSndDegreeDeclarations();
             activateLDTs();
@@ -224,7 +244,8 @@ public class KeyIO {
         }
 
         public ProblemFinder loadCompleteProblem() throws IOException {
-            if (ctx.isEmpty()) parseFile();
+            if (ctx.isEmpty())
+                parseFile();
             loadDeclarations();
             loadSndDegreeDeclarations();
             activateLDTs();
@@ -233,16 +254,17 @@ public class KeyIO {
         }
 
         public Loader parseFile() throws IOException {
-            if (!ctx.isEmpty()) return this;
-            //long start = System.currentTimeMillis();
+            if (!ctx.isEmpty())
+                return this;
+            long start = System.currentTimeMillis();
             if (resource != null)
                 ctx = parseFiles(resource);
             else {
                 KeyAst.File c = ParsingFacade.parseFile(content);
                 ctx.add(c);
             }
-            //long stop = System.currentTimeMillis();
-            //System.err.format("Parsing took %d%n", stop - start);
+            long stop = System.currentTimeMillis();
+            LOGGER.info("Parsing took {} ms", stop - start);
             return this;
         }
 
@@ -261,17 +283,15 @@ public class KeyIO {
         }
 
         public Loader loadDeclarations() {
-            //var choiceFinder = new ChoiceFinder(nss.choices());
             DeclarationBuilder declBuilder = new DeclarationBuilder(services, nss);
             long start = System.currentTimeMillis();
-            for (int i = ctx.size() - 1; i >= 0; i--) { // process backwards
-                KeyAst.File s = ctx.get(i);
-                //var p = parsers.get(i);
-                //s.accept(choiceFinder);
-                s.accept(declBuilder);
+            for (int i = ctx.size() - 1; i >= 0; --i) {
+                var file = ctx.get(i);
+                LOGGER.debug("Load declarations of {}", file);
+                file.accept(declBuilder);
             }
             long stop = System.currentTimeMillis();
-            //System.err.format("MODE: %s took %d%n", "declarations", stop - start);
+            LOGGER.info("MODE: {} took {} ms", "declarations", stop - start);
             return this;
         }
 
@@ -283,22 +303,23 @@ public class KeyIO {
                 s.accept(visitor);
             }
             long stop = System.currentTimeMillis();
-            //System.err.format("MODE: %s took %d%n", "2nd degree decls", stop - start);
+            LOGGER.debug("MODE: {} took {}", "2nd degree decls", stop - start);
             return this;
         }
 
         public ProblemFinder loadProblem() {
-            if (ctx.isEmpty()) throw new IllegalStateException();
+            if (ctx.isEmpty())
+                throw new IllegalStateException();
             ProblemFinder pf = new ProblemFinder(services, nss);
             ctx.get(0).accept(pf);
             return pf;
         }
 
         public List<Taclet> loadTaclets() {
-            if (ctx.isEmpty()) throw new IllegalStateException();
+            if (ctx.isEmpty())
+                throw new IllegalStateException();
             List<TacletPBuilder> parsers = ctx.stream().map(it -> new TacletPBuilder(services, nss))
                     .collect(Collectors.toList());
-            //Collections.reverse(parsers);
             long start = System.currentTimeMillis();
             List<Taclet> taclets = new ArrayList<>(2048);
             for (int i = 0; i < ctx.size(); i++) {
@@ -312,12 +333,12 @@ public class KeyIO {
                 schemaNamespace = p.schemaVariables();
             }
             long stop = System.currentTimeMillis();
-            //System.err.format("MODE: %s took %d%n", "taclets", stop - start);
+            LOGGER.debug("MODE: {} took {}ms", "taclets", stop - start);
             return taclets;
         }
 
         public Term getProblem() {
-            //TODO
+            // TODO weigl tbd
             return null;
         }
     }

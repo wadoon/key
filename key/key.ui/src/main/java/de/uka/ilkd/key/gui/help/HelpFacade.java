@@ -10,15 +10,17 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 
 /**
  * A gate to the KeY documentation system.
  * <p>
- * Provides the facility to open the documentation at press of F1.
- * The opened page is determined context-sensitive by the current focused component
- * and parent components. Specify the URL via {@HelpInfo}.
+ * Provides the facility to open the documentation at press of F1. The opened page is determined
+ * context-sensitive by the current focused component and parent components. Specify the URL via
+ * {@HelpInfo}.
  *
  * @author Alexander Weigl
  * @version 1 (10.04.19)
@@ -63,8 +65,7 @@ public class HelpFacade {
     }
 
     /**
-     * Opens the specified sub page of the key
-     * documentation website in the default system browser.
+     * Opens the specified sub page of the key documentation website in the default system browser.
      *
      * @param path a valid suffix to the current URI
      */
@@ -75,8 +76,8 @@ public class HelpFacade {
     /**
      * Tries to find the documentation of the given component and opens it.
      * <p>
-     * The documentation is determined by following the parents to the root and checking
-     * for {@see HelpInfo} on the classes.
+     * The documentation is determined by following the parents to the root and checking for
+     * {@see HelpInfo} on the classes.
      *
      * @param path
      */
@@ -107,8 +108,9 @@ public class HelpFacade {
     }
 
     /**
-     * Creates a {@link CButton}, that can be add to dockables and opens the given
-     * help pages at {@link #HELP_BASE_URL}
+     * Creates a {@link CButton}, that can be add to dockables and opens the given help pages at
+     * {@link #HELP_BASE_URL}
+     *
      * @param s path to help page
      * @return
      */
@@ -118,12 +120,27 @@ public class HelpFacade {
         return btn;
     }
 
+    public static KeyAction createHelpAction(String path) {
+        class HelpAction extends KeyAction {
+            private HelpAction() {
+                setName("");
+                setIcon(IconFactory.HELP.get());
+            }
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                openHelp(path);
+            }
+        }
+        return new HelpAction();
+    }
+
     private static class OpenHelpAction extends KeyAction {
         private static final long serialVersionUID = 85722762932429493L;
 
         public OpenHelpAction() {
             setName("Open help");
-            setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
+            setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_F1, KeyEvent.CTRL_DOWN_MASK));
             lookupAcceleratorKey();
         }
 

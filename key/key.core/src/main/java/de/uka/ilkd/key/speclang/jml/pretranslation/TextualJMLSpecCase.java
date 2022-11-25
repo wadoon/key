@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -31,8 +18,8 @@ import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Cla
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.ClauseHd.*;
 
 /**
- * A JML specification case (i.e., more or less an operation contract) in
- * textual form. Is also used for block contracts.
+ * A JML specification case (i.e., more or less an operation contract) in textual form. Is also used
+ * for block contracts.
  */
 public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
@@ -44,12 +31,12 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return getList(ENSURES_FREE, toString);
     }
 
-    private ImmutableList<LabeledParserRuleContext> getList(@Nonnull ClauseHd clause, @Nonnull Name heap) {
-        List<LabeledParserRuleContext> seq = clauses.stream()
-                .filter(it -> it.clauseType.equals(clause))
-                .filter(it -> Objects.equals(it.heap, heap))
-                .map(it -> it.ctx)
-                .collect(Collectors.toList());
+    private ImmutableList<LabeledParserRuleContext> getList(@Nonnull ClauseHd clause,
+            @Nonnull Name heap) {
+        List<LabeledParserRuleContext> seq =
+            clauses.stream().filter(it -> it.clauseType.equals(clause))
+                    .filter(it -> Objects.equals(it.heap, heap)).map(it -> it.ctx)
+                    .collect(Collectors.toList());
         return ImmutableList.fromList(seq);
     }
 
@@ -81,33 +68,16 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
      * Heap-independent clauses
      */
     public enum Clause {
-        MEASURED_BY,
-        WORKING_SPACE,
-        SIGNALS,
-        DIVERGES,
-        DEPENDS,
-        BREAKS,
-        CONTINUES,
-        RETURNS,
-        DECREASES,
-        SIGNALS_ONLY,
-        ABBREVIATION,
-        INFORMATION_FLOW
+        MEASURED_BY, WORKING_SPACE, SIGNALS, DIVERGES, DEPENDS, BREAKS, CONTINUES, RETURNS,
+        DECREASES, SIGNALS_ONLY, ABBREVIATION, INFORMATION_FLOW
     }
 
     /**
      * Heap-dependent clauses
      */
     public enum ClauseHd {
-        ACCESSIBLE,
-        ASSIGNABLE,
-        REQUIRES,
-        REQUIRES_FREE,
-        ENSURES,
-        ENSURES_FREE,
-        AXIOMS,
+        ACCESSIBLE, ASSIGNABLE, REQUIRES, REQUIRES_FREE, ENSURES, ENSURES_FREE, AXIOMS,
     }
-    //private ImmutableList<Triple<PositionedString, PositionedString, PositionedString>> abbreviations = ImmutableSLList.nil();
 
     private final Behavior behavior;
     private ArrayList<Entry> clauses = new ArrayList<>(16);
@@ -130,12 +100,10 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     public TextualJMLSpecCase(ImmutableList<String> mods, @Nonnull Behavior behavior) {
         super(mods);
-        assert behavior != null;
+        if (behavior == null) {
+            throw new IllegalArgumentException();
+        }
         this.behavior = behavior;
-        /*for (Name hName : HeapLDT.VALID_HEAP_NAMES) {
-            //heaps.put(hName.toString(), new ArrayList<>(32));
-            //accessibles.put(hName.toString() + "AtPre", ImmutableSLList.nil());
-        }*/
     }
 
     public TextualJMLSpecCase addClause(Clause clause, LabeledParserRuleContext ctx) {
@@ -147,7 +115,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return addClause(clause, null, ctx);
     }
 
-    public TextualJMLSpecCase addClause(ClauseHd clause, @Nullable Name heapName, LabeledParserRuleContext ctx) {
+    public TextualJMLSpecCase addClause(ClauseHd clause, @Nullable Name heapName,
+            LabeledParserRuleContext ctx) {
         if (heapName == null)
             heapName = HeapLDT.BASE_HEAP_NAME;
         clauses.add(new Entry(clause, ctx, heapName));
@@ -163,13 +132,13 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return addClause(clause, null, new LabeledParserRuleContext(ctx));
     }
 
-    public TextualJMLSpecCase addClause(ClauseHd clause, @Nullable Name heapName, ParserRuleContext ctx) {
+    public TextualJMLSpecCase addClause(ClauseHd clause, @Nullable Name heapName,
+            ParserRuleContext ctx) {
         return addClause(clause, heapName, new LabeledParserRuleContext(ctx));
     }
 
     /**
-     * Merge clauses of two spec cases.
-     * Keep behavior of this one.
+     * Merge clauses of two spec cases. Keep behavior of this one.
      *
      * @param other
      */
@@ -189,7 +158,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     public void addName(String n) {
         this.name = n;
-        //setPosition(n);
+        // setPosition(n);
     }
 
     public Behavior getBehavior() {
@@ -202,121 +171,18 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     @Override
     public String toString() {
-        return "TextualJMLSpecCase{" +
-                "behavior=" + behavior +
-                ", clauses=" + clauses +
-                ", mods=" + mods +
-                ", name='" + name + '\'' +
-                '}';
+        return "TextualJMLSpecCase{" + "behavior=" + behavior + ", clauses=" + clauses + ", mods="
+            + mods + ", name='" + name + '\'' + '}';
     }
 
-    /*
-    @Override
-    public String toString() {
-        StringBuffer sb = new StringBuffer();
-        Iterator<PositionedString> it;
 
-        sb.append(behavior).append("\n");
-
-        for (Triple<PositionedString, PositionedString, PositionedString> t : abbreviations) {
-            sb.append("old: ");
-            sb.append(t.first.toString());
-            sb.append(" ");
-            sb.append(t.second.toString());
-            sb.append(" = ");
-            sb.append(t.third.toString());
-            sb.append("\n");
-        }
-
-        for (Name h : HeapLDT.VALID_HEAP_NAMES) {
-            it = requires.get(h.toString()).iterator();
-            while (it.hasNext()) {
-                sb.append("requires<" + h + ">: " + it.next() + "\n");
-            }
-        }
-        for (Name h : HeapLDT.VALID_HEAP_NAMES) {
-            it = requiresFree.get(h.toString()).iterator();
-            while (it.hasNext()) {
-                sb.append("requires_free<" + h + ">: " + it.next() + "\n");
-            }
-        }
-        for (Name h : HeapLDT.VALID_HEAP_NAMES) {
-            it = assignables.get(h.toString()).iterator();
-            while (it.hasNext()) {
-                sb.append("assignable<" + h + ">: " + it.next() + "\n");
-            }
-        }
-        for (Name h : HeapLDT.VALID_HEAP_NAMES) {
-            it = accessibles.get(h.toString()).iterator();
-            while (it.hasNext()) {
-                sb.append("accessible<" + h + ">: " + it.next() + "\n");
-            }
-            it = accessibles.get(h.toString() + "AtPre").iterator();
-            while (it.hasNext()) {
-                sb.append("accessible<" + h + "AtPre>: " + it.next() + "\n");
-            }
-        }
-        for (Name h : HeapLDT.VALID_HEAP_NAMES) {
-            it = ensures.get(h.toString()).iterator();
-            while (it.hasNext()) {
-                sb.append("ensures<" + h + ">: " + it.next() + "\n");
-            }
-        }
-        for (Name h : HeapLDT.VALID_HEAP_NAMES) {
-            it = ensuresFree.get(h.toString()).iterator();
-            while (it.hasNext()) {
-                sb.append("ensures_free<" + h + ">: " + it.next() + "\n");
-            }
-        }
-        for (Name h : HeapLDT.VALID_HEAP_NAMES) {
-            it = axioms.get(h.toString()).iterator();
-            while (it.hasNext()) {
-                sb.append("axioms<" + h + ">: " + it.next() + "\n");
-            }
-        }
-        it = signals.iterator();
-        while (it.hasNext()) {
-            sb.append("signals: ").append(it.next()).append("\n");
-        }
-        it = signalsOnly.iterator();
-        while (it.hasNext()) {
-            sb.append("signals_only: ").append(it.next()).append("\n");
-        }
-        it = diverges.iterator();
-        while (it.hasNext()) {
-            sb.append("diverges: ").append(it.next()).append("\n");
-        }
-        it = depends.iterator();
-        while (it.hasNext()) {
-            sb.append("depends: ").append(it.next()).append("\n");
-        }
-        it = breaks.iterator();
-        while (it.hasNext()) {
-            sb.append("breaks: ").append(it.next()).append("\n");
-        }
-        it = continues.iterator();
-        while (it.hasNext()) {
-            sb.append("continues: ").append(it.next()).append("\n");
-        }
-        it = returns.iterator();
-        while (it.hasNext()) {
-            sb.append("returns: ").append(it.next()).append("\n");
-        }
-        it = infFlowSpecs.iterator();
-        while (it.hasNext()) {
-            sb.append("determines: ").append(it.next()).append("\n");
-        }
-        return sb.toString();
-    }
-    */
-
-    //region legacy api
+    // region legacy api
     public void addRequires(LabeledParserRuleContext label) {
         addClause(REQUIRES, label);
     }
 
     public Triple<LabeledParserRuleContext, LabeledParserRuleContext, LabeledParserRuleContext>[] getAbbreviations() {
-        //TODO System.out.println("TODO .getAbbreviations");
+        /* weigl: prepare for future use of generated abbreviations from JML specifications */
         return new Triple[0];
     }
 
@@ -354,9 +220,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     private ImmutableList<LabeledParserRuleContext> getList(Object key) {
         List<LabeledParserRuleContext> seq =
-                clauses.stream().filter(it -> it.clauseType.equals(key))
-                        .map(it -> it.ctx)
-                        .collect(Collectors.toList());
+            clauses.stream().filter(it -> it.clauseType.equals(key)).map(it -> it.ctx)
+                    .collect(Collectors.toList());
         return ImmutableList.fromList(seq);
     }
 
@@ -371,15 +236,16 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     public ImmutableList<LabeledParserRuleContext> getSignals() {
         return getList(SIGNALS);
     }
-    //endregion
+    // endregion
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof TextualJMLSpecCase)) return false;
+        if (this == o)
+            return true;
+        if (!(o instanceof TextualJMLSpecCase))
+            return false;
         TextualJMLSpecCase that = (TextualJMLSpecCase) o;
-        return getBehavior() == that.getBehavior() &&
-                clauses.equals(that.clauses);
+        return getBehavior() == that.getBehavior() && clauses.equals(that.clauses);
     }
 
     @Override

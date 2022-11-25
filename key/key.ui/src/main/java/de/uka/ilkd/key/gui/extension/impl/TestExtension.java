@@ -15,6 +15,8 @@ import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.Rule;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -29,38 +31,37 @@ import java.util.List;
  * @version 1 (16.04.19)
  */
 @KeYGuiExtension.Info(name = "Test Extension",
-        description = "Should only be used for testing of the extension facade",
-        priority = 100000,
-        optional = true,
-        experimental = true)
-public class TestExtension implements KeYGuiExtension,
-        KeYGuiExtension.MainMenu,
-        KeYGuiExtension.LeftPanel,
-        KeYGuiExtension.StatusLine,
-        KeYGuiExtension.ContextMenu,
-        KeYGuiExtension.Toolbar,
-        KeYGuiExtension.KeyboardShortcuts,
-        KeYGuiExtension.Settings {
+    description = "Should only be used for testing of the extension facade", priority = 100000,
+    optional = true)
+public class TestExtension implements KeYGuiExtension, KeYGuiExtension.MainMenu,
+        KeYGuiExtension.LeftPanel, KeYGuiExtension.StatusLine, KeYGuiExtension.ContextMenu,
+        KeYGuiExtension.Toolbar, KeYGuiExtension.KeyboardShortcuts, KeYGuiExtension.Settings {
 
-    KeyAction actionTest = new TestAction();
-    private ContextMenuAdapter cmAdapter = new ContextMenuAdapter() {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestExtension.class);
+
+    private final KeyAction actionTest = new TestAction();
+    private final ContextMenuAdapter cmAdapter = new ContextMenuAdapter() {
         @Override
-        public List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind, Proof underlyingObject) {
+        public List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind,
+                Proof underlyingObject) {
             return Collections.singletonList(actionTest);
         }
 
         @Override
-        public List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind, Node underlyingObject) {
+        public List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind,
+                Node underlyingObject) {
             return Collections.singletonList(actionTest);
         }
 
         @Override
-        public List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind, PosInSequent underlyingObject) {
+        public List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind,
+                PosInSequent underlyingObject) {
             return Collections.singletonList(actionTest);
         }
 
         @Override
-        public List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind, Rule underlyingObject) {
+        public List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind,
+                Rule underlyingObject) {
             return Collections.singletonList(actionTest);
         }
     };
@@ -71,7 +72,8 @@ public class TestExtension implements KeYGuiExtension,
     }
 
     @Override
-    public List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind, Object underlyingObject) {
+    public List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind,
+            Object underlyingObject) {
         return cmAdapter.getContextActions(mediator, kind, underlyingObject);
     }
 
@@ -108,7 +110,8 @@ public class TestExtension implements KeYGuiExtension,
     }
 
     @Override
-    public Collection<Action> getShortcuts(KeYMediator mediator, String componentId, JComponent component) {
+    public Collection<Action> getShortcuts(KeYMediator mediator, String componentId,
+            JComponent component) {
         return Collections.singleton(actionTest);
     }
 
@@ -119,7 +122,8 @@ public class TestExtension implements KeYGuiExtension,
             setName("Test");
             setMenuPath("Test.Test.Test");
             setIcon(IconFontSwing.buildIcon(FontAwesomeSolid.TEETH, 16, Color.BLUE));
-            putValue(LOCAL_ACCELERATOR, KeyStroke.getKeyStroke(KeyEvent.VK_1, KeyEvent.CTRL_DOWN_MASK));
+            putValue(LOCAL_ACCELERATOR,
+                KeyStroke.getKeyStroke(KeyEvent.VK_1, KeyEvent.CTRL_DOWN_MASK));
             lookupAcceleratorKey();
         }
 
@@ -142,7 +146,7 @@ public class TestExtension implements KeYGuiExtension,
 
         @Override
         public void applySettings(MainWindow window) throws InvalidSettingsInputException {
-            System.out.println("TestSettingsProvider.applySettings");
+            LOGGER.trace("TestSettingsProvider.applySettings");
         }
     }
 }

@@ -1,25 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General 
-// Public License. See LICENSE.TXT for details.
-// 
 
 /**
  * This class provides the static method removeDup. 
- * 
+ *
  * It takes an int-array and returns an array containing the same integer
  * values but no duplicates.
  *
  * The specification for removeDup was part of a KIT Formal Systems exam
  * in Feb 2014.
- * 
+ *
  * @author Mattias Ulbrich
  */
 class RemoveDup {

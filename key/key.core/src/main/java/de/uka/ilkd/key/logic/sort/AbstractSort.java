@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.logic.sort;
 
 import de.uka.ilkd.key.java.Services;
@@ -20,6 +7,8 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import javax.annotation.Nullable;
+
 /**
  * Abstract base class for implementations of the Sort interface.
  */
@@ -28,6 +17,16 @@ public abstract class AbstractSort implements Sort {
     private final Name name;
     private ImmutableSet<Sort> ext;
     private final boolean isAbstract;
+
+    /**
+     * Documentation for this sort given by the an associated documentation comment.
+     *
+     * @see de.uka.ilkd.key.nparser.KeYParser.One_sort_declContext#doc
+     */
+    private String documentation;
+
+    /** Information of the origin of this sort */
+    private String origin;
 
     public AbstractSort(Name name, ImmutableSet<Sort> ext, boolean isAbstract) {
         this.name = name;
@@ -65,7 +64,8 @@ public abstract class AbstractSort implements Sort {
             return true;
         }
 
-        return extendsSorts().exists((Sort superSort) -> superSort == sort || superSort.extendsTrans(sort));
+        return extendsSorts()
+                .exists((Sort superSort) -> superSort == sort || superSort.extendsTrans(sort));
     }
 
 
@@ -83,7 +83,8 @@ public abstract class AbstractSort implements Sort {
 
     @Override
     public final SortDependingFunction getCastSymbol(TermServices services) {
-        SortDependingFunction castFunction = SortDependingFunction.getFirstInstance(CAST_NAME, services);
+        SortDependingFunction castFunction =
+            SortDependingFunction.getFirstInstance(CAST_NAME, services);
         if (castFunction == null) {
             throw new IllegalStateException("Your namespaces does `cast' defined.");
         }
@@ -95,9 +96,8 @@ public abstract class AbstractSort implements Sort {
 
     @Override
     public final SortDependingFunction getInstanceofSymbol(TermServices services) {
-        SortDependingFunction result
-                = SortDependingFunction.getFirstInstance(INSTANCE_NAME, services)
-                .getInstanceFor(this, services);
+        SortDependingFunction result = SortDependingFunction
+                .getFirstInstance(INSTANCE_NAME, services).getInstanceFor(this, services);
         assert result.getSortDependingOn() == this;
         return result;
     }
@@ -105,9 +105,8 @@ public abstract class AbstractSort implements Sort {
 
     @Override
     public final SortDependingFunction getExactInstanceofSymbol(TermServices services) {
-        SortDependingFunction result
-                = SortDependingFunction.getFirstInstance(EXACT_INSTANCE_NAME, services)
-                .getInstanceFor(this, services);
+        SortDependingFunction result = SortDependingFunction
+                .getFirstInstance(EXACT_INSTANCE_NAME, services).getInstanceFor(this, services);
         assert result.getSortDependingOn() == this;
         return result;
     }
@@ -120,5 +119,25 @@ public abstract class AbstractSort implements Sort {
 
     public String declarationString() {
         return name.toString();
+    }
+
+    public void setDocumentation(@Nullable String documentation) {
+        this.documentation = documentation;
+    }
+
+    @Nullable
+    @Override
+    public String getDocumentation() {
+        return documentation;
+    }
+
+    @Nullable
+    @Override
+    public String getOrigin() {
+        return origin;
+    }
+
+    public void setOrigin(@Nullable String origin) {
+        this.origin = origin;
     }
 }

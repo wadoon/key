@@ -1,169 +1,184 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.smt;
 
 import java.util.Collection;
 
+import de.uka.ilkd.key.smt.communication.AbstractSolverSocket;
+import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
 
 /**
- * The SMTSolver interface represents a solver process (e.g. Z3, Simplify,...)
- * on the KeY side. It is used to store information about an instance of a
- * process and its result. A object of <code>SMTSolver</code> is, therefore,
- * related to exactly one object of typ <code>SMTProblem</code>. Each object of
- * <code>SMTSolver</code> has a specific solver type (<code>SolverType</code>),
- * e.g <code>SolverType.Z3Solver</code>. <br>
+ * The SMTSolver interface represents a solver process (e.g. Z3, Simplify,...) on the KeY side. It
+ * is used to store information about an instance of a process and its result. A object of
+ * <code>SMTSolver</code> is, therefore, related to exactly one object of typ
+ * <code>SMTProblem</code>. Each object of <code>SMTSolver</code> has a specific solver type
+ * (<code>SolverType</code>), e.g <code>SolverType.Z3Solver</code>. <br>
  * Note:<br>
- *A class that implements this interface should be thread safe since there
- * methods are accessed by different threads concurrently.
- * 
+ * A class that implements this interface should be thread safe since there methods are accessed by
+ * different threads concurrently.
+ *
+ * @author ?
  */
 public interface SMTSolver {
 
-    public enum ReasonOfInterruption {
-	User, Timeout, Exception, NoInterruption
+    /**
+     * Possible reasons for why a solver process was interrupted/stopped.
+     */
+    enum ReasonOfInterruption {
+        User, Timeout, Exception, NoInterruption
     }
 
     /**
-     * A solver process can have differnt states. When a solver is created, it
-     * is in state <code>Waiting</code>. Once it is started it is in state
-     * <code>Running</code>. After the execution has stopped the solver is in
-     * state <code>Stopped</code>.
+     * A solver process can have differnt states. When a solver is created, it is in state
+     * <code>Waiting</code>. Once it is started it is in state <code>Running</code>. After the
+     * execution has stopped the solver is in state <code>Stopped</code>.
      */
-    public enum SolverState {
-	Waiting, Running, Stopped
+    enum SolverState {
+        Waiting, Running, Stopped
     }
 
     /**
-     * Returns the name of the solver.
+     * @return the name of the solver.
      */
-    public String name();
+    String name();
 
     /**
-     * Returns the translation of the SMTProblem that is handed over to the
-     * solver process. If the solver process is still running the method returns
-     * <code>null</code> in order to maintain thread safety.
-     * 
-     * @return String representation of the corresponding problem, if the solver
-     *         process is not running, otherwise null.
+     * Returns the translation of the SMTProblem that is handed over to the solver process. If the
+     * solver process is still running the method returns <code>null</code> in order to maintain
+     * thread safety.
+     *
+     * @return String representation of the corresponding problem, if the solver process is not
+     *         running, otherwise null.
      */
-    public String getTranslation();
+    String getTranslation();
 
     /**
-     * Returns the taclet translation that is used as assumptions. If the solver
-     * process is still running the method returns <code>null</code> in order to
-     * maintain thread safety.
+     * Returns the taclet translation that is used as assumptions. If the solver process is still
+     * running the method returns <code>null</code> in order to maintain thread safety.
+     *
+     * @return the taclet translation that is used as assumptions
      */
-    public TacletSetTranslation getTacletTranslation();
+    TacletSetTranslation getTacletTranslation();
 
     /**
-     * Returns the type of the solver process.
+     * @return the type of the solver process.
      */
-    public SolverType getType();
+    SolverType getType();
 
     /**
-     * Returns the SMT Problem that is connected to this solver process. If the
-     * solver process is still running the method returns <code>null</code> in
-     * order to maintain thread safety.
+     * Returns the SMT Problem that is connected to this solver process. If the solver process is
+     * still running the method returns <code>null</code> in order to maintain thread safety.
+     *
+     * @return the SMT Problem that is connected to this solver process
      **/
-    public SMTProblem getProblem();
+    SMTProblem getProblem();
 
     /**
-     * If there has occurred an exception while executing the solver process,
-     * the method returns this exceptions, otherwise <code>null</code>
-     * 
+     * If there has occurred an exception while executing the solver process, the method returns
+     * this exception, otherwise <code>null</code>
+     *
+     * @return the exception that occured while executing the solver process, null if none occurred
      */
-    public Throwable getException();
+    Throwable getException();
 
     /**
      * Use this method in order to interrupt a running solver process.
-     * 
-     * @param reasonOfInterruption
-     *            The reason of interruption. Can only be set to
-     *            <code>ReasonOfInterruption.Timeout</code> or
-     *            <code>ReasonOfInterruption.User</code> other wise a
-     *            <code>IllegalArgumentException</code> is thrown.
+     *
+     * @param reasonOfInterruption The reason of interruption. Can only be set to
+     *        <code>ReasonOfInterruption.Timeout</code> or <code>ReasonOfInterruption.User</code>
+     *        other wise a <code>IllegalArgumentException</code> is thrown.
      */
-    public void interrupt(ReasonOfInterruption reasonOfInterruption);
+    void interrupt(ReasonOfInterruption reasonOfInterruption);
 
     /**
-     * Returns the system time when the solver was started. (in ms)
+     * @return the system time when the solver was started. (in ms)
      */
-    public long getStartTime();
+    long getStartTime();
 
     /**
-     * Returns the amount of milliseconds after a timeout occurs. (in ms)
+     * @return the amount of milliseconds after a timeout occurs. (in ms)
      */
-    public long getTimeout();
+    long getTimeout();
+
+    void setTimeout(long timeout);
+
 
     /**
      * Returns the current state of the solver. Possible values are<br>
-     * <code>Waiting<\code>: The solver process is waiting for the start signal<br>
-     * <code>Running<\code>: The solver process is running
-     * <code>Stopped<\code>: The solver process was stopped. The reason can be a user interruption, 
-     * an exception, a timeout or a successfull run.
+     * <code>Waiting</code>: The solver process is waiting for the start signal<br>
+     * <code>Running</code>: The solver process is running <code>Stopped</code>: The solver process
+     * was stopped. The reason can be a user interruption, an exception, a timeout or a successful
+     * run.
+     *
+     * @return the current state of the solver process
      */
-    public SolverState getState();
+    SolverState getState();
 
     /**
-     * Returns <code>true</code> if the solver process was interrupted by an
-     * user, an exception or a timeout. In all other cases (including that the
-     * solver is still running) the method returns <code>true</code>.
-     * */
-    public boolean wasInterrupted();
-
-    /**
-     * Returns <code>true</code> if the solver process is running else
+     * Returns <code>true</code> if the solver process was interrupted by a user, an exception or a
+     * timeout. In all other cases (including that the solver is still running) the method returns
      * <code>false</code>.
+     *
+     * @return true iff the solver process was interrupted by a user, an exception or a timeout
      */
-    public boolean isRunning();
+    boolean wasInterrupted();
 
     /**
-     * Returns the reason of the interruption: see
-     * <code>ReasonOfInterruption</code>.
+     * @return <code>true</code> if the solver process is running, else <code>false</code>.
      */
-    public ReasonOfInterruption getReasonOfInterruption();
+    boolean isRunning();
 
     /**
-     * Returns the result of the execution. If the solver process is still
-     * running the method returns a result object that represents the result
-     * 'unknown'.
+     * Starts a solver process. This method should be accessed only by an instance of
+     * <code>SolverLauncher</code>. If you want to start a solver please have a look at
+     * <code>SolverLauncher</code>.
+     *
+     * @param timeout
+     * @param settings
+     */
+    void start(SolverTimeout timeout, SMTSettings settings);
+
+    /**
+     * @return the reason of the interruption: see <code>ReasonOfInterruption</code>.
+     */
+    ReasonOfInterruption getReasonOfInterruption();
+
+    /**
+     * Returns the result of the execution. If the solver process is still running the method
+     * returns a result object that represents the result 'unknown'.
+     *
+     * @return the result of the solver process' execution
      **/
-    public SMTSolverResult getFinalResult();
-    
+    SMTSolverResult getFinalResult();
+
     /**
-     * Returns the solver output without any change. 
-     * The format is:
-     * "
-     * Normal Output:
-     * ...
-     * 
-     * Error Output:
-     * ...
-     * Exit Code: ...
-     * "
+     * Returns the raw solver output. This includes the result (sat/unsat/unknown), possibly
+     * error/warning messages, and possibly model/proof as certificate for sat/unsat.
+     *
+     * <br>
+     * <br>
+     * <b>Note:</b> Since "endmodel" and "success" are used only for steering the interaction
+     * between solver and KeY, these are currently filtered out!
+     *
+     * @return the raw output of the SMT solver
      */
-    public String getSolverOutput();
-    
+    String getRawSolverOutput();
+
     /**
-     * Returns the exceptions that has been thrown while translating taclets into assumptions. 
+     * Returns the raw solver input. This includes the preamble, the translation of the sequent, and
+     * the commands send to the solver to obtain the result(s).
+     *
+     * @return the complete input that has been sent to the solver
      */
-    public Collection<Throwable> getExceptionsOfTacletTranslation();
-    
-    
-    public AbstractSolverSocket getSocket();    
-    
-    
+    String getRawSolverInput();
+
+    /**
+     * @return the exceptions that have been thrown while translating taclets into assumptions.
+     */
+    Collection<Throwable> getExceptionsOfTacletTranslation();
+
+    /**
+     * @return the solver socket used by the solver process at hand
+     */
+    AbstractSolverSocket getSocket();
 
 }

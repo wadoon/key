@@ -1,29 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.core;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.util.Debug;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 public class KeYSelectionModel {
+    private static final Logger LOGGER = LoggerFactory.getLogger(KeYSelectionModel.class);
 
     /** the proof to listen to */
     private Proof proof;
@@ -36,10 +22,10 @@ public class KeYSelectionModel {
     /** the listeners to this model */
     private final List<KeYSelectionListener> listenerList;
     /** cached selected node event */
-    private KeYSelectionEvent selectionEvent = new KeYSelectionEvent(this);
+    private final KeYSelectionEvent selectionEvent = new KeYSelectionEvent(this);
 
     public KeYSelectionModel() {
-        listenerList = Collections.synchronizedList(new ArrayList<KeYSelectionListener>(5));
+        listenerList = Collections.synchronizedList(new ArrayList<>(5));
         goalIsValid = false;
     }
 
@@ -47,8 +33,7 @@ public class KeYSelectionModel {
      * Does not take care of GUI effects
      */
     public void setProof(Proof p) {
-        assert p != null;
-        proof = p;
+        proof = Objects.requireNonNull(p);
         Goal g = proof.openGoals().iterator().next();
         if (g == null) {
             selectedNode = proof.root().leavesIterator().next();
@@ -66,7 +51,7 @@ public class KeYSelectionModel {
      *
      * @see KeYMediator#setProof(Proof)
      */
-    void setSelectedProof(Proof p) {
+    public void setSelectedProof(Proof p) {
         goalIsValid = false;
         proof = p;
         if (proof != null) {
@@ -227,8 +212,8 @@ public class KeYSelectionModel {
     }
 
     /**
-     * selects the first goal in the goal list of proof if available if not it
-     * selects a leaf of the proof tree
+     * selects the first goal in the goal list of proof if available if not it selects a leaf of the
+     * proof tree
      */
     public void defaultSelection() {
         Goal g = null;
@@ -242,9 +227,9 @@ public class KeYSelectionModel {
             }
         }
 
-        /**
-         * Order of preference: 1. Not yet closable goals 2. Goals which are not closed
-         * for all metavariable instantiations 3. The first node of the tree
+        /*
+         * Order of preference: 1. Not yet closable goals 2. Goals which are not closed for all
+         * metavariable instantiations 3. The first node of the tree
          */
         if (g != null) {
             setSelectedGoal(g);
@@ -255,20 +240,12 @@ public class KeYSelectionModel {
                 setSelectedNode(proof.root().leavesIterator().next());
             }
         }
-        /*
-         * if (selectedNode != null) { Iterator<Node> nodeIt =
-         * selectedNode.leavesIterator(); while (nodeIt.hasNext()) { g =
-         * proof.getGoal(nodeIt.next()); if (g != null) { break; } } } if (g == null &&
-         * !proof.openGoals().isEmpty() ) { g = proof.openGoals().iterator().next(); }
-         * if (g != null) { setSelectedGoal(g); } else {
-         * setSelectedNode(proof.root().leavesIterator().next()); }
-         */
     }
 
     /**
-     * selects the first open goal below the given node <tt>old</tt> if no open goal
-     * is available node <tt>old</tt> is selected. In case that <tt>old</tt> has
-     * been removed from the proof the proof root is selected
+     * selects the first open goal below the given node <tt>old</tt> if no open goal is available
+     * node <tt>old</tt> is selected. In case that <tt>old</tt> has been removed from the proof the
+     * proof root is selected
      *
      * @param old the Node to start looking for open goals
      */
@@ -295,14 +272,12 @@ public class KeYSelectionModel {
     }
 
     /**
-     * retrieves the first open goal below the given node, i.e. the goal containing
-     * the first leaf of the subtree starting at <code>n</code> which is not already
-     * closed
+     * retrieves the first open goal below the given node, i.e. the goal containing the first leaf
+     * of the subtree starting at <code>n</code> which is not already closed
      *
      * @param n the Node where to start from
-     * @return the goal containing the first leaf of the subtree starting at
-     *         <code>n</code>, which is not already closed. <code>null</code> is
-     *         returned if no such goal exists.
+     * @return the goal containing the first leaf of the subtree starting at <code>n</code>, which
+     *         is not already closed. <code>null</code> is returned if no such goal exists.
      */
     private Goal getFirstOpenGoalBelow(Node n) {
         final Iterator<Node> it = n.leavesIterator();
@@ -315,16 +290,24 @@ public class KeYSelectionModel {
         return null;
     }
 
+    public void addKeYSelectionListenerChecked(KeYSelectionListener listener) {
+        synchronized (listenerList) {
+            if (!listenerList.contains(listener)) {
+                addKeYSelectionListener(listener);
+            }
+        }
+    }
+
     public void addKeYSelectionListener(KeYSelectionListener listener) {
         synchronized (listenerList) {
-            Debug.log4jInfo("Adding " + listener.getClass(), "key.threading");
+            LOGGER.debug("Adding {}", listener.getClass());
             listenerList.add(listener);
         }
     }
 
     public void removeKeYSelectionListener(KeYSelectionListener listener) {
         synchronized (listenerList) {
-            Debug.log4jInfo("Removing " + listener.getClass(), "key.threading");
+            LOGGER.debug("Removing {}", listener.getClass());
             listenerList.remove(listener);
         }
     }
@@ -339,11 +322,11 @@ public class KeYSelectionModel {
 
     public synchronized void fireSelectedProofChanged() {
         synchronized (listenerList) {
-            Debug.log4jInfo("Selected Proof changed, firing...", "key.threading");
+            LOGGER.info("Selected Proof changed, firing...");
             for (final KeYSelectionListener listener : listenerList) {
                 listener.selectedProofChanged(selectionEvent);
             }
-            Debug.log4jInfo("Selected Proof changed, done firing.", "key.threading");
+            LOGGER.info("Selected Proof changed, done firing.");
         }
     }
 

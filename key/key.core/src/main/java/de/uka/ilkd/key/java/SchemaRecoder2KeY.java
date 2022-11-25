@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.java;
 
 import java.io.BufferedReader;
@@ -26,13 +13,17 @@ import de.uka.ilkd.key.java.recoderext.SchemaJavaProgramFactory;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import recoder.java.declaration.TypeDeclaration;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 
 public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SchemaRecoder2KeY.class);
 
     /** the namespace containing the program schema variables allowed here */
     protected Namespace<SchemaVariable> svns;
@@ -42,11 +33,11 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader {
 
     /** caches constructor access for reflection */
     private final static HashMap<?, ?> recClass2schemakeyClassCons =
-            new LinkedHashMap<Object, Object>(400);
+        new LinkedHashMap<Object, Object>(400);
 
     // could this be the servConf of the super class?
-    private static SchemaCrossReferenceServiceConfiguration schemaServConf =
-            new SchemaCrossReferenceServiceConfiguration(new KeYRecoderExcHandler());
+    private static final SchemaCrossReferenceServiceConfiguration schemaServConf =
+        new SchemaCrossReferenceServiceConfiguration(new KeYRecoderExcHandler());
 
     public SchemaRecoder2KeY(Services services, NamespaceSet nss) {
         super(services, nss);
@@ -58,9 +49,8 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader {
     }
 
     /**
-     * returns the hashmap of a concrete RecodeR class to the constructor of its
-     * corresponding KeY class. Speeds up reflection. Attention must be
-     * overwritten by subclasses!
+     * returns the hashmap of a concrete RecodeR class to the constructor of its corresponding KeY
+     * class. Speeds up reflection. Attention must be overwritten by subclasses!
      */
     protected HashMap<?, ?> getKeYClassConstructorCache() {
         return recClass2schemakeyClassCons;
@@ -76,30 +66,27 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader {
 
     /**
      * creates an empty RECODER compilation unit
-     * 
+     *
      * @return the recoder.java.CompilationUnit
      */
     public Context createEmptyContext() {
         return new Context(schemaServConf, new recoder.java.CompilationUnit(),
-                schemaServConf.getProgramFactory().createClassDeclaration(null,
-                        new ImplicitIdentifier("<KeYSpecialParsing>"), null,
-                        null, null));	
+            schemaServConf.getProgramFactory().createClassDeclaration(null,
+                new ImplicitIdentifier("<KeYSpecialParsing>"), null, null, null));
     }
 
     /**
      * wraps a RECODER ClassDeclaration in a compilation unit
-     * 
-     * @param classDecl
-     *            the recoder.java.ClassDeclaration to wrap
-     * @param context
-     *            the Context containing the recoder.java.CompilationUnit where the class is wrapped
+     *
+     * @param classDecl the recoder.java.ClassDeclaration to wrap
+     * @param context the Context containing the recoder.java.CompilationUnit where the class is
+     *        wrapped
      * @return the enclosing recoder.java.CompilationUnit
      */
     protected recoder.java.CompilationUnit embedClass(
             recoder.java.declaration.ClassDeclaration classDecl, Context context) {
 
-        recoder.java.CompilationUnit cUnit = context
-        .getCompilationUnitContext();
+        recoder.java.CompilationUnit cUnit = context.getCompilationUnitContext();
 
         // add class to compilation unit
         ASTList<TypeDeclaration> typeDecls = cUnit.getDeclarations();
@@ -121,56 +108,47 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader {
     }
 
     /**
-     * parses a given JavaBlock using the context to determine the right
-     * references and returns a statement block of recoder.
-     * 
-     * @param block
-     *            a String describing a java block
-     * @param context
-     *            recoder.java.CompilationUnit in which the block has to be
-     *            interpreted
+     * parses a given JavaBlock using the context to determine the right references and returns a
+     * statement block of recoder.
+     *
+     * @param block a String describing a java block
+     * @param context recoder.java.CompilationUnit in which the block has to be interpreted
      * @return the parsed and resolved recoder statement block
      */
-    protected recoder.java.StatementBlock recoderBlock(String block,
-            Context context) {
+    protected recoder.java.StatementBlock recoderBlock(String block, Context context) {
         recoder.java.StatementBlock bl = null;
 
-        SchemaJavaProgramFactory factory = (SchemaJavaProgramFactory) schemaServConf
-        .getProgramFactory();
+        SchemaJavaProgramFactory factory =
+            (SchemaJavaProgramFactory) schemaServConf.getProgramFactory();
         factory.setSVNamespace(svns);
         Reader br = null;
         try {
             br = new BufferedReader(new StringReader(block));
-            try { 
+            try {
                 bl = factory.parseStatementBlock(br);
             } finally {
                 br.close();
             }
         } catch (recoder.ParserException e) {
-            Debug.out("readSchemaJavaBlock(Reader,CompilationUnit)"
-                    + " caused the " + "exception:\n", e);
-            Debug.out(e);
+            LOGGER.debug(
+                "readSchemaJavaBlock(Reader,CompilationUnit)" + " caused the " + "exception:\n", e);
             throw new ConvertException("Parsing: \n **** BEGIN ****\n " + block
-                    + "\n **** END ****\n failed. Thrown Exception:"
-                    + e.toString(), e);
+                + "\n **** END ****\n failed. Thrown Exception:" + e, e);
         } catch (IOException ioe) {
-            Debug.out("readSchemaJavaBlock(Reader,CompilationUnit)"
-                    + " caused the IO exception:\n", ioe);
-            Debug.out(ioe);
-            throw new ConvertException(
-                    "IO Error when parsing: \n **** BEGIN ****\n " + block
-                    + "\n **** END ****\n failed. Thrown IOException:"
-                    + ioe.toString(), ioe);
-        } 
-        
+            LOGGER.debug(
+                "readSchemaJavaBlock(Reader,CompilationUnit)" + " caused the IO exception:", ioe);
+            throw new ConvertException("IO Error when parsing: \n **** BEGIN ****\n " + block
+                + "\n **** END ****\n failed. Thrown IOException:" + ioe, ioe);
+        }
+
         embedClass(embedMethod(embedBlock(bl), context), context);
 
         return bl;
     }
 
     /**
-     * there is no need to parse special classes in this case, so
-     * this is empty
+     * there is no need to parse special classes in this case, so this is empty
+     *
      * @see de.uka.ilkd.key.java.Recoder2KeY#parseSpecialClasses()
      */
     public void parseSpecialClasses() {
