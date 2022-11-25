@@ -12,6 +12,7 @@ import java.io.StringReader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Map;
 
 public class JavaCCLanguageSupportFactory implements LanguageSupportFactory {
 
@@ -93,17 +94,17 @@ public class JavaCCLanguageSupportFactory implements LanguageSupportFactory {
             }
 
             @Override
-            public String nextTokenText() {
+            public String lastConsumedTokenText() {
                 return token.image;
             }
 
             @Override
-            public Integer nextStartIndex() {
+            public Integer lastConsumedTokenStartIndex() {
                 return stream.getPos(token.beginLine, token.beginColumn);
             }
 
             @Override
-            public Integer nextTokenType() {
+            public Integer lastConsumedTokenType() {
                 return token.kind;
             }
 
@@ -117,6 +118,12 @@ public class JavaCCLanguageSupportFactory implements LanguageSupportFactory {
                 return eofToken().image;
             }
         };
+    }
+
+    @Override
+    public Map<Integer, String> allTokenTypeNames() {
+        // TODO
+        return null;
     }
 
     @Override

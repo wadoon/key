@@ -93,7 +93,7 @@
       "ASSIGNABLE",
       "BREAKS",
       "CONTINUES",
-      "DECREASES",
+      "DECREASING",
       "DETERMINES",
       "ENSURES",
       "ENSURES_FREE",

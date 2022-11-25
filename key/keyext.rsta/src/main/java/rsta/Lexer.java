@@ -16,13 +16,14 @@ public interface Lexer {
      */
     boolean finished();
 
-    String nextTokenText();
+    String lastConsumedTokenText();
 
-    Integer nextStartIndex();
+    Integer lastConsumedTokenStartIndex();
 
-    Integer nextTokenType();
+    Integer lastConsumedTokenType();
 
     Integer eofTokenType();
 
     String eofTokenText();
+
 }

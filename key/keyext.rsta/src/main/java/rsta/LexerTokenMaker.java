@@ -49,9 +49,9 @@ public class LexerTokenMaker extends TokenMakerBase {
         List<String> tokenTexts = new ArrayList<>();
         while (!lexer.finished()) {
             lexer.step();
-            startIndices.add(lexer.nextStartIndex());
-            tokenTypes.add(lexer.nextTokenType());
-            tokenTexts.add(lexer.nextTokenText());
+            startIndices.add(lexer.lastConsumedTokenStartIndex());
+            tokenTypes.add(lexer.lastConsumedTokenType());
+            tokenTexts.add(lexer.lastConsumedTokenText());
         }
         if (startIndices.isEmpty()) {
             startIndices.add(0);

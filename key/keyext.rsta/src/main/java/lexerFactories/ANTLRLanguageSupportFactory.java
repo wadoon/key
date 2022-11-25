@@ -1,6 +1,5 @@
 package lexerFactories;
 
-import de.uka.ilkd.key.smt.solvertypes.SolverPropertiesLoader;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;
@@ -9,20 +8,18 @@ import org.fife.ui.rsyntaxtextarea.SyntaxScheme;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rsta.AutomaticSyntaxScheme;
-import rsta.LanguageSupport;
 import rsta.Lexer;
 import rsta.LanguageSupportFactory;
 
+import javax.annotation.Nullable;
 import javax.json.Json;
 import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
 import javax.json.JsonReader;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 public class ANTLRLanguageSupportFactory implements LanguageSupportFactory {
 
@@ -64,17 +61,17 @@ public class ANTLRLanguageSupportFactory implements LanguageSupportFactory {
             }
 
             @Override
-            public String nextTokenText() {
+            public String lastConsumedTokenText() {
                 return token.getText();
             }
 
             @Override
-            public Integer nextStartIndex() {
+            public Integer lastConsumedTokenStartIndex() {
                 return token.getStartIndex();
             }
 
             @Override
-            public Integer nextTokenType() {
+            public Integer lastConsumedTokenType() {
                 return token.getType();
             }
 
@@ -87,7 +84,31 @@ public class ANTLRLanguageSupportFactory implements LanguageSupportFactory {
             public String eofTokenText() {
                 return "<EOF>";
             }
+
         };
+    }
+
+    @Nullable
+    @Override
+    public Map<Integer, String> allTokenTypeNames() {
+        Map<Integer, String> tokenTypeMap = new HashMap<>();
+
+        try {
+            Field f = lexerClass.getDeclaredField("VOCABULARY");
+            f.setAccessible(true);
+
+            Vocabulary vocabulary = (Vocabulary) f.get(makeLexer(lexerClass, ""));
+
+            for (int i = 0; i < vocabulary.getMaxTokenType()+1; i++) {
+                tokenTypeMap.put(i, vocabulary.getSymbolicName(i));
+            }
+        } catch (NoSuchMethodException | InvocationTargetException
+                 | InstantiationException | IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        }
+        return null;
     }
 
     @Override
@@ -111,26 +132,7 @@ public class ANTLRLanguageSupportFactory implements LanguageSupportFactory {
                     fileName, e.getMessage()));
         }
 
-        Map<Integer, String> tokenTypeMap = new HashMap<>();
-
-        try {
-            Field f = lexerClass.getDeclaredField("VOCABULARY");
-            f.setAccessible(true);
-
-            Vocabulary vocabulary = (Vocabulary) f.get(makeLexer(lexerClass, ""));
-
-            for (int i = 0; i < vocabulary.getMaxTokenType()+1; i++) {
-                tokenTypeMap.put(i, vocabulary.getSymbolicName(i));
-            }
-        } catch (NoSuchMethodException | InvocationTargetException
-                 | InstantiationException | IllegalAccessException e) {
-            e.printStackTrace();
-            return null;
-        } catch (NoSuchFieldException e) {
-            throw new RuntimeException(e);
-        }
-
-        SyntaxScheme scheme = new AutomaticSyntaxScheme(jsonObject, tokenTypeMap);
+        SyntaxScheme scheme = new AutomaticSyntaxScheme(jsonObject, allTokenTypeNames());
 
         return scheme;
     }
