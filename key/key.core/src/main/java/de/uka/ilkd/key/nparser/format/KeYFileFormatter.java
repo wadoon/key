@@ -162,10 +162,21 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
 
     @Override
     public Void visitOne_include_statement(KeYParser.One_include_statementContext ctx) {
-        output.assertNewLineAndIndent();
-        output.enterIndent();
-        super.visitOne_include_statement(ctx);
-        output.exitIndent();
+        for (int i = 0; i < ctx.getChildCount(); i++) {
+            var child = ctx.getChild(i);
+            if (child instanceof TerminalNode) {
+                var token = ((TerminalNode) child).getSymbol().getType();
+                if (token == KeYParser.INCLUDE || token == KeYParser.INCLUDELDTS) {
+                    output.assertNewLineAndIndent();
+                    output.enterIndent();
+                }
+
+                if (token == KeYParser.SEMI) {
+                    output.exitIndent();
+                }
+            }
+            visit(child);
+        }
         return null;
     }
 
@@ -283,6 +294,7 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
                 output.assertIndented();
                 if (isDocLike && i != 0) {
                     output.spaceBeforeNext();
+                    line = line.stripLeading();
                 }
                 output.token(line);
             }
@@ -302,7 +314,7 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
     }
 
     static void processIndentationInSLComment(String text, Output output) {
-        output.assertNewLineAndIndent();
+        output.spaceBeforeNext();
         var trimmed = text.stripTrailing();
         // Normalize actual comment content
         if (trimmed.startsWith("//")) {
