@@ -27,7 +27,6 @@ public class ExpressionVisitor extends KeYParserBaseVisitor<Void> {
         KeYLexer.STAR,
         KeYLexer.MINUS,
         KeYLexer.PLUS,
-        KeYLexer.RGUILLEMETS,
         KeYLexer.EQV,
         KeYLexer.ASSIGN,
     };
@@ -75,8 +74,8 @@ public class ExpressionVisitor extends KeYParserBaseVisitor<Void> {
         var token = node.getSymbol().getType();
 
         boolean isLBrace =
-            token == KeYLexer.LBRACE || token == KeYLexer.LPAREN || token == KeYLexer.LBRACKET;
-        if (token == KeYLexer.RBRACE || token == KeYLexer.RPAREN || token == KeYLexer.RBRACKET) {
+            token == KeYLexer.LBRACE || token == KeYLexer.LPAREN || token == KeYLexer.LBRACKET || token == KeYLexer.LGUILLEMETS;
+        if (token == KeYLexer.RBRACE || token == KeYLexer.RPAREN || token == KeYLexer.RBRACKET || token == KeYLexer.RGUILLEMETS) {
             output.noSpaceBeforeNext();
             output.exitIndent();
         }
