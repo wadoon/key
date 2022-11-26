@@ -19,7 +19,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
-    private static final int MAX_LINES_BETWEEN = 3;
+    /** Maximum newlines between tokens (2 equals to 1 empty line) */
+    private static final int MAX_NEWLINES_BETWEEN = 2;
 
     final Output output = new Output();
     final CommonTokenStream ts;
@@ -228,7 +229,7 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
             String text = t.getText();
             if (t.getType() == KeYLexer.WS) {
                 int nls = countNLs(text);
-                for (int k = 0; k < Math.min(nls, MAX_LINES_BETWEEN); k++) {
+                for (int k = 0; k < Math.min(nls, MAX_NEWLINES_BETWEEN); k++) {
                     output.newLine();
                 }
             } else {
