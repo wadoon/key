@@ -3,18 +3,32 @@ package lexerFactories;
 import javacc.PositionStream;
 import javacc.SimpleCharStream;
 import javacc.Token;
+import lexerFacade.JavaCCLexer;
 import org.fife.ui.rsyntaxtextarea.SyntaxScheme;
-import rsta.Lexer;
-import rsta.LanguageSupportFactory;
+import lexerFacade.Lexer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonReader;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class JavaCCLanguageSupportFactory implements LanguageSupportFactory {
+
+    /**
+     * Logger.
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(JavaCCLanguageSupportFactory.class);
 
     private Class<?> tokenMgrClass;
     private Constructor<?> constructor;
@@ -46,7 +60,7 @@ public class JavaCCLanguageSupportFactory implements LanguageSupportFactory {
     }
 
     /**
-     * TODO make this less scuffed
+     * TODO make this less scuffed?
      */
     private boolean check(Class<?> tokenMgrClass) {
         try {
@@ -65,73 +79,54 @@ public class JavaCCLanguageSupportFactory implements LanguageSupportFactory {
     @Nullable
     @Override
     public Lexer create(String toLex) {
-
         PositionStream stream = makeStream(toLex);
-        return new Lexer() {
-
-            Token token;
-
-            @Override
-            public void step() {
-                Object tokenManager = null;
-
-                try {
-                    tokenManager = constructor.newInstance(stream);
-                } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                    throw new RuntimeException(e);
-                }
-
-                try {
-                    token = (Token) nextTokenMethod.invoke(tokenManager);
-                } catch (IllegalAccessException | InvocationTargetException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-            @Override
-            public boolean finished() {
-                return token.kind != eofTokenType();
-            }
-
-            @Override
-            public String lastConsumedTokenText() {
-                return token.image;
-            }
-
-            @Override
-            public Integer lastConsumedTokenStartIndex() {
-                return stream.getPos(token.beginLine, token.beginColumn);
-            }
-
-            @Override
-            public Integer lastConsumedTokenType() {
-                return token.kind;
-            }
-
-            @Override
-            public Integer eofTokenType() {
-                return eofToken().kind;
-            }
-
-            @Override
-            public String eofTokenText() {
-                return eofToken().image;
-            }
-        };
+        return new JavaCCLexer(stream, constructor, nextTokenMethod, eofToken());
     }
 
     @Override
     public Map<Integer, String> allTokenTypeNames() {
-        // TODO
-        return null;
+        Map<Integer, String> tokenTypeNames = new HashMap<>();
+        Object tokenManager;
+        try {
+            tokenManager = constructor.newInstance(makeStream(""));
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            LOGGER.error(e.getMessage());
+            return tokenTypeNames;
+        }
+        for (Field field: tokenMgrClass.getDeclaredFields()) {
+            if (field.getType().equals(Integer.class)) {
+                try {
+                    tokenTypeNames.put((Integer) field.get(tokenManager), field.getName());
+                } catch (Exception e) {
+                    LOGGER.error(e.getMessage());
+                }
+            }
+        }
+        return tokenTypeNames;
     }
 
     @Override
     public SyntaxScheme getSyntaxScheme() {
-        // TODO get actual grammar file name here, instead of assuming sth. about the class name
-        SyntaxScheme scheme = LanguageSupportFactory.createSyntaxScheme(
-                tokenMgrClass.getName().substring(0,
-                        tokenMgrClass.getName().length() - "TokenManager".length()));
+        String fileName = "defaultScheme.json";
+
+        InputStream jsonFile = ANTLRLanguageSupportFactory.class
+                .getResourceAsStream(fileName);
+        JsonObject jsonObject = null;
+        try {
+            JsonReader jsonReader = Json.createReader(jsonFile);
+            jsonObject = jsonReader.readObject();
+            jsonReader.close();
+        } catch (Exception e) {
+            // every possible exception should be caught as loading the files
+            // should not break key
+            // if loading the props file does not work for any reason,
+            // create a warning and continue
+            LOGGER.warn(String.format("File %s could not be loaded. Reason: %s",
+                    fileName, e.getMessage()));
+        }
+
+        SyntaxScheme scheme = new AutomaticSyntaxScheme(jsonObject, allTokenTypeNames());
+
         return scheme;
     }
 }

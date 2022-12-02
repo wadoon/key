@@ -4,6 +4,8 @@ package javacc;
 /**
  * An implementation of interface CharStream, where the stream is assumed to
  * contain only ASCII characters (without unicode processing).
+ *
+ * Inserted PositionStream implementation by hand.
  */
 
 public class SimpleCharStream implements PositionStream
