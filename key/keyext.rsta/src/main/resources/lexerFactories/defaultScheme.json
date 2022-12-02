@@ -36,6 +36,14 @@
     ]
   },
 
+  "KEYSETTINGS": {
+    "color": {
+      "r": 0,
+      "g": 255,
+      "b": 0
+    }
+  },
+
   "SEQARROW": {
     "color": {
       "r": 0,

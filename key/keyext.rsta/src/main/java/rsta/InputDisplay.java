@@ -36,7 +36,11 @@ public class InputDisplay {
         if (antlrLexerClass.isAssignableFrom(lexerClass)) {
             factory = createANTLRSupport((Class<Lexer>) lexerClass);
         } else {
-            factory = createJavaCCSupport(lexerClass);
+            try {
+                factory = createJavaCCSupport(lexerClass);
+            } catch (IllegalArgumentException e) {
+                return null;
+            }
         }
         return new LanguageSupport(factory.getSyntaxScheme(), new LexerTokenMaker(factory));
     }
@@ -65,15 +69,16 @@ public class InputDisplay {
         LanguageSupport lang = createLanguageSupport(lexerClass);
         RSyntaxTextArea textArea = new RSyntaxTextArea();
         RSyntaxDocument doc = (RSyntaxDocument) textArea.getDocument();
-        // Set the syntax scheme which defines how to display different types of tokens.
-        textArea.setSyntaxScheme(lang.syntaxScheme);
-        // Set the token maker used to create RSTA tokens out of the input stream.
-        doc.setSyntaxStyle(lang.tokenMaker);
+        if (lang != null) {
+            // Set the syntax scheme which defines how to display different types of tokens.
+            textArea.setSyntaxScheme(lang.syntaxScheme);
+            // Set the token maker used to create RSTA tokens out of the input stream.
+            doc.setSyntaxStyle(lang.tokenMaker);
+        }
 
         textArea.setText(text);
         textArea.setEditable(false);
 
-        RTextScrollPane sp = new RTextScrollPane(textArea);
-        return sp;
+        return new RTextScrollPane(textArea);
     }
 }

@@ -35,7 +35,11 @@ public class JavaCCLanguageSupportFactory implements LanguageSupportFactory {
     private Method nextTokenMethod;
 
     public JavaCCLanguageSupportFactory(Class<?> tokenMgrClass) {
-        check(tokenMgrClass);
+        if (!check(tokenMgrClass)) {
+            String msg = tokenMgrClass.getName() + " is not a JavaCC token maker.";
+            LOGGER.error(msg);
+            throw new IllegalArgumentException(msg);
+        }
         this.tokenMgrClass = tokenMgrClass;
     }
 
