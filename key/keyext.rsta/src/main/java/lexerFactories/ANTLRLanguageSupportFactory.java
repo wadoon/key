@@ -1,15 +1,13 @@
 package lexerFactories;
 
+import lexerFacade.ANTLRLexer;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.Vocabulary;
 import org.fife.ui.rsyntaxtextarea.SyntaxScheme;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rsta.AutomaticSyntaxScheme;
-import rsta.Lexer;
-import rsta.LanguageSupportFactory;
+import lexerFacade.Lexer;
 
 import javax.annotation.Nullable;
 import javax.json.Json;
@@ -46,46 +44,7 @@ public class ANTLRLanguageSupportFactory implements LanguageSupportFactory {
             return null;
         }
 
-        return new Lexer() {
-
-            Token token;
-
-            @Override
-            public void step() {
-                token = lexer.nextToken();
-            }
-
-            @Override
-            public boolean finished() {
-                return lexer._hitEOF;
-            }
-
-            @Override
-            public String lastConsumedTokenText() {
-                return token.getText();
-            }
-
-            @Override
-            public Integer lastConsumedTokenStartIndex() {
-                return token.getStartIndex();
-            }
-
-            @Override
-            public Integer lastConsumedTokenType() {
-                return token.getType();
-            }
-
-            @Override
-            public Integer eofTokenType() {
-                return Token.EOF;
-            }
-
-            @Override
-            public String eofTokenText() {
-                return "<EOF>";
-            }
-
-        };
+        return new ANTLRLexer(lexer);
     }
 
     @Nullable
@@ -102,6 +61,7 @@ public class ANTLRLanguageSupportFactory implements LanguageSupportFactory {
             for (int i = 0; i < vocabulary.getMaxTokenType()+1; i++) {
                 tokenTypeMap.put(i, vocabulary.getSymbolicName(i));
             }
+            return tokenTypeMap;
         } catch (NoSuchMethodException | InvocationTargetException
                  | InstantiationException | IllegalAccessException e) {
             e.printStackTrace();

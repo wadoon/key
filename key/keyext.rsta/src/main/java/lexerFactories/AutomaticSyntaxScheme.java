@@ -1,7 +1,5 @@
-package rsta;
+package lexerFactories;
 
-import de.uka.ilkd.key.settings.SettingsConverter;
-import lexerFactories.ANTLRLanguageSupportFactory;
 import org.fife.ui.rsyntaxtextarea.Style;
 import org.fife.ui.rsyntaxtextarea.SyntaxScheme;
 import org.slf4j.Logger;
@@ -10,9 +8,7 @@ import org.slf4j.LoggerFactory;
 import javax.json.*;
 import java.awt.*;
 import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
-import java.util.List;
 import java.util.stream.Collectors;
 
 public class AutomaticSyntaxScheme extends SyntaxScheme {
@@ -48,7 +44,7 @@ public class AutomaticSyntaxScheme extends SyntaxScheme {
     private final Map<Integer, String> tokenKinds;
 
     public AutomaticSyntaxScheme(JsonObject styleObject, Map<Integer, String> tokenKinds) {
-        super(true);
+        super(false);
         this.tokenKinds = tokenKinds;
         addDefaultAttributes();
         if (styleObject != null) {

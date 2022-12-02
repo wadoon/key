@@ -1,7 +1,10 @@
 package rsta;
 
+import lexerFacade.LexerTokenMaker;
 import lexerFactories.ANTLRLanguageSupportFactory;
 import lexerFactories.JavaCCLanguageSupportFactory;
+import lexerFactories.LanguageSupport;
+import lexerFactories.LanguageSupportFactory;
 import org.antlr.v4.runtime.Lexer;
 import org.fife.ui.rsyntaxtextarea.RSyntaxDocument;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
@@ -62,10 +65,11 @@ public class InputDisplay {
         LanguageSupport lang = createLanguageSupport(lexerClass);
         RSyntaxTextArea textArea = new RSyntaxTextArea();
         RSyntaxDocument doc = (RSyntaxDocument) textArea.getDocument();
-        // Set the token maker used to create RSTA tokens out of the input stream.
-        doc.setSyntaxStyle(lang.tokenMaker);
         // Set the syntax scheme which defines how to display different types of tokens.
         textArea.setSyntaxScheme(lang.syntaxScheme);
+        // Set the token maker used to create RSTA tokens out of the input stream.
+        doc.setSyntaxStyle(lang.tokenMaker);
+
         textArea.setText(text);
         textArea.setEditable(false);
 

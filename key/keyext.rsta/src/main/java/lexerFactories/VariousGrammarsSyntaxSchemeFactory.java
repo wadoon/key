@@ -1,9 +1,7 @@
 package lexerFactories;
 
 import org.fife.ui.rsyntaxtextarea.SyntaxScheme;
-import recoder.java.expression.operator.LogicalAnd;
-import rsta.LanguageSupportFactory;
-import rsta.Lexer;
+import lexerFacade.Lexer;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -121,12 +119,6 @@ public class VariousGrammarsSyntaxSchemeFactory implements LanguageSupportFactor
             public Integer eofTokenType() {
                 // TODO first lexer's eof token
                 return 0;
-            }
-
-            @Override
-            public String eofTokenText() {
-                // TODO first lexer's eof token
-                return "<EOF>";
             }
 
         };

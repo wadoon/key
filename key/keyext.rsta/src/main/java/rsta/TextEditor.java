@@ -1,5 +1,6 @@
 package rsta;
 
+import lexerFactories.LanguageSupport;
 import org.fife.ui.rsyntaxtextarea.RSyntaxDocument;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rtextarea.RTextScrollPane;

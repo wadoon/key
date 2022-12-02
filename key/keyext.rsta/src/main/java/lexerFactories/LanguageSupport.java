@@ -1,4 +1,4 @@
-package rsta;
+package lexerFactories;
 
 import lexerFactories.ANTLRLanguageSupportFactory;
 import lexerFactories.JavaCCLanguageSupportFactory;

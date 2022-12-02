@@ -1,5 +1,6 @@
-package rsta;
+package lexerFactories;
 
+import lexerFacade.Lexer;
 import org.fife.ui.rsyntaxtextarea.SyntaxScheme;
 
 import javax.annotation.Nullable;
