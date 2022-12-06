@@ -1,6 +1,9 @@
 plugins {
     id 'application'
 
+    id 'test-report-aggregation'
+    id 'jacoco-report-aggregation'
+
     // Used to create a single executable jar file with all dependencies
     // see task "shadowJar" below
     // https://imperceptiblethoughts.com/shadow/

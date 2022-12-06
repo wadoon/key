@@ -1,19 +1,13 @@
-#
-# This files describes the workflow of the continous integration
-# checker for KeY run within gitlab.
-#
-# Jenkins runs are triggered from somewhere else.
-#
-
 image: wadoon/key-test-docker:jdk11
 
-cache:
-  policy: pull-push
+cache: &globalcache
+  policy: pull
   paths:
-    - .gradle/wrapper
-    - .gradle/caches
-  untracked: true
-  key: ${CI_COMMIT_REF_SLUG}
+    - .gradle/    
+    - violations.jar
+  # untracked: true
+  key: $CI_COMMIT_REF_NAME
+
 
 variables:
   GRADLE_OPTS:  "-Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.workers.max=2 -Dorg.gradle.configureondemand=true"
@@ -21,99 +15,211 @@ variables:
   SONAR_SCANNER_OPTS: -Xmx8G
 
 before_script:
-  #  - echo `pwd` # debug
   #  - echo "$CI_BUILD_NAME, $CI_BUILD_REF_NAME $CI_BUILD_STAGE" # debug
   - export GRADLE_USER_HOME=`pwd`/.gradle
   - export SONAR_SCANNER_OPTS="-Xmx8G"
 
 stages:
-    - primary
-    - secondary
-    - ternary
-    - deploy
+  - prepare
+  - build 
+  - test 
+  - report     
+  - deploy
 
-compile:classes:
-  stage: primary
-  image: wadoon/key-test-docker:jdk11
-  script:
-    - javac -version
-    - gradle --build-cache classes
-  cache:
-    key: "$CI_COMMIT_REF_NAME"
-    policy: push
-    paths:
-      - build
-      - .gradle
 
-compile:testClasses:
-  dependencies:  ["compile:classes"]
-  stage: secondary
-  image: wadoon/key-test-docker:jdk11
-  script:
-    - javac -version
-    - gradle --build-cache --parallel testClasses
+# Use prepare to setup the pipeline, e.g., downloading libraries or tools. 
+# Gitlab docs say: Artifacts for material that is created during the pipeline. 
+#                  Caching for other material like gradle files, etc...
+
+# @TODO weigl: embedd violations jar into the docker file. 
+prepare:
+  stage: prepare
+  image: curlimages/curl:latest # a small and fast image for just downloading stuff
+  script: |      
+      if [ ! -f violations.jar ]; then 
+         curl https://repo1.maven.org/maven2/se/bjurr/violations/violations-command-line/1.22.3/violations-command-line-1.22.3.jar \
+              -o violations.jar
+      fi 
   cache:
-    key: "$CI_COMMIT_REF_NAME"
+    <<: *globalcache
     policy: pull-push
-    paths:
-      - build
-      - .gradle
-
-sonarqube:
-  dependencies:  ["compile:testClasses"]
-  stage: ternary
-  image: wadoon/key-test-docker:jdk11
-  allow_failure: true
+  
+assemble:  
+  stage: build
   script:
-    - ./scripts/tools/sonarqube_hint.py
-    - gradle --build-cache --continue -Dsonar.qualitygate.wait=true -DjacocoEnabled=true testFast sonarqube
-  only:
-    - merge_requests
-    - master
+    - javac -version
+    - gradle --build-cache assemble testClasses
   cache:
-    key: "$CI_COMMIT_REF_NAME"
-    policy: pull
-    paths:
-      - build
-      - .gradle
+    <<: *globalcache
+    # override the policy
+    policy: pull-push
+
   artifacts:
+    paths:
+      # excluding reports on tests, ...
+      - "*/build/{classes,generated,generated-src,libs,resources,tmp}"
+    # only short lived, as required by other pipeline steps. Nobody wants to download them!
+    expire_in: 12 hours
+
+test:
+  stage: test
+  needs: ["assemble"]
+  dependencies: ["assemble"]
+  script:
+    # Execute gradle, using caching techniques (*.class, *.jar provided by assemble)
+    # Activate coverage with jacoco.
+    # Exclude tests that are checked in `optionalTests`
+    # Compute an aggregated test report
+    - |
+      gradle --build-cache --continue -DjacocoEnabled=true \ 
+             -x key.core.proof_references:test \
+             -x key.core.symbolic_execution:test \
+             testAggregateTestReport jacocoTestReport testAggregateCodeCoverageReport
+  artifacts:
+    paths:
+      - "key.ui/build/reports/tests/unit-test/"
+      - "**/build/jacoco/*"    
     reports:
       junit:
-        - "**/**/build/test-results/*/TEST-*.xml"
+        - "**/**/build/test-results/test/TEST-*.xml"
+    expire_in: 1 month
 
-format:
-  stage: primary
-  image: wadoon/key-test-docker:jdk11
-  allow_failure: true
+coverage-jdk11:
+  stage: report
+  needs: ["test"]
+  dependencies: ["test"]  
+  image: registry.gitlab.com/haynes/jacoco2cobertura:1.0.7
   script:
-    - gradle spotlessCheck
-
-checkstyle:
-  stage: primary
-  image: wadoon/key-test-docker:jdk11
-  allow_failure: true
-  script:
-    - (scripts/tools/checkstyle/runIncrementalCheckstyle.sh | tee report.txt) || true
-    - scripts/tools/checkstyle/translateAudit.py report.txt > report.json
+    # convert report from jacoco to cobertura, using relative project path
+    - ls -lR key.ui/build/
+    - python /opt/cover2cover.py key.ui/build/jacoco/jacoco.xml $CI_PROJECT_DIR/*/src/main/java/ | tee cobertura.xml
   artifacts:
-    name: "checkstyle-report-$CI_JOB_ID"
-    paths:
-      - report.txt
-    when: always
     reports:
-      codequality: report.json
-    expire_in: 1 year
+      coverage_report:
+        coverage_format: cobertura
+        path: cobertura.xml
+
+testProveRules:
+  needs: ["assemble"]
+  dependencies: ["assemble"]
+  script:
+    - gradle --build-cache --continue testProveRules 
+  artifacts:
+    when: always
+    #paths:
+    #  - key.ui/build/reports/tests/unit-test/
+    expire_in: 1 month
+    reports:
+      junit:
+        - "*/build/test-results/test/TEST-*.xml"
+
+testRunAllFunProofs:
+  needs: ["assemble"]
+  dependencies: ["assemble"]
+  script:
+      - gradle --build-cache --continue testRunAllFunProofs 
+  artifacts:
+    when: always
+    paths:
+      - key.ui/build/reports/tests/unit-test/
+    expire_in: 1 week
+    reports:
+      junit:
+        - "*/build/test-results/test/TEST-*.xml"
+
+
+testRunAllInfProofs:
+  needs: ["assemble"]
+  dependencies: ["assemble"]
+  script:
+    - gradle --build-cache --continue testRunAllInfProofs 
+  artifacts:
+    when: always
+#    paths:
+#      - key.ui/build/reports/tests/unit-test/
+    expire_in: 1 month
+    reports:
+      junit:
+        - "*/build/test-results/test/TEST-*.xml"                
+
+
+optionalTest:
+  allow_failure: true
+  needs: ["assemble"]
+  dependencies: ["assemble"]
+  script:
+    - gradle --build-cache --continue key.core.proof_references:test -x key.core.symbolic_execution:test
+  artifacts:
+    when: always
+#    paths:
+#      - key.ui/build/reports/tests/unit-test/
+    expire_in: 1 month
+    reports:
+      junit:
+        - "**/**/build/test-results/test/TEST-*.xml"
+
+pmd:
+  needs: ["assemble", "prepare"]
+  dependencies: ["assemble"]
+  script:
+    - gradle --build-cache --continue pmdMain
+    - java -jar violations.jar -cc code-climate-report.json -v PMD . ".*/pmd/main\.xml$" "PMD" | wc -l
+    - ls -lh 
+  artifacts:
+    reports:
+      codequality: code-climate-report.json
+    expire_in: 1 week
+    # -v "CHECKSTYLE" "." ".*checkstyle/main\.xml$" "Checkstyle"
+
+javadoc:
+  stage: report
+  needs: ["assemble"]
+  dependencies: ["assemble"]
+  script:
+    - gradle alldoc
+    - zip -r javadoc.zip build/docs/javadoc
+  artifacts:
+    untracked: false
+    when: on_success
+    expire_in: "1 hour"
+    paths:
+      - javadoc.zip
+  rules:  # on main-branch only
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+
+javadoc-trigger:
+  stage: .post # execute at the 
+  needs: ["javadoc"]  
+  trigger: 
+    project: keyproject/key-javadoc
+  rules:  # on main-branch only
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH && $CI_SERVER_HOST == "gitlab.com"
+  
+
+  # script:
+  #  - curl --request POST --form "token=$CI_JOB_TOKEN" --form ref=main "https://gitlab.com/api/v4/projects/41370495/trigger/pipeline"
+  # rules:    
+    # on master only      - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+  # environment: production
+
 
 deploy-nightly:
   stage: deploy
+  environment: production
+  needs: ["assemble"]
+  dependencies: ["assemble"]
   script:
     - BUILD_NUMBER=SNAPSHOT gradle publish
   only:
     - stable
+  rules:
+    - if: $CI_SERVER_HOST == "gitlab.com" # only available on public instance 
 
 deploy-release:
-  when: manual
   stage: deploy
+  environment: production
+  needs: ["assemble"]
+  dependencies: ["assemble"]
   script:
     - gradle publish
   only:

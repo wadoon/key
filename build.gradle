@@ -23,7 +23,9 @@ plugins {
     // id "com.github.ben-manes.versions" version "0.39.0"
 
     // Code formatting
-    id "com.diffplug.spotless" version "6.11.0"
+    id "com.diffplug.spotless" version "6.12.0"
+
+    id 'pmd'
 }
 
 // Configure this project for use inside IntelliJ:
@@ -68,6 +70,7 @@ subprojects {
     apply plugin: "maven-publish"
     apply plugin: "idea"
     apply plugin: "eclipse"
+    apply plugin: 'pmd'
 
     apply plugin: "com.diffplug.spotless"
 
@@ -76,6 +79,16 @@ subprojects {
 
     sourceCompatibility = 11
     targetCompatibility = 11
+
+    pmd {
+        consoleOutput = false
+        toolVersion = "6.51.0"
+        incrementalAnalysis = true
+        ignoreFailures = true
+        ruleSets = ["category/java/errorprone.xml", "category/java/bestpractices.xml"]
+        rulesMinimumPriority = 3
+    }
+
 
     repositories {
         mavenCentral()
