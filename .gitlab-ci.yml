@@ -210,10 +210,8 @@ deploy-nightly:
   dependencies: ["assemble"]
   script:
     - BUILD_NUMBER=SNAPSHOT gradle publish
-  only:
-    - stable
   rules:
-    - if: $CI_SERVER_HOST == "gitlab.com" # only available on public instance 
+    - if: $CI_SERVER_HOST == "gitlab.com" && $CI_COMMIT_REF_NAME == "stable" # only available on public instance 
 
 deploy-release:
   stage: deploy
