@@ -84,7 +84,7 @@ coverage-jdk11:
         coverage_format: cobertura
         path: cobertura.xml
     paths: 
-      - **/**/jacoco.xml 
+      - "**/**/jacoco.xml"
       - cobertura.xml
 
 testProveRules:
