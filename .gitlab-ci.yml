@@ -20,7 +20,6 @@ before_script:
   - export SONAR_SCANNER_OPTS="-Xmx8G"
 
 stages:
-  - prepare
   - build 
   - test 
   - report     
@@ -31,18 +30,6 @@ stages:
 # Gitlab docs say: Artifacts for material that is created during the pipeline. 
 #                  Caching for other material like gradle files, etc...
 
-# @TODO weigl: embedd violations jar into the docker file. 
-prepare:
-  stage: prepare
-  image: curlimages/curl:latest # a small and fast image for just downloading stuff
-  script: |      
-      if [ ! -f violations.jar ]; then 
-         curl https://repo1.maven.org/maven2/se/bjurr/violations/violations-command-line/1.22.3/violations-command-line-1.22.3.jar \
-              -o violations.jar
-      fi 
-  cache:
-    <<: *globalcache
-    policy: pull-push
   
 assemble:  
   stage: build
@@ -71,10 +58,7 @@ test:
     # Exclude tests that are checked in `optionalTests`
     # Compute an aggregated test report
     - |
-      gradle --build-cache --continue -DjacocoEnabled=true \ 
-             -x key.core.proof_references:test \
-             -x key.core.symbolic_execution:test \
-             testAggregateTestReport jacocoTestReport testAggregateCodeCoverageReport
+      gradle --build-cache --continue -DjacocoEnabled=true -x key.core.proof_references:test -x key.core.symbolic_execution:test testAggregateTestReport jacocoTestReport testAggregateCodeCoverageReport
   artifacts:
     paths:
       - "key.ui/build/reports/tests/unit-test/"
@@ -91,13 +75,17 @@ coverage-jdk11:
   image: registry.gitlab.com/haynes/jacoco2cobertura:1.0.7
   script:
     # convert report from jacoco to cobertura, using relative project path
-    - ls -lR key.ui/build/
+    - ls -l 
+    - ls -lR key.ui/build/ 
     - python /opt/cover2cover.py key.ui/build/jacoco/jacoco.xml $CI_PROJECT_DIR/*/src/main/java/ | tee cobertura.xml
   artifacts:
     reports:
       coverage_report:
         coverage_format: cobertura
         path: cobertura.xml
+    paths: 
+      - **/**/jacoco.xml 
+      - cobertura.xml
 
 testProveRules:
   needs: ["assemble"]
@@ -159,9 +147,15 @@ optionalTest:
         - "**/**/build/test-results/test/TEST-*.xml"
 
 pmd:
-  needs: ["assemble", "prepare"]
+  needs: ["assemble"]
   dependencies: ["assemble"]
   script:
+    # @TODO weigl: embedd violations jar into the docker file. 
+    - |
+      if [ ! -f violations.jar ]; then 
+         curl https://repo1.maven.org/maven2/se/bjurr/violations/violations-command-line/1.22.3/violations-command-line-1.22.3.jar \
+              -o violations.jar
+      fi 
     - gradle --build-cache --continue pmdMain
     - java -jar violations.jar -cc code-climate-report.json -v PMD . ".*/pmd/main\.xml$" "PMD" | wc -l
     - ls -lh 
