@@ -9,16 +9,14 @@ subprojects {
 
     jacocoTestReport {
         reports {
-            html.enabled false
+            html.enabled true
             xml.enabled true
-            csv.enabled false
+            csv.enabled true
+            // destinationFile = file("$buildDir/jacoco/test.exec")
         }
     }
 
-    testFast {
+    test {
         finalizedBy jacocoTestReport
-        jacoco {
-            destinationFile = file("$buildDir/jacoco/test.exec")
-        }
     }
 }
