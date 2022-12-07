@@ -44,6 +44,8 @@ compile:classes:
     paths:
       - build
       - .gradle
+  tags:
+    - pfeifer
 
 compile:testClasses:
   dependencies:  ["compile:classes"]
@@ -58,6 +60,8 @@ compile:testClasses:
     paths:
       - build
       - .gradle
+  tags:
+    - pfeifer
 
 sonarqube:
   dependencies:  ["compile:testClasses"]
@@ -80,6 +84,8 @@ sonarqube:
     reports:
       junit:
         - "**/**/build/test-results/*/TEST-*.xml"
+  tags:
+    - pfeifer
 
 format:
   stage: primary
@@ -87,6 +93,8 @@ format:
   allow_failure: true
   script:
     - gradle spotlessCheck
+  tags:
+    - pfeifer
 
 checkstyle:
   stage: primary
@@ -103,6 +111,8 @@ checkstyle:
     reports:
       codequality: report.json
     expire_in: 1 year
+  tags:
+    - pfeifer
 
 deploy-nightly:
   stage: deploy
