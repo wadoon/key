@@ -58,7 +58,8 @@ test:
     # Exclude tests that are checked in `optionalTests`
     # Compute an aggregated test report
     - |
-      gradle --build-cache --continue -DjacocoEnabled=true -x key.core.proof_references:test -x key.core.symbolic_execution:test testAggregateTestReport jacocoTestReport testAggregateCodeCoverageReport
+      gradle --build-cache --continue -DjacocoEnabled=true -x key.core.proof_references:test -x key.core.symbolic_execution:test testAggregateTestReport jacocoTestReport testAggregateTestReport testCodeCoverageReport
+      # testAggregateCodeCoverageReport
   artifacts:
     paths:
       - "key.ui/build/reports/tests/unit-test/"
