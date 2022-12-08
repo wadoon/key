@@ -63,7 +63,7 @@ test:
   artifacts:
     paths:
       - "key.ui/build/reports/tests/unit-test/"
-      - "**/build/jacoco/*"    
+      - "**/build/*"    
     reports:
       junit:
         - "**/**/build/test-results/test/TEST-*.xml"
