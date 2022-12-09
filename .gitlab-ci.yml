@@ -70,6 +70,9 @@ test:
       junit:
         - "**/**/build/test-results/test/TEST-*.xml"
     expire_in: 1 month
+  only:
+    - merge_requests
+    - master
 
 coverage-jdk11:
   stage: report
@@ -89,6 +92,9 @@ coverage-jdk11:
     paths: 
       - "**/**/jacoco.xml"
       - cobertura.xml
+  only:
+    - merge_requests
+    - master
 
 testProveRules:
   needs: ["assemble"]
@@ -103,6 +109,9 @@ testProveRules:
     reports:
       junit:
         - "*/build/test-results/test/TEST-*.xml"
+  only:
+    - merge_requests
+    - master
 
 testRunAllFunProofs:
   needs: ["assemble"]
@@ -117,7 +126,9 @@ testRunAllFunProofs:
     reports:
       junit:
         - "*/build/test-results/test/TEST-*.xml"
-
+  only:
+    - merge_requests
+    - master
 
 testRunAllInfProofs:
   needs: ["assemble"]
@@ -132,7 +143,9 @@ testRunAllInfProofs:
     reports:
       junit:
         - "*/build/test-results/test/TEST-*.xml"                
-
+  only:
+    - merge_requests
+    - master
 
 optionalTest:
   allow_failure: true
@@ -148,6 +161,9 @@ optionalTest:
     reports:
       junit:
         - "**/**/build/test-results/test/TEST-*.xml"
+  only:
+    - merge_requests
+    - master
 
 pmd:
   needs: ["assemble"]
@@ -167,6 +183,10 @@ pmd:
       codequality: code-climate-report.json
     expire_in: 1 week
     # -v "CHECKSTYLE" "." ".*checkstyle/main\.xml$" "Checkstyle"
+
+  only:
+    - merge_requests
+    - master
 
 javadoc:
   stage: report
