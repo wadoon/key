@@ -26,6 +26,7 @@ plugins {
     id "com.diffplug.spotless" version "6.12.0"
 
     id 'pmd'
+    id 'checkstyle'
 }
 
 // Configure this project for use inside IntelliJ:
@@ -71,6 +72,7 @@ subprojects {
     apply plugin: "idea"
     apply plugin: "eclipse"
     apply plugin: 'pmd'
+    apply plugin: 'checkstyle'
 
     apply plugin: "com.diffplug.spotless"
 
@@ -90,6 +92,18 @@ subprojects {
     }
 
 
+    tasks.withType(Checkstyle) {
+        reports {
+            xml.required = false
+            html.required = true
+            maxErrors = 10000
+            showViolations = false
+            configFile = file("$rootDir/gradle/checkstyle/checkstyle.xml")
+            // html.stylesheet resources.text.fromFile('config/xsl/checkstyle-custom.xsl')
+        }
+    }
+
+
     repositories {
         mavenCentral()
         maven {
@@ -98,6 +112,9 @@ subprojects {
     }
 
     dependencies {
+        checkstyle "com.puppycrawl.tools:checkstyle:10.5.0"
+
+
         implementation("org.slf4j:slf4j-api:1.7.32")
         testImplementation("ch.qos.logback:logback-classic:1.2.10")
 

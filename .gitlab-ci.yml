@@ -192,6 +192,24 @@ pmd:
     - merge_requests
     - master
 
+
+checkstyle:
+  needs: ["assemble"]
+  dependencies: ["assemble"]
+  script:
+    - gradle --build-cache --continue checkstyleMain
+#    - java -jar violations.jar -cc code-climate-report.json -v PMD . ".*/pmd/main\.xml$" "PMD" | wc -l
+  artifacts:
+#    reports:
+#      codequality: code-climate-report.json
+    expire_in: 1 week
+    paths:
+      - "*/build/reports/checkstyle/*"
+  only:
+    - merge_requests
+    - master
+
+
 javadoc:
   stage: report
   needs: ["assemble"]
