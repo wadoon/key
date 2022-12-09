@@ -52,18 +52,19 @@ test:
   stage: test
   needs: ["assemble"]
   dependencies: ["assemble"]
-  script:
-    # Execute gradle, using caching techniques (*.class, *.jar provided by assemble)
-    # Activate coverage with jacoco.
-    # Exclude tests that are checked in `optionalTests`
-    # Compute an aggregated test report
-    - |
-      gradle --build-cache --continue -DjacocoEnabled=true -x key.core.proof_references:test -x key.core.symbolic_execution:test testAggregateTestReport jacocoTestReport testAggregateTestReport testCodeCoverageReport    
-    - ls -Rl
+  script: >
+    ./scripts/tools/sonarqube_hint.py
+    gradle --build-cache --continue -DjacocoEnabled=true -Dsonar.qualitygate.wait=true
+       -x key.core.proof_references:test
+       -x key.core.symbolic_execution:test
+       testAggregateTestReport
+       jacocoTestReport testCodeCoverageReport sonarqube
   artifacts:
     paths:
       - "key.ui/build/reports/tests/unit-test/"
-      # - "**/build/"
+      - "*/build/reports/jacoco/test/html"
+      - "**/**/jacocoTestReport.*"
+      - "**/**/test.exec"
     reports:
       junit:
         - "**/**/build/test-results/test/TEST-*.xml"
