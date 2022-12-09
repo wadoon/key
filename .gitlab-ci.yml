@@ -58,11 +58,11 @@ test:
   dependencies: ["assemble"]
   script:
     - ./scripts/tools/sonarqube_hint.py
-    - >
+    - |-
       gradle --build-cache --continue -DjacocoEnabled=true -Dsonar.qualitygate.wait=true \
-       -x key.core.proof_references:test \ 
-       -x key.core.symbolic_execution:test \
-       testAggregateTestReport \
+       -x key.core.proof_references:test  \
+       -x key.core.symbolic_execution:test  \
+       testAggregateTestReport  \
        jacocoTestReport testCodeCoverageReport sonarqube
   artifacts:
     paths:
@@ -185,9 +185,7 @@ pmd:
   artifacts:
     reports:
       codequality: code-climate-report.json
-    expire_in: 1 week
-    # -v "CHECKSTYLE" "." ".*checkstyle/main\.xml$" "Checkstyle"
-
+    expire_in: 1 week    
   only:
     - merge_requests
     - master
@@ -198,6 +196,7 @@ checkstyle:
   dependencies: ["assemble"]
   script:
     - gradle --build-cache --continue checkstyleMain
+    # - -v "CHECKSTYLE" "." ".*checkstyle/main\.xml$" "Checkstyle"
 #    - java -jar violations.jar -cc code-climate-report.json -v PMD . ".*/pmd/main\.xml$" "PMD" | wc -l
   artifacts:
 #    reports:
