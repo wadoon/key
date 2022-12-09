@@ -52,9 +52,10 @@ test:
   stage: test
   needs: ["assemble"]
   dependencies: ["assemble"]
-  script: >
-    ./scripts/tools/sonarqube_hint.py
-    gradle --build-cache --continue -DjacocoEnabled=true -Dsonar.qualitygate.wait=true
+  script:
+    - ./scripts/tools/sonarqube_hint.py
+    - >
+      gradle --build-cache --continue -DjacocoEnabled=true -Dsonar.qualitygate.wait=true
        -x key.core.proof_references:test
        -x key.core.symbolic_execution:test
        testAggregateTestReport
