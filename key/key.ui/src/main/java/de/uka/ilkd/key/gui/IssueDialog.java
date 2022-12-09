@@ -75,10 +75,13 @@ public final class IssueDialog extends JDialog {
     private final List<PositionedIssueString> warnings;
 
     private final Map<String, String> fileContentsCache = new HashMap<>();
+    private final int dividerSize;
 
     private final JTextField fTextField = new JTextField();
     private final JTextField lTextField = new JTextField();
     private final JTextField cTextField = new JTextField();
+    private final JPanel locPanel = new JPanel();
+    private JScrollPane srcPreview;
     private final JTextPane txtSource = new JTextPane();
     private final JTextArea txtStacktrace = new JTextArea();
 
@@ -179,6 +182,8 @@ public final class IssueDialog extends JDialog {
         this.warnings = decorateHTML(warnings);
         this.warnings.sort(Comparator.comparing(o -> o.fileName));
 
+        dividerSize = splitCenter.getDividerSize();
+
         setLayout(new BorderLayout());
 
         ///////// component overview (more indention means deeper nested):
@@ -217,20 +222,14 @@ public final class IssueDialog extends JDialog {
 
         listWarnings = new JList<>(this.warnings.toArray(new PositionedIssueString[0]));
 
-        JScrollPane scrWarnings = createWarningsPane(font);
-        splitCenter.setTopComponent(scrWarnings);
-
-        JPanel sourcePanel = createSourcePanel(font);
-        splitCenter.setBottomComponent(sourcePanel);
+        // Init layout properties
         splitCenter.setDividerLocation(-1);
         splitCenter.setResizeWeight(0.5);
         splitCenter.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
 
-        splitBottom.setTopComponent(splitCenter);
-        configureStacktracePanel(font);
-        splitBottom.setBottomComponent(stacktracePanel);
+        splitBottom.setDividerLocation(1.0);
+        splitBottom.setResizeWeight(1.0);
         splitBottom.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
-        add(splitBottom, BorderLayout.CENTER);
 
         // minimizing the stacktrace unchecks the details checkbox
         splitBottom.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, e -> {
@@ -241,11 +240,26 @@ public final class IssueDialog extends JDialog {
             chkDetails.addItemListener(detailsBoxListener);
         });
 
+        // Init the panels (some of them overwrite already given options, do this last)
+        JPanel sourcePanel = createSourcePanel(font);
+        // createWarningsPane needs some components initialized in createSourcePanel
+        JScrollPane scrWarnings = createWarningsPane(font);
+        splitCenter.setTopComponent(scrWarnings);
+        splitCenter.setBottomComponent(sourcePanel);
+
+        JPanel pCenter = new JPanel(new BorderLayout());
+        pCenter.add(splitCenter, BorderLayout.CENTER);
+        pCenter.add(createSouthPanel(), BorderLayout.SOUTH);
+
+        splitBottom.setTopComponent(pCenter);
+        configureStacktracePanel(font);
+        splitBottom.setBottomComponent(stacktracePanel);
+
+        add(splitBottom, BorderLayout.CENTER);
+
         // ensures that the buttons fit into a single row
         setMinimumSize(new Dimension(630, 300));
 
-        splitBottom.setDividerLocation(1.0);
-        splitBottom.setResizeWeight(1.0);
         stacktracePanel.setMinimumSize(new Dimension(0, 0));
 
         // show the dialog with a size of 900*800 or smaller
@@ -291,7 +305,7 @@ public final class IssueDialog extends JDialog {
                 stacktracePanel.setVisible(false);
             } else {
                 // enable the bottom split and show the divider
-                splitBottom.setDividerSize(splitCenter.getDividerSize());
+                splitBottom.setDividerSize(dividerSize);
                 stacktracePanel.setVisible(true);
                 chkDetails.setEnabled(true);
             }
@@ -434,21 +448,7 @@ public final class IssueDialog extends JDialog {
         return null;
     }
 
-    private JPanel createSourcePanel(Font font) {
-        txtSource.setEditable(false);
-        txtSource.setFont(font);
-
-        // workaround to disable automatic line wrapping and enable horizontal scrollbar instead
-        JPanel nowrap = new JPanel(new BorderLayout());
-        nowrap.add(txtSource);
-        JScrollPane scrPreview = new JScrollPane();
-        scrPreview.setViewportView(nowrap);
-        scrPreview.getVerticalScrollBar().setUnitIncrement(30);
-        scrPreview.getHorizontalScrollBar().setUnitIncrement(30);
-
-        TextLineNumber lineNumbers = new TextLineNumber(txtSource, 2);
-        scrPreview.setRowHeaderView(lineNumbers);
-
+    private Box createSouthPanel() {
         final JButton btnOK = new JButton("OK");
         btnOK.addActionListener(e -> accept());
         Dimension buttonDim = new Dimension(100, 29);
@@ -481,10 +481,25 @@ public final class IssueDialog extends JDialog {
         }
         pSouth.add(pButtons);
         getRootPane().setDefaultButton(btnOK);
+        return pSouth;
+    }
+
+    private JPanel createSourcePanel(Font font) {
+        txtSource.setEditable(false);
+        txtSource.setFont(font);
+
+        // workaround to disable automatic line wrapping and enable horizontal scrollbar instead
+        JPanel nowrap = new JPanel(new BorderLayout());
+        nowrap.add(txtSource);
+        srcPreview = new JScrollPane();
+        srcPreview.setViewportView(nowrap);
+        srcPreview.getVerticalScrollBar().setUnitIncrement(30);
+        srcPreview.getHorizontalScrollBar().setUnitIncrement(30);
+
+        TextLineNumber lineNumbers = new TextLineNumber(txtSource, 2);
+        srcPreview.setRowHeaderView(lineNumbers);
 
         JPanel sourcePanel = new JPanel(new BorderLayout());
-        JPanel locPanel = new JPanel();
-
         fTextField.setEditable(false);
         lTextField.setEditable(false);
         cTextField.setEditable(false);
@@ -493,8 +508,7 @@ public final class IssueDialog extends JDialog {
         locPanel.add(cTextField);
 
         sourcePanel.add(locPanel, BorderLayout.NORTH);
-        sourcePanel.add(scrPreview);
-        sourcePanel.add(pSouth, BorderLayout.SOUTH);
+        sourcePanel.add(srcPreview);
         return sourcePanel;
     }
 
@@ -628,40 +642,63 @@ public final class IssueDialog extends JDialog {
 
     private void updatePreview(PositionedIssueString issue) {
         // update text fields with position information
-        if (!issue.fileName.isEmpty()) {
+        boolean hasSource = issue.hasFilename();
+        if (hasSource) {
             fTextField.setText("URL: " + issue.fileName);
-        } else {
-            fTextField.setText("");
         }
-        cTextField.setText("Column: " + issue.pos.getColumn());
-        lTextField.setText("Line: " + issue.pos.getLine());
 
-        btnEditFile.setEnabled(issue.pos != Position.UNDEFINED);
+        fTextField.setEnabled(hasSource);
 
-        try {
-            String source = fileContentsCache.computeIfAbsent(issue.fileName, fn -> {
-                try (InputStream stream = IOUtil.openStream(issue.fileName)) {
-                    return IOUtil.readFrom(stream);
-                } catch (IOException e) {
-                    LOGGER.debug("Unknown IOException!", e);
-                    return "[SOURCE COULD NOT BE LOADED]\n" + e.getMessage();
+        boolean hasLocation = hasSource && !issue.pos.isNegative();
+        if (hasLocation) {
+            cTextField.setText("Column: " + issue.pos.getColumn());
+            lTextField.setText("Line: " + issue.pos.getLine());
+        }
+
+        cTextField.setVisible(hasLocation);
+        lTextField.setVisible(hasLocation);
+        locPanel.setVisible(hasSource);
+
+        btnEditFile.setEnabled(hasLocation);
+        srcPreview.setVisible(hasSource);
+
+        if (hasSource) {
+            splitCenter.setDividerSize(dividerSize);
+            splitCenter.setResizeWeight(0.5);
+            splitCenter.setDividerLocation(-1);
+        } else {
+            splitCenter.setDividerSize(0);
+            splitCenter.setResizeWeight(1.0);
+            splitCenter.setDividerLocation(-1);
+        }
+
+        if (hasSource) {
+            try {
+                String source = fileContentsCache.computeIfAbsent(issue.fileName, fn -> {
+                    try (InputStream stream = IOUtil.openStream(issue.fileName)) {
+                        return IOUtil.readFrom(stream);
+                    } catch (IOException e) {
+                        LOGGER.debug("Unknown IOException!", e);
+                        return "[SOURCE COULD NOT BE LOADED]\n" + e.getMessage();
+                    }
+                });
+
+                if (isJava(issue.fileName)) {
+                    showJavaSourceCode(source);
+                } else {
+                    txtSource.setText(source);
                 }
-            });
+                DefaultHighlighter dh = new DefaultHighlighter();
+                txtSource.setHighlighter(dh);
+                addHighlights(dh, issue.fileName);
 
-            if (isJava(issue.fileName)) {
-                showJavaSourceCode(source);
-            } else {
-                txtSource.setText(source);
+                // ensure that the currently selected problem is shown in view
+                int offset =
+                    issue.pos.isNegative() ? 0 : getOffsetFromLineColumn(source, issue.pos);
+                txtSource.setCaretPosition(offset);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-            DefaultHighlighter dh = new DefaultHighlighter();
-            txtSource.setHighlighter(dh);
-            addHighlights(dh, issue.fileName);
-
-            // ensure that the currently selected problem is shown in view
-            int offset = issue.pos.isNegative() ? 0 : getOffsetFromLineColumn(source, issue.pos);
-            txtSource.setCaretPosition(offset);
-        } catch (Exception e) {
-            e.printStackTrace();
         }
         validate();
     }
