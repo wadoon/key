@@ -47,6 +47,10 @@ assemble:
       - "*/build/{classes,generated,generated-src,libs,resources,tmp}"
     # only short lived, as required by other pipeline steps. Nobody wants to download them!
     expire_in: 12 hours
+  only:
+    - merge_requests
+    - master
+  
 
 test:
   stage: test
