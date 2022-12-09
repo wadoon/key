@@ -59,10 +59,10 @@ test:
   script:
     - ./scripts/tools/sonarqube_hint.py
     - >
-      gradle --build-cache --continue -DjacocoEnabled=true -Dsonar.qualitygate.wait=true
-       -x key.core.proof_references:test
-       -x key.core.symbolic_execution:test
-       testAggregateTestReport
+      gradle --build-cache --continue -DjacocoEnabled=true -Dsonar.qualitygate.wait=true \
+       -x key.core.proof_references:test \ 
+       -x key.core.symbolic_execution:test \
+       testAggregateTestReport \
        jacocoTestReport testCodeCoverageReport sonarqube
   artifacts:
     paths:
