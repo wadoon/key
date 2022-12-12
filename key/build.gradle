@@ -308,6 +308,13 @@ subprojects {
         }
     }
 
+    // This is currently needed for the custom spotless formatting task for .key files.
+    // Maybe there is a cleaner way ...
+    configurations { spotlessKeY }
+    dependencies { spotlessKeY project(':key.core') }
+    afterEvaluate {
+        spotlessKeY.dependsOn assemble
+    }
 
     spotless {
         // see https://github.com/diffplug/spotless/tree/main/plugin-gradle
@@ -315,10 +322,24 @@ subprojects {
         // optional: limit format enforcement to just the files changed by this feature branch
         // ratchetFrom 'origin/master'
 
-        format('Key') {
-            // define the files to apply `misc` to
-            //target '*.gradle', '*.md', '.gitignore'
+        format('KeY') {
             target 'src/main/resources/**/*.key'
+
+            custom 'keYFormat', { str ->
+                {
+                    // Very ugly loading of the formater class via reflection. This needs the project to be assembled
+                    // (see configuration 'spotlessKeY' above). Maybe this can be done better ...
+                    def urls = configurations.spotlessKeY.files.collect { it.toURI().toURL() }
+                    ClassLoader cl = new java.net.URLClassLoader(urls as URL[])
+                    Class myClass = cl.loadClass('de.uka.ilkd.key.nparser.format.KeYFileFormatter')
+
+                    // assuming method which accepts single String argument
+                    java.lang.reflect.Method myMethod = myClass.getMethod('format', String.class)
+                    Object result = myMethod.invoke(null, str)
+                    return (String)result
+                }
+            }
+
             trimTrailingWhitespace()
             //indentWithSpaces(4)       // this does not really work
             endWithNewline()
