@@ -6,7 +6,6 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 
 
 /**
@@ -38,9 +37,9 @@ public class NonDuplicateAppModPositionFeature extends NonDuplicateAppFeature {
             return true;
         }
 
-        final ImmutableList<UpdateLabelPair> oldUpdateContext =
+        final ImmutableList<Term> oldUpdateContext =
             oldApp.instantiations().getUpdateContext();
-        final ImmutableList<UpdateLabelPair> newUpdateContext =
+        final ImmutableList<Term> newUpdateContext =
             newApp.instantiations().getUpdateContext();
         return oldUpdateContext.equals(newUpdateContext);
     }

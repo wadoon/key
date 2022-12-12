@@ -28,7 +28,6 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletMatcher;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 import de.uka.ilkd.key.rule.match.TacletMatcherKit;
 import de.uka.ilkd.key.rule.match.vm.instructions.MatchSchemaVariableInstruction;
 import de.uka.ilkd.key.util.Pair;
@@ -118,8 +117,7 @@ public class VMTacletMatcher implements TacletMatcher {
 
         final boolean updateContextPresent =
             !p_matchCond.getInstantiations().getUpdateContext().isEmpty();
-        ImmutableList<UpdateLabelPair> context =
-            ImmutableSLList.<SVInstantiations.UpdateLabelPair>nil();
+        ImmutableList<Term> context = ImmutableSLList.<Term>nil();
 
         if (updateContextPresent) {
             context = p_matchCond.getInstantiations().getUpdateContext();
@@ -158,14 +156,13 @@ public class VMTacletMatcher implements TacletMatcher {
      * @return {@code null} if the update context does not match the one of the formula or the
      *         formula without the update context
      */
-    private Term matchUpdateContext(ImmutableList<UpdateLabelPair> context, Term formula) {
-        ImmutableList<UpdateLabelPair> curContext = context;
+    private Term matchUpdateContext(ImmutableList<Term> context, Term formula) {
+        ImmutableList<Term> curContext = context;
         for (int i = 0, size = context.size(); i < size; i++) {
             if (formula.op() instanceof UpdateApplication) {
                 final Term update = UpdateApplication.getUpdate(formula);
-                final UpdateLabelPair ulp = curContext.head();
-                if (ulp.getUpdate().equalsModRenaming(update)
-                        && ulp.getUpdateApplicationlabels().equals(update.getLabels())) {
+                final Term ulp = curContext.head();
+                if (ulp.equalsModRenaming(update)) {
                     curContext = curContext.tail();
                     formula = UpdateApplication.getTarget(formula);
                     continue;
@@ -305,11 +302,11 @@ public class VMTacletMatcher implements TacletMatcher {
             // updates can be ignored
             Term update = UpdateApplication.getUpdate(term);
             matchCond = matchCond.setInstantiations(
-                matchCond.getInstantiations().addUpdate(update, term.getLabels()));
+                matchCond.getInstantiations().addUpdate(update));
             return matchAndIgnoreUpdatePrefix(UpdateApplication.getTarget(term), matchCond,
                 services);
         } else {
-            return new Pair<Term, MatchConditions>(term, matchCond);
+            return new Pair<>(term, matchCond);
         }
     }
 

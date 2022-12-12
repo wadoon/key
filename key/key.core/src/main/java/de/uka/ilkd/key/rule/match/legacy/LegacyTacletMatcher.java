@@ -376,7 +376,7 @@ public final class LegacyTacletMatcher implements TacletMatcher {
             // updates can be ignored
             Term update = UpdateApplication.getUpdate(term);
             matchCond = matchCond.setInstantiations(
-                matchCond.getInstantiations().addUpdate(update, term.getLabels()));
+                matchCond.getInstantiations().addUpdate(update));
             return matchAndIgnoreUpdatePrefix(UpdateApplication.getTarget(term), template,
                 matchCond, services);
         } else {

@@ -59,7 +59,7 @@ public class SVInstantiations {
      * updates may be ignored when matching, therefore they need to be added after the application
      * around the added/replaced parts. These are stored in this list
      */
-    private final ImmutableList<UpdateLabelPair> updateContext;
+    private final ImmutableList<Term> updateContext;
 
     /** instantiations of generic sorts */
     private GenericSortInstantiations genericSortInstantiations =
@@ -71,7 +71,7 @@ public class SVInstantiations {
     /** creates a new SVInstantions object with an empty map */
     private SVInstantiations() {
         genericSortConditions = ImmutableSLList.<GenericSortCondition>nil();
-        updateContext = ImmutableSLList.<UpdateLabelPair>nil();
+        updateContext = ImmutableSLList.<Term>nil();
         map = DefaultImmutableMap.<SchemaVariable, InstantiationEntry<?>>nilMap();
         interesting = DefaultImmutableMap.<SchemaVariable, InstantiationEntry<?>>nilMap();
     }
@@ -83,7 +83,7 @@ public class SVInstantiations {
      */
     private SVInstantiations(ImmutableMap<SchemaVariable, InstantiationEntry<?>> map,
             ImmutableMap<SchemaVariable, InstantiationEntry<?>> interesting,
-            ImmutableList<UpdateLabelPair> updateContext,
+            ImmutableList<Term> updateContext,
             ImmutableList<GenericSortCondition> genericSortConditions) {
         this(map, interesting, updateContext, GenericSortInstantiations.EMPTY_INSTANTIATIONS,
             genericSortConditions);
@@ -91,7 +91,7 @@ public class SVInstantiations {
 
     private SVInstantiations(ImmutableMap<SchemaVariable, InstantiationEntry<?>> map,
             ImmutableMap<SchemaVariable, InstantiationEntry<?>> interesting,
-            ImmutableList<UpdateLabelPair> updateContext,
+            ImmutableList<Term> updateContext,
             GenericSortInstantiations genericSortInstantiations,
             ImmutableList<GenericSortCondition> genericSortConditions) {
         this.map = map;
@@ -414,51 +414,16 @@ public class SVInstantiations {
     /**
      * adds an update to the update context
      *
-     * @param updateApplicationlabels the TermLabels attached to the application operator term
+     * @param update the Term representing an update
      */
-    public SVInstantiations addUpdate(Term update,
-            ImmutableArray<TermLabel> updateApplicationlabels) {
+    public SVInstantiations addUpdate(Term update) {
         assert update.sort() == Sort.UPDATE;
         return new SVInstantiations(map, interesting(),
-            updateContext.append(new UpdateLabelPair(update, updateApplicationlabels)),
+            updateContext.append(update),
             getGenericSortInstantiations(), getGenericSortConditions());
     }
 
-    public static class UpdateLabelPair {
-        private Term update;
-
-        private ImmutableArray<TermLabel> updateApplicationlabels;
-
-        public UpdateLabelPair(Term update, ImmutableArray<TermLabel> updateApplicationlabels) {
-            this.update = update;
-            this.updateApplicationlabels = updateApplicationlabels;
-        }
-
-        public Term getUpdate() {
-            return update;
-        }
-
-        public ImmutableArray<TermLabel> getUpdateApplicationlabels() {
-            return updateApplicationlabels;
-        }
-
-        @Override
-        public int hashCode() {
-            return update.hashCode() + updateApplicationlabels.hashCode() * 7;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj instanceof UpdateLabelPair) {
-                return update.equals(((UpdateLabelPair) obj).getUpdate()) && updateApplicationlabels
-                        .equals(((UpdateLabelPair) obj).getUpdateApplicationlabels());
-            } else {
-                return false;
-            }
-        }
-    }
-
-    public SVInstantiations addUpdateList(ImmutableList<UpdateLabelPair> updates) {
+    public SVInstantiations addUpdateList(ImmutableList<Term> updates) {
         if (updates.isEmpty() && updateContext.isEmpty()) {
             // avoid unnecessary creation of SVInstantiations
             return this;
@@ -473,7 +438,7 @@ public class SVInstantiations {
             // avoid unnecessary creation of SVInstantiations
             return this;
         }
-        return new SVInstantiations(map, interesting(), ImmutableSLList.<UpdateLabelPair>nil(),
+        return new SVInstantiations(map, interesting(), ImmutableSLList.<Term>nil(),
             getGenericSortInstantiations(), getGenericSortConditions());
     }
 
@@ -526,7 +491,7 @@ public class SVInstantiations {
      *
      * @return the update context
      */
-    public ImmutableList<UpdateLabelPair> getUpdateContext() {
+    public ImmutableList<Term> getUpdateContext() {
         return updateContext;
     }
 
@@ -582,7 +547,7 @@ public class SVInstantiations {
             result = result.put(entry.key(), entry.value());
         }
 
-        ImmutableList<UpdateLabelPair> updates = ImmutableSLList.<UpdateLabelPair>nil();
+        ImmutableList<Term> updates = ImmutableSLList.<Term>nil();
 
         if (other.getUpdateContext().isEmpty()) {
             updates = getUpdateContext();

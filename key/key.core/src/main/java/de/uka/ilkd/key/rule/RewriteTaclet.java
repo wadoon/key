@@ -177,7 +177,7 @@ public class RewriteTaclet extends FindTaclet {
                     return null;
                 } else {
                     Term update = UpdateApplication.getUpdate(t);
-                    svi = svi.addUpdate(update, t.getLabels());
+                    svi = svi.addUpdate(update);
                 }
             } else if (getApplicationRestriction() != NONE
                     && (op instanceof Modality || op instanceof ModalOperatorSV)) {

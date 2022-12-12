@@ -34,7 +34,6 @@ import de.uka.ilkd.key.rule.inst.GenericSortException;
 import de.uka.ilkd.key.rule.inst.IllegalInstantiationException;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 import de.uka.ilkd.key.util.Debug;
 
 import javax.annotation.Nullable;
@@ -360,14 +359,14 @@ public abstract class TacletApp implements RuleApp {
     public boolean isExecutable(TermServices services) {
         // bugfix #1336, see bugtracker
         if (taclet instanceof RewriteTaclet) {
-            ImmutableList<UpdateLabelPair> oldUpdCtx =
+            ImmutableList<Term> oldUpdCtx =
                 matchConditions().getInstantiations().getUpdateContext();
             MatchConditions newConditions = ((RewriteTaclet) taclet).checkPrefix(posInOccurrence(),
                 MatchConditions.EMPTY_MATCHCONDITIONS);
             if (newConditions == null) {
                 return false;
             }
-            ImmutableList<UpdateLabelPair> newUpdCtx =
+            ImmutableList<Term> newUpdCtx =
                 newConditions.getInstantiations().getUpdateContext();
             if (!oldUpdCtx.equals(newUpdCtx)) {
                 return false;

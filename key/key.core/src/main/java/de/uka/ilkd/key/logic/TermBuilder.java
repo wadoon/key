@@ -21,7 +21,6 @@ import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.OpReplacer;
-import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.util.Pair;
 import org.key_project.util.collection.*;
@@ -1073,13 +1072,12 @@ public class TermBuilder {
         }
     }
 
-    public Term applyUpdatePairsSequential(ImmutableList<UpdateLabelPair> updates, Term target) {
+    public Term applyUpdatePairsSequential(ImmutableList<Term> updates, Term target) {
         if (updates.isEmpty()) {
             return target;
         } else {
-            return apply(updates.head().getUpdate(),
-                applyUpdatePairsSequential(updates.tail(), target),
-                updates.head().getUpdateApplicationlabels());
+            return apply(updates.head(),
+                applyUpdatePairsSequential(updates.tail(), target));
         }
     }
 
