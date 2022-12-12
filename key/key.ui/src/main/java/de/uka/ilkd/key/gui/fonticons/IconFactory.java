@@ -141,7 +141,10 @@ public final class IconFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(IconFactory.class);
 
     private static Image keyHole = getImage("images/ekey-mono.gif");
+    private static Image closed = getImage("images/ProofStatusVerified.png");
+
     private static Image keyHoleAlmostClosed = getImage("images/ekey-brackets.gif");
+    private static Image conditionallyClosed = getImage("images/ProofStatusConditionallyVerified.png");
     private static Image keyHoleInteractive = getImage("images/keyinteractive.gif");
     private static Image keyHoleLinked = getImage("images/keylinked.gif");
     private static Image keyLogo = getImage("images/key-color.png");
@@ -295,7 +298,7 @@ public final class IconFactory {
     }
 
     public static Icon keyHoleClosed(int x) {
-        return GOAL_CLOSED.load(x);
+        return scaleIcon(closed, x, x);//GOAL_CLOSED.load(x);
         // return scaleIcon(GOAL_CLOSED, x, y);
     }
 
@@ -308,7 +311,7 @@ public final class IconFactory {
     }
 
     public static ImageIcon keyHoleAlmostClosed(int x, int y) {
-        return scaleIcon(keyHoleAlmostClosed, x, y);
+        return scaleIcon(conditionallyClosed, x, y);//scaleIcon(keyHoleAlmostClosed, x, y);
     }
 
     public static ImageIcon keyHoleInteractive(int x, int y) {

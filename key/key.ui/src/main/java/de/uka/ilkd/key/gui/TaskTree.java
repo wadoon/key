@@ -292,8 +292,8 @@ public class TaskTree extends JPanel {
             implements java.io.Serializable {
         private static final long serialVersionUID = 2423935787625012908L;
         static final Icon keyIcon = IconFactory.keyHole(20, 20);
-        static final Icon keyClosedIcon = IconFactory.keyHoleClosed(20);
-        static final Icon keyAlmostClosedIcon = IconFactory.keyHoleAlmostClosed(20, 20);
+        static final Icon keyClosedIcon = IconFactory.keyHoleClosed(18);
+        static final Icon keyAlmostClosedIcon = IconFactory.keyHoleAlmostClosed(18, 18);
 
 
         public TaskTreeIconCellRenderer() {
@@ -315,10 +315,14 @@ public class TaskTree extends JPanel {
             if (value instanceof TaskTreeNode) {
                 ProofStatus ps = ((TaskTreeNode) value).getStatus();
                 if (ps != null) {
-                    if (ps.getProofClosed())
+                    if (ps.getProofClosed()) {
                         sup.setIcon(keyClosedIcon);
-                    if (ps.getProofClosedButLemmasLeft())
+                        sup.setToolTipText("Proven");
+                    }
+                    if (ps.getProofClosedButLemmasLeft()) {
                         sup.setIcon(keyAlmostClosedIcon);
+                        sup.setToolTipText("Conditionally proven");
+                    }
                     if (ps.getProofOpen())
                         sup.setIcon(keyIcon);
                 }
