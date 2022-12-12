@@ -87,7 +87,6 @@ sonarqube:
 format:
   stage: primary
   image: wadoon/key-test-docker:jdk11
-  allow_failure: true
   script:
     - cd key
     - gradle spotlessCheck
