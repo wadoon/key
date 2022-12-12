@@ -71,7 +71,7 @@ public class RewriteTaclet extends FindTaclet {
      * match on formulas which are evaluated in the same state as the sequent</li>
      * </ul>
      */
-    private int applicationRestriction;
+    private final int applicationRestriction;
 
 
     /**
@@ -163,7 +163,7 @@ public class RewriteTaclet extends FindTaclet {
         // this is assumed to hold
         assert p_pos.posInTerm() != null;
 
-        PIOPathIterator it = p_pos.iterator();
+        final PIOPathIterator it = p_pos.iterator();
         Operator op;
         while (it.next() != -1) {
             final Term t = it.getSubTerm();
@@ -172,14 +172,14 @@ public class RewriteTaclet extends FindTaclet {
                 return null;
             } else if (op instanceof UpdateApplication
                     && it.getChild() == UpdateApplication.targetPos()
-                    && getApplicationRestriction() != NONE) {
-                if ((getApplicationRestriction() & IN_SEQUENT_STATE) != 0 || veto(t)) {
+                    && applicationRestriction != NONE) {
+                if ((applicationRestriction & IN_SEQUENT_STATE) != 0 || veto(t)) {
                     return null;
                 } else {
                     Term update = UpdateApplication.getUpdate(t);
                     svi = svi.addUpdate(update);
                 }
-            } else if (getApplicationRestriction() != NONE
+            } else if (applicationRestriction != NONE
                     && (op instanceof Modality || op instanceof ModalOperatorSV)) {
                 return null;
             }
@@ -189,10 +189,10 @@ public class RewriteTaclet extends FindTaclet {
             }
         }
 
-        if (getApplicationRestriction() == NONE)
+        if (applicationRestriction == NONE)
             return p_mc;
-        if (((getApplicationRestriction() & ANTECEDENT_POLARITY) != 0 && polarity != -1)
-                || ((getApplicationRestriction() & SUCCEDENT_POLARITY) != 0 && polarity != 1)) {
+        if (((applicationRestriction & ANTECEDENT_POLARITY) != 0 && polarity != -1)
+                || ((applicationRestriction & SUCCEDENT_POLARITY) != 0 && polarity != 1)) {
             return null;
         }
         return p_mc.setInstantiations(svi);
@@ -201,7 +201,7 @@ public class RewriteTaclet extends FindTaclet {
     /**
      * Compute polarity
      *
-     * @see AntecSuccPrefixChecker seems to reimplement this.
+     * @see de.uka.ilkd.key.strategy.feature.findprefix.AntecSuccPrefixChecker; seems to reimplement this.
      */
     private int polarity(final Operator op, final PIOPathIterator it, int polarity) {
         // toggle polarity if find term is

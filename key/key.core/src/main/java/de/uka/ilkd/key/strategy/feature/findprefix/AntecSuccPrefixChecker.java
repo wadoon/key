@@ -11,7 +11,7 @@ import de.uka.ilkd.key.logic.op.Operator;
  *
  * @author christoph
  */
-class AntecSuccPrefixChecker implements Checker {
+public class AntecSuccPrefixChecker implements Checker {
 
     private static enum Polarity {
 
@@ -33,6 +33,8 @@ class AntecSuccPrefixChecker implements Checker {
     private AntecSuccPrefixChecker(AntecSuccPrefixChecker.Polarity polarity) {
         this.polarity = polarity;
     }
+
+
 
     private int checkOperator(Operator op, int child, int pol) {
         // compute polarity
