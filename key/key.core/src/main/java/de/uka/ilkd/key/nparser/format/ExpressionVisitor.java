@@ -73,9 +73,10 @@ public class ExpressionVisitor extends KeYParserBaseVisitor<Void> {
     public Void visitTerminal(TerminalNode node) {
         var token = node.getSymbol().getType();
 
-        boolean isLBrace =
-            token == KeYLexer.LBRACE || token == KeYLexer.LPAREN || token == KeYLexer.LBRACKET || token == KeYLexer.LGUILLEMETS;
-        if (token == KeYLexer.RBRACE || token == KeYLexer.RPAREN || token == KeYLexer.RBRACKET || token == KeYLexer.RGUILLEMETS) {
+        boolean isLBrace = token == KeYLexer.LBRACE || token == KeYLexer.LPAREN
+                || token == KeYLexer.LBRACKET || token == KeYLexer.LGUILLEMETS;
+        if (token == KeYLexer.RBRACE || token == KeYLexer.RPAREN || token == KeYLexer.RBRACKET
+                || token == KeYLexer.RGUILLEMETS) {
             output.noSpaceBeforeNext();
             output.exitIndent();
         }
