@@ -189,8 +189,9 @@ public class RewriteTaclet extends FindTaclet {
             }
         }
 
-        if (applicationRestriction == NONE)
+        if (applicationRestriction == NONE) {
             return p_mc;
+        }
         if (((applicationRestriction & ANTECEDENT_POLARITY) != 0 && polarity != -1)
                 || ((applicationRestriction & SUCCEDENT_POLARITY) != 0 && polarity != 1)) {
             return null;
@@ -201,7 +202,8 @@ public class RewriteTaclet extends FindTaclet {
     /**
      * Compute polarity
      *
-     * @see de.uka.ilkd.key.strategy.feature.findprefix.AntecSuccPrefixChecker; seems to reimplement this.
+     * @see de.uka.ilkd.key.strategy.feature.findprefix.AntecSuccPrefixChecker; seems to reimplement
+     *      this.
      */
     private int polarity(final Operator op, final PIOPathIterator it, int polarity) {
         // toggle polarity if find term is

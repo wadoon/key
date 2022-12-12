@@ -11,7 +11,7 @@ import de.uka.ilkd.key.logic.op.Operator;
  *
  * @author christoph
  */
-public class AntecSuccPrefixChecker implements Checker {
+public final class AntecSuccPrefixChecker implements Checker {
 
     private static enum Polarity {
 

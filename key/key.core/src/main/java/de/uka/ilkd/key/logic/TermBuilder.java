@@ -1072,6 +1072,14 @@ public class TermBuilder {
         }
     }
 
+    /**
+     * applies the given updates sequentially on the target term
+     *
+     * @param updates the ImmutableList<Term> updates to be applied
+     * @param target the {@link Term} on which the updates are applied to
+     * @return the resulting term (in case of an empty update list, the same as target)
+     * @throws NullPointerException if <code>updates</code> is <code>null</code>
+     */
     public Term applyUpdatePairsSequential(ImmutableList<Term> updates, Term target) {
         if (updates.isEmpty()) {
             return target;

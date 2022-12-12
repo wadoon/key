@@ -415,6 +415,7 @@ public class SVInstantiations {
      * adds an update to the update context
      *
      * @param update the Term representing an update
+     * @return the new {@link SVInstantiations} with the extended update context
      */
     public SVInstantiations addUpdate(Term update) {
         assert update.sort() == Sort.UPDATE;
@@ -423,6 +424,12 @@ public class SVInstantiations {
             getGenericSortInstantiations(), getGenericSortConditions());
     }
 
+    /**
+     * adds the given list of updates to the update context of this instantiation object
+     *
+     * @param updates the ImmutableList<Term> of updates to be added
+     * @return the {@link SVInstantiations} with the extended update context
+     */
     public SVInstantiations addUpdateList(ImmutableList<Term> updates) {
         if (updates.isEmpty() && updateContext.isEmpty()) {
             // avoid unnecessary creation of SVInstantiations
