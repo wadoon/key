@@ -1,7 +1,7 @@
 parser grammar KeYParser;
 
 @header {
-  import de.uka.ilkd.key.util.parsing.*;
+import de.uka.ilkd.key.util.parsing.*;
 }
 
 @members {
