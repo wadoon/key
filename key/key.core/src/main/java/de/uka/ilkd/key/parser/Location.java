@@ -1,10 +1,7 @@
 package de.uka.ilkd.key.parser;
 
-import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
-import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.MiscTools;
-import org.antlr.runtime.RecognitionException;
 import org.antlr.v4.runtime.IntStream;
+import org.key_project.util.java.URLUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +47,7 @@ public final class Location {
      */
     @Deprecated
     public Location(String filename, int line, int column) throws MalformedURLException {
-        this(filename == null ? null : MiscTools.parseURL(filename), line, column);
+        this(filename == null ? null : URLUtil.parseURL(filename), line, column);
     }
 
     /**
@@ -66,23 +63,6 @@ public final class Location {
         this.column = column;
     }
 
-    /**
-     * This factory method can be used to create a Location for a RecognitionException. A possibly
-     * thrown MalformedURLException is caught and printed to debug output, null is returned instead.
-     *
-     * @param re the RecognitionException to create a Location for
-     * @return the created Location or null if creation failed
-     */
-    public static Location create(RecognitionException re) {
-        try {
-            // ANTLR starts lines in column 0, files in line 1.
-            return new Location(re.input.getSourceName(), re.line, re.charPositionInLine + 1);
-        } catch (MalformedURLException e) {
-            LOGGER.error("Location could not be created from String: {}", re.input.getSourceName(),
-                e);
-            return null;
-        }
-    }
 
     /**
      * Checks if the given Location is valid, i.e. not null and has a URL.
