@@ -1,5 +1,6 @@
 plugins {
     id 'application'
+    id 'antlr'
 
     // Used to create a single executable jar file with all dependencies
     // see task "shadowJar" below
@@ -7,17 +8,27 @@ plugins {
     id 'com.github.johnrengelman.shadow' version "7.1.1"
 }
 
+configurations { antlr4 }
+
 dependencies {
-    implementation project(":key.core")
 
     //logging implementation used by the slf4j
-    implementation 'ch.qos.logback:logback-classic:1.2.10'
+    implementation 'ch.qos.logback:logback-classic:1.4.5'
+
+    antlr4 "org.antlr:antlr4:4.9.3"
+    api "org.antlr:antlr4-runtime:4.9.3"
 }
 
 shadowJar {
     archiveClassifier.set("exe")
     archiveBaseName.set("key-format")
     mergeServiceFiles()
+}
+
+// Generate code from ANTLR grammars.
+generateGrammarSource {
+    maxHeapSize = "64m"
+    arguments += ["-visitor", "-listener", "-long-messages"]
 }
 
 application {
@@ -27,3 +38,65 @@ application {
 run {
 
 }
+
+/* This task copies ANTLR lexer and parser (.g4 files) from key.core such that they can be compiled later on.
+ * In addition, a minimal set of files (collected by hand) is copied that is needed to be able to compile the parser.
+ * These files are:
+ * - from key.core:
+ *   - de/uka/ilkd/key/util/parsing/SyntaxErrorReporter.java
+ *   - de/uka/ilkd/key/util/parsing/HasLocation.java
+ *   - de/uka/ilkd/key/parser/Location.java
+ * - from key.util:
+ *   - org/key_project/util/java/URLUtil.java
+ *   - org/key_project/util/java/StringUtil.java
+ *   - org/key_project/util/java/WrapUtil.java
+ */
+tasks.register("copyKeYGrammar") {
+    doLast {
+        def coreRoot = project(":key.core").projectDir
+        copy {
+            from "$coreRoot/src/main/antlr4/KeYLexer.g4", "$coreRoot/src/main/antlr4/KeYParser.g4"
+            into "$projectDir/build/generated-src/antlr4/"
+        }
+        copy {
+            def loc = "de/uka/ilkd/key/util/parsing/SyntaxErrorReporter.java"
+            def loc2 = "de/uka/ilkd/key/util/parsing/HasLocation.java"
+            from "$coreRoot/src/main/java/$loc", "$coreRoot/src/main/java/$loc2"
+            into "$projectDir/build/generated-src/java/de/uka/ilkd/key/util/parsing/"
+        }
+        copy {
+            def loc = "de/uka/ilkd/key/parser/Location.java"
+            from "$coreRoot/src/main/java/$loc"
+            into "$projectDir/build/generated-src/java/de/uka/ilkd/key/parser/"
+        }
+        def utilRoot = project(":key.util").projectDir
+        copy {
+            def loc = "org/key_project/util/java/URLUtil.java"
+            def loc2 = "org/key_project/util/java/StringUtil.java"
+            def loc3 = "org/key_project/util/java/WrapUtils.java"
+            from "$utilRoot/src/main/java/$loc", "$utilRoot/src/main/java/$loc2", "$utilRoot/src/main/java/$loc3"
+            into "$projectDir/build/generated-src/java/org/key_project.util.java/"
+        }
+    }
+}
+
+def antlr4OutputKey = "$projectDir/build/generated-src/antlr4/main/de/uka/ilkd/key/nparser"
+tasks.register("runAntlr4", JavaExec) {
+    inputs.files "$projectDir/build/generated-src/antlr4/KeYLexer.g4", "$projectDir/build/generated-src/antlr4/KeYParser.g4"
+    outputs.dir antlr4OutputKey
+    classpath = configurations.antlr4
+    main = "org.antlr.v4.Tool"
+    args = ["-visitor",
+            "-Xexact-output-dir", "-o", antlr4OutputKey,
+            "-package", "de.uka.ilkd.key.nparser",
+            "$projectDir/build/generated-src/antlr4/KeYLexer.g4", "$projectDir/build/generated-src/antlr4/KeYParser.g4"]
+    doFirst {
+        file(antlr4OutputKey).mkdirs()
+        println("create $antlr4OutputKey")
+    }
+}
+
+runAntlr4.dependsOn copyKeYGrammar
+compileJava.dependsOn runAntlr4
+
+sourceSets.main.java.srcDirs "$projectDir/build/generated-src/antlr4/main/", "$projectDir/build/generated-src/java"
