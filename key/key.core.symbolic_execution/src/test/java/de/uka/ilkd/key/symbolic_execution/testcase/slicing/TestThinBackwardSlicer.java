@@ -177,7 +177,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     @Test
     public void testAliasedByExecutionTest() throws Exception {
         doSlicingTest("/slicing/aliasedByExecutionTest/AliasedByExecution.proof",
-            new ReturnSelector(41), true, 31);
+            new ReturnSelector(40), true, 31);
     }
 
     /**
@@ -188,7 +188,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     @Test
     public void testNotAliasedByExecutionTest() throws Exception {
         doSlicingTest("/slicing/aliasedByExecutionTest/AliasedByExecution.proof",
-            new ReturnSelector(72), true, 17);
+            new ReturnSelector(71), true, 17);
     }
 
     /**
