@@ -14,6 +14,7 @@ import java.util.zip.ZipFile;
 
 import de.uka.ilkd.key.java.recoderext.URLDataLocation;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
+import org.key_project.util.java.URLUtil;
 import recoder.io.DataLocation;
 
 
@@ -84,7 +85,7 @@ public class ZipFileCollection implements FileCollection {
                 throw new NoSuchElementException();
             } else if (fileRepo != null) {
                 // request an InputStream from the FileRepo
-                URI uri = MiscTools.getZipEntryURI(zipFile, currentEntry.getName());
+                URI uri = URLUtil.getZipEntryURI(zipFile, currentEntry.getName());
                 return fileRepo.getInputStream(uri.toURL());
             } else {
                 return openCurrent(); // fallback without FileRepo
@@ -114,7 +115,7 @@ public class ZipFileCollection implements FileCollection {
             // dont use ArchiveDataLocation this keeps the zip open and keeps reference to it!
             try {
                 // since we actually return a zip/jar, we use URLDataLocation
-                URI uri = MiscTools.getZipEntryURI(zipFile, currentEntry.getName());
+                URI uri = URLUtil.getZipEntryURI(zipFile, currentEntry.getName());
                 return new URLDataLocation(uri.toURL());
             } catch (IOException e) {
                 e.printStackTrace();

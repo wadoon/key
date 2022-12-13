@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.util.parsing;
 
 import de.uka.ilkd.key.parser.Location;
-import de.uka.ilkd.key.util.MiscTools;
+import org.key_project.util.java.URLUtil;
 import org.antlr.v4.runtime.*;
 import org.key_project.util.java.StringUtil;
 import org.slf4j.Logger;
@@ -187,7 +187,7 @@ public class SyntaxErrorReporter extends BaseErrorListener {
         public Location getLocation() throws MalformedURLException {
             if (!errors.isEmpty()) {
                 SyntaxError e = errors.get(0);
-                return new Location(MiscTools.parseURL(e.source), e.line, e.charPositionInLine);
+                return new Location(URLUtil.parseURL(e.source), e.line, e.charPositionInLine);
             }
             return null;
         }

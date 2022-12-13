@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.util.parsing;
 
 import de.uka.ilkd.key.parser.Location;
-import de.uka.ilkd.key.util.MiscTools;
 import org.antlr.v4.runtime.IntStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
+import org.key_project.util.java.URLUtil;
 
 import javax.annotation.Nullable;
 import java.net.MalformedURLException;
@@ -59,7 +59,7 @@ public class BuildingException extends RuntimeException implements HasLocation {
             var source = offendingSymbol.getTokenSource().getSourceName();
             URL url = null;
             if (!IntStream.UNKNOWN_SOURCE_NAME.equals(source)) {
-                url = MiscTools.parseURL(source);
+                url = URLUtil.parseURL(source);
             }
             return new Location(url, offendingSymbol.getLine(),
                 /*
