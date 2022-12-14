@@ -439,11 +439,9 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
                 } else {
                     // check for existence
                     final IfFormulaInstSeq assumesInSequent = (IfFormulaInstSeq) inst;
+                    final Semisequent searchFormula = (i>0) ? sequent.antecedent() : sequent.succedent();
 
-                    final Semisequent searchFormula = assumesInSequent.inAntec() ?
-                                                    sequent.antecedent() : sequent.succedent();
-
-                    if (!searchFormula.contains(inst.getConstrainedFormula())) {
+                    if (assumesInSequent.inAntec() == (i<=0) || !searchFormula.containsEqual(inst.getConstrainedFormula())) {
                         // TODO: instead of throwing an error, open a new goal to prove the instantiation
                         // On the other side, if a formula intended to be available is not, some coding error
                         // is present.

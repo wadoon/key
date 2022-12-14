@@ -312,7 +312,10 @@ public class Sequent implements Iterable<SequentFormula> {
     }
 
     public boolean numberInAntec(int formulaNumber) {
-        return formulaNumber <= antecedent.size();
+        if (formulaNumber <= 0 || formulaNumber > size()) {
+            throw new RuntimeException("Illegal formula number: " + formulaNumber + " in " + this);
+        }
+        return antecedent.size() > 0 && formulaNumber <= antecedent.size();
     }
 
     /**
