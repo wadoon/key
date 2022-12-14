@@ -5,8 +5,8 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.IfFormulaInstSeq;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
+import de.uka.ilkd.key.rule.AssumesFormulaInstSeq;
+import de.uka.ilkd.key.rule.AssumesFormulaInstantiation;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.Debug;
 
@@ -25,7 +25,7 @@ public class CheckApplyEqFeature extends BinaryTacletAppFeature {
         Debug.assertTrue(pos != null,
             "Need to know the position of " + "the application of the taclet");
 
-        IfFormulaInstantiation ifInst = p_app.ifFormulaInstantiations().head();
+        AssumesFormulaInstantiation ifInst = p_app.ifFormulaInstantiations().head();
 
         Debug.assertTrue(ifInst != null, "Need to know the equation the taclet" + " is used with");
 
@@ -34,10 +34,10 @@ public class CheckApplyEqFeature extends BinaryTacletAppFeature {
         ;
     }
 
-    private boolean isNotSelfApplication(PosInOccurrence pos, IfFormulaInstantiation ifInst) {
-        if (!(ifInst instanceof IfFormulaInstSeq)
+    private boolean isNotSelfApplication(PosInOccurrence pos, AssumesFormulaInstantiation ifInst) {
+        if (!(ifInst instanceof AssumesFormulaInstSeq)
                 || ifInst.getConstrainedFormula() != pos.sequentFormula()
-                || ((IfFormulaInstSeq) ifInst).inAntec() != pos.isInAntec())
+                || ((AssumesFormulaInstSeq) ifInst).inAntec() != pos.isInAntec())
             return true;
 
         // Position may not be one of the terms compared in

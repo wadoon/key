@@ -20,7 +20,6 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.ClashFreeSubst.VariableCollectVisitor;
@@ -68,7 +67,7 @@ public abstract class TacletApp implements RuleApp {
     /**
      * chosen instantiations for the if sequent formulas
      */
-    protected final ImmutableList<IfFormulaInstantiation> ifInstantiations;
+    protected final ImmutableList<AssumesFormulaInstantiation> ifInstantiations;
 
     /**
      * set of schema variables that appear in the Taclet and need to be instantiated but are not
@@ -89,7 +88,7 @@ public abstract class TacletApp implements RuleApp {
     }
 
     TacletApp(Taclet taclet, SVInstantiations instantiations,
-            ImmutableList<IfFormulaInstantiation> ifInstantiations) {
+            ImmutableList<AssumesFormulaInstantiation> ifInstantiations) {
         this.taclet = taclet;
         this.instantiations = instantiations;
         this.ifInstantiations = ifInstantiations;
@@ -188,7 +187,7 @@ public abstract class TacletApp implements RuleApp {
         return matchConditions;
     }
 
-    public ImmutableList<IfFormulaInstantiation> ifFormulaInstantiations() {
+    public ImmutableList<AssumesFormulaInstantiation> ifFormulaInstantiations() {
         return ifInstantiations;
     }
 
@@ -878,20 +877,20 @@ public abstract class TacletApp implements RuleApp {
      * metavariables and if formula instantiations given and forget the old ones
      */
     protected abstract TacletApp setAllInstantiations(MatchConditions mc,
-            ImmutableList<IfFormulaInstantiation> ifInstantiations, Services services);
+                                                      ImmutableList<AssumesFormulaInstantiation> ifInstantiations, Services services);
 
     /**
      * Creates a new Taclet application by matching the given formulas against the formulas of the
      * if sequent, adding SV instantiations, constraints and metavariables as needed. This will fail
      * if the if formulas have already been instantiated.
      */
-    public TacletApp setIfFormulaInstantiations(ImmutableList<IfFormulaInstantiation> p_list,
+    public TacletApp setIfFormulaInstantiations(ImmutableList<AssumesFormulaInstantiation> p_list,
             Services p_services) {
         if (p_list == null) {
             // (LG 2022-02-07) Apparently findIfFormulaInstantiations() might return null
             // instantiations that should actually be nil().
             // So we replace null with nil() here as a bugfix.
-            p_list = ImmutableSLList.<IfFormulaInstantiation>nil();
+            p_list = ImmutableSLList.<AssumesFormulaInstantiation>nil();
         }
         assert ifInstsCorrectSize(p_list) && ifInstantiations == null
                 : "If instantiations list has wrong size "
@@ -923,9 +922,9 @@ public abstract class TacletApp implements RuleApp {
         return findIfFormulaInstantiationsHelp(
             createSemisequentList(taclet().ifSequent().succedent()),
             createSemisequentList(taclet().ifSequent().antecedent()),
-            IfFormulaInstSeq.createList(seq, false, services),
-            IfFormulaInstSeq.createList(seq, true, services),
-            ImmutableSLList.<IfFormulaInstantiation>nil(), matchConditions(), services);
+            AssumesFormulaInstSeq.createList(seq, false, services),
+            AssumesFormulaInstSeq.createList(seq, true, services),
+            ImmutableSLList.<AssumesFormulaInstantiation>nil(), matchConditions(), services);
     }
 
     /**
@@ -944,11 +943,11 @@ public abstract class TacletApp implements RuleApp {
      * @return a list of tacletapps with the found if formula instantiations
      */
     private ImmutableList<TacletApp> findIfFormulaInstantiationsHelp(
-            ImmutableList<SequentFormula> ruleSuccTail, ImmutableList<SequentFormula> ruleAntecTail,
-            ImmutableList<IfFormulaInstantiation> instSucc,
-            ImmutableList<IfFormulaInstantiation> instAntec,
-            ImmutableList<IfFormulaInstantiation> instAlreadyMatched, MatchConditions matchCond,
-            Services services) {
+        ImmutableList<SequentFormula> ruleSuccTail, ImmutableList<SequentFormula> ruleAntecTail,
+        ImmutableList<AssumesFormulaInstantiation> instSucc,
+        ImmutableList<AssumesFormulaInstantiation> instAntec,
+        ImmutableList<AssumesFormulaInstantiation> instAlreadyMatched, MatchConditions matchCond,
+        Services services) {
 
         while (ruleSuccTail.isEmpty()) {
             if (ruleAntecTail == null) {
@@ -972,7 +971,7 @@ public abstract class TacletApp implements RuleApp {
         // For each matching formula call the method again to match
         // the remaining terms
         ImmutableList<TacletApp> res = ImmutableSLList.<TacletApp>nil();
-        Iterator<IfFormulaInstantiation> itCand = mr.getFormulas().iterator();
+        Iterator<AssumesFormulaInstantiation> itCand = mr.getFormulas().iterator();
         Iterator<MatchConditions> itMC = mr.getMatchConditions().iterator();
         ruleSuccTail = ruleSuccTail.tail();
         while (itCand.hasNext()) {
@@ -1169,7 +1168,7 @@ public abstract class TacletApp implements RuleApp {
      * @param list list of instantiations (non-null)
      * @return true iff the list of if instantiations has the correct size
      */
-    public boolean ifInstsCorrectSize(ImmutableList<IfFormulaInstantiation> list) {
+    public boolean ifInstsCorrectSize(ImmutableList<AssumesFormulaInstantiation> list) {
         Semisequent antec = taclet().ifSequent().antecedent();
         Semisequent succ = taclet().ifSequent().succedent();
         return list.size() == (antec.size() + succ.size());
@@ -1181,7 +1180,7 @@ public abstract class TacletApp implements RuleApp {
      * @return true iff the list of if instantiations has the correct size or is null
      */
     protected static boolean ifInstsCorrectSize(Taclet p_taclet,
-            ImmutableList<IfFormulaInstantiation> p_list) {
+            ImmutableList<AssumesFormulaInstantiation> p_list) {
         return p_list == null || p_list.size() == (p_taclet.ifSequent().antecedent().size()
                 + p_taclet.ifSequent().succedent().size());
     }

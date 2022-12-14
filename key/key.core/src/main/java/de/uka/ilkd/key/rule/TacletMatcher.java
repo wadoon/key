@@ -24,7 +24,7 @@ public interface TacletMatcher {
      *         could successfully be matched against p_template, and the corresponding
      *         MatchConditions.
      */
-    public abstract IfMatchResult matchIf(ImmutableList<IfFormulaInstantiation> p_toMatch,
+    public abstract IfMatchResult matchIf(ImmutableList<AssumesFormulaInstantiation> p_toMatch,
             Term p_template, MatchConditions p_matchCond, Services p_services);
 
     /**
@@ -34,7 +34,7 @@ public interface TacletMatcher {
      *
      * @return resulting MatchConditions or null if the given list p_toMatch does not match
      */
-    public abstract MatchConditions matchIf(Iterable<IfFormulaInstantiation> p_toMatch,
+    public abstract MatchConditions matchIf(Iterable<AssumesFormulaInstantiation> p_toMatch,
             MatchConditions p_matchCond, Services p_services);
 
     /**

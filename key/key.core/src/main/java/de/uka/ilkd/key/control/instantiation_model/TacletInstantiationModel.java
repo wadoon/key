@@ -23,8 +23,8 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.SVInstantiationException;
 import de.uka.ilkd.key.proof.SVInstantiationParserException;
 import de.uka.ilkd.key.proof.SortMismatchException;
-import de.uka.ilkd.key.rule.IfFormulaInstSeq;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
+import de.uka.ilkd.key.rule.AssumesFormulaInstSeq;
+import de.uka.ilkd.key.rule.AssumesFormulaInstantiation;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -131,10 +131,10 @@ public class TacletInstantiationModel {
         int size = asize + ifseq.succedent().size();
 
         if (size > 0) {
-            ImmutableList<IfFormulaInstantiation> antecCand =
-                IfFormulaInstSeq.createList(seq, true, services);
-            ImmutableList<IfFormulaInstantiation> succCand =
-                IfFormulaInstSeq.createList(seq, false, services);
+            ImmutableList<AssumesFormulaInstantiation> antecCand =
+                AssumesFormulaInstSeq.createList(seq, true, services);
+            ImmutableList<AssumesFormulaInstantiation> succCand =
+                AssumesFormulaInstSeq.createList(seq, false, services);
 
             Iterator<SequentFormula> it = ifseq.iterator();
             Term ifFma;
@@ -158,8 +158,8 @@ public class TacletInstantiationModel {
     private TacletApp createTacletAppFromIfs(TacletApp tacletApp) throws IfMismatchException,
             SVInstantiationParserException, MissingInstantiationException, SortMismatchException {
 
-        ImmutableList<IfFormulaInstantiation> instList =
-            ImmutableSLList.<IfFormulaInstantiation>nil();
+        ImmutableList<AssumesFormulaInstantiation> instList =
+            ImmutableSLList.<AssumesFormulaInstantiation>nil();
 
         for (int i = ifChoiceModel.length - 1; i >= 0; --i) {
             instList = instList.prepend(ifChoiceModel[i].getSelection(i));

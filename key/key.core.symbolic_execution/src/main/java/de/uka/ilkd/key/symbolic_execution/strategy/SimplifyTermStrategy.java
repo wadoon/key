@@ -6,7 +6,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
+import de.uka.ilkd.key.rule.AssumesFormulaInstantiation;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
@@ -66,7 +66,7 @@ public class SimplifyTermStrategy extends JavaCardDLStrategy {
                         // to be used in an assumes clause
                         TacletApp ta = (TacletApp) app;
                         if (ta.ifFormulaInstantiations() != null) {
-                            for (IfFormulaInstantiation ifi : ta.ifFormulaInstantiations()) {
+                            for (AssumesFormulaInstantiation ifi : ta.ifFormulaInstantiations()) {
                                 if (ifi.getConstrainedFormula().formula()
                                         .containsLabel(SymbolicExecutionUtil.RESULT_LABEL)) {
                                     hasLabel = true;

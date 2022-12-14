@@ -23,7 +23,7 @@ import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
+import de.uka.ilkd.key.rule.AssumesFormulaInstantiation;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
@@ -82,7 +82,7 @@ public class FormulaTermLabelUpdate implements TermLabelUpdate {
             if (ta.ifInstsComplete() && ta.ifFormulaInstantiations() != null) {
                 Map<SequentFormula, FormulaTermLabel> ifLabels =
                     new LinkedHashMap<SequentFormula, FormulaTermLabel>();
-                for (IfFormulaInstantiation ifInst : ta.ifFormulaInstantiations()) {
+                for (AssumesFormulaInstantiation ifInst : ta.ifFormulaInstantiations()) {
                     FormulaTermLabel ifLabel = StayOnFormulaTermLabelPolicy.searchFormulaTermLabel(
                         ifInst.getConstrainedFormula().formula().getLabels());
                     if (ifLabel != null) {

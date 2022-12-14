@@ -17,7 +17,7 @@ import de.uka.ilkd.key.proof.io.OutputStreamProofSaver;
  * Instantiation of an if-formula that is a formula of an existing sequent.
  */
 
-public class IfFormulaInstSeq implements IfFormulaInstantiation {
+public class AssumesFormulaInstSeq implements AssumesFormulaInstantiation {
 
     /**
      * Sequent and formula
@@ -26,14 +26,14 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
     private final boolean antec; // formula is in antecedent?
     private final SequentFormula cf;
 
-    public IfFormulaInstSeq(Sequent p_seq, boolean antec, SequentFormula p_cf) {
+    public AssumesFormulaInstSeq(Sequent p_seq, boolean antec, SequentFormula p_cf) {
         seq = p_seq;
         this.antec = antec;
         cf = p_cf;
     }
 
 
-    public IfFormulaInstSeq(Sequent seq, int formulaNr) {
+    public AssumesFormulaInstSeq(Sequent seq, int formulaNr) {
         this(seq, seq.numberInAntec(formulaNr), seq.getFormulabyNr(formulaNr));
     }
 
@@ -49,9 +49,9 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
     /**
      * Create a list with all formulas of a given semisequent
      */
-    private static ImmutableList<IfFormulaInstantiation> createListHelp(Sequent p_s,
-            boolean antec) {
-        ImmutableList<IfFormulaInstantiation> res = ImmutableSLList.<IfFormulaInstantiation>nil();
+    private static ImmutableList<AssumesFormulaInstantiation> createListHelp(Sequent p_s,
+                                                                             boolean antec) {
+        ImmutableList<AssumesFormulaInstantiation> res = ImmutableSLList.<AssumesFormulaInstantiation>nil();
         Iterator<SequentFormula> it;
         if (antec) {
             it = p_s.antecedent().iterator();
@@ -59,19 +59,19 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
             it = p_s.succedent().iterator();
         }
         while (it.hasNext()) {
-            res = res.prepend(new IfFormulaInstSeq(p_s, antec, it.next()));
+            res = res.prepend(new AssumesFormulaInstSeq(p_s, antec, it.next()));
         }
 
         return res;
     }
 
-    public static ImmutableList<IfFormulaInstantiation> createList(Sequent p_s, boolean antec,
-            Services services) {
+    public static ImmutableList<AssumesFormulaInstantiation> createList(Sequent p_s, boolean antec,
+                                                                        Services services) {
         final IfFormulaInstantiationCache cache =
             services.getCaches().getIfFormulaInstantiationCache();
         final Semisequent semi = antec ? p_s.antecedent() : p_s.succedent();
 
-        ImmutableList<IfFormulaInstantiation> val = cache.get(antec, semi);
+        ImmutableList<AssumesFormulaInstantiation> val = cache.get(antec, semi);
 
         if (val == null) {
             val = createListHelp(p_s, antec);
@@ -93,10 +93,10 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
 
     @Override
     public boolean equals(Object p_obj) {
-        if (!(p_obj instanceof IfFormulaInstSeq)) {
+        if (!(p_obj instanceof AssumesFormulaInstSeq)) {
             return false;
         }
-        final IfFormulaInstSeq other = (IfFormulaInstSeq) p_obj;
+        final AssumesFormulaInstSeq other = (AssumesFormulaInstSeq) p_obj;
         return seq == other.seq && cf == other.cf && antec == other.antec;
     }
 

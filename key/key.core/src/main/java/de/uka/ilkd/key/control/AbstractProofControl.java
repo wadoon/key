@@ -20,8 +20,8 @@ import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.IfFormulaInstSeq;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
+import de.uka.ilkd.key.rule.AssumesFormulaInstSeq;
+import de.uka.ilkd.key.rule.AssumesFormulaInstantiation;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
@@ -30,7 +30,6 @@ import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.DelegationBasedAutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.FocussedBreakpointRuleApplicationManager;
 import de.uka.ilkd.key.strategy.FocussedRuleApplicationManager;
-import de.uka.ilkd.key.util.Debug;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -167,9 +166,9 @@ public abstract class AbstractProofControl implements ProofControl {
                 }
                 if (ifCandidates.size() == 1 && pos != null) {
                     TacletApp a = ifCandidates.head();
-                    ImmutableList<IfFormulaInstantiation> ifs = a.ifFormulaInstantiations();
-                    if (ifs != null && ifs.size() == 1 && ifs.head() instanceof IfFormulaInstSeq) {
-                        IfFormulaInstSeq ifis = (IfFormulaInstSeq) ifs.head();
+                    ImmutableList<AssumesFormulaInstantiation> ifs = a.ifFormulaInstantiations();
+                    if (ifs != null && ifs.size() == 1 && ifs.head() instanceof AssumesFormulaInstSeq) {
+                        AssumesFormulaInstSeq ifis = (AssumesFormulaInstSeq) ifs.head();
                         if (ifis.toPosInOccurrence().equals(pos.topLevel())) {
                             continue; // skip app if find and if same formula
                         }

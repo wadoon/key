@@ -311,7 +311,7 @@ public class OutputStreamProofSaver {
         output.append(posInOccurrence2Proof(node.sequent(), appliedRuleApp.posInOccurrence()));
         output.append(newNames2Proof(node));
         output.append(getInteresting(appliedRuleApp.instantiations()));
-        final ImmutableList<IfFormulaInstantiation> l = appliedRuleApp.ifFormulaInstantiations();
+        final ImmutableList<AssumesFormulaInstantiation> l = appliedRuleApp.ifFormulaInstantiations();
         if (l != null) {
             output.append(ifFormulaInsts(node, l));
         }
@@ -687,16 +687,16 @@ public class OutputStreamProofSaver {
         return s.toString();
     }
 
-    public String ifFormulaInsts(Node node, ImmutableList<IfFormulaInstantiation> l) {
+    public String ifFormulaInsts(Node node, ImmutableList<AssumesFormulaInstantiation> l) {
         StringBuilder s = new StringBuilder();
-        for (final IfFormulaInstantiation aL : l) {
-            if (aL instanceof IfFormulaInstSeq) {
+        for (final AssumesFormulaInstantiation aL : l) {
+            if (aL instanceof AssumesFormulaInstSeq) {
                 final SequentFormula f = aL.getConstrainedFormula();
                 s.append(" (ifseqformula \"")
                         .append(node.sequent()
-                                .formulaNumberInSequent(((IfFormulaInstSeq) aL).inAntec(), f))
+                                .formulaNumberInSequent(((AssumesFormulaInstSeq) aL).inAntec(), f))
                         .append("\")");
-            } else if (aL instanceof IfFormulaInstDirect) {
+            } else if (aL instanceof AssumesFormulaInstDirect) {
 
                 final String directInstantiation =
                     printTerm(aL.getConstrainedFormula().formula(), node.proof().getServices())

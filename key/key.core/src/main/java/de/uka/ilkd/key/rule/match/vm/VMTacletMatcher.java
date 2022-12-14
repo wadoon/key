@@ -19,8 +19,8 @@ import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.rule.FindTaclet;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
-import de.uka.ilkd.key.rule.IfFormulaInstSeq;
+import de.uka.ilkd.key.rule.AssumesFormulaInstantiation;
+import de.uka.ilkd.key.rule.AssumesFormulaInstSeq;
 import de.uka.ilkd.key.rule.IfMatchResult;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.NoFindTaclet;
@@ -108,13 +108,13 @@ public class VMTacletMatcher implements TacletMatcher {
      *      de.uka.ilkd.key.rule.MatchConditions, de.uka.ilkd.key.java.Services)
      */
     @Override
-    public final IfMatchResult matchIf(ImmutableList<IfFormulaInstantiation> p_toMatch,
+    public final IfMatchResult matchIf(ImmutableList<AssumesFormulaInstantiation> p_toMatch,
             Term p_template, MatchConditions p_matchCond, Services p_services) {
         TacletMatchProgram prg = assumesMatchPrograms.get(p_template);
 
 
-        ImmutableList<IfFormulaInstantiation> resFormulas =
-            ImmutableSLList.<IfFormulaInstantiation>nil();
+        ImmutableList<AssumesFormulaInstantiation> resFormulas =
+            ImmutableSLList.<AssumesFormulaInstantiation>nil();
         ImmutableList<MatchConditions> resMC = ImmutableSLList.<MatchConditions>nil();
 
         final boolean updateContextPresent =
@@ -126,9 +126,9 @@ public class VMTacletMatcher implements TacletMatcher {
             context = p_matchCond.getInstantiations().getUpdateContext();
         }
 
-        ImmutableList<IfFormulaInstantiation> workingList = p_toMatch;
+        ImmutableList<AssumesFormulaInstantiation> workingList = p_toMatch;
         while (!workingList.isEmpty()) {
-            final IfFormulaInstantiation cf = workingList.head();
+            final AssumesFormulaInstantiation cf = workingList.head();
             workingList = workingList.tail();
 
             Term formula = cf.getConstrainedFormula().formula();
@@ -184,7 +184,7 @@ public class VMTacletMatcher implements TacletMatcher {
      *      de.uka.ilkd.key.rule.MatchConditions, de.uka.ilkd.key.java.Services)
      */
     @Override
-    public final MatchConditions matchIf(Iterable<IfFormulaInstantiation> p_toMatch,
+    public final MatchConditions matchIf(Iterable<AssumesFormulaInstantiation> p_toMatch,
             MatchConditions p_matchCond, Services p_services) {
 
         final Iterator<SequentFormula> anteIterator = assumesSequent.antecedent().iterator();
@@ -192,12 +192,12 @@ public class VMTacletMatcher implements TacletMatcher {
 
         ImmutableList<MatchConditions> newMC;
 
-        for (final IfFormulaInstantiation candidateInst : p_toMatch) {
+        for (final AssumesFormulaInstantiation candidateInst : p_toMatch) {
             // Part of fix for #1716: match antecedent with antecedent, succ with succ
-            boolean candidateInAntec = (candidateInst instanceof IfFormulaInstSeq)
-                    // Only IfFormulaInstSeq has inAntec() property ...
-                    && (((IfFormulaInstSeq) candidateInst).inAntec())
-                    || !(candidateInst instanceof IfFormulaInstSeq)
+            boolean candidateInAntec = (candidateInst instanceof AssumesFormulaInstSeq)
+                    // Only AssumesFormulaInstSeq has inAntec() property ...
+                    && (((AssumesFormulaInstSeq) candidateInst).inAntec())
+                    || !(candidateInst instanceof AssumesFormulaInstSeq)
                             // ... and it seems we don't need the check for other implementations.
                             // Default: just take the next ante formula, else succ formula
                             && anteIterator.hasNext();
@@ -207,7 +207,7 @@ public class VMTacletMatcher implements TacletMatcher {
 
             assert itIfSequent.hasNext()
                     : "p_toMatch and assumes sequent must have same number of elements";
-            newMC = matchIf(ImmutableSLList.<IfFormulaInstantiation>nil().prepend(candidateInst),
+            newMC = matchIf(ImmutableSLList.<AssumesFormulaInstantiation>nil().prepend(candidateInst),
                 itIfSequent.next().formula(), p_matchCond, p_services).getMatchConditions();
 
             if (newMC.isEmpty())

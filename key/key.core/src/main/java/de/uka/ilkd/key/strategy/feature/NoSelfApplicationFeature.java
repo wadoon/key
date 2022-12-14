@@ -4,7 +4,7 @@ import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
+import de.uka.ilkd.key.rule.AssumesFormulaInstantiation;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.Debug;
 
@@ -27,13 +27,13 @@ public class NoSelfApplicationFeature extends BinaryTacletAppFeature {
             return true;
         }
 
-        ImmutableList<IfFormulaInstantiation> ifInsts = p_app.ifFormulaInstantiations();
+        ImmutableList<AssumesFormulaInstantiation> ifInsts = p_app.ifFormulaInstantiations();
 
         Debug.assertTrue(ifInsts != null && !ifInsts.isEmpty(),
             "NoSelfApplicationFeature: Need to know the equation the taclet is used with");
 
         boolean noSelfApplication = true;
-        for (IfFormulaInstantiation ifInst : ifInsts) {
+        for (AssumesFormulaInstantiation ifInst : ifInsts) {
             noSelfApplication =
                 noSelfApplication && (ifInst.getConstrainedFormula() != pos.sequentFormula());
         }

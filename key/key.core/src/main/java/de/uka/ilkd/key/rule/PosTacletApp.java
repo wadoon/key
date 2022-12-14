@@ -48,7 +48,7 @@ public class PosTacletApp extends TacletApp {
     }
 
     public static PosTacletApp createPosTacletApp(FindTaclet taclet,
-            SVInstantiations instantiations, ImmutableList<IfFormulaInstantiation> ifInstantiations,
+            SVInstantiations instantiations, ImmutableList<AssumesFormulaInstantiation> ifInstantiations,
             PosInOccurrence pos, Services services) {
         Debug.assertTrue(ifInstsCorrectSize(taclet, ifInstantiations),
             "If instantiations list has wrong size");
@@ -88,7 +88,7 @@ public class PosTacletApp extends TacletApp {
      * @param pos the PosInOccurrence storing the position where to apply the Taclet
      */
     private PosTacletApp(FindTaclet taclet, SVInstantiations instantiations,
-            ImmutableList<IfFormulaInstantiation> ifInstantiations, PosInOccurrence pos) {
+                         ImmutableList<AssumesFormulaInstantiation> ifInstantiations, PosInOccurrence pos) {
         super(taclet, instantiations, ifInstantiations);
         this.pos = pos;
     }
@@ -254,7 +254,7 @@ public class PosTacletApp extends TacletApp {
      */
     @Override
     protected TacletApp setAllInstantiations(MatchConditions mc,
-            ImmutableList<IfFormulaInstantiation> ifInstantiations, Services services) {
+                                             ImmutableList<AssumesFormulaInstantiation> ifInstantiations, Services services) {
         return createPosTacletApp((FindTaclet) taclet, mc.getInstantiations(), ifInstantiations,
             posInOccurrence(), services);
     }

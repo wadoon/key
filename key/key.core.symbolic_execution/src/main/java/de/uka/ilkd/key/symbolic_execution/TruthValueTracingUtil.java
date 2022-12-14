@@ -32,8 +32,8 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
-import de.uka.ilkd.key.rule.IfFormulaInstSeq;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
+import de.uka.ilkd.key.rule.AssumesFormulaInstSeq;
+import de.uka.ilkd.key.rule.AssumesFormulaInstantiation;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -335,13 +335,13 @@ public final class TruthValueTracingUtil {
         }
         if (isClosingRule(tacletApp.taclet())) {
             if (tacletApp.ifInstsComplete() && tacletApp.ifFormulaInstantiations() != null) {
-                for (IfFormulaInstantiation ifInst : tacletApp.ifFormulaInstantiations()) {
-                    assert ifInst instanceof IfFormulaInstSeq;
+                for (AssumesFormulaInstantiation ifInst : tacletApp.ifFormulaInstantiations()) {
+                    assert ifInst instanceof AssumesFormulaInstSeq;
                     Term term = ifInst.getConstrainedFormula().formula();
                     TermLabel label = term.getLabel(termLabelName);
                     if (label instanceof FormulaTermLabel) {
                         result.add(new LabelOccurrence((FormulaTermLabel) label,
-                            ((IfFormulaInstSeq) ifInst).inAntec()));
+                            ((AssumesFormulaInstSeq) ifInst).inAntec()));
                     }
                 }
             }
@@ -551,7 +551,7 @@ public final class TruthValueTracingUtil {
                 if (parentRuleApp instanceof TacletApp) {
                     TacletApp ta = (TacletApp) parentRuleApp;
                     if (ta.ifInstsComplete() && ta.ifFormulaInstantiations() != null) {
-                        for (IfFormulaInstantiation ifInst : ta.ifFormulaInstantiations()) {
+                        for (AssumesFormulaInstantiation ifInst : ta.ifFormulaInstantiations()) {
                             checkForNewMinorIds(childNode, ifInst.getConstrainedFormula().formula(),
                                 termLabelName, parentPio, tb, results);
                         }

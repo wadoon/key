@@ -9,14 +9,14 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
  * Instantiation of an if-formula that has to be proven by an explicit if-goal
  */
 
-public class IfFormulaInstDirect implements IfFormulaInstantiation {
+public class AssumesFormulaInstDirect implements AssumesFormulaInstantiation {
 
     /**
      * Simply the formula
      */
     private SequentFormula cf;
 
-    public IfFormulaInstDirect(SequentFormula p_cf) {
+    public AssumesFormulaInstDirect(SequentFormula p_cf) {
         cf = p_cf;
     }
 
@@ -32,10 +32,10 @@ public class IfFormulaInstDirect implements IfFormulaInstantiation {
     }
 
     public boolean equals(Object p_obj) {
-        if (!(p_obj instanceof IfFormulaInstDirect)) {
+        if (!(p_obj instanceof AssumesFormulaInstDirect)) {
             return false;
         }
-        return cf.equals(((IfFormulaInstDirect) p_obj).cf);
+        return cf.equals(((AssumesFormulaInstDirect) p_obj).cf);
     }
 
     public int hashCode() {

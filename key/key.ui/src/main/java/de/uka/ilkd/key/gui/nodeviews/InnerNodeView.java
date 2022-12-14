@@ -26,8 +26,8 @@ import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.IfFormulaInstSeq;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
+import de.uka.ilkd.key.rule.AssumesFormulaInstSeq;
+import de.uka.ilkd.key.rule.AssumesFormulaInstantiation;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import org.slf4j.Logger;
@@ -116,15 +116,15 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
      * @throws BadLocationException
      */
     private void highlightIfFormulas(TacletApp tapp) throws BadLocationException {
-        final ImmutableList<IfFormulaInstantiation> ifs = tapp.ifFormulaInstantiations();
+        final ImmutableList<AssumesFormulaInstantiation> ifs = tapp.ifFormulaInstantiations();
         if (ifs == null) {
             return;
         }
-        for (final IfFormulaInstantiation inst2 : ifs) {
-            if (!(inst2 instanceof IfFormulaInstSeq)) {
+        for (final AssumesFormulaInstantiation inst2 : ifs) {
+            if (!(inst2 instanceof AssumesFormulaInstSeq)) {
                 continue;
             }
-            final IfFormulaInstSeq inst = (IfFormulaInstSeq) inst2;
+            final AssumesFormulaInstSeq inst = (AssumesFormulaInstSeq) inst2;
             final PosInOccurrence pos = new PosInOccurrence(inst.getConstrainedFormula(),
                 PosInTerm.getTopLevel(), inst.inAntec());
             highlightPos(pos, IF_FORMULA_HIGHLIGHTER);

@@ -8,7 +8,6 @@ import de.uka.ilkd.key.nparser.KeyIO;
 import org.antlr.runtime.RecognitionException;
 import org.key_project.util.collection.ImmutableList;
 
-import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -16,25 +15,24 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.NodeOrigin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
-import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.MissingInstantiationException;
 import de.uka.ilkd.key.proof.SVInstantiationParserException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
-import de.uka.ilkd.key.rule.IfFormulaInstDirect;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
+import de.uka.ilkd.key.rule.AssumesFormulaInstDirect;
+import de.uka.ilkd.key.rule.AssumesFormulaInstantiation;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
-public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiation> {
+public class TacletAssumesModel extends DefaultComboBoxModel<AssumesFormulaInstantiation> {
 
     /**
      * generated UID
      */
     private static final long serialVersionUID = -5388696072469119661L;
 
-    private static final IfFormulaInstantiation manualTextIF = new IfFormulaInstantiation() {
+    private static final AssumesFormulaInstantiation manualTextIF = new AssumesFormulaInstantiation() {
 
         @Override
         public String toString(Services services) {
@@ -56,7 +54,7 @@ public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiat
     private final TacletApp app;
     private final Goal goal;
 
-    public TacletAssumesModel(Term ifFma, ImmutableList<IfFormulaInstantiation> candidates,
+    public TacletAssumesModel(Term ifFma, ImmutableList<AssumesFormulaInstantiation> candidates,
             TacletApp app, Goal goal, Services services, NamespaceSet nss, AbbrevMap scm) {
         super(createIfInsts(candidates));
 
@@ -79,10 +77,10 @@ public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiat
         return ifFma;
     }
 
-    public static IfFormulaInstantiation[] createIfInsts(
-            ImmutableList<IfFormulaInstantiation> candidates) {
-        IfFormulaInstantiation[] res = new IfFormulaInstantiation[candidates.size()];
-        Iterator<IfFormulaInstantiation> it = candidates.iterator();
+    public static AssumesFormulaInstantiation[] createIfInsts(
+            ImmutableList<AssumesFormulaInstantiation> candidates) {
+        AssumesFormulaInstantiation[] res = new AssumesFormulaInstantiation[candidates.size()];
+        Iterator<AssumesFormulaInstantiation> it = candidates.iterator();
         int i = 0;
 
         while (it.hasNext()) {
@@ -110,10 +108,10 @@ public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiat
      * @throws SVInstantiationParserException
      * @throws MissingInstantiationException
      */
-    public IfFormulaInstantiation getSelection(int pos)
+    public AssumesFormulaInstantiation getSelection(int pos)
             throws SVInstantiationParserException, MissingInstantiationException {
         if (!isManualInputSelected()) {
-            return (IfFormulaInstantiation) getSelectedItem();
+            return (AssumesFormulaInstantiation) getSelectedItem();
         }
         try {
             if (manualInput == null || "".equals(manualInput)) {
@@ -131,7 +129,7 @@ public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiat
                         app.rule().displayName(), goal.node().serialNr())));
             }
 
-            return new IfFormulaInstDirect(new SequentFormula(term));
+            return new AssumesFormulaInstDirect(new SequentFormula(term));
         } catch (RecognitionException e) {
             throw new SVInstantiationParserException(manualInput, pos, e.charPositionInLine,
                 "Problem occured parsing a manual input" + " of an '\\assumes'-sequent.\n"

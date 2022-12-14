@@ -22,7 +22,6 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import recoder.service.KeYCrossReferenceSourceInfo;
 
 /**
  * A no position taclet application has no position information yet. This can have different
@@ -66,7 +65,7 @@ public class NoPosTacletApp extends TacletApp {
     }
 
     public static NoPosTacletApp createNoPosTacletApp(Taclet taclet,
-            SVInstantiations instantiations, ImmutableList<IfFormulaInstantiation> ifInstantiations,
+            SVInstantiations instantiations, ImmutableList<AssumesFormulaInstantiation> ifInstantiations,
             Services services) {
         Debug.assertTrue(ifInstsCorrectSize(taclet, ifInstantiations),
             "If instantiations list has wrong size");
@@ -116,7 +115,7 @@ public class NoPosTacletApp extends TacletApp {
      * @param instantiations the SVInstantiations
      */
     private NoPosTacletApp(Taclet taclet, SVInstantiations instantiations,
-            ImmutableList<IfFormulaInstantiation> ifInstantiations) {
+            ImmutableList<AssumesFormulaInstantiation> ifInstantiations) {
         super(taclet, instantiations, ifInstantiations);
     }
 
@@ -255,7 +254,7 @@ public class NoPosTacletApp extends TacletApp {
      */
     @Override
     protected TacletApp setAllInstantiations(MatchConditions mc,
-            ImmutableList<IfFormulaInstantiation> ifInstantiations, Services services) {
+                                             ImmutableList<AssumesFormulaInstantiation> ifInstantiations, Services services) {
         return createNoPosTacletApp(taclet, mc.getInstantiations(), ifInstantiations, services);
     }
 

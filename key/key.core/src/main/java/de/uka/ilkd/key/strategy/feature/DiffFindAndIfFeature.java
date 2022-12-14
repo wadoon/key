@@ -5,8 +5,8 @@ import org.key_project.util.collection.ImmutableList;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.IfFormulaInstSeq;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
+import de.uka.ilkd.key.rule.AssumesFormulaInstSeq;
+import de.uka.ilkd.key.rule.AssumesFormulaInstantiation;
 import de.uka.ilkd.key.rule.TacletApp;
 
 /**
@@ -24,14 +24,14 @@ public class DiffFindAndIfFeature extends BinaryTacletAppFeature {
     protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find";
 
-        ImmutableList<IfFormulaInstantiation> list = app.ifFormulaInstantiations();
+        ImmutableList<AssumesFormulaInstantiation> list = app.ifFormulaInstantiations();
         final SequentFormula findFormula = pos.sequentFormula();
         final boolean findIsInAntec = pos.isInAntec();
 
         assert list != null;
 
-        for (final IfFormulaInstantiation aList : list) {
-            final IfFormulaInstSeq iffi = (IfFormulaInstSeq) aList;
+        for (final AssumesFormulaInstantiation aList : list) {
+            final AssumesFormulaInstSeq iffi = (AssumesFormulaInstSeq) aList;
             assert iffi != null;
             final SequentFormula ifFormula = iffi.getConstrainedFormula();
 

@@ -5,11 +5,11 @@ import de.uka.ilkd.key.logic.SequentFormula;
 
 
 /*
- * This interface represents objects representing an instantiation of one formula of the if-sequence
+ * This interface represents objects representing an instantiation of one formula of the assumes-sequent
  * of a taclet.
  */
 
-public interface IfFormulaInstantiation {
+public interface AssumesFormulaInstantiation {
 
     /**
      * @return the cf this is pointing to

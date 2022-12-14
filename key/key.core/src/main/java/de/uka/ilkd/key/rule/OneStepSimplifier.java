@@ -399,8 +399,8 @@ public final class OneStepSimplifier implements BuiltInRule {
                 inAntecedent); // It is required to create a new PosInOccurrence because formula and
                                // pio.constrainedFormula().formula() are only equals module
                                // renamings and term labels
-        ImmutableList<IfFormulaInstantiation> ifInst = ImmutableSLList.nil();
-        ifInst = ifInst.append(new IfFormulaInstDirect(pio.sequentFormula()));
+        ImmutableList<AssumesFormulaInstantiation> ifInst = ImmutableSLList.nil();
+        ifInst = ifInst.append(new AssumesFormulaInstDirect(pio.sequentFormula()));
         TacletApp ta = PosTacletApp.createPosTacletApp(taclet, svi, ifInst, applicatinPIO,
             lastProof.getServices());
         return ta;

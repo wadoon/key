@@ -375,7 +375,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
      * elements of type IfFormulaInstDirect.
      *
      * @param p_goal the {@link Goal} on which the taclet is applied
-     * @param p_list the list of {@link IfFormulaInstantiation} containing the instantiations for
+     * @param p_list the list of {@link AssumesFormulaInstantiation} containing the instantiations for
      *        the assumes formulas
      * @param p_matchCond the {@link MatchConditions} with the instantiations of the schema
      *        variables
@@ -386,7 +386,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
      *         obligation for the to be proven formulas of the assumes goal
      */
     protected ImmutableList<SequentChangeInfo> checkAssumes(final Goal p_goal,
-                                                            ImmutableList<IfFormulaInstantiation> p_list,
+                                                            ImmutableList<AssumesFormulaInstantiation> p_list,
                                                             MatchConditions p_matchCond,
                                                             int p_numberOfNewGoals) {
         ImmutableList<SequentChangeInfo> res = null;
@@ -404,8 +404,8 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
         if (p_list != null) {
             int i = taclet.ifSequent().antecedent().size();
             Term ifPart;
-            for (final IfFormulaInstantiation inst : p_list) {
-                if (!(inst instanceof IfFormulaInstSeq)) {
+            for (final AssumesFormulaInstantiation inst : p_list) {
+                if (!(inst instanceof AssumesFormulaInstSeq)) {
                     // build the if obligation formula
                     ifPart = inst.getConstrainedFormula().formula();
 
@@ -438,7 +438,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
                     }
                 } else {
                     // check for existence
-                    final IfFormulaInstSeq assumesInSequent = (IfFormulaInstSeq) inst;
+                    final AssumesFormulaInstSeq assumesInSequent = (AssumesFormulaInstSeq) inst;
                     final Semisequent searchFormula = (i>0) ? sequent.antecedent() : sequent.succedent();
 
                     if (assumesInSequent.inAntec() == (i<=0) || !searchFormula.containsEqual(inst.getConstrainedFormula())) {

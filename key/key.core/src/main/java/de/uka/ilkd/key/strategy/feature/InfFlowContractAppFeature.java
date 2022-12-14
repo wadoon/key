@@ -21,7 +21,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
+import de.uka.ilkd.key.rule.AssumesFormulaInstantiation;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -92,9 +92,9 @@ public class InfFlowContractAppFeature implements Feature {
                 return false;
             }
         } else {
-            final Iterator<IfFormulaInstantiation> it0 =
+            final Iterator<AssumesFormulaInstantiation> it0 =
                 newApp.ifFormulaInstantiations().iterator();
-            final Iterator<IfFormulaInstantiation> it1 = cmp.ifFormulaInstantiations().iterator();
+            final Iterator<AssumesFormulaInstantiation> it1 = cmp.ifFormulaInstantiations().iterator();
 
             while (it0.hasNext()) {
                 // this test should be improved

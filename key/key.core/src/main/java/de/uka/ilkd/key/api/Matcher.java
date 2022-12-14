@@ -74,10 +74,10 @@ public class Matcher {
         List<SearchNode> finalCandidates = new ArrayList<>(100);
         if (size > 0) {
             // Iteratoren durch die Sequent
-            ImmutableList<IfFormulaInstantiation> antecCand =
-                IfFormulaInstSeq.createList(currentSeq, true, copyServices);
-            ImmutableList<IfFormulaInstantiation> succCand =
-                IfFormulaInstSeq.createList(currentSeq, false, copyServices);
+            ImmutableList<AssumesFormulaInstantiation> antecCand =
+                AssumesFormulaInstSeq.createList(currentSeq, true, copyServices);
+            ImmutableList<AssumesFormulaInstantiation> succCand =
+                AssumesFormulaInstSeq.createList(currentSeq, false, copyServices);
 
             SequentFormula[] patternArray = new SequentFormula[patternSeq.size()];
             int i = 0;

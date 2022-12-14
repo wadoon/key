@@ -14,8 +14,8 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.FindTaclet;
-import de.uka.ilkd.key.rule.IfFormulaInstSeq;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
+import de.uka.ilkd.key.rule.AssumesFormulaInstSeq;
+import de.uka.ilkd.key.rule.AssumesFormulaInstantiation;
 import de.uka.ilkd.key.rule.NoFindTaclet;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -235,16 +235,16 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         if (!getTacletApp().ifInstsComplete())
             return false;
 
-        final Iterator<IfFormulaInstantiation> it =
+        final Iterator<AssumesFormulaInstantiation> it =
             getTacletApp().ifFormulaInstantiations().iterator();
         final Sequent seq = p_goal.sequent();
 
         while (it.hasNext()) {
-            final IfFormulaInstantiation ifInst2 = it.next();
-            if (!(ifInst2 instanceof IfFormulaInstSeq))
+            final AssumesFormulaInstantiation ifInst2 = it.next();
+            if (!(ifInst2 instanceof AssumesFormulaInstSeq))
                 // faster than assertTrue
                 Debug.fail("Don't know what to do with the " + "if-instantiation " + ifInst2);
-            final IfFormulaInstSeq ifInst = (IfFormulaInstSeq) ifInst2;
+            final AssumesFormulaInstSeq ifInst = (AssumesFormulaInstSeq) ifInst2;
             if (!(ifInst.inAntec() ? seq.antecedent() : seq.succedent())
                     .contains(ifInst.getConstrainedFormula()))
                 return false;

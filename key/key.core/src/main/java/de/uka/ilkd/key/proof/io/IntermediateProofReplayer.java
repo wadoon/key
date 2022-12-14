@@ -20,7 +20,6 @@ import java.util.stream.StreamSupport;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.util.ProgressMonitor;
-import de.uka.ilkd.key.rule.*;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -476,11 +475,11 @@ public class IntermediateProofReplayer {
 
         ourApp = constructInsts(ourApp, currGoal, currInterm.getInsts(), services);
 
-        ImmutableList<IfFormulaInstantiation> ifFormulaList =
-            ImmutableSLList.<IfFormulaInstantiation>nil();
+        ImmutableList<AssumesFormulaInstantiation> ifFormulaList =
+            ImmutableSLList.<AssumesFormulaInstantiation>nil();
         for (String ifFormulaStr : currInterm.getIfSeqFormulaList()) {
             ifFormulaList =
-                ifFormulaList.append(new IfFormulaInstSeq(seq, Integer.parseInt(ifFormulaStr)));
+                ifFormulaList.append(new AssumesFormulaInstSeq(seq, Integer.parseInt(ifFormulaStr)));
         }
         for (String ifFormulaStr : currInterm.getIfDirectFormulaList()) {
             // MU 2019: #1487. We have to use the right namespaces to not
@@ -488,7 +487,7 @@ public class IntermediateProofReplayer {
             NamespaceSet nss = currGoal.getLocalNamespaces();
             Term term = parseTerm(ifFormulaStr, proof, nss.variables(), nss.programVariables(),
                 nss.functions());
-            ifFormulaList = ifFormulaList.append(new IfFormulaInstDirect(new SequentFormula(term)));
+            ifFormulaList = ifFormulaList.append(new AssumesFormulaInstDirect(new SequentFormula(term)));
         }
 
         if (!ourApp.ifInstsCorrectSize(ifFormulaList)) {

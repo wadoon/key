@@ -15,7 +15,7 @@ import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
+import de.uka.ilkd.key.rule.AssumesFormulaInstantiation;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -67,9 +67,9 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
 
 
         // compare the if-sequent instantiations
-        final ImmutableList<IfFormulaInstantiation> newAppIfFmlInstantiations =
+        final ImmutableList<AssumesFormulaInstantiation> newAppIfFmlInstantiations =
             newApp.ifFormulaInstantiations();
-        final ImmutableList<IfFormulaInstantiation> cmpIfFmlInstantiations =
+        final ImmutableList<AssumesFormulaInstantiation> cmpIfFmlInstantiations =
             cmp.ifFormulaInstantiations();
         if (newAppIfFmlInstantiations == null || cmpIfFmlInstantiations == null) {
             if (newAppIfFmlInstantiations != null || cmpIfFmlInstantiations != null) {
@@ -77,8 +77,8 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
             }
         } else {
 
-            final Iterator<IfFormulaInstantiation> it0 = newAppIfFmlInstantiations.iterator();
-            final Iterator<IfFormulaInstantiation> it1 = cmpIfFmlInstantiations.iterator();
+            final Iterator<AssumesFormulaInstantiation> it0 = newAppIfFmlInstantiations.iterator();
+            final Iterator<AssumesFormulaInstantiation> it1 = cmpIfFmlInstantiations.iterator();
 
             while (it0.hasNext()) {
                 // this test should be improved

@@ -341,16 +341,16 @@ public class DragNDropInstantiator extends DropTargetAdapter {
 
         ImmutableList<PosTacletApp> result = ImmutableSLList.<PosTacletApp>nil();
 
-        final ImmutableList<IfFormulaInstantiation> ifFmlInst;
+        final ImmutableList<AssumesFormulaInstantiation> ifFmlInst;
 
         if (ifPIO == null || !ifPIO.isTopLevel()) {
             // if formula have to be top level formulas
             // TODO: should update prefix be allowed?
             ifFmlInst = null;
         } else {
-            final IfFormulaInstSeq ifInst =
-                new IfFormulaInstSeq(seq, ifPIO.isInAntec(), ifPIO.sequentFormula());
-            ifFmlInst = ImmutableSLList.<IfFormulaInstantiation>nil().prepend(ifInst);
+            final AssumesFormulaInstSeq ifInst =
+                new AssumesFormulaInstSeq(seq, ifPIO.isInAntec(), ifPIO.sequentFormula());
+            ifFmlInst = ImmutableSLList.<AssumesFormulaInstantiation>nil().prepend(ifInst);
         }
 
         for (PosTacletApp app1 : apps) {
@@ -369,7 +369,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
                 } else {
                     // the right side is not checked in tacletapp
                     // not sure where to incorporate the check...
-                    if (((IfFormulaInstSeq) ifFmlInst.head())
+                    if (((AssumesFormulaInstSeq) ifFmlInst.head())
                             .inAntec() == (ifSequent.succedent().size() == 0)) {
                         app = (PosTacletApp) app.setIfFormulaInstantiations(ifFmlInst, services);
                     }

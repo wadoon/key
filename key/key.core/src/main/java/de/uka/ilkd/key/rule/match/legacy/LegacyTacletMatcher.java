@@ -25,7 +25,7 @@ import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.rule.FindTaclet;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
+import de.uka.ilkd.key.rule.AssumesFormulaInstantiation;
 import de.uka.ilkd.key.rule.IfMatchResult;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.NotFreeIn;
@@ -220,10 +220,10 @@ public final class LegacyTacletMatcher implements TacletMatcher {
      *      de.uka.ilkd.key.rule.MatchConditions, de.uka.ilkd.key.java.Services)
      */
     @Override
-    public final IfMatchResult matchIf(ImmutableList<IfFormulaInstantiation> p_toMatch,
+    public final IfMatchResult matchIf(ImmutableList<AssumesFormulaInstantiation> p_toMatch,
             Term p_template, MatchConditions p_matchCond, Services p_services) {
-        ImmutableList<IfFormulaInstantiation> resFormulas =
-            ImmutableSLList.<IfFormulaInstantiation>nil();
+        ImmutableList<AssumesFormulaInstantiation> resFormulas =
+            ImmutableSLList.<AssumesFormulaInstantiation>nil();
         ImmutableList<MatchConditions> resMC = ImmutableSLList.<MatchConditions>nil();
 
         Term updateFormula;
@@ -233,7 +233,7 @@ public final class LegacyTacletMatcher implements TacletMatcher {
             updateFormula = p_services.getTermBuilder().applyUpdatePairsSequential(
                 p_matchCond.getInstantiations().getUpdateContext(), p_template);
 
-        for (IfFormulaInstantiation cf : p_toMatch) {
+        for (AssumesFormulaInstantiation cf : p_toMatch) {
             final MatchConditions newMC = checkConditions(
                 match(cf.getConstrainedFormula().formula(), updateFormula, p_matchCond, p_services),
                 p_services);
@@ -252,16 +252,16 @@ public final class LegacyTacletMatcher implements TacletMatcher {
      *      de.uka.ilkd.key.rule.MatchConditions, de.uka.ilkd.key.java.Services)
      */
     @Override
-    public final MatchConditions matchIf(Iterable<IfFormulaInstantiation> p_toMatch,
+    public final MatchConditions matchIf(Iterable<AssumesFormulaInstantiation> p_toMatch,
             MatchConditions p_matchCond, Services p_services) {
         final Iterator<SequentFormula> itIfSequent = assumesSequent.iterator();
 
         ImmutableList<MatchConditions> newMC;
 
-        for (final IfFormulaInstantiation candidateInst : p_toMatch) {
+        for (final AssumesFormulaInstantiation candidateInst : p_toMatch) {
             assert itIfSequent.hasNext()
                     : "p_toMatch and assumes sequent must have same number of elements";
-            newMC = matchIf(ImmutableSLList.<IfFormulaInstantiation>nil().prepend(candidateInst),
+            newMC = matchIf(ImmutableSLList.<AssumesFormulaInstantiation>nil().prepend(candidateInst),
                 itIfSequent.next().formula(), p_matchCond, p_services).getMatchConditions();
 
             if (newMC.isEmpty())
