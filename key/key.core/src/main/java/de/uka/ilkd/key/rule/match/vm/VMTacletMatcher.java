@@ -1,11 +1,8 @@
 package de.uka.ilkd.key.rule.match.vm;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 
-import de.uka.ilkd.key.rule.*;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
@@ -21,6 +18,16 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.rule.FindTaclet;
+import de.uka.ilkd.key.rule.IfFormulaInstantiation;
+import de.uka.ilkd.key.rule.IfFormulaInstSeq;
+import de.uka.ilkd.key.rule.IfMatchResult;
+import de.uka.ilkd.key.rule.MatchConditions;
+import de.uka.ilkd.key.rule.NoFindTaclet;
+import de.uka.ilkd.key.rule.NotFreeIn;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletMatcher;
+import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 import de.uka.ilkd.key.rule.match.TacletMatcherKit;
@@ -171,48 +178,6 @@ public class VMTacletMatcher implements TacletMatcher {
         return formula;
     }
 
-    private Iterable<IfFormulaInstantiation> filterForCorrectPolarity(
-            Iterable<IfFormulaInstantiation> instCandidates,
-            MatchConditions p_matchCond,
-            Services p_services) {
-        List<IfFormulaInstantiation> filtered = new ArrayList<>();
-        for (final SequentFormula sf : assumesSequent.antecedent()) {
-            instCandidates.forEach(ifinst -> {
-                if (matchIf(ImmutableSLList.<IfFormulaInstantiation>nil().prepend(ifinst),
-                    sf.formula(), p_matchCond, p_services).getMatchConditions() != null) {
-                    if (ifinst instanceof IfFormulaInstSeq) {
-                        if (((IfFormulaInstSeq) ifinst).inAntec()) {
-                            filtered.add(ifinst);
-                        } else {
-                            // this one has wrong polarity and will be filtered out!
-                            return;
-                        }
-                    } else {
-                        filtered.add(ifinst);
-                    }
-                }
-            });
-        }
-
-        for (final SequentFormula sf : assumesSequent.succedent()) {
-            instCandidates.forEach(ifinst -> {
-                if (matchIf(ImmutableSLList.<IfFormulaInstantiation>nil().prepend(ifinst),
-                    sf.formula(), p_matchCond, p_services).getMatchConditions() != null) {
-                    if (ifinst instanceof IfFormulaInstSeq) {
-                        if (!((IfFormulaInstSeq) ifinst).inAntec()) {
-                            filtered.add(ifinst);
-                        } else {
-                            // this one has wrong polarity and will be filtered out!
-                            return;
-                        }
-                    } else {
-                        filtered.add(ifinst);
-                    }
-                }
-            });
-        }
-        return filtered;
-    }
 
     /**
      * @see de.uka.ilkd.key.rule.TacletMatcher#matchIf(java.lang.Iterable,
@@ -222,17 +187,26 @@ public class VMTacletMatcher implements TacletMatcher {
     public final MatchConditions matchIf(Iterable<IfFormulaInstantiation> p_toMatch,
             MatchConditions p_matchCond, Services p_services) {
 
-        final Iterator<SequentFormula> itIfSequent = assumesSequent.iterator();
+        final Iterator<SequentFormula> anteIterator = assumesSequent.antecedent().iterator();
+        final Iterator<SequentFormula> succIterator = assumesSequent.succedent().iterator();
 
         ImmutableList<MatchConditions> newMC;
 
-        /*
-         * part of the fix for #1716: ensure that position of "assumes" part (antecedent/succedent)
-         * matches the polarity specified in taclet defintion.
-         */
-        p_toMatch = filterForCorrectPolarity(p_toMatch, p_matchCond, p_services);
-
         for (final IfFormulaInstantiation candidateInst : p_toMatch) {
+            // Part of fix for #1716: match antecedent with antecedent, succ with succ
+            boolean candidateInAntec
+                =     (candidateInst instanceof IfFormulaInstSeq)
+                         // Only IfFormulaInstSeq has inAntec() property ...
+                         && (((IfFormulaInstSeq) candidateInst).inAntec())
+                  || !(candidateInst instanceof IfFormulaInstSeq)
+                         // ... and it seems we don't need the check for other implementations.
+                         // Default: just take the next ante formula, else succ formula
+                         && anteIterator.hasNext();
+
+            Iterator<SequentFormula> itIfSequent
+                = candidateInAntec ? anteIterator : succIterator;
+            // Fix end
+
             assert itIfSequent.hasNext()
                     : "p_toMatch and assumes sequent must have same number of elements";
             newMC = matchIf(ImmutableSLList.<IfFormulaInstantiation>nil().prepend(candidateInst),
@@ -243,13 +217,8 @@ public class VMTacletMatcher implements TacletMatcher {
 
             p_matchCond = newMC.head();
         }
-        assert !itIfSequent.hasNext()
+        assert !anteIterator.hasNext() && !succIterator.hasNext()
                 : "p_toMatch and assumes sequent must have same number of elements";
-
-        if (itIfSequent.hasNext()) {
-            // some of the given "assume" instantiations do not match the expected polarity
-            return null;
-        }
 
         return p_matchCond;
     }
