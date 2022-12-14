@@ -466,6 +466,8 @@ public class IntermediateProofReplayer {
 
                 ourApp = ((NoPosTacletApp) ourApp).matchFind(pos, services);
                 ourApp = ourApp.setPosInOccurrence(pos, services);
+            } catch (TacletAppConstructionException tae) {
+                throw tae;
             } catch (Exception e) {
                 throw (TacletAppConstructionException) new TacletAppConstructionException(
                     "Wrong position information: " + pos).initCause(e);
