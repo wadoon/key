@@ -89,7 +89,7 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
         final MatchConditions mc = tacletApp.matchConditions();
 
         final ImmutableList<SequentChangeInfo> newSequentsForGoals =
-            checkIfGoals(goal, tacletApp.ifFormulaInstantiations(), mc, numberOfNewGoals);
+            checkAssumes(goal, tacletApp.ifFormulaInstantiations(), mc, numberOfNewGoals);
 
         final ImmutableList<Goal> newGoals = goal.split(newSequentsForGoals.size());
 

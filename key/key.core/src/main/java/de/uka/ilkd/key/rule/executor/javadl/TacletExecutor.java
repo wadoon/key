@@ -4,20 +4,13 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.rule.*;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.RenamingTable;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.SemisequentChangeInfo;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -27,14 +20,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.ProgVarReplacer;
-import de.uka.ilkd.key.rule.IfFormulaInstSeq;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
-import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
-import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
-import de.uka.ilkd.key.rule.TacletSchemaVariableCollector;
 import de.uka.ilkd.key.rule.executor.RuleExecutor;
 import de.uka.ilkd.key.rule.inst.GenericSortCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -399,9 +385,10 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
      *         two entries: one for the original sequent and one with the sequent encoding the proof
      *         obligation for the to be proven formulas of the assumes goal
      */
-    protected ImmutableList<SequentChangeInfo> checkIfGoals(Goal p_goal,
-            ImmutableList<IfFormulaInstantiation> p_list, MatchConditions p_matchCond,
-            int p_numberOfNewGoals) {
+    protected ImmutableList<SequentChangeInfo> checkAssumes(final Goal p_goal,
+                                                            ImmutableList<IfFormulaInstantiation> p_list,
+                                                            MatchConditions p_matchCond,
+                                                            int p_numberOfNewGoals) {
         ImmutableList<SequentChangeInfo> res = null;
         Iterator<SequentChangeInfo> itNewGoalSequents;
 
@@ -409,13 +396,14 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
         Term ifObl = null;
 
         // always create at least one new goal
-        if (p_numberOfNewGoals == 0)
+        if (p_numberOfNewGoals == 0) {
             p_numberOfNewGoals = 1;
+        }
 
+        final Sequent sequent = p_goal.sequent();
         if (p_list != null) {
             int i = taclet.ifSequent().antecedent().size();
             Term ifPart;
-
             for (final IfFormulaInstantiation inst : p_list) {
                 if (!(inst instanceof IfFormulaInstSeq)) {
                     // build the if obligation formula
@@ -431,7 +419,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
                         for (int j = 0; j < p_numberOfNewGoals + 1; j++) {
                             res = res.prepend(SequentChangeInfo.createSequentChangeInfo(
                                 (SemisequentChangeInfo) null, (SemisequentChangeInfo) null,
-                                p_goal.sequent(), p_goal.sequent()));
+                                sequent, sequent));
                         }
                         ifObl = ifPart;
                     } else {
@@ -448,8 +436,20 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
                         addToPosWithoutInst(inst.getConstrainedFormula(), seq, null, (i > 0));
                         seq = itNewGoalSequents.next();
                     }
-                }
+                } else {
+                    // check for existence
+                    final IfFormulaInstSeq assumesInSequent = (IfFormulaInstSeq) inst;
 
+                    final Semisequent searchFormula = assumesInSequent.inAntec() ?
+                                                    sequent.antecedent() : sequent.succedent();
+
+                    if (!searchFormula.contains(inst.getConstrainedFormula())) {
+                        // TODO: instead of throwing an error, open a new goal to prove the instantiation
+                        // On the other side, if a formula intended to be available is not, some coding error
+                        // is present.
+                        throw new IllegalStateException("Taclet instantiation of assumes not found.");
+                    }
+                }
                 --i;
             }
         }
