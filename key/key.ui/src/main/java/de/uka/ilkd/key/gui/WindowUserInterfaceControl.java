@@ -483,12 +483,16 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                 }
                 getMediator().getSelectionModel().setSelectedNode(result.getNode());
                 if (result.hasErrors()) {
-                    throw new ProblemLoaderException(loader,
-                        "Proof could only be loaded partially.\n" + "In summary "
-                            + result.getErrorList().size()
-                            + " not loadable rule application(s) have been detected.\n"
-                            + "The first one:\n" + result.getErrorList().get(0).getMessage(),
-                        result.getErrorList().get(0));
+                    String errorMessage = "The proof could only be loaded partially.\n";
+                    if (result.getErrorList().size() > 1) {
+                        errorMessage += "While loading, " + result.getErrorList().size() +
+                                            " errors (not loadable rule applications) were detected.\n" +
+                                            "The first one:\n ";
+                    } else {
+                        errorMessage += "The following rule application could not be loaded:\n";
+                    }
+                    errorMessage += result.getErrorList().get(0).getMessage();
+                    throw new ProblemLoaderException(loader, errorMessage, result.getErrorList().get(0));
                 }
             } else {
                 // should never happen as replay always returns a result object
