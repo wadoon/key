@@ -361,8 +361,8 @@ public final class Goal {
      *        changes to the sequent of the parent node
      */
     public void setSequent(SequentChangeInfo sci) {
-        node().setSequent(sci.sequent());
-        node().getNodeInfo().setSequentChangeInfo(sci);
+        node.setSequent(sci.sequent());
+        node.getNodeInfo().setSequentChangeInfo(sci);
         // VK reminder: now update the index
         fireSequentChanged(sci);
     }
@@ -419,7 +419,7 @@ public final class Goal {
      * @param app the TacletApp
      */
     public void addNoPosTacletApp(NoPosTacletApp app) {
-        node().addNoPosTacletApp(app);
+        node.addNoPosTacletApp(app);
         ruleAppIndex.addNoPosTacletApp(app);
     }
 
@@ -518,7 +518,7 @@ public final class Goal {
     public void addAppliedRuleApp(RuleApp app) {
         // Last app first makes inserting and searching faster
         appliedRuleApps = appliedRuleApps.prepend(app);
-        node().setAppliedRuleApp(app);
+        node.setAppliedRuleApp(app);
     }
 
     /**
@@ -580,7 +580,7 @@ public final class Goal {
     }
 
     void pruneToParent() {
-        setNode(node().parent());
+        setNode(node.parent());
         removeLastAppliedRuleApp();
         resetLocalSymbols();
     }
@@ -708,12 +708,12 @@ public final class Goal {
     public List<RuleApp> getAllBuiltInRuleApps() {
         final BuiltInRuleAppIndex index = ruleAppIndex().builtInRuleAppIndex();
         LinkedList<RuleApp> ruleApps = new LinkedList<>();
-        for (SequentFormula sf : node().sequent().antecedent()) {
+        for (SequentFormula sf : node.sequent().antecedent()) {
             ImmutableList<IBuiltInRuleApp> t =
                 index.getBuiltInRule(this, new PosInOccurrence(sf, PosInTerm.getTopLevel(), true));
             t.forEach(ruleApps::add);
         }
-        for (SequentFormula sf : node().sequent().succedent()) {
+        for (SequentFormula sf : node.sequent().succedent()) {
             ImmutableList<IBuiltInRuleApp> t =
                 index.getBuiltInRule(this, new PosInOccurrence(sf, PosInTerm.getTopLevel(), false));
             t.forEach(ruleApps::add);
@@ -731,13 +731,13 @@ public final class Goal {
                 return true;
             }
         };
-        for (SequentFormula sf : node().sequent().antecedent()) {
+        for (SequentFormula sf : node.sequent().antecedent()) {
             ImmutableList<TacletApp> tacletAppAtAndBelow = index.getTacletAppAtAndBelow(filter,
                 new PosInOccurrence(sf, PosInTerm.getTopLevel(), true), services);
             tacletAppAtAndBelow.forEach(allApps::add);
         }
 
-        for (SequentFormula sf : node().sequent().succedent()) {
+        for (SequentFormula sf : node.sequent().succedent()) {
             ImmutableList<TacletApp> tacletAppAtAndBelow = index.getTacletAppAtAndBelow(filter,
                 new PosInOccurrence(sf, PosInTerm.getTopLevel(), false), services);
             tacletAppAtAndBelow.forEach(allApps::add);

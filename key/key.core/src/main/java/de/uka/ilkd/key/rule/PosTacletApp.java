@@ -120,10 +120,10 @@ public class PosTacletApp extends TacletApp {
 
     @Override
     protected ImmutableSet<QuantifiableVariable> contextVars(SchemaVariable sv) {
-        if (!taclet().getPrefix(sv).context()) {
+        if (!taclet.getPrefix(sv).context()) {
             return DefaultImmutableSet.<QuantifiableVariable>nil();
         }
-        return varsBoundAboveFindPos(taclet(), posInOccurrence());
+        return varsBoundAboveFindPos(taclet, posInOccurrence());
     }
 
 
@@ -163,11 +163,11 @@ public class PosTacletApp extends TacletApp {
             Services services) {
 
         if (interesting)
-            return createPosTacletApp((FindTaclet) taclet(),
+            return createPosTacletApp((FindTaclet) taclet,
                 instantiations().addInteresting(sv, term, services), ifFormulaInstantiations(),
                 posInOccurrence(), services);
         else
-            return createPosTacletApp((FindTaclet) taclet(),
+            return createPosTacletApp((FindTaclet) taclet,
                 instantiations().add(sv, term, services), ifFormulaInstantiations(),
                 posInOccurrence(), services);
     }
@@ -183,11 +183,11 @@ public class PosTacletApp extends TacletApp {
     public TacletApp addInstantiation(SchemaVariable sv, ProgramElement pe, boolean interesting,
             Services services) {
         if (interesting)
-            return createPosTacletApp((FindTaclet) taclet(),
+            return createPosTacletApp((FindTaclet) taclet,
                 instantiations().addInteresting(sv, pe, services), ifFormulaInstantiations(),
                 posInOccurrence(), services);
         else
-            return createPosTacletApp((FindTaclet) taclet(), instantiations().add(sv, pe, services),
+            return createPosTacletApp((FindTaclet) taclet, instantiations().add(sv, pe, services),
                 ifFormulaInstantiations(), posInOccurrence(), services);
     }
 
@@ -197,11 +197,11 @@ public class PosTacletApp extends TacletApp {
     public TacletApp addInstantiation(SchemaVariable sv, Object[] list, boolean interesting,
             Services services) {
         if (interesting) {
-            return createPosTacletApp((FindTaclet) taclet(),
+            return createPosTacletApp((FindTaclet) taclet,
                 instantiations().addInterestingList(sv, list, services), ifFormulaInstantiations(),
                 posInOccurrence(), services);
         } else {
-            return createPosTacletApp((FindTaclet) taclet(),
+            return createPosTacletApp((FindTaclet) taclet,
                 instantiations().addList(sv, list, services), ifFormulaInstantiations(),
                 posInOccurrence(), services);
         }
@@ -218,7 +218,7 @@ public class PosTacletApp extends TacletApp {
      */
     @Override
     public TacletApp addInstantiation(SVInstantiations svi, Services services) {
-        return createPosTacletApp((FindTaclet) taclet(), svi.union(instantiations(), services),
+        return createPosTacletApp((FindTaclet) taclet, svi.union(instantiations(), services),
             ifFormulaInstantiations(), posInOccurrence(), services);
     }
 
@@ -232,7 +232,7 @@ public class PosTacletApp extends TacletApp {
      */
     @Override
     protected TacletApp setInstantiation(SVInstantiations svi, Services services) {
-        return createPosTacletApp((FindTaclet) taclet(), svi, ifFormulaInstantiations(),
+        return createPosTacletApp((FindTaclet) taclet, svi, ifFormulaInstantiations(),
             posInOccurrence(), services);
     }
 
@@ -243,7 +243,7 @@ public class PosTacletApp extends TacletApp {
      */
     @Override
     public TacletApp setMatchConditions(MatchConditions mc, Services services) {
-        return createPosTacletApp((FindTaclet) taclet(), mc.getInstantiations(),
+        return createPosTacletApp((FindTaclet) taclet, mc.getInstantiations(),
             ifFormulaInstantiations(), posInOccurrence(), services);
     }
 
@@ -255,7 +255,7 @@ public class PosTacletApp extends TacletApp {
     @Override
     protected TacletApp setAllInstantiations(MatchConditions mc,
             ImmutableList<IfFormulaInstantiation> ifInstantiations, Services services) {
-        return createPosTacletApp((FindTaclet) taclet(), mc.getInstantiations(), ifInstantiations,
+        return createPosTacletApp((FindTaclet) taclet, mc.getInstantiations(), ifInstantiations,
             posInOccurrence(), services);
     }
 

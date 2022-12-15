@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.util.ProgressMonitor;
 import de.uka.ilkd.key.rule.*;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -63,17 +64,6 @@ import de.uka.ilkd.key.proof.io.intermediate.MergeAppIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.MergePartnerAppIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.NodeIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.TacletAppIntermediate;
-import de.uka.ilkd.key.rule.AbstractContractRuleApp;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.IfFormulaInstDirect;
-import de.uka.ilkd.key.rule.IfFormulaInstSeq;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
-import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.UseDependencyContractRule;
-import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.merge.MergePartner;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
@@ -145,7 +135,7 @@ public class IntermediateProofReplayer {
      *
      * @param loader The problem loader, for reporting errors.
      * @param proof The proof object into which to load the replayed proof.
-     * @param intermediate
+     * @param parserResult parser results up to this point
      */
     public IntermediateProofReplayer(AbstractProblemLoader loader, Proof proof,
             IntermediatePresentationProofFileParser.Result parserResult) {
@@ -446,7 +436,7 @@ public class IntermediateProofReplayer {
         final PosInTerm currPosInTerm = currInterm.getPosInfo().second;
         final Sequent seq = currGoal.sequent();
 
-        TacletApp ourApp = null;
+        TacletApp ourApp;
         PosInOccurrence pos = null;
 
         Taclet t = proof.getInitConfig().lookupActiveTaclet(new Name(tacletName));

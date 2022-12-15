@@ -53,7 +53,7 @@ import javax.annotation.Nullable;
 public abstract class TacletApp implements RuleApp {
 
     /** the taclet for which the application information is collected */
-    private final Taclet taclet;
+    protected final Taclet taclet;
 
     /**
      * contains the instantiations of the schema variables of the Taclet
@@ -308,11 +308,11 @@ public abstract class TacletApp implements RuleApp {
             SchemaVariable u, Term y, Services services) {
 
         SVInstantiations result = insts;
-        LogicVariable x = (LogicVariable) ((Term) insts.getInstantiation(u)).op();
+        final LogicVariable x = (LogicVariable) ((Term) insts.getInstantiation(u)).op();
         if (t.op() instanceof SchemaVariable) {
             if (!(t.op() instanceof VariableSV)) {
-                SchemaVariable sv = (SchemaVariable) t.op();
-                ClashFreeSubst cfSubst = new ClashFreeSubst(x, y, services.getTermBuilder());
+                final SchemaVariable sv = (SchemaVariable) t.op();
+                final ClashFreeSubst cfSubst = new ClashFreeSubst(x, y, services.getTermBuilder());
                 result =
                     result.replace(sv, cfSubst.apply((Term) insts.getInstantiation(sv)), services);
             }
@@ -322,7 +322,6 @@ public abstract class TacletApp implements RuleApp {
                     result = replaceInstantiation(result, t.sub(i), u, y, services);
                 }
             }
-
         }
 
         result = result.replace(u, y, services);
@@ -350,7 +349,7 @@ public abstract class TacletApp implements RuleApp {
         }
         registerSkolemConstants(goal.getLocalNamespaces());
         goal.addAppliedRuleApp(this);
-        return taclet().apply(goal, services, this);
+        return taclet.apply(goal, services, this);
     }
 
     /*
