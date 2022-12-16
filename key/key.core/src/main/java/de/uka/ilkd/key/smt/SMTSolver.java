@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.smt;
 
 import java.util.Collection;
+import java.util.concurrent.Callable;
 
 import de.uka.ilkd.key.smt.communication.AbstractSolverSocket;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
@@ -18,13 +19,13 @@ import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
  *
  * @author ?
  */
-public interface SMTSolver {
+public interface SMTSolver extends Callable<SMTSolverResult> {
 
     /**
      * Possible reasons for why a solver process was interrupted/stopped.
      */
     enum ReasonOfInterruption {
-        User, Timeout, Exception, NoInterruption
+        USER, TIMEOUT, EXCEPTION, NO_INTERRUPTION
     }
 
     /**
@@ -33,7 +34,7 @@ public interface SMTSolver {
      * execution has stopped the solver is in state <code>Stopped</code>.
      */
     enum SolverState {
-        Waiting, Running, Stopped
+        WAITING, RUNNING, STOPPED
     }
 
     /**
@@ -87,7 +88,7 @@ public interface SMTSolver {
      *        <code>ReasonOfInterruption.Timeout</code> or <code>ReasonOfInterruption.User</code>
      *        other wise a <code>IllegalArgumentException</code> is thrown.
      */
-    void interrupt(ReasonOfInterruption reasonOfInterruption);
+    void interrupt(ReasonOfInterruption reasonOfInterruption) throws InterruptedException;
 
     /**
      * @return the system time when the solver was started. (in ms)
@@ -101,6 +102,9 @@ public interface SMTSolver {
 
     void setTimeout(long timeout);
 
+    SMTSettings getSettings();
+
+    void setSettings(SMTSettings settings);
 
     /**
      * Returns the current state of the solver. Possible values are<br>
@@ -126,16 +130,6 @@ public interface SMTSolver {
      * @return <code>true</code> if the solver process is running, else <code>false</code>.
      */
     boolean isRunning();
-
-    /**
-     * Starts a solver process. This method should be accessed only by an instance of
-     * <code>SolverLauncher</code>. If you want to start a solver please have a look at
-     * <code>SolverLauncher</code>.
-     *
-     * @param timeout
-     * @param settings
-     */
-    void start(SolverTimeout timeout, SMTSettings settings);
 
     /**
      * @return the reason of the interruption: see <code>ReasonOfInterruption</code>.

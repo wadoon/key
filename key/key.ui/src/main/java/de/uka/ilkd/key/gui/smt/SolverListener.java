@@ -351,13 +351,13 @@ public class SolverListener implements SolverLauncherListener {
     private boolean refreshProgessOfProblem(InternSMTProblem problem) {
         SolverState state = problem.solver.getState();
         switch (state) {
-        case Running:
+        case RUNNING:
             running(problem);
             return true;
-        case Stopped:
+        case STOPPED:
             stopped(problem);
             return false;
-        case Waiting:
+        case WAITING:
             waiting(problem);
             return true;
 
@@ -427,7 +427,7 @@ public class SolverListener implements SolverLauncherListener {
         int x = problem.getSolverIndex();
         int y = problem.getProblemIndex();
         switch (reason) {
-        case Exception:
+        case EXCEPTION:
             progressModel.setProgress(0, x, y);
             progressModel.setTextColor(RED.get(), x, y);
             progressModel.setText("Exception!", x, y);
@@ -435,15 +435,15 @@ public class SolverListener implements SolverLauncherListener {
 
 
             break;
-        case NoInterruption:
+        case NO_INTERRUPTION:
             throw new RuntimeException("This position should not be reachable!");
 
-        case Timeout:
+        case TIMEOUT:
             progressModel.setProgress(0, x, y);
             progressModel.setText("Timeout.", x, y);
 
             break;
-        case User:
+        case USER:
             progressModel.setText("Interrupted by user.", x, y);
             break;
         }

@@ -56,7 +56,7 @@ public class ExternalProcessLauncher {
      * @param command command (program and arguments) which is used to start the external process
      * @throws IOException if an I/O error occurs
      */
-    public void launch(final String[] command) throws IOException {
+    public void launch(final String[] command) throws IOException, InterruptedException {
         try {
             ProcessBuilder builder = new ProcessBuilder(command);
             builder.redirectErrorStream(true);
@@ -73,12 +73,14 @@ public class ExternalProcessLauncher {
     /**
      * Stops the external process: In particular the pipe is closed and the process is destroyed.
      */
-    public void stop() {
+    public void stop() throws InterruptedException {
         if (process != null) {
             process.destroy();
         }
         // TODO: where to close the pipe?
-        // pipe.close();
+        if (pipe != null) {
+            pipe.close();
+        }
     }
 
     public Pipe getPipe() {

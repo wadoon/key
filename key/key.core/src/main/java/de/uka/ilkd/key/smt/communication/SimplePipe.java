@@ -123,6 +123,7 @@ public class SimplePipe implements Pipe {
 
     @Override
     public void close() {
+        /*
         try {
             processReader.close();
         } catch (IOException ignore) {
@@ -132,7 +133,7 @@ public class SimplePipe implements Pipe {
             processWriter.close();
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
 
         process.destroy();
     }
