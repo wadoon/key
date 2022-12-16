@@ -103,7 +103,7 @@ public class SimplePipe implements Pipe {
 
     public void tryToReadExhaustively() {
         try {
-            while (-1 != processReader.read()) {
+            while (process.isAlive() && -1 != processReader.read()) {
                 /* empty */
             }
         } catch (IOException ignore) {
