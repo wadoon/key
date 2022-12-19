@@ -26,6 +26,8 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
+import de.uka.ilkd.key.util.CommandLine;
+import de.uka.ilkd.key.util.CommandLineException;
 import de.uka.ilkd.key.util.KeYTypeUtil;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
@@ -43,6 +45,9 @@ import org.key_project.util.collection.ImmutableSet;
 
 import java.awt.event.WindowAdapter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 import java.util.*;
 
 /**
@@ -53,6 +58,12 @@ import java.util.*;
  */
 public class ExtractorTest {
     private static final int MAX_STEPS = 50000;
+    
+    private static final String CL_INSPECT = "--inspect";
+    private static final String CL_INPUT = "--input";
+    private static final String CL_OUTPUT = "--output";
+    private static final String CL_PROJECTION_VARS = "--projectionVars";
+    
 
     /**
      * Main method allowing the test of the precondition extraction funtionality
@@ -60,47 +71,66 @@ public class ExtractorTest {
      * @param args First parameter: JML file to load
      */
     public static void main(String[] args) {
-        if (args.length <= 0) {
-            System.err.println("No file provided");
+        CommandLine cl = new CommandLine();
+        cl.addOption(CL_INSPECT, null, "open the KeY UI to inspect the unfinished proofs (off by default)");
+        cl.addOption(CL_INPUT, "<dir>", "the input directory");
+        cl.addOption(CL_OUTPUT, "<dir>", "the output file (stdout by default)");
+        cl.addOption(CL_PROJECTION_VARS, "<list>", "the list of projection variables, separated by ','");
+        try {
+            cl.parse(args);
+        } catch (CommandLineException e1) {
+            cl.printUsage(System.out);
             return;
         }
-        String javaFileName = args[0];
-        File location = new File(javaFileName);
-        if (!location.exists()) {
-            System.err.println("File not found: " + javaFileName);
+        
+        String inputStr = cl.getString(CL_INPUT, null);
+        
+        if (inputStr == null) {
+            cl.printUsage(System.out);
             return;
         }
+
+        File input = new File(inputStr);
+        if (!input.exists()) {
+            System.err.println("File not found: " + inputStr);
+            return;
+        }
+        
         List<File> classPaths = null; // Optionally: Additional specifications for API classes
         File bootClassPath = null; // Optionally: Different default specifications for Java API
         List<File> includes = null; // Optionally: Additional includes to consider
         final KeYEnvironment<?> env;
+        
         try {
-            env = createKeyEnvironment(location, classPaths, bootClassPath, includes);
+            env = createKeyEnvironment(input, classPaths, bootClassPath, includes);
         } catch (ProblemLoaderException e) {
             System.err.println("Failed loading file in KeY:");
             e.printStackTrace();
             return;
         }
-        ImmutableList<ProgramVariable> projectionVars = null;
-        if (args.length>=2) {
-            Iterator<String> argsIterator = Arrays.stream(args).iterator();
-            // Skip file name
-            argsIterator.next();
-            projectionVars = ImmutableSLList.nil();
-            while (argsIterator.hasNext()) {
-                projectionVars = projectionVars.append(
-                    new LocationVariable(new ProgramElementName(argsIterator.next()), Sort.ANY)
-                );
-            }
-        }
+
+        String projectionVarsStr = cl.getString(CL_PROJECTION_VARS, "");
+        ImmutableList<ProgramVariable> projectionVars = Arrays.stream(projectionVarsStr.split(",")).map(
+                s -> new LocationVariable(new ProgramElementName(s), Sort.ANY)).collect(ImmutableList.collector());
 
         List<UnclosedProof> unclosedProofs = generateProofs(env,
-                                                            location.getPath().endsWith("proof"),
+                                                            input.getPath().endsWith("proof"),
                                                             projectionVars);
 
-        boolean openWindow = getYesNo("Inspect proofs in KeY? (y/n)");
+        String outputStr = cl.getString(CL_OUTPUT, null);
+        PrintStream output;
+        if (outputStr != null) {
+            try {
+                output = new PrintStream(new File(outputStr));
+            } catch (FileNotFoundException e) {
+                System.err.println("File not found: " + outputStr);
+                return;
+            }
+        } else {
+            output = System.out;
+        }
 
-        if (openWindow) {
+        if (cl.isSet(CL_INSPECT)) {
             MainWindow mainWindow = MainWindow.getInstance();
             AbstractMediatorUserInterfaceControl visualUi = mainWindow.getUserInterface();
             for (UnclosedProof currentUnclosed : unclosedProofs) {
@@ -119,47 +149,23 @@ public class ExtractorTest {
                             finalUnclosedProofs.add(curProof);
                         }
                     }
-                    extractPreconditions(finalUnclosedProofs, env);
+                    extractPreconditions(finalUnclosedProofs, env, output);
                     System.exit(0);
                 }
             });
         } else {
-            extractPreconditions(unclosedProofs, env);
+            extractPreconditions(unclosedProofs, env, output);
         }
     }
 
-    public static boolean getYesNo(String msg) {
-        Scanner kbd = new Scanner (System.in);
-        boolean yn = false;
-        boolean res = false;
-        while (!yn) {
-            System.out.println(msg);
-            switch (kbd.nextLine()) {
-                case "y":
-                case "yes":
-                    res = true;
-                    yn = true;
-                    break;
-                case "n":
-                case "no":
-                    res = false;
-                    yn = true;
-                    break;
-                default:
-                    break;
-            }
-        }
-        return res;
-    }
-
-    private static void extractPreconditions(List<UnclosedProof> unclosedProofs, KeYEnvironment<?> env) {
+    private static void extractPreconditions(List<UnclosedProof> unclosedProofs, KeYEnvironment<?> env, PrintStream output) {
         UserInterfaceControl ui = env.getUi();
         try {
-            System.out.println("[");
+            output.println("[");
             boolean isFirst=true;
             for (UnclosedProof currentUnclosed : unclosedProofs) {
                 if (!isFirst) {
-                    System.out.println(",");
+                    output.println(",");
                 }
                 isFirst=false;
                 Proof currentProof = currentUnclosed.proof;
@@ -179,14 +185,14 @@ public class ExtractorTest {
                         projection
                     );
                 Pair<ImmutableList<Term>, Map<String, ImmutableList<Term>>> preconditionList = preconditionExtractor.extract();
-                System.out.print(
+                output.print(
                     "{\n\"contract\":\"" + currentProof.name() + "\",\n\"precondition\":");
-                PreconditionPrinter printer = new JsonPreconditionPrinter(currentProof.getServices());
+                PreconditionPrinter printer = new JsonPreconditionPrinter(currentProof.getServices(), output);
                 printer.print(preconditionList);
-                System.out.print("}");
+                output.print("}");
                 currentProof.dispose();
             }
-            System.out.println("]");
+            output.println("]");
         } catch (Exception exception) {
             exception.printStackTrace();
         } finally {

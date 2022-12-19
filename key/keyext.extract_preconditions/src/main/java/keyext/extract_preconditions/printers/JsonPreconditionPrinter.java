@@ -13,6 +13,7 @@ import keyext.extract_preconditions.projections.visitors.FindVarNamesVisitor;
 import keyext.extract_preconditions.projections.visitors.VarNameVisitor;
 import org.key_project.util.collection.ImmutableList;
 
+import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -20,62 +21,64 @@ import java.util.Set;
 public class JsonPreconditionPrinter implements PreconditionPrinter {
 
     private Services services;
+    private PrintStream output;
 
-    public JsonPreconditionPrinter(Services services) {
+    public JsonPreconditionPrinter(Services services, PrintStream output) {
         this.services = services;
+        this.output = output;
     }
 
     private void printTerm(Term curTerm) {
         VarNameIdentificationVisitor v = new VarNameIdentificationVisitor(this.services);
         curTerm.execPostOrder(v);
         HashMap<String, Sort> variables = v.getSortedTerms();
-        System.out.println("\"variables\":{");
+        output.println("\"variables\":{");
         boolean isFirst=true;
         for (String variableName : variables.keySet()) {
             if (!isFirst) {
-                System.out.println(",");
+                output.println(",");
             }
-            System.out.print("\""+variableName+"\": \""+variables.get(variableName).toString()+"\"");
+            output.print("\""+variableName+"\": \""+variables.get(variableName).toString()+"\"");
             isFirst=false;
         }
-        System.out.print("},\n\"term\":\"");
-        System.out
+        output.print("},\n\"term\":\"");
+        output
             .print(LogicPrinter.quickPrintTerm(
                 this.services.getTermBuilder().or(curTerm),
                 this.services)
                 .replaceAll("\n\\s*","")
                 .replaceAll("\\\\","\\\\\\\\"));
-        System.out.println("\"");
+        output.println("\"");
     }
 
     @Override
     public void print(Pair<ImmutableList<Term>, Map<String, ImmutableList<Term>>> preconditions) {
-        System.out.println("{\"error_preconditions\":[");
+        output.println("{\"error_preconditions\":[");
         boolean isFirst=true;
         for(Term curPrecond : preconditions.first) {
             if (!isFirst) {
-                System.out.println(",");
+                output.println(",");
             }
-            System.out.println("{");
+            output.println("{");
             this.printTerm(curPrecond);
-            System.out.println("}");
+            output.println("}");
             isFirst=false;
         }
-        System.out.println("],\n\"service_preconditions\":[");
+        output.println("],\n\"service_preconditions\":[");
         isFirst=true;
         for (String precondName : preconditions.second.keySet()) {
             for (Term curTerm : preconditions.second.get(precondName)) {
                 if (!isFirst) {
-                    System.out.println(",");
+                    output.println(",");
                 }
-                System.out.println("{");
-                System.out.print("\"service\":\"" + precondName + "\",");
+                output.println("{");
+                output.print("\"service\":\"" + precondName + "\",");
                 this.printTerm(curTerm);
-                System.out.println("}");
+                output.println("}");
                 isFirst=false;
             }
         }
-        System.out.println("]}");
+        output.println("]}");
         Term completeTerm = this.services.getTermBuilder().or(preconditions.first);
         for (String precondName : preconditions.second.keySet()) {
             completeTerm = this.services.getTermBuilder().or(
