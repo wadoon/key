@@ -1,6 +1,7 @@
 pipeline {
     agent {
         docker {
+            label "bwcloud"
             image 'wadoon/key-test-docker:jdk11'
         }
     }
@@ -25,7 +26,7 @@ pipeline {
 
         stage('Test: JUnit') {
             steps {
-                sh 'cd key && ./gradlew --continue test'
+                sh 'cd key && ./gradlew --continue test -x key.core.symbolic_execution:test -x key.core.proof_references:test'
             }
         }
 
@@ -33,11 +34,33 @@ pipeline {
             steps {
                 sh 'cd key && ./gradlew --continue testProveRules'
             }
-        }    
+        }
 
-        stage('Test: testRunAllProofs') {
+        stage('Test: testRunAllFunProofs') {
             steps {
-                sh 'cd key && ./gradlew --continue testRunAllProofs'
+                sh 'cd key && ./gradlew --continue testRunAllFunProofs'
+            }
+        }
+
+        stage('Test: testRunAllInfProofs') {
+            steps {
+                sh 'cd key && ./gradlew --continue testRunAllInfProofs'
+            }
+        }
+
+        stage('Test: Optional Features') {
+            steps {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    sh 'cd key && ./gradlew --continue key.core.symbolic_execution:test key.core.proof_references:test'
+                }
+            }
+        }
+
+        stage('Check Formatting') {
+            steps {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    sh 'cd key && ./gradlew --continue spotlessCheck'
+                }
             }
         }
 
