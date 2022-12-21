@@ -682,14 +682,13 @@ public class TestCaseGenerator {
                     init = "false";
                 }
 
-                result.append(NEW_LINE).append(TAB).append(NULLABLE).append(" ")
-                        .append(getSafeType(c.sort())).append(" ").append(c).append(" = ")
-                        .append(init).append(";");
+                result.append(NEW_LINE).append(TAB).append(NULLABLE)
+                        .append(" ").append(getSafeType(c.sort())).append(" ")
+                        .append(c.op().name()).append(" = ").append(init).append(";");
                 if (junitFormat) {
                     result.append(NEW_LINE).append(TAB).append(NULLABLE).append(" ")
                             .append(getSafeType(c.sort())).append(" ")
-                            .append(getPreName(c.toString())).append(" = ").append(init)
-                            .append(";");
+                            .append(getPreName(c.op().toString())).append(" = ").append(init).append(";");
                 }
             }
         }
