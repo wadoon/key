@@ -111,7 +111,7 @@ public class ServiceCaches {
    private final Map<Term, ClausesGraph> graphCache = new LRUCache<Term, ClausesGraph> (1000);
 
    /**
-    * Cache used by the TermFactory to avoid unnecessary creation of terms
+    * Cache used by the AbstractTermFactory to avoid unnecessary creation of terms
     */
    private final Map<Term, Term> termCache = new LRUCache<Term, Term>(20000);
 

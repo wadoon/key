@@ -24,7 +24,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.AbstractTermFactory;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.proof.Counter;
@@ -116,8 +116,8 @@ public class Services implements TermServices {
     	this.profile = profile;
     	this.counters = new LinkedHashMap<String, Counter>();
     	this.caches = new ServiceCaches();
-    	this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
-    	this.termBuilderWithoutCache = new TermBuilder(new TermFactory(), this);
+    	this.termBuilder = new TermBuilder(AbstractTermFactory.getTermFactory(caches.getTermFactoryCache()), this);
+    	this.termBuilderWithoutCache = new TermBuilder(AbstractTermFactory.getTermFactory(), this);
     	this.specRepos = new SpecificationRepository(this);
     	cee = new ConstantExpressionEvaluator(this);
     	typeconverter = new TypeConverter(this);
@@ -135,8 +135,8 @@ public class Services implements TermServices {
     	this.profile = profile;
     	this.counters = counters;
     	this.caches = caches;
-    	this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
-        this.termBuilderWithoutCache = new TermBuilder(new TermFactory(), this);
+    	this.termBuilder = new TermBuilder(AbstractTermFactory.getTermFactory(caches.getTermFactoryCache()), this);
+        this.termBuilderWithoutCache = new TermBuilder(AbstractTermFactory.getTermFactory(), this);
     	this.specRepos = new SpecificationRepository(this);
     	cee = new ConstantExpressionEvaluator(this);
     	typeconverter = new TypeConverter(this);
@@ -158,8 +158,8 @@ public class Services implements TermServices {
         this.nameRecorder = s.nameRecorder;
         this.factory = s.factory;
         this.caches = s.caches;
-        this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
-        this.termBuilderWithoutCache = new TermBuilder(new TermFactory(), this);
+        this.termBuilder = new TermBuilder(AbstractTermFactory.getTermFactory(caches.getTermFactoryCache()), this);
+        this.termBuilderWithoutCache = new TermBuilder(AbstractTermFactory.getTermFactory(), this);
     }
 
     public Services getOverlay(NamespaceSet namespaces) {
@@ -417,11 +417,11 @@ public class Services implements TermServices {
     }
 
     /**
-     * Returns the {@link TermFactory} used to create {@link Term}s.
-     * @return The {@link TermFactory} used to create {@link Term}s.
+     * Returns the {@link AbstractTermFactory} used to create {@link Term}s.
+     * @return The {@link AbstractTermFactory} used to create {@link Term}s.
      */
     @Override
-    public TermFactory getTermFactory() {
+    public AbstractTermFactory getTermFactory() {
         return termBuilder.tf();
     }
 

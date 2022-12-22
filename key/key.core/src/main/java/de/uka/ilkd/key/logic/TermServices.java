@@ -48,6 +48,6 @@ public interface TermServices {
      * Returns the {@link TermBuilder} used to create {@link Term}s.
      * @return The {@link TermBuilder} used to create {@link Term}s.
      */
-    public abstract TermFactory getTermFactory();
+    public abstract AbstractTermFactory getTermFactory();
 
 }

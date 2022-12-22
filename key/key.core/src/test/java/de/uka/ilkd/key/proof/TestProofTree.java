@@ -57,7 +57,7 @@ public class TestProofTree {
 	LogicVariable b6=new LogicVariable(new Name("b6"),s);
 	LogicVariable b7=new LogicVariable(new Name("b7"),s);
 
-	TermFactory tf = TacletForTests.services().getTermFactory();
+	AbstractTermFactory tf = TacletForTests.services().getTermFactory();
 	
 	Term t_b1=tf.createTerm(Equality.EQUALS,
 		                tf.createTerm(b1),

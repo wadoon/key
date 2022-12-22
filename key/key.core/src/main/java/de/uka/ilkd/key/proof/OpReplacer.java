@@ -17,6 +17,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import de.uka.ilkd.key.logic.AbstractTermFactory;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -24,7 +25,6 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
@@ -41,7 +41,7 @@ public class OpReplacer {
     /**
      * Term factory.
      */
-    private TermFactory tf;
+    private AbstractTermFactory tf;
 
     /**
      * The replacement map.
@@ -52,7 +52,7 @@ public class OpReplacer {
      * <p> Creates an {@code OpReplacer}. </p>
      *
      * <p> If there is a proof currently loaded, you may want to use
-     * {@link #OpReplacer(Map, TermFactory, Proof)} as it correctly deals with
+     * {@link #OpReplacer(Map, AbstractTermFactory, Proof)} as it correctly deals with
      * {@link OriginTermLabels} and other proof-dependent features. </p>
      *
      * @param map map mapping from the operators/terms to be replaced to the ones to
@@ -60,7 +60,7 @@ public class OpReplacer {
      * @param tf a term factory.
      */
     public OpReplacer(
-            Map<? extends SVSubstitute, ? extends SVSubstitute> map, TermFactory tf) {
+            Map<? extends SVSubstitute, ? extends SVSubstitute> map, AbstractTermFactory tf) {
         this(map, tf, null);
     }
 
@@ -73,7 +73,7 @@ public class OpReplacer {
       * @param proof the currently loaded proof
       */
     public OpReplacer(
-            Map<? extends SVSubstitute, ? extends SVSubstitute> map, TermFactory tf, Proof proof) {
+            Map<? extends SVSubstitute, ? extends SVSubstitute> map, AbstractTermFactory tf, Proof proof) {
         assert map != null;
 
         this.map = map instanceof ReplacementMap
@@ -87,7 +87,7 @@ public class OpReplacer {
      * <p> Replace a sub-term. </p>
      *
      * <p> If there is a proof currently loaded, you may want to use
-     * {@link OpReplacer#replace(Operator, Operator, Term, TermFactory, Proof)}
+     * {@link OpReplacer#replace(Operator, Operator, Term, AbstractTermFactory, Proof)}
      * as it correctly deals with
      * {@link OriginTermLabels} and other proof-dependent features. </p>
      *
@@ -97,7 +97,7 @@ public class OpReplacer {
      * @param tf a term factory.
      * @return a term with all occurences of the sub-term replaced.
      */
-    public static Term replace(Term toReplace, Term with, Term in, TermFactory tf) {
+    public static Term replace(Term toReplace, Term with, Term in, AbstractTermFactory tf) {
         return replace(toReplace, with, in, tf, null);
     }
 
@@ -105,7 +105,7 @@ public class OpReplacer {
      * <p> Replace a sub-term. </p>
      *
      * <p> If there is a proof currently loaded, you may want to use
-     * {@link OpReplacer#replace(Term, Term, ImmutableList, TermFactory, Proof)}
+     * {@link OpReplacer#replace(Term, Term, ImmutableList, AbstractTermFactory, Proof)}
      * as it correctly deals with
      * {@link OriginTermLabels} and other proof-dependent features. </p>
      *
@@ -116,7 +116,7 @@ public class OpReplacer {
      * @return the terms with all occurences of the sub-term replaced.
      */
     public static ImmutableList<Term> replace(
-            Term toReplace, Term with, ImmutableList<Term> in, TermFactory tf) {
+            Term toReplace, Term with, ImmutableList<Term> in, AbstractTermFactory tf) {
         return replace(toReplace, with, in, tf, null);
     }
 
@@ -124,7 +124,7 @@ public class OpReplacer {
      * <p> Replace an operator. </p>
      *
      * <p> If there is a proof currently loaded, you may want to use
-     * {@link OpReplacer#replace(Operator, Operator, Term, TermFactory, Proof)}
+     * {@link OpReplacer#replace(Operator, Operator, Term, AbstractTermFactory, Proof)}
      * as it correctly deals with
      * {@link OriginTermLabels} and other proof-dependent features. </p>
      *
@@ -134,7 +134,7 @@ public class OpReplacer {
      * @param tf a term factory.
      * @return a term with all occurences of the operator replaced.
      */
-    public static Term replace(Operator toReplace, Operator with, Term in, TermFactory tf) {
+    public static Term replace(Operator toReplace, Operator with, Term in, AbstractTermFactory tf) {
         return replace(toReplace, with, in, tf, null);
     }
 
@@ -148,7 +148,7 @@ public class OpReplacer {
      * @param proof the currently loaded proof.
      * @return a term with all occurences of the sub-term replaced.
      */
-    public static Term replace(Term toReplace, Term with, Term in, TermFactory tf, Proof proof) {
+    public static Term replace(Term toReplace, Term with, Term in, AbstractTermFactory tf, Proof proof) {
         Map<Term, Term> map = new LinkedHashMap<Term, Term>();
         map.put(toReplace, with);
         OpReplacer or = new OpReplacer(map, tf, proof);
@@ -168,7 +168,7 @@ public class OpReplacer {
     public static ImmutableList<Term> replace(Term toReplace,
                                           Term with,
                                           ImmutableList<Term> in,
-                                          TermFactory tf,
+                                          AbstractTermFactory tf,
                                           Proof proof) {
         Map<Term, Term> map = new LinkedHashMap<Term, Term>();
         map.put(toReplace, with);
@@ -187,7 +187,7 @@ public class OpReplacer {
      * @return a term with all occurences of the operator replaced.
      */
     public static Term replace(
-            Operator toReplace, Operator with, Term in, TermFactory tf, Proof proof) {
+            Operator toReplace, Operator with, Term in, AbstractTermFactory tf, Proof proof) {
         Map<Operator, Operator> map = new LinkedHashMap<Operator, Operator>();
         map.put(toReplace, with);
         OpReplacer or = new OpReplacer(map, tf, proof);

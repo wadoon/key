@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 public class LabeledTermImplTest {
 
         private TermServices services;
-        private TermFactory tf;
+        private AbstractTermFactory tf;
 
         @BeforeEach
         public void setUp() {

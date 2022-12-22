@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import de.uka.ilkd.key.logic.*;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -27,19 +28,7 @@ import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.DefaultVisitor;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.AbstractTermFactory;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
@@ -1336,7 +1325,7 @@ public class TermLabelManager {
                 computeRefactorings(state, services, applicationPosInOccurrence,
                                     applicationTerm, rule, goal, hint, tacletTerm);
         // Refactor application term
-        final TermFactory tf = services.getTermFactory();
+        final AbstractTermFactory tf = services.getTermFactory();
         Term newApplicationTerm =
                 refactorApplicationTerm(state, services, applicationPosInOccurrence,
                                         applicationTerm, rule, goal, hint, tacletTerm,
@@ -1442,7 +1431,7 @@ public class TermLabelManager {
      * @param state The {@link TermLabelState} of the current rule application.
      * @param pio The {@link PosInOccurrence} to replace {@link Term} at.
      * @param newTerm The new {@link Term} to set.
-     * @param tf The {@link TermFactory} to use.
+     * @param tf The {@link AbstractTermFactory} to use.
      * @param parentRefactorings The {@link RefactoringsContainer} to consider.
      * @param services The {@link Services} used by the {@link Proof} on which a
      *                 {@link Rule} is applied right now.
@@ -1462,7 +1451,7 @@ public class TermLabelManager {
     protected Term replaceTerm(TermLabelState state,
                                PosInOccurrence pio,
                                Term newTerm,
-                               TermFactory tf,
+                               AbstractTermFactory tf,
                                ImmutableList<TermLabelRefactoring> parentRefactorings,
                                Services services,
                                PosInOccurrence applicationPosInOccurrence,
@@ -1805,7 +1794,7 @@ public class TermLabelManager {
      * @param tacletTerm The optional taclet {@link Term}.
      * @param refactorings The {@link RefactoringsContainer} with the
      *                     {@link TermLabelRefactoring}s to consider.
-     * @param tf The {@link TermFactory} to create the term.
+     * @param tf The {@link AbstractTermFactory} to create the term.
      * @return The new application {@link Term} or {@code null} if no refactoring was performed.
      */
     private Term refactorChildTerms(TermLabelState state, Services services,
@@ -1813,7 +1802,7 @@ public class TermLabelManager {
                                     Term applicationTerm, Rule rule, Goal goal,
                                     Object hint, Term tacletTerm,
                                     RefactoringsContainer refactorings,
-                                    TermFactory tf) {
+                                    AbstractTermFactory tf) {
         Term newApplicationTerm = applicationTerm;
         if (!refactorings.getDirectChildRefactorings().isEmpty()) {
             boolean changed = false;
@@ -1858,7 +1847,7 @@ public class TermLabelManager {
      * @param tacletTerm The optional taclet {@link Term}.
      * @param refactorings The {@link RefactoringsContainer} with the
      *                     {@link TermLabelRefactoring}s to consider.
-     * @param tf The {@link TermFactory} to create the term.
+     * @param tf The {@link AbstractTermFactory} to create the term.
      * @param newApplicationTerm The refactored application term until now.
      * @return The new application {@link Term} or {@code null} if no refactoring was performed.
      */
@@ -1867,7 +1856,7 @@ public class TermLabelManager {
                                       Term applicationTerm, Rule rule, Goal goal,
                                       Object hint, Term tacletTerm,
                                       RefactoringsContainer refactorings,
-                                      TermFactory tf, Term newApplicationTerm) {
+                                      AbstractTermFactory tf, Term newApplicationTerm) {
         if (!refactorings.getBelowUpdatesRefactorings().isEmpty()) {
             Pair<ImmutableList<Term>, Term> pair =
                     TermBuilder.goBelowUpdates2(newApplicationTerm);
@@ -1910,7 +1899,7 @@ public class TermLabelManager {
      * @param tacletTerm The optional taclet {@link Term}.
      * @param refactorings The {@link RefactoringsContainer} with the
      *                     {@link TermLabelRefactoring}s to consider.
-     * @param tf The {@link TermFactory} to create the term.
+     * @param tf The {@link AbstractTermFactory} to create the term.
      * @param newApplicationTerm The refactored application term until now.
      * @return The new application {@link Term} or {@code null} if no refactoring was performed.
      */
@@ -1920,7 +1909,7 @@ public class TermLabelManager {
                                              Term applicationTerm, Rule rule, Goal goal,
                                              Object hint, Term tacletTerm,
                                              RefactoringsContainer refactorings,
-                                             TermFactory tf, Term newApplicationTerm) {
+                                             AbstractTermFactory tf, Term newApplicationTerm) {
         ImmutableList<TermLabelRefactoring> allChildAndGrandchildRefactorings =
                 refactorings.getAllApplicationChildAndGrandchildRefactorings();
         if (!allChildAndGrandchildRefactorings.isEmpty()) {
@@ -1966,7 +1955,7 @@ public class TermLabelManager {
      * @param tacletTerm The optional taclet {@link Term}.
      * @param refactorings The {@link RefactoringsContainer} with the
      *                     {@link TermLabelRefactoring}s to consider.
-     * @param tf The {@link TermFactory} to create the term.
+     * @param tf The {@link AbstractTermFactory} to create the term.
      * @return The new application {@link Term} or {@code null} if no refactoring was performed.
      */
     protected Term refactorApplicationTerm(TermLabelState state,
@@ -1978,7 +1967,7 @@ public class TermLabelManager {
                                            Object hint,
                                            Term tacletTerm,
                                            RefactoringsContainer refactorings,
-                                           TermFactory tf) {
+                                           AbstractTermFactory tf) {
         if (applicationTerm != null &&
                 (!refactorings.getDirectChildRefactorings().isEmpty() ||
                         !refactorings.getChildAndGrandchildRefactorings().isEmpty() ||

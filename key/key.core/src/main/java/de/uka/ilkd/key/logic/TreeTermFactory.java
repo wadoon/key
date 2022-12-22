@@ -1,16 +1,3 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
 package de.uka.ilkd.key.logic;
 
 import java.util.List;
@@ -24,19 +11,9 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
-/**
- * The TermFactory is the <em>only</em> way to create terms using constructors
- * of class Term or any of its subclasses. It is the only class that implements
- * and may exploit knowledge about sub classes of {@link Term}. All other
- * classes of the system only know about terms what the {@link Term} class
- * offers them.
- *
- * This class is used to encapsulate knowledge about the internal term
- * structures.
- * See {@link de.uka.ilkd.key.logic.TermBuilder} for more convenient methods to
- * create terms.
- */
-public final class TermFactory {
+
+public final class TreeTermFactory extends AbstractTermFactory {
+
 
 
     private static final ImmutableArray<Term> NO_SUBTERMS = new ImmutableArray<Term>();
@@ -48,11 +25,11 @@ public final class TermFactory {
     //-------------------------------------------------------------------------
 
 
-    public TermFactory() {
+    TreeTermFactory() {
         this.cache = null;
     }
 
-    public TermFactory(Map<Term, Term> cache) {
+     TreeTermFactory(Map<Term, Term> cache) {
         this.cache = cache;
     }
 
@@ -67,10 +44,10 @@ public final class TermFactory {
      * are created in the entire system.
      */
     public Term createTerm(Operator op,
-	    		   ImmutableArray<Term> subs,
-	    		   ImmutableArray<QuantifiableVariable> boundVars,
-	    		   JavaBlock javaBlock,
-			   ImmutableArray<TermLabel> labels) {
+                           ImmutableArray<Term> subs,
+                           ImmutableArray<QuantifiableVariable> boundVars,
+                           JavaBlock javaBlock,
+                           ImmutableArray<TermLabel> labels) {
         if(op == null) {
             throw new TermCreationException("Given operator is null.");
         }
@@ -83,19 +60,19 @@ public final class TermFactory {
     }
 
     public Term createTerm(Operator op,
-	    		   ImmutableArray<Term> subs,
-	    		   ImmutableArray<QuantifiableVariable> boundVars,
-	    		   JavaBlock javaBlock) {
+                           ImmutableArray<Term> subs,
+                           ImmutableArray<QuantifiableVariable> boundVars,
+                           JavaBlock javaBlock) {
 
-    	return createTerm(op, subs, boundVars, javaBlock, null);
+        return createTerm(op, subs, boundVars, javaBlock, null);
     }
 
 
     public Term createTerm(Operator op,
                            Term[] subs,
-	    		   ImmutableArray<QuantifiableVariable> boundVars,
-	    		   JavaBlock javaBlock) {
-	return createTerm(op, createSubtermArray(subs), boundVars, javaBlock, null);
+                           ImmutableArray<QuantifiableVariable> boundVars,
+                           JavaBlock javaBlock) {
+        return createTerm(op, createSubtermArray(subs), boundVars, javaBlock, null);
     }
 
 
@@ -108,14 +85,14 @@ public final class TermFactory {
                            ImmutableArray<QuantifiableVariable> boundVars,
                            JavaBlock javaBlock,
                            ImmutableArray<TermLabel> labels) {
-    	return createTerm(op, createSubtermArray(subs), boundVars, javaBlock, labels);
+        return createTerm(op, createSubtermArray(subs), boundVars, javaBlock, labels);
     }
 
     public Term createTerm(Operator op,
-            Term[] subs,
-            ImmutableArray<QuantifiableVariable> boundVars,
-            JavaBlock javaBlock,
-            TermLabel label) {
+                           Term[] subs,
+                           ImmutableArray<QuantifiableVariable> boundVars,
+                           JavaBlock javaBlock,
+                           TermLabel label) {
         return createTerm(op, createSubtermArray(subs), boundVars,
                 javaBlock, new ImmutableArray<TermLabel>(label));
     }
@@ -125,20 +102,20 @@ public final class TermFactory {
     }
 
     public Term createTerm(Operator op, Term[] subs, ImmutableArray<TermLabel> labels) {
-    	return createTerm(op, createSubtermArray(subs), null, null, labels);
+        return createTerm(op, createSubtermArray(subs), null, null, labels);
     }
 
     public Term createTerm(Operator op, Term sub, ImmutableArray<TermLabel> labels) {
-    	return createTerm(op, new ImmutableArray<Term>(sub), null, null, labels);
+        return createTerm(op, new ImmutableArray<Term>(sub), null, null, labels);
     }
 
     public Term createTerm(Operator op, Term sub1, Term sub2, ImmutableArray<TermLabel> labels) {
-    	return createTerm(op, new Term[]{sub1, sub2}, null, null, labels);
+        return createTerm(op, new Term[]{sub1, sub2}, null, null, labels);
     }
 
 
     public Term createTerm(Operator op, ImmutableArray<TermLabel> labels) {
-    	return createTerm(op, NO_SUBTERMS, null, null, labels);
+        return createTerm(op, NO_SUBTERMS, null, null, labels);
     }
 
     //-------------------------------------------------------------------------
@@ -151,30 +128,31 @@ public final class TermFactory {
     }
 
     private Term doCreateTerm(Operator op, ImmutableArray<Term> subs,
-            ImmutableArray<QuantifiableVariable> boundVars,
-            JavaBlock javaBlock, ImmutableArray<TermLabel> labels) {
+                              ImmutableArray<QuantifiableVariable> boundVars,
+                              JavaBlock javaBlock, ImmutableArray<TermLabel> labels) {
         final Term newTerm
-            = (labels == null || labels.isEmpty() ?
-                    new TermImpl(op, subs, boundVars, javaBlock) :
+                = (labels == null || labels.isEmpty() ?
+                new TermImpl(op, subs, boundVars, javaBlock) :
                 new LabeledTermImpl(op, subs, boundVars, javaBlock, labels)).checked();
+
         // Check if caching is possible. It is not possible if a non empty JavaBlock is available
         // in the term or in one of its children because the meta information like PositionInfos
         // may be different.
         if (cache != null && !newTerm.containsJavaBlockRecursive()) {
-           Term term;
-           synchronized(cache) {
-               term = cache.get(newTerm);
-           }
-           if(term == null) {
-               term = newTerm;
-               synchronized(cache) {
-                   cache.put(term, term);
-               }
-           }
-           return term;
+            Term term;
+            synchronized(cache) {
+                term = cache.get(newTerm);
+            }
+            if(term == null) {
+                term = newTerm;
+                synchronized(cache) {
+                    cache.put(term, term);
+                }
+            }
+            return term;
         }
         else {
-           return newTerm;
+            return newTerm;
         }
     }
 

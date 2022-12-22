@@ -22,14 +22,8 @@ import java.util.regex.Pattern;
 import javax.naming.NameAlreadyBoundException;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.AbstractTermFactory;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -138,7 +132,7 @@ public abstract class AbstractionPredicate
     public static AbstractionPredicate create(final Term predicate,
             final LocationVariable placeholder, Services services) {
         final TermBuilder tb = services.getTermBuilder();
-        final TermFactory tf = services.getTermFactory();
+        final AbstractTermFactory tf = services.getTermFactory();
         final Sort fInputSort = placeholder.sort();
 
         AbstractionPredicate result = new AbstractionPredicate(fInputSort) {

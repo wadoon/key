@@ -420,7 +420,7 @@ public class EqualityConstraint implements Constraint {
 //        
 //        final Metavariable newMV = 
 //            new Metavariable(new Name("#MV"+(MV_COUNTER++)), intersectionSort);
-//        final Term newMVTerm = TermFactory.DEFAULT.createFunctionTerm(newMV);
+//        final Term newMVTerm = AbstractTermFactory.DEFAULT.createFunctionTerm(newMV);
 //        
 //        final Constraint addFirst = normalize ( (Metavariable)t0.op (),
 //                                                newMVTerm,

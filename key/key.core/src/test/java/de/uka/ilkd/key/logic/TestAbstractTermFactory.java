@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /** class tests the term factory
 */
-public class TestTermFactory {
+public class TestAbstractTermFactory {
     
 
     private Term et1;
@@ -65,7 +65,7 @@ public class TestTermFactory {
 
     Function g=new Function(new Name("g"), osort3, osort2, osort1);
    private TermBuilder TB;
-   private TermFactory tf;
+   private AbstractTermFactory tf;
 
 
     @BeforeEach

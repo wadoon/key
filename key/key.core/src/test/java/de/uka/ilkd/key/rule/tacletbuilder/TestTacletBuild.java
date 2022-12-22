@@ -41,7 +41,7 @@ public class TestTacletBuild {
 
     public static final Term[] NO_SUBTERMS = new Term[0];
 
-    private TermFactory tf;
+    private AbstractTermFactory tf;
 
     private TermBuilder tb;
 

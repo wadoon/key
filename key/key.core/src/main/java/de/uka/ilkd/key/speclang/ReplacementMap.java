@@ -4,7 +4,7 @@ import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Sorted;
-import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.AbstractTermFactory;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -26,7 +26,7 @@ public abstract class ReplacementMap<S extends Sorted & SVSubstitute>
      * constructs a replacement map with the given term factory
      * @param tf a term factory
      */
-    public ReplacementMap(TermFactory tf) {
+    public ReplacementMap(AbstractTermFactory tf) {
         super(tf);
     }
 

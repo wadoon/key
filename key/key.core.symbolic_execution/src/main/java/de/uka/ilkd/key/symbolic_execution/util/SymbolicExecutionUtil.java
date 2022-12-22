@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import de.uka.ilkd.key.nparser.DebugKeyLexer;
+import de.uka.ilkd.key.logic.*;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -71,20 +71,7 @@ import de.uka.ilkd.key.java.visitor.ContainsStatementVisitor;
 import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.DefaultVisitor;
-import de.uka.ilkd.key.logic.IntIterator;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.ProgramPrefix;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.AbstractTermFactory;
 import de.uka.ilkd.key.logic.label.BlockContractValidityTermLabel;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
@@ -2948,7 +2935,7 @@ public final class SymbolicExecutionUtil {
                               collectSkolemConstants(originalSequentWithoutMethodFrame, tb.parallel(updates));
       originalSequentWithoutMethodFrame = removeAllUnusedSkolemEqualities(originalSequentWithoutMethodFrame, skolemTerms);
       if (addResultLabel) {
-         TermFactory factory = node.proof().getServices().getTermFactory();
+         AbstractTermFactory factory = node.proof().getServices().getTermFactory();
          Set<Term> skolemInNewTerm = collectSkolemConstantsNonRecursive(newSuccedentToProve);
          originalSequentWithoutMethodFrame = labelSkolemConstants(originalSequentWithoutMethodFrame, skolemInNewTerm, factory);
          newSuccedentToProve = addLabelRecursiveToNonSkolem(factory, newSuccedentToProve, RESULT_LABEL);
@@ -2966,12 +2953,12 @@ public final class SymbolicExecutionUtil {
     * Labels all specified skolem equalities with the {@link SymbolicExecutionUtil#RESULT_LABEL}.
     * @param sequent The {@link Sequent} to modify.
     * @param constantsToLabel The skolem constants to label.
-    * @param factory The {@link TermFactory} to use.
+    * @param factory The {@link AbstractTermFactory} to use.
     * @return The modified {@link Sequent}.
     */
    protected static Sequent labelSkolemConstants(Sequent sequent,
                                                  Set<Term> constantsToLabel,
-                                                 TermFactory factory) {
+                                                 AbstractTermFactory factory) {
       for (SequentFormula sf : sequent.antecedent()) {
          int skolemEquality = checkSkolemEquality(sf);
          if (skolemEquality == -1) {
@@ -3004,12 +2991,12 @@ public final class SymbolicExecutionUtil {
 
    /**
     * Adds the given {@link TermLabel} to the given {@link Term} and to all of its children.
-    * @param tf The {@link TermFactory} to use.
+    * @param tf The {@link AbstractTermFactory} to use.
     * @param term The {@link Term} to add label to.
     * @param label The {@link TermLabel} to add.
     * @return A new {@link Term} with the given {@link TermLabel}.
     */
-   private static Term addLabelRecursiveToNonSkolem(TermFactory tf, Term term, TermLabel label) {
+   private static Term addLabelRecursiveToNonSkolem(AbstractTermFactory tf, Term term, TermLabel label) {
       List<Term> newSubs = new LinkedList<Term>();
       for (Term oldSub : term.subs()) {
          newSubs.add(addLabelRecursiveToNonSkolem(tf, oldSub, label));
@@ -3031,12 +3018,12 @@ public final class SymbolicExecutionUtil {
 
    /**
     * Removes the given {@link TermLabel} from the given {@link Term} and from all of its children.
-    * @param tf The {@link TermFactory} to use.
+    * @param tf The {@link AbstractTermFactory} to use.
     * @param term The {@link Term} to remove label from.
     * @param label The {@link TermLabel} to remove.
     * @return A new {@link Term} without the given {@link TermLabel}.
     */
-   public static Term removeLabelRecursive(TermFactory tf, Term term, TermLabel label) {
+   public static Term removeLabelRecursive(AbstractTermFactory tf, Term term, TermLabel label) {
       // Update children
       List<Term> newSubs = new LinkedList<Term>();
       ImmutableArray<Term> oldSubs = term.subs();

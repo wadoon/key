@@ -76,7 +76,7 @@ public class TestSchemaModalOperators {
         
 	// proof required to test application with mv
 	/*
-       TermFactory tf=TermFactory.DEFAULT;
+       AbstractTermFactory tf=AbstractTermFactory.DEFAULT;
 
 	mvProof = new Proof();
 

@@ -3,17 +3,12 @@ package de.uka.ilkd.key.informationflow.macros;
 import java.util.Map;
 import java.util.Set;
 
+import de.uka.ilkd.key.logic.*;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Named;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.AbstractTermFactory;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.macros.AbstractProofMacro;
 import de.uka.ilkd.key.proof.Goal;
@@ -125,7 +120,7 @@ public abstract class AbstractFinishAuxiliaryComputationMacro extends AbstractPr
 
     private static Term buildFormulaFromGoal(Goal symbExecGoal) {
         final TermBuilder tb = symbExecGoal.proof().getServices().getTermBuilder();
-        final TermFactory tf = symbExecGoal.proof().getServices().getTermFactory();
+        final AbstractTermFactory tf = symbExecGoal.proof().getServices().getTermFactory();
         Term result = tb.tt();
         for (final SequentFormula f : symbExecGoal.sequent().antecedent()) {
             result = tb.and(result, f.formula());

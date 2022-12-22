@@ -2,7 +2,7 @@ package de.uka.ilkd.key.speclang;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.AbstractTermFactory;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
@@ -17,7 +17,7 @@ public class TermReplacementMap extends ReplacementMap<Term> {
      * constructs a replacement map with the given term factory
      * @param tf a term factory
      */
-    public TermReplacementMap(TermFactory tf) {
+    public TermReplacementMap(AbstractTermFactory tf) {
         super(tf);
     }
 

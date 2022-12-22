@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class AbstractTestTermParser {
 
-    protected final TermFactory tf;
+    protected final AbstractTermFactory tf;
     protected final TermBuilder tb;
     protected final NamespaceSet nss;
     protected final Services services;

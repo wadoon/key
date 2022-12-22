@@ -3,8 +3,8 @@ package de.uka.ilkd.key.smt.newsmt2;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
+import de.uka.ilkd.key.logic.AbstractTermFactory;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
@@ -23,7 +23,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 
@@ -53,13 +52,13 @@ public class SeqDefHandler implements SMTHandler {
     public static final String SEQ_DEF_PREFIX = "seqDef";
     private SeqLDT seqLDT;
     private boolean enabled;
-    private TermFactory termFactory;
+    private AbstractTermFactory abstractTermFactory;
 
     @Override
     public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets) {
         enabled = !HandlerUtil.PROPERTY_NOBINDERS.get(masterHandler.getTranslationState());
         seqLDT = services.getTypeConverter().getSeqLDT();
-        termFactory = services.getTermFactory();
+        abstractTermFactory = services.getTermFactory();
     }
 
     @Override
@@ -214,7 +213,7 @@ public class SeqDefHandler implements SMTHandler {
     private SExpr makeTermApplication(MasterHandler trans, String name, Set<ParsableVariable> vars) throws SMTTranslationException {
         List<SExpr> args = new ArrayList<>();
         for (ParsableVariable var : vars) {
-            SExpr ref = trans.translate(termFactory.createTerm(var));
+            SExpr ref = trans.translate(abstractTermFactory.createTerm(var));
             args.add(SExprs.coerce(ref, Type.UNIVERSE));
         }
         return new SExpr(name, Type.UNIVERSE, args);

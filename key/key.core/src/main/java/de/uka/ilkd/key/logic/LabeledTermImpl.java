@@ -28,7 +28,7 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
  * The labeled term class is used for terms that have a label attached.
  *
  * Two labeled terms are equal if they have equal term structure and equal annotations. In contrast
- * the method {@link Term#equalsModRenaming(Object)} does not care about annotations and will just
+ * the method {@link Term#equalsModIrrelevantTermLabels(Object)} does not care about annotations and will just
  * compare the term structure alone modula renaming.
  *
  * @see Term

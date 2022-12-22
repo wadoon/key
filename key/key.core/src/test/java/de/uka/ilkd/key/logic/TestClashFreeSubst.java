@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class TestClashFreeSubst extends AbstractTestTermParser {
 
-    TermFactory tf;
+    AbstractTermFactory tf;
 
     Services services;
     NamespaceSet nss;
@@ -271,7 +271,7 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
     }
 
     // disabled. multi vars at quantifier currently not supported by
-    // KeY and feature of data structures suppressed by TermFactory. /AR 040420
+    // KeY and feature of data structures suppressed by AbstractTermFactory. /AR 040420
     @Test@Disabled
 	public void xtestMultiClash() throws Exception {
 	Term s = parseTerm("f(x)");
@@ -289,7 +289,7 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
     }
 
     // disabled. multi vars at quantifier currently not supported by
-    // KeY and feature of data structures suppressed by TermFactory. /AR 040420
+    // KeY and feature of data structures suppressed by AbstractTermFactory. /AR 040420
     @Test@Disabled public void xtestMultiClash1() throws Exception {
 	Term s = parseTerm("f(x)");
 	Term t = toMulti(parseFma("\\forall y; \\forall x;\\forall z; q(g(x,y),g(v,z))"));

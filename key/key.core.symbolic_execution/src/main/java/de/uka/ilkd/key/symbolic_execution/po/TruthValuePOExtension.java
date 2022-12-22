@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.symbolic_execution.po;
 
+import de.uka.ilkd.key.logic.AbstractTermFactory;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
@@ -49,7 +49,7 @@ public class TruthValuePOExtension implements POExtension {
     */
    protected Term labelPostTerm(Services services, Term term) {
       if (term != null) {
-         final TermFactory tf = services.getTermFactory();
+         final AbstractTermFactory tf = services.getTermFactory();
          // Label children of operator
          if (TruthValueTracingUtil.isLogicOperator(term)) {
             Term[] newSubs = new Term[term.arity()];

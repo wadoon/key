@@ -123,7 +123,7 @@ public class TestCollisionResolving {
 
 	TermBuilder tb = services.getTermBuilder();
 
-	final TermFactory tf = services.getTermFactory();
+	final AbstractTermFactory tf = services.getTermFactory();
 
 	Term t_x = tf.createTerm(x);
 	Term t_p_x = tf.createTerm(p, new Term[]{t_x}, null, null);

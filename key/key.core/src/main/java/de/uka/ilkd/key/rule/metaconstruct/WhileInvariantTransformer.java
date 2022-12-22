@@ -40,7 +40,7 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.AbstractTermFactory;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
@@ -81,7 +81,7 @@ public final class WhileInvariantTransformer {
      */
     private JavaInfo javaInfo;
     private TypeConverter typeConv;
-    private TermFactory tf;
+    private AbstractTermFactory tf;
 
     private ProgramElement body;
     private Term inv, post;

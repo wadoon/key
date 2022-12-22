@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.speclang;
 
-import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.AbstractTermFactory;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
@@ -15,7 +15,7 @@ public class VariableReplacementMap extends ReplacementMap<ProgramVariable> {
      * constructs a replacement map with the given term factory
      * @param tf a term factory
      */
-    public VariableReplacementMap(TermFactory tf) {
+    public VariableReplacementMap(AbstractTermFactory tf) {
         super(tf);
     }
 

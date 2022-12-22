@@ -15,15 +15,11 @@ package de.uka.ilkd.key.logic.label;
 
 import java.util.stream.Collectors;
 
+import de.uka.ilkd.key.logic.*;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.AbstractTermFactory;
 import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
@@ -183,7 +179,7 @@ public interface TermLabel extends Named {
      * @return the transformed term.
      * @see #isProofRelevant()
      */
-    static Term removeIrrelevantLabels(Term term, TermFactory tf) {
+    static Term removeIrrelevantLabels(Term term, AbstractTermFactory tf) {
         return tf.createTerm(
                 term.op(),
                 new ImmutableArray<>(

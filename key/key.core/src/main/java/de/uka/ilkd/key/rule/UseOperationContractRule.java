@@ -17,6 +17,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.uka.ilkd.key.logic.*;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -51,16 +52,7 @@ import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.Throw;
 import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInProgram;
-import de.uka.ilkd.key.logic.ProgramPrefix;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.AbstractTermFactory;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
@@ -1112,7 +1104,7 @@ public final class UseOperationContractRule implements BuiltInRule {
                                    LocationVariable baseHeap,
                                    Instantiation inst,
                                    Term resultTerm,
-                                   TermFactory tf) {
+                                   AbstractTermFactory tf) {
         return OpReplacer.replace(baseHeapTerm,
                 atPres.get(baseHeap),
                 inst.pm.isConstructor() ? resultTerm : inst.actualSelf, tf);
@@ -1131,7 +1123,7 @@ public final class UseOperationContractRule implements BuiltInRule {
                                                     Map<LocationVariable, Term> atPres,
                                                     LocationVariable baseHeap,
                                                     Instantiation inst,
-                                                    TermFactory tf) {
+                                                    AbstractTermFactory tf) {
         return OpReplacer.replace(baseHeapTerm, atPres.get(baseHeap), inst.actualParams, tf);
     }
 

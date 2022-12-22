@@ -31,7 +31,6 @@ import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.DefaultTermParser;
-import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.OpReplacer;
@@ -49,26 +48,26 @@ import java.util.Map;
 /**
  * <p>
  * Use this class if you intend to build complex terms by hand. It is more
- * convenient than the @link{TermFactory} class.
+ * convenient than the @link{AbstractTermFactory} class.
  * </p>
  *
  * <p>
  * Attention: some methods of this class try to simplify some terms. So if you
  * want to be sure that the term looks exactly as you built it, you will have to
- * use the TermFactory.
+ * use the AbstractTermFactory.
  * </p>
  */
 public class TermBuilder {
 
     private static final String JAVA_LANG_THROWABLE = "java.lang.Throwable";
 
-    private final TermFactory tf;
+    private final AbstractTermFactory tf;
     private final Term tt;
     private final Term ff;
 
     protected final Services services; // TODO; Make private
 
-    public TermBuilder(TermFactory tf, Services services) {
+    public TermBuilder(AbstractTermFactory tf, Services services) {
         assert services != null;
         this.services = services;
         this.tf = tf;
@@ -76,7 +75,7 @@ public class TermBuilder {
         this.ff = tf.createTerm(Junctor.FALSE);
     }
 
-    public TermFactory tf() {
+    public AbstractTermFactory tf() {
         return tf;
     }
 

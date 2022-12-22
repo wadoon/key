@@ -40,11 +40,11 @@ import de.uka.ilkd.key.logic.sort.Sort;
  *  cannot be changed. The advantage is that we can use term sharing and
  *  saving a lot of memory space.
  *  </li>
- *  <li> Term has to be created using the {@link TermFactory} and
+ *  <li> Term has to be created using the {@link AbstractTermFactory} and
  *    _not_ by using the constructors itself.
  *  </li>
  *  <li> Term is subclassed, but all subclasses have to be package private, so
- *    that all other classes except {@link TermFactory} know only the class
+ *    that all other classes except {@link AbstractTermFactory} know only the class
  *    Term and its interface. Even most classes of the logic package.
  *  </li>
  *  <li> as it is immutable, most (all) attributes should be declared final

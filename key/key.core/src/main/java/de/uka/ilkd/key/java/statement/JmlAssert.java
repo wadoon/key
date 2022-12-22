@@ -5,8 +5,8 @@ import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import de.uka.ilkd.key.logic.AbstractTermFactory;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
@@ -120,8 +120,8 @@ public class JmlAssert extends JavaStatement {
      * @param services services
      */
     public Term getCond(final Term self, final Services services) {
-        final TermFactory termFactory = services.getTermFactory();
-        final TermReplacementMap replacementMap = new TermReplacementMap(termFactory);
+        final AbstractTermFactory abstractTermFactory = services.getTermFactory();
+        final TermReplacementMap replacementMap = new TermReplacementMap(abstractTermFactory);
         if (self != null) {
             replacementMap.replaceSelf(vars.selfVar, self, services);
         }
@@ -129,7 +129,7 @@ public class JmlAssert extends JavaStatement {
         replacementMap.replaceRemembranceLocalVariables(vars.atBeforeVars, vars.atBefores,
                 services);
         final OpReplacer replacer = new OpReplacer(
-                replacementMap, termFactory, services.getProof());
+                replacementMap, abstractTermFactory, services.getProof());
         return replacer.replace(cond);
     }
 
@@ -210,11 +210,11 @@ public class JmlAssert extends JavaStatement {
      * @param services services
      */
     public void updateVars(final Map<LocationVariable, Term> atPres, final Services services) {
-        final TermFactory termFactory = services.getTermFactory();
-        final TermReplacementMap replacementMap = new TermReplacementMap(termFactory);
+        final AbstractTermFactory abstractTermFactory = services.getTermFactory();
+        final TermReplacementMap replacementMap = new TermReplacementMap(abstractTermFactory);
         replacementMap.replaceRemembranceLocalVariables(vars.atPreVars, atPres, services);
         final OpReplacer replacer = new OpReplacer(
-                replacementMap, termFactory, services.getProof());
+                replacementMap, abstractTermFactory, services.getProof());
         cond = replacer.replace(cond);
         vars.atPres = atPres;
 

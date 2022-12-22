@@ -4,8 +4,8 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
+import de.uka.ilkd.key.logic.AbstractTermFactory;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
@@ -34,7 +34,7 @@ public interface ReplacementMap<S extends SVSubstitute, T> extends Map<S, T> {
      * @return a new replacement map.
      */
     public static <S extends SVSubstitute, T>
-        ReplacementMap<S, T> create(TermFactory tf, Proof proof) {
+        ReplacementMap<S, T> create(AbstractTermFactory tf, Proof proof) {
         if (ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().getUseOriginLabels()) {
             return new NoIrrelevantLabelsReplacementMap<S, T>(tf);
         } else {
@@ -53,7 +53,7 @@ public interface ReplacementMap<S extends SVSubstitute, T> extends Map<S, T> {
      * @return a new replacement map.
      */
     public static <S extends SVSubstitute, T>
-        ReplacementMap<S, T> create(TermFactory tf, Proof proof, Map<S, T> initialMappings) {
+        ReplacementMap<S, T> create(AbstractTermFactory tf, Proof proof, Map<S, T> initialMappings) {
         ReplacementMap<S, T> result = create(tf, proof);
         result.putAll(initialMappings);
         return result;
@@ -101,14 +101,14 @@ public interface ReplacementMap<S extends SVSubstitute, T> extends Map<S, T> {
         /**
          * Term factory.
          */
-        private final TermFactory tf;
+        private final AbstractTermFactory tf;
 
         /**
          * Create a new map
          *
          * @param tf a term factory.
          */
-        public NoIrrelevantLabelsReplacementMap(TermFactory tf) {
+        public NoIrrelevantLabelsReplacementMap(AbstractTermFactory tf) {
             this.tf = tf;
         }
 

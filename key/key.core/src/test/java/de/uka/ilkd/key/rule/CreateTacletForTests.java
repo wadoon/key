@@ -74,7 +74,7 @@ public class CreateTacletForTests extends AbstractTestTermParser {
     static SchemaVariable b;
     static LogicVariable z;
     static Sort sort1;
-    static TermFactory tf;
+    static AbstractTermFactory tf;
 
     static NamespaceSet nss;
 
