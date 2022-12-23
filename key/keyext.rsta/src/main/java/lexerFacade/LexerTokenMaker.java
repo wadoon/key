@@ -6,6 +6,8 @@ import org.fife.ui.rsyntaxtextarea.Token;
 import org.fife.ui.rsyntaxtextarea.TokenImpl;
 import org.fife.ui.rsyntaxtextarea.TokenMakerBase;
 import org.fife.ui.rsyntaxtextarea.TokenTypes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.swing.text.Segment;
@@ -13,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LexerTokenMaker extends TokenMakerBase {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(LexerTokenMaker.class);
 
     /**
      * Improve performance for multiple getTokenList calls with the same input.
@@ -29,7 +33,7 @@ public class LexerTokenMaker extends TokenMakerBase {
     }
 
     @Nullable
-    private Token toRSTAToken(Segment text, int startOffset,
+    private static Token toRSTAToken(Segment text, int startOffset,
                          List<Integer> startIndices, List<Integer> tokenTypes, List<String> tokenTexts) {
         assert(startIndices.size() == tokenTypes.size() && startIndices.size() == tokenTexts.size());
         if (startIndices.isEmpty()) {
@@ -38,7 +42,7 @@ public class LexerTokenMaker extends TokenMakerBase {
             int currentIndex = startIndices.get(0);
             int currentType = tokenTypes.get(0);
             if (currentType == TokenTypes.SEPARATOR) {
-            System.out.println(currentType  + " equals the static separator constant, help");
+                LOGGER.warn(currentType  + " equals the static separator constant, help");
             }
             String currentText = tokenTexts.get(0);
             int currentStopIndex = Math.min(currentIndex + currentText.length(), startOffset + text.count)-1;
@@ -80,11 +84,13 @@ public class LexerTokenMaker extends TokenMakerBase {
         if (completeText.equals(cachedText)) {
             return toRSTAToken(text, startOffset, cachedIndices, cachedTypes, cachedImages);
         }
-        while (!lexer.finished()) {
+        int length = 0;
+        while (!lexer.finished() && length < completeText.length()) {
             lexer.step();
             startIndices.add(lexer.lastConsumedTokenStartIndex());
             tokenTypes.add(lexer.lastConsumedTokenType());
             tokenTexts.add(lexer.lastConsumedTokenText());
+            length += lexer.lastConsumedTokenText().length();
         }
         if (startIndices.isEmpty()) {
             startIndices.add(0);

@@ -2,6 +2,8 @@ package lexerFactories;
 
 import lexerFacade.Lexer;
 import org.fife.ui.rsyntaxtextarea.SyntaxScheme;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.InvocationTargetException;
@@ -16,16 +18,6 @@ public interface LanguageSupportFactory {
 
     SyntaxScheme getSyntaxScheme();
 
-    static SyntaxScheme createSyntaxScheme(String grammarName) {
-        try {
-            Class<SyntaxScheme> syntaxSchemeClass
-                    = (Class<SyntaxScheme>) Class.forName(grammarName + "SyntaxScheme");
-            return syntaxSchemeClass.getConstructor().newInstance();
-        } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException |
-                 IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
+    int getEOFTokenType();
 
 }

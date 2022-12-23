@@ -1,127 +1,74 @@
 package lexerFactories;
 
+import lexerFacade.MultipleLexersLexer;
 import org.fife.ui.rsyntaxtextarea.SyntaxScheme;
 import lexerFacade.Lexer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonReader;
+import javax.security.auth.callback.LanguageCallback;
+import java.io.InputStream;
 import java.util.*;
 
 public class VariousGrammarsSyntaxSchemeFactory implements LanguageSupportFactory {
 
-    private final LexerDelegationMap lexerDelegationMap;
-    private final List<LanguageSupportFactory> lexerOrder;
+    /**
+     * Logger.
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(VariousGrammarsSyntaxSchemeFactory.class);
+    private final List<LanguageSupportFactory> lexerFactoryOrder;
+    private final MultipleLexersLexer.LexerDelegationMap lexerDelegationMap;
     private Map<Integer, String> allTokenTypeNames = new HashMap<>();
 
-    public VariousGrammarsSyntaxSchemeFactory(List<LanguageSupportFactory> lexerOrder, LexerDelegationMap lexerDelegationMap) {
+    public VariousGrammarsSyntaxSchemeFactory(
+            List<LanguageSupportFactory> lexerFactoryOrder,
+            MultipleLexersLexer.LexerDelegationMap lexerDelegationMap) {
         // TODO create this map via json?
+        this.lexerFactoryOrder = new ArrayList<>(lexerFactoryOrder);
         this.lexerDelegationMap = lexerDelegationMap;
-        this.lexerOrder = new ArrayList<>(lexerOrder);
-        for (LanguageSupportFactory factory: lexerOrder) {
+        for (LanguageSupportFactory factory: lexerFactoryOrder) {
             Map<Integer, String> map = factory.allTokenTypeNames();
             if (map == null) {
                 continue;
             }
             for (Map.Entry<Integer, String> mapping : map.entrySet()) {
-                // TODO SyntaxScheme definition has problems if different tokens have the same name here
+                //TODO AutomaticSyntaxScheme definition has problems if different tokens have the same name here (they will all be treated the same)
                 allTokenTypeNames.put(evaluateTokenType(factory, mapping.getKey()), mapping.getValue());
             }
         }
     }
 
-    // TODO make this the EOF token of the first lexer/factory
-    private final int EOF = 0;
-
     private int evaluateTokenType(LanguageSupportFactory factory, int tokenType) {
-        // TODO make more memory (and runtime) efficient
-        OptionalInt maxTokenAmount = lexerOrder.stream()
+        OptionalInt maxTokenAmount = lexerFactoryOrder.stream()
                 .mapToInt(l -> l.allTokenTypeNames() == null ? 0 : l.allTokenTypeNames().entrySet().size())
                 .max();
         int maxTokens = maxTokenAmount.isEmpty() ? 0 : maxTokenAmount.getAsInt();
         if (tokenType > maxTokens) {
-            return EOF;
+            return lexerFactoryOrder.get(0).getEOFTokenType();
         }
-        for (int index = 0; index < lexerOrder.size(); index++) {
+        /*
+        Otherwise, evaluate the unique token type.
+         */
+        for (int index = 0; index < lexerFactoryOrder.size(); index++) {
             // Make sure the first lexer gets its tokens mapped to their original value to have the EOF tokens match.
-            if (lexerOrder.get(index).equals(factory)) {
+            if (lexerFactoryOrder.get(index).equals(factory)) {
                 return index*maxTokens+tokenType;
             }
         }
-        return EOF;
+        /*
+        If the given factory dies not exist, just return the eof value of the first factory.
+         */
+        return lexerFactoryOrder.get(0).getEOFTokenType();
     }
 
     @Nullable
     @Override
     public Lexer create(String toLex) {
-        return new Lexer() {
-
-
-            LanguageSupportFactory currentFactory = lexerOrder.get(0);
-            Lexer currentLexer = currentFactory.create(toLex);
-            Lexer oldLexer = currentLexer;
-            String lastConsumedTokenText;
-            int lastConsumedTokenType;
-
-            int lastConsumedStartIndex = 0;
-
-            @Override
-            public void step() {
-                currentLexer.step();
-                String currentLastConsumedText = currentLexer.lastConsumedTokenText();
-                int currentLastConsumedType = currentLexer.lastConsumedTokenType();
-                /*
-                Case 1: The current lexer consumes the token and does not have to delegate it.
-                 */
-                LanguageSupportFactory newFactory = lexerDelegationMap.getNextLexer(currentFactory, currentLastConsumedType);
-                if (newFactory == null) {
-                    lastConsumedTokenType = currentLastConsumedType;
-                    lastConsumedTokenText = currentLastConsumedText;
-                    int currentLastConsumedStartIndex = currentLexer.lastConsumedTokenStartIndex();
-                    // current lexer does the next step unless it is finished
-                    if (currentLexer.finished()) {
-                        currentLexer = oldLexer;
-                    }
-                    return;
-                }
-                /*
-                Case 2: The current lexer consumes the token and has to delegate it further.
-                 */
-                oldLexer = currentLexer;
-                currentLexer = newFactory.create(currentLastConsumedText);
-                step();
-            }
-
-            @Override
-            public boolean finished() {
-                // finished if the first lexer reached EOF
-                return currentFactory.equals(lexerOrder.get(0)) && currentLexer.finished();
-            }
-
-            @Override
-            public String lastConsumedTokenText() {
-                return lastConsumedTokenText;
-            }
-
-            @Override
-            public Integer lastConsumedTokenStartIndex() {
-                int currentLastConsumedStartIndex = currentLexer.lastConsumedTokenStartIndex();
-                lastConsumedStartIndex = (currentFactory.equals(lexerOrder.get(0)))
-                        ? currentLastConsumedStartIndex
-                        : currentLastConsumedStartIndex + lastConsumedStartIndex;
-                return lastConsumedStartIndex;
-            }
-
-            @Override
-            public Integer lastConsumedTokenType() {
-                return lastConsumedTokenType;
-            }
-
-            @Override
-            public Integer eofTokenType() {
-                // TODO first lexer's eof token
-                return 0;
-            }
-
-        };
+        return new MultipleLexersLexer(lexerFactoryOrder, lexerDelegationMap, toLex);
     }
 
     @Override
@@ -131,34 +78,64 @@ public class VariousGrammarsSyntaxSchemeFactory implements LanguageSupportFactor
 
     @Override
     public SyntaxScheme getSyntaxScheme() {
-        return null;
+        String fileName = "defaultScheme.json";
+
+        InputStream jsonFile = ANTLRLanguageSupportFactory.class
+                .getResourceAsStream(fileName);
+        JsonObject jsonObject = null;
+        try {
+            JsonReader jsonReader = Json.createReader(jsonFile);
+            jsonObject = jsonReader.readObject();
+            jsonReader.close();
+        } catch (Exception e) {
+            // every possible exception should be caught as loading the files
+            // should not break key
+            // if loading the props file does not work for any reason,
+            // create a warning and continue
+            LOGGER.warn(String.format("File %s could not be loaded. Reason: %s",
+                    fileName, e.getMessage()));
+        }
+
+        SyntaxScheme scheme = new AutomaticSyntaxScheme(jsonObject, allTokenTypeNames());
+
+        return scheme;
     }
 
-    /**
-     * Note that the lexer order in the map may be relevant.
-     */
-    public static class LexerDelegationMap {
+    @Override
+    public int getEOFTokenType() {
+        return lexerFactoryOrder.get(0).getEOFTokenType();
+    }
 
-        private final Map<LanguageSupportFactory, Map<Integer, LanguageSupportFactory>> delegationMap;
-
-        public LexerDelegationMap(Map<LanguageSupportFactory, Map<Integer, LanguageSupportFactory>> delegationMap) {
-            this.delegationMap = delegationMap;
+    @Override
+    public boolean equals(Object other) {
+        if (!other.getClass().equals(this.getClass())) {
+            return false;
         }
-
-        @Nullable
-        public LanguageSupportFactory getNextLexer(LanguageSupportFactory currentLexer, Integer tokenType) {
-            Map<Integer, LanguageSupportFactory> delegationTable = delegationMap.get(currentLexer);
-            return delegationTable == null ? null : delegationTable.get(tokenType);
+        VariousGrammarsSyntaxSchemeFactory o = (VariousGrammarsSyntaxSchemeFactory) other;
+        if (o.lexerFactoryOrder.size() != lexerFactoryOrder.size() || o.allTokenTypeNames.size() != allTokenTypeNames.size()) {
+            return false;
         }
-
-        static int getIndex(LanguageSupportFactory factory, List<LanguageSupportFactory> orderedList) {
-            for (int i = 0; i < orderedList.size(); i++) {
-                if (orderedList.get(i).equals(factory)) {
-                    return i;
-                }
+        for (Map.Entry<Integer, String> entry: allTokenTypeNames.entrySet()) {
+            if (!o.allTokenTypeNames.entrySet().contains(entry)) {
+                return false;
             }
-            return orderedList.size() + 1;
         }
-
+        for (Map.Entry<Integer, String> entry: o.allTokenTypeNames.entrySet()) {
+            if (!allTokenTypeNames.entrySet().contains(entry)) {
+                return false;
+            }
+        }
+        for (LanguageSupportFactory factory: lexerFactoryOrder) {
+            if (!o.lexerFactoryOrder.contains(factory)) {
+                return false;
+            }
+        }
+        for (LanguageSupportFactory factory: o.lexerFactoryOrder) {
+            if (!lexerFactoryOrder.contains(factory)) {
+                return false;
+            }
+        }
+        return true;
     }
+
 }

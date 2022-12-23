@@ -37,7 +37,7 @@ public class ANTLRLexer implements Lexer {
     private final Class<? extends org.antlr.v4.runtime.Lexer> lexerClass;
 
     private final org.antlr.v4.runtime.Lexer lexer;
-    private Token token = CommonTokenFactory.DEFAULT.create(Token.INVALID_TYPE,"");
+    private Token token = CommonTokenFactory.DEFAULT.create(Token.INVALID_TYPE,"<INVALID>");
 
     public ANTLRLexer(org.antlr.v4.runtime.Lexer lexer) {
         this.lexer = lexer;
@@ -72,6 +72,11 @@ public class ANTLRLexer implements Lexer {
     @Override
     public Integer eofTokenType() {
         return Token.EOF;
+    }
+
+    @Override
+    public String toString() {
+        return "ANTLRLexer for " + lexerClass.getName() + " on " + lexer._text;
     }
 
     /*

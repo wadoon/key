@@ -1,5 +1,6 @@
 package lexerFactories;
 
+import de.uka.ilkd.key.parser.proofjava.JavaCharStream;
 import javacc.PositionStream;
 import javacc.SimpleCharStream;
 import javacc.Token;
@@ -132,5 +133,37 @@ public class JavaCCLanguageSupportFactory implements LanguageSupportFactory {
         SyntaxScheme scheme = new AutomaticSyntaxScheme(jsonObject, allTokenTypeNames());
 
         return scheme;
+    }
+
+    @Override
+    public int getEOFTokenType() {
+        return eofToken().kind;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(tokenMgrClass);
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (!other.getClass().equals(this.getClass())) {
+            return false;
+        }
+        JavaCCLanguageSupportFactory o = (JavaCCLanguageSupportFactory) other;
+        if (o.allTokenTypeNames().size() != allTokenTypeNames().size()) {
+            return false;
+        }
+        for (Map.Entry<Integer, String> entry: allTokenTypeNames().entrySet()) {
+            if (!o.allTokenTypeNames().entrySet().contains(entry)) {
+                return false;
+            }
+        }
+        for (Map.Entry<Integer, String> entry: o.allTokenTypeNames().entrySet()) {
+            if (!allTokenTypeNames().entrySet().contains(entry)) {
+                return false;
+            }
+        }
+        return tokenMgrClass.equals(o.tokenMgrClass);
     }
 }

@@ -18,6 +18,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class ANTLRLanguageSupportFactory implements LanguageSupportFactory {
 
@@ -64,7 +65,7 @@ public class ANTLRLanguageSupportFactory implements LanguageSupportFactory {
             return tokenTypeMap;
         } catch (NoSuchMethodException | InvocationTargetException
                  | InstantiationException | IllegalAccessException e) {
-            e.printStackTrace();
+            LOGGER.warn(e.getMessage());
         } catch (NoSuchFieldException e) {
             throw new RuntimeException(e);
         }
@@ -97,6 +98,12 @@ public class ANTLRLanguageSupportFactory implements LanguageSupportFactory {
         return scheme;
     }
 
+    @Override
+    public int getEOFTokenType() {
+        // TODO
+        return 0;
+    }
+
     private static org.antlr.v4.runtime.Lexer makeLexer(
             Class<org.antlr.v4.runtime.Lexer> lexerClass, String input)
             throws NoSuchMethodException, InvocationTargetException,
@@ -105,5 +112,32 @@ public class ANTLRLanguageSupportFactory implements LanguageSupportFactory {
                 .getConstructor(CharStream.class)
                 // TODO use sth that is not deprecated
                 .newInstance(new ANTLRInputStream(input));
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(lexerClass);
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (!other.getClass().equals(this.getClass())) {
+            return false;
+        }
+        ANTLRLanguageSupportFactory o = (ANTLRLanguageSupportFactory) other;
+        if (o.allTokenTypeNames().size() != allTokenTypeNames().size()) {
+            return false;
+        }
+        for (Map.Entry<Integer, String> entry: allTokenTypeNames().entrySet()) {
+            if (!o.allTokenTypeNames().entrySet().contains(entry)) {
+                return false;
+            }
+        }
+        for (Map.Entry<Integer, String> entry: o.allTokenTypeNames().entrySet()) {
+            if (!allTokenTypeNames().entrySet().contains(entry)) {
+                return false;
+            }
+        }
+        return lexerClass.equals(o.lexerClass);
     }
 }
