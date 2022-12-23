@@ -29,6 +29,8 @@ public class ANTLRLanguageSupportFactory implements LanguageSupportFactory {
 
     private Class<org.antlr.v4.runtime.Lexer> lexerClass;
 
+    private Map<Integer, String> tokenTypeMap;
+
     public ANTLRLanguageSupportFactory(Class<org.antlr.v4.runtime.Lexer> lexerClass) {
         this.lexerClass = lexerClass;
     }
@@ -51,7 +53,11 @@ public class ANTLRLanguageSupportFactory implements LanguageSupportFactory {
     @Nullable
     @Override
     public Map<Integer, String> allTokenTypeNames() {
-        Map<Integer, String> tokenTypeMap = new HashMap<>();
+        if (tokenTypeMap != null) {
+            return tokenTypeMap;
+        }
+
+        tokenTypeMap = new HashMap<>();
 
         try {
             Field f = lexerClass.getDeclaredField("VOCABULARY");
@@ -62,14 +68,13 @@ public class ANTLRLanguageSupportFactory implements LanguageSupportFactory {
             for (int i = 0; i < vocabulary.getMaxTokenType()+1; i++) {
                 tokenTypeMap.put(i, vocabulary.getSymbolicName(i));
             }
-            return tokenTypeMap;
         } catch (NoSuchMethodException | InvocationTargetException
                  | InstantiationException | IllegalAccessException e) {
             LOGGER.warn(e.getMessage());
         } catch (NoSuchFieldException e) {
             throw new RuntimeException(e);
         }
-        return null;
+        return tokenTypeMap;
     }
 
     @Override

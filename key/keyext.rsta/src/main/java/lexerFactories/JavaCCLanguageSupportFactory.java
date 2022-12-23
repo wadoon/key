@@ -35,6 +35,8 @@ public class JavaCCLanguageSupportFactory implements LanguageSupportFactory {
     private Constructor<?> constructor;
     private Method nextTokenMethod;
 
+    private Map<Integer, String> tokenTypeMap;
+
     public JavaCCLanguageSupportFactory(Class<?> tokenMgrClass) {
         if (!check(tokenMgrClass)) {
             String msg = tokenMgrClass.getName() + " is not a JavaCC token maker.";
@@ -90,24 +92,28 @@ public class JavaCCLanguageSupportFactory implements LanguageSupportFactory {
 
     @Override
     public Map<Integer, String> allTokenTypeNames() {
-        Map<Integer, String> tokenTypeNames = new HashMap<>();
+        if (tokenTypeMap != null) {
+            return tokenTypeMap;
+        }
+
+        tokenTypeMap = new HashMap<>();
         Object tokenManager;
         try {
             tokenManager = constructor.newInstance(makeStream(""));
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             LOGGER.error(e.getMessage());
-            return tokenTypeNames;
+            return tokenTypeMap;
         }
         for (Field field: tokenMgrClass.getDeclaredFields()) {
             if (field.getType().equals(Integer.class)) {
                 try {
-                    tokenTypeNames.put((Integer) field.get(tokenManager), field.getName());
+                    tokenTypeMap.put((Integer) field.get(tokenManager), field.getName());
                 } catch (Exception e) {
                     LOGGER.error(e.getMessage());
                 }
             }
         }
-        return tokenTypeNames;
+        return tokenTypeMap;
     }
 
     @Override
