@@ -5,6 +5,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.*;
 
@@ -257,8 +258,10 @@ public interface KeYGuiExtension {
     }
 
     interface EditorExtension {
-        MainWindowAction getEditorAction(Class<?> grammarClass, String input, MainWindow window, Dialog parent);
+        MainWindowAction getEditorAction(String input, MainWindow window, Dialog parent,
+                                         List<Class<?>> lexerClasses,
+                                         Map<Class<?>, Map<String, Class<?>>> map);
 
-        Component getPanel(Class<?> grammarClass, String input, Dialog parent);
+        Component getPanel(List<Class<?>> lexerClasses, Map<Class<?>, Map<String, Class<?>>> map, String input, Dialog parent);
     }
 }

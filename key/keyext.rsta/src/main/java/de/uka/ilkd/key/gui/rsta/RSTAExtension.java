@@ -3,10 +3,13 @@ package de.uka.ilkd.key.gui.rsta;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
+import lexerFactories.VariousGrammarsSyntaxSchemeFactory;
 import rsta.InputDisplay;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
+import java.util.Map;
 
 @KeYGuiExtension.Info(name = "RSTAExtension",
         experimental = false,
@@ -18,12 +21,14 @@ public class RSTAExtension implements KeYGuiExtension, KeYGuiExtension.EditorExt
     }
 
     @Override
-    public MainWindowAction getEditorAction(Class<?> grammarClass, String input, MainWindow window, Dialog parent) {
-        return new EditorAction(grammarClass, input, window, parent);
+    public MainWindowAction getEditorAction(String input, MainWindow window, Dialog parent,
+                                            List<Class<?>> lexerClasses,
+                                            Map<Class<?>, Map<String, Class<?>>> map) {
+        return new EditorAction(input, window, parent, lexerClasses, map);
     }
 
     @Override
-    public Component getPanel(Class<?> grammarClass, String input, Dialog parent) {
-        return InputDisplay.panel(input, grammarClass, parent);
+    public Component getPanel(List<Class<?>> lexerClasses, Map<Class<?>, Map<String, Class<?>>> map, String input, Dialog parent) {
+        return InputDisplay.panel(input, lexerClasses, map, parent);
     }
 }

@@ -100,7 +100,7 @@ public final class IssueDialog extends JDialog {
 
 
 
-    private Class<?> issueGrammarClass;
+    private Class<?> issueLexerClass;
 
 
     /** Reacts to selection events to the "Show details" checkbox (fold/unfold stacktrace).
@@ -478,10 +478,8 @@ public final class IssueDialog extends JDialog {
         Collection<KeYGuiExtension.EditorExtension> ext = KeYGuiExtensionFacade.getEditorExtensions();
         ext.forEach(it -> {
             JButton but = new JButton(
-                    it.getEditorAction(issueGrammarClass,
-                            txtSource.getText(),
-                            MainWindow.getInstance(),
-                            this));
+                    it.getEditorAction(txtSource.getText(), MainWindow.getInstance(), this,
+                            Collections.singletonList(issueLexerClass), new HashMap<>()));
             but.setText("rsta");
             pButtons.add(but);
         });
@@ -661,7 +659,7 @@ public final class IssueDialog extends JDialog {
                 }
             });
 
-            issueGrammarClass = getIssueGrammarClass(issue.fileName);
+            issueLexerClass = getIssueLexerClass(issue.fileName);
 
             if (isJava(issue.fileName)) {
                 showJavaSourceCode(source);
@@ -729,7 +727,7 @@ public final class IssueDialog extends JDialog {
         return fileName.endsWith(".java");
     }
 
-    private @Nullable Class<?> getIssueGrammarClass(String fileName) {
+    private @Nullable Class<?> getIssueLexerClass(String fileName) {
         if (fileName.endsWith(".proof")) {
             return KeYLexer.class;
         }

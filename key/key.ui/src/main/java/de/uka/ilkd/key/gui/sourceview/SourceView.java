@@ -588,10 +588,7 @@ public final class SourceView extends JComponent {
                     ext.forEach(it -> {
                         Component rstaTab = null;
                         try {
-                            rstaTab = it.getPanel(
-                                    getGrammarClass(tab.simpleFileName),
-                                    IOUtil.readFrom(text),
-                                    null);
+                            rstaTab = it.getPanel(getLexerClasses(tab.simpleFileName), getLexerMap(tab.simpleFileName), IOUtil.readFrom(text), null);
                         } catch (IOException e) {
                             LOGGER.error("Cannot create RSTA view: " + e.getMessage());
                         }
@@ -603,6 +600,28 @@ public final class SourceView extends JComponent {
             }
         }
         throw new IOException("Could not open file: " + fileURI);
+    }
+
+    private Map<Class<?>, Map<String, Class<?>>> getLexerMap(String simpleFileName) {
+        Map<Class<?>, Map<String, Class<?>>> lexerMap = new HashMap<>();
+        if (simpleFileName.endsWith(".java") || simpleFileName.endsWith(".proof")) {
+            Map<String, Class<?>> proofJavaMap = new HashMap<>();
+            proofJavaMap.put("ASSIGNABLE", KeYLexer.class);
+            lexerMap.put(JmlLexer.class, proofJavaMap);
+            lexerMap.put(KeYLexer.class, new HashMap<>());
+        }
+        return lexerMap;
+    }
+
+    private List<Class<?>> getLexerClasses(String simpleFileName) {
+        List<Class<?>> lexerClasses = new ArrayList<>();
+        if (simpleFileName.endsWith(".java") || simpleFileName.endsWith(".proof")) {
+            lexerClasses.add(JmlLexer.class);
+            lexerClasses.add(KeYLexer.class);
+            return lexerClasses;
+        }
+        lexerClasses.add(KeYLexer.class);
+        return lexerClasses;
     }
 
     /*
