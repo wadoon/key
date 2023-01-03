@@ -164,6 +164,7 @@ MAXEXPANDMETHOD : '\\mayExpandMethod';
 STRICT    : '\\strict';
 TYPEOF : '\\typeof';
 INSTANTIATE_GENERIC : '\\instantiateGeneric';
+INNER_CLASS : '\\innerClass';
 
 // Quantifiers, binding, substitution
 FORALL : '\\forall' | '\u2200';
