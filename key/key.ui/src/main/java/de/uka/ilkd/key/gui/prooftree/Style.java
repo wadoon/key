@@ -31,6 +31,8 @@ public class Style {
     public static final Key<String> KEY_TOOLTIP = new Key<>(String.class);
     public static final Key<String> KEY_TEXT = new Key<>(String.class);
 
+    public static final Key<JButton> RIGHT_BUTTON = new Key<>(JButton.class);
+
     @Nonnull
     public <T> Style set(@Nonnull Key<T> key, @Nullable T value) {
         if (!sealed.contains(key)) {

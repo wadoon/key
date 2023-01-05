@@ -17,19 +17,20 @@ import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.nodeviews.TacletInfoToggle;
 import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
-import de.uka.ilkd.key.util.Debug;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.plaf.TreeUI;
 import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.plaf.metal.MetalTreeUI;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.tree.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -939,6 +940,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
             style.set(KEY_FONT_ITALIC, false);
             style.set(KEY_TOOLTIP, "");
             style.set(KEY_ICON, null);
+            style.set(RIGHT_BUTTON, null);
 
             stylers.forEach(it -> it.style(style, (GUIAbstractTreeNode) value));
 
@@ -959,12 +961,42 @@ public class ProofTreeView extends JPanel implements TabPanel {
             setToolTipText(style.get(KEY_TOOLTIP));
             setIcon(style.get(KEY_ICON));
 
-            return this;
+            JPanel panel = new JPanel();
+            panel.setLayout(new BorderLayout());
+            panel.add(this, BorderLayout.WEST);
+
+            JButton right_button = style.get(RIGHT_BUTTON);
+            if (right_button != null) {
+                panel.add(right_button, BorderLayout.EAST);
+                delegateView.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+                        if (containsScreenPos(right_button, e.getLocationOnScreen())) {
+                            right_button.doClick();
+                        }
+                    }
+                });
+            }
+
+            panel.getInsets().set(0,0,0,0);
+            panel.setBorder(BorderFactory.createEmptyBorder());
+            panel.repaint();
+
+            return panel;
         }
     }
 
+    boolean containsScreenPos(Component c, Point p) {
+        Point leftTop = c.getLocation();
+        SwingUtilities.convertPointToScreen(leftTop, c.getParent());
+        int width = c.getBounds().width;
+        int height = 12;
+        Point rightBottom = new Point(leftTop.x + width, leftTop.y + height);
+        return p.x >= leftTop.x /*&& p.x <= rightBottom.x && p.y >= leftTop.y && p.y <= rightBottom.y*/;
+    }
 
     public ProofTreePopupFactory getProofTreePopupFactory() {
         return proofTreePopupFactory;
     }
+
 }
