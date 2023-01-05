@@ -1,14 +1,19 @@
 package de.uka.ilkd.key.kexext.backgroundSMT;
 
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.KeYSelectionEvent;
+import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
+import de.uka.ilkd.key.gui.prooftree.GUIAbstractTreeNode;
+import de.uka.ilkd.key.gui.smt.ProgressDialog;
+import de.uka.ilkd.key.gui.smt.SolverListener;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.smt.RuleAppSMT;
-import de.uka.ilkd.key.smt.SMTProblem;
-import de.uka.ilkd.key.smt.SMTSolver;
-import de.uka.ilkd.key.smt.SMTSolverResult;
+import de.uka.ilkd.key.smt.*;
 
 import java.awt.event.ActionEvent;
 import java.util.*;
@@ -17,57 +22,21 @@ public class ApplyBackgroundSolverAction extends KeyAction {
 
     private BackgroundSolverRunner runner;
 
+    private Set<BackgroundSolverRunner> runners = new HashSet<>();
     private Map<BackgroundSolverRunner, Boolean> runnerStatus = new HashMap<>();
 
-    public ApplyBackgroundSolverAction() {
-        setEnabled(false);
-    }
+    private final Node treeNode;
 
-    public void setRunner(BackgroundSolverRunner runner) {
-        if (!runnerStatus.keySet().contains(runner)) {
-            runnerStatus.put(runner, !runner.getSolvedProblems().isEmpty());
-        }
-        this.runner = runner;
+    private final BackgroundSMTExtension extension;
+
+    public ApplyBackgroundSolverAction(Node obj, BackgroundSMTExtension extension) {
+        this.extension = extension;
+        this.treeNode = obj;
     }
 
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
-        if (runner == null) {
-            return;
-        }
-        // copied from SolverListener
-        KeYMediator mediator = MainWindow.getInstance().getMediator();
-        mediator.stopInterface(true);
-        try {
-            for (SMTProblem problem : runner.getSolvedProblems()) {
-                if (problem.getFinalResult().isValid() == SMTSolverResult.ThreeValuedTruth.VALID) {
-                    IBuiltInRuleApp app =
-                            RuleAppSMT.rule.createApp(null).setTitle(getTitle(problem));
-                    problem.getGoal().apply(app);
-                }
-            }
-            runner.clearSolvedProblems();
-        } finally {
-            mediator.startInterface(true);
-        }
-    }
-
-    public void notify(BackgroundSolverRunner runner) {
-        runnerStatus.put(runner, !runner.getSolvedProblems().isEmpty());
-        setEnabled(runnerStatus.containsValue(true));
-    }
-
-    // copied from SolverListener
-    private String getTitle(SMTProblem p) {
-        String title = "";
-        Iterator<SMTSolver> it = p.getSolvers().iterator();
-        while (it.hasNext()) {
-            title += it.next().name();
-            if (it.hasNext()) {
-                title += ", ";
-            }
-        }
-        return title;
+        extension.applyRunner(treeNode);
     }
 
 }
