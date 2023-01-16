@@ -25,7 +25,8 @@ import java.util.*;
 
 
 public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeature {
-    private static final ThreadLocal<LRUCache<Node, HashMap<Name, List<RuleApp>>>> localCache =
+    /** cache of all applied rules by name of a node */
+    private static final ThreadLocal<LRUCache<Node, HashMap<Name, List<RuleApp>>>> LOCAL_CACHE =
         ThreadLocal.withInitial(() -> new LRUCache<>(32));
 
     protected AbstractNonDuplicateAppFeature() {}
@@ -61,7 +62,7 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
         if (node.getAppliedRuleApp() != null || node.childrenCount() != 0) {
             throw new AssertionFailure("Expected an empty leaf node");
         }
-        final var cacheValue = localCache.get();
+        final var cacheValue = LOCAL_CACHE.get();
         HashMap<Name, List<RuleApp>> cache = cacheValue.get(node);
 
         if (cache == null) {
@@ -206,8 +207,9 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
 
         // Check all rules with this name
         for (RuleApp a : apps) {
-            if (sameApplication(a, app, pos))
+            if (sameApplication(a, app, pos)) {
                 return false;
+            }
         }
 
         return true;

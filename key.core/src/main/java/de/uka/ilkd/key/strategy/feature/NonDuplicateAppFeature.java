@@ -16,13 +16,22 @@ public class NonDuplicateAppFeature extends AbstractNonDuplicateAppFeature {
 
     public static final Feature INSTANCE = new NonDuplicateAppFeature();
 
+    /**
+     * Returns true if the rule application is absent in the all applied rules of this goal
+     *
+     * @param goal the goal
+     * @param rapp the taclet to apply
+     * @param pio pos in occurrence
+     * @return true if it is absent
+     */
     protected boolean ruleAppIsAbsent(Goal goal, TacletApp rapp,
             PosInOccurrence pio) {
         List<RuleApp> apps = getRuleAppsWithName(goal.node(), rapp.rule().name());
         if (apps != null) {
             for (RuleApp a : apps) {
-                if (sameApplication(a, rapp, pio))
+                if (sameApplication(a, rapp, pio)) {
                     return false;
+                }
             }
         }
 
