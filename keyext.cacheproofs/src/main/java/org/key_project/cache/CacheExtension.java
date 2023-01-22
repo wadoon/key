@@ -88,7 +88,7 @@ public class CacheExtension implements KeYGuiExtension, Toolbar, Startup {
         nodes.add(mediator.getSelectedProof().root());
         while (!nodes.isEmpty()) {
             Node node = nodes.removeFirst();
-            if(node.isClosed()) {
+            if (node.isClosed()) {
                 theCache.add(getHash(node.sequent()));
             }
             Iterator<Node> it = node.childrenIterator();
@@ -108,8 +108,10 @@ public class CacheExtension implements KeYGuiExtension, Toolbar, Startup {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o)
+                return true;
+            if (o == null || getClass() != o.getClass())
+                return false;
             Hash hash = (Hash) o;
             return print.equals(hash.print);
         }
@@ -140,7 +142,7 @@ public class CacheExtension implements KeYGuiExtension, Toolbar, Startup {
 
     private final KeYSelectionListener selectionListener = new KeYSelectionListener() {
         private final Set<Proof> installedProofs =
-                Collections.newSetFromMap(new IdentityHashMap<>());
+            Collections.newSetFromMap(new IdentityHashMap<>());
 
         @Override
         public void selectedNodeChanged(KeYSelectionEvent e) {
@@ -150,7 +152,7 @@ public class CacheExtension implements KeYGuiExtension, Toolbar, Startup {
         @Override
         public void selectedProofChanged(KeYSelectionEvent e) {
             Proof proof = e.getSource().getSelectedProof();
-            if(!installedProofs.contains(proof) && proof != null) {
+            if (!installedProofs.contains(proof) && proof != null) {
                 proof.addRuleAppListener(CacheExtension.this::ruleApplied);
                 installedProofs.add(proof);
             }
