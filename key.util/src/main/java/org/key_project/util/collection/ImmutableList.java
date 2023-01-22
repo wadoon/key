@@ -207,4 +207,16 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
         }
         return result;
     }
+
+    default ImmutableList<T> filter(Predicate<T> predicate) {
+        if (size() == 0) {
+            return this;
+        } else {
+            if (predicate.test(head())) {
+                return tail().filter(predicate).prepend(head());
+            } else {
+                return tail().filter(predicate);
+            }
+        }
+    }
 }
