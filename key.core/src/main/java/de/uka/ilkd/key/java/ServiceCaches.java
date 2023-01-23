@@ -3,6 +3,7 @@ package de.uka.ilkd.key.java;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import de.uka.ilkd.key.strategy.feature.AppliedRuleAppsNameCache;
 import org.key_project.util.LRUCache;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -139,6 +140,8 @@ public class ServiceCaches {
     private final IfFormulaInstantiationCache ifFormulaInstantiationCache =
         new IfFormulaInstantiationCache();
 
+    /** applied rule apps name cache */
+    private final AppliedRuleAppsNameCache appliedRuleAppsNameCache = new AppliedRuleAppsNameCache();
 
     /**
      * Returns the cache used by {@link TermTacletAppIndexCacheSet} instances.
@@ -209,4 +212,7 @@ public class ServiceCaches {
         return ifFormulaInstantiationCache;
     }
 
+    public AppliedRuleAppsNameCache getAppliedRuleAppsNameCache() {
+        return appliedRuleAppsNameCache;
+    }
 }

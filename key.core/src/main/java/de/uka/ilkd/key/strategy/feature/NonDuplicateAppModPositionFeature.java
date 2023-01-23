@@ -22,7 +22,7 @@ public class NonDuplicateAppModPositionFeature extends NonDuplicateAppFeature {
             return true;
         }
 
-        return ruleAppIsAbsent(goal, app, pos);
+        return noDuplicateFindTaclet(app, pos, goal);
     }
 
     @Override

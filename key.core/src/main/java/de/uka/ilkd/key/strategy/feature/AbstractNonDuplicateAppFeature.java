@@ -25,10 +25,6 @@ import java.util.*;
 
 
 public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeature {
-    /** cache of all applied rules by name of a node */
-    private static final ThreadLocal<LRUCache<Node, HashMap<Name, List<RuleApp>>>> LOCAL_CACHE =
-        ThreadLocal.withInitial(() -> new LRUCache<>(32));
-
     protected AbstractNonDuplicateAppFeature() {}
 
     /**
@@ -38,80 +34,6 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
      */
     protected abstract boolean comparePio(TacletApp newApp, TacletApp oldApp,
             PosInOccurrence newPio, PosInOccurrence oldPio);
-
-    /**
-     * Check whether a semisequent contains a formula. Again, one can either search for the same or
-     * an equal formula
-     */
-    protected abstract boolean semiSequentContains(Semisequent semisequent, SequentFormula cfma);
-
-    /**
-     * Gets rule apps applied to any node before the given node with the given name.
-     *
-     * Multiple assumptions about nodes:
-     * * The given node is a leaf, no children, no applied rule
-     * * Only *new* nodes are appended to nodes
-     * * Non leaf nodes are not changed, pruning is allowed
-     * * If the tree is pruned the removed nodes are discarded and not reused
-     *
-     * @param node the node
-     * @param name the name
-     * @return rule apps
-     */
-    public static List<RuleApp> getRuleAppsWithName(Node node, Name name) {
-        if (node.getAppliedRuleApp() != null || node.childrenCount() != 0) {
-            throw new AssertionFailure("Expected an empty leaf node");
-        }
-        final var cacheValue = LOCAL_CACHE.get();
-        HashMap<Name, List<RuleApp>> cache = cacheValue.get(node);
-
-        if (cache == null) {
-            // Try to use parent cache to initialize the new cache
-            HashMap<Name, List<RuleApp>> parentCache =
-                node.root() ? null : cacheValue.get(node.parent());
-            cache = new HashMap<>();
-
-            if (parentCache != null) {
-                if (node.parent().childrenCount() <= 1) {
-                    // Parent cache will be removed, reuse it
-                    cache = parentCache;
-                } else {
-                    // Copy the parent cache
-                    for (Map.Entry<Name, List<RuleApp>> entry : parentCache.entrySet()) {
-                        cache.put(entry.getKey(), new ArrayList<>(entry.getValue()));
-                    }
-                }
-
-                // Parent did not have a rule applied when we calculated this, add the rule applied
-                // there
-                RuleApp parentApp = node.parent().getAppliedRuleApp();
-                cache.computeIfAbsent(parentApp.rule().name(), k -> new ArrayList<>())
-                        .add(parentApp);
-
-                // If this is an inner node, we hope we will never revisit it, remove it from the
-                // cache
-                if (node.parent().childrenCount() <= 1) {
-                    cacheValue.remove(node.parent());
-                }
-            } else {
-                // Check all earlier rule applications
-                Node current = node;
-                while (!current.root()) {
-                    final Node par = current.parent();
-
-                    RuleApp a = par.getAppliedRuleApp();
-                    cache.computeIfAbsent(a.rule().name(), k -> new ArrayList<>()).add(a);
-
-                    current = par;
-                }
-            }
-
-            cacheValue.put(node, cache);
-        }
-
-        List<RuleApp> apps = cache.get(name);
-        return apps == null ? null : Collections.unmodifiableList(apps);
-    }
 
     /**
      * Check whether the old rule application <code>ruleCmp</code> is a duplicate of the new
@@ -200,10 +122,8 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
      */
     protected boolean noDuplicateFindTaclet(TacletApp app, PosInOccurrence pos, Goal goal) {
         final Node node = goal.node();
-        List<RuleApp> apps = getRuleAppsWithName(node, app.rule().name());
-        if (apps == null) {
-            return true;
-        }
+        final AppliedRuleAppsNameCache cache = node.proof().getServices().getCaches().getAppliedRuleAppsNameCache();
+        List<RuleApp> apps = cache.get(node, app.rule().name());
 
         // Check all rules with this name
         for (RuleApp a : apps) {

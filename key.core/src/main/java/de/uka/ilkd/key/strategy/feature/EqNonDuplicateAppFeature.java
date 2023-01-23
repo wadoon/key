@@ -28,10 +28,6 @@ public class EqNonDuplicateAppFeature extends AbstractNonDuplicateAppFeature {
         return noDuplicateFindTaclet(app, pos, goal);
     }
 
-    protected boolean semiSequentContains(Semisequent semisequent, SequentFormula cfma) {
-        return semisequent.containsEqual(cfma);
-    }
-
     protected boolean comparePio(TacletApp newApp, TacletApp oldApp, PosInOccurrence newPio,
             PosInOccurrence oldPio) {
         return oldPio.eqEquals(newPio);
