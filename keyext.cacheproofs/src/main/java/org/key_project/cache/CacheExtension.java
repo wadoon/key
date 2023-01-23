@@ -1,47 +1,30 @@
 package org.key_project.cache;
 
-import de.uka.ilkd.key.api.ScriptResults;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.colors.ColorSettings;
-import de.uka.ilkd.key.gui.extension.api.ContextMenuAdapter;
-import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension.Info;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension.Startup;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension.Toolbar;
-import de.uka.ilkd.key.gui.extension.api.TabPanel;
-import de.uka.ilkd.key.gui.prooftree.GUIAbstractTreeNode;
-import de.uka.ilkd.key.gui.prooftree.Style;
-import de.uka.ilkd.key.gui.prooftree.Styler;
+import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
-import de.uka.ilkd.key.proof.ProofTreeAdapter;
-import de.uka.ilkd.key.proof.ProofTreeListener;
-import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
-import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 
 import javax.annotation.Nonnull;
 import javax.swing.*;
-import java.awt.*;
-import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -51,7 +34,10 @@ import java.util.Set;
  * @version 1 (16.04.19)
  */
 @Info(name = "Proof Caching",
-    description = "Author: MU",
+    description = "This extension allows you to cache sequents which are known " +
+        "to be provable to speed up reconduction of proof after small changes. " +
+        "Proof nodes " +
+        "Author: Mattias Ulbrich <ulbrich@kit.edu>",
     experimental = false, optional = true, priority = 10000)
 public class CacheExtension implements KeYGuiExtension, Toolbar, Startup {
     private JToolBar toolBar;
@@ -177,6 +163,8 @@ public class CacheExtension implements KeYGuiExtension, Toolbar, Startup {
     public JToolBar getToolbar(MainWindow mainWindow) {
         if (toolBar == null) {
             toolBar = new JToolBar();
+            toolBar.add(new JLabel("Caching closed nodes: ",
+                IconUtil.makeIcon(FontAwesomeSolid.DATABASE), JLabel.LEADING));
             toggleAction = new ToggleProofCacheAction(this);
             toolBar.add(new JToggleButton(toggleAction));
             toolBar.add(new JButton(new EmptyProofCachesAction(this)));
