@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.gui.prooftree;
 
-import bibliothek.gui.dock.common.action.CAction;
-import bibliothek.gui.dock.common.action.CButton;
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
@@ -24,7 +22,6 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
 import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
@@ -69,17 +66,6 @@ public class ProofTreeView extends JPanel implements TabPanel {
     public static final KeyStroke searchKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_F,
         java.awt.event.InputEvent.CTRL_DOWN_MASK | java.awt.event.InputEvent.SHIFT_DOWN_MASK
                 | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
-    /**
-     * Keystroke for navigating to last selected node: CTRL+ALT+LEFT
-     */
-    public static final KeyStroke navigateBackKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_LEFT,
-        java.awt.event.InputEvent.CTRL_DOWN_MASK | java.awt.event.InputEvent.ALT_DOWN_MASK);
-    /**
-     * Keystroke for navigating forward in selection history: CTRL+ALT+RIGHT
-     */
-    public static final KeyStroke navigateForwardKeyStroke =
-        KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT,
-            java.awt.event.InputEvent.CTRL_DOWN_MASK | java.awt.event.InputEvent.ALT_DOWN_MASK);
 
     private static final long serialVersionUID = 3732875161168302809L;
 
@@ -108,15 +94,6 @@ public class ProofTreeView extends JPanel implements TabPanel {
      * Stores for each loaded proof the GUI tree model.
      */
     private final WeakHashMap<Proof, GUIProofTreeModel> models = new WeakHashMap<>(20);
-
-    /**
-     * Stores for each loaded proof the navigation history (i.e. the selected proof nodes).
-     */
-    private final WeakHashMap<Proof, Deque<Node>> navigationHistory = new WeakHashMap<>();
-    /**
-     * Stores for each loaded proof the nodes navigated away from.
-     */
-    private final WeakHashMap<Proof, Deque<Node>> navigationForward = new WeakHashMap<>();
 
     /**
      * The (currently selected) proof this view shows.
@@ -420,8 +397,6 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 delegateModel = new GUIProofTreeModel(p);
                 models.put(p, delegateModel);
             }
-            navigationHistory.computeIfAbsent(proof, _x -> new ArrayDeque<>());
-            navigationForward.computeIfAbsent(proof, _x -> new ArrayDeque<>());
             delegateModel.addTreeModelListener(proofTreeSearchPanel);
             delegateModel.register();
             delegateView.setModel(delegateModel);
@@ -449,7 +424,6 @@ public class ProofTreeView extends JPanel implements TabPanel {
     public void removeProofs(Proof[] ps) {
         for (final Proof p : ps) {
             models.remove(p);
-            navigationHistory.remove(p);
             mediator.getCurrentlyOpenedProofs().removeElement(p);
         }
     }
@@ -610,60 +584,6 @@ public class ProofTreeView extends JPanel implements TabPanel {
         return this;
     }
 
-    @Nonnull
-    @Override
-    public Collection<CAction> getTitleCActions() {
-        CButton btn = new CButton("Go back", IconFactory.PREVIOUS.get());
-        btn.setAccelerator(navigateBackKeyStroke);
-        btn.setAcceleratorIsGlobal(true);
-        btn.setTooltip("Go back");
-        btn.addActionListener(e -> navigateToLastSelection());
-
-        CButton btn2 = new CButton("Go forward", IconFactory.NEXT.get());
-        btn2.setAccelerator(navigateForwardKeyStroke);
-        btn2.setAcceleratorIsGlobal(true);
-        btn2.setTooltip("Go forward");
-        btn2.addActionListener(e -> navigateToNextSelection());
-
-        return List.of(btn, btn2);
-    }
-
-    private void navigateToLastSelection() {
-        Deque<Node> selectionHistory = navigationHistory.get(proof);
-        if (selectionHistory != null && selectionHistory.size() > 1) {
-            // remove current selection
-            Node currentSelection = selectionHistory.removeLast();
-            // navigate to previous selection
-            Node previous = selectionHistory.peekLast();
-            // edge case: node may have been pruned away
-            while (previous != null && !proof.find(previous)) {
-                selectionHistory.removeLast();
-                previous = selectionHistory.peekLast();
-            }
-            if (previous != null) {
-                mediator.getSelectionModel().setSelectedNode(previous);
-                navigationForward.get(proof).addLast(currentSelection);
-            }
-        }
-    }
-
-    private void navigateToNextSelection() {
-        Deque<Node> selectionHistory = navigationForward.get(proof);
-        if (selectionHistory != null && !selectionHistory.isEmpty()) {
-            // navigate to the next selection stored in the history
-            Node previous = selectionHistory.removeLast();
-            // edge case: node may have been pruned away
-            while (previous != null && !proof.find(previous)) {
-                previous = selectionHistory.removeLast();
-            }
-            if (previous != null) {
-                // add to history here to ensure the forward history isn't cleared
-                navigationHistory.get(proof).addLast(previous);
-                mediator.getSelectionModel().setSelectedNode(previous);
-            }
-        }
-    }
-
     public GUIProofTreeModel getDelegateModel() {
         return delegateModel;
     }
@@ -736,11 +656,6 @@ public class ProofTreeView extends JPanel implements TabPanel {
         public void selectedNodeChanged(KeYSelectionEvent e) {
             if (!ignoreNodeSelectionChange) {
                 makeSelectedNodeVisible(mediator.getSelectedNode());
-            }
-            Deque<Node> history = navigationHistory.get(proof);
-            if (history != null && history.peekLast() != e.getSource().getSelectedNode()) {
-                history.add(e.getSource().getSelectedNode());
-                navigationForward.get(proof).clear();
             }
         }
 
