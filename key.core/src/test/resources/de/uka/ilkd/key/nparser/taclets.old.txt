@@ -1,5 +1,5 @@
 # This files contains representation of taclets, which are accepted and revised.
-# Date: Mon Jan 23 13:04:53 CET 2023
+# Date: Tue Jan 24 15:11:22 CET 2023
 
 == abortJavaCardTransactionAPI (abortJavaCardTransactionAPI) =========================================
 abortJavaCardTransactionAPI {
@@ -6234,8 +6234,8 @@ Choices: programRules:Java}
 -----------------------------------------------------
 == equality_comparison_new (equality comparison) =========================================
 equality_comparison_new {
-\find(#allmodal ( (modal operator))\[{ .. #lhs=#se0==#se1; ... }\] (post))
-\replacewith(if-then-else(not(equals(#se0,#se1)),#allmodal ( (modal operator))\[{ .. #lhs=false; ... }\] (post),#allmodal ( (modal operator))\[{ .. #lhs=true; ... }\] (post))) 
+\find(#allmodal ( (modal operator))\[{ .. #lhs=#senf0==#senf1; ... }\] (post))
+\replacewith(if-then-else(not(equals(#senf0,#senf1)),#allmodal ( (modal operator))\[{ .. #lhs=false; ... }\] (post),#allmodal ( (modal operator))\[{ .. #lhs=true; ... }\] (post))) 
 \heuristics(split_if, simplify_prog, obsolete)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -8056,8 +8056,8 @@ Choices: true}
 -----------------------------------------------------
 == greater_equal_than_comparison_new (greater-or-equal than distinction) =========================================
 greater_equal_than_comparison_new {
-\find(#allmodal ( (modal operator))\[{ .. #lhs=#se0>=#se1; ... }\] (post))
-\replacewith(if-then-else(geq(#se0,#se1),#allmodal ( (modal operator))\[{ .. #lhs=true; ... }\] (post),#allmodal ( (modal operator))\[{ .. #lhs=false; ... }\] (post))) 
+\find(#allmodal ( (modal operator))\[{ .. #lhs=#senf0>=#senf1; ... }\] (post))
+\replacewith(if-then-else(geq(#senf0,#senf1),#allmodal ( (modal operator))\[{ .. #lhs=true; ... }\] (post),#allmodal ( (modal operator))\[{ .. #lhs=false; ... }\] (post))) 
 \heuristics(split_if, simplify_prog, obsolete)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -8091,8 +8091,8 @@ Choices: true}
 -----------------------------------------------------
 == greater_than_comparison_new (greater than distinction) =========================================
 greater_than_comparison_new {
-\find(#allmodal ( (modal operator))\[{ .. #lhs=#se0>#se1; ... }\] (post))
-\replacewith(if-then-else(gt(#se0,#se1),#allmodal ( (modal operator))\[{ .. #lhs=true; ... }\] (post),#allmodal ( (modal operator))\[{ .. #lhs=false; ... }\] (post))) 
+\find(#allmodal ( (modal operator))\[{ .. #lhs=#senf0>#senf1; ... }\] (post))
+\replacewith(if-then-else(gt(#senf0,#senf1),#allmodal ( (modal operator))\[{ .. #lhs=true; ... }\] (post),#allmodal ( (modal operator))\[{ .. #lhs=false; ... }\] (post))) 
 \heuristics(split_if, simplify_prog, obsolete)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -9474,8 +9474,8 @@ Choices: true}
 -----------------------------------------------------
 == inequality_comparison_new (inequality comparison) =========================================
 inequality_comparison_new {
-\find(#allmodal ( (modal operator))\[{ .. #lhs=#se0!=#se1; ... }\] (post))
-\replacewith(if-then-else(not(equals(#se0,#se1)),#allmodal ( (modal operator))\[{ .. #lhs=true; ... }\] (post),#allmodal ( (modal operator))\[{ .. #lhs=false; ... }\] (post))) 
+\find(#allmodal ( (modal operator))\[{ .. #lhs=#senf0!=#senf1; ... }\] (post))
+\replacewith(if-then-else(not(equals(#senf0,#senf1)),#allmodal ( (modal operator))\[{ .. #lhs=true; ... }\] (post),#allmodal ( (modal operator))\[{ .. #lhs=false; ... }\] (post))) 
 \heuristics(split_if, simplify_prog, obsolete)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -10446,8 +10446,8 @@ Choices: true}
 -----------------------------------------------------
 == less_equal_than_comparison_new (less-or-equal than distinction) =========================================
 less_equal_than_comparison_new {
-\find(#allmodal ( (modal operator))\[{ .. #lhs=#se0<=#se1; ... }\] (post))
-\replacewith(if-then-else(leq(#se0,#se1),#allmodal ( (modal operator))\[{ .. #lhs=true; ... }\] (post),#allmodal ( (modal operator))\[{ .. #lhs=false; ... }\] (post))) 
+\find(#allmodal ( (modal operator))\[{ .. #lhs=#senf0<=#senf1; ... }\] (post))
+\replacewith(if-then-else(leq(#senf0,#senf1),#allmodal ( (modal operator))\[{ .. #lhs=true; ... }\] (post),#allmodal ( (modal operator))\[{ .. #lhs=false; ... }\] (post))) 
 \heuristics(split_if, simplify_prog, obsolete)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -10538,8 +10538,8 @@ Choices: true}
 -----------------------------------------------------
 == less_than_comparison_new (lesser than distinction) =========================================
 less_than_comparison_new {
-\find(#allmodal ( (modal operator))\[{ .. #lhs=#se0<#se1; ... }\] (post))
-\replacewith(if-then-else(lt(#se0,#se1),#allmodal ( (modal operator))\[{ .. #lhs=true; ... }\] (post),#allmodal ( (modal operator))\[{ .. #lhs=false; ... }\] (post))) 
+\find(#allmodal ( (modal operator))\[{ .. #lhs=#senf0<#senf1; ... }\] (post))
+\replacewith(if-then-else(lt(#senf0,#senf1),#allmodal ( (modal operator))\[{ .. #lhs=true; ... }\] (post),#allmodal ( (modal operator))\[{ .. #lhs=false; ... }\] (post))) 
 \heuristics(split_if, simplify_prog, obsolete)
 Choices: programRules:Java}
 -----------------------------------------------------
