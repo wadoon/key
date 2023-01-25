@@ -42,7 +42,7 @@ public class ImmutableTrie {
       @ requires tokens != null && element != null;
       @ requires (\forall int i; 0 <= i && i < tokens.length; 0 <= tokens[i] && tokens[i] < 16);
       @ ensures path[0] == root && (\forall int i; 0 <= i && i < idx; path[i].traverseEdge(tokens[i]) == path[i+1]);
-      @ assignable \nothing;
+      @ assignable path, idx;
       @*/
     public boolean contains(Object element, int[] tokens) {
         //@ set path = new TrieNode[tokens.length+1];
@@ -69,6 +69,31 @@ public class ImmutableTrie {
             return false;
         }
         return current.containsElement(element);
+    }
+
+    /*@ public normal_behaviour
+      @ requires (\forall int n; 0 <= n && n < tokens.length; 0 <= tokens[n] && tokens[n] < 16);
+      @ ensures true;
+      @ assignable \nothing;
+      @*/
+    public TrieNode[] getPath(int[] tokens) {
+        TrieNode[] path = new TrieNode[tokens.length+1];
+        path[0] = root;
+        int i = 0;
+        /*@ loop_invariant 0 <= i && i <= tokens.length;
+          @ loop_invariant (\forall int k; 0 <= k && k < i; path[k+1] == path[k].traverseEdge(tokens[k]));
+          @ loop_invariant (\forall int k; 0 <= k && k <= i; path[k] != null);
+          @ decreases tokens.length - i;
+          @ assignable path[*];
+          @*/
+        while (i < tokens.length) {
+            path[i+1] = path[i].traverseEdge(tokens[i]);
+            if (path[i+1] == null) {
+                return path;
+            }
+            i++;
+        }
+        return path;
     }
 
     // add-operation
