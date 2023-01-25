@@ -2,12 +2,22 @@ package org.key_project.util.collection;
 
 public class TrieNode {
     // public static final int ALPHABET_SIZE = 16;
-    private TrieNode[] children = new TrieNode[16];
-    private Object[] elements = new Object[0];
+    private TrieNode[] children;
+    private Object[] elements;
 
-    /*@ public invariant children != null && children.length == 16;
-      @ public invariant elements != null;
+    /*@ public invariant children.length == 16;
+      @ public invariant !(\exists int i, j; 0 <= i && i < j && j < elements.length; elements[i] == elements[j]);
       @*/
+
+    /*@ public normal_behaviour
+      @ ensures children.length == 16;
+      @ ensures elements.length == 0;
+      @ assignable this.children, this.elements;
+      @*/
+    public TrieNode() {
+        this.children = new TrieNode[16];
+        this.elements = new Object[0];
+    }
 
     /*@ public normal_behaviour
       @ requires 0 <= token && token < 16;
