@@ -58,66 +58,133 @@ public class TrieNode {
     }
 
     /*@ public normal_behaviour
-      @ requires obj != null;
-      @ ensures (\exists int n; 0 <= n && n < elements.length; elements[n] == obj) ==> \result == true;
-      @ ensures (\forall int n; 0 <= n && n < elements.length; elements[n] != obj) ==> \result == false;
-      @ assignable \nothing;
+      @ ensures \result == (\exists int n; 0 <= n && n < elements.length; elements[n] == obj);
+      @ assignable \strictly_nothing;
       @*/
     public boolean containsElement(Object obj) {
-        boolean isFound = false;
         /*@ loop_invariant 0 <= i && i <= elements.length;
-          @ loop_invariant (\exists int k; 0 <= k && k < i; elements[k] == obj) ==> isFound == true;
-          @ loop_invariant (\forall int k; 0 <= k && k < i; elements[k] != obj) ==> isFound == false;
+          @ loop_invariant (\forall int k; 0 <= k && k < i; elements[k] != obj);
           @ decreases elements.length - i;
-          @ assignable isFound;
+          @ assignable \strictly_nothing;
           @*/
         for (int i = 0; i < elements.length; i++) {
             if (elements[i] == obj) {
-                isFound = true;
+                return true;
             }
         }
-        return isFound;
+        return false;
     }
 
     /*@ public normal_behaviour
-      @ requires element != null;
+      @ requires (\exists int n; 0 <= n && n < elements.length; elements[n] == obj);
+      @ ensures \result == false;
+      @ assignable \nothing;
+      @
+      @ also
+      @
+      @ public normal_behaviour
+      @ requires !(\exists int n; 0 <= n && n < elements.length; elements[n] == obj);
       @ ensures elements.length == \old(elements).length + 1;
       @ ensures (\forall int i; 0 <= i && i < \old(elements).length; \old(elements)[i] == elements[i]);
-      @ ensures elements[\old(elements).length] == element;
+      @ ensures elements[elements.length - 1] == obj;
+      @ ensures \result == true;
       @ assignable elements;
       @*/
-    public void insertElement(Object element) {
-        Object[] newElements = new Object[elements.length+1];
-        /*@ loop_invariant 0 <= i && i <= elements.length;
-          @ loop_invariant (\forall int k; 0 <= k && k < i; newElements[k] == elements[k]);
-          @ decreases elements.length - i;
-          @ assignable newElements[*];
-          @*/
-        for (int i = 0; i < elements.length; i++) {
-            newElements[i] = elements[i];
+    public boolean insertElement(Object obj) {
+        if (containsElement(obj)) {
+            return false;
+        } else {
+            Object[] newElements = new Object[elements.length+1];
+            /*@ loop_invariant 0 <= i && i <= elements.length;
+              @ loop_invariant (\forall int k; 0 <= k && k < i; newElements[k] == elements[k]);
+              @ decreases elements.length - i;
+              @ assignable newElements[*];
+              @*/
+            for (int i = 0; i < elements.length; i++) {
+                newElements[i] = elements[i];
+            }
+            newElements[elements.length] = obj;
+            elements = newElements;
+            return true;
         }
-        newElements[elements.length] = element;
+    }
+
+    /*@ public normal_behaviour
+      @ requires (\exists int n; 0 <= n && n < elements.length; elements[n] == obj);
+      @ ensures elements.length == \old(elements).length - 1;
+      @ ensures !(\exists int n; 0 <= n && n < elements.length; elements[n] == obj);
+      @ ensures (\forall int n; 0 <= n && n < \old(getIndex(obj)); elements[n] == \old(elements)[n]);
+      @ ensures (\forall int n; \old(getIndex(obj)) <= n && n < elements.length; elements[n] == \old(elements)[n + 1]);
+      @ ensures \result == true;
+      @ assignable elements;
+      @
+      @ also
+      @
+      @ public normal_behaviour
+      @ requires !(\exists int n; 0 <= n && n < elements.length; elements[n] == obj);
+      @ ensures \result == false;
+      @ assignable \nothing;
+      @*/
+    public boolean removeElement(Object obj) {
+        int index = getIndex(obj);
+        if (index != -1) {
+            removeElement(index);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /*@ public normal_behaviour
+      @ requires 0 <= index && index < elements.length;
+      @ ensures elements.length == \old(elements).length - 1;
+      @ ensures (\forall int n; 0 <= n && n < index; elements[n] == \old(elements)[n]);
+      @ ensures (\forall int n; index <= n && n < elements.length; elements[n] == \old(elements)[n + 1]);
+      @ ensures !(\exists int n; 0 <= n && n < elements.length; elements[n] == \old(elements)[index]);
+      @ assignable elements;
+      @*/
+    private void removeElement(int index) {
+        Object[] newElements = new Object[elements.length-1];
+        int i = 0;
+        /*@ loop_invariant 0 <= i && i <= index;
+          @ loop_invariant (\forall int k; 0 <= k && k < i; newElements[k] == elements[k]);
+          @ decreases index - i;
+          @ assignable newElements[0 .. index-1];
+          @*/
+        while (i < index) {
+            newElements[i] = elements[i];
+            i++;
+        }
+        /*@ loop_invariant index <= i && i <= newElements.length;
+          @ loop_invariant (\forall int k; index <= k && k < i; newElements[k] == elements[k + 1]);
+          @ decreases newElements.length - i;
+          @ assignable newElements[index .. newElements.length-1];
+          @*/
+        while (i < newElements.length) {
+            newElements[i] = elements[i + 1];
+            i++;
+        }
         elements = newElements;
     }
 
-    public void removeElement(Object element) {
-        if (elements.length == 0) {
-            return;
+    /*@ public normal_behaviour
+      @ ensures \result == -1 ==> !(\exists int n; 0 <= n && n < elements.length; elements[n] == obj);
+      @ ensures \result != -1 ==> elements[\result] == obj && 0 <= \result && \result < elements.length
+      @             && (\forall int i; 0 <= i && i < elements.length && i != \result; elements[i] != obj);
+      @ assignable \strictly_nothing;
+      @*/
+    private int getIndex(Object obj) {
+        /*@ loop_invariant 0 <= i && i <= elements.length;
+          @ loop_invariant (\forall int k; 0 <= k && k < i; elements[k] != obj);
+          @ decreases elements.length - i;
+          @ assignable \strictly_nothing;
+          @*/
+        for (int i = 0; i < elements.length; i++) {
+            if (elements[i] == obj) {
+                return i;
+            }
         }
-        boolean isFound = false;
-        Object[] newElements = new Object[elements.length-1];
-        for (int i = 0; i < newElements.length; i++) {
-            if (elements[i] != element && !isFound) {
-                newElements[i] = elements[i];
-            }
-            if (elements == element && !isFound) {
-                isFound = true;
-            }
-            if (isFound) {
-                newElements[i] = elements[i+1];
-            }
-        }
-        elements = newElements;
+        return -1;
     }
 
 }
