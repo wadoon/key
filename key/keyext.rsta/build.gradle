@@ -28,13 +28,46 @@ generateGrammarSource {
     arguments += ["-visitor", "-long-messages"]
 }
 
+def antlr4OutputKey = "$buildDir/generated-src/antlr4/main/testgrammar"
+task runAntlr4Subproject(type:JavaExec) {
+    //see incremental task api, prevents rerun if nothing has changed.
+    inputs.files "src/main/java/antlr/Testlexer.g4"
+    outputs.dir antlr4OutputKey
+    classpath = configurations.antlr4
+    main = "org.antlr.v4.Tool"
+    args = ["-visitor",
+            "-Xexact-output-dir", "-o", antlr4OutputKey,
+            "-package", "testlexer",
+            "src/main/java/antlr/Testlexer.g4"]
+    doFirst {
+        file(antlr4OutputKey).mkdirs()
+    }
+}
+task runAntlr4Subproject2(type:JavaExec) {
+    //see incremental task api, prevents rerun if nothing has changed.
+    inputs.files "src/main/java/antlr/Testlexer_Inner.g4"
+    outputs.dir antlr4OutputKey
+    classpath = configurations.antlr4
+    main = "org.antlr.v4.Tool"
+    args = ["-visitor",
+            "-Xexact-output-dir", "-o", antlr4OutputKey,
+            "-package", "testlexer",
+            "src/main/java/antlr/Testlexer_Inner.g4"]
+    doFirst {
+        file(antlr4OutputKey).mkdirs()
+    }
+}
+
+compileJava.dependsOn(runAntlr4Subproject)
+compileJava.dependsOn(runAntlr4Subproject2)
+
 def javaCCOutputDir = file("${buildDir}/generated-src/javacc")
 def javaCCOutputDirMain = file("$javaCCOutputDir/main")
 
 sourceSets.main.java.srcDirs(javaCCOutputDirMain, "$projectDir/build/generated-src/antlr4/main/")
 
 compileJavacc {
-    inputDirectory = file('src/main/resources/javacc')
+    inputDirectory = file('src/main/java/javacc')
     outputDirectory = javaCCOutputDirMain
 }
 

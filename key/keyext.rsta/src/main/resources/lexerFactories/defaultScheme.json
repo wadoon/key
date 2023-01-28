@@ -7,7 +7,7 @@
       "b": 255
     },
     "contained_tokens": [
-      "IDENT"
+      "IDENT", "INNER_TE"
     ]
   },
 
@@ -18,21 +18,21 @@
       "b": 255
     },
     "contained_tokens": [
-      "AND", "OR", "NOT", "IMP", "EQUALS", "NOT_EQUALS", "EQV"
+      "AND", "OR", "NOT", "IMP", "EQUALS", "NOT_EQUALS", "EQV", "TEST"
     ]
   },
 
   "category_math_operator": {
     "color": {
       "r": 255,
-      "g": 255,
+      "g": 125,
       "b": 0
     },
     "font": {
       "style": 1
     },
     "contained_tokens": [
-      "EXP", "TILDE", "PLUS", "MINUS", "PERCENT", "STAR", "GREATER", "GREATEREQUAL"
+      "EXP", "TILDE", "PLUS", "MINUS", "PERCENT", "STAR", "GREATER", "GREATEREQUAL", "COMMENT"
     ]
   },
 
@@ -63,19 +63,19 @@
     },
     "contained_tokens": [
       "SORTS", "GENERIC", "PROXY", "EXTENDS", "ONEOF", "ABSTRACT", "SCHEMAVARIABLES", "SCHEMAVAR",
-      "MODALOPERATOR"
+      "MODALOPERATOR", "INNER_ST", "CONTENT"
     ]
   },
 
   "category_java_keyword": {
     "color": {
       "r": 255,
-      "g": 170,
+      "g": 0,
       "b": 0
     },
     "contained_tokens": [
       "BOOLEAN", "BYTE", "FALSE", "INSTANCEOF", "INT", "LONG", "NEW", "NULL", "SHORT", "SUPER", "THIS",
-      "TRUE", "VOID"
+      "TRUE", "VOID", "HUI", "ERROR", "IN_COMMENT"
     ]
   },
 

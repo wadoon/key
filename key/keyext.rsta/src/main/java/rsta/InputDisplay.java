@@ -10,6 +10,7 @@ import org.fife.ui.rsyntaxtextarea.SyntaxScheme;
 import org.fife.ui.rtextarea.RTextScrollPane;
 
 import javax.annotation.Nullable;
+import javax.swing.*;
 import java.awt.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
@@ -79,12 +80,12 @@ public class InputDisplay {
                     delegationMap);
         }
         Class<?> lexerClass = lexerClasses.get(0);
-        LanguageSupportFactory factory;
+        LanguageSupportFactory factory = null;
         if (antlrLexerClass.isAssignableFrom(lexerClass)) {
             factory = createANTLRSupport((Class<Lexer>) lexerClass);
-        } else {
+        } else if (lexerFacade.Lexer.class.isAssignableFrom(lexerClass)){
             try {
-                factory = createJavaCCSupport(lexerClass);
+                factory = createJavaCCSupport((Class<lexerFacade.Lexer>) lexerClass);
             } catch (IllegalArgumentException e) {
                 return null;
             }
@@ -92,7 +93,7 @@ public class InputDisplay {
         return factory;
     }
 
-    private static @Nullable LanguageSupportFactory createJavaCCSupport(Class<?> tokenMgrClass) {
+    private static @Nullable LanguageSupportFactory createJavaCCSupport(Class<? extends lexerFacade.Lexer> tokenMgrClass) {
         return new JavaCCLanguageSupportFactory(tokenMgrClass);
     }
 

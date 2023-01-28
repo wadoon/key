@@ -1,0 +1,104 @@
+options {
+  LOOKAHEAD = 1;
+  CHOICE_AMBIGUITY_CHECK = 2;
+  OTHER_AMBIGUITY_CHECK = 1;
+  STATIC = false;
+  DEBUG_PARSER = false;
+  DEBUG_LOOKAHEAD = false;
+  DEBUG_TOKEN_MANAGER = false;
+  ERROR_REPORTING = true;
+  JAVA_UNICODE_ESCAPE = false;
+  UNICODE_INPUT = false;
+  IGNORE_CASE = false;
+  USER_TOKEN_MANAGER = false;
+  USER_CHAR_STREAM = false;
+  BUILD_PARSER = true;
+  BUILD_TOKEN_MANAGER = true;
+  SANITY_CHECK = true;
+  FORCE_LA_CHECK = false;
+}
+
+PARSER_BEGIN(TestCC)
+
+package javacc;
+
+import lexerFacade.Lexer;
+import lexerFacade.TokenFacade;
+import org.antlr.v4.runtime.misc.IntegerStack;
+
+public class TestCC implements Lexer {
+
+    @Override
+    public boolean finished() {
+          try {
+              token_source.input_stream.readChar();
+              token_source.input_stream.backup(1);
+              return false;
+          }
+          catch (java.io.IOException e1) {
+              return true;
+          }
+    }
+
+    @Override
+    public int getMode() {
+        return token_source.curLexState;
+    }
+
+    @Override
+    public void setMode(int mode) {
+        token_source.SwitchTo(mode);
+    }
+
+    @Override
+    public void pushMode(int mode) {
+        token_source.getStateSet()[token_source.jjnewStateCnt++] = mode;
+        setMode(mode);
+    }
+
+    @Override
+    public int popMode() {
+        int poppedMode = token_source.getStateSet()[token_source.jjnewStateCnt--];
+        token_source.SwitchTo(token_source.getStateSet()[token_source.jjnewStateCnt]);
+        return poppedMode;
+    }
+
+    @Override
+    public IntegerStack getModeStack() {
+        IntegerStack stack = new IntegerStack();
+        for (int i = 0; i < token_source.jjnewStateCnt; i++) {
+            stack.push(token_source.getStateSet()[i]);
+        }
+        return stack;
+    }
+
+    @Override
+    public TokenFacade nextToken() {
+        Token token = token_source.getNextToken();
+        // TODO alternatives
+        return new TokenFacade(token.kind, jj_input_stream.getPos(token.beginLine, token.beginColumn), token.image);
+    }
+
+}
+
+PARSER_END(TestCC)
+
+TOKEN_MGR_DECLS : {
+    public int[] getStateSet() {
+        return jjstateSet;
+    }
+}
+
+TOKEN :
+{
+  < OPEN_COMMENT : "/*" > : IN_COMMENT
+  | < UNKNOWN : ~[] >
+}
+
+<IN_COMMENT>
+TOKEN :
+{
+    < CONTENT : "hui" >
+    | < CLOSE_COMMENT : "*/"> : DEFAULT
+    | < ANY: ~[] >
+}
