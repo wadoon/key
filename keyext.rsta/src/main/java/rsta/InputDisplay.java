@@ -81,9 +81,9 @@ public class InputDisplay {
         }
         Class<?> lexerClass = lexerClasses.get(0);
         LanguageSupportFactory factory = null;
-        if (antlrLexerClass.isAssignableFrom(lexerClass)) {
+        if (lexerClass != null && antlrLexerClass.isAssignableFrom(lexerClass)) {
             factory = createANTLRSupport((Class<Lexer>) lexerClass);
-        } else if (lexerFacade.Lexer.class.isAssignableFrom(lexerClass)){
+        } else if (lexerClass != null && lexerFacade.Lexer.class.isAssignableFrom(lexerClass)){
             try {
                 factory = createJavaCCSupport((Class<lexerFacade.Lexer>) lexerClass);
             } catch (IllegalArgumentException e) {
