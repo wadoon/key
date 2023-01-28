@@ -31,6 +31,8 @@ public class ANTLRLanguageSupportFactory implements LanguageSupportFactory {
 
     private Map<Integer, String> tokenTypeMap;
 
+    private Map<Integer, String> modeMap;
+
     public ANTLRLanguageSupportFactory(Class<org.antlr.v4.runtime.Lexer> lexerClass) {
         this.lexerClass = lexerClass;
     }
@@ -60,10 +62,7 @@ public class ANTLRLanguageSupportFactory implements LanguageSupportFactory {
         tokenTypeMap = new HashMap<>();
 
         try {
-            Field f = lexerClass.getDeclaredField("VOCABULARY");
-            f.setAccessible(true);
-
-            Vocabulary vocabulary = (Vocabulary) f.get(makeLexer(lexerClass, ""));
+            Vocabulary vocabulary = makeLexer(lexerClass, "").getVocabulary();
 
             for (int i = 0; i < vocabulary.getMaxTokenType()+1; i++) {
                 tokenTypeMap.put(i, vocabulary.getSymbolicName(i));
@@ -71,8 +70,6 @@ public class ANTLRLanguageSupportFactory implements LanguageSupportFactory {
         } catch (NoSuchMethodException | InvocationTargetException
                  | InstantiationException | IllegalAccessException e) {
             LOGGER.warn(e.getMessage());
-        } catch (NoSuchFieldException e) {
-            throw new RuntimeException(e);
         }
         return tokenTypeMap;
     }
@@ -104,9 +101,24 @@ public class ANTLRLanguageSupportFactory implements LanguageSupportFactory {
     }
 
     @Override
-    public int getEOFTokenType() {
-        // TODO
-        return 0;
+    public Map<Integer, String> allModes() {
+        if (modeMap != null) {
+            return modeMap;
+        }
+
+        modeMap = new HashMap<>();
+
+        try {
+            String[] modes = makeLexer(lexerClass, "").getModeNames();
+
+            for (int i = 0; i < modes.length; i++) {
+                modeMap.put(i, modes[i]);
+            }
+        } catch (NoSuchMethodException | InvocationTargetException
+                 | InstantiationException | IllegalAccessException e) {
+            LOGGER.warn(e.getMessage());
+        }
+        return modeMap;
     }
 
     private static org.antlr.v4.runtime.Lexer makeLexer(

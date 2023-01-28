@@ -23,6 +23,7 @@ public class VariousGrammarsSyntaxSchemeFactory implements LanguageSupportFactor
     private final List<LanguageSupportFactory> lexerFactoryOrder;
     private final MultipleLexersLexer.LexerDelegationMap lexerDelegationMap;
     private Map<Integer, String> allTokenTypeNames = new HashMap<>();
+    private Map<Integer, String> modes = new HashMap<>();
 
     public VariousGrammarsSyntaxSchemeFactory(
             List<LanguageSupportFactory> lexerFactoryOrder,
@@ -32,12 +33,19 @@ public class VariousGrammarsSyntaxSchemeFactory implements LanguageSupportFactor
         this.lexerDelegationMap = lexerDelegationMap;
         for (LanguageSupportFactory factory: lexerFactoryOrder) {
             Map<Integer, String> map = factory.allTokenTypeNames();
+            Map<Integer, String> modeMap = factory.allModes();
             if (map == null) {
                 continue;
             }
             for (Map.Entry<Integer, String> mapping : map.entrySet()) {
                 //TODO AutomaticSyntaxScheme definition has problems if different tokens have the same name here (they will all be treated the same)
                 allTokenTypeNames.put(evaluateTokenType(factory, mapping.getKey()), mapping.getValue());
+            }
+            if (modeMap == null) {
+                continue;
+            }
+            for (Map.Entry<Integer, String> mapping : modeMap.entrySet()) {
+                modes.put(mapping.getKey(), mapping.getValue());
             }
         }
     }
@@ -48,7 +56,7 @@ public class VariousGrammarsSyntaxSchemeFactory implements LanguageSupportFactor
                 .max();
         int maxTokens = maxTokenAmount.isEmpty() ? 0 : maxTokenAmount.getAsInt();
         if (tokenType > maxTokens) {
-            return lexerFactoryOrder.get(0).getEOFTokenType();
+            return -1;
         }
         /*
         Otherwise, evaluate the unique token type.
@@ -59,10 +67,11 @@ public class VariousGrammarsSyntaxSchemeFactory implements LanguageSupportFactor
                 return index*maxTokens+tokenType;
             }
         }
+        // TODO does this break stuff?
         /*
-        If the given factory dies not exist, just return the eof value of the first factory.
+        If the given factory does not exist, just return -1;
          */
-        return lexerFactoryOrder.get(0).getEOFTokenType();
+        return -1;
     }
 
     @Nullable
@@ -102,8 +111,8 @@ public class VariousGrammarsSyntaxSchemeFactory implements LanguageSupportFactor
     }
 
     @Override
-    public int getEOFTokenType() {
-        return lexerFactoryOrder.get(0).getEOFTokenType();
+    public Map<Integer, String> allModes() {
+        return modes;
     }
 
     @Override

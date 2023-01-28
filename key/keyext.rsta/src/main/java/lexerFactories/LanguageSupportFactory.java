@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
 import java.util.Map;
 
 public interface LanguageSupportFactory {
@@ -18,6 +19,5 @@ public interface LanguageSupportFactory {
 
     SyntaxScheme getSyntaxScheme();
 
-    int getEOFTokenType();
-
+    Map<Integer, String> allModes();
 }

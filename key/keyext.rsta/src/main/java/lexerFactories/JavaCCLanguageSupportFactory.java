@@ -1,10 +1,8 @@
 package lexerFactories;
 
-import de.uka.ilkd.key.parser.proofjava.JavaCharStream;
 import javacc.PositionStream;
 import javacc.SimpleCharStream;
 import javacc.Token;
-import lexerFacade.JavaCCLexer;
 import org.fife.ui.rsyntaxtextarea.SyntaxScheme;
 import lexerFacade.Lexer;
 import org.slf4j.Logger;
@@ -14,12 +12,14 @@ import javax.annotation.Nullable;
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -31,63 +31,26 @@ public class JavaCCLanguageSupportFactory implements LanguageSupportFactory {
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(JavaCCLanguageSupportFactory.class);
 
-    private Class<?> tokenMgrClass;
-    private Constructor<?> constructor;
-    private Method nextTokenMethod;
+    private Class<? extends Lexer> parserClass;
 
     private Map<Integer, String> tokenTypeMap;
 
-    public JavaCCLanguageSupportFactory(Class<?> tokenMgrClass) {
-        if (!check(tokenMgrClass)) {
-            String msg = tokenMgrClass.getName() + " is not a JavaCC token maker.";
-            LOGGER.error(msg);
-            throw new IllegalArgumentException(msg);
-        }
-        this.tokenMgrClass = tokenMgrClass;
-    }
-
-    protected PositionStream makeStream(String input) {
-        return new SimpleCharStream(new StringReader(input), 0, 0);
-    }
-
-    /**
-     * By default, an EOF token has the image "<EOF>".
-     *
-     * @return an EOF token for the JavaCC grammar this factory is related to.
-     */
-    protected Token eofToken() {
-        int eofKind = 0;
-        Token eof = Token.newToken(eofKind);
-        eof.image = "<EOF>";
-        eof.beginLine = 0;
-        eof.endLine = 0;
-        eof.beginColumn = 0;
-        eof.endColumn = 0;
-        return eof;
-    }
-
-    /**
-     * TODO make this less scuffed?
-     */
-    private boolean check(Class<?> tokenMgrClass) {
-        try {
-            this.constructor = tokenMgrClass.getDeclaredConstructor(SimpleCharStream.class);
-        } catch (NoSuchMethodException | SecurityException e) {
-            return false;
-        }
-        try {
-            this.nextTokenMethod = tokenMgrClass.getDeclaredMethod("getNextToken");
-        } catch (NoSuchMethodException | SecurityException e) {
-            return false;
-        }
-        return true;
+    public JavaCCLanguageSupportFactory(Class<? extends Lexer> parserClass) {
+        this.parserClass = parserClass;
     }
 
     @Nullable
     @Override
     public Lexer create(String toLex) {
-        PositionStream stream = makeStream(toLex);
-        return new JavaCCLexer(stream, constructor, nextTokenMethod, eofToken());
+        InputStream targetStream = new ByteArrayInputStream(toLex.getBytes(StandardCharsets.UTF_8));
+        try {
+            return parserClass.getConstructor(InputStream.class).newInstance(targetStream);
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            // TODO
+            throw new RuntimeException(e);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -98,14 +61,16 @@ public class JavaCCLanguageSupportFactory implements LanguageSupportFactory {
 
         tokenTypeMap = new HashMap<>();
         Object tokenManager;
+        InputStream targetStream = new ByteArrayInputStream("".getBytes(StandardCharsets.UTF_8));
         try {
-            tokenManager = constructor.newInstance(makeStream(""));
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            tokenManager = parserClass.getConstructor(InputStream.class).newInstance(targetStream);
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                 NoSuchMethodException e) {
             LOGGER.error(e.getMessage());
             return tokenTypeMap;
         }
-        for (Field field: tokenMgrClass.getDeclaredFields()) {
-            if (field.getType().equals(Integer.class)) {
+        for (Field field: parserClass.getFields()) {
+            if (field.getType().equals(int.class)) {
                 try {
                     tokenTypeMap.put((Integer) field.get(tokenManager), field.getName());
                 } catch (Exception e) {
@@ -120,7 +85,7 @@ public class JavaCCLanguageSupportFactory implements LanguageSupportFactory {
     public SyntaxScheme getSyntaxScheme() {
         String fileName = "defaultScheme.json";
 
-        InputStream jsonFile = ANTLRLanguageSupportFactory.class
+        InputStream jsonFile = JavaCCLanguageSupportFactory.class
                 .getResourceAsStream(fileName);
         JsonObject jsonObject = null;
         try {
@@ -142,13 +107,13 @@ public class JavaCCLanguageSupportFactory implements LanguageSupportFactory {
     }
 
     @Override
-    public int getEOFTokenType() {
-        return eofToken().kind;
+    public Map<Integer, String> allModes() {
+        return null;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(tokenMgrClass);
+        return Objects.hashCode(parserClass);
     }
 
     @Override
@@ -170,6 +135,6 @@ public class JavaCCLanguageSupportFactory implements LanguageSupportFactory {
                 return false;
             }
         }
-        return tokenMgrClass.equals(o.tokenMgrClass);
+        return parserClass.equals(o.parserClass);
     }
 }
