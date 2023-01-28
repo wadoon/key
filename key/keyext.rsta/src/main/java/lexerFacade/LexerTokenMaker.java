@@ -14,132 +14,148 @@ import javax.swing.text.Segment;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A {@link org.fife.ui.rsyntaxtextarea.TokenMaker} for implementations of {@link Lexer}
+ * created by a {@link LanguageSupportFactory}.
+ *
+ * @author Alexander Weigl, Alicia Appelhagen
+ */
 public class LexerTokenMaker extends TokenMakerBase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LexerTokenMaker.class);
 
     /**
-     * Improve performance for multiple getTokenList calls with the same input.
+     * Creates {@link Lexer} objects for a given input.
      */
-    private String cachedText;
-    private List<Integer> cachedTypes;
-    private List<Integer> cachedIndices;
-    private List<String> cachedImages;
-
     private LanguageSupportFactory factory;
 
     public LexerTokenMaker(LanguageSupportFactory factory) {
         this.factory = factory;
     }
 
-    @Nullable
-    private static Token toRSTAToken(Segment text, int startOffset,
-                         List<Integer> startIndices, List<Integer> tokenTypes, List<String> tokenTexts) {
-        assert(startIndices.size() == tokenTypes.size() && startIndices.size() == tokenTexts.size());
-        if (startIndices.isEmpty()) {
-            return null;
-        } else {
-            int currentIndex = startIndices.get(0);
-            int currentType = tokenTypes.get(0);
-            if (currentType == TokenTypes.SEPARATOR) {
-                LOGGER.warn(currentType  + " equals the static separator constant, help");
-            }
-            String currentText = tokenTexts.get(0);
-            int currentStopIndex = Math.min(currentIndex + currentText.length(), startOffset + text.count)-1;
-            if (currentStopIndex < startOffset) {
-                return toRSTAToken(text, startOffset,
-                        startIndices.subList(1, startIndices.size()),
-                        tokenTypes.subList(1, tokenTypes.size()),
-                        tokenTexts.subList(1, tokenTexts.size()));
-            }
-            TokenImpl rstaToken = new TokenImpl(text, Math.max(currentIndex, startOffset), currentStopIndex,
-                    currentIndex, currentType, 0);
-            if (currentStopIndex >= startOffset + text.count - 1) {
-                return rstaToken;
-            }
-            rstaToken.setNextToken(toRSTAToken(text, startOffset,
-                    startIndices.subList(1, startIndices.size()),
-                    tokenTypes.subList(1, tokenTypes.size()),
-                    tokenTexts.subList(1, tokenTexts.size())));
-            return rstaToken;
-        }
-    }
-
     @Override
     public Token getTokenList(Segment text, int initialTokenType, int startOffset) {
         if (text == null) {
             throw new IllegalArgumentException();
         }
-        String completeText = new String(text.array);
-        // Lex the complete text to correctly recognize multiline tokens
-        // TODO Optimize this towards real line-by-line lexing
-        Lexer lexer = factory.create(completeText);
-        List<Integer> startIndices = new ArrayList<>();
-        List<Integer> tokenTypes = new ArrayList<>();
-        List<String> tokenTexts = new ArrayList<>();
-        if (text.count == 0 || startOffset != text.offset) {
-            return new TokenImpl(text, text.offset, text.offset,
-                    startOffset, lexer.eofTokenType(), 0);
-        }
-        if (completeText.equals(cachedText)) {
-            return toRSTAToken(text, startOffset, cachedIndices, cachedTypes, cachedImages);
-        }
-        int length = 0;
-        while (!lexer.finished() && length < completeText.length()) {
-            lexer.step();
-            startIndices.add(lexer.lastConsumedTokenStartIndex());
-            tokenTypes.add(lexer.lastConsumedTokenType());
-            tokenTexts.add(lexer.lastConsumedTokenText());
-            length += lexer.lastConsumedTokenText().length();
-        }
-        if (startIndices.isEmpty()) {
-            startIndices.add(0);
-            tokenTypes.add(lexer.eofTokenType());
-            tokenTexts.add("<EOF>");
-        }
-        cachedImages = tokenTexts;
-        cachedIndices = startIndices;
-        cachedTypes = tokenTypes;
-        cachedText = completeText;
-        // Only return the tokens that are actually part of the text segment
-        return toRSTAToken(text, startOffset, startIndices, tokenTypes, tokenTexts);
-    }
+        resetTokenList();
 
-    /*
-    @Override
-    public Token getTokenList(Segment text, int initialTokenType, int startOffset) {
-        if (text == null) {
-            throw new IllegalArgumentException();
+        // Create a lexer for the given text segment.
+        String textSegment = text.toString();
+        Lexer lexer = factory.create(textSegment);
+
+        // initialTokenType contains the mode stack of the lexer
+        int initTokType = initialTokenType;
+        int mode = initTokType & 0xF; // TODO currently assuming exactly 4 bits for lexer mode, change that?
+        lexer.setMode(mode);
+        initTokType = initTokType >> 4;
+        while (initTokType > 0) {
+            mode = initTokType & 0xF;
+            lexer.pushMode(mode);
+            initTokType = initTokType >> 4;
         }
-        if (startRestOfLastLine != null) {
-            text = new Segment(text.array,
-                    startRestOfLastLine,
-                    text.count + text.offset - startRestOfLastLine + 1);
-        }
-        Lexer lexer = factory.create(text.toString());
-        List<Integer> startIndices = new ArrayList<>();
-        List<Integer> tokenTypes = new ArrayList<>();
-        List<String> tokenTexts = new ArrayList<>();
-        int lastUnambiguousOffset = startOffset;
+
+        List<TokenFacade> tokens = new ArrayList<>();
+        List<Integer> modeStack = new ArrayList<>();
+        TokenFacade cur = lexer.nextToken();
+        modeStack.add(lexer.getMode());
+        tokens.add(cur);
+        // TODO
         while (!lexer.finished()) {
-            lexer.saveStatusBeforeHitEOF();
-            lastUnambiguousOffset += lexer.lastConsumedTokenText().length() + 1;
-            lexer.step();
-            startIndices.add(lexer.lastConsumedTokenStartIndex());
-            tokenTypes.add(lexer.lastConsumedTokenType());
-            tokenTexts.add(lexer.lastConsumedTokenText());
+            System.out.format("%25s %-25s%n", cur.text, factory.allTokenTypeNames().get(cur.tokenType));
+            int m = lexer.getMode();
+            cur = lexer.nextToken();
+            modeStack.add(m);
+            tokens.add(cur);
         }
-        if (lexer.finished()) {
-            // end of line was reached, so we save the rest of the text consumed before hitting EOF
-            // in order to start the next line with that rest
-            startRestOfLastLine = lastUnambiguousOffset;
+
+        /*if (cur.tokenType == lexer.eofTokenType() && cur.stopIndex - cur.startIndex > 0) {
+            // TODO what exactly is happening here
+            changeType(lexer, cur);
+            if (cur.tokenType != org.antlr.v4.runtime.Token.EOF) {
+                modeStack.add(lexer.getMode());
+                tokens.add(cur);
+            }
+        }*/
+
+        if (tokens.size() == 0) {
+            // If the lexer did not lex anything, just pack the whole text into one token.
+            currentToken = new TokenImpl(text,
+                    text.offset,
+                    text.offset,
+                    startOffset, 0, 0);
+
+            TokenImpl modeToken = new TokenImpl() {
+                @Override
+                public boolean isPaintable() {
+                    return false;
+                }
+            };
+            modeToken.text = null;
+            modeToken.setOffset(-1);
+            modeToken.setNextToken(null);
+            // mode stack hasn't changed
+            modeToken.setType(initialTokenType);
+            currentToken.setNextToken(modeToken);
+            return currentToken;
+        } else {
+            mode = 0;
+            // skip last artificial '\n' token
+            // TODO ?
+            for (int i = 0; i < tokens.size(); i++) {
+                TokenFacade token = tokens.get(i);
+                mode = modeStack.get(i);
+                int newType = rewriteTokenType(token.tokenType);
+                int start = token.startIndex;
+                TokenImpl newToken = new TokenImpl(text,
+                        text.offset + start,
+                        text.offset + start + token.text.length() - 1,
+                        startOffset + start, newType, 0);
+                // TODO ?
+                newToken.setLanguageIndex(mode);
+                if (firstToken == null) {
+                    firstToken = newToken;
+                } else {
+                    assert (currentToken != null);
+                    currentToken.setNextToken(newToken);
+                }
+                currentToken = newToken;
+            }
+
+            // encode current mode stack in token type
+            // TODO only 32 bits for the mode stack (aka 8 modes in this encoding?)
+            int modeTokenType = 0xF & simulateNewLine(lexer);
+            while (lexer.getModeStack().size() > 0) {
+                modeTokenType = (modeTokenType << 4) | (0xF & lexer.popMode());
+            }
+
+            TokenImpl modeToken = new TokenImpl() {
+                @Override
+                public boolean isPaintable() {
+                    return false;
+                }
+            };
+            modeToken.text = null;
+            modeToken.setOffset(-1);
+            modeToken.setNextToken(null);
+            modeToken.setType(modeTokenType);
+            currentToken.setNextToken(modeToken);
         }
-        if (startIndices.isEmpty()) {
-            startIndices.add(0);
-            tokenTypes.add(lexer.eofTokenType());
-            tokenTexts.add("");
-        }
-        return toRSTAToken(text, startOffset, startIndices, tokenTypes, tokenTexts);
+        return firstToken;
     }
-    */
+
+    // TODO use types that are not static variables in TokenTypes here
+    protected int rewriteTokenType(int tokenType) {
+        return tokenType;
+    }
+
+    // TODO ?
+    protected void changeType(Lexer lexer, TokenFacade cur) {
+    }
+
+    // TODO ?
+    protected int simulateNewLine(Lexer lexer) {
+        return lexer.getMode();
+    }
+
 }

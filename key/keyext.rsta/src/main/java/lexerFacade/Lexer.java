@@ -1,27 +1,31 @@
 package lexerFacade;
 
+import org.antlr.v4.runtime.misc.IntegerStack;
+
 /**
  * A unified lexer interface used for {@link LexerTokenMaker}.
  */
 public interface Lexer {
 
     /**
-     * Consume the next token.
-     * Should impact nextTokenText, nextStartIndex and nextTokenType accordingly.
-     */
-    void step();
-
-    /**
      * @return true iff the lexer reached some kind of EOF
      */
     boolean finished();
 
-    String lastConsumedTokenText();
+    int getMode();
 
-    Integer lastConsumedTokenStartIndex();
+    void setMode(int mode);
 
-    Integer lastConsumedTokenType();
+    void pushMode(int mode);
 
-    Integer eofTokenType();
+    int popMode();
+
+    IntegerStack getModeStack();
+
+    /**
+     * Consume the next token and hide it behind a TokenFacade object.
+     * @return
+     */
+    TokenFacade nextToken();
 
 }
