@@ -66,7 +66,10 @@ public class DepFileSaver {
      */
     private void writeDependencies(PrintWriter ps) {
         for (FileDependencyInformation fdi : di.getFileDependencyInfos()) {
-            ps.println(fdi.getFilePath() + " {");
+            ps.print('"');
+            ps.print(fdi.getFilePath());
+            ps.print('"');
+            ps.println(" {");
             for (Contract c : fdi.getContracts()) {
                 ps.print('\t');
                 writeContract(c, ps);
@@ -89,10 +92,13 @@ public class DepFileSaver {
      * @param ps The writer to write to
      */
     private void writeContract(Contract c, PrintWriter ps) {
+        ps.print('"');
         ps.print(c.getName());
+        ps.print('"');
         ps.print('|');
         ps.print(services.getContractDependencyRepository().getSpecificationHash(c));
         if (c instanceof FunctionalOperationContract) {
+            ps.print('|');
             ps.print(services.getContractDependencyRepository().getImplementationHash(c));
         }
     }

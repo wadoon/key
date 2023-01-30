@@ -64,31 +64,40 @@ public class DepFileTokenizer implements Iterator<DepFileTokenizer.Token> {
                 tt = TokenType.VERT_DASH;
                 break;
             }
-            case '/': {
-                // File path
+            case '"': {
                 Pos start = pos;
                 int startIdx = idx;
+                eat();
+                c = getCurrent();
+                if (c == '/') {
+                    // File path
 
-                eatUntilEndOfFilepath();
+                    eatUntilNextQuote();
 
-                String spelling = input.substring(startIdx, idx).trim();
-                return new Token(TokenType.FILE_PATH, spelling, start);
+                    String spelling = input.substring(startIdx + 1, idx - 1);
+                    return new Token(TokenType.FILE_PATH, spelling, start);
+                }
+                if (Character.isLetterOrDigit(c)) {
+                    // Contract name
+
+                    eatUntilNextQuote();
+
+                    String spelling = input.substring(startIdx + 1, idx - 1);
+                    return new Token(TokenType.CONTRACT_NAME, spelling, start);
+                }
+                break;
             }
             default: {
-                if (c == '-' || Character.isLetterOrDigit(c)) {
-                    // Hash or contract name
-                    Pos start = pos;
-                    int startIdx = idx;
-
-                    eatUntilNonNameOrHash();
-
-                    String spelling = input.substring(startIdx, idx).trim();
-                    try {
-                        Integer.parseInt(spelling);
-                        return new Token(TokenType.NUMBER, spelling, start);
-                    } catch (NumberFormatException e) {
-                        return new Token(TokenType.CONTRACT_NAME, spelling, start);
-                    }
+                // Hash
+                Pos start = pos;
+                int startIdx = idx;
+                eatUntilNonHash();
+                String spelling = input.substring(startIdx, idx).trim();
+                try {
+                    Integer.parseInt(spelling);
+                    return new Token(TokenType.NUMBER, spelling, start);
+                } catch (NumberFormatException e) {
+                    return new Token(TokenType.UNKNOWN, spelling, start);
                 }
             }
         }
@@ -129,10 +138,21 @@ public class DepFileTokenizer implements Iterator<DepFileTokenizer.Token> {
         eat();
     }
 
+    private void eatUntilNextQuote() {
+        while (getCurrent() != '"') {
+            eat();
+            if (getCurrent() == '\\') {
+                eat();
+                eat();
+            }
+        }
+        eat();
+    }
+
     /**
      * Advance to end of hash or contract name
      */
-    private void eatUntilNonNameOrHash() {
+    private void eatUntilNonHash() {
         while (getCurrent() != '|' && getCurrent() != '{' && getCurrent() != '\n') {
             eat();
         }

@@ -191,7 +191,7 @@ public class ContractDependencyRepository {
         if (!deps.containsKey(addTo)) {
             throw new IllegalArgumentException("Contract " + addTo.getName() + " is not registered.");
         }
-        deps.get(addTo).add(toAdd);
+        deps.put(addTo, deps.get(addTo).add(toAdd));
     }
 
     /**
