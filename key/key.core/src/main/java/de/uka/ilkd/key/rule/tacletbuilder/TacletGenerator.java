@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.rule.conditions.MayUseMethodContractCondition;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -444,13 +445,13 @@ public class TacletGenerator {
     }
 
     public ImmutableSet<Taclet> generateContractAxiomTaclets(Name name, Term originalPre,
-            Term originalFreePre, Term originalPost, Term originalFreePost, Term originalMby,
-            KeYJavaType kjt, IObserverFunction target, List<? extends ProgramVariable> heaps,
-            ProgramVariable originalSelfVar, ProgramVariable originalResultVar,
-            Map<LocationVariable, ProgramVariable> atPreVars,
-            ImmutableList<ProgramVariable> originalParamVars,
-            ImmutableSet<Pair<Sort, IObserverFunction>> toLimit, boolean satisfiabilityGuard,
-            TermServices services) {
+                                                             Term originalFreePre, Term originalPost, Term originalFreePost, Term originalMby,
+                                                             KeYJavaType kjt, IObserverFunction target, List<? extends ProgramVariable> heaps,
+                                                             ProgramVariable originalSelfVar, ProgramVariable originalResultVar,
+                                                             Map<LocationVariable, ProgramVariable> atPreVars,
+                                                             ImmutableList<ProgramVariable> originalParamVars,
+                                                             ImmutableSet<Pair<Sort, IObserverFunction>> toLimit, boolean satisfiabilityGuard,
+                                                             String contractName, TermServices services) {
 
         ImmutableList<ProgramVariable> pvs = ImmutableSLList.<ProgramVariable>nil();
         ImmutableList<SchemaVariable> svs = ImmutableSLList.<SchemaVariable>nil();
@@ -562,6 +563,8 @@ public class TacletGenerator {
             }
             // tacletBuilder.addVarsNotFreeIn(boundSV, resultSV);
         }
+
+        tacletBuilder.addVariableCondition(new MayUseMethodContractCondition(contractName));
 
         tacletBuilder.setFind(find);
         tacletBuilder.setApplicationRestriction(RewriteTaclet.SAME_UPDATE_LEVEL);

@@ -222,13 +222,13 @@ public final class ProofCorrectnessMgt {
         if (!rj.isAxiomJustification()) {
             cachedRuleApps.add(r);
         }
-        proof.getServices().getContractDependencyRepository().ruleApplied(proof, rj);
+        proof.getServices().getContractDependencyRepository().ruleApplied(proof, r, rj);
     }
 
 
     public void ruleUnApplied(RuleApp r) {
         cachedRuleApps.remove(r);
-        proof.getServices().getContractDependencyRepository().ruleUnApplied(proof, getJustification(r));
+        proof.getServices().getContractDependencyRepository().ruleUnApplied(proof, r, getJustification(r));
     }
 
 

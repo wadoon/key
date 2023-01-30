@@ -37,16 +37,17 @@ public final class ContractAxiom extends ClassAxiom {
     private final ProgramVariable originalResultVar;
     private final ImmutableList<ProgramVariable> originalParamVars;
     private final Map<LocationVariable, ProgramVariable> atPreVars;
+    private final FunctionalOperationContract contract;
 
-    public ContractAxiom(String name, IObserverFunction target, KeYJavaType kjt,
+    public ContractAxiom(FunctionalOperationContract contract, String name, IObserverFunction target, KeYJavaType kjt,
             VisibilityModifier visibility, Term pre, Term freePre, Term post, Term freePost,
             Term mby, Map<LocationVariable, ProgramVariable> atPreVars, ProgramVariable selfVar,
             ProgramVariable resultVar, ImmutableList<ProgramVariable> paramVars) {
-        this(name, null, target, kjt, visibility, pre, freePre, post, freePost, mby, atPreVars,
+        this(contract, name, null, target, kjt, visibility, pre, freePre, post, freePost, mby, atPreVars,
             selfVar, resultVar, paramVars);
     }
 
-    public ContractAxiom(String name, String displayName, IObserverFunction target, KeYJavaType kjt,
+    public ContractAxiom(FunctionalOperationContract contract, String name, String displayName, IObserverFunction target, KeYJavaType kjt,
             VisibilityModifier visibility, Term originalPre, Term originalFreePre,
             Term originalPost, Term originalFreePost, Term originalMby,
             Map<LocationVariable, ProgramVariable> atPreVars, ProgramVariable selfVar,
@@ -72,11 +73,12 @@ public final class ContractAxiom extends ClassAxiom {
         this.originalParamVars = paramVars;
         this.atPreVars = atPreVars;
         this.displayName = displayName;
+        this.contract = contract;
     }
 
     @Override
     public ContractAxiom map(UnaryOperator<Term> op, Services services) {
-        return new ContractAxiom(name, displayName, target, kjt, visibility, op.apply(originalPre),
+        return new ContractAxiom(contract, name, displayName, target, kjt, visibility, op.apply(originalPre),
             op.apply(originalFreePre), op.apply(originalPost), op.apply(originalFreePost),
             op.apply(originalMby), atPreVars, originalSelfVar, originalResultVar,
             originalParamVars);
@@ -95,7 +97,7 @@ public final class ContractAxiom extends ClassAxiom {
         return TG.generateContractAxiomTaclets(tacletName, originalPre, originalFreePre,
             originalPost, originalFreePost, originalMby, kjt, target, heaps, self,
             originalResultVar, atPreVars, originalParamVars, toLimit, satisfiabilityGuard,
-            services);
+            contract.getName(), services);
     }
 
     @Override

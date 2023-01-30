@@ -8,10 +8,16 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
+import de.uka.ilkd.key.rule.PosTacletApp;
+import de.uka.ilkd.key.rule.RewriteTaclet;
+import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.VariableCondition;
+import de.uka.ilkd.key.rule.conditions.MayUseMethodContractCondition;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.util.Pair;
 import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 import java.io.File;
@@ -69,7 +75,11 @@ public class ContractDependencyRepository {
     /**
      * A map of dependency arcs to the rule justifications that added this arc (even redundant additions)
      */
-    private final Map<Pair<Contract, Contract>, List<RuleJustification>> modifyingRuleApplications = new HashMap<>();
+    private final Map<Pair<Contract, Contract>, List<RuleJustification>> modifyingRuleJustifications = new HashMap<>();
+    /**
+     * A map of dependency arcs to the rule applications that added this arc (even redundant additions). For contract axioms
+     */
+    private final Map<Pair<Contract, Contract>, List<RuleApp>> modifyingRuleApplications = new HashMap<>();
 
 
     public ContractDependencyRepository(Services s) {
@@ -198,10 +208,31 @@ public class ContractDependencyRepository {
             deps.put(addTo, deps.get(addTo).add(a));
             // We must track which rule applications introduce which dependencies because rules can be pruned
             Pair<Contract, Contract> p = new Pair<>(addTo, a);
+            if (!modifyingRuleJustifications.containsKey(p)) {
+                modifyingRuleJustifications.put(p, new LinkedList<>());
+            }
+            modifyingRuleJustifications.get(p).add(rj);
+        }
+    }
+
+    /**
+     * Adds a dependency introduced by a rule application of contract axiom
+     * @param addTo The contract to which we add the dependency
+     * @param toAdd The contract on which <code>addTo</code> depends
+     * @param ra The rule application that adds the dependency
+     */
+    private void addDependenciesFromContractAxiom(Contract addTo, ImmutableSet<Contract> toAdd, RuleApp ra) {
+        if (!deps.containsKey(addTo)) {
+            throw new IllegalArgumentException("Contract " + addTo.getName() + " is not registered.");
+        }
+        for (Contract a : toAdd) {
+            deps.put(addTo, deps.get(addTo).add(a));
+            // We must track which rule applications introduce which dependencies because rules can be pruned
+            Pair<Contract, Contract> p = new Pair<>(addTo, a);
             if (!modifyingRuleApplications.containsKey(p)) {
                 modifyingRuleApplications.put(p, new LinkedList<>());
             }
-            modifyingRuleApplications.get(p).add(rj);
+            modifyingRuleApplications.get(p).add(ra);
         }
     }
 
@@ -217,11 +248,11 @@ public class ContractDependencyRepository {
         }
         for (Contract r : toRemove) {
             Pair<Contract, Contract> p = new Pair<>(removeFrom, r);
-            if (modifyingRuleApplications.containsKey(p)) {
-                List<RuleJustification> justifications = modifyingRuleApplications.get(p);
+            if (modifyingRuleJustifications.containsKey(p)) {
+                List<RuleJustification> justifications = modifyingRuleJustifications.get(p);
                 if (justifications.size() == 1) {
                     // It was the only justification; we can remove the dependency
-                    modifyingRuleApplications.remove(p);
+                    modifyingRuleJustifications.remove(p);
                     deps.put(removeFrom, deps.get(removeFrom).remove(r));
                 } else {
                     // Don't remove the dependency, but remove the rule application
@@ -232,11 +263,38 @@ public class ContractDependencyRepository {
     }
 
     /**
+     * Adds a dependency introduced by a rule application if necessary
+     * @param removeFrom The contract from which we remove the dependency
+     * @param toRemove The contract on which <code>removeFrom</code> depends
+     * @param ra The application that added the dependency
+     */
+    private void removeDependenciesFromContractAxiom(Contract removeFrom, ImmutableSet<Contract> toRemove, RuleApp ra) {
+        if (!deps.containsKey(removeFrom)) {
+            throw new IllegalArgumentException("Contract " + removeFrom.getName() + " is not registered.");
+        }
+        for (Contract r : toRemove) {
+            Pair<Contract, Contract> p = new Pair<>(removeFrom, r);
+            if (modifyingRuleApplications.containsKey(p)) {
+                List<RuleApp> apps = modifyingRuleApplications.get(p);
+                if (apps.size() == 1) {
+                    // It was the only application; we can remove the dependency
+                    modifyingRuleApplications.remove(p);
+                    deps.put(removeFrom, deps.get(removeFrom).remove(r));
+                } else {
+                    // Don't remove the dependency, but remove the rule application
+                    apps.remove(ra);
+                }
+            }
+        }
+    }
+
+    /**
      * Introduces a dependency caused by a rule if necessary
      * @param p The current proof
+     * @param r The rule application
      * @param rj The justification of the rule just applied
      */
-    public void ruleApplied(Proof p, RuleJustification rj) {
+    public void ruleApplied(Proof p, RuleApp r, RuleJustification rj) {
         if (rj == null) {
             return;
         }
@@ -253,6 +311,18 @@ public class ContractDependencyRepository {
                 atomicContracts = services.getSpecificationRepository().getInheritedContracts(atomicContracts);
                 addDependenciesFromRule(originalContract, atomicContracts, rj);
             }
+        } else {
+            // May be model method contract axiom
+            if (r instanceof PosTacletApp) {
+                PosTacletApp ta = (PosTacletApp) r;
+                if (ta.rule() instanceof RewriteTaclet) {
+                    RewriteTaclet rt = (RewriteTaclet) ta.rule();
+                    if (rt.displayName().startsWith("Contract_axiom")) {
+                        ImmutableSet<Contract> atomicContracts = extractContractsFromTaclet(rt);
+                        addDependenciesFromContractAxiom(originalContract, atomicContracts, ta);
+                    }
+                }
+            }
         }
     }
 
@@ -261,7 +331,7 @@ public class ContractDependencyRepository {
      * @param p The current proof
      * @param rj The justification of the rule just applied
      */
-    public void ruleUnApplied(Proof p, RuleJustification rj) {
+    public void ruleUnApplied(Proof p, RuleApp r, RuleJustification rj) {
         if (rj == null) {
             return;
         }
@@ -278,7 +348,29 @@ public class ContractDependencyRepository {
                 atomicContracts = services.getSpecificationRepository().getInheritedContracts(atomicContracts);
                 removeDependenciesFromRule(originalContract, atomicContracts, rj);
             }
+        } else {
+            // May be model method contract axiom
+            if (r instanceof PosTacletApp) {
+                PosTacletApp ta = (PosTacletApp) r;
+                if (ta.rule() instanceof RewriteTaclet) {
+                    RewriteTaclet rt = (RewriteTaclet) ta.rule();
+                    if (rt.displayName().startsWith("Contract_axiom")) {
+                        ImmutableSet<Contract> atomicContracts = extractContractsFromTaclet(rt);
+                        removeDependenciesFromContractAxiom(originalContract, atomicContracts, ta);
+                    }
+                }
+            }
         }
+    }
+
+    private ImmutableSet<Contract> extractContractsFromTaclet(RewriteTaclet rt) {
+        ImmutableList<VariableCondition> conds = rt.getVariableConditions();
+        assert conds.size() == 1 : "unexpected conditions size";
+        MayUseMethodContractCondition mayUse = (MayUseMethodContractCondition) conds.head();
+        Contract c = services.getSpecificationRepository().getContractByName(mayUse.getParameter());
+        ImmutableSet<Contract> atomicContracts = services.getSpecificationRepository().splitContract(c);
+        assert atomicContracts != null;
+        return services.getSpecificationRepository().getInheritedContracts(atomicContracts);
     }
 
     /**
