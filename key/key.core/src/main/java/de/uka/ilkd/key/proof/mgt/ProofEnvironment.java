@@ -72,6 +72,7 @@ public class ProofEnvironment {
         proofs.add(pl);
         for (Proof p : pl.getProofs()) {
             getServicesForEnvironment().getSpecificationRepository().registerProof(po, p);
+            getServicesForEnvironment().getContractDependencyRepository().registerProof(p);
         }
         fireProofRegistered(new ProofEnvironmentEvent(this, po, pl));
     }

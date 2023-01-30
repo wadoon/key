@@ -23,6 +23,7 @@ import de.uka.ilkd.key.proof.TermProgramVariableCollector;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.proof.mgt.deps.ContractDependencyRepository;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 import org.key_project.util.lookup.Lookup;
@@ -98,6 +99,8 @@ public class Services implements TermServices {
 
     private final TermBuilder termBuilderWithoutCache;
 
+    private ContractDependencyRepository contractDepRepo;
+
     /**
      * creates a new Services object with a new TypeConverter and a new JavaInfo object with no
      * information stored at none of these.
@@ -115,6 +118,7 @@ public class Services implements TermServices {
         javainfo = new JavaInfo(
             new KeYProgModelInfo(this, typeconverter, new KeYRecoderExcHandler()), this);
         nameRecorder = new NameRecorder();
+        contractDepRepo = new ContractDependencyRepository(this);
     }
 
     private Services(Profile profile, KeYCrossReferenceServiceConfiguration crsc,
@@ -133,6 +137,7 @@ public class Services implements TermServices {
         typeconverter = new TypeConverter(this);
         javainfo = new JavaInfo(new KeYProgModelInfo(this, crsc, rec2key, typeconverter), this);
         nameRecorder = new NameRecorder();
+        contractDepRepo = new ContractDependencyRepository(this);
     }
 
     private Services(Services s) {
@@ -150,6 +155,7 @@ public class Services implements TermServices {
         this.caches = s.caches;
         this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
         this.termBuilderWithoutCache = new TermBuilder(new TermFactory(), this);
+        contractDepRepo = s.contractDepRepo;
     }
 
     public Services getOverlay(NamespaceSet namespaces) {
@@ -216,6 +222,14 @@ public class Services implements TermServices {
         return innerVarNamer;
     }
 
+    public ContractDependencyRepository getContractDependencyRepository() {
+        return contractDepRepo;
+    }
+
+    private void setContractDependencyRepository(ContractDependencyRepository repo) {
+        this.contractDepRepo = repo;
+    }
+
     /**
      * creates a new services object containing a copy of the java info of this object and a new
      * TypeConverter (shallow copy) The copy does not belong to a {@link Proof} object and can hence
@@ -253,6 +267,7 @@ public class Services implements TermServices {
         s.setNamespaces(namespaces.copy());
         nameRecorder = nameRecorder.copy();
         s.setJavaModel(getJavaModel());
+        s.setContractDependencyRepository(getContractDependencyRepository());
         return s;
     }
 

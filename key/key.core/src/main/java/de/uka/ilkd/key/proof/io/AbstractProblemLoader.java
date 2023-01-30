@@ -289,6 +289,7 @@ public abstract class AbstractProblemLoader {
         if (!problemInitializer.getWarnings().isEmpty()) {
             control.reportWarnings(problemInitializer.getWarnings());
         }
+        initConfig.getServices().getContractDependencyRepository().initializeRepo();
     }
 
     /**
@@ -612,6 +613,7 @@ public abstract class AbstractProblemLoader {
             initConfig.getServices().getSpecificationRepository()
                     .registerProof(poContainer.getProofOblInput(), p);
             initConfig.getFileRepo().registerProof(p);
+            initConfig.getServices().getContractDependencyRepository().registerProof(p);
         }
 
         return proofList;

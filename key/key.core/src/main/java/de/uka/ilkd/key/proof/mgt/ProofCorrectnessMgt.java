@@ -4,7 +4,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
+import de.uka.ilkd.key.proof.mgt.deps.ContractDependencyRepository;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -20,7 +20,6 @@ import de.uka.ilkd.key.proof.RuleAppListener;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.util.Debug;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -98,10 +97,12 @@ public final class ProofCorrectnessMgt {
             newPaths = newPaths.add(ImmutableSLList.<Contract>nil().prepend(c));
         }
 
+        final ContractDependencyRepository contractRepo = proof.getInitConfig().getServices().getContractDependencyRepository();
+
         // look for cycles
         while (!newPaths.isEmpty()) {
             final Iterator<ImmutableList<Contract>> it = newPaths.iterator();
-            newPaths = DefaultImmutableSet.<ImmutableList<Contract>>nil();
+            newPaths = DefaultImmutableSet.nil();
 
             while (it.hasNext()) {
                 final ImmutableList<Contract> path = it.next();
@@ -111,16 +112,12 @@ public final class ProofCorrectnessMgt {
                         return false;
                     }
                 } else {
-                    final ImmutableSet<Proof> proofsForEnd = specRepos.getProofs(end);
-                    for (Proof proofForEnd : proofsForEnd) {
-                        final ImmutableSet<Contract> contractsUsedForEnd =
-                            proofForEnd.mgt().getUsedContracts();
-                        for (Contract contractUsedForEnd : contractsUsedForEnd) {
-                            if (!path.contains(contractUsedForEnd)) {
-                                final ImmutableList<Contract> extendedPath =
+                    final ImmutableSet<Contract> contractsUsedForEnd = contractRepo.getDependencies(end);
+                    for (Contract contractUsedForEnd : contractsUsedForEnd) {
+                        if (!path.contains(contractUsedForEnd)) {
+                            final ImmutableList<Contract> extendedPath =
                                     path.prepend(contractUsedForEnd);
-                                newPaths = newPaths.add(extendedPath);
-                            }
+                            newPaths = newPaths.add(extendedPath);
                         }
                     }
                 }
@@ -225,11 +222,13 @@ public final class ProofCorrectnessMgt {
         if (!rj.isAxiomJustification()) {
             cachedRuleApps.add(r);
         }
+        proof.getServices().getContractDependencyRepository().ruleApplied(proof, rj);
     }
 
 
     public void ruleUnApplied(RuleApp r) {
         cachedRuleApps.remove(r);
+        proof.getServices().getContractDependencyRepository().ruleUnApplied(proof, getJustification(r));
     }
 
 

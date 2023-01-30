@@ -56,7 +56,7 @@ public final class DiskFileRepo extends AbstractFileRepo {
                 // delete the temporary directory with all contained files
                 deleteDiskContent();
             } catch (IOException e) {
-                // this is called at program exist, so we only print a console message
+                // this is called at program exit, so we only print a console message
                 e.printStackTrace();
             }
         }));
