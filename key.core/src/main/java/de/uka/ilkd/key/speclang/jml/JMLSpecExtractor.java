@@ -102,7 +102,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
     private int getIndexOfMethodDecl(IProgramMethod pm, TextualJMLConstruct[] constructsArray) {
         for (int i = 0; i < constructsArray.length; i++) {
-            if (constructsArray[i] instanceof TextualJMLMethodDecl methodDecl) {
+            if (constructsArray[i]instanceof TextualJMLMethodDecl methodDecl) {
                 if (methodDecl.getMethodName().equals(pm.getName())) {
                     return i;
                 }
@@ -203,7 +203,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
         ImmutableSet<SpecificationElement> result = DefaultImmutableSet.nil();
 
         // primitive types have no class invariants
-        if (!(kjt.getJavaType() instanceof TypeDeclaration td)) {
+        if (!(kjt.getJavaType()instanceof TypeDeclaration td)) {
             return result;
         }
 
@@ -387,7 +387,8 @@ public final class JMLSpecExtractor implements SpecExtractor {
         } else {
             startPos = constructsArray.length - 1;
         }
-        for (int i = startPos; i >= 0 && constructsArray[i] instanceof TextualJMLSpecCase specCase; i--) {
+        for (int i = startPos; i >= 0
+                && constructsArray[i]instanceof TextualJMLSpecCase specCase; i--) {
             if (modelMethodDecl != null && modelMethodDecl.getMethodDefinition() != null) {
                 specCase.addClause(AXIOMS, null, modelMethodDecl.getMethodDefinition());
             }
@@ -586,7 +587,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
         final TextualJMLConstruct[] constructs =
             parseMethodLevelComments(removeDuplicates(comments), getFileName(method));
         for (int i = constructs.length - 1; i >= 0
-                && constructs[i] instanceof TextualJMLSpecCase specificationCase; i--) {
+                && constructs[i]instanceof TextualJMLSpecCase specificationCase; i--) {
             try {
                 result = result.union(
                     jsf.createJMLBlockContracts(method, labels, block, specificationCase));
@@ -606,7 +607,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
         final TextualJMLConstruct[] constructs =
             parseMethodLevelComments(removeDuplicates(comments), getFileName(method));
         for (int i = constructs.length - 1; i >= 0
-                && constructs[i] instanceof TextualJMLSpecCase specificationCase; i--) {
+                && constructs[i]instanceof TextualJMLSpecCase specificationCase; i--) {
             try {
                 result = result
                         .union(jsf.createJMLLoopContracts(method, labels, loop, specificationCase));
@@ -626,7 +627,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
         final TextualJMLConstruct[] constructs =
             parseMethodLevelComments(removeDuplicates(comments), getFileName(method));
         for (int i = constructs.length - 1; i >= 0
-                && constructs[i] instanceof TextualJMLSpecCase specificationCase; i--) {
+                && constructs[i]instanceof TextualJMLSpecCase specificationCase; i--) {
             try {
                 result = result.union(
                     jsf.createJMLLoopContracts(method, labels, block, specificationCase));

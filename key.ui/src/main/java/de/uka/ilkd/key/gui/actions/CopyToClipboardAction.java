@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
-import java.io.Serial;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.nodeviews.CurrentGoalView;
@@ -21,10 +20,11 @@ public class CopyToClipboardAction extends MainWindowAction {
     public CopyToClipboardAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("Copy to clipboard");
-        setTooltip("""
-                Copy a selected sequent term into your default clipboard.
-                This functionality may depend on your window manager or installed clipboard managers.
-                The default clipboard is not the 'middle click clipboard' on X window systems.""");
+        setTooltip(
+            """
+                    Copy a selected sequent term into your default clipboard.
+                    This functionality may depend on your window manager or installed clipboard managers.
+                    The default clipboard is not the 'middle click clipboard' on X window systems.""");
     }
 
     @Override

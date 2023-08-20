@@ -904,7 +904,7 @@ public class SMTObjTranslator implements SMTTranslator {
 
 
         addSingleSort(sorts, s);
-        if (term.op() instanceof SortDependingFunction sdf) {
+        if (term.op()instanceof SortDependingFunction sdf) {
             Sort d = sdf.getSortDependingOn();
             addSingleSort(sorts, d);
         }

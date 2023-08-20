@@ -51,7 +51,7 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
             return DefaultImmutableSet.nil();
         }
         return getApplicableContracts(services.getSpecificationRepository(),
-            instantiation.statement, instantiation.modality, goal);
+            instantiation.statement(), instantiation.modality(), goal);
     }
 
     /**

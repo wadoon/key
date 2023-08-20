@@ -6,8 +6,10 @@ import de.uka.ilkd.key.logic.Sequent;
 
 /**
  * Label attached to a symbolic execution thread.
+ *
+ * @param id The unique ID of this term label in the {@link Sequent}.
  */
-public class SymbolicExecutionTermLabel implements TermLabel {
+public record SymbolicExecutionTermLabel(int id) implements TermLabel {
     /**
      * The unique name of this label.
      */
@@ -19,17 +21,11 @@ public class SymbolicExecutionTermLabel implements TermLabel {
     public static final String PROOF_COUNTER_NAME = "SE_LABEL_COUNTER";
 
     /**
-     * The unique ID of this term label in the {@link Sequent}.
-     */
-    private final int id;
-
-    /**
      * Constructor.
      *
      * @param id The unique ID of this term label in the {@link Sequent}.
      */
-    public SymbolicExecutionTermLabel(int id) {
-        this.id = id;
+    public SymbolicExecutionTermLabel {
     }
 
     /**
@@ -43,7 +39,7 @@ public class SymbolicExecutionTermLabel implements TermLabel {
      * {@inheritDoc}
      */
     public String toString() {
-        return NAME + "(" + getId() + ")";
+        return NAME + "(" + id() + ")";
     }
 
     /**
@@ -51,12 +47,10 @@ public class SymbolicExecutionTermLabel implements TermLabel {
      */
     @Override
     public Object getChild(int i) {
-        switch (i) {
-        case 0:
-            return getId();
-        default:
-            return null;
+        if (i == 0) {
+            return id();
         }
+        return null;
     }
 
     /**
@@ -72,7 +66,8 @@ public class SymbolicExecutionTermLabel implements TermLabel {
      *
      * @return The unique ID of this label in the {@link Sequent}.
      */
-    public int getId() {
+    @Override
+    public int id() {
         return id;
     }
 

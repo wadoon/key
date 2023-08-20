@@ -26,19 +26,15 @@ public class ScriptTreeParser {
                 return root;
             }
 
-            switch (command.args.get(ScriptLineParser.COMMAND_KEY)) {
-            case "branches":
-                branchStack.push(last);
-                break;
-            case "next":
-                last = branchStack.peek();
-                break;
-            case "end":
+            switch (command.args().get(ScriptLineParser.COMMAND_KEY)) {
+            case "branches" -> branchStack.push(last);
+            case "next" -> last = branchStack.peek();
+            case "end" -> {
                 last = null;
                 branchStack.pop();
-                break;
-            default:
-                ScriptNode node = new ScriptNode(last, command.args, from, to);
+            }
+            default -> {
+                ScriptNode node = new ScriptNode(last, command.args(), from, to);
                 if (root == null) {
                     root = node;
                 } else if (last == null) {
@@ -47,7 +43,7 @@ public class ScriptTreeParser {
                     last.addNode(node);
                 }
                 last = node;
-                break;
+            }
             }
         }
 

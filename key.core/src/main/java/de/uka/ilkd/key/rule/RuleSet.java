@@ -7,18 +7,16 @@ package de.uka.ilkd.key.rule;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 
-public class RuleSet implements Named {
-    /** name of the heuristic */
-    private final Name name;
-
-
+/**
+ * @param name name of the heuristic
+ */
+public record RuleSet(Name name) implements Named {
     /**
      * creates a heuristic
      *
      * @param name Name object that contains name of the heuristic
      */
-    public RuleSet(Name name) {
-        this.name = name;
+    public RuleSet {
     }
 
     /**
@@ -26,6 +24,7 @@ public class RuleSet implements Named {
      *
      * @return Name object that is the name of the heuristic
      */
+    @Override
     public Name name() {
         return name;
     }
@@ -45,7 +44,9 @@ public class RuleSet implements Named {
     }
 
 
-    /** toString */
+    /**
+     * toString
+     */
     public String toString() {
         return name.toString();
     }

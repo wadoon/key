@@ -118,7 +118,7 @@ public final class SideProofStore {
                     ProofUserManager.getInstance().removeUserAndDispose(entry.getProof(), this);
                 }
                 fireEntriesRemoved(
-                    new SideProofStoreEvent(this, entries.toArray(new Entry[entries.size()])));
+                    new SideProofStoreEvent(this, entries.toArray(new Entry[0])));
             }
         }
     }
@@ -187,7 +187,7 @@ public final class SideProofStore {
      * @return All available {@link Entry}s.
      */
     public Entry[] getEntries() {
-        return entries.toArray(new Entry[entries.size()]);
+        return entries.toArray(new Entry[0]);
     }
 
     /**
@@ -218,7 +218,7 @@ public final class SideProofStore {
      * @return All registered {@link ISideProofStoreListener}.
      */
     public ISideProofStoreListener[] getProofStoreListener() {
-        return listener.toArray(new ISideProofStoreListener[listener.size()]);
+        return listener.toArray(new ISideProofStoreListener[0]);
     }
 
     /**

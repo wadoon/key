@@ -128,7 +128,7 @@ public abstract class AbstractProofReplayer {
                     .getJustification(ruleApp, originalProof.getServices());
             currContract = proof.getServices().getSpecificationRepository()
                     .getContractByName(
-                        ((RuleJustificationBySpec) justification).getSpec().getName());
+                        ((RuleJustificationBySpec) justification).spec().getName());
         }
 
         // Load ifInsts, if applicable
