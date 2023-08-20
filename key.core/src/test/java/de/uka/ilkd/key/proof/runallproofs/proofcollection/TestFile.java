@@ -312,7 +312,7 @@ public class TestFile implements Serializable {
                     .stream()
                     .map(s -> s.node().serialNr())
                     .limit(10)
-                    .collect(Collectors.toList());
+                    .toList();
             assertTrue(reloadedProof.closed(),
                 "Reloaded proof did not close: " + proofFile + ", open goals were " + goalsSerials
                     + ", replay status: " + result.getStatus());

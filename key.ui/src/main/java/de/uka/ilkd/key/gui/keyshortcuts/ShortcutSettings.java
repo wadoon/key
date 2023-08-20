@@ -126,7 +126,7 @@ public class ShortcutSettings extends SimpleSettingsPanel implements SettingsPro
          */
 
         List<KeyStroke> keystrokes =
-            s.stream().map(KeyStroke::getKeyStroke).collect(Collectors.toList());
+            s.stream().map(KeyStroke::getKeyStroke).toList();
         /*
          * if (keystrokes.contains(null)) { throw new InvalidSettingsInputException(
          * "Invalid keystroke specified", this, tblShortcuts); }
