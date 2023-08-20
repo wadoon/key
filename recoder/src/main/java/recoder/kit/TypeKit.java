@@ -81,8 +81,7 @@ public class TypeKit {
         TypeReference result = null;
         if (t instanceof PrimitiveType) {
             result = f.createTypeReference(f.createIdentifier(t.getName()));
-        } else if (t instanceof ParameterizedType) {
-            ParameterizedType pt = ((ParameterizedType) t);
+        } else if (t instanceof ParameterizedType pt) {
             result = createTypeReference(f, pt.getGenericType());
             if (addTypeArgs) {
                 result.setTypeArguments(makeTypeArgRef(f, pt.getTypeArgs()));
@@ -204,8 +203,7 @@ public class TypeKit {
                     if (vars.size() > 0) {
                         imembers.add(d);
                     }
-                } else if (cmemd instanceof MethodDeclaration) {
-                    MethodDeclaration md = (MethodDeclaration) cmemd;
+                } else if (cmemd instanceof MethodDeclaration md) {
 
                     if (!md.isStatic() && md.isPublic() && !(md instanceof ConstructorDeclaration)
                     // !!!!!!!!!!!!!!!!!! Die folgende Methode gibt es noch
@@ -371,8 +369,7 @@ public class TypeKit {
         // Create an adapter interface with delegating methods
         for (int i2 = 0; i2 < classDecl.getMembers().size(); i2++) {
             MemberDeclaration member = classDecl.getMembers().get(i2);
-            if (member instanceof MethodDeclaration) {
-                MethodDeclaration method = (MethodDeclaration) member;
+            if (member instanceof MethodDeclaration method) {
                 if (method.isPublic()) {
                     Debug.info(2, "adapting public method " + method.getName());
                     MethodDeclaration clone =
@@ -523,8 +520,7 @@ public class TypeKit {
     public static List<Member> getMembers(ClassTypeContainer ctc) {
         List<Member> result = new ArrayList<>();
         List<? extends Member> mlist;
-        if (ctc instanceof ClassType) {
-            ClassType ct = (ClassType) ctc;
+        if (ctc instanceof ClassType ct) {
             mlist = ct.getConstructors();
             if (mlist != null) {
                 result.addAll(mlist);
@@ -712,8 +708,7 @@ public class TypeKit {
         // get all super interface references
         ClassType superclass = null;
         List<TypeReference> superinterfaces = new ArrayList<>(0);
-        if (td instanceof InterfaceDeclaration) {
-            InterfaceDeclaration id = (InterfaceDeclaration) td;
+        if (td instanceof InterfaceDeclaration id) {
             if (id.getExtendedTypes() != null) {
                 superinterfaces = id.getExtendedTypes().getSupertypes();
             }

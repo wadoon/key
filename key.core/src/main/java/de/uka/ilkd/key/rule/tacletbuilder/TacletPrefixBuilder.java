@@ -79,8 +79,7 @@ public class TacletPrefixBuilder {
         }
         if (t.hasLabels()) {
             for (TermLabel l : t.getLabels()) {
-                if (l instanceof SchemaVariable) {
-                    SchemaVariable sv = (SchemaVariable) l;
+                if (l instanceof SchemaVariable sv) {
                     ImmutableSet<SchemaVariable> relevantBoundVars = removeNotFreeIn(sv);
                     TacletPrefix prefix = prefixMap.get(sv);
                     if (prefix == null || prefix.prefix().equals(relevantBoundVars)) {

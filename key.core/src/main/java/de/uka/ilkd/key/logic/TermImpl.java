@@ -478,11 +478,9 @@ public class TermImpl implements Term, EqualsModProofIrrelevancy {
             return true;
         }
 
-        if (!(o instanceof TermImpl)) {
+        if (!(o instanceof TermImpl t)) {
             return false;
         }
-
-        final TermImpl t = (TermImpl) o;
 
         if (!(op.equals(t.op) && boundVars.equals(t.boundVars) && javaBlock.equals(t.javaBlock))) {
             return false;
@@ -517,11 +515,9 @@ public class TermImpl implements Term, EqualsModProofIrrelevancy {
             return true;
         }
 
-        if (!(o instanceof TermImpl)) {
+        if (!(o instanceof TermImpl t)) {
             return false;
         }
-
-        final TermImpl t = (TermImpl) o;
 
         if (!(op.equals(t.op) && boundVars.equals(t.boundVars) && javaBlock.equals(t.javaBlock))) {
             return false;
@@ -541,11 +537,9 @@ public class TermImpl implements Term, EqualsModProofIrrelevancy {
             return true;
         }
 
-        if (!(o instanceof TermImpl)) {
+        if (!(o instanceof TermImpl t)) {
             return false;
         }
-
-        final TermImpl t = (TermImpl) o;
 
         boolean opResult = op.equalsModProofIrrelevancy(t.op);
         if (!(opResult

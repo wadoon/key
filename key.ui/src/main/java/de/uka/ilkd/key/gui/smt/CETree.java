@@ -303,8 +303,7 @@ public class CETree {
             if (selRow != -1) {
                 if (e.getClickCount() == 2) {
                     Object oNode = selPath.getLastPathComponent();
-                    if (oNode instanceof DefaultMutableTreeNode) {
-                        DefaultMutableTreeNode node = (DefaultMutableTreeNode) oNode;
+                    if (oNode instanceof DefaultMutableTreeNode node) {
 
                         if (node.getChildCount() > 0) {
                             return;

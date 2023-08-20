@@ -897,8 +897,7 @@ public abstract class AbstractSlicer {
             ExecutionContext ec, ReferencePrefix thisReference, ImmutableList<Access> children) {
         if (prefix instanceof ProgramVariable) {
             return children.prepend(new Access((ProgramVariable) prefix));
-        } else if (prefix instanceof FieldReference) {
-            FieldReference fr = (FieldReference) prefix;
+        } else if (prefix instanceof FieldReference fr) {
             ReferencePrefix parent = fr.getReferencePrefix();
             children = children.prepend(new Access(fr.getProgramVariable()));
             if (parent != null) {
@@ -915,8 +914,7 @@ public abstract class AbstractSlicer {
                 throw new IllegalStateException(
                     "Unsupported this reference '" + thisReference + "'.");
             }
-        } else if (prefix instanceof ArrayReference) {
-            ArrayReference ar = (ArrayReference) prefix;
+        } else if (prefix instanceof ArrayReference ar) {
             children =
                 children.prepend(new Access(toTerm(services, ar.getDimensionExpressions(), ec)));
             return toLocationRecursive(services, ar.getReferencePrefix(), ec, thisReference,

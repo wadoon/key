@@ -90,10 +90,9 @@ public class TacletPrefix {
         if (o == this) {
             return true;
         }
-        if (!(o instanceof TacletPrefix)) {
+        if (!(o instanceof TacletPrefix other)) {
             return false;
         }
-        TacletPrefix other = (TacletPrefix) o;
         return (other.prefix().equals(prefix())) && (other.context() == context());
     }
 

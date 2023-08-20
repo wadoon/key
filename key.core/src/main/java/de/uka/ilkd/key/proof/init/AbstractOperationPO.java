@@ -133,8 +133,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
         if (proof != null && !proof.isDisposed()) {
             ProofOblInput problem =
                 proof.getServices().getSpecificationRepository().getProofOblInput(proof);
-            if (problem instanceof AbstractOperationPO) {
-                AbstractOperationPO operationPO = (AbstractOperationPO) problem;
+            if (problem instanceof AbstractOperationPO operationPO) {
                 if (operationPO.isAddUninterpretedPredicate()) {
                     return operationPO.getUninterpretedPredicate();
                 }
@@ -153,8 +152,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
         if (proof != null && !proof.isDisposed()) {
             ProofOblInput problem =
                 proof.getServices().getSpecificationRepository().getProofOblInput(proof);
-            if (problem instanceof AbstractOperationPO) {
-                AbstractOperationPO operationPO = (AbstractOperationPO) problem;
+            if (problem instanceof AbstractOperationPO operationPO) {
                 if (operationPO.isAddUninterpretedPredicate()) {
                     return operationPO.getAdditionalUninterpretedPredicates();
                 }
@@ -177,8 +175,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
     public static Term addUninterpretedPredicateIfRequired(Services services, Term term) {
         ProofOblInput problem =
             services.getSpecificationRepository().getProofOblInput(services.getProof());
-        if (problem instanceof AbstractOperationPO) {
-            AbstractOperationPO operationPO = (AbstractOperationPO) problem;
+        if (problem instanceof AbstractOperationPO operationPO) {
             if (operationPO.isAddUninterpretedPredicate()) {
                 term = services.getTermBuilder().and(term, operationPO.getUninterpretedPredicate());
             }
@@ -203,8 +200,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
             ImmutableList<LocationVariable> variablesToProtect, Term exceptionVar) {
         ProofOblInput problem =
             services.getSpecificationRepository().getProofOblInput(services.getProof());
-        if (problem instanceof AbstractOperationPO) {
-            AbstractOperationPO operationPO = (AbstractOperationPO) problem;
+        if (problem instanceof AbstractOperationPO operationPO) {
             if (operationPO.isAddUninterpretedPredicate()) {
                 Term up = operationPO.newAdditionalUninterpretedPredicate(variablesToProtect,
                     exceptionVar, operationPO.getUninterpretedPredicateName(), services);

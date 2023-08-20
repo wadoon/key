@@ -49,8 +49,7 @@ public class TestGenericRemovingLemmaGenerator {
 
         sorts.add(term.sort());
 
-        if (term.op() instanceof SortDependingFunction) {
-            SortDependingFunction sdf = (SortDependingFunction) term.op();
+        if (term.op() instanceof SortDependingFunction sdf) {
             sorts.add(sdf.getSortDependingOn());
         }
 

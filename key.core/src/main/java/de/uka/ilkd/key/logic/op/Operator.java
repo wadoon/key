@@ -75,10 +75,9 @@ public interface Operator extends Named, SVSubstitute, EqualsModProofIrrelevancy
         if (this == obj) {
             return true;
         }
-        if (!(obj instanceof Operator)) {
+        if (!(obj instanceof Operator that)) {
             return false;
         }
-        Operator that = (Operator) obj;
         // assume name and arity uniquely identifies operator
         return arity() == that.arity() && name().equals(that.name());
     }

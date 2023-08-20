@@ -990,11 +990,9 @@ public class ModelExtractor {
 
         for (Query q : queries) {
 
-            if (q instanceof ConstantQuery) {
-                ConstantQuery cq = (ConstantQuery) q;
+            if (q instanceof ConstantQuery cq) {
                 model.addConstant(cq.getConstantID(), cq.getResult());
-            } else if (q instanceof FieldQuery) {
-                FieldQuery fq = (FieldQuery) q;
+            } else if (q instanceof FieldQuery fq) {
 
                 String heapID = fq.getHeapID();
                 String objectID = fq.getObjectID();
@@ -1024,8 +1022,7 @@ public class ModelExtractor {
                 }
 
                 ov.put(fieldID, value);
-            } else if (q instanceof LocSetQuery) {
-                LocSetQuery lq = (LocSetQuery) q;
+            } else if (q instanceof LocSetQuery lq) {
 
                 String locsetID = lq.getLocSetID();
 
@@ -1046,8 +1043,7 @@ public class ModelExtractor {
                     ls.add(new Location(objectID, fieldID));
                 }
 
-            } else if (q instanceof ObjectLengthQuery) {
-                ObjectLengthQuery oq = (ObjectLengthQuery) q;
+            } else if (q instanceof ObjectLengthQuery oq) {
                 String objectID = oq.getObjectID();
 
                 int result = Integer.parseInt(oq.getResult());
@@ -1069,8 +1065,7 @@ public class ModelExtractor {
                         }
                     }
                 }
-            } else if (q instanceof SeqLengthQuery) {
-                SeqLengthQuery sq = (SeqLengthQuery) q;
+            } else if (q instanceof SeqLengthQuery sq) {
 
                 String seqId = sq.getSeqID();
 
@@ -1087,8 +1082,7 @@ public class ModelExtractor {
                 Sequence s = new Sequence(result, seqId);
                 model.addSequence(s);
 
-            } else if (q instanceof FunValueQuery) {
-                FunValueQuery iq = (FunValueQuery) q;
+            } else if (q instanceof FunValueQuery iq) {
 
 
                 String heapID = iq.getHeapID();
@@ -1126,8 +1120,7 @@ public class ModelExtractor {
                 ov.putFunValue(fun, result);
 
 
-            } else if (q instanceof ExactInstanceQuery) {
-                ExactInstanceQuery eq = (ExactInstanceQuery) q;
+            } else if (q instanceof ExactInstanceQuery eq) {
 
                 String objectID = eq.getObjectId();
 
@@ -1254,8 +1247,7 @@ public class ModelExtractor {
 
     private void processTypesQueries() {
         for (Query q : queries) {
-            if (q instanceof ObjectTypeQuery) {
-                ObjectTypeQuery oq = (ObjectTypeQuery) q;
+            if (q instanceof ObjectTypeQuery oq) {
                 String objectID = oq.getObjectId();
                 Sort s = oq.getSort();
                 String result = oq.getResult();
@@ -1291,8 +1283,7 @@ public class ModelExtractor {
 
     private void processArrayQueries() {
         for (Query q : queries) {
-            if (q instanceof ArrayFieldQuery) {
-                ArrayFieldQuery aq = (ArrayFieldQuery) q;
+            if (q instanceof ArrayFieldQuery aq) {
 
                 String heapID = aq.getHeapID();
                 String objectID = aq.getObjectID();
@@ -1310,8 +1301,7 @@ public class ModelExtractor {
 
     private void processSeqQueries() {
         for (Query q : queries) {
-            if (q instanceof SeqFieldQuery) {
-                SeqFieldQuery sq = (SeqFieldQuery) q;
+            if (q instanceof SeqFieldQuery sq) {
 
 
                 Sequence s = sq.getSeq();

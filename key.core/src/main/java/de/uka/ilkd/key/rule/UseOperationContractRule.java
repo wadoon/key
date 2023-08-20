@@ -118,8 +118,7 @@ public final class UseOperationContractRule implements BuiltInRule {
                 && ((New) activeStatement).getTypeDeclarationCount() == 0) {
             actualResult = null;
             mr = (New) activeStatement;
-        } else if (activeStatement instanceof CopyAssignment) {
-            final CopyAssignment ca = (CopyAssignment) activeStatement;
+        } else if (activeStatement instanceof CopyAssignment ca) {
             final Expression lhs = ca.getExpressionAt(0);
             final Expression rhs = ca.getExpressionAt(1);
             if ((rhs instanceof MethodReference
@@ -167,8 +166,7 @@ public final class UseOperationContractRule implements BuiltInRule {
     private static IProgramMethod getProgramMethod(MethodOrConstructorReference mr,
             KeYJavaType staticType, ExecutionContext ec, Services services) {
         IProgramMethod result;
-        if (mr instanceof MethodReference) { // from MethodCall.java
-            MethodReference methRef = (MethodReference) mr;
+        if (mr instanceof MethodReference methRef) { // from MethodCall.java
             if (ec != null) {
                 result = methRef.method(services, staticType, ec);
                 if (result == null) {
@@ -336,8 +334,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 
         PosInProgram result = PosInProgram.TOP;
 
-        if (pe instanceof ProgramPrefix) {
-            ProgramPrefix curPrefix = (ProgramPrefix) pe;
+        if (pe instanceof ProgramPrefix curPrefix) {
 
             final ImmutableArray<ProgramPrefix> prefix = curPrefix.getPrefixElements();
             final int length = prefix.size();

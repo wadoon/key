@@ -1056,8 +1056,7 @@ public abstract class SequentView extends JEditorPane {
 
         @Override
         public boolean equals(Object o) {
-            if (o instanceof CurrentGoalView.PIO_age) {
-                CurrentGoalView.PIO_age c = (CurrentGoalView.PIO_age) o;
+            if (o instanceof PIO_age c) {
                 return this.age == c.age && this.pio == c.pio;
             }
             return false;

@@ -160,8 +160,7 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
                 assum = TacletSections.ASSUM.getDefaultValue(services);
 
         // translate the find pattern.
-        if (taclet instanceof FindTaclet) {
-            FindTaclet findTaclet = (FindTaclet) taclet;
+        if (taclet instanceof FindTaclet findTaclet) {
             if (getFindFromTaclet(findTaclet) != null) {
                 find = getFindFromTaclet(findTaclet);
             }
@@ -178,8 +177,7 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
             } else if (taclet instanceof SuccTaclet) {
                 list = list.append(translateReplaceAndAddSequent(template, SUCC, services));
 
-            } else if (taclet instanceof RewriteTaclet) {
-                RewriteTaclet rwTaclet = (RewriteTaclet) taclet;
+            } else if (taclet instanceof RewriteTaclet rwTaclet) {
                 if (rwTaclet.find().sort().equals(Sort.FORMULA)) {
                     int polarity = getPolarity(rwTaclet);
                     list = list.append(

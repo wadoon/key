@@ -82,8 +82,7 @@ public class ASTIterator {
     protected void recurse(ProgramElement pe) {
         if (pe != null) {
             listener.enteringNode(this, pe);
-            if (pe instanceof NonTerminalProgramElement) {
-                NonTerminalProgramElement ntpe = (NonTerminalProgramElement) pe;
+            if (pe instanceof NonTerminalProgramElement ntpe) {
                 int childCount;
                 switch (listener.enterChildren(this, ntpe)) {
                 case ASTIterator.ENTER_NONE:
@@ -125,8 +124,7 @@ public class ASTIterator {
      * @param pe the current program element.
      */
     protected void simpleRecurse(ProgramElement pe) {
-        if (pe instanceof NonTerminalProgramElement) {
-            NonTerminalProgramElement ntpe = (NonTerminalProgramElement) pe;
+        if (pe instanceof NonTerminalProgramElement ntpe) {
             int childCount = ntpe.getChildCount();
             for (int i = 0; i < childCount; i++) {
                 ProgramElement child = ntpe.getChildAt(i);

@@ -178,10 +178,9 @@ public abstract class AbstractIndex implements HashCode {
     }
 
     public boolean equals(Object ob) {
-        if (!(ob instanceof AbstractIndex)) {
+        if (!(ob instanceof AbstractIndex x)) {
             return false;
         }
-        AbstractIndex x = (AbstractIndex) ob;
         if (x.size() != size()) {
             return false;
         }

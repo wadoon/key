@@ -84,10 +84,9 @@ public abstract class ChoiceExpr {
             if (this == o) {
                 return true;
             }
-            if (!(o instanceof Proposition)) {
+            if (!(o instanceof Proposition that)) {
                 return false;
             }
-            Proposition that = (Proposition) o;
             return choice.equals(that.choice);
         }
 
@@ -121,10 +120,9 @@ public abstract class ChoiceExpr {
             if (this == o) {
                 return true;
             }
-            if (!(o instanceof And)) {
+            if (!(o instanceof And and)) {
                 return false;
             }
-            And and = (And) o;
             return left.equals(and.left) && right.equals(and.right);
         }
 
@@ -158,10 +156,9 @@ public abstract class ChoiceExpr {
             if (this == o) {
                 return true;
             }
-            if (!(o instanceof Or)) {
+            if (!(o instanceof Or or)) {
                 return false;
             }
-            Or or = (Or) o;
             return left.equals(or.left) && right.equals(or.right);
         }
 
@@ -193,10 +190,9 @@ public abstract class ChoiceExpr {
             if (this == o) {
                 return true;
             }
-            if (!(o instanceof Not)) {
+            if (!(o instanceof Not not)) {
                 return false;
             }
-            Not not = (Not) o;
             return sub.equals(not.sub);
         }
 

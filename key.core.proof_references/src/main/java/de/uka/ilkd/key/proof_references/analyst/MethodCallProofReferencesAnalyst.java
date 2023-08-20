@@ -52,8 +52,7 @@ public class MethodCallProofReferencesAnalyst implements IProofReferencesAnalyst
                         new LinkedHashSet<>();
                     result.add(reference);
                     return result;
-                } else if (info.getActiveStatement() instanceof Assignment) {
-                    Assignment assignment = (Assignment) info.getActiveStatement();
+                } else if (info.getActiveStatement() instanceof Assignment assignment) {
                     ExecutionContext context = extractContext(node, services);
                     LinkedHashSet<IProofReference<?>> result =
                         new LinkedHashSet<>();
@@ -107,7 +106,7 @@ public class MethodCallProofReferencesAnalyst implements IProofReferencesAnalyst
             IProgramMethod pm = mr.method(services, refPrefixType, context);
             return new DefaultProofReference<>(IProofReference.CALL_METHOD, node, pm);
         } else {
-            if (!(node.getAppliedRuleApp() instanceof PosTacletApp)) {
+            if (!(node.getAppliedRuleApp() instanceof PosTacletApp app)) {
                 throw new IllegalArgumentException("PosTacletApp expected.");
             }
             if (!"staticMethodCallStaticWithAssignmentViaTypereference"
@@ -116,7 +115,6 @@ public class MethodCallProofReferencesAnalyst implements IProofReferencesAnalyst
                     "Rule \"staticMethodCallStaticWithAssignmentViaTypereference\" expected, but is \""
                         + MiscTools.getRuleName(node) + "\".");
             }
-            PosTacletApp app = (PosTacletApp) node.getAppliedRuleApp();
             SchemaVariable methodSV = app.instantiations().lookupVar(new Name("#mn"));
             SchemaVariable typeSV = app.instantiations().lookupVar(new Name("#t"));
             SchemaVariable argsSV = app.instantiations().lookupVar(new Name("#elist"));

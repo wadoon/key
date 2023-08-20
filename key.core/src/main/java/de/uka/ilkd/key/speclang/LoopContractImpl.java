@@ -181,8 +181,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
         loopLabels.add(outerLabel);
 
         SourceElement first = block.getFirstElement();
-        while (first instanceof LabeledStatement) {
-            LabeledStatement s = (LabeledStatement) first;
+        while (first instanceof LabeledStatement s) {
             loopLabels.add(s.getLabel());
             first = s.getBody();
         }
@@ -619,8 +618,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
             Map<Term, Term> postReplacementMap = new HashMap<>();
             for (int i = 0; i < head.getStatementCount(); ++i) {
                 Statement stmt = head.getStatementAt(i);
-                if (stmt instanceof LocalVariableDeclaration) {
-                    LocalVariableDeclaration decl = (LocalVariableDeclaration) stmt;
+                if (stmt instanceof LocalVariableDeclaration decl) {
                     ProgramVariable var =
                         (ProgramVariable) decl.getVariables().get(0).getProgramVariable();
                     Expression init = decl.getVariables().get(0).getInitializer();

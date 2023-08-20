@@ -1074,8 +1074,7 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
         if (x.getThrown() != null) {
             printElement(1, x.getThrown());
         }
-        if (x instanceof AnnotationPropertyDeclaration) {
-            AnnotationPropertyDeclaration apd = (AnnotationPropertyDeclaration) x;
+        if (x instanceof AnnotationPropertyDeclaration apd) {
             Expression e = apd.getDefaultValueExpression();
             if (e != null) {
                 print(" default ");

@@ -246,8 +246,7 @@ public class OracleGenerator {
         } // negation
         else if (op == Junctor.NOT) {
             OracleTerm sub = generateOracle(term.sub(0), initialSelect);
-            if (sub instanceof OracleUnaryTerm) {
-                OracleUnaryTerm neg = (OracleUnaryTerm) sub;
+            if (sub instanceof OracleUnaryTerm neg) {
                 return neg.getSub();
             }
             return new OracleUnaryTerm(sub, Op.Neg);
@@ -266,8 +265,7 @@ public class OracleGenerator {
             return new OracleBinTerm(OR, notLeft, right);
         }
         // quantifiable variable
-        else if (op instanceof QuantifiableVariable) {
-            QuantifiableVariable qop = (QuantifiableVariable) op;
+        else if (op instanceof QuantifiableVariable qop) {
             return new OracleVariable(qop.name().toString(), qop.sort());
         }
         // integers
@@ -305,8 +303,7 @@ public class OracleGenerator {
             return translateFunction(term, initialSelect);
         }
         // program variables
-        else if (op instanceof ProgramVariable) {
-            ProgramVariable var = (ProgramVariable) op;
+        else if (op instanceof ProgramVariable var) {
             return new OracleConstant(var.name().toString(), var.sort());
         } else {
             LOGGER.debug("Could not translate: {}", term);
@@ -339,8 +336,7 @@ public class OracleGenerator {
             OracleTerm o = generateOracle(term.sub(0), initialSelect);
             return new OracleConstant(o + ".length", term.sort());
         } else if (name.endsWith("::<inv>")) {
-            if (fun instanceof IObserverFunction) {
-                IObserverFunction obs = (IObserverFunction) fun;
+            if (fun instanceof IObserverFunction obs) {
 
                 Sort s = obs.getContainerType().getSort();
                 OracleMethod m;
@@ -377,8 +373,7 @@ public class OracleGenerator {
             }
         } else if (name.endsWith("::instance")) {
 
-            if (fun instanceof SortDependingFunction) {
-                SortDependingFunction sdf = (SortDependingFunction) fun;
+            if (fun instanceof SortDependingFunction sdf) {
                 Sort s = sdf.getSortDependingOn();
 
 

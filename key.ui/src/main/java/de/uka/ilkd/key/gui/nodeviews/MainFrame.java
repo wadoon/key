@@ -29,8 +29,7 @@ public final class MainFrame extends JPanel {
     public Component setContent(Component component) {
         Component oldContent = content;
         content = component;
-        if (component instanceof SequentView) {
-            SequentView sequentView = (SequentView) component;
+        if (component instanceof SequentView sequentView) {
             Point oldSequentViewPosition = scrollPane.getViewport().getViewPosition();
             scrollPane.setViewportView(new SequentViewPanel(sequentView));
             scrollPane.getViewport().setViewPosition(oldSequentViewPosition);
@@ -94,8 +93,7 @@ public final class MainFrame extends JPanel {
     public void setShowTacletInfo(boolean showTacletInfo) {
         this.showTacletInfo = showTacletInfo;
 
-        if (content instanceof InnerNodeView) {
-            InnerNodeView view = (InnerNodeView) content;
+        if (content instanceof InnerNodeView view) {
             view.tacletInfo.setVisible(this.showTacletInfo);
         }
     }

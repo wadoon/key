@@ -75,10 +75,9 @@ public final class JavaBlock implements EqualsModProofIrrelevancy {
     public boolean equals(Object o) {
         if (o == this) {
             return true;
-        } else if (!(o instanceof JavaBlock)) {
+        } else if (!(o instanceof JavaBlock block)) {
             return false;
         } else {
-            JavaBlock block = (JavaBlock) o;
 
             if (block.program() == null) {
                 return program() == null;
@@ -131,13 +130,12 @@ public final class JavaBlock implements EqualsModProofIrrelevancy {
 
     @Override
     public boolean equalsModProofIrrelevancy(Object obj) {
-        if (!(obj instanceof JavaBlock)) {
+        if (!(obj instanceof JavaBlock other)) {
             return false;
         }
         if (this == obj) {
             return true;
         }
-        JavaBlock other = (JavaBlock) obj;
         // quite inefficient, but sufficient
         return toString().equals(other.toString());
     }

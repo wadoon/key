@@ -491,7 +491,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
     @Override
     public boolean equals(Contract c) {
-        if (!(c instanceof InformationFlowContract)) {
+        if (!(c instanceof InformationFlowContract ifc)) {
             return false;
         }
         assert name != null;
@@ -504,7 +504,6 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
         assert origParams != null;
         assert origDep != null;
         assert origInfFlowSpecs != null;
-        InformationFlowContract ifc = (InformationFlowContract) c;
         return name.equals(ifc.getName()) && forClass.equals(ifc.getKJT())
                 && pm.equals(ifc.getTarget()) && modality.equals(ifc.getModality())
                 && origPre.equals(ifc.getPre()) && origFreePre.equals(ifc.getFreePre())

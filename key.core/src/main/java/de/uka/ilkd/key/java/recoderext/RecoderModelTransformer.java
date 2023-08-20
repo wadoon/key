@@ -302,8 +302,7 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
 
         public void walk(SourceElement s) {
             s.accept(this);
-            if (s instanceof NonTerminalProgramElement) {
-                final NonTerminalProgramElement pe = (NonTerminalProgramElement) s;
+            if (s instanceof NonTerminalProgramElement pe) {
                 for (int i = 0, sz = pe.getChildCount(); i < sz; i++) {
                     walk(pe.getChildAt(i));
                 }
@@ -349,8 +348,7 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
             if (s instanceof TypeDeclaration) {
                 types.add((TypeDeclaration) s);
             }
-            if (s instanceof NonTerminalProgramElement) {
-                final NonTerminalProgramElement pe = (NonTerminalProgramElement) s;
+            if (s instanceof NonTerminalProgramElement pe) {
                 for (int i = 0, sz = pe.getChildCount(); i < sz; i++) {
                     walk(pe.getChildAt(i));
                 }

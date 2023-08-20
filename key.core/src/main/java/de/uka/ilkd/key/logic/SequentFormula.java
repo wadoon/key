@@ -51,8 +51,7 @@ public class SequentFormula implements EqualsModProofIrrelevancy {
         if (this == obj) {
             return true;
         }
-        if (obj instanceof SequentFormula) {
-            SequentFormula cmp = (SequentFormula) obj;
+        if (obj instanceof SequentFormula cmp) {
             return term.equals(cmp.formula());
         }
         return false;
@@ -72,8 +71,7 @@ public class SequentFormula implements EqualsModProofIrrelevancy {
         if (this == obj) {
             return true;
         }
-        if (obj instanceof SequentFormula) {
-            SequentFormula cmp = (SequentFormula) obj;
+        if (obj instanceof SequentFormula cmp) {
             if (term.equalsModProofIrrelevancy(cmp.formula())) {
                 return true;
             }

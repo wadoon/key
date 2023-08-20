@@ -67,8 +67,7 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
             final Modality modality, final Goal goal) {
         ImmutableSet<LoopContract> collectedContracts;
 
-        if (statement instanceof StatementBlock) {
-            StatementBlock block = (StatementBlock) statement;
+        if (statement instanceof StatementBlock block) {
 
             collectedContracts = specifications.getLoopContracts(block, modality);
             if (modality == Modality.BOX) {
@@ -122,9 +121,7 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
         Node previousNode = null;
         while (selfOrParentNode != null) {
             RuleApp app = selfOrParentNode.getAppliedRuleApp();
-            if (app instanceof LoopContractInternalBuiltInRuleApp) {
-                LoopContractInternalBuiltInRuleApp blockRuleApp =
-                    (LoopContractInternalBuiltInRuleApp) app;
+            if (app instanceof LoopContractInternalBuiltInRuleApp blockRuleApp) {
                 if ((contract.isOnBlock() && blockRuleApp.getStatement().equals(contract.getBlock())
                         || !contract.isOnBlock()
                                 && blockRuleApp.getStatement().equals(contract.getLoop()))

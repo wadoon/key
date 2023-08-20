@@ -62,9 +62,9 @@ public class ContractFactoryTest {
     }
 
     /**
-     * Checks that two equal assignable clauses are combined correctly, i.e. without if-expressions.
+     * Checks that two equal assignable clauses are combined correctly, i.e., without if-expressions.
      *
-     * @throws SLTranslationException is not thrown if test succeeds
+     * @throws SLTranslationException is not thrown if the test succeeds
      */
     @Test
     public void testCombineEqualAssignable() throws SLTranslationException {
@@ -159,8 +159,7 @@ public class ContractFactoryTest {
 
         ImmutableSet<Contract> contractSet = ImmutableSet.empty();
         for (TextualJMLConstruct c : constructs) {
-            if (c instanceof TextualJMLSpecCase) {
-                TextualJMLSpecCase c1 = (TextualJMLSpecCase) c;
+            if (c instanceof TextualJMLSpecCase c1) {
                 contractSet = contractSet.union(jsf.createJMLOperationContracts(pm, c1));
             }
         }
