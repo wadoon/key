@@ -1,7 +1,6 @@
 package org.key_project.slicing;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.util.Pair;
 

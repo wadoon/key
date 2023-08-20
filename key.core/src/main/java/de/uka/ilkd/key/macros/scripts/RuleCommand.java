@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.macros.scripts;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
