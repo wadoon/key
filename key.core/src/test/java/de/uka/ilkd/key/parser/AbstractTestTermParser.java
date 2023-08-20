@@ -100,14 +100,17 @@ public class AbstractTestTermParser {
         assertEquals(expected.replaceAll("\\s+", ""), actual.replaceAll("\\s+", ""), message);
     }
 
-    protected void verifyPrettyPrinting(String expectedPrettySyntax, Term expectedParseResult)
-            throws IOException {
+    protected void verifyPrettyPrinting(String expectedPrettySyntax, Term expectedParseResult) {
         // check whether pretty-printing the parsed term yields the original pretty syntax again
         String printedSyntax = printTerm(expectedParseResult);
-        String message = "\nAssertion failed while pretty-printing a term:\n" + expectedParseResult
-            + "\nExpected pretty-syntax is: \"" + expectedPrettySyntax
-            + "\"\nBut pretty-printing resulted in: \"" + printedSyntax
-            + "\"\n(whitespaces are ignored during comparison of the above strings)\n";
+        String message = ("""
+
+                Assertion failed while pretty-printing a term:
+                %s
+                Expected pretty-syntax is: "%s"
+                But pretty-printing resulted in: "%s"
+                (whitespaces are ignored during comparison of the above strings)
+                """).formatted(expectedParseResult, expectedPrettySyntax, printedSyntax);
         assertEqualsIgnoreWhitespaces(message, expectedPrettySyntax, printedSyntax);
     }
 
@@ -131,7 +134,6 @@ public class AbstractTestTermParser {
      * @param verboseSyntax {@link Term} in verbose syntax.
      * @param optionalStringRepresentations Optionally, additional String representations will be
      *        tested for correct parsing.
-     * @throws IOException
      */
     protected void comparePrettySyntaxAgainstVerboseSyntax(String prettySyntax,
             String verboseSyntax, String... optionalStringRepresentations) throws Exception {
@@ -148,7 +150,6 @@ public class AbstractTestTermParser {
      * @param expectedParseResult Expected result after parsing {@code expectedPrettySyntax}.
      * @param optionalStringRepresentations Optionally, additional String representations will be
      *        tested for correct parsing.
-     * @throws IOException
      */
     protected void compareStringRepresentationAgainstTermRepresentation(String prettySyntax,
             Term expectedParseResult, String... optionalStringRepresentations) throws Exception {
