@@ -1,0 +1,807 @@
+{
+  "resources":{
+  "includes":[{
+    "pattern":"\\QMETA-INF/services/ch.qos.logback.classic.spi.Configurator\\E"
+  }, {
+    "pattern":"\\QMETA-INF/services/com.sun.source.util.Plugin\\E"
+  }, {
+    "pattern":"\\QMETA-INF/services/de.uka.ilkd.key.gui.extension.api.KeYGuiExtension\\E"
+  }, {
+    "pattern":"\\QMETA-INF/services/de.uka.ilkd.key.macros.ProofMacro\\E"
+  }, {
+    "pattern":"\\QMETA-INF/services/de.uka.ilkd.key.nparser.varexp.TacletBuilderCommand\\E"
+  }, {
+    "pattern":"\\QMETA-INF/services/de.uka.ilkd.key.proof.init.DefaultProfileResolver\\E"
+  }, {
+    "pattern":"\\QMETA-INF/services/de.uka.ilkd.key.proof.init.POExtension\\E"
+  }, {
+    "pattern":"\\QMETA-INF/services/java.awt.im.spi.InputMethodDescriptor\\E"
+  }, {
+    "pattern":"\\QMETA-INF/services/java.lang.System$LoggerFinder\\E"
+  }, {
+    "pattern":"\\QMETA-INF/services/java.net.spi.InetAddressResolverProvider\\E"
+  }, {
+    "pattern":"\\QMETA-INF/services/java.nio.charset.spi.CharsetProvider\\E"
+  }, {
+    "pattern":"\\QMETA-INF/services/java.nio.file.spi.FileSystemProvider\\E"
+  }, {
+    "pattern":"\\QMETA-INF/services/java.time.zone.ZoneRulesProvider\\E"
+  }, {
+    "pattern":"\\QMETA-INF/services/java.util.prefs.PreferencesFactory\\E"
+  }, {
+    "pattern":"\\QMETA-INF/services/java.util.spi.ResourceBundleControlProvider\\E"
+  }, {
+    "pattern":"\\QMETA-INF/services/javax.annotation.processing.Processor\\E"
+  }, {
+    "pattern":"\\QMETA-INF/services/javax.xml.parsers.DocumentBuilderFactory\\E"
+  }, {
+    "pattern":"\\QMETA-INF/services/javax.xml.parsers.SAXParserFactory\\E"
+  }, {
+    "pattern":"\\QMETA-INF/services/javax.xml.transform.TransformerFactory\\E"
+  }, {
+    "pattern":"\\QMETA-INF/services/org.slf4j.spi.SLF4JServiceProvider\\E"
+  }, {
+    "pattern":"\\Qdata/bibliothek/gui/dock/common/icons/externalize.png\\E"
+  }, {
+    "pattern":"\\Qdata/bibliothek/gui/dock/common/icons/icons.ini\\E"
+  }, {
+    "pattern":"\\Qdata/bibliothek/gui/dock/common/icons/maximize.png\\E"
+  }, {
+    "pattern":"\\Qdata/bibliothek/gui/dock/common/icons/minimize.png\\E"
+  }, {
+    "pattern":"\\Qdata/bibliothek/gui/dock/common/icons/normalize.png\\E"
+  }, {
+    "pattern":"\\Qdata/bibliothek/gui/dock/common/icons/rename.png\\E"
+  }, {
+    "pattern":"\\Qdata/bibliothek/gui/dock/common/icons/replace.png\\E"
+  }, {
+    "pattern":"\\Qdata/bibliothek/gui/dock/common/icons/unexternalize.png\\E"
+  }, {
+    "pattern":"\\Qdata/bibliothek/gui/dock/core/close.png\\E"
+  }, {
+    "pattern":"\\Qdata/bibliothek/gui/dock/core/dockStation.png\\E"
+  }, {
+    "pattern":"\\Qdata/bibliothek/gui/dock/core/dockable.png\\E"
+  }, {
+    "pattern":"\\Qdata/bibliothek/gui/dock/core/flap_auto.png\\E"
+  }, {
+    "pattern":"\\Qdata/bibliothek/gui/dock/core/flap_direction.png\\E"
+  }, {
+    "pattern":"\\Qdata/bibliothek/gui/dock/core/flap_east.png\\E"
+  }, {
+    "pattern":"\\Qdata/bibliothek/gui/dock/core/flap_free.png\\E"
+  }, {
+    "pattern":"\\Qdata/bibliothek/gui/dock/core/flap_hold.png\\E"
+  }, {
+    "pattern":"\\Qdata/bibliothek/gui/dock/core/flap_north.png\\E"
+  }, {
+    "pattern":"\\Qdata/bibliothek/gui/dock/core/flap_south.png\\E"
+  }, {
+    "pattern":"\\Qdata/bibliothek/gui/dock/core/flap_west.png\\E"
+  }, {
+    "pattern":"\\Qdata/bibliothek/gui/dock/core/icons.ini\\E"
+  }, {
+    "pattern":"\\Qdata/bibliothek/gui/dock/core/small_default.png\\E"
+  }, {
+    "pattern":"\\Qdata/bibliothek/gui/dock/core/small_delete.png\\E"
+  }, {
+    "pattern":"\\Qdata/bibliothek/gui/dock/core/split_maximize.png\\E"
+  }, {
+    "pattern":"\\Qdata/bibliothek/gui/dock/core/split_normalize.png\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/gui/help/choiceExplanations.xml\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/gui/help/functionExplanations.xml\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/gui/help/ruleExplanations.xml\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/gui/help/termLabelExplanations.xml\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/gui/images/closed-cached.png\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/gui/images/ekey-brackets.gif\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/gui/images/ekey-mono.gif\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/gui/images/key-color-icon-square.gif\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/gui/images/key-color.png\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/gui/images/key-shadow-2.12.png\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/gui/images/key-shadow.png\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/gui/images/keyinteractive.gif\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/gui/images/keylinked.gif\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/gui/images/toolbar/jml.png\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/gui/images/toolbar/junit_logo.png\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/gui/images/toolbar/oneStepSimplifier.png\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/gui/images/toolbar/uml.png\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/<Default>.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/JAVALANG.TXT\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/io/FilterOutputStream.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/io/FilterOutputStream.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/io/IOException.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/io/IOException.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/io/InputStream.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/io/InputStream.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/io/OutputStream.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/io/OutputStream.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/io/PrintStream.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/io/PrintStream.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/io/Serializable.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/io/Serializable.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/ArithmeticException.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/ArithmeticException.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/ArrayIndexOutOfBoundsException.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/ArrayIndexOutOfBoundsException.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/ArrayStoreException.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/ArrayStoreException.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/AssertionError.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/AssertionError.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/Boolean.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/Boolean.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/Character.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/Character.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/Class.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/Class.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/ClassCastException.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/ClassCastException.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/CloneNotSupportedException.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/CloneNotSupportedException.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/Cloneable.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/Cloneable.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/Comparable.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/Comparable.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/Double.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/Double.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/Enum.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/Enum.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/Error.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/Error.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/Exception.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/Exception.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/ExceptionInInitializerError.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/ExceptionInInitializerError.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/Float.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/Float.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/IllegalArgumentException.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/IllegalArgumentException.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/IndexOutOfBoundsException.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/IndexOutOfBoundsException.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/Integer.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/Integer.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/InterruptedException.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/InterruptedException.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/Iterable.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/Iterable.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/LinkageError.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/LinkageError.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/Long.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/Long.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/Math.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/Math.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/NegativeArraySizeException.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/NegativeArraySizeException.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/NoClassDefFoundError.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/NoClassDefFoundError.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/NullPointerException.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/NullPointerException.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/Number.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/Number.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/NumberFormatException.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/NumberFormatException.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/Object.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/Object.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/OutOfMemoryError.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/OutOfMemoryError.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/Runnable.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/Runnable.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/RuntimeException.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/RuntimeException.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/String.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/String.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/StringBuffer.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/StringBuffer.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/System.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/System.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/Thread.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/Thread.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/Throwable.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/Throwable.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/VirtualMachineError.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/VirtualMachineError.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/annotation/Annotation.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/lang/annotation/Annotation.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/math/BigInteger.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/math/BigInteger.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/util/ArrayList.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/util/ArrayList.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/util/Arrays.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/util/Arrays.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/util/Collection.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/util/Collection.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/util/Date.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/util/Date.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/util/Iterator.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/util/Iterator.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/util/LinkedHashMap.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/util/LinkedHashMap.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/util/LinkedList.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/util/LinkedList.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/util/List.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/util/List.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/util/ListIterator.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/util/ListIterator.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/util/ListIteratorImpl.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/util/ListIteratorImpl.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/util/Map.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/util/Map.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/util/Set.java\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/java/JavaRedux/java/util/Set.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/activeUse.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/adtProgramDecompositionRules.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/assertions.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/bigint.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/binaryAxioms.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/binaryLemmas.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/boolean.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/booleanRules.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/bprod.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/bsum.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/charListHeader.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/charListRules.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/epsilon.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/execRules.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/firstOrderRules.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/floatAssignment2UpdateRules.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/floatHeader.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/floatRules.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/floatRulesAssumeStrictfp.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/floatRulesCommon.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/floatRulesVerifyNormal.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/forLoopRules.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/formulaNormalisationRules.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/freeADT.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/genericRules.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/heap.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/heapRules.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/ifThenElseRules.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/infFlow.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/instanceAllocation.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/intDiv.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/intPow.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/intRules.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/intRulesCheckedSemantics.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/intRulesJavaSemantics.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/intRulesUncheckedSemantics.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/integerAssignment2UpdateRules.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/integerHeader.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/integerRulesCommon.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/integerSimplificationRules.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/java5.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/javaRules.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/ldt.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/locSets.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/locSetsRules.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/loopInvariantRules.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/loopRules.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/loopScopeRules.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/map.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/mapSize.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/permission.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/permissionRules.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/precRules.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/propRule.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/reach.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/reachRules.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/regExAxioms.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/regExHeader.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/regExLemmaProven.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/regExTheory.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/ruleSetsDeclarations.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/seq.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/seqCoreRules.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/seqEq.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/seqPerm.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/seqPerm2.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/seqRules.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/standardRules.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/updateRules.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/wd.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/wdFormulaRules.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/wdGeneralRules.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/wdHeader.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/wdHeapRules.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/wdLocSetRules.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/wdNumericalRules.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/wdReachRules.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/wdRegExRules.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/wdSeqRules.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/wdStringRules.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/proof/rules/wellfound.key\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/settings/default-proof-settings.props\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/smt/newsmt2/BooleanConnectiveHandler.preamble.xml\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/smt/newsmt2/CastHandler.preamble.xml\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/smt/newsmt2/CastingFunctionsHandler.preamble.xml\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/smt/newsmt2/DefinedSymbolsHandler.preamble.xml\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/smt/newsmt2/FieldConstantHandler.preamble.xml\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/smt/newsmt2/FloatHandler.preamble.xml\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/smt/newsmt2/FloatRemainderHandler.preamble.xml\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/smt/newsmt2/InstanceOfHandler.preamble.xml\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/smt/newsmt2/IntegerOpHandler.preamble.xml\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/smt/newsmt2/LogicalVariableHandler.preamble.xml\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/smt/newsmt2/NumberConstantsHandler.preamble.xml\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/smt/newsmt2/PolymorphicHandler.preamble.xml\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/smt/newsmt2/QuantifierHandler.preamble.xml\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/smt/newsmt2/SumProdHandler.preamble.xml\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/smt/newsmt2/UninterpretedSymbolsHandler.preamble.xml\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/smt/newsmt2/UpdateHandler.preamble.xml\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/smt/newsmt2/preamble.smt2\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/smt/solvertypes/CVC4.props\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/smt/solvertypes/CVC4_legacy.props\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/smt/solvertypes/CVC5.props\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/smt/solvertypes/Princess.props\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/smt/solvertypes/Z3.props\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/smt/solvertypes/Z3_CE.props\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/smt/solvertypes/Z3_FloatingPoint.props\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/smt/solvertypes/Z3_legacy.props\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/smt/solvertypes/solvers.txt\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/util/branch\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/util/sha1\\E"
+  }, {
+    "pattern":"\\Qde/uka/ilkd/key/util/version\\E"
+  }, {
+    "pattern":"\\Qexamples.zip\\E"
+  }, {
+    "pattern":"\\Qfonts/Font Awesome 6 Free-Regular-400.otf\\E"
+  }, {
+    "pattern":"\\Qfonts/Font Awesome 6 Free-Solid-900.otf\\E"
+  }, {
+    "pattern":"\\Qfonts/MaterialIcons-Regular.ttf\\E"
+  }, {
+    "pattern":"\\Qlogback-test.xml\\E"
+  }, {
+    "pattern":"\\Qlogback.xml\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/<Default>.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/io/FilterOutputStream.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/io/IOException.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/io/InputStream.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/io/OutputStream.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/io/PrintStream.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/io/Serializable.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/lang/ArithmeticException.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/lang/ArrayIndexOutOfBoundsException.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/lang/ArrayStoreException.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/lang/AssertionError.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/lang/Boolean.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/lang/Character.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/lang/Class.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/lang/ClassCastException.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/lang/CloneNotSupportedException.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/lang/Cloneable.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/lang/Comparable.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/lang/Double.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/lang/Enum.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/lang/Error.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/lang/Exception.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/lang/ExceptionInInitializerError.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/lang/Float.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/lang/IllegalArgumentException.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/lang/IndexOutOfBoundsException.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/lang/Integer.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/lang/InterruptedException.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/lang/Iterable.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/lang/LinkageError.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/lang/Long.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/lang/Math.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/lang/NegativeArraySizeException.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/lang/NoClassDefFoundError.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/lang/NullPointerException.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/lang/Number.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/lang/NumberFormatException.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/lang/Object.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/lang/OutOfMemoryError.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/lang/Runnable.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/lang/RuntimeException.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/lang/StringBuffer.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/lang/System.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/lang/Thread.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/lang/Throwable.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/lang/VirtualMachineError.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/lang/annotation/Annotation.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/math/BigInteger.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/util/ArrayList.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/util/Arrays.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/util/Collection.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/util/Date.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/util/Iterator.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/util/LinkedHashMap.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/util/LinkedList.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/util/List.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/util/ListIterator.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/util/ListIteratorImpl.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/util/Map.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/lang/JavaRedux/java/util/Set.key\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/util/currency.data\\E"
+  }, {
+    "pattern":"java.base:\\Qjdk/internal/icu/impl/data/icudt72b/nfc.nrm\\E"
+  }, {
+    "pattern":"java.base:\\Qsun/text/resources/LineBreakIteratorData\\E"
+  }, {
+    "pattern":"java.desktop:\\Qjavax/swing/plaf/metal/icons/ocean/collapsed-rtl.gif\\E"
+  }, {
+    "pattern":"java.desktop:\\Qjavax/swing/plaf/metal/icons/ocean/collapsed.gif\\E"
+  }, {
+    "pattern":"java.desktop:\\Qjavax/swing/plaf/metal/icons/ocean/computer.gif\\E"
+  }, {
+    "pattern":"java.desktop:\\Qjavax/swing/plaf/metal/icons/ocean/directory.gif\\E"
+  }, {
+    "pattern":"java.desktop:\\Qjavax/swing/plaf/metal/icons/ocean/expanded.gif\\E"
+  }, {
+    "pattern":"java.desktop:\\Qjavax/swing/plaf/metal/icons/ocean/file.gif\\E"
+  }, {
+    "pattern":"java.desktop:\\Qjavax/swing/plaf/metal/icons/ocean/floppy.gif\\E"
+  }, {
+    "pattern":"java.desktop:\\Qjavax/swing/plaf/metal/icons/ocean/hardDrive.gif\\E"
+  }, {
+    "pattern":"java.desktop:\\Qjavax/swing/plaf/metal/icons/ocean/homeFolder.gif\\E"
+  }, {
+    "pattern":"java.desktop:\\Qjavax/swing/plaf/metal/icons/ocean/newFolder.gif\\E"
+  }, {
+    "pattern":"java.desktop:\\Qjavax/swing/plaf/metal/icons/ocean/question.png\\E"
+  }, {
+    "pattern":"java.desktop:\\Qjavax/swing/plaf/metal/icons/ocean/upFolder.gif\\E"
+  }, {
+    "pattern":"java.desktop:\\Qjavax/swing/plaf/metal/icons/sortUp.png\\E"
+  }, {
+    "pattern":"java.desktop:\\Qjavax/swing/text/html/default.css\\E"
+  }, {
+    "pattern":"java.desktop:\\Qjavax/swing/text/html/parser/html32.bdtd\\E"
+  }, {
+    "pattern":"java.desktop:\\Qsun/awt/resources/cursors/CopyDrop32x32.gif\\E"
+  }, {
+    "pattern":"java.desktop:\\Qsun/awt/resources/cursors/LinkDrop32x32.gif\\E"
+  }, {
+    "pattern":"java.desktop:\\Qsun/awt/resources/cursors/MoveDrop32x32.gif\\E"
+  }, {
+    "pattern":"java.desktop:\\Qsun/awt/resources/cursors/cursors.properties\\E"
+  }, {
+    "pattern":"java.desktop:\\Qsun/awt/resources/cursors/invalid32x32.gif\\E"
+  }, {
+    "pattern":"java.xml:\\Qcom/sun/org/apache/xml/internal/serializer/Encodings.properties\\E"
+  }]},
+  "bundles":[{
+    "name":"com.sun.org.apache.xml.internal.serializer.XMLEntities",
+    "locales":[""]
+  }, {
+    "name":"com.sun.swing.internal.plaf.basic.resources.basic",
+    "classNames":["com.sun.swing.internal.plaf.basic.resources.basic"]
+  }, {
+    "name":"com.sun.swing.internal.plaf.metal.resources.metal",
+    "classNames":["com.sun.swing.internal.plaf.metal.resources.metal"]
+  }, {
+    "name":"com.sun.tools.javac.resources.compiler",
+    "classNames":["com.sun.tools.javac.resources.compiler"]
+  }, {
+    "name":"com.sun.tools.javac.resources.javac",
+    "classNames":["com.sun.tools.javac.resources.javac"]
+  }, {
+    "name":"data.bibliothek.gui.dock.common.locale.common",
+    "locales":[""]
+  }, {
+    "name":"data.bibliothek.gui.dock.core.locale.text",
+    "locales":[""]
+  }, {
+    "name":"de.uka.ilkd.key.gui.smt.settings.messages",
+    "locales":[""]
+  }, {
+    "name":"de.uka.ilkd.key.nparser.builder.resources",
+    "locales":[""]
+  }, {
+    "name":"sun.awt.resources.awt",
+    "classNames":["sun.awt.resources.awt"]
+  }]
+}

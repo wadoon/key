@@ -1,0 +1,1441 @@
+[
+{
+  "name":"[Lde.uka.ilkd.key.java.Comment;"
+},
+{
+  "name":"[Lde.uka.ilkd.key.java.Expression;"
+},
+{
+  "name":"[Lde.uka.ilkd.key.java.Import;"
+},
+{
+  "name":"[Lde.uka.ilkd.key.java.ProgramElement;"
+},
+{
+  "name":"[Lde.uka.ilkd.key.java.Statement;"
+},
+{
+  "name":"[Lde.uka.ilkd.key.java.declaration.FieldSpecification;"
+},
+{
+  "name":"[Lde.uka.ilkd.key.java.declaration.Modifier;"
+},
+{
+  "name":"[Lde.uka.ilkd.key.java.declaration.ParameterDeclaration;"
+},
+{
+  "name":"[Lde.uka.ilkd.key.java.declaration.TypeDeclaration;"
+},
+{
+  "name":"[Lde.uka.ilkd.key.java.declaration.VariableSpecification;"
+},
+{
+  "name":"[Lde.uka.ilkd.key.java.statement.Branch;"
+},
+{
+  "name":"[Lde.uka.ilkd.key.logic.Term;"
+},
+{
+  "name":"[Lde.uka.ilkd.key.logic.op.QuantifiableVariable;"
+},
+{
+  "name":"[Lde.uka.ilkd.key.logic.sort.Sort;"
+},
+{
+  "name":"[Lde.uka.ilkd.key.strategy.definition.AbstractStrategyPropertyDefinition;"
+},
+{
+  "name":"[Lde.uka.ilkd.key.strategy.definition.StrategyPropertyValueDefinition;"
+},
+{
+  "name":"[Ljava.awt.event.MouseMotionListener;"
+},
+{
+  "name":"[Ljava.awt.event.WindowFocusListener;"
+},
+{
+  "name":"[Ljava.lang.Boolean;"
+},
+{
+  "name":"[Ljavax.swing.event.TreeExpansionListener;"
+},
+{
+  "name":"bibliothek.extension.gui.dock.theme.BubbleTheme",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"bibliothek.extension.gui.dock.theme.EclipseTheme",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"bibliothek.extension.gui.dock.theme.FlatTheme",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"bibliothek.extension.gui.dock.theme.SmoothTheme",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"bibliothek.extension.gui.dock.theme.smooth.SmoothDefaultTitle",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"bibliothek.gui.DockController"
+},
+{
+  "name":"bibliothek.gui.DockFrontend"
+},
+{
+  "name":"bibliothek.gui.DockFrontend$Internals"
+},
+{
+  "name":"bibliothek.gui.DockUI"
+},
+{
+  "name":"bibliothek.gui.ToolbarExtension"
+},
+{
+  "name":"bibliothek.gui.dock.FlapDockStation"
+},
+{
+  "name":"bibliothek.gui.dock.ScreenDockStation"
+},
+{
+  "name":"bibliothek.gui.dock.SplitDockStation",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"bibliothek.gui.dock.SplitDockStation$Content",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"bibliothek.gui.dock.StackDockStation"
+},
+{
+  "name":"bibliothek.gui.dock.StackDockStation$Background",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"bibliothek.gui.dock.StackDockStation$Background$1",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"bibliothek.gui.dock.common.CContentArea",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"bibliothek.gui.dock.common.CContentArea$MinimizeStation",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"bibliothek.gui.dock.common.CControl"
+},
+{
+  "name":"bibliothek.gui.dock.common.CControl$9"
+},
+{
+  "name":"bibliothek.gui.dock.common.CControl$Access"
+},
+{
+  "name":"bibliothek.gui.dock.common.CMinimizeArea",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"bibliothek.gui.dock.common.group.SingleGroupMovement"
+},
+{
+  "name":"bibliothek.gui.dock.common.intern.AbstractCDockable"
+},
+{
+  "name":"bibliothek.gui.dock.common.intern.CDockFrontend"
+},
+{
+  "name":"bibliothek.gui.dock.common.intern.CDockFrontend$1"
+},
+{
+  "name":"bibliothek.gui.dock.common.intern.station.CSplitDockStation",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"bibliothek.gui.dock.common.intern.station.CommonDockStationFactory"
+},
+{
+  "name":"bibliothek.gui.dock.common.mode.CLocationModeManager"
+},
+{
+  "name":"bibliothek.gui.dock.common.mode.station.CSplitDockStationHandle$Normal"
+},
+{
+  "name":"bibliothek.gui.dock.common.theme.ThemeMap"
+},
+{
+  "name":"bibliothek.gui.dock.common.theme.ThemeMap$1"
+},
+{
+  "name":"bibliothek.gui.dock.control.DockRegister"
+},
+{
+  "name":"bibliothek.gui.dock.facile.mode.AbstractLocationMode"
+},
+{
+  "name":"bibliothek.gui.dock.facile.mode.DefaultLocationMode"
+},
+{
+  "name":"bibliothek.gui.dock.facile.mode.LocationModeManager"
+},
+{
+  "name":"bibliothek.gui.dock.facile.mode.LocationModeManager$5"
+},
+{
+  "name":"bibliothek.gui.dock.facile.mode.LocationModeManager$6"
+},
+{
+  "name":"bibliothek.gui.dock.facile.mode.LocationModeManager$6$1"
+},
+{
+  "name":"bibliothek.gui.dock.focus.AbstractDockableSelection",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"bibliothek.gui.dock.focus.DefaultDockableSelection",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"bibliothek.gui.dock.focus.DefaultDockableSelection$Renderer",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"bibliothek.gui.dock.frontend.DefaultLayoutChangeStrategy"
+},
+{
+  "name":"bibliothek.gui.dock.layout.DockSituation"
+},
+{
+  "name":"bibliothek.gui.dock.layout.PredefinedDockSituation$PreloadFactory"
+},
+{
+  "name":"bibliothek.gui.dock.security.SecureContainer",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"bibliothek.gui.dock.station.AbstractDockStation"
+},
+{
+  "name":"bibliothek.gui.dock.station.AbstractDockableStation"
+},
+{
+  "name":"bibliothek.gui.dock.station.OverpaintablePanel",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"bibliothek.gui.dock.station.OverpaintablePanel$Overlay",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"bibliothek.gui.dock.station.flap.ButtonPane",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"bibliothek.gui.dock.station.flap.ButtonPane$Content",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"bibliothek.gui.dock.station.flap.FlapDockStationFactory"
+},
+{
+  "name":"bibliothek.gui.dock.station.screen.ScreenDockStationFactory"
+},
+{
+  "name":"bibliothek.gui.dock.station.split.Leaf"
+},
+{
+  "name":"bibliothek.gui.dock.station.split.Node"
+},
+{
+  "name":"bibliothek.gui.dock.station.split.Root"
+},
+{
+  "name":"bibliothek.gui.dock.station.split.SplitDockStationFactory"
+},
+{
+  "name":"bibliothek.gui.dock.station.split.SplitNode"
+},
+{
+  "name":"bibliothek.gui.dock.station.stack.DefaultStackDockComponent",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"bibliothek.gui.dock.station.stack.StackDockStationFactory"
+},
+{
+  "name":"bibliothek.gui.dock.support.mode.ModeManager"
+},
+{
+  "name":"bibliothek.gui.dock.support.mode.ModeManager$3"
+},
+{
+  "name":"bibliothek.gui.dock.support.mode.ModeManager$4"
+},
+{
+  "name":"bibliothek.gui.dock.support.util.ApplicationResourceManager"
+},
+{
+  "name":"bibliothek.gui.dock.themes.BasicTheme",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"bibliothek.gui.dock.themes.StationCombinerValue"
+},
+{
+  "name":"bibliothek.gui.dock.themes.ThemeCombiner"
+},
+{
+  "name":"bibliothek.gui.dock.themes.ThemeManager"
+},
+{
+  "name":"bibliothek.gui.dock.themes.basic.BasicCombiner"
+},
+{
+  "name":"bibliothek.gui.dock.themes.basic.BasicDockTitle",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"bibliothek.gui.dock.themes.basic.BasicDockableDisplayer",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"bibliothek.gui.dock.themes.basic.BasicDockableSelection",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"bibliothek.gui.dock.themes.basic.BasicDockableSelection$ImagePainter",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"bibliothek.gui.dock.themes.basic.BasicStackDockComponent",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"bibliothek.gui.dock.themes.basic.DisplayerContentPane",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"bibliothek.gui.dock.themes.basic.action.buttons.BasicMiniButton",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"bibliothek.gui.dock.themes.basic.action.buttons.ButtonPanel",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"bibliothek.gui.dock.themes.basic.action.buttons.MiniButton",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"bibliothek.gui.dock.themes.basic.action.buttons.MiniButtonContent",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"bibliothek.gui.dock.themes.basic.action.buttons.MiniButtonContent$3",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"bibliothek.gui.dock.title.AbstractDockTitle",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"bibliothek.gui.dock.title.AbstractDockTitle$1",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"bibliothek.gui.dock.title.AbstractMultiDockTitle",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"bibliothek.gui.dock.title.AbstractMultiDockTitle$1",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"bibliothek.gui.dock.toolbar.CToolbarExtension"
+},
+{
+  "name":"bibliothek.gui.dock.util.BackgroundPanel",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"bibliothek.gui.dock.util.ConfiguredBackgroundPanel",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"bibliothek.gui.dock.util.DockUtilities"
+},
+{
+  "name":"bibliothek.gui.dock.util.swing.DLabel",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"bibliothek.gui.dock.util.swing.OrientedLabel",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"bibliothek.util.workarounds.Java9Workaround",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"ch.qos.logback.classic.encoder.PatternLayoutEncoder",
+  "queryAllPublicMethods":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"ch.qos.logback.classic.filter.ThresholdFilter",
+  "queryAllPublicMethods":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"setLevel","parameterTypes":["java.lang.String"] }]
+},
+{
+  "name":"ch.qos.logback.classic.pattern.DateConverter",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"ch.qos.logback.classic.pattern.FileOfCallerConverter",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"ch.qos.logback.classic.pattern.LevelConverter",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"ch.qos.logback.classic.pattern.LineOfCallerConverter",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"ch.qos.logback.classic.pattern.LineSeparatorConverter",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"ch.qos.logback.classic.pattern.LoggerConverter",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"ch.qos.logback.classic.pattern.MessageConverter",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"ch.qos.logback.classic.pattern.NopThrowableInformationConverter",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"ch.qos.logback.classic.pattern.RelativeTimeConverter",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"ch.qos.logback.classic.pattern.ThreadConverter",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"ch.qos.logback.classic.pattern.ThrowableProxyConverter",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"ch.qos.logback.classic.pattern.color.HighlightingCompositeConverter",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"ch.qos.logback.core.ConsoleAppender",
+  "queryAllPublicMethods":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"ch.qos.logback.core.FileAppender",
+  "queryAllPublicMethods":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"setAppend","parameterTypes":["boolean"] }, {"name":"setFile","parameterTypes":["java.lang.String"] }]
+},
+{
+  "name":"ch.qos.logback.core.OutputStreamAppender",
+  "methods":[{"name":"setEncoder","parameterTypes":["ch.qos.logback.core.encoder.Encoder"] }]
+},
+{
+  "name":"ch.qos.logback.core.UnsynchronizedAppenderBase",
+  "methods":[{"name":"addFilter","parameterTypes":["ch.qos.logback.core.filter.Filter"] }]
+},
+{
+  "name":"ch.qos.logback.core.encoder.Encoder",
+  "methods":[{"name":"valueOf","parameterTypes":["java.lang.String"] }]
+},
+{
+  "name":"ch.qos.logback.core.encoder.LayoutWrappingEncoder",
+  "methods":[{"name":"setCharset","parameterTypes":["java.nio.charset.Charset"] }, {"name":"setParent","parameterTypes":["ch.qos.logback.core.spi.ContextAware"] }]
+},
+{
+  "name":"ch.qos.logback.core.filter.Filter",
+  "methods":[{"name":"valueOf","parameterTypes":["java.lang.String"] }]
+},
+{
+  "name":"ch.qos.logback.core.pattern.PatternLayoutEncoderBase",
+  "methods":[{"name":"setOutputPatternAsHeader","parameterTypes":["boolean"] }, {"name":"setPattern","parameterTypes":["java.lang.String"] }]
+},
+{
+  "name":"ch.qos.logback.core.pattern.ReplacingCompositeConverter",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"ch.qos.logback.core.pattern.color.CyanCompositeConverter",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"ch.qos.logback.core.spi.ContextAware",
+  "methods":[{"name":"valueOf","parameterTypes":["java.lang.String"] }]
+},
+{
+  "name":"ch.qos.logback.core.status.NopStatusListener",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"com.apple.eawt.Application"
+},
+{
+  "name":"com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.ClassTree",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.ClassTree$1",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.ContractSelectionPanel",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.ContractSelectionPanel$1",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.ExampleChooser",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.GoalList",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.GoalList$IconCellRenderer",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.InfoTree",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.InfoView",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.InfoViewContentPane",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.IssueDialog",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.KeYFileChooser",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.KeYFileChooserBookmarkPanel",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.LogView",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.MainStatusLine",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.MainWindow",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.MainWindow$BlockingGlassPane",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.MaxRuleAppSlider",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.ProofManagementDialog",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.ProofManagementDialog$2",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.SearchBar",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.StrategySelectionView",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.TaskTree",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.TaskTree$TaskTreeIconCellRenderer",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.actions.KeYMenuCheckBox",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.actions.MinimizeInteraction",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.actions.ShowProofStatistics$StatisticsEditorPane",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.actions.ShowProofStatistics$Window",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.actions.TermLabelMenu",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.actions.TermLabelMenu$DisplayLabelsCheckBox",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.actions.TermLabelMenu$TermLabelCheckBox",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.colors.ColorSettingsProvider",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.colors.ColorSettingsProvider$1",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.docking.DockingHelper"
+},
+{
+  "name":"de.uka.ilkd.key.gui.docking.DockingLayout",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.extension.ExtensionManager",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.extension.impl.HeatmapExt",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.extension.impl.HeatmapSettingsProvider",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.keyshortcuts.ShortcutSettings",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.nodeviews.CurrentGoalView",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.nodeviews.CurrentGoalViewMenu",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.nodeviews.EmptySequent",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.nodeviews.InnerNodeView",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.nodeviews.InnerNodeViewMenu",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.nodeviews.MainFrame",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.nodeviews.SequentView",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.nodeviews.SequentViewMenu",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.nodeviews.SequentViewPanel",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.nodeviews.SequentViewSearchBar",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.originlabels.OriginTermLabelsExt",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.plugins.caching.CachingExtension",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.plugins.caching.CachingSettingsProvider",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.plugins.caching.ReferenceSearchButton",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.plugins.javac.JavacExtension",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.prooftree.ProofTreeSearchBar",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.prooftree.ProofTreeView",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.prooftree.ProofTreeView$2",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.prooftree.ProofTreeView$ProofRenderer",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.settings.SettingsDialog",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.settings.SettingsPanel",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.settings.SettingsUi",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.settings.SettingsUi$1",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.settings.SimpleSettingsPanel",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.settings.SimpleSettingsPanel$1",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.settings.StandardUISettings",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.settings.TacletOptionsSettings",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.smt.DropdownSelectionButton$DoubleClickCheckBoxMenuItem",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.smt.settings.NewTranslationOptions",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.smt.settings.SMTSettingsProvider",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.smt.settings.SolverOptions",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.smt.settings.TacletTranslationOptions",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.sourceview.SourceView",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.sourceview.SourceView$Tab",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.sourceview.SourceView$Tab$1",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.sourceview.SourceView$TabbedPane",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.sourceview.SourceViewFrame",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.sourceview.TextLineNumber",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.testgen.TGInfoDialog",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.testgen.TestgenExtension",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"de.uka.ilkd.key.gui.testgen.TestgenOptionsPanel",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"de.uka.ilkd.key.java.Recoder2KeYConverter",
+  "methods":[{"name":"convert","parameterTypes":["de.uka.ilkd.key.java.recoderext.Ccatch"] }, {"name":"convert","parameterTypes":["de.uka.ilkd.key.java.recoderext.CcatchBreakLabelParameterDeclaration"] }, {"name":"convert","parameterTypes":["de.uka.ilkd.key.java.recoderext.CcatchBreakParameterDeclaration"] }, {"name":"convert","parameterTypes":["de.uka.ilkd.key.java.recoderext.CcatchBreakWildcardParameterDeclaration"] }, {"name":"convert","parameterTypes":["de.uka.ilkd.key.java.recoderext.CcatchContinueLabelParameterDeclaration"] }, {"name":"convert","parameterTypes":["de.uka.ilkd.key.java.recoderext.CcatchContinueParameterDeclaration"] }, {"name":"convert","parameterTypes":["de.uka.ilkd.key.java.recoderext.CcatchContinueWildcardParameterDeclaration"] }, {"name":"convert","parameterTypes":["de.uka.ilkd.key.java.recoderext.CcatchReturnParameterDeclaration"] }, {"name":"convert","parameterTypes":["de.uka.ilkd.key.java.recoderext.CcatchReturnValParameterDeclaration"] }, {"name":"convert","parameterTypes":["de.uka.ilkd.key.java.recoderext.Exec"] }, {"name":"convert","parameterTypes":["de.uka.ilkd.key.java.recoderext.ExtendedIdentifier"] }, {"name":"convert","parameterTypes":["de.uka.ilkd.key.java.recoderext.Ghost"] }, {"name":"convert","parameterTypes":["de.uka.ilkd.key.java.recoderext.ImplicitIdentifier"] }, {"name":"convert","parameterTypes":["de.uka.ilkd.key.java.recoderext.JMLTransformer$1"] }, {"name":"convert","parameterTypes":["de.uka.ilkd.key.java.recoderext.MethodBodyStatement"] }, {"name":"convert","parameterTypes":["de.uka.ilkd.key.java.recoderext.Model"] }, {"name":"convert","parameterTypes":["de.uka.ilkd.key.java.recoderext.PassiveExpression"] }, {"name":"convert","parameterTypes":["de.uka.ilkd.key.java.recoderext.TransactionStatement"] }, {"name":"convert","parameterTypes":["de.uka.ilkd.key.java.recoderext.adt.AllFields"] }, {"name":"convert","parameterTypes":["de.uka.ilkd.key.java.recoderext.adt.AllObjects"] }, {"name":"convert","parameterTypes":["de.uka.ilkd.key.java.recoderext.adt.Intersect"] }, {"name":"convert","parameterTypes":["de.uka.ilkd.key.java.recoderext.adt.SeqConcat"] }, {"name":"convert","parameterTypes":["de.uka.ilkd.key.java.recoderext.adt.SeqGet"] }, {"name":"convert","parameterTypes":["de.uka.ilkd.key.java.recoderext.adt.SeqIndexOf"] }, {"name":"convert","parameterTypes":["de.uka.ilkd.key.java.recoderext.adt.SeqLength"] }, {"name":"convert","parameterTypes":["de.uka.ilkd.key.java.recoderext.adt.SeqReverse"] }, {"name":"convert","parameterTypes":["de.uka.ilkd.key.java.recoderext.adt.SeqSingleton"] }, {"name":"convert","parameterTypes":["de.uka.ilkd.key.java.recoderext.adt.SeqSub"] }, {"name":"convert","parameterTypes":["de.uka.ilkd.key.java.recoderext.adt.SetMinus"] }, {"name":"convert","parameterTypes":["de.uka.ilkd.key.java.recoderext.adt.SetUnion"] }, {"name":"convert","parameterTypes":["de.uka.ilkd.key.java.recoderext.adt.Singleton"] }, {"name":"convert","parameterTypes":["recoder.java.CompilationUnit"] }, {"name":"convert","parameterTypes":["recoder.java.Identifier"] }, {"name":"convert","parameterTypes":["recoder.java.JavaProgramElement"] }, {"name":"convert","parameterTypes":["recoder.java.PackageSpecification"] }, {"name":"convert","parameterTypes":["recoder.java.StatementBlock"] }, {"name":"convert","parameterTypes":["recoder.java.declaration.ClassDeclaration"] }, {"name":"convert","parameterTypes":["recoder.java.declaration.ConstructorDeclaration"] }, {"name":"convert","parameterTypes":["recoder.java.declaration.Extends"] }, {"name":"convert","parameterTypes":["recoder.java.declaration.FieldDeclaration"] }, {"name":"convert","parameterTypes":["recoder.java.declaration.FieldSpecification"] }, {"name":"convert","parameterTypes":["recoder.java.declaration.Implements"] }, {"name":"convert","parameterTypes":["recoder.java.declaration.InterfaceDeclaration"] }, {"name":"convert","parameterTypes":["recoder.java.declaration.LocalVariableDeclaration"] }, {"name":"convert","parameterTypes":["recoder.java.declaration.MethodDeclaration"] }, {"name":"convert","parameterTypes":["recoder.java.declaration.Modifier"] }, {"name":"convert","parameterTypes":["recoder.java.declaration.ParameterDeclaration"] }, {"name":"convert","parameterTypes":["recoder.java.declaration.Throws"] }, {"name":"convert","parameterTypes":["recoder.java.declaration.VariableSpecification"] }, {"name":"convert","parameterTypes":["recoder.java.declaration.modifier.Abstract"] }, {"name":"convert","parameterTypes":["recoder.java.declaration.modifier.Final"] }, {"name":"convert","parameterTypes":["recoder.java.declaration.modifier.Native"] }, {"name":"convert","parameterTypes":["recoder.java.declaration.modifier.Private"] }, {"name":"convert","parameterTypes":["recoder.java.declaration.modifier.Protected"] }, {"name":"convert","parameterTypes":["recoder.java.declaration.modifier.Public"] }, {"name":"convert","parameterTypes":["recoder.java.declaration.modifier.Static"] }, {"name":"convert","parameterTypes":["recoder.java.expression.ParenthesizedExpression"] }, {"name":"convert","parameterTypes":["recoder.java.expression.literal.BooleanLiteral"] }, {"name":"convert","parameterTypes":["recoder.java.expression.literal.DoubleLiteral"] }, {"name":"convert","parameterTypes":["recoder.java.expression.literal.FloatLiteral"] }, {"name":"convert","parameterTypes":["recoder.java.expression.literal.IntLiteral"] }, {"name":"convert","parameterTypes":["recoder.java.expression.literal.LongLiteral"] }, {"name":"convert","parameterTypes":["recoder.java.expression.literal.NullLiteral"] }, {"name":"convert","parameterTypes":["recoder.java.expression.literal.StringLiteral"] }, {"name":"convert","parameterTypes":["recoder.java.expression.operator.BinaryAnd"] }, {"name":"convert","parameterTypes":["recoder.java.expression.operator.BinaryAndAssignment"] }, {"name":"convert","parameterTypes":["recoder.java.expression.operator.BinaryNot"] }, {"name":"convert","parameterTypes":["recoder.java.expression.operator.BinaryOr"] }, {"name":"convert","parameterTypes":["recoder.java.expression.operator.BinaryOrAssignment"] }, {"name":"convert","parameterTypes":["recoder.java.expression.operator.BinaryXOr"] }, {"name":"convert","parameterTypes":["recoder.java.expression.operator.BinaryXOrAssignment"] }, {"name":"convert","parameterTypes":["recoder.java.expression.operator.Conditional"] }, {"name":"convert","parameterTypes":["recoder.java.expression.operator.CopyAssignment"] }, {"name":"convert","parameterTypes":["recoder.java.expression.operator.Divide"] }, {"name":"convert","parameterTypes":["recoder.java.expression.operator.DivideAssignment"] }, {"name":"convert","parameterTypes":["recoder.java.expression.operator.Equals"] }, {"name":"convert","parameterTypes":["recoder.java.expression.operator.GreaterOrEquals"] }, {"name":"convert","parameterTypes":["recoder.java.expression.operator.GreaterThan"] }, {"name":"convert","parameterTypes":["recoder.java.expression.operator.Instanceof"] }, {"name":"convert","parameterTypes":["recoder.java.expression.operator.LessOrEquals"] }, {"name":"convert","parameterTypes":["recoder.java.expression.operator.LessThan"] }, {"name":"convert","parameterTypes":["recoder.java.expression.operator.LogicalAnd"] }, {"name":"convert","parameterTypes":["recoder.java.expression.operator.LogicalNot"] }, {"name":"convert","parameterTypes":["recoder.java.expression.operator.LogicalOr"] }, {"name":"convert","parameterTypes":["recoder.java.expression.operator.Minus"] }, {"name":"convert","parameterTypes":["recoder.java.expression.operator.MinusAssignment"] }, {"name":"convert","parameterTypes":["recoder.java.expression.operator.Modulo"] }, {"name":"convert","parameterTypes":["recoder.java.expression.operator.ModuloAssignment"] }, {"name":"convert","parameterTypes":["recoder.java.expression.operator.Negative"] }, {"name":"convert","parameterTypes":["recoder.java.expression.operator.New"] }, {"name":"convert","parameterTypes":["recoder.java.expression.operator.NotEquals"] }, {"name":"convert","parameterTypes":["recoder.java.expression.operator.Plus"] }, {"name":"convert","parameterTypes":["recoder.java.expression.operator.PlusAssignment"] }, {"name":"convert","parameterTypes":["recoder.java.expression.operator.Positive"] }, {"name":"convert","parameterTypes":["recoder.java.expression.operator.PostDecrement"] }, {"name":"convert","parameterTypes":["recoder.java.expression.operator.PostIncrement"] }, {"name":"convert","parameterTypes":["recoder.java.expression.operator.PreDecrement"] }, {"name":"convert","parameterTypes":["recoder.java.expression.operator.PreIncrement"] }, {"name":"convert","parameterTypes":["recoder.java.expression.operator.ShiftLeft"] }, {"name":"convert","parameterTypes":["recoder.java.expression.operator.ShiftLeftAssignment"] }, {"name":"convert","parameterTypes":["recoder.java.expression.operator.ShiftRight"] }, {"name":"convert","parameterTypes":["recoder.java.expression.operator.ShiftRightAssignment"] }, {"name":"convert","parameterTypes":["recoder.java.expression.operator.Times"] }, {"name":"convert","parameterTypes":["recoder.java.expression.operator.TimesAssignment"] }, {"name":"convert","parameterTypes":["recoder.java.expression.operator.TypeCast"] }, {"name":"convert","parameterTypes":["recoder.java.expression.operator.UnsignedShiftRight"] }, {"name":"convert","parameterTypes":["recoder.java.expression.operator.UnsignedShiftRightAssignment"] }, {"name":"convert","parameterTypes":["recoder.java.reference.ArrayLengthReference"] }, {"name":"convert","parameterTypes":["recoder.java.reference.ArrayReference"] }, {"name":"convert","parameterTypes":["recoder.java.reference.FieldReference"] }, {"name":"convert","parameterTypes":["recoder.java.reference.MethodReference"] }, {"name":"convert","parameterTypes":["recoder.java.reference.PackageReference"] }, {"name":"convert","parameterTypes":["recoder.java.reference.SuperConstructorReference"] }, {"name":"convert","parameterTypes":["recoder.java.reference.SuperReference"] }, {"name":"convert","parameterTypes":["recoder.java.reference.ThisConstructorReference"] }, {"name":"convert","parameterTypes":["recoder.java.reference.ThisReference"] }, {"name":"convert","parameterTypes":["recoder.java.reference.TypeReference"] }, {"name":"convert","parameterTypes":["recoder.java.reference.VariableReference"] }, {"name":"convert","parameterTypes":["recoder.java.statement.Assert"] }, {"name":"convert","parameterTypes":["recoder.java.statement.Break"] }, {"name":"convert","parameterTypes":["recoder.java.statement.Catch"] }, {"name":"convert","parameterTypes":["recoder.java.statement.Do"] }, {"name":"convert","parameterTypes":["recoder.java.statement.Else"] }, {"name":"convert","parameterTypes":["recoder.java.statement.EmptyStatement"] }, {"name":"convert","parameterTypes":["recoder.java.statement.EnhancedFor"] }, {"name":"convert","parameterTypes":["recoder.java.statement.Finally"] }, {"name":"convert","parameterTypes":["recoder.java.statement.If"] }, {"name":"convert","parameterTypes":["recoder.java.statement.LabeledStatement"] }, {"name":"convert","parameterTypes":["recoder.java.statement.Return"] }, {"name":"convert","parameterTypes":["recoder.java.statement.SynchronizedBlock"] }, {"name":"convert","parameterTypes":["recoder.java.statement.Then"] }, {"name":"convert","parameterTypes":["recoder.java.statement.Throw"] }, {"name":"convert","parameterTypes":["recoder.java.statement.Try"] }, {"name":"convert","parameterTypes":["recoder.java.statement.While"] }]
+},
+{
+  "name":"de.uka.ilkd.key.java.SchemaRecoder2KeYConverter",
+  "methods":[{"name":"convert","parameterTypes":["de.uka.ilkd.key.java.recoderext.CatchSVWrapper"] }, {"name":"convert","parameterTypes":["de.uka.ilkd.key.java.recoderext.CcatchSVWrapper"] }, {"name":"convert","parameterTypes":["de.uka.ilkd.key.java.recoderext.ContextStatementBlock"] }, {"name":"convert","parameterTypes":["de.uka.ilkd.key.java.recoderext.ExecCtxtSVWrapper"] }, {"name":"convert","parameterTypes":["de.uka.ilkd.key.java.recoderext.ExecutionContext"] }, {"name":"convert","parameterTypes":["de.uka.ilkd.key.java.recoderext.ExpressionSVWrapper"] }, {"name":"convert","parameterTypes":["de.uka.ilkd.key.java.recoderext.ExtendedIdentifier"] }, {"name":"convert","parameterTypes":["de.uka.ilkd.key.java.recoderext.LabelSVWrapper"] }, {"name":"convert","parameterTypes":["de.uka.ilkd.key.java.recoderext.LoopScopeBlock"] }, {"name":"convert","parameterTypes":["de.uka.ilkd.key.java.recoderext.MergePointStatement"] }, {"name":"convert","parameterTypes":["de.uka.ilkd.key.java.recoderext.MethodSignatureSVWrapper"] }, {"name":"convert","parameterTypes":["de.uka.ilkd.key.java.recoderext.ProgramVariableSVWrapper"] }, {"name":"convert","parameterTypes":["de.uka.ilkd.key.java.recoderext.RKeYMetaConstruct"] }, {"name":"convert","parameterTypes":["de.uka.ilkd.key.java.recoderext.RKeYMetaConstructExpression"] }, {"name":"convert","parameterTypes":["de.uka.ilkd.key.java.recoderext.RKeYMetaConstructType"] }, {"name":"convert","parameterTypes":["de.uka.ilkd.key.java.recoderext.RMethodBodyStatement"] }, {"name":"convert","parameterTypes":["de.uka.ilkd.key.java.recoderext.RMethodCallStatement"] }, {"name":"convert","parameterTypes":["de.uka.ilkd.key.java.recoderext.StatementSVWrapper"] }, {"name":"convert","parameterTypes":["de.uka.ilkd.key.java.recoderext.TypeSVWrapper"] }, {"name":"convert","parameterTypes":["recoder.java.JavaNonTerminalProgramElement"] }, {"name":"convert","parameterTypes":["recoder.java.declaration.LocalVariableDeclaration"] }, {"name":"convert","parameterTypes":["recoder.java.declaration.VariableSpecification"] }, {"name":"convert","parameterTypes":["recoder.java.reference.FieldReference"] }, {"name":"convert","parameterTypes":["recoder.java.reference.MethodReference"] }, {"name":"convert","parameterTypes":["recoder.java.reference.SuperReference"] }, {"name":"convert","parameterTypes":["recoder.java.reference.ThisReference"] }, {"name":"convert","parameterTypes":["recoder.java.reference.TypeReference"] }, {"name":"convert","parameterTypes":["recoder.java.statement.Continue"] }, {"name":"convert","parameterTypes":["recoder.java.statement.For"] }, {"name":"convert","parameterTypes":["recoder.java.statement.JavaStatement"] }, {"name":"convert","parameterTypes":["recoder.java.statement.JumpStatement"] }, {"name":"convert","parameterTypes":["recoder.java.statement.LabelJumpStatement"] }]
+},
+{
+  "name":"de.uka.ilkd.key.java.declaration.modifier.Native",
+  "methods":[{"name":"<init>","parameterTypes":["org.key_project.util.ExtList"] }]
+},
+{
+  "name":"de.uka.ilkd.key.java.statement.Continue",
+  "methods":[{"name":"<init>","parameterTypes":["org.key_project.util.ExtList"] }]
+},
+{
+  "name":"de.uka.ilkd.key.proof.init.FunctionalOperationContractPO",
+  "methods":[{"name":"loadFrom","parameterTypes":["de.uka.ilkd.key.proof.init.InitConfig","java.util.Properties"] }]
+},
+{
+  "name":"de.uka.ilkd.key.rule.conditions.AbstractOrInterfaceType",
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":["de.uka.ilkd.key.rule.conditions.TypeResolver","boolean"] }]
+},
+{
+  "name":"de.uka.ilkd.key.rule.conditions.ApplyUpdateOnRigidCondition",
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":["de.uka.ilkd.key.logic.op.UpdateSV","de.uka.ilkd.key.logic.op.SchemaVariable","de.uka.ilkd.key.logic.op.SchemaVariable"] }]
+},
+{
+  "name":"de.uka.ilkd.key.rule.conditions.ArrayLengthCondition",
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":["de.uka.ilkd.key.logic.op.SchemaVariable","boolean"] }]
+},
+{
+  "name":"de.uka.ilkd.key.rule.conditions.ArrayTypeCondition",
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":["de.uka.ilkd.key.logic.op.SchemaVariable","boolean"] }]
+},
+{
+  "name":"de.uka.ilkd.key.rule.conditions.ConstantCondition",
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":["de.uka.ilkd.key.logic.op.AbstractSortedOperator","boolean"] }]
+},
+{
+  "name":"de.uka.ilkd.key.rule.conditions.ContainsAssignmentCondition",
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":["de.uka.ilkd.key.logic.op.SchemaVariable","boolean"] }]
+},
+{
+  "name":"de.uka.ilkd.key.rule.conditions.DifferentFields",
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":["de.uka.ilkd.key.logic.op.SchemaVariable","de.uka.ilkd.key.logic.op.SchemaVariable"] }]
+},
+{
+  "name":"de.uka.ilkd.key.rule.conditions.DifferentInstantiationCondition",
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":["de.uka.ilkd.key.logic.op.SchemaVariable","de.uka.ilkd.key.logic.op.SchemaVariable"] }]
+},
+{
+  "name":"de.uka.ilkd.key.rule.conditions.DropEffectlessElementariesCondition",
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":["de.uka.ilkd.key.logic.op.UpdateSV","de.uka.ilkd.key.logic.op.SchemaVariable","de.uka.ilkd.key.logic.op.SchemaVariable"] }]
+},
+{
+  "name":"de.uka.ilkd.key.rule.conditions.DropEffectlessStoresCondition",
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":["de.uka.ilkd.key.logic.op.TermSV","de.uka.ilkd.key.logic.op.TermSV","de.uka.ilkd.key.logic.op.TermSV","de.uka.ilkd.key.logic.op.TermSV","de.uka.ilkd.key.logic.op.TermSV"] }]
+},
+{
+  "name":"de.uka.ilkd.key.rule.conditions.EnumConstantCondition",
+  "queryAllPublicConstructors":true
+},
+{
+  "name":"de.uka.ilkd.key.rule.conditions.EnumTypeCondition",
+  "queryAllPublicConstructors":true
+},
+{
+  "name":"de.uka.ilkd.key.rule.conditions.EqualUniqueCondition",
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":["de.uka.ilkd.key.logic.op.TermSV","de.uka.ilkd.key.logic.op.TermSV","de.uka.ilkd.key.logic.op.FormulaSV"] }]
+},
+{
+  "name":"de.uka.ilkd.key.rule.conditions.FieldTypeToSortCondition",
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":["de.uka.ilkd.key.logic.op.SchemaVariable","de.uka.ilkd.key.logic.sort.GenericSort"] }]
+},
+{
+  "name":"de.uka.ilkd.key.rule.conditions.FinalReferenceCondition",
+  "queryAllPublicConstructors":true
+},
+{
+  "name":"de.uka.ilkd.key.rule.conditions.FreeLabelInVariableCondition",
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":["de.uka.ilkd.key.logic.op.SchemaVariable","de.uka.ilkd.key.logic.op.SchemaVariable","boolean"] }]
+},
+{
+  "name":"de.uka.ilkd.key.rule.conditions.HasLoopInvariantCondition",
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":["de.uka.ilkd.key.logic.op.ProgramSV","de.uka.ilkd.key.logic.op.SchemaVariable"] }]
+},
+{
+  "name":"de.uka.ilkd.key.rule.conditions.InStrictFp",
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":["boolean"] }]
+},
+{
+  "name":"de.uka.ilkd.key.rule.conditions.IsThisReference",
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":["de.uka.ilkd.key.logic.op.ParsableVariable","boolean"] }]
+},
+{
+  "name":"de.uka.ilkd.key.rule.conditions.LocalVariableCondition",
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":["de.uka.ilkd.key.logic.op.SchemaVariable","boolean"] }]
+},
+{
+  "name":"de.uka.ilkd.key.rule.conditions.LoopFreeInvariantCondition",
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":["de.uka.ilkd.key.logic.op.ProgramSV","de.uka.ilkd.key.logic.op.SchemaVariable","de.uka.ilkd.key.logic.op.SchemaVariable"] }]
+},
+{
+  "name":"de.uka.ilkd.key.rule.conditions.LoopInvariantCondition",
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":["de.uka.ilkd.key.logic.op.ProgramSV","de.uka.ilkd.key.logic.op.SchemaVariable","de.uka.ilkd.key.logic.op.SchemaVariable"] }]
+},
+{
+  "name":"de.uka.ilkd.key.rule.conditions.MayExpandMethodCondition",
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":["de.uka.ilkd.key.logic.op.SchemaVariable","de.uka.ilkd.key.logic.op.SchemaVariable","de.uka.ilkd.key.logic.op.SchemaVariable","boolean"] }, {"name":"<init>","parameterTypes":["de.uka.ilkd.key.logic.op.SchemaVariable","de.uka.ilkd.key.logic.op.SchemaVariable","boolean"] }]
+},
+{
+  "name":"de.uka.ilkd.key.rule.conditions.MetaDisjointCondition",
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":["de.uka.ilkd.key.logic.op.TermSV","de.uka.ilkd.key.logic.op.TermSV"] }]
+},
+{
+  "name":"de.uka.ilkd.key.rule.conditions.ModelFieldCondition",
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":["de.uka.ilkd.key.logic.op.SchemaVariable","boolean"] }]
+},
+{
+  "name":"de.uka.ilkd.key.rule.conditions.NewJumpLabelCondition",
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":["de.uka.ilkd.key.logic.op.SchemaVariable"] }]
+},
+{
+  "name":"de.uka.ilkd.key.rule.conditions.ObserverCondition",
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":["de.uka.ilkd.key.logic.op.TermSV","de.uka.ilkd.key.logic.op.TermSV"] }]
+},
+{
+  "name":"de.uka.ilkd.key.rule.conditions.SameObserverCondition",
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":["de.uka.ilkd.key.logic.op.ParsableVariable","de.uka.ilkd.key.logic.op.ParsableVariable"] }]
+},
+{
+  "name":"de.uka.ilkd.key.rule.conditions.SimplifyIfThenElseUpdateCondition",
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":["de.uka.ilkd.key.logic.op.FormulaSV","de.uka.ilkd.key.logic.op.UpdateSV","de.uka.ilkd.key.logic.op.UpdateSV","de.uka.ilkd.key.logic.op.FormulaSV","de.uka.ilkd.key.logic.op.SchemaVariable"] }]
+},
+{
+  "name":"de.uka.ilkd.key.rule.conditions.StaticFieldCondition",
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":["de.uka.ilkd.key.logic.op.SchemaVariable","boolean"] }]
+},
+{
+  "name":"de.uka.ilkd.key.rule.conditions.StaticMethodCondition",
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":["de.uka.ilkd.key.logic.op.SchemaVariable","de.uka.ilkd.key.logic.op.SchemaVariable","de.uka.ilkd.key.logic.op.SchemaVariable","boolean"] }]
+},
+{
+  "name":"de.uka.ilkd.key.rule.conditions.StaticReferenceCondition",
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":["de.uka.ilkd.key.logic.op.SchemaVariable","boolean"] }]
+},
+{
+  "name":"de.uka.ilkd.key.rule.conditions.StoreStmtInCondition",
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":["de.uka.ilkd.key.logic.op.ProgramSV","de.uka.ilkd.key.logic.Term"] }]
+},
+{
+  "name":"de.uka.ilkd.key.rule.conditions.SubFormulaCondition",
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":["de.uka.ilkd.key.logic.op.FormulaSV","boolean"] }]
+},
+{
+  "name":"de.uka.ilkd.key.rule.conditions.TermLabelCondition",
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":["de.uka.ilkd.key.logic.op.TermLabelSV","java.lang.String","boolean"] }]
+},
+{
+  "name":"de.uka.ilkd.key.smt.SmtLib2Translator",
+  "methods":[{"name":"<init>","parameterTypes":["java.lang.String[]","java.lang.String[]","java.lang.String"] }]
+},
+{
+  "name":"de.uka.ilkd.key.smt.communication.CVC4Socket",
+  "methods":[{"name":"<init>","parameterTypes":["java.lang.String","de.uka.ilkd.key.smt.ModelExtractor"] }]
+},
+{
+  "name":"de.uka.ilkd.key.smt.communication.CVC5Socket",
+  "methods":[{"name":"<init>","parameterTypes":["java.lang.String","de.uka.ilkd.key.smt.ModelExtractor"] }]
+},
+{
+  "name":"de.uka.ilkd.key.smt.communication.Z3CESocket",
+  "methods":[{"name":"<init>","parameterTypes":["java.lang.String","de.uka.ilkd.key.smt.ModelExtractor"] }]
+},
+{
+  "name":"de.uka.ilkd.key.smt.communication.Z3Socket",
+  "methods":[{"name":"<init>","parameterTypes":["java.lang.String","de.uka.ilkd.key.smt.ModelExtractor"] }]
+},
+{
+  "name":"de.uka.ilkd.key.smt.newsmt2.BooleanConnectiveHandler",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"de.uka.ilkd.key.smt.newsmt2.CastHandler",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"de.uka.ilkd.key.smt.newsmt2.CastingFunctionsHandler",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"de.uka.ilkd.key.smt.newsmt2.DefinedSymbolsHandler",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"de.uka.ilkd.key.smt.newsmt2.FieldConstantHandler",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"de.uka.ilkd.key.smt.newsmt2.FloatHandler",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"de.uka.ilkd.key.smt.newsmt2.FloatRemainderHandler",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"de.uka.ilkd.key.smt.newsmt2.InstanceOfHandler",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"de.uka.ilkd.key.smt.newsmt2.IntegerOpHandler",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"de.uka.ilkd.key.smt.newsmt2.LogicalVariableHandler",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator",
+  "methods":[{"name":"<init>","parameterTypes":["java.lang.String[]","java.lang.String[]","java.lang.String"] }]
+},
+{
+  "name":"de.uka.ilkd.key.smt.newsmt2.NumberConstantsHandler",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"de.uka.ilkd.key.smt.newsmt2.PolymorphicHandler",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"de.uka.ilkd.key.smt.newsmt2.QuantifierHandler",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"de.uka.ilkd.key.smt.newsmt2.SumProdHandler",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"de.uka.ilkd.key.smt.newsmt2.UninterpretedSymbolsHandler",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"de.uka.ilkd.key.smt.newsmt2.UpdateHandler",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"glass.eclipse.CGlassExtension"
+},
+{
+  "name":"glass.eclipse.GlassExtension"
+},
+{
+  "name":"java.awt.Component",
+  "methods":[{"name":"setMixingCutoutShape","parameterTypes":["java.awt.Shape"] }]
+},
+{
+  "name":"java.awt.EventDispatchThread"
+},
+{
+  "name":"java.awt.EventQueue"
+},
+{
+  "name":"java.awt.EventQueue$4"
+},
+{
+  "name":"java.awt.SequencedEvent"
+},
+{
+  "name":"java.awt.Taskbar",
+  "methods":[{"name":"getTaskbar","parameterTypes":[] }, {"name":"setIconImage","parameterTypes":["java.awt.Image"] }]
+},
+{
+  "name":"java.awt.event.InvocationEvent"
+},
+{
+  "name":"java.awt.event.KeyEvent",
+  "allDeclaredFields":true,
+  "fields":[{"name":"VK_ADD"}, {"name":"VK_BACK_SLASH"}, {"name":"VK_BACK_SPACE"}, {"name":"VK_CONTEXT_MENU"}, {"name":"VK_COPY"}, {"name":"VK_CUT"}, {"name":"VK_DOWN"}, {"name":"VK_END"}, {"name":"VK_ENTER"}, {"name":"VK_ESCAPE"}, {"name":"VK_F1"}, {"name":"VK_F10"}, {"name":"VK_F11"}, {"name":"VK_F12"}, {"name":"VK_F2"}, {"name":"VK_F8"}, {"name":"VK_HOME"}, {"name":"VK_INSERT"}, {"name":"VK_KP_DOWN"}, {"name":"VK_KP_LEFT"}, {"name":"VK_KP_RIGHT"}, {"name":"VK_KP_UP"}, {"name":"VK_PAGE_DOWN"}, {"name":"VK_PAGE_UP"}, {"name":"VK_PASTE"}, {"name":"VK_SLASH"}, {"name":"VK_SUBTRACT"}, {"name":"VK_TAB"}, {"name":"VK_UP"}]
+},
+{
+  "name":"java.beans.Beans"
+},
+{
+  "name":"java.beans.PropertyVetoException"
+},
+{
+  "name":"java.io.FilePermission"
+},
+{
+  "name":"java.lang.Object",
+  "queryAllPublicMethods":true
+},
+{
+  "name":"java.lang.ObjectCustomizer"
+},
+{
+  "name":"java.lang.RuntimePermission"
+},
+{
+  "name":"java.lang.Thread",
+  "fields":[{"name":"threadLocalRandomProbe"}]
+},
+{
+  "name":"java.net.NetPermission"
+},
+{
+  "name":"java.net.SocketPermission"
+},
+{
+  "name":"java.net.URLPermission",
+  "methods":[{"name":"<init>","parameterTypes":["java.lang.String","java.lang.String"] }]
+},
+{
+  "name":"java.nio.charset.Charset",
+  "methods":[{"name":"valueOf","parameterTypes":["java.lang.String"] }]
+},
+{
+  "name":"java.security.AccessController"
+},
+{
+  "name":"java.security.AllPermission"
+},
+{
+  "name":"java.security.ProtectionDomain$JavaSecurityAccessImpl"
+},
+{
+  "name":"java.security.SecureRandomParameters"
+},
+{
+  "name":"java.security.SecurityPermission"
+},
+{
+  "name":"java.util.ArrayList"
+},
+{
+  "name":"java.util.PropertyPermission"
+},
+{
+  "name":"java.util.concurrent.ForkJoinTask",
+  "fields":[{"name":"aux"}, {"name":"status"}]
+},
+{
+  "name":"java.util.concurrent.atomic.AtomicBoolean",
+  "fields":[{"name":"value"}]
+},
+{
+  "name":"java.util.concurrent.atomic.AtomicReference",
+  "fields":[{"name":"value"}]
+},
+{
+  "name":"java.util.concurrent.atomic.Striped64",
+  "fields":[{"name":"base"}, {"name":"cellsBusy"}]
+},
+{
+  "name":"javax.smartcardio.CardPermission"
+},
+{
+  "name":"javax.swing.plaf.basic.BasicButtonListener",
+  "methods":[{"name":"loadActionMap","parameterTypes":["javax.swing.plaf.basic.LazyActionMap"] }]
+},
+{
+  "name":"javax.swing.plaf.basic.BasicCheckBoxMenuItemUI",
+  "methods":[{"name":"createUI","parameterTypes":["javax.swing.JComponent"] }]
+},
+{
+  "name":"javax.swing.plaf.basic.BasicEditorPaneUI",
+  "methods":[{"name":"createUI","parameterTypes":["javax.swing.JComponent"] }]
+},
+{
+  "name":"javax.swing.plaf.basic.BasicFormattedTextFieldUI",
+  "methods":[{"name":"createUI","parameterTypes":["javax.swing.JComponent"] }]
+},
+{
+  "name":"javax.swing.plaf.basic.BasicListUI",
+  "methods":[{"name":"createUI","parameterTypes":["javax.swing.JComponent"] }]
+},
+{
+  "name":"javax.swing.plaf.basic.BasicMenuItemUI",
+  "methods":[{"name":"createUI","parameterTypes":["javax.swing.JComponent"] }, {"name":"loadActionMap","parameterTypes":["javax.swing.plaf.basic.LazyActionMap"] }]
+},
+{
+  "name":"javax.swing.plaf.basic.BasicMenuUI",
+  "methods":[{"name":"createUI","parameterTypes":["javax.swing.JComponent"] }]
+},
+{
+  "name":"javax.swing.plaf.basic.BasicOptionPaneUI",
+  "methods":[{"name":"createUI","parameterTypes":["javax.swing.JComponent"] }, {"name":"loadActionMap","parameterTypes":["javax.swing.plaf.basic.LazyActionMap"] }]
+},
+{
+  "name":"javax.swing.plaf.basic.BasicPanelUI",
+  "methods":[{"name":"createUI","parameterTypes":["javax.swing.JComponent"] }]
+},
+{
+  "name":"javax.swing.plaf.basic.BasicPopupMenuUI",
+  "methods":[{"name":"createUI","parameterTypes":["javax.swing.JComponent"] }, {"name":"loadActionMap","parameterTypes":["javax.swing.plaf.basic.LazyActionMap"] }]
+},
+{
+  "name":"javax.swing.plaf.basic.BasicRootPaneUI",
+  "methods":[{"name":"loadActionMap","parameterTypes":["javax.swing.plaf.basic.LazyActionMap"] }]
+},
+{
+  "name":"javax.swing.plaf.basic.BasicSpinnerUI",
+  "methods":[{"name":"createUI","parameterTypes":["javax.swing.JComponent"] }]
+},
+{
+  "name":"javax.swing.plaf.basic.BasicTableHeaderUI",
+  "methods":[{"name":"createUI","parameterTypes":["javax.swing.JComponent"] }]
+},
+{
+  "name":"javax.swing.plaf.basic.BasicTableUI",
+  "methods":[{"name":"createUI","parameterTypes":["javax.swing.JComponent"] }]
+},
+{
+  "name":"javax.swing.plaf.basic.BasicTextAreaUI",
+  "methods":[{"name":"createUI","parameterTypes":["javax.swing.JComponent"] }]
+},
+{
+  "name":"javax.swing.plaf.basic.BasicTextPaneUI",
+  "methods":[{"name":"createUI","parameterTypes":["javax.swing.JComponent"] }]
+},
+{
+  "name":"javax.swing.plaf.basic.BasicToolBarSeparatorUI",
+  "methods":[{"name":"createUI","parameterTypes":["javax.swing.JComponent"] }]
+},
+{
+  "name":"javax.swing.plaf.basic.BasicTreeUI",
+  "methods":[{"name":"loadActionMap","parameterTypes":["javax.swing.plaf.basic.LazyActionMap"] }]
+},
+{
+  "name":"javax.swing.plaf.basic.BasicViewportUI",
+  "methods":[{"name":"createUI","parameterTypes":["javax.swing.JComponent"] }]
+},
+{
+  "name":"javax.swing.plaf.metal.MetalButtonUI",
+  "methods":[{"name":"createUI","parameterTypes":["javax.swing.JComponent"] }]
+},
+{
+  "name":"javax.swing.plaf.metal.MetalCheckBoxUI",
+  "methods":[{"name":"createUI","parameterTypes":["javax.swing.JComponent"] }]
+},
+{
+  "name":"javax.swing.plaf.metal.MetalComboBoxUI",
+  "methods":[{"name":"createUI","parameterTypes":["javax.swing.JComponent"] }]
+},
+{
+  "name":"javax.swing.plaf.metal.MetalFileChooserUI",
+  "methods":[{"name":"createUI","parameterTypes":["javax.swing.JComponent"] }]
+},
+{
+  "name":"javax.swing.plaf.metal.MetalLabelUI",
+  "methods":[{"name":"createUI","parameterTypes":["javax.swing.JComponent"] }]
+},
+{
+  "name":"javax.swing.plaf.metal.MetalMenuBarUI",
+  "methods":[{"name":"createUI","parameterTypes":["javax.swing.JComponent"] }]
+},
+{
+  "name":"javax.swing.plaf.metal.MetalPopupMenuSeparatorUI",
+  "methods":[{"name":"createUI","parameterTypes":["javax.swing.JComponent"] }]
+},
+{
+  "name":"javax.swing.plaf.metal.MetalProgressBarUI",
+  "methods":[{"name":"createUI","parameterTypes":["javax.swing.JComponent"] }]
+},
+{
+  "name":"javax.swing.plaf.metal.MetalRadioButtonUI",
+  "methods":[{"name":"createUI","parameterTypes":["javax.swing.JComponent"] }]
+},
+{
+  "name":"javax.swing.plaf.metal.MetalRootPaneUI",
+  "methods":[{"name":"createUI","parameterTypes":["javax.swing.JComponent"] }]
+},
+{
+  "name":"javax.swing.plaf.metal.MetalScrollBarUI",
+  "methods":[{"name":"createUI","parameterTypes":["javax.swing.JComponent"] }]
+},
+{
+  "name":"javax.swing.plaf.metal.MetalScrollPaneUI",
+  "methods":[{"name":"createUI","parameterTypes":["javax.swing.JComponent"] }]
+},
+{
+  "name":"javax.swing.plaf.metal.MetalSeparatorUI",
+  "methods":[{"name":"createUI","parameterTypes":["javax.swing.JComponent"] }]
+},
+{
+  "name":"javax.swing.plaf.metal.MetalSliderUI",
+  "methods":[{"name":"createUI","parameterTypes":["javax.swing.JComponent"] }]
+},
+{
+  "name":"javax.swing.plaf.metal.MetalSplitPaneUI",
+  "methods":[{"name":"createUI","parameterTypes":["javax.swing.JComponent"] }]
+},
+{
+  "name":"javax.swing.plaf.metal.MetalTabbedPaneUI",
+  "methods":[{"name":"createUI","parameterTypes":["javax.swing.JComponent"] }]
+},
+{
+  "name":"javax.swing.plaf.metal.MetalTextFieldUI",
+  "methods":[{"name":"createUI","parameterTypes":["javax.swing.JComponent"] }]
+},
+{
+  "name":"javax.swing.plaf.metal.MetalToggleButtonUI",
+  "methods":[{"name":"createUI","parameterTypes":["javax.swing.JComponent"] }]
+},
+{
+  "name":"javax.swing.plaf.metal.MetalToolBarUI",
+  "methods":[{"name":"createUI","parameterTypes":["javax.swing.JComponent"] }]
+},
+{
+  "name":"javax.swing.plaf.metal.MetalTreeUI",
+  "methods":[{"name":"createUI","parameterTypes":["javax.swing.JComponent"] }]
+},
+{
+  "name":"javax.swing.text.html.HTMLEditorKit",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"jdk.internal.misc.Unsafe"
+},
+{
+  "name":"net.miginfocom.layout.BoundSize",
+  "queryAllPublicMethods":true
+},
+{
+  "name":"net.miginfocom.layout.BoundSizeCustomizer"
+},
+{
+  "name":"net.miginfocom.layout.UnitValue",
+  "queryAllPublicMethods":true
+},
+{
+  "name":"net.miginfocom.layout.UnitValueCustomizer"
+},
+{
+  "name":"org.key_project.proofmanagement.CheckConfigDialog",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"org.key_project.proofmanagement.CheckConfigDialog$BlockingGlassPane",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"org.key_project.proofmanagement.ProofManagementExt",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.key_project.slicing.SlicingExtension",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.key_project.slicing.SlicingSettingsProvider",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"org.key_project.slicing.ui.SlicingLeftPanel",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
+  "name":"socketClass=de.uka.ilkd.key.smt.communication.CVC4Socket"
+},
+{
+  "name":"sun.awt.X11.XToolkit",
+  "fields":[{"name":"awtAppClassName"}]
+},
+{
+  "name":"sun.awt.shell.ShellFolderManager",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"sun.java2d.marlin.DMarlinRenderingEngine",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"sun.security.provider.NativePRNG",
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"<init>","parameterTypes":["java.security.SecureRandomParameters"] }]
+},
+{
+  "name":"sun.security.provider.SHA",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+}
+]
