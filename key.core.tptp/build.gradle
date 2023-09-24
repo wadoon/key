@@ -1,0 +1,31 @@
+description "Support for TPTP problem files for the KeY theorem prover"
+
+configurations { antlr4 }
+
+dependencies {
+    api project(':key.util')
+    antlr4 "org.antlr:antlr4:4.13.1"
+    implementation "org.antlr:antlr4-runtime:4.13.1"
+
+    testImplementation project(":key.core")
+}
+
+sourceSets.main.java.srcDirs("$projectDir/build/generated-src/antlr4/main/")
+
+def antlr4OutputKey = "$projectDir/build/generated-src/antlr4/main/de/uka/ilkd/key/tptp"
+task runAntlr4(type: JavaExec) {
+    inputs.files "src/main/antlr4/KeYLexer.g4", "src/main/antlr4/KeYParser.g4"
+    outputs.dir antlr4OutputKey
+    classpath = configurations.antlr4
+    mainClass.set("org.antlr.v4.Tool")
+    args = ["-visitor",
+            "-Xexact-output-dir", "-o", antlr4OutputKey,
+            "-package", "de.uka.ilkd.key.tptp",
+            "src/main/antlr4/tptp_v7_0_0_0.g4"]
+    doFirst {
+        file(antlr4OutputKey).mkdirs()
+        println("create $antlr4OutputKey")
+    }
+}
+compileJava.dependsOn runAntlr4
+sourcesJar.dependsOn(runAntlr4)
