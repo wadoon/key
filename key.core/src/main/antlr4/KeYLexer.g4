@@ -434,7 +434,7 @@ fragment EXP_SUFFIX:
    ;
 
 // reals, floats and doubles are all rationals here.
-fragment RATIONAL_LITERAL:
+RATIONAL_LITERAL:
       (DIGIT)+ ('.' (DIGIT)*)? (EXP_SUFFIX)?
     | '.' (DIGIT)+ (EXP_SUFFIX)?
     ;
