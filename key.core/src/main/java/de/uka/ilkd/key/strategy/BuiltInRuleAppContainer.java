@@ -76,7 +76,7 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
     private PosInOccurrence getPosInOccurrence(Goal p_goal) {
         final PosInOccurrence topPos = p_goal.getFormulaTagManager().getPosForTag(positionTag);
 
-        assert topPos != null;
+        if (topPos == null) throw new AssertionError(bir.rule().displayName());
 
         return applicationPosition.replaceConstrainedFormula(topPos.sequentFormula());
     }

@@ -14,6 +14,7 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.tuc.TucRule;
 import de.uka.ilkd.key.strategy.*;
 
 public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
@@ -97,6 +98,10 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
         public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal) {
 
             Rule rule = app.rule();
+            if (rule instanceof TucRule) {
+                // don't apply TUC in auto mode
+                return TopRuleAppCost.INSTANCE;
+            }
             if (FinishSymbolicExecutionMacro.isForbiddenRule(rule)) {
                 return TopRuleAppCost.INSTANCE;
             }

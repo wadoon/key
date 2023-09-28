@@ -449,6 +449,10 @@ public class Node implements Iterable<Node> {
         return new NodeIterator(getLeaves().iterator());
     }
 
+    public Iterator<Node> openLeavesIterator() {
+        return new OpenLeavesIterator(this);
+    }
+
     /**
      * @return an iterator for the direct children of this node.
      */

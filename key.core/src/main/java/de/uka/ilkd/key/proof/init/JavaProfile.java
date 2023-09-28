@@ -36,6 +36,7 @@ import de.uka.ilkd.key.rule.label.OriginTermLabelRefactoring;
 import de.uka.ilkd.key.rule.label.TermLabelPolicy;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring;
 import de.uka.ilkd.key.rule.merge.MergeRule;
+import de.uka.ilkd.key.rule.tuc.TucRule;
 import de.uka.ilkd.key.smt.newsmt2.DefinedSymbolsHandler;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyFactory;
@@ -155,6 +156,7 @@ public class JavaProfile extends AbstractProfile {
                 .prepend(QueryExpand.INSTANCE).prepend(MergeRule.INSTANCE)
                 .prepend(LoopApplyHeadRule.INSTANCE).prepend(JmlAssertRule.ASSERT_INSTANCE)
                 .prepend(JmlAssertRule.ASSUME_INSTANCE)
+                .prepend(TucRule.INSTANCE)
                 .prepend(ObserverToUpdateRule.INSTANCE);
 
         // contract insertion rule, ATTENTION: ProofMgt relies on the fact

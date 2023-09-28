@@ -165,7 +165,7 @@ public final class Immutables {
      *        predicate to apply to each element to determine if it
      *        should be included
      *
-     * @returns the filtered list
+     * @return the filtered list
      */
     public static <T> ImmutableList<T> filter(ImmutableList<T> ts, Predicate<T> predicate) {
         // This must be a loop. A tail recursive implementation is not optimised
