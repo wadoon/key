@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.annotation.Nonnull;
 import javax.swing.*;
 
 import de.uka.ilkd.key.gui.SearchBar;
@@ -17,6 +16,8 @@ import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.pp.*;
 import de.uka.ilkd.key.util.Pair;
+
+import org.jspecify.annotations.NonNull;
 
 
 
@@ -168,7 +169,7 @@ public class SequentViewSearchBar extends SearchBar {
      * searches for the occurrence of the specified string
      */
     @Override
-    public boolean search(@Nonnull String search) {
+    public boolean search(@NonNull String search) {
         clearSearchResults();
 
         if (sequentView.getFilter() instanceof SearchSequentPrintFilter searchSequentPrintFilter) {
