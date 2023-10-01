@@ -67,8 +67,8 @@ subprojects {
     group = rootProject.group
     version = rootProject.version
 
-    sourceCompatibility = 17
-    targetCompatibility = 17
+    sourceCompatibility = 21
+    targetCompatibility = 21
 
     repositories {
         mavenCentral()
@@ -98,8 +98,8 @@ subprojects {
     tasks.withType(JavaCompile) {
         // Setting UTF-8 as the java source encoding.
         options.encoding = "UTF-8"
-        // Setting the release to Java 17
-        options.release = 17
+        // Setting the release to Java 21
+        options.release = 21
     }
 
     tasks.withType(Javadoc) {
@@ -349,9 +349,9 @@ subprojects {
             // specific delimiter: normally just 'package', but spotless crashes for files in default package
             // (see https://github.com/diffplug/spotless/issues/30), therefore 'import' is needed. '//' is for files
             // with completely commented out code (which would probably better just be removed in future).
-            if(project.name == 'recoder') {
+            if (project.name == 'recoder') {
                 licenseHeaderFile("$rootDir/gradle/header-recoder", '(package|import|//)')
-            }else {
+            } else {
                 licenseHeaderFile("$rootDir/gradle/header", '(package|import|//)')
             }
         }

@@ -16,7 +16,7 @@ class TargetFile {
     public void writeTo(PrintWriter target) {
         target.format("""
                 \\sorts {
-                %s 
+                %s
                 }
                                     
                 \\predicates {
@@ -24,7 +24,7 @@ class TargetFile {
                 }
                                     
                 \\functions {
-                %s                    
+                %s                
                 }
                                     
                 \\problem { 

@@ -8,6 +8,7 @@ dependencies {
     implementation "org.antlr:antlr4-runtime:4.13.1"
 
     testImplementation project(":key.core")
+    implementation("org.jspecify:jspecify:0.3.0")
 }
 
 sourceSets.main.java.srcDirs("$projectDir/build/generated-src/antlr4/main/")

@@ -29,8 +29,10 @@ public class TestTptp {
         Facade.translateTptpFile(tptp, new PrintWriter(sw));
         var actual = sw.toString();
         var name = tptp.toString().replace(".tptp", ".key");
-        var expected = Files.readString(Paths.get(name));
+        System.out.println(actual);
         ParsingFacade.parseFile(CharStreams.fromString(actual));
+
+        var expected = Files.readString(Paths.get(name));
         Assertions.assertEquals(expected, actual);
     }
 }
