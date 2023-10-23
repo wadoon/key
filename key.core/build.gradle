@@ -27,7 +27,8 @@ dependencies {
 def javaCCOutputDir = file("${buildDir}/generated-src/javacc")
 def javaCCOutputDirMain = file("$javaCCOutputDir/main")
 
-sourceSets.main.java.srcDirs(javaCCOutputDirMain, "$projectDir/build/generated-src/antlr4/main/")
+sourceSets.main.java.srcDirs(javaCCOutputDirMain, "$projectDir/build/generated-src/antlr4/main/",
+        "$projectDir/build/generated-src/ldt/")
 
 // Generate code from ANTLR grammars.
 generateGrammarSource {
