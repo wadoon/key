@@ -2,6 +2,8 @@ package de.uka.ilkd.key.macros;
 
 import java.util.Set;
 
+import de.uka.ilkd.key.proof.Proof;
+
 /**
  * This macro performs simplification of integers and terms with integers.
  * It applies only non-splitting simplification rules.
@@ -134,7 +136,7 @@ public class IntegerSimplificationMacro extends AbstractPropositionalExpansionMa
     });
 
     @Override
-    protected Set<String> getAdmittedRuleNames() {
+    protected Set<String> getAdmittedRuleNames(Proof proof) {
         return ADMITTED_RULES_SET;
     }
 

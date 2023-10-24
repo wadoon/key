@@ -4,6 +4,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import de.uka.ilkd.key.proof.Proof;
+
 /**
  * This macro applies only update simplification rules.
  * @author Richard Bubel
@@ -60,7 +62,7 @@ public class UpdateSimplificationMacro extends
 	}
 
 	@Override
-	protected Set<String> getAdmittedRuleNames() {
+    protected Set<String> getAdmittedRuleNames(Proof proof) {
 		return ADMITTED_RULE_NAMES_AS_SET;
 	}
 

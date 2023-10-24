@@ -303,7 +303,7 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
                         for (Entry<Term, List<Node>> entry : valueNodeMap.entrySet()) {
                            List<Term> conditions = new LinkedList<Term>();
                            for (Node node : entry.getValue()) {
-                              Term condition = SymbolicExecutionUtil.computePathCondition(node, getSettings().isSimplifyConditions(), false);
+                              Term condition = SymbolicExecutionUtil.computePathCondition(node, getSettings().isSimplifyConditions(), false, true);
                               conditions.add(condition);
                            }
                            Term condition = services.getTermBuilder().or(conditions);

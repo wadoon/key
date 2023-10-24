@@ -118,6 +118,17 @@ public final class ParameterlessTermLabel implements TermLabel {
            new ParameterlessTermLabel(LOOP_SCOPE_INDEX_LABEL_NAME);
 
     /**
+     * Name of {@link #LOOP_INV_ANON_LABEL}.
+     */
+    public static final Name LOOP_INV_ANON_LABEL_NAME = new Name("loopInvAnon");
+
+    /**
+     * Label attached to loop scope index variables in {@link LoopScopeInvariantRule}.
+     */
+    public static final TermLabel LOOP_INV_ANON_LABEL =
+            new ParameterlessTermLabel(LOOP_INV_ANON_LABEL_NAME);
+
+    /**
      * The unique name of this label.
      * This is the basename and does not include the parameters
      */

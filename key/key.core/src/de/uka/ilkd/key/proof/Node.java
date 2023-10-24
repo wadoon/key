@@ -449,7 +449,17 @@ public class Node  {
             c += n.localIntroducedRules.size();
                       
             if (n.parent != null && n.parent.childrenCount() > 1) {
-               id.append(n.siblingNr);
+                // Appending the sibling number may fail if there's a rule app
+                // with a lot of siblings; say, a rule produces 10 siblings,
+                // then cannot be distinguished from two levels where we first
+                // visit the second and then the first sibling.
+                assert n.siblingNr < Character.MAX_RADIX :
+                    "Could fail in getting a unique taclet id "
+                  + "due to high sibling number " + n.siblingNr;
+
+                final String convertedSiblingNumber =
+                        Integer.toUnsignedString(n.siblingNr, Character.MAX_RADIX);
+                id.append(convertedSiblingNumber);
             }
             
             n = n.parent;

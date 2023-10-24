@@ -20,6 +20,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SubstOp;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
@@ -55,7 +56,7 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
          assert label instanceof FormulaTermLabel;
          FormulaTermLabel formulaLabel = (FormulaTermLabel) label;
          FormulaTermLabel originalLabel = searchFormulaTermLabel(newTermOriginalLabels);
-         FormulaTermLabel mostImportantLabel = originalLabel != null ? originalLabel : formulaLabel;
+         FormulaTermLabel mostImportantLabel = originalLabel != null ? originalLabel : formulaLabel;// System.out.println(String.format("Goal %s, Term %s, Label %s\n", goal.node().serialNr(), LogicPrinter.quickPrintTerm(applicationTerm, services).replaceAll("\\n", "").trim(), mostImportantLabel));
          // May change sub ID if logical operators like junctors are used
          boolean newLabelIdRequired = false;
          Set<String> originalLabelIds = new LinkedHashSet<String>();

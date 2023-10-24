@@ -197,4 +197,9 @@ public interface LoopSpecification extends SpecificationElement {
      */
     public OriginalVariables getOrigVars();
 
+    /**
+     * @return The variables that are modified in the loop and visible to the outside.
+     */
+    ImmutableList<Term> getLocalOuts();
+
 }

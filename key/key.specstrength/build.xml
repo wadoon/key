@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project basedir="." default="all" name="Specification Strength Estimation">
+	<property name="src.dir" value="${basedir}/src" />
+	<property name="build.dir" value="${basedir}/bin" />
+	<property name="ext.dir" value="${basedir}/lib" />
+	<property name="destfile" value="key.specstrength.jar" />
+	<property name="dist.dir"  value="${basedir}/../deployment" />
+	<property name="lib.dir" value="${basedir}/../key.core/lib"/>
+
+	<path id="classpath">
+		<fileset dir="${ext.dir}" includes="commons-cli-1.3.1.jar" />
+		<fileset dir="${ext.dir}" includes="log4j-api-2.6.2.jar" />
+		<fileset dir="${ext.dir}" includes="log4j-core-2.6.2.jar" />
+      <fileset dir="${ext.dir}" includes="JHighlighter.jar"/>
+		<pathelement path="${basedir}/../key.core/bin" />
+		<pathelement path="${basedir}/../key.util/bin" />
+		<pathelement path="${basedir}/../key.core.symbolic_execution/bin" />
+      <pathelement path="${basedir}/../key.ui/bin" />
+		<pathelement path="${lib.dir}/antlr.jar"/>
+		<pathelement path="${lib.dir}/recoderKey.jar"/>
+	</path>
+
+	<target name="clean" description="Deletes all generated files and folders.">
+		<delete failonerror="false" includeemptydirs="true">
+			<fileset dir="${build.dir}" includes="**/*" />
+		</delete>
+		<delete file="${destfile}" />
+	</target>
+
+	<target name="copy" description="Copy all resources into the binary directory.">
+		<copy todir="${build.dir}">
+			<fileset dir="${basedir}/resources/" />
+		</copy>
+		<copy todir="${build.dir}/META-INF">
+			<fileset dir="${basedir}/META-INF/" />
+		</copy>
+	</target>
+
+	<target name="compile" depends="copy">
+		<mkdir dir="${build.dir}" />
+		<javac
+			srcdir="${src.dir}"
+			destdir="${build.dir}"
+			includes="**/*.java"
+			classpathref="classpath"
+			includeantruntime="false"
+			deprecation="true"
+			debug="true"
+			debuglevel="lines,vars,source"
+			source="1.8" />
+	</target>
+
+	<target name="deploy" depends="compile" description="Create a JAR archive in the destination directory.">
+		<mkdir dir="${dist.dir}"/>
+		<mkdir dir="${dist.dir}/components"/>
+		<mkdir dir="${dist.dir}/libs"/>
+		<copy todir="${dist.dir}/libs">
+			<fileset file="${ext.dir}/commons-cli-1.3.1.jar"/>
+			<fileset file="${ext.dir}/log4j-api-2.6.2.jar"/>
+			<fileset file="${ext.dir}/log4j-core-2.6.2.jar"/>
+         <fileset file="${ext.dir}/JHighlighter.jar"/>
+		</copy>
+		<jar destfile="${dist.dir}/components/key.specstrength.jar" basedir="${build.dir}" manifest="${basedir}/META-INF/MANIFEST.MF" />
+	</target>
+
+	<target name="jar" depends="compile">
+		<jar destfile="${destfile}" basedir="${build.dir}" includes="**/*">
+			<zipgroupfileset dir="${ext.dir}" includes="*.jar" />
+			<!--<fileset dir="." includes="gpl.txt" />-->
+			<manifest>
+				<attribute name="Main-Class" value="de.tud.cs.se.ds.specstr.cli.Main" />
+			</manifest>
+		</jar>
+		<chmod file="${destfile}" perm="ugo+x" />
+	</target>
+
+	<target name="run" depends="jar">
+		<java jar="${destfile}" fork="true">
+			<classpath>
+				<pathelement location="${destfile}" />
+			</classpath>
+		</java>
+	</target>
+
+	<target name="all" depends="compile,jar" />
+</project>

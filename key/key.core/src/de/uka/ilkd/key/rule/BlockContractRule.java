@@ -1179,7 +1179,11 @@ public class BlockContractRule implements BuiltInRule {
             StatementBlock finishedBlock = finishTransactionIfModalityIsTransactional(wrappedBlock);
             JavaBlock newJavaBlock = JavaBlock.createJavaBlock(finishedBlock);
             Term newPost = tb.and(postconditions);
-            newPost = AbstractOperationPO.addAdditionalUninterpretedPredicateIfRequired(services, newPost, ImmutableSLList.<LocationVariable>nil().prepend(terms.remembranceLocalVariables.keySet()), terms.exception);
+            newPost = AbstractOperationPO.addAdditionalUninterpretedPredicateIfRequired(
+                    services, newPost,
+                    ImmutableSLList.<LocationVariable>nil().prepend(
+                            terms.remembranceLocalVariables.keySet()),
+                    null, terms.exception);
             newPost = TermLabelManager.refactorTerm(termLabelState, services, null, newPost, rule, goal, BlockContractRule.NEW_POSTCONDITION_TERM_HINT, null);
             goal.changeFormula(new SequentFormula(
                   tb.applySequential(

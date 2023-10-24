@@ -778,6 +778,8 @@ public class Proof implements Named {
             return null;
         }
 
+        final String origBranchLabel = cuttingPoint.getNodeInfo().getBranchLabel();
+
         ProofPruner pruner = new ProofPruner();
         if (fireChanges) {
             fireProofIsBeingPruned(cuttingPoint);
@@ -787,6 +789,11 @@ public class Proof implements Named {
             fireProofGoalsChanged();
             fireProofPruned(cuttingPoint);
         }
+
+        // We have to reset the branch label, otherwise it will get lost when
+        // the NodeInfo is "refreshed" after pruning
+        cuttingPoint.getNodeInfo().setBranchLabel(origBranchLabel);
+
         return result;
     }
 

@@ -44,6 +44,7 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -70,6 +71,7 @@ import de.uka.ilkd.key.parser.KeYLexerF;
 import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.parser.ParserMode;
+import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -203,6 +205,30 @@ public class MergeRuleUtils {
     }
 
     /**
+     * Translates a String into a formula or to null if not applicable.
+     *
+     * @param services
+     *            The services object.
+     * @param namespaces
+     *            The (usually local) {@link NamespaceSet} to use for parsing.
+     * @param toTranslate
+     *            The formula to be translated.
+     * @return The formula represented by the input or null if not applicable.
+     */
+    public static Term translateToFormula(final Services services,
+            NamespaceSet namespaces, final String toTranslate) {
+        try {
+            final KeYParserF parser = new KeYParserF(ParserMode.TERM,
+                    new KeYLexerF(new StringReader(toTranslate), ""), services,
+                    namespaces);
+            final Term result = parser.term();
+            return result.sort() == Sort.FORMULA ? result : null;
+        } catch (Throwable e) {
+            return null;
+        }
+    }
+
+    /**
      * @param u
      *            The update (in normal form) to extract program locations from.
      * @return All program locations (left sides) in the given update.
@@ -311,6 +337,13 @@ public class MergeRuleUtils {
 
         if (term.op() instanceof LocationVariable) {
             result.add((LocationVariable) term.op());
+        } else if (term.op() instanceof ElementaryUpdate) {
+            if (((ElementaryUpdate) term.op())
+                    .lhs() instanceof LocationVariable) {
+                result.add((LocationVariable) ((ElementaryUpdate) term.op())
+                        .lhs());
+            }
+            result.addAll(getLocationVariablesHashSet(term.sub(0), services));
         } else {
             if (!term.javaBlock().isEmpty()) {
                 result.addAll(getProgramLocationsHashSet(term, services));
@@ -1376,41 +1409,43 @@ public class MergeRuleUtils {
                 final Operator mergeStateOp = thisGoalSymbols.parallelStream()
                         .filter(s -> s.name().equals(partnerStateOp.name()))
                         .collect(Collectors.toList()).get(0);
-                
+
                 Operator newOp1;
                 Operator newOp2;
                 if (partnerStateOp instanceof Function) {
-                    newOp1 = ((Function) mergeStateOp)
-                            .rename(new Name(tb.newName(partnerStateOp.name().toString(),
+                    newOp1 = ((Function) mergeStateOp).rename(new Name(
+                            tb.newName(partnerStateOp.name().toString(),
                                     thisGoal.getLocalNamespaces())));
                     thisGoalNamespaces.functions().add((Function) newOp1);
                     thisGoalNamespaces.flushToParent();
 
-                    newOp2 = ((Function) partnerStateOp)
-                            .rename(new Name(tb.newName(partnerStateOp.name().toString(),
+                    newOp2 = ((Function) partnerStateOp).rename(new Name(
+                            tb.newName(partnerStateOp.name().toString(),
                                     thisGoal.getLocalNamespaces())));
                     thisGoalNamespaces.functions().add((Function) newOp2);
                     thisGoalNamespaces.flushToParent();
                 } else if (partnerStateOp instanceof LocationVariable) {
-                    newOp1 = ((LocationVariable) mergeStateOp)
-                            .rename(new Name(tb.newName(partnerStateOp.name().toString(),
+                    newOp1 = ((LocationVariable) mergeStateOp).rename(new Name(
+                            tb.newName(partnerStateOp.name().toString(),
                                     thisGoal.getLocalNamespaces())));
                     thisGoalNamespaces.programVariables()
                             .add((LocationVariable) newOp1);
                     thisGoalNamespaces.flushToParent();
 
                     newOp2 = ((LocationVariable) partnerStateOp)
-                            .rename(new Name(tb.newName(partnerStateOp.name().toString(),
-                                    thisGoal.getLocalNamespaces())));
+                            .rename(new Name(
+                                    tb.newName(partnerStateOp.name().toString(),
+                                            thisGoal.getLocalNamespaces())));
                     thisGoalNamespaces.programVariables()
                             .add((LocationVariable) newOp2);
                     thisGoalNamespaces.flushToParent();
                 } else {
                     throw new RuntimeException(
                             "MergeRule: Unexpected type of Operator involved in name clash: "
-                                    + partnerStateOp.getClass().getSimpleName());
+                                    + partnerStateOp.getClass()
+                                            .getSimpleName());
                 }
-                
+
                 mergeState = new SymbolicExecutionState(
                         OpReplacer.replace(mergeStateOp, newOp1,
                                 mergeState.getSymbolicState(), tb.tf()),
@@ -1806,6 +1841,23 @@ public class MergeRuleUtils {
                 doSplit, "Provability check", timeout);
         final Proof proof = proofResult.getProof();
         boolean result = proof.closed();
+
+        // XXX Remove -->
+        if (!result) {
+            for (Goal g : proof.openGoals()) {
+                Set<Operator> ops = new HashSet<>();
+                for (SequentFormula sf : g.node().sequent()) {
+                    OpCollector opColl = new OpCollector();
+                    sf.formula().execPostOrder(opColl);
+                    ops.addAll(opColl.ops());
+                }
+
+                System.out.println(
+                        LogicPrinter.quickPrintSequent(g.sequent(), services));
+                System.out.println();
+            }
+        }
+        // XXX <-- Remove
 
         return result;
 

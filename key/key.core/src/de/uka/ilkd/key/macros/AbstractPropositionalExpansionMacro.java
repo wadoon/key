@@ -24,6 +24,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCostCollector;
@@ -35,7 +36,7 @@ import de.uka.ilkd.key.strategy.TopRuleAppCost;
  * rules.
  *
  * The names of the set of rules to be applied is defined by the abstract method
- * {@link #getAdmittedRuleNames()}.
+ * {@link #getAdmittedRuleNames(Proof)}.
  *
  * This is very helpful to perform many "andLeft", "impRight" or even "andRight"
  * steps at a time.
@@ -59,9 +60,13 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
     /**
      * Gets the set of admitted rule names.
      *
+     * @param proof
+     *            The {@link Proof} object, can be used for obtaining rules from
+     *            {@link RuleSet} names.
+     *
      * @return a constant non-<code>null</code> set
      */
-    protected abstract Set<String> getAdmittedRuleNames();
+    protected abstract Set<String> getAdmittedRuleNames(Proof proof);
     
     /**
      * Whether this macro includes One Step Simplification.
@@ -71,7 +76,7 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
     @Override
     protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
         return new PropExpansionStrategy(proof.getActiveStrategy(),
-                                         getAdmittedRuleNames(), allowOSS());
+                                         getAdmittedRuleNames(proof), allowOSS());
     }
     
     /**

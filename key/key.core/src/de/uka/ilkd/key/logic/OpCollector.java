@@ -13,7 +13,6 @@
 
 package de.uka.ilkd.key.logic;
 
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -25,7 +24,7 @@ import de.uka.ilkd.key.logic.op.Operator;
  */
 public class OpCollector extends DefaultVisitor {
     /** the found operators */
-    private HashSet<Operator> ops;
+    private Set<Operator> ops;
 
     /** creates the Op collector */
     public OpCollector() {

@@ -13,6 +13,10 @@
 
 package de.uka.ilkd.key.logic;
 
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -155,7 +159,7 @@ public class SemisequentChangeInfo {
     /**
      * This method combines this change information from this info and its successor. 
      * ATTENTION: it takes over ownership over {@link succ} and does not release it. This means
-     * when invoking the method it must be snsured that succ is never used afterwards.
+     * when invoking the method it must be ensured that succ is never used afterwards.
      */
     public void combine(SemisequentChangeInfo succ) {
        final SemisequentChangeInfo predecessor = this;
@@ -182,13 +186,41 @@ public class SemisequentChangeInfo {
           }
        }
        
-       for (FormulaChangeInfo fci : succ.modified) {
-          if (predecessor.addedFormulas().contains(fci.getOriginalFormula())) {
-             predecessor.added = predecessor.added.removeAll(fci.getOriginalFormula());
-             predecessor.addedFormula(succ.lastFormulaIndex, fci.getNewFormula());
-          } else {
-             predecessor.modifiedFormula(succ.lastFormulaIndex, fci);
-          }
+        for (final FormulaChangeInfo fci : succ.modified) {
+            if (predecessor.addedFormulas()
+                    .contains(fci.getOriginalFormula())) {
+                predecessor.added = predecessor.added
+                        .removeAll(fci.getOriginalFormula());
+                predecessor.addedFormula(succ.lastFormulaIndex,
+                        fci.getNewFormula());
+            } else {
+                // In the presence of term labels, it has happened that there
+                // are two changes f<<label1>> ==> f<<label2>> and f<<label2>>
+                // ==> f<<label3>>, those have to be treated transitively since
+                // otherwise, eventually there will be a search for a formula
+                // which does not exist in the sequent.
+                final List<FormulaChangeInfo> transitivityCandidates = StreamSupport
+                        .stream(predecessor.modified.spliterator(), true)
+                        .filter(fci2 -> fci2.getNewFormula()
+                                .equals(fci.getOriginalFormula()))
+                        .collect(Collectors.toList());
+
+                assert transitivityCandidates
+                        .size() < 2 : "There are more than 1 'transitive'"
+                                + " modifications, check what happens here.";
+
+                if (!transitivityCandidates.isEmpty()) {
+                    predecessor.modifiedFormula(succ.lastFormulaIndex,
+                            new FormulaChangeInfo(
+                                    transitivityCandidates.get(0)
+                                            .getPositionOfModification(),
+                                    fci.getNewFormula()));
+                    predecessor.modified = predecessor.modified
+                            .removeAll(transitivityCandidates.get(0));
+                } else {
+                    predecessor.modifiedFormula(succ.lastFormulaIndex, fci);
+                }
+            }
        }
 
        for (SequentFormula sf : succ.added) {

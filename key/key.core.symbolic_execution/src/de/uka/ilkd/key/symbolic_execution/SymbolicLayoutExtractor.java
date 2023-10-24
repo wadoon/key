@@ -251,7 +251,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
             // Get path condition
             Term pathCondition = SymbolicExecutionUtil.computePathCondition(node, 
                                                                             true, // Path condition needs always to be simplified, because otherwise additinal symbolic values might be introduced.
-                                                                            false);
+                                                                            false, true);
             pathCondition = removeImplicitSubTermsFromPathCondition(pathCondition);
             // Compute all locations used in path conditions and updates. The values of the locations will be later computed in the state computation (and finally shown in a memory layout).
             Set<ExtractLocationParameter> temporaryCurrentLocations = new LinkedHashSet<ExtractLocationParameter>();

@@ -499,8 +499,11 @@ public class IntermediatePresentationProofFileParser implements
         protected int currCorrespondingMergeNodeId = 0;
         protected int currMergeNodeId = 0;
         protected String currDistFormula = null;
-        protected Class<? extends AbstractPredicateAbstractionLattice> currPredAbstraLatticeType =
-                null;
+        /**
+         * The type of the lattice.
+         */
+        protected Class<? extends AbstractPredicateAbstractionLattice>
+                currPredAbstraLatticeType = null;
         protected String currAbstractionPredicates = null;
         public String currUserChoices = null;
 

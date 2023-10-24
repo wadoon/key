@@ -121,12 +121,14 @@ import de.uka.ilkd.key.rule.AbstractContractRuleApp;
 import de.uka.ilkd.key.rule.BlockContractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.ContractRuleApp;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
+import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
 import de.uka.ilkd.key.rule.merge.CloseAfterMergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
@@ -1765,17 +1767,29 @@ public final class SymbolicExecutionUtil {
       }
    }
    
-   /**
-    * Computes the branch condition of the given {@link Node}.
-    * @param node The {@link Node} to compute its branch condition.
-    * @param simplify {@code true} simplify condition in a side proof, {@code false} do not simplify condition.
-    * @param improveReadability {@code true} improve readability, {@code false} do not improve readability.
-    * @return The computed branch condition.
-    * @throws ProofInputException Occurred Exception.
-    */
+    /**
+     * Computes the branch condition of the given {@link Node}.
+     * 
+     * @param node
+     *            The {@link Node} to compute its branch condition.
+     * @param simplify
+     *            {@code true} simplify condition in a side proof, {@code false}
+     *            do not simplify condition.
+     * @param improveReadability
+     *            {@code true} improve readability, {@code false} do not improve
+     *            readability.
+     * @param includeInvariants
+     *            Set to true iff you want to have loop invariants included in
+     *            the result.
+     * @return The computed branch condition.
+     * @throws ProofInputException
+     *             Occurred Exception.
+     */
    public static Term computeBranchCondition(Node node,
                                              boolean simplify,
-                                             boolean improveReadability) throws ProofInputException {
+                                             boolean improveReadability,
+                                             boolean includeInvariants) throws ProofInputException {
+      final Term tt = node.proof().getServices().getTermBuilder().tt(); 
       // Get applied taclet on parent proof node
       Node parent = node.parent();
       if (parent.getAppliedRuleApp() instanceof TacletApp) {
@@ -1784,11 +1798,21 @@ public final class SymbolicExecutionUtil {
       else if (parent.getAppliedRuleApp() instanceof ContractRuleApp) {
         return computeContractRuleAppBranchCondition(parent, node, simplify, improveReadability);
       }
-      else if (parent.getAppliedRuleApp() instanceof LoopInvariantBuiltInRuleApp) {
-         return computeLoopInvariantBuiltInRuleAppBranchCondition(parent, node, simplify, improveReadability);
+      else if (parent.getAppliedRuleApp().rule() == WhileInvariantRule.INSTANCE) {
+         return computeLoopInvariantBuiltInRuleAppBranchCondition(parent, node, simplify, improveReadability, includeInvariants);
       }
+      else if (parent.getAppliedRuleApp().rule() == LoopScopeInvariantRule.INSTANCE) {
+         return includeInvariants
+                 ? computeLoopScopeInvariantBuiltInRuleBranchCondition(
+                         parent, node, simplify, improveReadability)
+                 : tt;
+       }
       else if (parent.getAppliedRuleApp() instanceof BlockContractBuiltInRuleApp) {
          return computeBlockContractBuiltInRuleAppBranchCondition(parent, node, simplify, improveReadability);
+      }
+      else if (parent.getAppliedRuleApp().rule().name().toString().equals("AnalyzePostCondImpliesMethodEffects") ||
+              parent.getAppliedRuleApp().rule().name().toString().equals("AnalyzeInvImpliesLoopEffects")) {
+          return tt;
       }
       else {
          throw new ProofInputException("Unsupported RuleApp in branch computation \"" + parent.getAppliedRuleApp() + "\".");
@@ -2172,28 +2196,125 @@ public final class SymbolicExecutionUtil {
       }
    }
    
-   /**
-    * <p>
-    * Computes the branch condition of the given {@link Node} which was constructed by a {@link LoopInvariantBuiltInRuleApp}.
-    * </p>
-    * <p>
-    * The branch conditions are:
-    * <ul>
-    *    <li>Preserves Branch: Invariant + LoopCondition</li>
-    *    <li>Use Branch: Invariant + !LoopCondition</li>
-    * </ul>
-    * </p>
-    * @param parent The parent {@link Node} of the given one.
-    * @param node The {@link Node} to compute its branch condition.
-    * @param simplify {@code true} simplify condition in a side proof, {@code false} do not simplify condition.
-    * @param improveReadability {@code true} improve readability, {@code false} do not improve readability.
-    * @return The computed branch condition.
-    * @throws ProofInputException Occurred Exception.
-    */
+    /**
+     * <p>
+     * Computes the branch condition of the given {@link Node} which was
+     * constructed by a {@link LoopScopeInvariantRule} app.
+     * </p>
+     * <p>
+     * The branch conditions are:
+     * <ul>
+     * <li>Preserves / Use Case Branch: Invariant</li>
+     * </ul>
+     * </p>
+     * 
+     * @param parent
+     *            The parent {@link Node} of the given one.
+     * @param node
+     *            The {@link Node} to compute its branch condition.
+     * @param simplify
+     *            {@code true} simplify condition in a side proof, {@code false}
+     *            do not simplify condition.
+     * @param improveReadability
+     *            {@code true} improve readability, {@code false} do not improve
+     *            readability.
+     * @return The computed branch condition.
+     * @throws ProofInputException
+     *             Occurred Exception.
+     */
+    private static Term computeLoopScopeInvariantBuiltInRuleBranchCondition(
+            Node parent,
+            Node node,
+            boolean simplify,
+            boolean improveReadability) throws ProofInputException {
+        // Make sure that a computation is possible
+        if (!(parent.getAppliedRuleApp()
+                .rule() instanceof LoopScopeInvariantRule)) {
+            throw new ProofInputException(
+                    "Only LoopScopeInvariantRule is allowed in branch computation but rule \""
+                            + parent.getAppliedRuleApp().rule()
+                            + "\" was found.");
+        }
+
+        // Make sure that branch is supported
+        final int childIndex =
+                CollectionUtil.indexOf(parent.childrenIterator(), node);
+
+        if (childIndex != 1) {
+            throw new ProofInputException(
+                    "Branch condition of initially valid check is not supported.");
+        }
+
+        // Compute invariant (last antecedent formula of the preserved / use
+        // case branch)
+        final Semisequent antecedent = parent.child(1).sequent().antecedent();
+        Term invTerm = antecedent.get(antecedent.size() - 1).formula();
+
+        // Create formula which contains the value interested in.
+        Term condition;
+        if (simplify) {
+            final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil
+                    .cloneProofEnvironmentWithOwnOneStepSimplifier(
+                            parent.proof(), true);
+            Sequent newSequent = createSequentToProveWithNewSuccedent(parent,
+                    (Term) null, invTerm, null, true);
+            condition = evaluateInSideProof(parent.proof().getServices(),
+                    parent.proof(),
+                    sideProofEnv,
+                    newSequent,
+                    RESULT_LABEL,
+                    "Loop invariant branch condition computation on node "
+                            + parent.serialNr() + " for branch "
+                            + node.serialNr() + ".",
+                    StrategyProperties.SPLITTING_OFF);
+        }
+        else {
+            condition = TermBuilder.goBelowUpdates(invTerm);
+        }
+
+        if (improveReadability) {
+            condition =
+                    improveReadability(condition, parent.proof().getServices());
+        }
+
+        return condition;
+    }
+   
+    /**
+     * <p>
+     *   Computes the branch condition of the given {@link Node} which was
+     *   constructed by a {@link LoopInvariantBuiltInRuleApp}.
+     * </p>
+     * <p>
+     *   The branch conditions are:
+     *   <ul>
+     *     <li>Preserves Branch: Invariant + LoopCondition</li>
+     *     <li>Use Branch: Invariant + !LoopCondition</li>
+     *   </ul>
+     * </p>
+     * 
+     * @param parent
+     *            The parent {@link Node} of the given one.
+     * @param node
+     *            The {@link Node} to compute its branch condition.
+     * @param simplify
+     *            {@code true} simplify condition in a side proof, {@code false}
+     *            do not simplify condition.
+     * @param improveReadability
+     *            {@code true} improve readability, {@code false} do not improve
+     *            readability.
+     * @param includeInvariants
+     *            Set to true iff you want to have loop invariants included in
+     *            the result.
+     * @return The computed branch condition.
+     * @throws ProofInputException
+     *             Occurred Exception.
+     */
    private static Term computeLoopInvariantBuiltInRuleAppBranchCondition(Node parent,
                                                                          Node node,
                                                                          boolean simplify,
-                                                                         boolean improveReadability) throws ProofInputException {
+                                                                         boolean improveReadability,
+                                                                         boolean includeInvariants) throws ProofInputException {
       // Make sure that a computation is possible
       if (!(parent.getAppliedRuleApp() instanceof LoopInvariantBuiltInRuleApp)) {
          throw new ProofInputException("Only LoopInvariantBuiltInRuleApp is allowed in branch computation but rule \"" + parent.getAppliedRuleApp() + "\" was found.");
@@ -2235,7 +2356,7 @@ public final class SymbolicExecutionUtil {
          }
          // Create formula which contains the value interested in.
          invTerm = TermBuilder.goBelowUpdates(invTerm);
-         Term loopCondAndInv = services.getTermBuilder().and(loopConditionModalityTerm.sub(0), invTerm);
+         Term loopCondAndInv = includeInvariants ? services.getTermBuilder().and(loopConditionModalityTerm.sub(0), invTerm) : loopConditionModalityTerm.sub(0);
          Term newTerm = loopCondAndInv;
          Term modalityTerm = childIndex == 1 ?
                              services.getTermBuilder().box(loopConditionModalityTerm.javaBlock(), newTerm) :
@@ -3354,53 +3475,148 @@ public final class SymbolicExecutionUtil {
       return result;
    }
 
-   /**
-    * Computes the path condition of the given {@link Node}.
-    * @param node The {@link Node} to compute its path condition.
-    * @param simplify {@code true} simplify each branch condition in a side proof, {@code false} do not simplify branch conditions.
-    * @param improveReadability {@code true} improve readability, {@code false} do not improve readability.
-    * @return The computed path condition.
-    * @throws ProofInputException Occurred Exception.
-    */
+    /**
+     * Computes the path condition of the given {@link Node}.
+     * 
+     * @param node
+     *            The {@link Node} to compute its path condition.
+     * @param simplify
+     *            {@code true} simplify each branch condition in a side proof,
+     *            {@code false} do not simplify branch conditions.
+     * @param improveReadability
+     *            {@code true} improve readability, {@code false} do not improve
+     *            readability.
+     * @param includeInvariants
+     *            Set to true iff you want to have loop invariants included in
+     *            the result.
+     * @return The computed path condition.
+     * @throws ProofInputException
+     *             Occurred Exception.
+     */
    public static Term computePathCondition(Node node,
                                            boolean simplify,
-                                           boolean improveReadability) throws ProofInputException {
-      return computePathCondition(null, node, simplify, improveReadability);
+                                           boolean improveReadability,
+                                           boolean includeInvariants) throws ProofInputException {
+      return computePathCondition(null, node, simplify, improveReadability, includeInvariants);
    }
 
-   /**
-    * Computes the path condition between the given {@link Node}s.
-    * @param parentNode The {@link Node} to stop path condition computation at.
-    * @param childNode The {@link Node} to compute its path condition back to the parent.
-    * @param simplify {@code true} simplify each branch condition in a side proof, {@code false} do not simplify branch conditions.
-    * @param improveReadability {@code true} improve readability, {@code false} do not improve readability.
-    * @return The computed path condition.
-    * @throws ProofInputException Occurred Exception.
-    */
+    /**
+     * Computes the path condition between the given {@link Node}s.
+     * 
+     * @param parentNode
+     *            The {@link Node} to stop path condition computation at.
+     * @param childNode
+     *            The {@link Node} to compute its path condition back to the
+     *            parent.
+     * @param simplify
+     *            {@code true} simplify each branch condition in a side proof,
+     *            {@code false} do not simplify branch conditions.
+     * @param improveReadability
+     *            {@code true} improve readability, {@code false} do not improve
+     *            readability.
+     * @param includeInvariants
+     *            Set to true iff you want to have loop invariants included in
+     *            the result.
+     * @return The computed path condition.
+     * @throws ProofInputException
+     *             Occurred Exception.
+     */
    public static Term computePathCondition(Node parentNode,
                                            Node childNode,
                                            boolean simplify,
-                                           boolean improveReadability) throws ProofInputException {
+                                           boolean improveReadability,
+                                           boolean includeInvariants) throws ProofInputException {
       if (childNode != null) {
-         final Services services = childNode.proof().getServices();
+        final Node origNode = childNode;
+        final Proof proof = childNode.proof();
+        final Services services = proof.getServices();
+        
          Term pathCondition = services.getTermBuilder().tt();
          while (childNode != null && childNode != parentNode) {
+             
             Node parent = childNode.parent();
             if (parent != null && parent.childrenCount() >= 2) {
-               Term branchCondition = computeBranchCondition(childNode, simplify, improveReadability);
+               Term branchCondition = computeBranchCondition(childNode, simplify, improveReadability, includeInvariants);
                pathCondition = services.getTermBuilder().and(branchCondition, pathCondition);
             }
             childNode = parent;
          }
+         
          if (services.getTermBuilder().ff().equals(pathCondition)) {
             throw new ProofInputException("Path condition computation failed because the result is false.");
          }
+         
+         pathCondition = simplifyAndImproveReadability(simplify,
+                improveReadability, origNode, pathCondition);
+         
          return pathCondition;
       }
       else {
          return null;
       }
    }
+
+    /**
+     * Simplifies and / or improves the readability of the {@link Term}
+     * termToSimplify in the given {@link Node}.<br>
+     * TODO: This should make the other simplification steps superfluous, i.e.
+     * those dedicated to special {@link RuleApp}s. Check whether they can be
+     * removed.
+     *
+     * @param simplify
+     *            true iff side-proof based simplification should be applied.
+     * @param improveReadability
+     *            true iff readabiltiy should be improved (syntactical
+     *            transformations).
+     * @param node
+     *            The {@link Node} to start with.
+     * @param termToSimplify
+     *            The {@link Term} to simplify.
+     * @return A simplified version of termToSimplify.
+     * @throws ProofInputException
+     *             Hopefully not.
+     */
+    public static Term simplifyAndImproveReadability(boolean simplify,
+            boolean improveReadability, final Node node,
+            final Term termToSimplify)
+            throws ProofInputException {
+        assert node != null && termToSimplify != null;
+
+        Term result = termToSimplify;
+
+        final Proof proof = node.proof();
+        final Services services = proof.getServices();
+
+        if (simplify) {
+            final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil
+                    .cloneProofEnvironmentWithOwnOneStepSimplifier(
+                            proof, true);
+
+            TermFactory factory = services.getTermFactory();
+            result = addLabelRecursiveToNonSkolem(factory, termToSimplify,
+                    RESULT_LABEL);
+
+            Sequent newSequent = Sequent.createSuccSequent(
+                    new Semisequent(new SequentFormula(termToSimplify)));
+            result = evaluateInSideProof(proof.getServices(),
+                    proof,
+                    sideProofEnv,
+                    newSequent,
+                    RESULT_LABEL,
+                    "Branch condition simplification.",
+                    StrategyProperties.SPLITTING_OFF);
+        }
+        else {
+            result = TermBuilder.goBelowUpdates(termToSimplify);
+        }
+
+        if (improveReadability) {
+            result =
+                    improveReadability(termToSimplify, services);
+        }
+        
+        return result;
+    }
 
    /**
     * Checks if the {@link Sort} of the given {@link Term} is a reference type.
@@ -4083,7 +4299,7 @@ public final class SymbolicExecutionUtil {
     * @param variable The {@link IProgramVariable} for that the value is needed.
     * @return The found value or {@code null} if it is not defined in the given update term.
     */
-	protected static ImmutableArray<Term> extractValueFromUpdate(Term term, IProgramVariable variable) {
+	public static ImmutableArray<Term> extractValueFromUpdate(Term term, IProgramVariable variable) {
 		ImmutableArray<Term> result = null;
 		if (term.op() instanceof ElementaryUpdate) {
 			ElementaryUpdate update = (ElementaryUpdate) term.op();

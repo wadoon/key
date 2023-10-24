@@ -13,8 +13,6 @@
 
 package de.uka.ilkd.key.proof.io;
 
-import static de.uka.ilkd.key.proof.io.IProofFileParser.ProofElementID;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -53,6 +51,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.IPersistablePO;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.io.IProofFileParser.ProofElementID;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
@@ -84,6 +83,10 @@ import de.uka.ilkd.key.util.MiscTools;
  */
 public class OutputStreamProofSaver {
 
+    /**
+     * TODO Comment.
+     */
+    static final String DUMMY_ID_BRANCH_LABEL = "dummy ID";
     protected final Proof proof;
     protected final String internalVersion;
 
@@ -548,7 +551,8 @@ public class OutputStreamProofSaver {
     public String node2Proof(Node node) {
         StringBuffer tree = new StringBuffer();
         String s =
-                "(branch \"dummy ID\"\n" + collectProof(node, "", tree) + ")\n";
+                "(branch \"" + DUMMY_ID_BRANCH_LABEL + "\"\n"
+                        + collectProof(node, "", tree) + ")\n";
         return s;
     }
 

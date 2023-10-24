@@ -50,7 +50,7 @@ public class TestLocalSymbols extends TestCase {
         }
 
         @Override
-        protected Set<String> getAdmittedRuleNames() {
+        protected Set<String> getAdmittedRuleNames(Proof proof) {
             return asSet("andRight", "orRight", "forallRight");
         }
 

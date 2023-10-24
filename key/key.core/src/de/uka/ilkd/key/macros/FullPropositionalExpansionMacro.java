@@ -15,6 +15,8 @@ package de.uka.ilkd.key.macros;
 
 import java.util.Set;
 
+import de.uka.ilkd.key.proof.Proof;
+
 /**
  * The macro FullPropositionalExpansionMacro apply rules to decompose
  * propositional toplevel formulas; it even splits the goal if necessary.
@@ -52,7 +54,7 @@ public class FullPropositionalExpansionMacro extends AbstractPropositionalExpans
     private static final Set<String> ADMITTED_RULES_SET = asSet(ADMITTED_RULES);
 
     @Override
-    protected Set<String> getAdmittedRuleNames() {
+    protected Set<String> getAdmittedRuleNames(Proof proof) {
         return ADMITTED_RULES_SET;
     }
 

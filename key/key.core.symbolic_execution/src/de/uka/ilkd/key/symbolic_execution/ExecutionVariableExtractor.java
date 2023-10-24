@@ -90,7 +90,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
       // Get path condition
       Term pathCondition = SymbolicExecutionUtil.computePathCondition(executionNode.getProofNode(), 
                                                                       true, // Path condition needs always to be simplified, because otherwise additinal symbolic values might be introduced. 
-                                                                      false);
+                                                                      false, true);
       pathCondition = removeImplicitSubTermsFromPathCondition(pathCondition);
       // Extract locations from updates
       Set<ExtractLocationParameter> temporaryCurrentLocations = new LinkedHashSet<ExtractLocationParameter>();

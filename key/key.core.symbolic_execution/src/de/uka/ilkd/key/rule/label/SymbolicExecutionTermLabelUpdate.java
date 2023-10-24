@@ -30,10 +30,10 @@ import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BlockContractRule;
+import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
@@ -51,6 +51,7 @@ public class SymbolicExecutionTermLabelUpdate implements TermLabelUpdate {
    public ImmutableList<Name> getSupportedRuleNames() {
       return ImmutableSLList.<Name>nil()
                             .prepend(WhileInvariantRule.INSTANCE.name())
+                            .prepend(LoopScopeInvariantRule.INSTANCE.name())
                             .prepend(BlockContractRule.INSTANCE.name());
    }
 

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.web.WebView?>
+
+<AnchorPane prefHeight="582.0" prefWidth="926.0" xmlns="http://javafx.com/javafx/8.0.92" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.tud.cs.se.ds.specstr.gui.AnalyzerGUIController">
+   <children>
+      <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <center>
+            <SplitPane dividerPositions="0.3008658008658009" BorderPane.alignment="CENTER">
+               <items>
+                  <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefHeight="501.0" prefWidth="295.0">
+                     <children>
+                        <VBox prefHeight="220.0" prefWidth="274.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <children>
+                              <BorderPane prefWidth="200.0">
+                                 <center>
+                                    <TextField id="txtJavaFile" fx:id="txtJavaFile" editable="false" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER" />
+                                 </center>
+                                 <top>
+                                    <Label text="Select Java File" BorderPane.alignment="TOP_LEFT">
+                                       <opaqueInsets>
+                                          <Insets />
+                                       </opaqueInsets>
+                                       <font>
+                                          <Font name="System Bold" size="14.0" />
+                                       </font>
+                                       <BorderPane.margin>
+                                          <Insets bottom="10.0" />
+                                       </BorderPane.margin>
+                                    </Label>
+                                 </top>
+                                 <VBox.margin>
+                                    <Insets bottom="20.0" />
+                                 </VBox.margin>
+                                 <bottom>
+                                    <FlowPane hgap="10.0" prefHeight="26.0" prefWrapLength="90" BorderPane.alignment="CENTER">
+                                       <BorderPane.margin>
+                                          <Insets top="10.0" />
+                                       </BorderPane.margin>
+                                       <children>
+                                          <Button id="btnFileChooser" fx:id="btnFileChooser" mnemonicParsing="false" onAction="#handleChooseFilePressed" text="Load" />
+                                          <Button fx:id="btnFileEdit" mnemonicParsing="false" onAction="#handleEditFilePressed" text="Edit" />
+                                          <Button fx:id="btnRecent" mnemonicParsing="false" onAction="#handleLoadRecentPressed" style="-fx-graphic: url('/de/tud/cs/se/ds/specstr/gui/refresh.png')">
+                                             <FlowPane.margin>
+                                                <Insets />
+                                             </FlowPane.margin>
+                                          </Button>
+                                       </children>
+                                    </FlowPane>
+                                 </bottom>
+                              </BorderPane>
+                              <BorderPane prefWidth="200.0">
+                                 <center>
+                                    <ComboBox fx:id="cmbMethodChooser" maxWidth="1.7976931348623157E308" onAction="#handleMethodSelected" BorderPane.alignment="CENTER" />
+                                 </center>
+                                 <top>
+                                    <Label text="Select Method" BorderPane.alignment="TOP_LEFT">
+                                       <opaqueInsets>
+                                          <Insets />
+                                       </opaqueInsets>
+                                       <font>
+                                          <Font name="System Bold" size="14.0" />
+                                       </font>
+                                       <BorderPane.margin>
+                                          <Insets bottom="10.0" />
+                                       </BorderPane.margin>
+                                    </Label>
+                                 </top>
+                                 <VBox.margin>
+                                    <Insets bottom="20.0" />
+                                 </VBox.margin>
+                                 <bottom>
+                                    <FlowPane hgap="10.0" prefWidth="239.0" BorderPane.alignment="CENTER">
+                                       <children>
+                                          <Button fx:id="btnStartAnalysis" mnemonicParsing="false" onAction="#handleAnalyzeButtonPressed" text="Analyze" />
+                                          <Button fx:id="btnOpenKeY" mnemonicParsing="false" onAction="#handleOpenKeYButtonPressed" text="Open KeY" />
+                                          <Button fx:id="btnReloadProof" mnemonicParsing="false" onAction="#handleReloadProofButtonPressed" style="-fx-graphic: url('/de/tud/cs/se/ds/specstr/gui/refresh.png')" />
+                                       </children>
+                                       <BorderPane.margin>
+                                          <Insets top="10.0" />
+                                       </BorderPane.margin>
+                                    </FlowPane>
+                                 </bottom>
+                              </BorderPane>
+                           </children>
+                        </VBox>
+                     </children>
+                     <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                     </padding>
+                  </AnchorPane>
+                  <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0">
+                     <children>
+                        <WebView fx:id="wvInfo" prefHeight="-1.0" prefWidth="-1.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" BorderPane.alignment="CENTER" />
+                     </children>
+                  </AnchorPane>
+               </items>
+            </SplitPane>
+         </center>
+      </BorderPane>
+   </children>
+</AnchorPane>

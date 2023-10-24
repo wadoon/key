@@ -15,6 +15,8 @@ package de.uka.ilkd.key.macros;
 
 import java.util.Set;
 
+import de.uka.ilkd.key.proof.Proof;
+
 /**
  * This macro performs simplification of Heap and LocSet terms.
  * It applies simplification rules (including the "unoptimized" select rules),
@@ -202,7 +204,7 @@ public class HeapSimplificationMacro extends AbstractPropositionalExpansionMacro
 
 
     @Override
-    protected Set<String> getAdmittedRuleNames() {
+    protected Set<String> getAdmittedRuleNames(Proof proof) {
         return ADMITTED_RULES_SET;
     }
     
