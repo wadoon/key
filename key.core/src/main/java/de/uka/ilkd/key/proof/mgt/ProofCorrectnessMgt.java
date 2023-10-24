@@ -266,10 +266,8 @@ public final class ProofCorrectnessMgt {
         return proofStatus;
     }
 
-    @Override
-    protected void finalize() throws Throwable {
+    public void dispose() {
         removeProofListener();
-        super.finalize();
     }
 
 

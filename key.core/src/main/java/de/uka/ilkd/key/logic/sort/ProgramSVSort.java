@@ -816,7 +816,7 @@ public abstract class ProgramSVSort extends AbstractSort {
      * This sort represents a type of program schema variables that match on a method call with
      * SIMPLE PREFIX and AT LEAST a NONSIMPLE expression in the ARGUMENTS.
      */
-    private static final class NonSimpleMethodReferenceSort extends ProgramSVSort {
+    public static final class NonSimpleMethodReferenceSort extends ProgramSVSort {
 
         public NonSimpleMethodReferenceSort() {
             super(new Name("NonSimpleMethodReference"));
