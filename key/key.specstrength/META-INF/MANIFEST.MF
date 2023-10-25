@@ -1,4 +1,0 @@
-Manifest-Version: 1.0
-Permissions: all-permissions
-Class-Path: key.util.jar key.core.jar key.symbolic_execution.jar
-Codebase: formal.iti.kit.edu
