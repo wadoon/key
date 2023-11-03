@@ -1,7 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
 import java.util.Optional;
-import org.jspecify.annotations.NonNull;
 
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
@@ -23,6 +25,8 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement.Kin
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * A rule for JML assert/assume statements.

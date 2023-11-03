@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.settings;
 
 import java.io.IOException;
@@ -6,9 +9,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Properties;
 import java.util.stream.Collectors;
-import org.jspecify.annotations.NonNull;
 
 import org.key_project.util.Streams;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Utility class providing various methods to read properties.

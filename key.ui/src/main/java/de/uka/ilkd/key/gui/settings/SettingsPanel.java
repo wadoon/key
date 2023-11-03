@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.settings;
 
 
@@ -5,7 +8,6 @@ import java.awt.*;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
-import org.jspecify.annotations.Nullable;
 import javax.swing.*;
 
 import de.uka.ilkd.key.gui.KeYFileChooser;
@@ -16,6 +18,7 @@ import net.miginfocom.layout.AC;
 import net.miginfocom.layout.CC;
 import net.miginfocom.layout.LC;
 import net.miginfocom.swing.MigLayout;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Extension of {@link SimpleSettingsPanel} which uses {@link MigLayout} to create a nice

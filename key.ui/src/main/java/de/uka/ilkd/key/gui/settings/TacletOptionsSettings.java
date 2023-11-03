@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.settings;
 
 import java.awt.*;
@@ -11,7 +14,6 @@ import java.io.InputStream;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.jspecify.annotations.NonNull;
 import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -23,6 +25,7 @@ import net.miginfocom.layout.AC;
 import net.miginfocom.layout.CC;
 import net.miginfocom.layout.LC;
 import net.miginfocom.swing.MigLayout;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

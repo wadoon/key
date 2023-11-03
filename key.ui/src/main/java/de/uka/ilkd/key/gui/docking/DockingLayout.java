@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.docking;
 
 import java.awt.*;
@@ -8,7 +11,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.List;
-import org.jspecify.annotations.NonNull;
 import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
@@ -26,6 +28,7 @@ import de.uka.ilkd.key.settings.PathConfig;
 import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.util.IconManager;
 import bibliothek.gui.dock.util.Priority;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

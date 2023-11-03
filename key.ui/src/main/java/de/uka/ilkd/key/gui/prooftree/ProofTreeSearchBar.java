@@ -1,8 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.prooftree;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.jspecify.annotations.NonNull;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.text.Position;
@@ -10,6 +12,8 @@ import javax.swing.tree.TreePath;
 
 import de.uka.ilkd.key.gui.SearchBar;
 import de.uka.ilkd.key.util.Pair;
+
+import org.jspecify.annotations.NonNull;
 
 class ProofTreeSearchBar extends SearchBar implements TreeModelListener {
 

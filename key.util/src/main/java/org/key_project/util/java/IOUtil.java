@@ -1,9 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.java;
-
-import org.checkerframework.checker.nullness.qual.PolyNull;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
 
 import java.io.*;
 import java.net.*;
@@ -17,6 +15,10 @@ import java.util.function.Predicate;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipInputStream;
+
+import org.checkerframework.checker.nullness.qual.PolyNull;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Provides static methods to work with java IO.
@@ -216,7 +218,8 @@ public final class IOUtil {
      * @param encoding The encoding to use.
      * @throws IOException Occurred Exception.
      */
-    public static void writeTo(@Nullable OutputStream out, @Nullable String content, @Nullable String encoding)
+    public static void writeTo(@Nullable OutputStream out, @Nullable String content,
+            @Nullable String encoding)
             throws IOException {
         if (out == null || content == null) {
             return;
@@ -301,7 +304,8 @@ public final class IOUtil {
      * @return The computed start indices.
      * @throws IOException Occurred Exception.
      */
-    public static LineInformation[] computeLineInformation(@Nullable InputStream in) throws IOException {
+    public static LineInformation[] computeLineInformation(@Nullable InputStream in)
+            throws IOException {
         if (in == null) {
             return new LineInformation[0];
         }
@@ -594,7 +598,8 @@ public final class IOUtil {
      * @return A new {@link InputStream} with with the replaced line breaks.
      * @throws IOException Occurred Exception.
      */
-    public static @PolyNull InputStream unifyLineBreaks(@PolyNull InputStream in) throws IOException {
+    public static @PolyNull InputStream unifyLineBreaks(@PolyNull InputStream in)
+            throws IOException {
         if (in != null) {
             String text = IOUtil.readFrom(in);
             text = text.replace("\r\n", "\n");
@@ -777,7 +782,8 @@ public final class IOUtil {
      */
     public static File getCurrentDirectory() {
         File result = new File(".").getAbsoluteFile().getParentFile();
-        assert result != null : "@AssumeAssertion(nullness): this always works, even in the toplevel directory ...";
+        assert result != null
+                : "@AssumeAssertion(nullness): this always works, even in the toplevel directory ...";
         return result;
     }
 
@@ -846,7 +852,8 @@ public final class IOUtil {
                     // Since path is the result of resolving a zip entry name in the
                     // target directory, it does have a parent.
                     @SuppressWarnings("nullness")
-                    @NonNull Path parent = path.getParent();
+                    @NonNull
+                    Path parent = path.getParent();
                     Files.createDirectories(parent);
                     Files.copy(zin, path);
                 }

@@ -1,9 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.List;
-import org.jspecify.annotations.Nullable;
 import javax.swing.*;
 
 import de.uka.ilkd.key.gui.IssueDialog;
@@ -24,6 +26,8 @@ import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.LoaderLis
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.Nullable;
 
 public abstract class LemmaGenerationAction extends MainWindowAction {
     public enum Mode {

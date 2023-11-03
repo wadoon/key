@@ -1,6 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.ldt;
-
-import org.jspecify.annotations.Nullable;
 
 import de.uka.ilkd.key.java.ConvertException;
 import de.uka.ilkd.key.java.Expression;
@@ -17,6 +18,8 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
 
 import org.key_project.util.ExtList;
+
+import org.jspecify.annotations.Nullable;
 
 
 public final class CharListLDT extends LDT {

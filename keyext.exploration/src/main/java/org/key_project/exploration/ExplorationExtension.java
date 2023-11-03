@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.exploration;
 
 import java.awt.*;
@@ -5,7 +8,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import org.jspecify.annotations.NonNull;
 import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
@@ -30,6 +32,8 @@ import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 
 import org.key_project.exploration.actions.*;
 import org.key_project.exploration.ui.ExplorationStepsList;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Entry point for the Proof Exploration Extension.

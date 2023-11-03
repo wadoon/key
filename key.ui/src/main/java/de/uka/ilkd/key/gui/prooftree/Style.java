@@ -1,13 +1,17 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.prooftree;
 
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.jspecify.annotations.NonNull;
 import javax.swing.Icon;
 
 import de.uka.ilkd.key.pp.LogicPrinter;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * @author Alexander Weigl

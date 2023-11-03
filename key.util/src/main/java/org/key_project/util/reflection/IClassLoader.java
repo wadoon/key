@@ -1,8 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.reflection;
 
-import org.jspecify.annotations.NullMarked;
-
 import java.util.ServiceLoader;
+
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Instances of this class allow to access {@link Class}es at runtime in a special application type.

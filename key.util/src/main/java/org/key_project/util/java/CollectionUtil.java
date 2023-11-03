@@ -1,9 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.java;
-
-import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Predicate;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Provides static methods to work with {@link Collection}s.
@@ -217,7 +220,8 @@ public class CollectionUtil {
      * @param filter The filter to select an element.
      * @return The found element or {@code null} if no element was found.
      */
-    public static <T, E extends Throwable> @Nullable T searchAndRemoveWithException(Iterable<T> iterable,
+    public static <T, E extends Throwable> @Nullable T searchAndRemoveWithException(
+            Iterable<T> iterable,
             IFilterWithException<T, E> filter) throws E {
         T result = null;
         if (iterable != null && filter != null) {

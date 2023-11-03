@@ -1,11 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.exploration.ui;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.*;
 import java.util.List;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import javax.swing.*;
 import javax.swing.tree.*;
 
@@ -23,6 +24,8 @@ import org.key_project.exploration.ExplorationNodeData;
 import org.key_project.exploration.Icons;
 
 import bibliothek.gui.dock.common.action.CAction;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A view that summaries the exploration steps inside a proof.
