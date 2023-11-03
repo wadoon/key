@@ -2,8 +2,6 @@
  * This file is part of KeY since 2021 - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-// This file is part of the RECODER library and protected by the LGPL.
-
 package recoder.convenience;
 
 import recoder.java.NonTerminalProgramElement;
@@ -102,8 +100,7 @@ public class CustomTreeWalker extends TreeWalker {
                 } while (current == null);
             }
         }
-        if (current instanceof NonTerminalProgramElement) {
-            NonTerminalProgramElement nt = (NonTerminalProgramElement) current;
+        if (current instanceof NonTerminalProgramElement nt) {
             int s = nt.getChildCount();
             if (count + s + 2 >= stack.length) {
                 ProgramElement[] newStack =

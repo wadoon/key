@@ -2,8 +2,6 @@
  * This file is part of KeY since 2021 - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-// This file is part of the RECODER library and protected by the LGPL.
-
 package recoder.convenience;
 
 import recoder.java.NonTerminalProgramElement;
@@ -86,8 +84,7 @@ public class ASTIterator {
     protected void recurse(ProgramElement pe) {
         if (pe != null) {
             listener.enteringNode(this, pe);
-            if (pe instanceof NonTerminalProgramElement) {
-                NonTerminalProgramElement ntpe = (NonTerminalProgramElement) pe;
+            if (pe instanceof NonTerminalProgramElement ntpe) {
                 int childCount;
                 switch (listener.enterChildren(this, ntpe)) {
                 case ASTIterator.ENTER_NONE:
@@ -129,8 +126,7 @@ public class ASTIterator {
      * @param pe the current program element.
      */
     protected void simpleRecurse(ProgramElement pe) {
-        if (pe instanceof NonTerminalProgramElement) {
-            NonTerminalProgramElement ntpe = (NonTerminalProgramElement) pe;
+        if (pe instanceof NonTerminalProgramElement ntpe) {
             int childCount = ntpe.getChildCount();
             for (int i = 0; i < childCount; i++) {
                 ProgramElement child = ntpe.getChildAt(i);

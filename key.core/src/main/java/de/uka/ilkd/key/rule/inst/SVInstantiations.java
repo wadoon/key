@@ -12,7 +12,6 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermImpl;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -22,6 +21,7 @@ import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.util.EqualsModProofIrrelevancy;
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -30,11 +30,12 @@ import org.key_project.util.collection.ImmutableMapEntry;
 import org.key_project.util.collection.ImmutableSLList;
 
 /**
- * This class wraps a ImmMap<SchemaVariable,InstantiationEntry<?>> and is used to store
- * instantiations of schemavariables. The class is immutable, this means changing its content will
- * result in creating a new object.
+ * This class wraps an {@link ImmutableMap} from {@link SchemaVariable} to
+ * {@link InstantiationEntry}
+ * and is used to store instantiations of schemavariables. The class is immutable,
+ * this means changing its content results in creating a new object.
  */
-public class SVInstantiations {
+public class SVInstantiations implements EqualsModProofIrrelevancy {
     /** the empty instantiation */
     public static final SVInstantiations EMPTY_SVINSTANTIATIONS = new SVInstantiations();
 
@@ -251,7 +252,7 @@ public class SVInstantiations {
      * already, the new pair is taken without a warning.
      *
      * @param sv the SchemaVariable to be instantiated
-     * @param entry the InstantiationEntry<?>
+     * @param entry the InstantiationEntry
      * @return SVInstantiations the new SVInstantiations containing the given pair
      */
     public SVInstantiations add(SchemaVariable sv, InstantiationEntry<?> entry, Services services) {
@@ -288,7 +289,7 @@ public class SVInstantiations {
      * instantiated already, the new pair is taken without a warning.
      *
      * @param sv the SchemaVariable to be instantiated
-     * @param entry the InstantiationEntry<?> the SchemaVariable is instantiated with
+     * @param entry the InstantiationEntry the SchemaVariable is instantiated with
      */
     public SVInstantiations replace(SchemaVariable sv, InstantiationEntry<?> entry,
             Services services) {
@@ -379,7 +380,8 @@ public class SVInstantiations {
     /**
      * returns the instantiation of the given SchemaVariable
      *
-     * @return the InstantiationEntry<?> the SchemaVariable will be instantiated with, null if no
+     * @return the InstantiationEntry the SchemaVariable will be instantiated with, {@code null} if
+     *         no
      *         instantiation is stored
      */
     public InstantiationEntry<?> getInstantiationEntry(SchemaVariable sv) {
@@ -430,37 +432,20 @@ public class SVInstantiations {
             getGenericSortInstantiations(), getGenericSortConditions());
     }
 
-    public static class UpdateLabelPair {
-        private final Term update;
-
-        private final ImmutableArray<TermLabel> updateApplicationlabels;
-
-        public UpdateLabelPair(Term update, ImmutableArray<TermLabel> updateApplicationlabels) {
-            this.update = update;
-            this.updateApplicationlabels = updateApplicationlabels;
-        }
-
-        public Term getUpdate() {
-            return update;
-        }
-
-        public ImmutableArray<TermLabel> getUpdateApplicationlabels() {
-            return updateApplicationlabels;
+    public record UpdateLabelPair(Term update, ImmutableArray<TermLabel> updateApplicationlabels) {
+        @Override
+        public boolean equals(Object obj) {
+            if (obj instanceof UpdateLabelPair) {
+                return update.equals(((UpdateLabelPair) obj).update()) && updateApplicationlabels
+                        .equals(((UpdateLabelPair) obj).updateApplicationlabels());
+            } else {
+                return false;
+            }
         }
 
         @Override
         public int hashCode() {
-            return update.hashCode() + updateApplicationlabels.hashCode() * 7;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj instanceof UpdateLabelPair) {
-                return update.equals(((UpdateLabelPair) obj).getUpdate()) && updateApplicationlabels
-                        .equals(((UpdateLabelPair) obj).getUpdateApplicationlabels());
-            } else {
-                return false;
-            }
+            return update.hashCode() + 13*updateApplicationlabels.hashCode();
         }
     }
 
@@ -501,9 +486,9 @@ public class SVInstantiations {
     }
 
     /**
-     * returns iterator of the mapped pair (SchemaVariables, InstantiationEntry<?>)
+     * returns iterator of the mapped pair {@code (SchemaVariables, InstantiationEntry)}
      *
-     * @return the Iterator<IEntry><SchemaVariable,InstantiationEntry<?>>
+     * @return the Iterator
      */
     public Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> pairIterator() {
         return map.iterator();
@@ -558,9 +543,38 @@ public class SVInstantiations {
             final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> e = it.next();
             final Object inst = e.value().getInstantiation();
             assert inst != null : "Illegal null instantiation.";
-            if (inst instanceof TermImpl) {
-                if (!((TermImpl) inst)
-                        .equalsModIrrelevantTermLabels(cmp.getInstantiation(e.key()))) {
+            if (inst instanceof Term instAsTerm) {
+                if (!instAsTerm.equalsModIrrelevantTermLabels(cmp.getInstantiation(e.key()))) {
+                    return false;
+                }
+            } else if (!inst.equals(cmp.getInstantiation(e.key()))) {
+                return false;
+            }
+        }
+        return true;
+
+    }
+
+    @Override
+    public boolean equalsModProofIrrelevancy(Object obj) {
+        final SVInstantiations cmp;
+        if (!(obj instanceof SVInstantiations)) {
+            return false;
+        } else {
+            cmp = (SVInstantiations) obj;
+        }
+        if (size() != cmp.size() || !getUpdateContext().equals(cmp.getUpdateContext())) {
+            return false;
+        }
+
+        final Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> it =
+            pairIterator();
+        while (it.hasNext()) {
+            final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> e = it.next();
+            final Object inst = e.value().getInstantiation();
+            assert inst != null : "Illegal null instantiation.";
+            if (inst instanceof Term instAsTerm) {
+                if (!instAsTerm.equalsModProofIrrelevancy(cmp.getInstantiation(e.key()))) {
                     return false;
                 }
             } else if (!inst.equals(cmp.getInstantiation(e.key()))) {
@@ -577,8 +591,7 @@ public class SVInstantiations {
             pairIterator();
         while (it.hasNext()) {
             final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> e = it.next();
-            if (e.value().getInstantiation() instanceof TermLabel) {
-                TermLabel termLabel = (TermLabel) e.value().getInstantiation();
+            if (e.value().getInstantiation() instanceof TermLabel termLabel) {
                 if (!termLabel.isProofRelevant()) {
                     continue;
                 }
@@ -586,6 +599,11 @@ public class SVInstantiations {
             result = 37 * result + e.value().getInstantiation().hashCode() + e.key().hashCode();
         }
         return result;
+    }
+
+    @Override
+    public int hashCodeModProofIrrelevancy() {
+        return this.size(); // not used currently
     }
 
     public SVInstantiations union(SVInstantiations other, Services services) {

@@ -10,7 +10,6 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import org.checkerframework.checker.nullness.util.NullnessUtil;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -46,7 +45,7 @@ public class KeYCollections {
      * {@link java.util.Map} (provided in Java SE) as <code>m0</code>.
      */
     public static <S, T, U> Map<S, U> apply(Map<S, ? extends T> m0, Map<T, U> m1) {
-        Map<S, U> res = null;
+        Map<S, U> res;
         final int size = Math.min(m0.size(), m1.size());
         // try to use more specific implementation
         if (m0 instanceof java.util.TreeMap) {

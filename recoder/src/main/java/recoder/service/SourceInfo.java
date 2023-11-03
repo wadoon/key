@@ -2,8 +2,6 @@
  * This file is part of KeY since 2021 - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-// This file is part of the RECODER library and protected by the LGPL.
-
 package recoder.service;
 
 import java.util.List;
@@ -309,7 +307,7 @@ public interface SourceInfo extends ProgramModelInfo {
      * Returns the syntactical counterpart of the given method. Returns <CODE>
      * null</CODE>, if the given method is not a method declaration.
      *
-     * @param m a method.
+     * @param c a constructor.
      * @return the corresponding method declaration, or <CODE>null</CODE>, if the given method has
      *         no syntactical representation.
      */
@@ -319,7 +317,7 @@ public interface SourceInfo extends ProgramModelInfo {
      * Returns the syntactical counterpart of the given variable. Returns <CODE>
      * null</CODE>, if the given variable is not a variable specification.
      *
-     * @param m a variable.
+     * @param v a variable.
      * @return the corresponding variable specification, or <CODE>null</CODE>, if the given variable
      *         has no syntactical representation.
      */

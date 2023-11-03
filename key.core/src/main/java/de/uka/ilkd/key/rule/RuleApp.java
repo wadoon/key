@@ -13,6 +13,9 @@ import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.Nullable;
 
+/**
+ * rule application with specific information how and where the rule has to be applied
+ */
 public interface RuleApp extends EqualsModProofIrrelevancy {
 
     /**

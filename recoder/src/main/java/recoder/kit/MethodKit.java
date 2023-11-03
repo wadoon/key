@@ -2,8 +2,6 @@
  * This file is part of KeY since 2021 - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-// This file is part of the RECODER library and protected by the LGPL
-
 package recoder.kit;
 
 import java.util.ArrayList;
@@ -286,10 +284,9 @@ public class MethodKit {
         Type fieldType = si.getType(f);
         for (int i = mems.size() - 1; i >= 0; i -= 1) {
             MemberDeclaration md = mems.get(i);
-            if (!(md instanceof MethodDeclaration)) {
+            if (!(md instanceof MethodDeclaration m)) {
                 continue;
             }
-            MethodDeclaration m = (MethodDeclaration) md;
             if (fieldType instanceof PrimitiveType) {
                 if (m.getReturnType() != fieldType) {
                     continue;
@@ -312,10 +309,9 @@ public class MethodKit {
                 continue;
             }
             Expression expr = ((Return) last).getExpression();
-            if (!(expr instanceof FieldReference)) {
+            if (!(expr instanceof FieldReference fr)) {
                 continue;
             }
-            FieldReference fr = (FieldReference) expr;
             if (si.getField(fr) == f) {
                 res.add(m);
             }
@@ -651,8 +647,7 @@ public class MethodKit {
         if (members != null) {
             for (int i = members.size() - 1; i >= 0; i -= 1) {
                 MemberDeclaration md = members.get(i);
-                if (md instanceof MethodDeclaration) {
-                    MethodDeclaration m = (MethodDeclaration) md;
+                if (md instanceof MethodDeclaration m) {
                     if (m.getName().equals(name) && m.getSignature().equals(signature)) {
                         return new NameConflict(m);
                     }

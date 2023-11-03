@@ -1204,16 +1204,15 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
             Services services) {
         Sort svSort = sv.sort();
         if (svSort == ProgramSVSort.LABEL) {
-            return VariableNamer.parseName(instantiation);
+            return new ProgramElementName(instantiation);
         } else if (svSort == ProgramSVSort.VARIABLE) {
             NewVarcond nvc = taclet.varDeclaredNew(sv);
             if (nvc != null) {
                 KeYJavaType kjt;
                 Object o = nvc.getTypeDefiningObject();
                 JavaInfo javaInfo = services.getJavaInfo();
-                if (o instanceof SchemaVariable) {
+                if (o instanceof SchemaVariable peerSV) {
                     final TypeConverter tc = services.getTypeConverter();
-                    final SchemaVariable peerSV = (SchemaVariable) o;
                     final Object peerInst = instantiations().getInstantiation(peerSV);
                     if (peerInst instanceof TypeReference) {
                         kjt = ((TypeReference) peerInst).getKeYJavaType();
@@ -1291,29 +1290,29 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
 
     @Override
     public boolean equalsModProofIrrelevancy(Object obj) {
-        if (!(obj instanceof TacletApp)) {
+        if (!(obj instanceof TacletApp that)) {
             return false;
         }
-        TacletApp that = (TacletApp) obj;
-        if ((ifInstantiations == null && that.ifInstantiations != null)
-                || (ifInstantiations != null
-                        && !EqualsModProofIrrelevancyUtil.compareImmutableLists(ifInstantiations,
-                            that.ifInstantiations))) {
+        if (!EqualsModProofIrrelevancyUtil.compareImmutableLists(ifInstantiations,
+            that.ifInstantiations)) {
             return false;
         }
-        if (!instantiations.equals(that.instantiations)) {
+        if (!instantiations.equalsModProofIrrelevancy(that.instantiations)) {
             return false;
         }
         if (!matchConditions.equalsModProofIrrelevancy(that.matchConditions)) {
             return false;
         }
-        if (!Objects.equals(missingVars, that.missingVars)) {
+        if ((missingVars != null || that.missingVars.size() != 0)
+                && (missingVars.size() != 0 || that.missingVars != null)
+                && !Objects.equals(missingVars, that.missingVars)) {
             return false;
         }
-        if (updateContextFixed != that.updateContextFixed) {
-            return false;
-        }
-        if (!rule().equals(that.rule())) {
+        if (rule() instanceof Taclet) {
+            if (!((Taclet) rule()).equalsModProofIrrelevancy(that.rule())) {
+                return false;
+            }
+        } else if (!rule().equals(that.rule())) {
             return false;
         }
         return true;

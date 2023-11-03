@@ -10,6 +10,10 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import org.key_project.util.Strings;
+
+import org.jspecify.annotations.Nullable;
+
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -299,16 +303,7 @@ public class DefaultImmutableSet<T extends @Nullable Object> implements Immutabl
 
     @Override
     public String toString() {
-        Iterator<T> it = this.iterator();
-        StringBuilder str = new StringBuilder("{");
-        while (it.hasNext()) {
-            str.append(it.next());
-            if (it.hasNext()) {
-                str.append(",");
-            }
-        }
-        str.append("}");
-        return str.toString();
+        return Strings.formatAsList(this, "{", ",", "}");
     }
 
     /** represents the empty set for elements of type <T> */

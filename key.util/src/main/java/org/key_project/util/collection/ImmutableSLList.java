@@ -18,6 +18,8 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.key_project.util.Strings;
+
 /**
  * Simple implementation of a non-destructive (unmodifiable) list. The list implementation allows
  * list sharing of sublists.
@@ -300,7 +302,7 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
          */
         @Override
         public ImmutableList<S> append(S e) {
-            return new Cons<S>(e).prepend(this);
+            return new Cons<>(e).prepend(this);
         }
 
         /**
@@ -469,16 +471,7 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
 
         @Override
         public String toString() {
-            Iterator<S> it = this.iterator();
-            StringBuilder str = new StringBuilder("[");
-            while (it.hasNext()) {
-                str.append(it.next());
-                if (it.hasNext()) {
-                    str.append(",");
-                }
-            }
-            str.append("]");
-            return str.toString();
+            return Strings.formatAsList(this, "[", ",", "]");
         }
     }
 

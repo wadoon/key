@@ -2,8 +2,6 @@
  * This file is part of KeY since 2021 - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-// This file is part of the RECODER library and protected by the LGPL.
-
 package recoder.io;
 
 /**
@@ -130,27 +128,27 @@ public interface PropertyNames {
      * <TD>
      *
      * <PRE>
-     * <p>
+     * {@code
      * while (i < n) { if (a[i] == x) { return i; } i += 1; }
-     *
+     * }
      * </PRE>
      *
      * </TD>
      * <TD>
      *
      * <PRE>
-     * <p>
+     * {@code
      * while (i < n) { if (a[i] == x) { return i; } i += 1; }
-     *
+     * }
      * </PRE>
      *
      * </TD>
      * <TD>
      *
      * <PRE>
-     * <p>
+     * {@code
      * while (i < n) { if (a[i] == x) { return i; } i += 1; }
-     *
+     * }
      * </PRE>
      *
      * </TD>
@@ -411,16 +409,16 @@ public interface PropertyNames {
      * <TD>
      *
      * <PRE>
-     * <p>
+     * {@code
      * (1 < < 3)
-     *
+     * }
      * </PRE>
      *
      * </TD>
      * <TD>
      *
      * <PRE>
-     * ( 1 < < 3 )
+     * {@code ( 1 < < 3 ) }
      * </PRE>
      *
      * </TD>

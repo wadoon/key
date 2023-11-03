@@ -290,17 +290,12 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
         ReasonOfInterruption reason = getReasonOfInterruption();
         setReasonOfInterruption(ReasonOfInterruption.Exception, e);
         switch (reason) {
-        case Exception:
-        case NoInterruption:
+        case Exception, NoInterruption -> {
             setReasonOfInterruption(ReasonOfInterruption.Exception, e);
             listener.processInterrupted(this, problem, e);
-            break;
-        case Timeout:
-            listener.processTimeout(this, problem);
-            break;
-        case User:
-            listener.processUser(this, problem);
-            break;
+        }
+        case Timeout -> listener.processTimeout(this, problem);
+        case User -> listener.processUser(this, problem);
         }
     }
 
@@ -400,7 +395,7 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
     public String getRawSolverOutput() {
         StringBuilder output = new StringBuilder();
         for (Message m : solverCommunication.getOutMessages()) {
-            String s = m.getContent();
+            String s = m.content();
             output.append(s).append("\n");
         }
         return output.toString();
@@ -411,7 +406,7 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
         StringBuilder input = new StringBuilder();
 
         for (Message m : solverCommunication.getMessages(SolverCommunication.MessageType.INPUT)) {
-            String s = m.getContent();
+            String s = m.content();
             input.append(s).append("\n");
         }
         return input.toString();

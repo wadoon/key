@@ -2,8 +2,6 @@
  * This file is part of KeY since 2021 - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-// This file is part of the RECODER library and protected by the LGPL.
-
 package recoder.java.declaration;
 
 import java.util.List;
@@ -41,7 +39,6 @@ public abstract class VariableDeclaration extends JavaDeclaration
      *
      * @param mods a modifier mutable list.
      * @param typeRef a type reference.
-     * @param vars a variable specification mutable list.
      */
 
     public VariableDeclaration(ASTList<DeclarationSpecifier> mods, TypeReference typeRef) {

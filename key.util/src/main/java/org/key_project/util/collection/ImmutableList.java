@@ -13,6 +13,8 @@ import java.util.stream.StreamSupport;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * List interface to be implemented by non-destructive lists
  */
@@ -360,6 +362,18 @@ public interface ImmutableList<T extends @Nullable Object>
         T result = remainder.head();
         assert result != null : "@AssumeAssertion(nullness): this should never be null";
         return result;
+    }
+
+    /**
+     * Get the n-th element of this list.
+     *
+     * @param idx the 0-based index of the element
+     * @return the element at index idx.
+     * @throws IndexOutOfBoundsException if idx is less than 0 or at
+     *         least {@link #size()}.
+     */
+    default T get(int idx) {
+        return take(idx).head();
     }
 
 }

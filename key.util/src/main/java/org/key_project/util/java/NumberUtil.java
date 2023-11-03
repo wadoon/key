@@ -37,9 +37,7 @@ public class NumberUtil {
         int numOfDigits = numberOfDigits(number);
         StringBuilder sb = new StringBuilder();
         sb.append(getAlgebraicSign(number));
-        for (int i = 0; i < MAX_INT_DIGITS - numOfDigits; i++) {
-            sb.append("0");
-        }
+        sb.append("0".repeat(Math.max(0, MAX_INT_DIGITS - numOfDigits)));
         String numberString = Integer.toString(number);
         if (numberString.startsWith("-")) {
             sb.append(numberString.substring(1));
@@ -60,9 +58,7 @@ public class NumberUtil {
         int numOfDigits = numberOfDigits(number);
         StringBuilder sb = new StringBuilder();
         sb.append(getAlgebraicSign(number));
-        for (int i = 0; i < MAX_LONG_DIGITS - numOfDigits; i++) {
-            sb.append("0");
-        }
+        sb.append("0".repeat(Math.max(0, MAX_LONG_DIGITS - numOfDigits)));
         String numberString = Long.toString(number);
         if (numberString.startsWith("-")) {
             sb.append(numberString.substring(1));

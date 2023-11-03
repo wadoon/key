@@ -14,6 +14,9 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
+/**
+ * This class encapsulates initializers of a for loop
+ */
 public class LoopInit extends JavaNonTerminalProgramElement
         implements StatementContainer, ILoopInit {
 

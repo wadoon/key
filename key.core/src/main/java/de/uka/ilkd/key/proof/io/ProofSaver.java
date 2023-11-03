@@ -87,21 +87,21 @@ public class ProofSaver extends OutputStreamProofSaver {
         save(new FileOutputStream(file));
     }
 
-    public String save() throws IOException {
+    public String save() {
         String errorMsg = null;
         try {
             save(file);
         } catch (IOException ioe) {
             errorMsg = "Could not save \n" + filename() + ".\n";
             errorMsg += ioe.toString();
-            LOGGER.warn("Failed to save", ioe);
+            LOGGER.warn("Failed to save ", ioe);
         } catch (NullPointerException npe) {
             errorMsg = "Could not save \n" + filename() + "\n";
             errorMsg += "No proof present?";
-            LOGGER.warn("No proof present?", npe);
+            LOGGER.warn("No proof present? ", npe);
         } catch (RuntimeException e) {
             errorMsg = e.toString();
-            LOGGER.warn("Failed to save", e);
+            LOGGER.warn("Failed to save ", e);
         }
         fireProofSaved(new ProofSaverEvent(this, filename(), errorMsg));
         return errorMsg;

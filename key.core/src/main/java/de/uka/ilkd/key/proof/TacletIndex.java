@@ -302,7 +302,8 @@ public abstract class TacletIndex {
      *
      * @param map the map to select the NoPosTacletApps from
      * @param pe the program element that is used to retrieve the taclets
-     * @param prefixOcc the PrefixOccurrence object used to keep track of the occuring prefix
+     * @param prefixOccurrences the PrefixOccurrence object used to keep track of the occuring
+     *        prefix
      *        elements
      */
     private ImmutableList<NoPosTacletApp> getJavaTacletList(
@@ -380,7 +381,7 @@ public abstract class TacletIndex {
      * @param second the second list
      * @return the merged list
      */
-    private final ImmutableList<NoPosTacletApp> merge(ImmutableList<NoPosTacletApp> first,
+    private ImmutableList<NoPosTacletApp> merge(ImmutableList<NoPosTacletApp> first,
             final ImmutableList<NoPosTacletApp> second) {
         if (second == null) {
             return first;
@@ -580,9 +581,7 @@ public abstract class TacletIndex {
          * resets the occurred field to 'nothing has occurred'
          */
         public void reset() {
-            for (int i = 0; i < PREFIXTYPES; i++) {
-                occurred[i] = false;
-            }
+            Arrays.fill(occurred, 0, PREFIXTYPES, false);
         }
 
         /**

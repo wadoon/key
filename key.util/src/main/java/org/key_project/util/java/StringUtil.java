@@ -14,6 +14,8 @@ import org.checkerframework.checker.nullness.qual.PolyNull;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * Provides static methods to work with strings.
@@ -311,15 +313,11 @@ public final class StringUtil {
                 throw new IllegalArgumentException(String.format(
                     "Text \"%s\" with length %d is longer as %d.", text, text.length(), length));
             } else {
-                for (int i = 0; i < length - text.length(); i++) {
-                    sb.append(leadingCharacter);
-                }
+                sb.append(String.valueOf(leadingCharacter).repeat(length - text.length()));
                 sb.append(text);
             }
         } else {
-            for (int i = 0; i < length; i++) {
-                sb.append(leadingCharacter);
-            }
+            sb.append(String.valueOf(leadingCharacter).repeat(Math.max(0, length)));
         }
         return sb.toString();
     }

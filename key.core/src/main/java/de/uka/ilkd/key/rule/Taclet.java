@@ -12,7 +12,6 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.LemmaJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
@@ -22,6 +21,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
+import org.key_project.util.EqualsModProofIrrelevancy;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
@@ -29,6 +29,8 @@ import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+
+import static org.key_project.util.Strings.formatAsList;
 
 
 /**
@@ -73,15 +75,9 @@ import org.jspecify.annotations.Nullable;
  * {@link de.uka.ilkd.key.rule.TacletApp TacletApp}
  * </p>
  */
-public abstract class Taclet implements Rule, Named {
+public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
 
     protected final ImmutableSet<TacletAnnotation> tacletAnnotations;
-
-    /**
-     * The proof node that added this taclet to the set of available taclets.
-     * May be null if this taclet wasn't added by another proof step.
-     */
-    private Node addedBy = null;
 
     public RuleJustification getRuleJustification() {
         if (tacletAnnotations.contains(TacletAnnotation.LEMMA)) {
@@ -91,7 +87,7 @@ public abstract class Taclet implements Rule, Named {
         }
     }
 
-    /** name of the taclet */
+    /** unique name of the taclet */
     private final Name name;
 
     /** name displayed by the pretty printer */
@@ -162,6 +158,8 @@ public abstract class Taclet implements Rule, Named {
 
     /** Integer to cache the hashcode */
     private int hashcode = 0;
+    /** Integer to cache the hashcode */
+    private int hashcode2 = 0;
 
     private final Trigger trigger;
 
@@ -478,6 +476,43 @@ public abstract class Taclet implements Rule, Named {
     }
 
     @Override
+    public boolean equalsModProofIrrelevancy(Object o) {
+        if (o == this)
+            return true;
+
+        if (o == null || o.getClass() != this.getClass()) {
+            return false;
+        }
+
+        final Taclet t2 = (Taclet) o;
+
+        if ((ifSequent == null && t2.ifSequent != null)
+                || (ifSequent != null && t2.ifSequent == null)) {
+            return false;
+        } else {
+            ImmutableList<SequentFormula> if1 = ifSequent.asList();
+            ImmutableList<SequentFormula> if2 = t2.ifSequent.asList();
+            while (if1.head() != null && if1.head().equalsModProofIrrelevancy(if2.head())) {
+                if1 = if1.tail();
+                if2 = if2.tail();
+            }
+            if (if1.head() != null || if2.head() != null) {
+                return false;
+            }
+        }
+
+        if (!choices.equals(t2.choices)) {
+            return false;
+        }
+
+        if (!goalTemplates.equals(t2.goalTemplates)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
     public int hashCode() {
         if (hashcode == 0) {
             hashcode = 37 * name.hashCode() + 17;
@@ -486,6 +521,17 @@ public abstract class Taclet implements Rule, Named {
             }
         }
         return hashcode;
+    }
+
+    @Override
+    public int hashCodeModProofIrrelevancy() {
+        if (hashcode2 == 0) {
+            hashcode2 = ifSequent.getFormulabyNr(1).hashCodeModProofIrrelevancy();
+            if (hashcode2 == 0) {
+                hashcode2 = -1;
+            }
+        }
+        return hashcode2;
     }
 
     /**
@@ -543,7 +589,6 @@ public abstract class Taclet implements Rule, Named {
     }
 
     StringBuffer toStringVarCond(StringBuffer sb) {
-
         if (!varsNew.isEmpty() || !varsNotFreeIn.isEmpty() || !variableConditions.isEmpty()) {
             sb = sb.append("\\varcond(");
 
@@ -566,14 +611,8 @@ public abstract class Taclet implements Rule, Named {
                 --countVarsNotFreeIn;
             }
 
-            int countVariableConditions = variableConditions.size();
-            for (final VariableCondition vc : variableConditions) {
-                sb.append(vc);
-                if (countVariableConditions > 0) {
-                    sb.append(", ");
-                }
-                --countVariableConditions;
-            }
+            sb.append(formatAsList(variableConditions, "", ", ", ""));
+
             sb = sb.append(")\n");
         }
         return sb;
@@ -583,29 +622,14 @@ public abstract class Taclet implements Rule, Named {
         if (goalTemplates.isEmpty()) {
             sb.append("\\closegoal");
         } else {
-            Iterator<TacletGoalTemplate> it = goalTemplates().iterator();
-            while (it.hasNext()) {
-                sb = sb.append(it.next());
-                if (it.hasNext()) {
-                    sb = sb.append(";");
-                }
-                sb = sb.append("\n");
-            }
+            sb.append(formatAsList(goalTemplates, "", ";\n", "\n"));
         }
         return sb;
     }
 
     StringBuffer toStringRuleSets(StringBuffer sb) {
-        Iterator<RuleSet> itRS = ruleSets();
-        if (itRS.hasNext()) {
-            sb = sb.append("\\heuristics(");
-            while (itRS.hasNext()) {
-                sb = sb.append(itRS.next());
-                if (itRS.hasNext()) {
-                    sb = sb.append(", ");
-                }
-            }
-            sb = sb.append(")");
+        if (!ruleSets.isEmpty()) {
+            sb.append("\\heuristics").append(formatAsList(ruleSets, "(", ", ", ")"));
         }
         return sb;
     }
@@ -619,19 +643,12 @@ public abstract class Taclet implements Rule, Named {
     StringBuffer toStringTriggers(StringBuffer sb) {
         if (trigger != null) {
             sb.append("\n\\trigger{");
-            sb.append(trigger.getTriggerVar());
+            sb.append(trigger.triggerVar());
             sb.append("} ");
             sb.append(trigger.getTerm());
             if (trigger.hasAvoidConditions()) {
-                Iterator<Term> itTerms = trigger.getAvoidConditions().iterator();
                 sb.append(" \\avoid ");
-                while (itTerms.hasNext()) {
-                    Term cond = itTerms.next();
-                    sb.append(cond);
-                    if (itTerms.hasNext()) {
-                        sb.append(", ");
-                    }
-                }
+                sb.append(formatAsList(trigger.avoidConditions(), "", ", ", ""));
             }
         }
         return sb;
@@ -773,9 +790,9 @@ public abstract class Taclet implements Rule, Named {
         }
 
         /**
-         * Constructor.
+         * Constructor creating a hint indicating
+         * {@link TacletOperation#REPLACE_TERM} as the currently performed operation.
          *
-         * @param tacletOperation The currently performed operation.
          * @param term The optional replace {@link Term} of the taclet.
          */
         public TacletLabelHint(Term term) {
@@ -956,15 +973,11 @@ public abstract class Taclet implements Rule, Named {
 
     @Override
     @Nullable
-    public String getOrigin() { return origin; }
-
-    public void setOrigin(@Nullable String origin) { this.origin = origin; }
-
-    public void setAddedBy(Node addedBy) {
-        this.addedBy = addedBy;
+    public String getOrigin() {
+        return origin;
     }
 
-    public Node getAddedBy() {
-        return addedBy;
+    public void setOrigin(@Nullable String origin) {
+        this.origin = origin;
     }
 }

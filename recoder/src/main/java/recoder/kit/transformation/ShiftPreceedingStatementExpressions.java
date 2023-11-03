@@ -2,8 +2,6 @@
  * This file is part of KeY since 2021 - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-// This file is part of the RECODER library and protected by the LGPL.
-
 package recoder.kit.transformation;
 
 import java.util.ArrayList;
@@ -257,10 +255,9 @@ public class ShiftPreceedingStatementExpressions extends TwoPassTransformation {
                 // preceeding.getExpression(i).getASTParent()));
                 replace(preceeding.get(i), tempVarRefs.get(i));
             }
-        } else if (parent instanceof FieldSpecification) {
+        } else if (parent instanceof FieldSpecification fs) {
             ProgramFactory f = getProgramFactory();
             // create class initializer and insert it before the field
-            FieldSpecification fs = (FieldSpecification) parent;
             StatementBlock body = f.createStatementBlock();
             // add variable declarations
             for (int i = 0; i < tempSize; i += 1) {

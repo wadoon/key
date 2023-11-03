@@ -182,7 +182,7 @@ public class KeYSelectionModel {
             throw new IllegalStateException("No proof loaded.");
         }
         if (!goalIsValid) {
-            selectedGoal = proof.getGoal(selectedNode);
+            selectedGoal = proof.getOpenGoal(selectedNode);
             goalIsValid = true;
         }
         return selectedGoal;
@@ -221,15 +221,15 @@ public class KeYSelectionModel {
             nextOne = null;
             while (nextOne == null) {
                 switch (currentPos) {
-                case POS_START:
+                case POS_START -> {
                     currentPos = POS_LEAVES;
                     if (selectedNode != null) {
                         nodeIt = selectedNode.leavesIterator();
                     } else {
                         nodeIt = null;
                     }
-                    break;
-                case POS_LEAVES:
+                }
+                case POS_LEAVES -> {
                     if (nodeIt == null || !nodeIt.hasNext()) {
                         currentPos = POS_GOAL_LIST;
                         if (!proof.openGoals().isEmpty()) {
@@ -238,18 +238,17 @@ public class KeYSelectionModel {
                             goalIt = null;
                         }
                     } else {
-                        nextOne = proof.getGoal(nodeIt.next());
+                        nextOne = proof.getOpenGoal(nodeIt.next());
                     }
-                    break;
-
-                case POS_GOAL_LIST:
+                }
+                case POS_GOAL_LIST -> {
                     if (goalIt == null || !goalIt.hasNext()) {
                         // no more items
                         return;
                     } else {
                         nextOne = goalIt.next();
                     }
-                    break;
+                }
                 }
             }
         }
@@ -278,14 +277,10 @@ public class KeYSelectionModel {
      */
     public void defaultSelection() {
         Goal g = null;
-        Goal firstG = null;
         Iterator<Goal> it = new DefaultSelectionIterator();
 
         while (g == null && it.hasNext()) {
             g = it.next();
-            if (firstG == null) {
-                firstG = g;
-            }
         }
 
         /*
@@ -295,11 +290,7 @@ public class KeYSelectionModel {
         if (g != null) {
             setSelectedGoal(g);
         } else {
-            if (firstG != null) {
-                setSelectedGoal(firstG);
-            } else {
-                setSelectedNode(proof.root().leavesIterator().next());
-            }
+            setSelectedNode(proof.root().leavesIterator().next());
         }
     }
 
@@ -345,7 +336,7 @@ public class KeYSelectionModel {
         while (it.hasNext()) {
             final Node node = it.next();
             if (!node.isClosed()) {
-                return proof.getGoal(node);
+                return proof.getOpenGoal(node);
             }
         }
         return null;

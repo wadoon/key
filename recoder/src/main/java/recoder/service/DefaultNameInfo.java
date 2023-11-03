@@ -2,8 +2,6 @@
  * This file is part of KeY since 2021 - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-// This file is part of the RECODER library and protected by the LGPL.
-
 package recoder.service;
 
 import java.beans.PropertyChangeEvent;
@@ -514,8 +512,7 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
         List<Type> tl = getTypes();
         int s = tl.size();
         for (Type t : tl) {
-            if (t instanceof ClassType) {
-                ClassType ct = (ClassType) t;
+            if (t instanceof ClassType ct) {
                 if (ct.getContainer() == pkg) {
                     result.add(ct);
                 }

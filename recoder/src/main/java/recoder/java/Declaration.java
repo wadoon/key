@@ -2,8 +2,6 @@
  * This file is part of KeY since 2021 - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-// This file is part of the RECODER library and protected by the LGPL.
-
 package recoder.java;
 
 import recoder.java.declaration.DeclarationSpecifier;
@@ -25,7 +23,7 @@ public interface Declaration extends NonTerminalProgramElement {
      */
     // ModifierMutableList getModifiers();
 
-    /**
+    /*
      * Sets the modifiers.
      *
      * @param m the new (original) list of modifiers.
@@ -37,7 +35,7 @@ public interface Declaration extends NonTerminalProgramElement {
     /**
      * Sets the declaration specifiers (annotations plus modifiers)
      *
-     * @param m the new list of declaration specifiers
+     * @param d the new list of declaration specifiers
      */
     void setDeclarationSpecifiers(ASTList<DeclarationSpecifier> d);
 }

@@ -51,7 +51,7 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
         implements RuleCompletionHandler, ProofEnvironmentListener, ProofDisposedListener {
     private static final Logger LOGGER =
         LoggerFactory.getLogger(AbstractMediatorUserInterfaceControl.class);
-    protected boolean saveOnly = false;
+    private boolean saveOnly = false;
 
     private final MediatorProofControl proofControl = createProofControl();
 
@@ -218,10 +218,9 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
         final File toSave = new File(proofFolder, filename);
         final KeYResourceManager krm = KeYResourceManager.getManager();
         final ProofSaver ps = new ProofSaver(proof, toSave.getAbsolutePath(), krm.getSHA1());
-        try {
-            ps.save();
-        } catch (IOException e) {
-            reportException(this, null, e);
+        final String errorMsg = ps.save();
+        if (errorMsg != null) {
+            reportException(this, null, new IOException(errorMsg));
         }
     }
 
@@ -267,10 +266,10 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
      * asks if removal of a task is completed. This is useful to display a dialog to the user and
      * asking her or if on command line to allow it always.
      *
-     * @param message
+     * @param message to be displayed asking for confirmation
      * @return true if removal has been granted
      */
-    public boolean confirmTaskRemoval(String string) {
+    public boolean confirmTaskRemoval(String message) {
         return true;
     }
 

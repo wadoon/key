@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.proof.io;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 import de.uka.ilkd.key.proof.init.Includes;
@@ -60,7 +59,6 @@ public interface EnvInput {
         return null;
     }
 
-
     /**
      * gets the classpath elements to be considered here.
      */
@@ -69,10 +67,8 @@ public interface EnvInput {
 
     /**
      * gets the boot classpath element, null if none set.
-     *
-     * @throws
      */
-    File readBootClassPath() throws IOException;
+    File readBootClassPath();
 
     /**
      * Reads the input using the given modification strategy, i.e., parts of the input do not modify
@@ -105,7 +101,10 @@ public interface EnvInput {
      * If true, the requested Java file has to given via {@link #getJavaFile()}.
      * </p>
      *
-     * @see de.uka.ilkd.key.proof.init.ProblemInitializer#readJava(EnvInput, InitConfig)
+     * For further information see the <code>readJava(EnvInput, InitConfig)</code> method of class
+     * {@link de.uka.ilkd.key.proof.init.ProblemInitializer}
+     *
+     * @see de.uka.ilkd.key.proof.init.ProblemInitializer
      */
     default boolean isIgnoreOtherJavaFiles() { return false; }
 }

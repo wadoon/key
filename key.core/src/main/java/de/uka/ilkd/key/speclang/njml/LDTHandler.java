@@ -21,18 +21,11 @@ import org.jspecify.annotations.Nullable;
 public abstract class LDTHandler implements JMLOperatorHandler {
     /**
      * Pair (KJT, Operator)
+     *
+     * @param type type
+     * @param operator operator
      */
-    public static class TypedOperator {
-        /** type */
-        public final KeYJavaType type;
-        /** operator */
-        public final Operator operator;
-
-        /** constructor */
-        public TypedOperator(KeYJavaType type, Operator operator) {
-            this.type = type;
-            this.operator = operator;
-        }
+    public record TypedOperator(KeYJavaType type, Operator operator) {
     }
 
     protected final Services services;

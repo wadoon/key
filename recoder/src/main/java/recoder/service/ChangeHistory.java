@@ -2,8 +2,6 @@
  * This file is part of KeY since 2021 - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-// This file is part of the RECODER library and protected by the LGPL.
-
 package recoder.service;
 
 import java.util.*;
@@ -137,7 +135,7 @@ public class ChangeHistory extends AbstractService {
     /**
      * Adds a model update listener to the history.
      *
-     * @param mul a listener.
+     * @param l a listener.
      */
     public void addModelUpdateListener(ModelUpdateListener l) {
         synchronized (updateListeners) {
@@ -152,7 +150,7 @@ public class ChangeHistory extends AbstractService {
     /**
      * Removes a model update listener from the history.
      *
-     * @param mul a listener.
+     * @param l a listener.
      */
     public void removeModelUpdateListener(ModelUpdateListener l) {
         synchronized (updateListeners) {
@@ -482,8 +480,7 @@ public class ChangeHistory extends AbstractService {
         }
         while (reportCount > position) {
             reportCount -= 1;
-            if (reportStack[reportCount] instanceof TreeChange) {
-                TreeChange lastChange = (TreeChange) reportStack[reportCount];
+            if (reportStack[reportCount] instanceof TreeChange lastChange) {
                 TreeChange undoChange = undo(lastChange);
                 if (lastChange == getTailChange()) {
                     // if the change is still in the update queue, remove it
@@ -601,10 +598,9 @@ public class ChangeHistory extends AbstractService {
             }
             return result;
         }
-        if (!(tc instanceof DetachChange)) {
+        if (!(tc instanceof DetachChange dc)) {
             return null;
         }
-        DetachChange dc = (DetachChange) tc;
 
         // !!!!!!!!!!!!!!!!!!!!!!
         // if (dc.getReplacement() != null) ...

@@ -177,8 +177,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
         pe.setEndPosition(updatePositionRelativeTo(pe.getEndPosition(), pos));
 
         // recurse to children
-        if (pe instanceof NonTerminalProgramElement) {
-            NonTerminalProgramElement ntpe = (NonTerminalProgramElement) pe;
+        if (pe instanceof NonTerminalProgramElement ntpe) {
             for (int i = 0; i < ntpe.getChildCount(); i++) {
                 updatePositionInformation(ntpe.getChildAt(i), pos);
             }
@@ -191,8 +190,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
     private ProgramElement[] getChildren(ProgramElement pe) {
         ProgramElement[] result;
 
-        if (pe instanceof NonTerminalProgramElement) {
-            NonTerminalProgramElement ntpe = (NonTerminalProgramElement) pe;
+        if (pe instanceof NonTerminalProgramElement ntpe) {
             int childCount = ntpe.getChildCount();
             result = new ProgramElement[childCount];
             for (int i = 0; i < childCount; i++) {
@@ -503,7 +501,8 @@ public final class JMLTransformer extends RecoderModelTransformer {
                 de.uka.ilkd.key.java.Position.fromSEPosition(recoderPos);
 
             // call preparser
-            var parser = new PreParser();
+            var parser = new PreParser(ProofIndependentSettings.DEFAULT_INSTANCE
+                    .getTermLabelSettings().getUseOriginLabels());
             ImmutableList<TextualJMLConstruct> constructs =
                 parser.parseClassLevel(concatenatedComment, fileName, pos);
             warnings = warnings.append(parser.getWarnings());
@@ -559,7 +558,8 @@ public final class JMLTransformer extends RecoderModelTransformer {
             de.uka.ilkd.key.java.Position.fromSEPosition(recoderPos);
 
         // call preparser
-        var parser = new PreParser();
+        var parser = new PreParser(
+            ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().getUseOriginLabels());
         ImmutableList<TextualJMLConstruct> constructs =
             parser.parseMethodLevel(concatenatedComment, fileName, pos);
         warnings = warnings.append(parser.getWarnings());
@@ -688,18 +688,16 @@ public final class JMLTransformer extends RecoderModelTransformer {
 
                     // iterate over all pre-existing constructors
                     for (Constructor aConstructorList : constructorList) {
-                        if (aConstructorList instanceof ConstructorDeclaration) {
-                            ConstructorDeclaration cd = (ConstructorDeclaration) aConstructorList;
+                        if (aConstructorList instanceof ConstructorDeclaration cd) {
                             transformMethodlevelComments(cd, resource);
                         }
                     }
 
                     // iterate over all pre-existing methods
                     for (Method aMethodList : methodList) {
-                        if (aMethodList instanceof MethodDeclaration) { // might
+                        if (aMethodList instanceof MethodDeclaration md) { // might
                             // be
                             // ImplicitEnumMethod
-                            MethodDeclaration md = (MethodDeclaration) aMethodList;
                             transformMethodlevelComments(md, resource);
                         }
                     }
@@ -736,8 +734,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
 
         public void walk(@NonNull SourceElement s) {
             s.accept(this);
-            if (s instanceof NonTerminalProgramElement) {
-                NonTerminalProgramElement pe = (NonTerminalProgramElement) s;
+            if (s instanceof NonTerminalProgramElement pe) {
                 for (int i = 0; i < pe.getChildCount(); i++) {
                     walk(pe.getChildAt(i));
                 }

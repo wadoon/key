@@ -12,6 +12,10 @@ import java.util.List;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import org.key_project.util.Strings;
+
+import org.jspecify.annotations.NonNull;
+
 import org.jspecify.annotations.NonNull;
 
 @SuppressWarnings("nullness")
@@ -147,16 +151,7 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("[");
-        for (int i = 0, sz = size(); i < sz; i++) {
-            sb.append(content[i]);
-            if (i < sz - 1) {
-                sb.append(",");
-            }
-        }
-        sb.append("]");
-        return sb.toString();
+        return Strings.formatAsList(this, "[", ",", "]");
     }
 
     @Override

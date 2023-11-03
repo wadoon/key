@@ -30,12 +30,19 @@ public class DepthFirstGoalChooser extends DefaultGoalChooser {
             if (nextGoals.isEmpty()) {
                 result = null;
             } else {
-                result = nextGoals.head();
-                nextGoals = nextGoals.tail();
+                do {
+                    result = nextGoals.head();
+                    nextGoals = nextGoals.tail();
+                } while (result != null && !result.isAutomatic());
             }
         } else {
             ++nextGoalCounter;
-            result = selectedList.isEmpty() ? null : selectedList.head();
+            do {
+                result = selectedList.isEmpty() ? null : selectedList.head();
+                if (result != null && !result.isAutomatic()) {
+                    selectedList = selectedList.tail();
+                }
+            } while (result != null && !result.isAutomatic());
         }
         return result;
     }
@@ -47,9 +54,7 @@ public class DepthFirstGoalChooser extends DefaultGoalChooser {
     protected ImmutableList<Goal> insertNewGoals(ImmutableList<Goal> newGoals,
             ImmutableList<Goal> prevGoalList) {
 
-        for (Goal newGoal : newGoals) {
-            final Goal g = newGoal;
-
+        for (final Goal g : newGoals) {
             if (proof.openGoals().contains(g)) {
                 // if (!allGoalsSatisfiable)
                 // goalList = goalList.prepend(g);

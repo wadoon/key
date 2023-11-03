@@ -11,7 +11,9 @@ import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
 
-
+/**
+ * This interface has to be implemented by all classes that want to act as a rule in the calculus.
+ */
 public interface Rule extends HasOrigin {
 
     /**

@@ -10,6 +10,12 @@ import de.uka.ilkd.key.logic.op.VariableSV;
 
 import org.key_project.util.collection.ImmutableSet;
 
+/**
+ * This class contains the prefix for a Taclet according to M.Gieses paper "Taclet mit
+ * Schemavariablen und lokalen Deklarationen" It is used as a data container for the set of all
+ * variables bound above the appearance of a SchemaVariable v in a Taclet without all those x not
+ * free in v variables
+ */
 public class TacletPrefix {
 
     /** the prefix of the taclet */
@@ -87,10 +93,9 @@ public class TacletPrefix {
         if (o == this) {
             return true;
         }
-        if (!(o instanceof TacletPrefix)) {
+        if (!(o instanceof TacletPrefix other)) {
             return false;
         }
-        TacletPrefix other = (TacletPrefix) o;
         return (other.prefix().equals(prefix())) && (other.context() == context());
     }
 

@@ -10,6 +10,9 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+/**
+ * This class encapsulates a guard for a loop
+ */
 public class Guard extends JavaNonTerminalProgramElement implements IGuard {
 
     final Expression expr;
