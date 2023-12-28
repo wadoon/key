@@ -32,6 +32,7 @@ import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.proof.io.consistency.SimpleFileRepo;
 import de.uka.ilkd.key.prover.impl.PerfScope;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
+import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.SLEnvInput;

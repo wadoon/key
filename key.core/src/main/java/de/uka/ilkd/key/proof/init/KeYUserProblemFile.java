@@ -13,17 +13,20 @@ import de.uka.ilkd.key.nparser.ChoiceInformation;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.nparser.ProblemInformation;
 import de.uka.ilkd.key.nparser.ProofReplayer;
+import de.uka.ilkd.key.nparser.builder.ProblemFinder;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.io.IProofFileParser;
 import de.uka.ilkd.key.proof.io.KeYFile;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
+import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.ProgressMonitor;
 import de.uka.ilkd.key.util.Triple;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -37,7 +40,11 @@ import org.jspecify.annotations.NonNull;
  * obligation.
  */
 public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
+    @Nullable
     private Sequent problem = null;
+
+    @Nullable
+    private Configuration settings;
 
     // -------------------------------------------------------------------------
     // constructors
@@ -120,6 +127,13 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         warnings = warnings.add(getPositionedStrings(readRules()));
 
         return warnings;
+    }
+
+    public Configuration  readSettings() {
+        if(settings==null){
+            settings = getParseContext().findSettings();
+        }
+        return settings;
     }
 
     @Override

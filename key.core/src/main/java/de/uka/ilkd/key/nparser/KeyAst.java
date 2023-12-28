@@ -73,6 +73,20 @@ public abstract class KeyAst<T extends ParserRuleContext> {
             return settings;
         }
 
+        /**
+         * Returns the raw settings within a {@link de.uka.ilkd.key.proof.io.KeYFile}.
+         */
+        public Configuration findSettings() {
+            final var cfg = new ConfigurationBuilder();
+            if (ctx.preferences() == null || ctx.preferences().cvalue() == null) {
+                return new Configuration();
+            }
+
+            var c = ctx.preferences().cvalue();
+            return (Configuration) c.accept(cfg);
+        }
+
+
         public @Nullable Triple<String, Integer, Integer> findProofScript() {
             if (ctx.problem() != null && ctx.problem().proofScript() != null) {
                 KeYParser.ProofScriptContext pctx = ctx.problem().proofScript();
