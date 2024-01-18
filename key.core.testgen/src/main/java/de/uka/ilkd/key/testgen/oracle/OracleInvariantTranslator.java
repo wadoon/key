@@ -19,14 +19,9 @@ import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.RepresentsAxiom;
 
-public class OracleInvariantTranslator {
+import java.util.Objects;
 
-    private final Services services;
-
-    public OracleInvariantTranslator(Services services) {
-        this.services = services;
-    }
-
+public record OracleInvariantTranslator(Services services) {
     public Term getInvariantTerm(Sort s) {
         JavaInfo info = services.getJavaInfo();
         TermBuilder tb = new TermBuilder(services.getTermFactory(), services);
@@ -36,8 +31,7 @@ public class OracleInvariantTranslator {
 
         LogicVariable h = new LogicVariable(new Name("h"), heapSort);
 
-
-        KeYJavaType kjt = info.getKeYJavaType(s);
+        KeYJavaType kjt = Objects.requireNonNull(info.getKeYJavaType(s));
 
         if (!(kjt.getJavaType() instanceof ClassDeclaration
                 || kjt.getJavaType() instanceof InterfaceDeclaration
@@ -73,19 +67,9 @@ public class OracleInvariantTranslator {
                             result = tb.and(result, left);
                         }
                     }
-
-
                 }
-
-
             }
-
         }
-
         return tb.tt();
-
-
-
     }
-
 }
