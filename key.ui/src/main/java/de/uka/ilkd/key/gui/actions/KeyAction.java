@@ -8,7 +8,11 @@ import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.KeyStroke;
 
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
+import org.pushingpixels.radiance.component.api.common.CommandAction;
+import org.pushingpixels.radiance.component.api.common.CommandActionEvent;
+import org.pushingpixels.radiance.component.api.common.model.Command;
 
 import static de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager.SHORTCUT_KEY_MASK;
 
@@ -40,7 +44,7 @@ public abstract class KeyAction extends AbstractAction {
      * <p>
      * The path should be a dot-separated string, i.e. "Heatmap.Options" would inject an action into
      * a sub-sub Menu Options below Heatmap.
-     *
+     * <p>
      * (see {@code KeYGuiExtensionFacade.findMenu(JMenu, Iterator)})
      */
     public static final String PATH = "PATH";
@@ -155,5 +159,12 @@ public abstract class KeyAction extends AbstractAction {
      */
     protected void setPriority(int priority) {
         putValue(PRIORITY, priority);
+    }
+
+    public Command asCommand() {
+        return Command.builder()
+                .setText(getName())
+                .setAction(commandActionEvent -> actionPerformed(null))
+                .build();
     }
 }

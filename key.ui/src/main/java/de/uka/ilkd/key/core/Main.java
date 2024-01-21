@@ -11,6 +11,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import javax.swing.*;
 import javax.xml.parsers.ParserConfigurationException;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
@@ -38,6 +39,7 @@ import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.rifl.RIFLTransformer;
 
 import org.key_project.util.java.IOUtil;
+import org.key_project.util.java.SwingUtil;
 import org.key_project.util.reflection.ClassLoaderUtil;
 
 import org.slf4j.Logger;
@@ -176,7 +178,7 @@ public final class Main {
     private Main() {
     }
 
-    public static void main(final String[] args) {
+    public static void main(final String[] args) throws InterruptedException, InvocationTargetException {
         Locale.setDefault(Locale.US);
 
         // does no harm on non macs
@@ -184,23 +186,24 @@ public final class Main {
 
         Watchdog.start();
 
-        try {
-            cl = createCommandLine();
-            cl.parse(args);
-            evaluateOptions(cl);
-            fileArguments = cl.getFileArguments();
-            fileArguments = preProcessInput(fileArguments);
-            AbstractMediatorUserInterfaceControl userInterface = createUserInterface(fileArguments);
-            loadCommandLineFiles(userInterface, fileArguments);
-        } catch (ExceptionInInitializerError e) {
-            LOGGER.error("D'oh! It seems that KeY was not built properly!", e);
-            System.exit(777);
-        } catch (CommandLineException e) {
-            printHeader(); // exception before verbosity option could be read
-            LOGGER.error("Error in parsing the command: {}", e.getMessage());
-            printUsageAndExit(true, e.getMessage(), -1);
-        }
-
+        SwingUtilities.invokeAndWait(() -> {
+            try {
+                cl = createCommandLine();
+                cl.parse(args);
+                evaluateOptions(cl);
+                fileArguments = cl.getFileArguments();
+                fileArguments = preProcessInput(fileArguments);
+                AbstractMediatorUserInterfaceControl userInterface = createUserInterface(fileArguments);
+                loadCommandLineFiles(userInterface, fileArguments);
+            } catch (ExceptionInInitializerError e) {
+                LOGGER.error("D'oh! It seems that KeY was not built properly!", e);
+                System.exit(777);
+            } catch (CommandLineException e) {
+                printHeader(); // exception before verbosity option could be read
+                LOGGER.error("Error in parsing the command: {}", e.getMessage());
+                printUsageAndExit(true, e.getMessage(), -1);
+            }
+        });
     }
 
     private static void logInformation() {

@@ -28,6 +28,10 @@ dependencies {
     api 'org.key-project:docking-frames-common:1.1.3p1'
     api 'org.key-project:docking-frames-core:1.1.3p1'
 
+    api("org.pushing-pixels:radiance-component:6.5.0")
+    implementation 'org.pushing-pixels:radiance-theming:6.5.0'
+    api 'org.pushing-pixels:radiance-common:6.5.0'
+
     runtimeOnly project(":keyext.ui.testgen")
     runtimeOnly project(":keyext.exploration")
     runtimeOnly project(":keyext.slicing")
