@@ -181,6 +181,12 @@ public abstract class KeyAst<T extends ParserRuleContext> {
         }
     }
 
+    public static class Taclet extends KeyAst<KeYParser.TacletContext> {
+        public Taclet(KeYParser.TacletContext taclet) {
+            super(taclet);
+        }
+    }
+
     /**
      * This class represents the entry of a proof script within a KeY file.
      *
