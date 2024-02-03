@@ -3,17 +3,19 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser;
 
+import java.net.URI;
 import java.net.URL;
 import java.util.List;
 
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.nparser.builder.BuilderHelpers;
 import de.uka.ilkd.key.nparser.builder.ChoiceFinder;
 import de.uka.ilkd.key.nparser.builder.FindProblemInformation;
 import de.uka.ilkd.key.nparser.builder.IncludeFinder;
+import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.ProofSettings;
-import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.util.java.StringUtil;
 
@@ -87,11 +89,14 @@ public abstract class KeyAst<T extends ParserRuleContext> {
         }
 
 
-        public @Nullable Triple<String, Integer, Integer> findProofScript() {
+        public @Nullable ProofScriptEntry findProofScript() {
             if (ctx.problem() != null && ctx.problem().proofScript() != null) {
                 KeYParser.ProofScriptContext pctx = ctx.problem().proofScript();
                 String text = pctx.ps.getText();
-                return new Triple<>(StringUtil.trim(text, '"'), pctx.ps.getLine(),
+                return new ProofScriptEntry(
+                    StringUtil.trim(text, '"'),
+                    URI.create(pctx.start.getInputStream().getSourceName()),
+                    pctx.ps.getLine(),
                     pctx.ps.getCharPositionInLine());
             }
             return null;
@@ -173,6 +178,19 @@ public abstract class KeyAst<T extends ParserRuleContext> {
     public static class Seq extends KeyAst<KeYParser.SeqContext> {
         Seq(KeYParser.SeqContext ctx) {
             super(ctx);
+        }
+    }
+
+    /**
+     * This class represents the entry of a proof script within a KeY file.
+     *
+     * @param code               non-null string containing the proof script
+     * @param line               line number of the entry
+     * @param charPositionInLine starting offset position in the line
+     */
+    public record ProofScriptEntry(@NonNull String code, URI source, int line, int charPositionInLine) {
+        public Location getLocation() {
+            return new Location(source, Position.newOneBased(this.line(), this.charPositionInLine()));
         }
     }
 }

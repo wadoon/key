@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
+import java.util.*;
+
 import de.uka.ilkd.key.logic.RenamingTable;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
@@ -13,15 +15,15 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.util.Pair;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
+
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.lookup.Lookup;
 
-import java.util.*;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public class Node implements Iterable<Node> {
     private static final String RULE_WITHOUT_NAME = "rule without name";
@@ -115,7 +117,7 @@ public class Node implements Iterable<Node> {
      * taclet with an addrule section on this node, then these taclets are stored in this list
      */
     private ImmutableSet<NoPosTacletApp> localIntroducedRules =
-            DefaultImmutableSet.nil();
+        DefaultImmutableSet.nil();
 
     /**
      * Holds the undo methods for the information added by rules to the {@code Goal.strategyInfos}.
@@ -446,7 +448,7 @@ public class Node implements Iterable<Node> {
 
     /**
      * @return an iterator for the leaves of the subtree below this node. The computation is called
-     * at every call!
+     *         at every call!
      */
     public Iterator<Node> leavesIterator() {
         return new NodeIterator(getLeaves().iterator());
@@ -491,7 +493,7 @@ public class Node implements Iterable<Node> {
     /**
      * @param child a child of this node.
      * @return the number of the node <code>child</code>, if it is a child of this node (starting
-     * with <code>0</code>), <code>-1</code> otherwise
+     *         with <code>0</code>), <code>-1</code> otherwise
      */
     public int getChildNr(Node child) {
         int res = 0;
@@ -531,16 +533,16 @@ public class Node implements Iterable<Node> {
      * Helper for {@link #toString()}
      *
      * @param prefix needed to keep track if a line has to be printed
-     * @param tree   the tree representation we want to add this subtree " @param preEnumeration the
-     *               enumeration of the parent without the last number
+     * @param tree the tree representation we want to add this subtree " @param preEnumeration the
+     *        enumeration of the parent without the last number
      * @param postNr the last number of the parents enumeration
-     * @param maxNr  the number of nodes at this level
-     * @param ownNr  the place of this node at this level
+     * @param maxNr the number of nodes at this level
+     * @param ownNr the place of this node at this level
      * @return the string representation of this node.
      */
 
     private StringBuffer toString(String prefix, StringBuffer tree, String preEnumeration,
-                                  int postNr, int maxNr, int ownNr) {
+            int postNr, int maxNr, int ownNr) {
         Iterator<Node> childrenIt = childrenIterator();
         // Some constants
         String frontIndent = (maxNr > 1 ? " " : "");
@@ -591,7 +593,7 @@ public class Node implements Iterable<Node> {
         while (childrenIt.hasNext()) {
             childId++;
             childrenIt.next().toString(prefix, tree, newEnumeration, newPostNr, children.size(),
-                    childId);
+                childId);
         }
 
         return tree;
@@ -648,7 +650,7 @@ public class Node implements Iterable<Node> {
      * this node.
      *
      * @return true iff the parent of this node has this node as child and this condition holds also
-     * for the own children.
+     *         for the own children.
      */
     public boolean sanityCheckDoubleLinks() {
         if (!root()) {
@@ -775,7 +777,7 @@ public class Node implements Iterable<Node> {
      * Retrieves a user-defined data.
      *
      * @param service the class for which the data were registered
-     * @param <T>     any class
+     * @param <T> any class
      * @return null or the previous data
      * @see #register(Object, Class)
      */
@@ -793,7 +795,7 @@ public class Node implements Iterable<Node> {
     /**
      * Register a user-defined data in this node info.
      *
-     * @param obj     an object to be registered
+     * @param obj an object to be registered
      * @param service the key under it should be registered
      * @param <T>
      */
@@ -804,9 +806,9 @@ public class Node implements Iterable<Node> {
     /**
      * Remove a previous registered user-defined data.
      *
-     * @param obj     registered object
+     * @param obj registered object
      * @param service the key under which the data was registered
-     * @param <T>     arbitray object
+     * @param <T> arbitray object
      */
     public <T> void deregister(T obj, Class<T> service) {
         if (userData != null) {
@@ -846,7 +848,8 @@ public class Node implements Iterable<Node> {
     }
 
     /**
-     * Calculates an array is the path from root node to this node. Each entry defines the child to be selected.
+     * Calculates an array is the path from root node to this node. Each entry defines the child to
+     * be selected.
      *
      * @see #traversePath(Iterator)
      */
