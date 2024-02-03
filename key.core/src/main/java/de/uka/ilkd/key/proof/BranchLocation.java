@@ -6,8 +6,6 @@ package de.uka.ilkd.key.proof;
 import java.util.List;
 import java.util.Objects;
 
-import de.uka.ilkd.key.util.Pair;
-
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -26,14 +24,14 @@ public class BranchLocation {
     /**
      * List of branch choices (branching nodes and sub-proof indices).
      */
-    private final ImmutableList<Pair<Node, Integer>> location;
+    private final ImmutableList<BranchChoice> location;
 
     /**
      * Construct a new branch location given a list of branch choices.
      *
      * @param location series of branch choices
      */
-    public BranchLocation(ImmutableList<Pair<Node, Integer>> location) {
+    public BranchLocation(ImmutableList<BranchChoice> location) {
         this.location = location;
     }
 
@@ -61,7 +59,7 @@ public class BranchLocation {
             if (!keepGoing) {
                 break;
             }
-            Pair<Node, Integer> x = locations[0].get(i);
+            var x = locations[0].get(i);
             for (int j = 1; j < locations.length; j++) {
                 if (!locations[j].get(i).equals(x)) {
                     keepGoing = false;
@@ -92,7 +90,7 @@ public class BranchLocation {
      * @param newBranch branch choice
      * @return extnded branch location
      */
-    public BranchLocation append(Pair<Node, Integer> newBranch) {
+    public BranchLocation append(BranchChoice newBranch) {
         return new BranchLocation(location.append(newBranch));
     }
 
@@ -102,7 +100,7 @@ public class BranchLocation {
      * @return shorter branch location
      */
     public BranchLocation removeLast() {
-        List<Pair<Node, Integer>> list = location.toList();
+        List<BranchChoice> list = location.toList();
         list.remove(list.size() - 1);
         return new BranchLocation(ImmutableList.fromList(list));
     }
@@ -121,7 +119,7 @@ public class BranchLocation {
         return location.isEmpty();
     }
 
-    private Pair<Node, Integer> get(int idx) {
+    private BranchChoice get(int idx) {
         return location.stream().skip(idx).findFirst().get();
     }
 
@@ -170,5 +168,8 @@ public class BranchLocation {
     @Override
     public int hashCode() {
         return Objects.hash(location);
+    }
+
+    public record BranchChoice(Node first, int second) {
     }
 }

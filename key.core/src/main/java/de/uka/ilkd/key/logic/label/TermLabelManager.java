@@ -22,7 +22,6 @@ import de.uka.ilkd.key.rule.label.TermLabelPolicy;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring.RefactoringScope;
 import de.uka.ilkd.key.util.LinkedHashMap;
-import de.uka.ilkd.key.util.Pair;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -1536,15 +1535,15 @@ public class TermLabelManager {
             Object hint, Term tacletTerm, RefactoringsContainer refactorings, TermFactory tf,
             Term newApplicationTerm) {
         if (!refactorings.belowUpdatesRefactorings().isEmpty()) {
-            Pair<ImmutableList<Term>, Term> pair = TermBuilder.goBelowUpdates2(newApplicationTerm);
+            TermBuilder.BelowUpdates pair = TermBuilder.goBelowUpdates2(newApplicationTerm);
             ImmutableArray<TermLabel> newLabels = performRefactoring(state, services,
                 applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm,
-                pair.second, refactorings.belowUpdatesRefactorings());
-            if (newLabels != pair.second.getLabels()) {
-                Term newModality = tf.createTerm(pair.second.op(), pair.second.subs(),
-                    pair.second.boundVars(), pair.second.javaBlock(), newLabels);
+                pair.second(), refactorings.belowUpdatesRefactorings());
+            if (newLabels != pair.second().getLabels()) {
+                Term newModality = tf.createTerm(pair.second().op(), pair.second().subs(),
+                    pair.second().boundVars(), pair.second().javaBlock(), newLabels);
                 newApplicationTerm =
-                    services.getTermBuilder().applyParallel(pair.first, newModality,
+                    services.getTermBuilder().applyParallel(pair.first(), newModality,
                         newApplicationTerm.getLabels());
             }
         }

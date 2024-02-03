@@ -12,12 +12,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.ldt.BooleanLDT;
-import de.uka.ilkd.key.ldt.DoubleLDT;
-import de.uka.ilkd.key.ldt.FloatLDT;
-import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.ldt.LocSetLDT;
+import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
@@ -32,7 +27,6 @@ import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 import de.uka.ilkd.key.speclang.HeapContext;
-import de.uka.ilkd.key.util.Pair;
 
 import org.key_project.util.collection.*;
 
@@ -2113,13 +2107,13 @@ public class TermBuilder {
     /**
      * Removes leading updates from the passed term.
      */
-    public static Pair<ImmutableList<Term>, Term> goBelowUpdates2(Term term) {
+    public static BelowUpdates goBelowUpdates2(Term term) {
         ImmutableList<Term> updates = ImmutableSLList.nil();
         while (term.op() instanceof UpdateApplication) {
             updates = updates.append(UpdateApplication.getUpdate(term));
             term = UpdateApplication.getTarget(term);
         }
-        return new Pair<>(updates, term);
+        return new BelowUpdates(updates, term);
     }
 
     public Term seqDef(QuantifiableVariable qv, Term a, Term b, Term t) {
@@ -2313,5 +2307,8 @@ public class TermBuilder {
      */
     public OriginTermLabelFactory getOriginFactory() {
         return services.getOriginFactory();
+    }
+
+    public record BelowUpdates(ImmutableList<Term> first, Term second) {
     }
 }

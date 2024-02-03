@@ -13,7 +13,6 @@ import de.uka.ilkd.key.rule.merge.MergePartner;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstractionFactory;
-import de.uka.ilkd.key.util.Pair;
 
 /**
  * A completion class for merge procedures. Certain procedures, such as
@@ -41,7 +40,7 @@ public abstract class MergeProcedureCompletion<C extends MergeProcedure> {
         return new MergeProcedureCompletion<>() {
             @Override
             public T complete(
-                    T proc, Pair<Goal, PosInOccurrence> mergeGoalPio,
+                    T proc, MergeGoalPio mergeGoalPio,
                     Collection<MergePartner> partners) {
                 return completion.apply(proc);
             }
@@ -57,7 +56,7 @@ public abstract class MergeProcedureCompletion<C extends MergeProcedure> {
      * @param partners The {@link MergePartner}s chosen.
      * @return The completed {@link MergeProcedure}.
      */
-    public abstract C complete(final C proc, final Pair<Goal, PosInOccurrence> mergeGoalPio,
+    public abstract C complete(final C proc, final MergeGoalPio mergeGoalPio,
             final Collection<MergePartner> partners);
 
     /**
@@ -74,4 +73,6 @@ public abstract class MergeProcedureCompletion<C extends MergeProcedure> {
         }
     }
 
+    public record MergeGoalPio(Goal first, PosInOccurrence second) {
+    }
 }

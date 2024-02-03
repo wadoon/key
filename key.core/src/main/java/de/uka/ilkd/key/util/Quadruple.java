@@ -14,6 +14,7 @@ import java.util.Comparator;
  * @param <T4> type of fourth element
  * @author Dominic Scheurer
  */
+@Deprecated(forRemoval = false)
 public record Quadruple<T1, T2, T3, T4>(T1 first, T2 second, T3 third, T4 fourth) {
 
     /**

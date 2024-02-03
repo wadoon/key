@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.util.Quadruple;
-import de.uka.ilkd.key.util.Triple;
 
 /**
  * Simple data object to store a mapping of rules to various counters.
@@ -24,7 +23,7 @@ public class RuleStatistics {
      * that used this rule and didn't contribute to the proof ("useless" proof steps), and the
      * number of "useless" proof steps that initiate a chain of further (useless) proof steps.
      */
-    private final Map<String, Triple<Integer, Integer, Integer>> map = new HashMap<>();
+    private final Map<String, RuleStatisticData> map = new HashMap<>();
     /**
      * Mapping of rule name to whether this rule introduces new proof branches.
      */
@@ -40,9 +39,8 @@ public class RuleStatistics {
         String name = rule.displayName();
         ruleBranched.put(name, branches);
 
-        Triple<Integer, Integer, Integer> entry =
-            map.computeIfAbsent(name, it -> new Triple<>(0, 0, 0));
-        map.put(name, new Triple<>(entry.first + 1, entry.second, entry.third));
+        var entry = map.computeIfAbsent(name, it -> new RuleStatisticData(0, 0, 0));
+        map.put(name, new RuleStatisticData(entry.first + 1, entry.second, entry.third));
     }
 
     /**
@@ -55,9 +53,8 @@ public class RuleStatistics {
         String name = rule.displayName();
         ruleBranched.put(name, branches);
 
-        Triple<Integer, Integer, Integer> entry =
-            map.computeIfAbsent(name, it -> new Triple<>(0, 0, 0));
-        map.put(name, new Triple<>(entry.first + 1, entry.second + 1, entry.third));
+        var entry = map.computeIfAbsent(name, it -> new RuleStatisticData(0, 0, 0));
+        map.put(name, new RuleStatisticData(entry.first + 1, entry.second + 1, entry.third));
     }
 
     /**
@@ -70,9 +67,8 @@ public class RuleStatistics {
         String name = rule.displayName();
         ruleBranched.put(name, branches);
 
-        Triple<Integer, Integer, Integer> entry =
-            map.computeIfAbsent(name, it -> new Triple<>(0, 0, 0));
-        map.put(name, new Triple<>(entry.first + 1, entry.second + 1, entry.third + 1));
+        var entry = map.computeIfAbsent(name, it -> new RuleStatisticData(0, 0, 0));
+        map.put(name, new RuleStatisticData(entry.first + 1, entry.second + 1, entry.third + 1));
     }
 
     /**
@@ -98,5 +94,8 @@ public class RuleStatistics {
      */
     public boolean branches(String rule) {
         return ruleBranched.get(rule);
+    }
+
+    public record RuleStatisticData(int first, int second, int third) {
     }
 }

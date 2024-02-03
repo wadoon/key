@@ -12,7 +12,11 @@ import java.util.Objects;
  * @param <T1> type of first element
  * @param <T2> type of second element
  * @param <T3> type of third element
+ * @deprecated Should be removed: In Java 17+, we have the possibility to declare records, which are
+ *             definitely a
+ *             better solution.
  */
+@Deprecated(forRemoval = true)
 public class Triple<T1, T2, T3> {
     /**
      * First element.

@@ -6,8 +6,6 @@ package de.uka.ilkd.key.proof.io.intermediate;
 import java.util.LinkedList;
 
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.util.Pair;
 
 import org.key_project.util.collection.ImmutableList;
 
@@ -18,12 +16,12 @@ import org.key_project.util.collection.ImmutableList;
  */
 public class TacletAppIntermediate extends AppIntermediate {
 
-    private String tacletName = null;
-    private Pair<Integer, PosInTerm> posInfo = null;
-    private LinkedList<String> insts = null;
-    private ImmutableList<String> ifSeqFormulaList = null;
-    private ImmutableList<String> ifDirectFormulaList = null;
-    private ImmutableList<Name> newNames = null;
+    private String tacletName;
+    private BuiltInAppIntermediate.PosInfo posInfo;
+    private LinkedList<String> insts;
+    private ImmutableList<String> ifSeqFormulaList;
+    private ImmutableList<String> ifDirectFormulaList;
+    private ImmutableList<Name> newNames;
 
     /**
      * Constructs a new intermediate taclet application.
@@ -36,7 +34,7 @@ public class TacletAppIntermediate extends AppIntermediate {
      * @param ifDirectFormulaList
      * @param newNames New names registered during taclet application.
      */
-    public TacletAppIntermediate(String tacletName, Pair<Integer, PosInTerm> posInfo,
+    public TacletAppIntermediate(String tacletName, BuiltInAppIntermediate.PosInfo posInfo,
             LinkedList<String> insts, ImmutableList<String> ifSeqFormulaList,
             ImmutableList<String> ifDirectFormulaList, ImmutableList<Name> newNames) {
         // Taclet names are internalized later, so we don't waste memory
@@ -52,7 +50,7 @@ public class TacletAppIntermediate extends AppIntermediate {
         return tacletName;
     }
 
-    public Pair<Integer, PosInTerm> getPosInfo() {
+    public BuiltInAppIntermediate.PosInfo getPosInfo() {
         return posInfo;
     }
 

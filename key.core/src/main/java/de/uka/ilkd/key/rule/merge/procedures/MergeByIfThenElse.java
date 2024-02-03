@@ -12,16 +12,13 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.MergeRule;
-import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Quadruple;
+import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 
-import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.countAtoms;
-import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getDistinguishingFormula;
-import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getUpdateRightSideFor;
-import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.trySimplify;
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.*;
 
 /**
  * Rule that merges two sequents based on the if-then-else construction: If two locations are
@@ -153,8 +150,8 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
 
         TermBuilder tb = services.getTermBuilder();
 
-        Term rightSide1 = getUpdateRightSideFor(state1.first, v);
-        Term rightSide2 = getUpdateRightSideFor(state2.first, v);
+        Term rightSide1 = getUpdateRightSideFor(state1.first(), v);
+        Term rightSide2 = getUpdateRightSideFor(state2.first(), v);
 
         if (rightSide1 == null) {
             rightSide1 = tb.var(v);
@@ -199,15 +196,15 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
         // formula is implied by the original path condition; for completeness,
         // we add the common subformula in the new path condition, if it
         // is not already implied by that.
-        Optional<Pair<Term, Term>> distinguishingAndEqualFormula1 =
-            getDistinguishingFormula(state1.second, state2.second, services);
+        Optional<MergeRuleUtils.DistinguishedFormula> distinguishingAndEqualFormula1 =
+            getDistinguishingFormula(state1.second(), state2.second(), services);
         Term distinguishingFormula = distinguishingAndEqualFormula1
-                .map(termTermPair -> termTermPair.first).orElse(null);
+                .map(MergeRuleUtils.DistinguishedFormula::first).orElse(null);
 
-        Optional<Pair<Term, Term>> distinguishingAndEqualFormula2 =
-            getDistinguishingFormula(state2.second, state1.second, services);
+        Optional<MergeRuleUtils.DistinguishedFormula> distinguishingAndEqualFormula2 =
+            getDistinguishingFormula(state2.second(), state1.second(), services);
         Term distinguishingFormula2 = distinguishingAndEqualFormula2
-                .map(termTermPair -> termTermPair.first).orElse(null);
+                .map(MergeRuleUtils.DistinguishedFormula::first).orElse(null);
 
         // NOTE (DS): This assertion does not prevent the merging of states with
         // equal

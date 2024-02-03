@@ -26,7 +26,6 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
-import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
 
@@ -93,8 +92,8 @@ public abstract class AbstractSlicer {
         }
         PosInOccurrence pio = seedNode.getAppliedRuleApp().posInOccurrence();
         Term applicationTerm = pio.subTerm();
-        Pair<ImmutableList<Term>, Term> pair = TermBuilder.goBelowUpdates2(applicationTerm);
-        Term modalityTerm = pair.second;
+        TermBuilder.BelowUpdates pair = TermBuilder.goBelowUpdates2(applicationTerm);
+        Term modalityTerm = pair.second();
         SymbolicExecutionTermLabel label =
             SymbolicExecutionUtil.getSymbolicExecutionLabel(modalityTerm);
         if (label == null) {
@@ -207,8 +206,8 @@ public abstract class AbstractSlicer {
     protected SequentInfo analyzeSequent(Node node, ImmutableList<ISymbolicEquivalenceClass> sec) {
         PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
         Term topLevel = pio.sequentFormula().formula();
-        Pair<ImmutableList<Term>, Term> pair = TermBuilder.goBelowUpdates2(topLevel);
-        Term modalityTerm = pair.second;
+        TermBuilder.BelowUpdates pair = TermBuilder.goBelowUpdates2(topLevel);
+        Term modalityTerm = pair.second();
         SymbolicExecutionTermLabel label =
             SymbolicExecutionUtil.getSymbolicExecutionLabel(modalityTerm);
         Services services = node.proof().getServices();
@@ -224,7 +223,8 @@ public abstract class AbstractSlicer {
             Map<ProgramVariable, Term> localValues = new HashMap<>();
             analyzeEquivalenceClasses(services, sec, aliases, thisReference);
             analyzeSequent(services, node.sequent(), aliases, thisReference);
-            analyzeUpdates(pair.first, services, heapLDT, aliases, localValues, ec, thisReference);
+            analyzeUpdates(pair.first(), services, heapLDT, aliases, localValues, ec,
+                thisReference);
             return new SequentInfo(aliases, localValues, ec, thisReference);
         } else {
             return null; // Not the modality of interest.

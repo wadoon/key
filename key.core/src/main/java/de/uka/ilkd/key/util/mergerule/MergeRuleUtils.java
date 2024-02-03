@@ -29,14 +29,11 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
 import de.uka.ilkd.key.rule.merge.MergePartner;
 import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
-import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.util.collection.*;
 
-import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,7 +55,7 @@ import org.slf4j.LoggerFactory;
  * <li>MERGE RELATED</li>
  * <li>PRIVATE</li>
  * </ol>
- *
+ * <p>
  * Feel free to make private methods publicly visible if you need them.
  *
  * @author Dominic Scheurer
@@ -138,7 +135,6 @@ public class MergeRuleUtils {
      */
     public static Term translateToFormula(final Services services, final String toTranslate) {
         try {
-            @NonNull
             Term result = new KeyIO(services).parseExpression(toTranslate);
             return result.sort() == Sort.FORMULA ? result : null;
         } catch (Throwable e) {
@@ -396,8 +392,8 @@ public class MergeRuleUtils {
      */
     public static Function getNewSkolemConstantForPrefix(String prefix, Sort sort,
             Services services) {
-        Function result = null;
-        String newName = "";
+        Function result;
+        String newName;
 
         do {
             newName = services.getTermBuilder().newName(prefix);
@@ -418,8 +414,8 @@ public class MergeRuleUtils {
      */
     public static LogicVariable getFreshVariableForPrefix(String prefix, Sort sort,
             Services services) {
-        LogicVariable result = null;
-        String newName = "";
+        LogicVariable result;
+        String newName;
 
         do {
             newName = services.getTermBuilder().newName(prefix);
@@ -441,8 +437,8 @@ public class MergeRuleUtils {
      */
     public static LocationVariable getFreshLocVariableForPrefix(String prefix, Sort sort,
             Services services) {
-        LocationVariable result = null;
-        String newName = "";
+        LocationVariable result;
+        String newName;
 
         do {
             newName = services.getTermBuilder().newName(prefix);
@@ -519,10 +515,8 @@ public class MergeRuleUtils {
      */
     public static Term exClosure(final Term term, final Services services) {
         TermBuilder tb = services.getTermBuilder();
-        Pair<Term, ImmutableSet<QuantifiableVariable>> anonymized =
-            anonymizeProgramVariables(term, services);
-
-        return tb.ex(anonymized.second, anonymized.first);
+        var anonymized = anonymizeProgramVariables(term, services);
+        return tb.ex(anonymized.freeVars, anonymized.apply);
     }
 
     /**
@@ -534,10 +528,8 @@ public class MergeRuleUtils {
      */
     public static Term allClosure(final Term term, final Services services) {
         TermBuilder tb = services.getTermBuilder();
-        Pair<Term, ImmutableSet<QuantifiableVariable>> anonymized =
-            anonymizeProgramVariables(term, services);
-
-        return tb.all(anonymized.second, anonymized.first);
+        var anonymized = anonymizeProgramVariables(term, services);
+        return tb.all(anonymized.freeVars, anonymized.apply);
     }
 
     /**
@@ -645,7 +637,7 @@ public class MergeRuleUtils {
             return JavaBlock.EMPTY_JAVABLOCK;
         }
 
-        if (term.subs().size() == 0 || !term.javaBlock().isEmpty()) {
+        if (term.subs().isEmpty() || !term.javaBlock().isEmpty()) {
             return term.javaBlock();
         } else {
             for (Term sub : term.subs()) {
@@ -723,7 +715,6 @@ public class MergeRuleUtils {
      * @param term2 Second term to check.
      * @param services The services object.
      * @param timeout Time in milliseconds after which the side proof is aborted.
-     *
      * @throws RuntimeException iff proving the equivalence of term1 and term2 fails.
      */
     public static void assertEquivalent(Term term1, Term term2, Services services, int timeout) {
@@ -757,7 +748,6 @@ public class MergeRuleUtils {
      * @param timeout Time in milliseconds after which the side proof is aborted.
      * @return The simplified {@link Term} or the original term, if simplification was not
      *         successful.
-     *
      * @see #simplify(Proof, Term, int)
      */
     public static Term trySimplify(final Proof parentProof, final Term term,
@@ -842,13 +832,13 @@ public class MergeRuleUtils {
      * but possibly simpler. In the ideal case, the returned formula can be literally shorter than
      * each of the two formulae; in this case, it consists of the common elements of those.
      * <p>
-     *
+     * <p>
      * The underlying idea is based upon the observation that many path conditions that should be
      * merged are conjunctions of mostly the same elements and, in addition, formulae phi and !phi
      * that vanish after creating the disjunction of the path conditions. The corresponding valid
      * formula is {@code (phi & psi) | (phi & !psi) <-> phi}
      * <p>
-     *
+     * <p>
      * For formulae that cannot be simplified by this law, the method performs two additional
      * steps:<br>
      * (1) it applies, if possible, distributivity to simplify the result<br>
@@ -911,7 +901,7 @@ public class MergeRuleUtils {
      *         are contradicting, does not imply pathCondition2, and (2) the "rest" of
      *         pathCondition1 that is common with pathCondition2.
      */
-    public static Optional<Pair<Term, Term>> getDistinguishingFormula(Term pathCondition1,
+    public static Optional<DistinguishedFormula> getDistinguishingFormula(Term pathCondition1,
             Term pathCondition2, Services services) {
 
         return getDistinguishingFormula(getConjunctiveElementsFor(pathCondition1),
@@ -922,7 +912,7 @@ public class MergeRuleUtils {
     /**
      * @see #getDistinguishingFormula(Term, Term, Services)
      */
-    public static Optional<Pair<Term, Term>> getDistinguishingFormula(
+    public static Optional<DistinguishedFormula> getDistinguishingFormula(
             ArrayList<Term> conjElemsPathCond1, ArrayList<Term> conjElemsPathCond2,
             Services services) {
 
@@ -951,7 +941,7 @@ public class MergeRuleUtils {
             }
         }
 
-        return Optional.of(new Pair<>(
+        return Optional.of(new DistinguishedFormula(
             theOneDistinguishingTerm != null ? theOneDistinguishingTerm
                     : joinConjuctiveElements(cond1SpecificElems, services),
             joinConjuctiveElements(equalElements, services)));
@@ -968,9 +958,9 @@ public class MergeRuleUtils {
      */
     public static boolean pathConditionsAreDistinguishable(Term pathCondition1, Term pathCondition2,
             Services services) {
-        Optional<Pair<Term, Term>> distinguishingAndEqualFormula1 =
+        var distinguishingAndEqualFormula1 =
             getDistinguishingFormula(pathCondition1, pathCondition2, services);
-        Optional<Pair<Term, Term>> distinguishingAndEqualFormula2 =
+        var distinguishingAndEqualFormula2 =
             getDistinguishingFormula(pathCondition2, pathCondition1, services);
 
         return distinguishingAndEqualFormula1.isPresent()
@@ -1019,10 +1009,8 @@ public class MergeRuleUtils {
      */
     public static SymbolicExecutionState sequentToSEPair(Node node, PosInOccurrence pio,
             Services services) {
-
         SymbolicExecutionStateWithProgCnt triple = sequentToSETriple(node, pio, services);
-
-        return new SymbolicExecutionState(triple.first, triple.second, node);
+        return new SymbolicExecutionState(triple.symbolicState(), triple.pathCondition(), node);
     }
 
     /**
@@ -1032,7 +1020,7 @@ public class MergeRuleUtils {
      * branch-unique correspondents in order to enable merging of different branches declaring local
      * variables.
      * <p>
-     *
+     * <p>
      * The problem which makes this renaming necessary is the fact that when executing a program
      * like <code>int x; x = ...</code>, the variable x is renamed to x_1, x_2 and so on in
      * different branches, which makes a "normal" merging impossible. Branch unique names are
@@ -1088,12 +1076,11 @@ public class MergeRuleUtils {
         for (MergePartner sequentInfo : sequentInfos) {
             final Node node = sequentInfo.getGoal().node();
             final Services services = sequentInfo.getGoal().proof().getServices();
-
-            Triple<Term, Term, Term> partnerSEState =
-                sequentToSETriple(node, sequentInfo.getPio(), services);
+            var partnerSEState = sequentToSETriple(node, sequentInfo.getPio(), services);
 
             result = result.prepend(
-                new SymbolicExecutionState(partnerSEState.first, partnerSEState.second, node));
+                new SymbolicExecutionState(partnerSEState.symbolicState(),
+                    partnerSEState.pathCondition(), node));
         }
 
         return result;
@@ -1108,10 +1095,9 @@ public class MergeRuleUtils {
      * @param mergeState The {@link SymbolicExecutionState} in which the partners should be merged.
      * @param mergePartnerState The {@link SymbolicExecutionState} of the second merge partner.
      * @param services The {@link Services} object.
-     *
      * @return The renamed {@link SymbolicExecutionState} of the second merge partner.
      */
-    public static Pair<SymbolicExecutionState, SymbolicExecutionState> handleNameClashes(
+    public static ClashData handleNameClashes(
             SymbolicExecutionState mergeState, SymbolicExecutionState mergePartnerState,
             Services services) {
         final TermBuilder tb = services.getTermBuilder();
@@ -1200,7 +1186,7 @@ public class MergeRuleUtils {
             }
         }
 
-        return new Pair<>(mergeState, mergePartnerState);
+        return new ClashData(mergeState, mergePartnerState);
     }
 
     /**
@@ -1215,7 +1201,7 @@ public class MergeRuleUtils {
      * @throws NameAlreadyBoundException If the given placeholder is already known to the system.
      * @throws SortNotKnownException If the given sort is not known to the system.
      */
-    public static Pair<Sort, Name> parsePlaceholder(String input, Services services) {
+    public static Placeholder parsePlaceholder(String input, Services services) {
         return parsePlaceholder(input, true, services);
     }
 
@@ -1233,7 +1219,7 @@ public class MergeRuleUtils {
      * @throws NameAlreadyBoundException If the given placeholder is already known to the system.
      * @throws SortNotKnownException If the given sort is not known to the system.
      */
-    public static Pair<Sort, Name> parsePlaceholder(String input, boolean registerInNamespaces,
+    public static Placeholder parsePlaceholder(String input, boolean registerInNamespaces,
             Services services) {
         String[] chunks = input.split(" ");
         if (chunks.length != 2) {
@@ -1254,7 +1240,7 @@ public class MergeRuleUtils {
                 + "\" is already known to the system.<br/>\n" + "Plase choose a fresh one.");
         }
 
-        return new Pair<>(sort, name);
+        return new Placeholder(sort, name);
     }
 
     /**
@@ -1270,7 +1256,7 @@ public class MergeRuleUtils {
      * @throws ParserException If there is a syntax error.
      */
     public static AbstractionPredicate parsePredicate(String input,
-            ArrayList<Pair<Sort, Name>> registeredPlaceholders, NamespaceSet localNamespaces,
+            ArrayList<Placeholder> registeredPlaceholders, NamespaceSet localNamespaces,
             Services services) throws ParserException {
         DefaultTermParser parser = new DefaultTermParser();
         Term formula = parser.parse(new StringReader(input), Sort.FORMULA, services,
@@ -1281,9 +1267,9 @@ public class MergeRuleUtils {
 
         int nrContainedPlaceholders = 0;
         LocationVariable usedPlaceholder = null;
-        for (Pair<Sort, Name> placeholder : registeredPlaceholders) {
+        for (var placeholder : registeredPlaceholders) {
             LocationVariable placeholderVariable = (LocationVariable) (services.getNamespaces()
-                    .programVariables().lookup(placeholder.second));
+                    .programVariables().lookup(placeholder.name));
 
             if (containedLocVars.contains(placeholderVariable)) {
                 nrContainedPlaceholders++;
@@ -1313,7 +1299,7 @@ public class MergeRuleUtils {
      * @return A term of the form <code>{ ... || x := vx || ...} term</code> for every PV x
      *         occurring in the term, where vx is a fresh variable.
      */
-    private static Pair<Term, ImmutableSet<QuantifiableVariable>> anonymizeProgramVariables(
+    private static AnonymizedProgramVariables anonymizeProgramVariables(
             final Term term, final Services services) {
         TermBuilder tb = services.getTermBuilder();
 
@@ -1330,8 +1316,7 @@ public class MergeRuleUtils {
             elementaries = elementaries.prepend(tb.elementary(tb.var(loc), tb.var(newVar)));
         }
 
-        return new Pair<>(
-            tb.apply(tb.parallel(elementaries), term), freeVars);
+        return new AnonymizedProgramVariables(tb.apply(tb.parallel(elementaries), term), freeVars);
     }
 
     /**
@@ -1343,7 +1328,7 @@ public class MergeRuleUtils {
      */
     private static Term joinListToAndTerm(ImmutableList<SequentFormula> formulae,
             Services services) {
-        if (formulae.size() == 0) {
+        if (formulae.isEmpty()) {
             return services.getTermBuilder().tt();
         } else if (formulae.size() == 1) {
             return formulae.head().formula();
@@ -1546,7 +1531,6 @@ public class MergeRuleUtils {
      * @param timeout Time in milliseconds after which the side proof is aborted.
      * @return The simplified {@link Term}.
      * @throws ProofInputException Occurred Exception.
-     *
      */
     private static Term simplify(Proof parentProof, Term term, int timeout)
             throws ProofInputException {
@@ -1607,7 +1591,6 @@ public class MergeRuleUtils {
      *
      * @param name The name to check uniqueness for.
      * @param globals The global variables for the givan branch.
-     *
      */
     private static boolean isUniqueInGlobals(String name, Iterable<IProgramVariable> globals) {
         for (final IProgramVariable n : globals) {
@@ -1710,46 +1693,46 @@ public class MergeRuleUtils {
     }
 
     /**
-         * Simple term wrapper for comparing terms modulo renaming.
-         *
-         * @author Dominic Scheurer
-         * @see TermWrapperFactory
-         */
-        record TermWrapper(Term term, int hashcode) {
+     * Simple term wrapper for comparing terms modulo renaming.
+     *
+     * @author Dominic Scheurer
+     * @see TermWrapperFactory
+     */
+    record TermWrapper(Term term, int hashcode) {
 
         @Override
-            public boolean equals(Object obj) {
-                return obj instanceof TermWrapper
-                        && term.equalsModRenaming(((TermWrapper) obj).term());
-            }
-
-            @Override
-            public int hashCode() {
-                return hashcode;
-            }
-
-            @Override
-            public String toString() {
-                return term.toString();
-            }
-
-            /**
-             * Adds the wrapped content of the Iterable object into the given target collection.
-             *
-             * @param target            The collection to insert the wrapped terms into.
-             * @param wrappedCollection Iterable to transform.
-             * @return The target collection with inserted terms.
-             */
-            public static <T extends Collection<Term>> T toTermList(T target,
-                                                                    Iterable<TermWrapper> wrappedCollection) {
-
-                for (TermWrapper termWrapper : wrappedCollection) {
-                    target.add(termWrapper.term());
-                }
-
-                return target;
-            }
+        public boolean equals(Object obj) {
+            return obj instanceof TermWrapper
+                    && term.equalsModRenaming(((TermWrapper) obj).term());
         }
+
+        @Override
+        public int hashCode() {
+            return hashcode;
+        }
+
+        @Override
+        public String toString() {
+            return term.toString();
+        }
+
+        /**
+         * Adds the wrapped content of the Iterable object into the given target collection.
+         *
+         * @param target            The collection to insert the wrapped terms into.
+         * @param wrappedCollection Iterable to transform.
+         * @return The target collection with inserted terms.
+         */
+        public static <T extends Collection<Term>> T toTermList(T target,
+                                                                Iterable<TermWrapper> wrappedCollection) {
+
+            for (TermWrapper termWrapper : wrappedCollection) {
+                target.add(termWrapper.term());
+            }
+
+            return target;
+        }
+    }
 
     /**
      * Visitor for collecting program locations in a Java block.
@@ -1825,8 +1808,6 @@ public class MergeRuleUtils {
      */
     private static class LocVarReplBranchUniqueMap
             extends HashMap<ProgramVariable, ProgramVariable> {
-        private static final long serialVersionUID = 2305410114265133879L;
-
         private final Node node;
         private final ImmutableSet<LocationVariable> doNotRename;
         private final HashMap<LocationVariable, ProgramVariable> cache =
@@ -1904,8 +1885,6 @@ public class MergeRuleUtils {
      * current situation.
      */
     static class SortNotKnownException extends RuntimeException {
-        private static final long serialVersionUID = -5728194402773352846L;
-
         public SortNotKnownException(String message) {
             super(message);
         }
@@ -1916,10 +1895,22 @@ public class MergeRuleUtils {
      * register it is already known to the system.
      */
     static class NameAlreadyBoundException extends RuntimeException {
-        private static final long serialVersionUID = -2406984399754204833L;
-
         public NameAlreadyBoundException(String message) {
             super(message);
         }
+    }
+
+    public record ClashData(SymbolicExecutionState mergeState,
+            SymbolicExecutionState mergePartnerState) {
+    }
+
+    public record Placeholder(Sort sort, Name name) {
+    }
+
+    public record AnonymizedProgramVariables(Term apply,
+            ImmutableSet<QuantifiableVariable> freeVars) {
+    }
+
+    public record DistinguishedFormula(Term first, Term second) {
     }
 }

@@ -6,8 +6,6 @@ package org.key_project.slicing;
 import java.util.Collections;
 import java.util.List;
 
-import de.uka.ilkd.key.util.Pair;
-
 import org.key_project.slicing.graph.GraphNode;
 
 /**
@@ -21,7 +19,7 @@ public class DependencyNodeData {
      * List of graph nodes required to instantiate the proof step. Each boolean indicates whether
      * the graph node was replaced (consumed) by this proof step.
      */
-    public final List<Pair<GraphNode, Boolean>> inputs;
+    public final List<DependencyTracker.ConsumedNode> inputs;
     /**
      * New graph nodes (formulas, ..) introduced by this proof step.
      */
@@ -38,7 +36,7 @@ public class DependencyNodeData {
      * @param outputs graph nodes created by the proof step
      * @param label label for this node
      */
-    public DependencyNodeData(List<Pair<GraphNode, Boolean>> inputs, List<GraphNode> outputs,
+    public DependencyNodeData(List<DependencyTracker.ConsumedNode> inputs, List<GraphNode> outputs,
             String label) {
         this.inputs = Collections.unmodifiableList(inputs);
         this.outputs = Collections.unmodifiableList(outputs);

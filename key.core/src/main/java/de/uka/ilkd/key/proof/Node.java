@@ -22,7 +22,6 @@ import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRule;
-import de.uka.ilkd.key.util.Pair;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -823,7 +822,7 @@ public class Node implements Iterable<Node> {
         if (branchLocation == null) {
             BranchLocation prev = parent != null ? parent.getBranchLocation() : BranchLocation.ROOT;
             if (parent != null && parent.children.size() > 1) {
-                prev = prev.append(new Pair<>(parent, siblingNr));
+                prev = prev.append(new BranchLocation.BranchChoice(parent, siblingNr));
             }
             this.branchLocation = prev;
         }

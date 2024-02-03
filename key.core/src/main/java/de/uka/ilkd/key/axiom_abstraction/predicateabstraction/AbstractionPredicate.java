@@ -18,7 +18,6 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.io.OutputStreamProofSaver;
-import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 /**
@@ -68,8 +67,8 @@ public abstract class AbstractionPredicate implements Function<Term, Term>, Name
      * @return The placeholder variable and the function term that this predicate has been
      *         constructed with.
      */
-    public Pair<LocationVariable, Term> getPredicateFormWithPlaceholder() {
-        return new Pair<>(placeholderVariable, predicateFormWithPlaceholder);
+    public PredicateFormWithPlaceholder getPredicateFormWithPlaceholder() {
+        return new PredicateFormWithPlaceholder(placeholderVariable, predicateFormWithPlaceholder);
     }
 
     /**
@@ -179,7 +178,7 @@ public abstract class AbstractionPredicate implements Function<Term, Term>, Name
      */
     public String toParseableString(final Services services) {
         StringBuilder sb = new StringBuilder();
-        Pair<LocationVariable, Term> predicateFormWithPlaceholder =
+        PredicateFormWithPlaceholder predicateFormWithPlaceholder =
             getPredicateFormWithPlaceholder();
 
         sb.append("(").append("'").append(predicateFormWithPlaceholder.first.sort()).append(" ")
@@ -221,13 +220,14 @@ public abstract class AbstractionPredicate implements Function<Term, Term>, Name
                 final String predStr = m.group(i + 1);
 
                 // Parse the placeholder
-                Pair<Sort, Name> ph = MergeRuleUtils.parsePlaceholder(phStr, false, services);
+                MergeRuleUtils.Placeholder ph =
+                    MergeRuleUtils.parsePlaceholder(phStr, false, services);
 
                 // Add placeholder to namespaces, if necessary
                 Namespace<IProgramVariable> variables = services.getNamespaces().programVariables();
-                if (variables.lookup(ph.second) == null) {
-                    variables.add(new LocationVariable(new ProgramElementName(ph.second.toString()),
-                        ph.first));
+                if (variables.lookup(ph.name()) == null) {
+                    variables.add(new LocationVariable(new ProgramElementName(ph.name().toString()),
+                        ph.sort()));
                 }
 
                 // Parse the predicate
@@ -253,4 +253,7 @@ public abstract class AbstractionPredicate implements Function<Term, Term>, Name
                 && otherPred.predicateFormWithPlaceholder.equals(predicateFormWithPlaceholder);
     }
 
+    public record PredicateFormWithPlaceholder(LocationVariable first,
+            Term second) {
+    }
 }
