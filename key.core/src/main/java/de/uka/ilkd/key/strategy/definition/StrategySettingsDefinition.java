@@ -4,12 +4,12 @@
 package de.uka.ilkd.key.strategy.definition;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.util.collection.ImmutableArray;
 
@@ -37,7 +37,7 @@ import org.key_project.util.collection.ImmutableArray;
  */
 public class StrategySettingsDefinition {
 
-    private static final ArrayList<Triple<String, Integer, IDefaultStrategyPropertiesFactory>> STD_FURTHER_DEFAULTS;
+    private static final ArrayList<StdDefault> STD_FURTHER_DEFAULTS;
 
     /**
      * Defines if a user interface control is shown to edit {@link StrategySettings#getMaxSteps()}.
@@ -74,20 +74,19 @@ public class StrategySettingsDefinition {
      * Further default settings, for example suitable for simplification. Consists of triples
      * (DEFAULT_NAME, MAX_RULE_APPS, PROPERTIES).
      */
-    private final ArrayList<Triple<String, Integer, IDefaultStrategyPropertiesFactory>> furtherDefaults;
+    private final List<StdDefault> furtherDefaults;
 
     static {
-        STD_FURTHER_DEFAULTS =
-            new ArrayList<>();
+        STD_FURTHER_DEFAULTS = new ArrayList<>();
 
         // Java verification standard preset (tested in TimSort case study)
-        STD_FURTHER_DEFAULTS.add(new Triple<>(
-            "Java verif. std.", 7000, () -> {
-                final StrategyProperties newProps =
+        STD_FURTHER_DEFAULTS.add(new StdDefault(
+                "Java verif. std.", 7000, () -> {
+            final StrategyProperties newProps =
                     IDefaultStrategyPropertiesFactory.DEFAULT_FACTORY
                             .createDefaultStrategyProperties();
 
-                newProps.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY,
+            newProps.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY,
                     StrategyProperties.SPLITTING_DELAYED);
 
                 newProps.setProperty(StrategyProperties.LOOP_OPTIONS_KEY,
@@ -124,7 +123,7 @@ public class StrategySettingsDefinition {
             }));
 
         // Simplification preset
-        STD_FURTHER_DEFAULTS.add(new Triple<>(
+        STD_FURTHER_DEFAULTS.add(new StdDefault(
             "Simplification", 5000, () -> {
                 final StrategyProperties newProps =
                     IDefaultStrategyPropertiesFactory.DEFAULT_FACTORY
@@ -173,8 +172,7 @@ public class StrategySettingsDefinition {
      *        {@link StrategyProperties}.
      * @param properties Defines the controls to edit {@link StrategyProperties}.
      */
-    public StrategySettingsDefinition(String propertiesTitle,
-            AbstractStrategyPropertyDefinition... properties) {
+    public StrategySettingsDefinition(String propertiesTitle, AbstractStrategyPropertyDefinition... properties) {
         this(true, "Max. Rule Applications", 10000, propertiesTitle,
             IDefaultStrategyPropertiesFactory.DEFAULT_FACTORY, STD_FURTHER_DEFAULTS, properties);
     }
@@ -195,10 +193,10 @@ public class StrategySettingsDefinition {
      * @param properties Defines the controls to edit {@link StrategyProperties}.
      */
     public StrategySettingsDefinition(boolean showMaxRuleApplications,
-            String maxRuleApplicationsLabel, int defaultMaxRuleApplications, String propertiesTitle,
-            IDefaultStrategyPropertiesFactory defaultPropertiesFactory,
-            ArrayList<Triple<String, Integer, IDefaultStrategyPropertiesFactory>> furtherDefaults,
-            AbstractStrategyPropertyDefinition... properties) {
+                                      String maxRuleApplicationsLabel, int defaultMaxRuleApplications, String propertiesTitle,
+                                      IDefaultStrategyPropertiesFactory defaultPropertiesFactory,
+                                      ArrayList<StdDefault> furtherDefaults,
+                                      AbstractStrategyPropertyDefinition... properties) {
         assert defaultPropertiesFactory != null;
         this.showMaxRuleApplications = showMaxRuleApplications;
         this.maxRuleApplicationsLabel = maxRuleApplicationsLabel;
@@ -272,8 +270,10 @@ public class StrategySettingsDefinition {
     /**
      * @return Further default settings, e.g. for simplification.
      */
-    public ArrayList<Triple<String, Integer, IDefaultStrategyPropertiesFactory>> getFurtherDefaults() {
+    public List<StdDefault> getFurtherDefaults() {
         return furtherDefaults;
     }
 
+    public record StdDefault(String first, int second, IDefaultStrategyPropertiesFactory third) {
+    }
 }
