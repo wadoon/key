@@ -12,7 +12,6 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.MergeRule;
-import de.uka.ilkd.key.util.Quadruple;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 
@@ -103,9 +102,9 @@ public class MergeIfThenElseAntecedent extends MergeProcedure
         ImmutableSet<Term> result = DefaultImmutableSet.nil();
 
         if (distinguishingFormula == null) {
-            final Quadruple<Term, Term, Term, Boolean> distFormAndRightSidesForITEUpd =
-                MergeByIfThenElse.createDistFormAndRightSidesForITEUpd(state1, state2, ifTerm,
-                    elseTerm, services);
+            MergeByIfThenElse.DistForm distFormAndRightSidesForITEUpd =
+                    MergeByIfThenElse.createDistFormAndRightSidesForITEUpd(state1, state2, ifTerm,
+                            elseTerm, services);
 
             final Term cond = distFormAndRightSidesForITEUpd.first();
             final Term ifForm = distFormAndRightSidesForITEUpd.second();
