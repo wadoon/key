@@ -67,11 +67,6 @@ public class TGInfoDialog extends JDialog {
 
     private final TestGenerationLog logger = new TestGenerationLog() {
         @Override
-        public void write(String t) {
-            textArea.append(t);
-        }
-
-        @Override
         public void writeln(String line) {
             ThreadUtilities.invokeOnEventQueue(() -> textArea.append(line + "\n"));
         }
