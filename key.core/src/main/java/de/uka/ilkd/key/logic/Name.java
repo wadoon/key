@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
+import org.jspecify.annotations.NullMarked;
+
 import java.util.Objects;
 
 /**
@@ -13,23 +15,31 @@ import java.util.Objects;
  * It wraps a string object. To save memory and to speed up equality checks, the wrapped strings are
  * stored in their {@linkplain String#intern() interned} representation.
  */
+@NullMarked
 public class Name implements Comparable<Name> {
-
     private static final String NONAME = "_noname_";
+    public static final Stirng SCOPE_DELIM = "#";
 
-    private final /** Interned */
-    String nameString;
+    private final String identifier;
+    private final String scope;
+
+    public Name(String identifier, String scope) {
+        this.identifier = identifier.intern();
+        this.scope = scope.intern();
+    }
 
     /**
      * creates a name object
      */
-    public Name(String n) {
-        nameString = (n == null ? NONAME : n).intern();
+    public Name(String name) {
+        var parts = name.split(SCOPE_DELIM);
+        this.identifier = parts[1].intern();
+        this.scope = parts[0].intern();
     }
 
     @Override
     public String toString() {
-        return nameString;
+        return scope + SCOPE_DELIM + identifier;
     }
 
     @Override
@@ -39,17 +49,28 @@ public class Name implements Comparable<Name> {
         }
         // since ALL nameStrings are interned, equality can be safely reduced to
         // identity in THIS case:
-        return Objects.equals(nameString, ((Name) o).nameString);
+        return Objects.equals(identifier, ((Name) o).identifier);
     }
 
     @Override
     public int compareTo(Name o) {
-        return nameString.compareTo(o.nameString);
+        return identifier.compareTo(o.identifier);
     }
 
     @Override
     public int hashCode() {
-        return nameString.hashCode();
+        return identifier.hashCode();
     }
 
+    public boolean isGlobal() {
+        return getScope().isBlank();
+    }
+
+    public String getScope() {
+        return scope;
+    }
+
+    public String getIdentifier() {
+        return identifier;
+    }
 }

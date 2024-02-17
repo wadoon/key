@@ -11,7 +11,7 @@ public SyntaxErrorReporter getErrorReporter() { return errorReporter;}
 
 options { tokenVocab=KeYLexer; } // use tokens from STLexer.g4
 
-file: DOC_COMMENT* (profile? preferences? decls problem? proof?) EOF;
+file: DOC_COMMENT* (profile? preferences? decls theory* problem? proof?) EOF;
 
 decls
 :
@@ -29,9 +29,9 @@ decls
     | transform_decls
     | datatype_decls
     | ruleset_decls
-    | contracts             // for problems
-    | invariants            // for problems
-    | rulesOrAxioms         // for problems
+    | contracts
+    | invariants
+    | rulesOrAxioms
     )*
 ;
 
@@ -877,3 +877,34 @@ cvalue:
      (ckv (COMMA ckv)*)? COMMA?
     RBRACE #table
   | LBRACKET (cvalue (COMMA cvalue)*)? COMMA? RBRACKET #list;
+
+
+//region the new grammar
+theory: THEORY simple_ident LBRACE theorycontent* RBRACE;
+theorycontent:
+    | use_statement
+    | import_statement
+    | export_statement
+    | binding_statement
+
+    | one_include_statement
+    | options_choice
+    | option_decls
+    | sort_decls
+    | prog_var_decls
+    | schema_var_decls
+    | pred_decls
+    | func_decls
+    | transform_decls
+    | datatype_decls
+    | ruleset_decls
+    | contracts
+    | invariants
+    | rulesOrAxioms
+;
+
+use_statement: USE name=simple_ident SEMI;
+import_statement: IMPORT simple_ident (ONLY simple_ident_comma_list) SEMI;
+export_statement: EXPORT exportPair+ SEMI;
+exportPair: simple_ident AS simple_ident;
+binding_statement: BINDING simple_ident_dots SEMI;

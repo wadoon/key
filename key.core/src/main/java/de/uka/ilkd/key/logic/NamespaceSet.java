@@ -9,8 +9,10 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.RuleSet;
 
+/**
+ * This class represents a sorted FOL signature.
+ */
 public class NamespaceSet {
-
     private Namespace<QuantifiableVariable> varNS = new Namespace<>();
     private Namespace<IProgramVariable> progVarNS = new Namespace<>();
     private Namespace<Function> funcNS = new Namespace<>();

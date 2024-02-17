@@ -20,9 +20,7 @@ import org.slf4j.LoggerFactory;
  * objects have to implement the interface {@link Named}. It is possible to have nested namespaces
  * in order to represent different visibility scopes.
  */
-public class Namespace<E extends Named> implements java.io.Serializable {
-
-    private static final long serialVersionUID = 7510655524858729144L;
+public class Namespace<E extends Named> {
     private static final Logger LOGGER = LoggerFactory.getLogger(Namespace.class);
 
     /**
@@ -72,11 +70,9 @@ public class Namespace<E extends Named> implements java.io.Serializable {
      * This is not threadsafe.
      */
     public void add(E sym) {
-
         if (sealed) {
             LOGGER.warn("Namespace is SEALED");
-            throw new IllegalStateException(
-                "This namespace has been sealed; addition is not possible.");
+            throw new IllegalStateException("This namespace has been sealed; addition is not possible.");
         }
 
         /*
@@ -93,7 +89,6 @@ public class Namespace<E extends Named> implements java.io.Serializable {
             }
             symbols.put(sym.name(), sym);
         }
-
     }
 
     public void add(Namespace<E> source) {
