@@ -77,10 +77,9 @@ USE     : '\\use';
 IMPORT  : '\\import';
 ONlY    : '\\only';
 IMPLIES : '\\implies';
-/*EXPORT  : '\\export';
-AS      : '\\as';*/
-
-
+EXPORT  : '\\export';
+AS      : '\\as';
+BINDING : '\\binding';
 
 SORTS:'\\sorts';
 GENERIC : '\\generic';

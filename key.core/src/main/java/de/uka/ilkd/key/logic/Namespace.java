@@ -3,12 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
+import org.jspecify.annotations.NullMarked;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.Nullable;
@@ -20,26 +17,43 @@ import org.slf4j.LoggerFactory;
  * objects have to implement the interface {@link Named}. It is possible to have nested namespaces
  * in order to represent different visibility scopes.
  */
-public class Namespace<E extends Named> implements java.io.Serializable {
-
-    private static final long serialVersionUID = 7510655524858729144L;
+@NullMarked
+public class Namespace<E extends Named> {
     private static final Logger LOGGER = LoggerFactory.getLogger(Namespace.class);
 
     /**
      * The fall-back namespace for symbols not present in this Namespace.
      */
+    @Nullable
     private Namespace<E> parent;
 
     /**
      * The map that maps a name to a symbols of that name if it is defined in this Namespace.
      */
-    private Map<Name, E> symbols;
+    private final Map<Name, E> symbols = new HashMap<>();
 
     /**
      * A namespace can be made immutable, this is called "sealing". This flag indicates whether this
      * namespace has been sealed or not.
      */
     private boolean sealed;
+
+    /**
+     *
+     */
+    private Set<String> importedScopes = new TreeSet<>();
+
+    public void addImportedScope(String scope) {
+        importedScopes.add(scope);
+    }
+
+    public void addImportOnly(List<Name> names) {
+        for (Name name : names) {
+            E obj = lookup(name);
+            symbols.put(name.withScope(""), obj);
+        }
+    }
+
 
     /**
      * Construct an empty Namespace without a parent namespace.
@@ -60,23 +74,21 @@ public class Namespace<E extends Named> implements java.io.Serializable {
      * Adds the object <code>sym</code> to this Namespace. If an object with the same name is
      * already there, it is quietly replaced by <code>sym</code>. Use addSafely() instead if
      * possible.
-     *
+     * <p>
      * TODO:The problem of saving to localSym, symbols, and symbolRefs is not solved yet. (This is
      * no longer self-explanatory. mu 2016)
-     *
+     * <p>
      * If the local table is empty, then the new symbol is added as "singleton map". This has been
      * adapted from an earlier implementation, done for memory efficiency reasons: Many namespaces
      * only contain a single element; no need to allocate a hash map. The hash map is only created
      * when the 2nd element is added.
-     *
+     * <p>
      * This is not threadsafe.
      */
     public void add(E sym) {
-
         if (sealed) {
             LOGGER.warn("Namespace is SEALED");
-            throw new IllegalStateException(
-                "This namespace has been sealed; addition is not possible.");
+            throw new IllegalStateException("This namespace has been sealed; addition is not possible.");
         }
 
         /*
@@ -84,16 +96,7 @@ public class Namespace<E extends Named> implements java.io.Serializable {
          * null && old != sym) { LOGGER.warn("Clash! Name already used: " + sym.name().toString());
          * }
          */
-
-        if (symbols == null) {
-            symbols = Collections.singletonMap(sym.name(), sym);
-        } else {
-            if (symbols.size() == 1) {
-                symbols = new LinkedHashMap<>(symbols);
-            }
-            symbols.put(sym.name(), sym);
-        }
-
+        symbols.put(sym.name(), sym);
     }
 
     public void add(Namespace<E> source) {
@@ -127,23 +130,17 @@ public class Namespace<E extends Named> implements java.io.Serializable {
 
     /**
      * Remove a name from the namespace.
-     *
+     * <p>
      * Removal is not delegated to the parent namespace.
      *
      * @param name non-null name whose symbol is to be removed.
      */
     public void remove(Name name) {
-        if (symbols != null) {
-            symbols.remove(name);
-        }
+        symbols.remove(name);
     }
 
     protected E lookupLocally(Name name) {
-        if (symbols != null) {
-            return symbols.get(name);
-        } else {
-            return null;
-        }
+        return symbols.get(name);
     }
 
 
@@ -170,15 +167,8 @@ public class Namespace<E extends Named> implements java.io.Serializable {
      */
     public @Nullable E lookup(Name name) {
         E symbol = lookupLocally(name);
-        if (symbol != null) {
-            return symbol;
-        }
+        return symbol;
 
-        if (parent != null) {
-            return parent.lookup(name);
-        }
-
-        return null;
     }
 
     /** Convenience method to look up. */
@@ -193,11 +183,7 @@ public class Namespace<E extends Named> implements java.io.Serializable {
      * @return the list of the named objects
      */
     public Collection<E> elements() {
-        if (symbols == null) {
-            return Collections.emptyList();
-        } else {
-            return Collections.unmodifiableCollection(symbols.values());
-        }
+        return Collections.unmodifiableCollection(symbols.values());
     }
 
 
@@ -229,16 +215,14 @@ public class Namespace<E extends Named> implements java.io.Serializable {
 
     public Namespace<E> copy() {
         Namespace<E> copy = new Namespace<>(parent);
-        if (symbols != null) {
-            copy.add(symbols.values());
-        }
+        copy.add(symbols.values());
 
         return copy;
     }
 
     private void reset() {
         parent = null;
-        symbols = null;
+        symbols.clear();
     }
 
     public <T extends E> void set(ImmutableSet<T> names) {
@@ -251,7 +235,7 @@ public class Namespace<E extends Named> implements java.io.Serializable {
     }
 
     public boolean isEmpty() {
-        return symbols == null || symbols.isEmpty();
+        return symbols.isEmpty();
     }
 
     public boolean isSealed() {
@@ -285,8 +269,9 @@ public class Namespace<E extends Named> implements java.io.Serializable {
         for (E element : elements()) {
             parent.add(element);
         }
+
         // all symbols are contained in parent now ... we are empty again.
-        symbols = null;
+        symbols.clear();
     }
 
 }

@@ -13,28 +13,6 @@ options { tokenVocab=KeYLexer; } // use tokens from STLexer.g4
 
 file: DOC_COMMENT* (profile? preferences? decls theory* problem? proof?) EOF;
 
-theory
-:
-    THEORY simple_ident
-    LBRACE
-    DOC_COMMENT?
-    (use_theory | import_theory)*
-    sort_decls?
-    //datatype_decls
-    func_decls
-    pred_decls
-
-    rulesOrAxioms
-    (IMPLIES rulesOrAxioms)*
-
-    //export*
-    RBRACE
-;
-
-use_theory   :    USE simple_ident SEMI;
-import_theory: IMPORT simple_ident (ONLY simple_ident*)? SEMI;
-//export       : EXPORT simple_ident AS simple_ident;
-
 decls
 :
     ( bootClassPath          // for problems
@@ -43,23 +21,23 @@ decls
     | one_include_statement
     | options_choice
     | option_decls
-    | import_theory
     | sort_decls
     | prog_var_decls
     | schema_var_decls
     | pred_decls
     | func_decls
     | transform_decls
+    | datatype_decls
     | ruleset_decls
-    | contracts             // for problems
-    | invariants            // for problems
-    | rulesOrAxioms         // for problems
+    | contracts
+    | invariants
+    | rulesOrAxioms
     )*
 ;
 
 problem
 :
-  ( PROBLEM LBRACE a=term RBRACE
+  ( PROBLEM LBRACE ( t=termorseq ) RBRACE
   | CHOOSECONTRACT (chooseContract=string_value SEMI)?
   | PROOFOBLIGATION  (proofObligation=string_value SEMI)?
   )
@@ -74,7 +52,7 @@ one_include_statement
     one_include (COMMA one_include)* SEMI
 ;
 
-one_include 
+one_include
 :
     absfile=IDENT | relfile=string_value
 ;
@@ -218,7 +196,7 @@ schema_modifiers
         LBRACKET
         opts = simple_ident_comma_list
         RBRACKET
-       
+
     ;
 
 one_schema_modal_op_decl
@@ -250,6 +228,36 @@ func_decl
 	whereToBind=where_to_bind?
   argSorts = arg_sorts
   SEMI
+;
+
+/**
+\datatypes {
+ \free List = Nil | Cons(any head, List tail);
+}
+*/
+datatype_decls:
+  DATATYPES LBRACE datatype_decl* RBRACE
+;
+
+datatype_decl:
+  doc=DOC_COMMENT?
+  // weigl: all datatypes are free!
+  // FREE?
+  name=simple_ident
+  EQUALS
+  datatype_constructor (OR datatype_constructor)*
+  SEMI
+;
+
+datatype_constructor:
+  name=simple_ident
+  (
+    LPAREN
+    (argSort+=sortId argName+=simple_ident
+     (COMMA argSort+=sortId argName+=simple_ident)*
+    )?
+    RPAREN
+  )?
 ;
 
 func_decls
@@ -290,6 +298,7 @@ transform_decl
     SEMI
 ;
 
+
 transform_decls:
     TRANSFORMERS LBRACE (transform_decl)* RBRACE
 ;
@@ -307,7 +316,7 @@ where_to_bind:
         b+=(TRUE | FALSE)
         (COMMA b+=(TRUE | FALSE) )*
         RBRACE
-        
+
    ;
 
 ruleset_decls
@@ -317,11 +326,7 @@ ruleset_decls
 
 sortId
 :
-    id=simple_ident_dots (typeArgs)? (EMPTYBRACKETS)*
-;
-
-typeArgs:
-    LESS sortId (COMMA sortId) GREATER
+    id=simple_ident_dots (EMPTYBRACKETS)*
 ;
 
 id_declaration
@@ -538,7 +543,7 @@ ifExThenElseTerm
 locset_term
 :
     LBRACE
-        ( l = location_term 
+        ( l = location_term
         ( COMMA l = location_term  )* )?
     RBRACE
 ;
@@ -548,7 +553,7 @@ bound_variables
     var=one_bound_variable (COMMA var=one_bound_variable)* SEMI
 ;
 
-one_bound_variable 
+one_bound_variable
 :
   s=sortId? id=simple_ident
 ;
@@ -834,14 +839,15 @@ oneJavaSource
 :
   ( string_value
   | COLON
-  )+ 
+  )+
 ;
 
 profile: PROFILE name=string_value SEMI;
 
 preferences
 :
-	KEYSETTINGS LBRACE (s=string_value)? RBRACE
+	KEYSETTINGS (LBRACE s=string_value? RBRACE
+	            |  c=cvalue ) // LBRACE, RBRACE included in cvalue#table
 ;
 
 proofScript
@@ -851,3 +857,53 @@ proofScript
 
 // PROOF
 proof: PROOF EOF;
+
+// Config
+cfile: cvalue* EOF;
+//csection: LBRACKET IDENT RBRACKET;
+ckv: doc=DOC_COMMENT? ckey ':' cvalue;
+ckey: IDENT | STRING_LITERAL;
+cvalue:
+    IDENT #csymbol
+  | STRING_LITERAL #cstring
+  | BIN_LITERAL #cintb
+  | HEX_LITERAL #cinth
+  | MINUS? INT_LITERAL #cintd
+  | MINUS? FLOAT_LITERAL #cfpf
+  | MINUS? DOUBLE_LITERAL #cfpd
+  | MINUS? REAL_LITERAL #cfpr
+  | (TRUE|FALSE) #cbool
+  | LBRACE
+     (ckv (COMMA ckv)*)? COMMA?
+    RBRACE #table
+  | LBRACKET (cvalue (COMMA cvalue)*)? COMMA? RBRACKET #list;
+
+
+//region the new grammar
+theory: THEORY simple_ident LBRACE theorycontent* RBRACE;
+theorycontent:
+    | use_statement
+    | import_statement
+    | export_statement
+    | binding_statement
+    | one_include_statement
+    | options_choice
+    | option_decls
+    | sort_decls
+    | prog_var_decls
+    | schema_var_decls
+    | pred_decls
+    | func_decls
+    | transform_decls
+    | datatype_decls
+    | ruleset_decls
+    | contracts
+    | invariants
+    | rulesOrAxioms
+;
+
+use_statement: USE name=simple_ident SEMI;
+import_statement: IMPORT simple_ident (ONLY simple_ident_comma_list) SEMI;
+export_statement: EXPORT exportPair+ SEMI;
+exportPair: simple_ident AS simple_ident;
+binding_statement: BINDING simple_ident_dots SEMI;
