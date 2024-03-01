@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://key-project.org/key/recentFiles.schema.json",
+  "title": "Recent Files",
+  "description": "Recent Files of the KeY Systems. Stored in ~/.key/recentFiles.json",
+  "type": "object",
+  "properties": {
+    "recentFiles": {
+      "description": "A list of recently opened files.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    }
+  }
+}

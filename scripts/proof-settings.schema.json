@@ -1,0 +1,275 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://key-project.org/key/proof-settings.schema.json",
+  "title": "Format of the Proof Settings in the KeY System. Stored in ~/.key/proof-settings.json",
+  "description": "Proof dependent settings.",
+  "properties": {
+    "Choice": {
+      "type": "object",
+      "properties": {
+        "JavaCard": {
+          "type": "string"
+        },
+        "Strings": {
+          "type": "string"
+        },
+        "assertions": {
+          "type": "string"
+        },
+        "bigint": {
+          "type": "string"
+        },
+        "floatRules": {
+          "type": "string"
+        },
+        "initialisation": {
+          "type": "string"
+        },
+        "intRules": {
+          "type": "string"
+        },
+        "integerSimplificationRules": {
+          "type": "string"
+        },
+        "javaLoopTreatment": {
+          "type": "string"
+        },
+        "mergeGenerateIsWeakeningGoal": {
+          "type": "string"
+        },
+        "methodExpansion": {
+          "type": "string"
+        },
+        "modelFields": {
+          "type": "string"
+        },
+        "moreSeqRules": {
+          "type": "string"
+        },
+        "permissions": {
+          "type": "string"
+        },
+        "programRules": {
+          "type": "string"
+        },
+        "reach": {
+          "type": "string"
+        },
+        "runtimeExceptions": {
+          "type": "string"
+        },
+        "sequences": {
+          "type": "string"
+        },
+        "wdChecks": {
+          "type": "string"
+        },
+        "wdOperator": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "JavaCard",
+        "Strings",
+        "assertions",
+        "bigint",
+        "floatRules",
+        "initialisation",
+        "intRules",
+        "integerSimplificationRules",
+        "javaLoopTreatment",
+        "mergeGenerateIsWeakeningGoal",
+        "methodExpansion",
+        "modelFields",
+        "moreSeqRules",
+        "permissions",
+        "programRules",
+        "reach",
+        "runtimeExceptions",
+        "sequences",
+        "wdChecks",
+        "wdOperator"
+      ]
+    },
+    "Labels": {
+      "type": "object",
+      "properties": {
+        "UseOriginLabels": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "UseOriginLabels"
+      ]
+    },
+    "NewSMT": {
+      "type": "object"
+    },
+    "SMTSettings": {
+      "type": "object",
+      "properties": {
+        "SelectedTaclets": {
+          "type": "array",
+          "items": {}
+        },
+        "UseBuiltUniqueness": {
+          "type": "boolean"
+        },
+        "explicitTypeHierarchy": {
+          "type": "boolean"
+        },
+        "instantiateHierarchyAssumptions": {
+          "type": "boolean"
+        },
+        "integersMaximum": {
+          "type": "integer"
+        },
+        "integersMinimum": {
+          "type": "integer"
+        },
+        "invariantForall": {
+          "type": "boolean"
+        },
+        "maxGenericSorts": {
+          "type": "integer"
+        },
+        "useConstantsForBigOrSmallIntegers": {
+          "type": "boolean"
+        },
+        "useUninterpretedMultiplication": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "SelectedTaclets",
+        "UseBuiltUniqueness",
+        "explicitTypeHierarchy",
+        "instantiateHierarchyAssumptions",
+        "integersMaximum",
+        "integersMinimum",
+        "invariantForall",
+        "maxGenericSorts",
+        "useConstantsForBigOrSmallIntegers",
+        "useUninterpretedMultiplication"
+      ]
+    },
+    "Strategy": {
+      "type": "object",
+      "properties": {
+        "ActiveStrategy": {
+          "type": "string"
+        },
+        "MaximumNumberOfAutomaticApplications": {
+          "type": "integer"
+        },
+        "Timeout": {
+          "type": "integer"
+        },
+        "options": {
+          "type": "object",
+          "properties": {
+            "AUTO_INDUCTION_OPTIONS_KEY": {
+              "type": "string"
+            },
+            "BLOCK_OPTIONS_KEY": {
+              "type": "string"
+            },
+            "CLASS_AXIOM_OPTIONS_KEY": {
+              "type": "string"
+            },
+            "DEP_OPTIONS_KEY": {
+              "type": "string"
+            },
+            "INF_FLOW_CHECK_PROPERTY": {
+              "type": "string"
+            },
+            "LOOP_OPTIONS_KEY": {
+              "type": "string"
+            },
+            "METHOD_OPTIONS_KEY": {
+              "type": "string"
+            },
+            "MPS_OPTIONS_KEY": {
+              "type": "string"
+            },
+            "NON_LIN_ARITH_OPTIONS_KEY": {
+              "type": "string"
+            },
+            "OSS_OPTIONS_KEY": {
+              "type": "string"
+            },
+            "QUANTIFIERS_OPTIONS_KEY": {
+              "type": "string"
+            },
+            "QUERYAXIOM_OPTIONS_KEY": {
+              "type": "string"
+            },
+            "QUERY_NEW_OPTIONS_KEY": {
+              "type": "string"
+            },
+            "SPLITTING_OPTIONS_KEY": {
+              "type": "string"
+            },
+            "STOPMODE_OPTIONS_KEY": {
+              "type": "string"
+            },
+            "SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY": {
+              "type": "string"
+            },
+            "SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY": {
+              "type": "string"
+            },
+            "USER_TACLETS_OPTIONS_KEY1": {
+              "type": "string"
+            },
+            "USER_TACLETS_OPTIONS_KEY2": {
+              "type": "string"
+            },
+            "USER_TACLETS_OPTIONS_KEY3": {
+              "type": "string"
+            },
+            "VBT_PHASE": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "AUTO_INDUCTION_OPTIONS_KEY",
+            "BLOCK_OPTIONS_KEY",
+            "CLASS_AXIOM_OPTIONS_KEY",
+            "DEP_OPTIONS_KEY",
+            "INF_FLOW_CHECK_PROPERTY",
+            "LOOP_OPTIONS_KEY",
+            "METHOD_OPTIONS_KEY",
+            "MPS_OPTIONS_KEY",
+            "NON_LIN_ARITH_OPTIONS_KEY",
+            "OSS_OPTIONS_KEY",
+            "QUANTIFIERS_OPTIONS_KEY",
+            "QUERYAXIOM_OPTIONS_KEY",
+            "QUERY_NEW_OPTIONS_KEY",
+            "SPLITTING_OPTIONS_KEY",
+            "STOPMODE_OPTIONS_KEY",
+            "SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY",
+            "SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY",
+            "USER_TACLETS_OPTIONS_KEY1",
+            "USER_TACLETS_OPTIONS_KEY2",
+            "USER_TACLETS_OPTIONS_KEY3",
+            "VBT_PHASE"
+          ]
+        }
+      },
+      "required": [
+        "ActiveStrategy",
+        "MaximumNumberOfAutomaticApplications",
+        "Timeout",
+        "options"
+      ]
+    }
+  },
+  "required": [
+    "Choice",
+    "Labels",
+    "NewSMT",
+    "SMTSettings",
+    "Strategy"
+  ]
+}
