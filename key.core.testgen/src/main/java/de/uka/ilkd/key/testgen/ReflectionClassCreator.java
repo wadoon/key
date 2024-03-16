@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import javax.lang.model.element.Modifier;
 
-import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.logic.sort.Sort;
 
 import com.squareup.javapoet.*;
 

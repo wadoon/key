@@ -10,7 +10,8 @@ import org.jspecify.annotations.Nullable;
  * second one is of type <T> and named value
  */
 
-public interface ImmutableMapEntry<S extends @Nullable Object, T extends @Nullable Object> extends java.io.Serializable {
+public interface ImmutableMapEntry<S extends @Nullable Object, T extends @Nullable Object>
+        extends java.io.Serializable {
 
     /** @return the first part of the tupel */
     S key();

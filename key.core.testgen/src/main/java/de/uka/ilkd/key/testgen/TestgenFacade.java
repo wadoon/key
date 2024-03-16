@@ -3,6 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.testgen;
 
+import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
+
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.prover.ProverTaskListener;
@@ -19,11 +23,8 @@ import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import de.uka.ilkd.key.testgen.macros.SemanticsBlastingMacro;
 import de.uka.ilkd.key.testgen.settings.TestGenerationSettings;
 import de.uka.ilkd.key.testgen.smt.testgen.TestGenerationLog;
-import org.jspecify.annotations.Nullable;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
+import org.jspecify.annotations.Nullable;
 
 public record TestgenFacade(TestGenerationSettings settings) {
     /**

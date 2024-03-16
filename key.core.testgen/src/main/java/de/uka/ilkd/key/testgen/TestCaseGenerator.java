@@ -3,7 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.testgen;
 
-import com.squareup.javapoet.*;
+import java.io.IOException;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import javax.lang.model.element.Modifier;
+
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -14,7 +20,6 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -28,18 +33,16 @@ import de.uka.ilkd.key.testgen.settings.TestGenerationSettings;
 import de.uka.ilkd.key.testgen.smt.testgen.MemoryTestGenerationLog;
 import de.uka.ilkd.key.testgen.smt.testgen.TestGenerationLog;
 import de.uka.ilkd.key.util.KeYConstants;
+
+import org.key_project.logic.op.Function;
+import org.key_project.logic.sort.Sort;
+import org.key_project.util.java.StringUtil;
+
+import com.squareup.javapoet.*;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
-import org.key_project.util.java.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.lang.model.element.Modifier;
-import java.io.IOException;
-import java.nio.file.*;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static de.uka.ilkd.key.testgen.Format.JUnit4;
 import static de.uka.ilkd.key.testgen.TestgenUtils.*;
@@ -66,7 +69,7 @@ public class TestCaseGenerator {
     public static final String DONT_COPY = "aux";
     private static final ClassName JUNIT4_TEST_ANNOTATION = ClassName.get("org.junit", "Test");
     private static final ClassName JUNIT5_TEST_ANNOTATION =
-            ClassName.get("org.junit.jupiter.api", "Test");
+        ClassName.get("org.junit.jupiter.api", "Test");
     private static final ClassName TESTNG_TEST_ANNOTATION = ClassName.get("org.junit", "Test");
     private final Services services;
     private final boolean rflAsInternalClass;
@@ -91,7 +94,8 @@ public class TestCaseGenerator {
 
     private final TestGenerationSettings settings;
 
-    public TestCaseGenerator(Proof proof, TestGenerationSettings settings, @Nullable TestGenerationLog log) {
+    public TestCaseGenerator(Proof proof, TestGenerationSettings settings,
+            @Nullable TestGenerationLog log) {
         logger = Objects.requireNonNullElse(log, new MemoryTestGenerationLog());
         this.settings = settings;
 
@@ -110,8 +114,8 @@ public class TestCaseGenerator {
 
         info = new ProofInfo(proof);
         String mutCall = Objects.requireNonNullElse(info.getMUTCall(),
-                "<method under test> //Manually write a call to the method under test, "
-                        + "because KeY could not determine it automatically.");
+            "<method under test> //Manually write a call to the method under test, "
+                + "because KeY could not determine it automatically.");
 
         mutName = Objects.requireNonNull(info.getMUT()).getFullName();
         rflCreator = new ReflectionClassCreator();
@@ -194,7 +198,7 @@ public class TestCaseGenerator {
                     boolean returnNull = true;
                     try {
                         final String retType =
-                                md.getTypeReference().getKeYJavaType().getSort().name().toString();
+                            md.getTypeReference().getKeYJavaType().getSort().name().toString();
                         if (retType.equals("java.lang.String")) {
                             ms.addStatement("{ return $S;", className);
                             returnNull = false;
@@ -282,7 +286,7 @@ public class TestCaseGenerator {
         oracleGenerator.getOracleMethods().forEach(it -> oracleMethods.add(it.build()));
 
         LOGGER.debug("Modifier Set: {}",
-                oracleGenerator.getOracleLocationSet(info.getAssignable()));
+            oracleGenerator.getOracleLocationSet(info.getAssignable()));
 
         return "assertTrue(" + oracleCall + ");";
     }
@@ -314,9 +318,9 @@ public class TestCaseGenerator {
             }
         } catch (Exception ex) {
             logger.writeln("Error: The file RFL" + JAVA_FILE_EXTENSION_WITH_DOT
-                    + " is either not generated or it has an error.");
+                + " is either not generated or it has an error.");
             LOGGER.error("Error: The file RFL {} is either not generated or it has an error.",
-                    JAVA_FILE_EXTENSION_WITH_DOT);
+                JAVA_FILE_EXTENSION_WITH_DOT);
         }
         TestCaseGenerator.FILE_COUNTER.incrementAndGet();
         return testSuite.toString();
@@ -343,11 +347,11 @@ public class TestCaseGenerator {
                         Map<String, Sort> typeInfMap = generateTypeInferenceMap(goal.node());
                         ms.addComment(originalNodeName);
                         switch (settings.useJunit()) {
-                            case JUnit4 -> ms.addAnnotation(JUNIT4_TEST_ANNOTATION);
-                            case JUnit5 -> ms.addAnnotation(JUNIT5_TEST_ANNOTATION);
-                            case TestNG -> ms.addAnnotation(TESTNG_TEST_ANNOTATION);
-                            case Plain -> {
-                            }
+                        case JUnit4 -> ms.addAnnotation(JUNIT4_TEST_ANNOTATION);
+                        case JUnit5 -> ms.addAnnotation(JUNIT5_TEST_ANNOTATION);
+                        case TestNG -> ms.addAnnotation(TESTNG_TEST_ANNOTATION);
+                        case Plain -> {
+                        }
                         }
                         ms.addComment("Test preamble: creating objects and intializing test data");
                         generateTestCase(ms, m, typeInfMap);
@@ -356,7 +360,7 @@ public class TestCaseGenerator {
                         info.getProgramVariables(info.getPO(), vars);
                         ms.addComment("Other variables")
                                 .addStatement(
-                                        getRemainingConstants(m.getConstants().keySet(), vars))
+                                    getRemainingConstants(m.getConstants().keySet(), vars))
                                 .addComment("   //Calling the method under test   ")
                                 .addStatement(info.getCode());
 
@@ -373,17 +377,18 @@ public class TestCaseGenerator {
                 }
             } catch (final Exception ex) {
                 logger.writeException(ex);
-                logger.writeln("A test case was not generated due to an exception. Continuing test generation...");
+                logger.writeln(
+                    "A test case was not generated due to an exception. Continuing test generation...");
             }
         }
 
         if (counter == 0) {
             logger.writeln(
-                    "Warning: no test case was generated. Adjust the SMT solver settings (e.g. timeout) "
-                            + "in Options->SMT Solvers.");
+                "Warning: no test case was generated. Adjust the SMT solver settings (e.g. timeout) "
+                    + "in Options->SMT Solvers.");
         } else if (counter < problemSolvers.size()) {
             logger.writeln("Warning: SMT solver could not solve all test data constraints. "
-                    + "Adjust the SMT solver settings (e.g. timeout) in Options->SMT Solvers.");
+                + "Adjust the SMT solver settings (e.g. timeout) in Options->SMT Solvers.");
         }
 
         clazz.addMethod(getMainMethod(fileName, counter));
@@ -398,13 +403,13 @@ public class TestCaseGenerator {
 
         var jfile = JavaFile.builder(packageName, clazz.build());
         jfile.addFileComment(
-                """
-                        This is a test driver generated by KeY $S (www.key-project.org).
-                        $S
-                        @author Christoph Gladisch
-                        @author Mihai Herda                       
-                        """,
-                KeYConstants.VERSION, fileName + ".java");
+            """
+                    This is a test driver generated by KeY $S (www.key-project.org).
+                    $S
+                    @author Christoph Gladisch
+                    @author Mihai Herda
+                    """,
+            KeYConstants.VERSION, fileName + ".java");
         return jfile.build();
     }
 
@@ -436,10 +441,10 @@ public class TestCaseGenerator {
                 }
             } else {
                 LOGGER.debug("PV {} Sort: {} KeYJavaType: {}", name, pv.sort(),
-                        pv.getKeYJavaType());
+                    pv.getKeYJavaType());
                 map.put(name, pv.sort());
             }
-        } else if (op instanceof Function && !(op instanceof ObserverFunction)) {
+        } else if (op instanceof JFunction && !(op instanceof ObserverFunction)) {
             // This case collects fields of classes. The function itself has
             // sort "Field" because it is just the name of the field. To get
             // the actual class of the field
@@ -449,7 +454,8 @@ public class TestCaseGenerator {
             HeapLDT hLDT = services.getTypeConverter().getHeapLDT();
             if (sort == hLDT.getFieldSort()) {
                 var pv = getProgramVariable(t);
-                if (pv == null) return;
+                if (pv == null)
+                    return;
 
                 name = name.replace("::$", "::");
 
@@ -472,7 +478,7 @@ public class TestCaseGenerator {
     private ProgramVariable getProgramVariable(Term locationTerm) {
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         ProgramVariable result = null;
-        if (locationTerm.op() instanceof Function function) {
+        if (locationTerm.op() instanceof JFunction function) {
             // Make sure that the function is not an array
             if (heapLDT.getArr() != function) {
                 String typeName = HeapLDT.getClassName(function);
@@ -487,7 +493,7 @@ public class TestCaseGenerator {
     }
 
     private String getRemainingConstants(Collection<String> existingConstants,
-                                         Collection<Term> newConstants) {
+            Collection<Term> newConstants) {
         StringBuilder result = new StringBuilder();
 
         for (Term c : newConstants) {
@@ -570,7 +576,7 @@ public class TestCaseGenerator {
                 String right;
                 if (type.endsWith("[]")) {
                     right =
-                            "new " + type.substring(0, type.length() - 2) + "[" + o.getLength() + "]";
+                        "new " + type.substring(0, type.length() - 2) + "[" + o.getLength() + "]";
                 } else if (o.getSort() == null || o.getSort().toString().equals("Null")) {
                     right = "null";
                 } else {
@@ -625,10 +631,10 @@ public class TestCaseGenerator {
                             && isInPrestate(prestate, val)) {
                         if (isLiteral) {
                             mb.addStatement(assignmentCreator.assign(declType, getPreName(c),
-                                    "(" + type + ")" + val));
+                                "(" + type + ")" + val));
                         } else {
                             mb.addStatement(assignmentCreator.assign(declType, getPreName(c),
-                                    "(" + type + ")" + getPreName(val)));
+                                "(" + type + ")" + getPreName(val)));
                         }
                     }
                 }
@@ -661,8 +667,8 @@ public class TestCaseGenerator {
                     final String rcObjType = getSafeType(o.getSort());
 
                     mb.addStatement(assignmentCreator.assign("",
-                            new RefEx(rcObjType, receiverObject, vType, fieldName),
-                            "(" + vType + ")" + val));
+                        new RefEx(rcObjType, receiverObject, vType, fieldName),
+                        "(" + vType + ")" + val));
 
 
                     if (isJunit() && isInPrestate(prestate, o)) {
@@ -674,8 +680,8 @@ public class TestCaseGenerator {
                         }
 
                         mb.addStatement(assignmentCreator.assign("",
-                                new RefEx(rcObjType, getPreName(receiverObject), vType, fieldName),
-                                "(" + vType + ")" + val));
+                            new RefEx(rcObjType, getPreName(receiverObject), vType, fieldName),
+                            "(" + vType + ")" + val));
                     }
 
                 }
@@ -691,7 +697,7 @@ public class TestCaseGenerator {
                         String val = o.getArrayValue(i);
                         val = translateValueExpression(val);
                         mb.addStatement(
-                                assignmentCreator.assign("", receiverObject + fieldName, val));
+                            assignmentCreator.assign("", receiverObject + fieldName, val));
 
                         if (isJunit() && isInPrestate(prestate, o)) {
                             if (!elementType.equals("int") && !elementType.equals("boolean")
@@ -699,7 +705,7 @@ public class TestCaseGenerator {
                                 val = getPreName(val);
                             }
                             mb.addStatement(assignmentCreator.assign("",
-                                    getPreName(receiverObject) + fieldName, val));
+                                getPreName(receiverObject) + fieldName, val));
                         }
                     }
                 }
@@ -718,7 +724,7 @@ public class TestCaseGenerator {
     private void createOldMap(MethodSpec.Builder mb, Set<String> objNames) {
         ClassName NAME_HASH_MAP = ClassName.get(HashMap.class);
         var map =
-                ParameterizedTypeName.get(NAME_HASH_MAP, ClassName.OBJECT, ClassName.OBJECT);
+            ParameterizedTypeName.get(NAME_HASH_MAP, ClassName.OBJECT, ClassName.OBJECT);
         mb.addStatement("$T $N = new $T()", map, OLDMap, map);
         for (String o : objNames) {
             mb.addStatement("$N.put($N, $L)", OLDMap, getPreName(o), o);

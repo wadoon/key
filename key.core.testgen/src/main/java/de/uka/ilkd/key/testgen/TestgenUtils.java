@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.testgen;
 
 import de.uka.ilkd.key.smt.model.Model;
+
 import org.jspecify.annotations.Nullable;
 
 public class TestgenUtils {
@@ -22,10 +23,10 @@ public class TestgenUtils {
     public static String createAssignmentWithRfl(String type, Object left, String right) {
         if (left instanceof RefEx leftEx) {
             return "%s.%s%s(%s.class, %s, \"%s\", %s)".formatted(
-                    ReflectionClassCreator.NAME_OF_CLASS,
-                    ReflectionClassCreator.SET_PREFIX,
-                    ReflectionClassCreator.cleanTypeName(leftEx.fieldType()),
-                    leftEx.rcObjType(), leftEx.rcObj(), leftEx.field(), right);
+                ReflectionClassCreator.NAME_OF_CLASS,
+                ReflectionClassCreator.SET_PREFIX,
+                ReflectionClassCreator.cleanTypeName(leftEx.fieldType()),
+                leftEx.rcObjType(), leftEx.rcObj(), leftEx.field(), right);
         } else {
             return createAssignmentWithoutRfl(type, left, right);
         }

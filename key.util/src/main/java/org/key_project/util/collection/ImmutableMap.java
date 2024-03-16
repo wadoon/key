@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.collection;
 
-import org.jspecify.annotations.Nullable;
 
 import java.util.Iterator;
 

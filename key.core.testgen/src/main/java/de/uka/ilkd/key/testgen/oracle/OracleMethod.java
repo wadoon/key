@@ -5,7 +5,8 @@ package de.uka.ilkd.key.testgen.oracle;
 
 import java.util.List;
 
-import de.uka.ilkd.key.logic.sort.Sort;
+import org.jspecify.annotations.Nullable;
+import org.key_project.logic.sort.Sort;
 
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
@@ -22,17 +23,16 @@ public class OracleMethod {
 
     private final String body;
 
+    @Nullable
     private Sort returnType;
 
     public OracleMethod(String methodName, List<OracleVariable> args, String body) {
-        super();
         this.methodName = methodName;
         this.args = args;
         this.body = body;
     }
 
     public OracleMethod(String methodName, List<OracleVariable> args, String body, Sort sort) {
-        super();
         this.methodName = methodName;
         this.args = args;
         this.body = body;
@@ -59,7 +59,7 @@ public class OracleMethod {
 
         Iterable<ParameterSpec> params = args.stream().map(
             it -> ParameterSpec.builder(ClassName.get("", it.sort().name().toString()),
-                it.name().toString()).build()).toList();
+                    it.name()).build()).toList();
 
         var m = MethodSpec.methodBuilder(methodName)
                 .returns(retType)

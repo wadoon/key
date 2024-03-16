@@ -3,6 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.testgen;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.Callable;
+
 import de.uka.ilkd.key.api.ProofManagementApi;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
@@ -11,18 +17,13 @@ import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.testgen.settings.TestGenerationSettings;
 import de.uka.ilkd.key.testgen.smt.testgen.TestGenerationLog;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.Callable;
-
 @CommandLine.Command(name = "tcgen", mixinStandardHelpOptions = true,
-        description = "Generator of Testcases based on Proof Attempts")
+    description = "Generator of Testcases based on Proof Attempts")
 public class TGMain implements Callable<Integer> {
     private final static Logger LOGGER = LoggerFactory.getLogger("main");
 
@@ -34,33 +35,34 @@ public class TGMain implements Callable<Integer> {
     @CommandLine.Parameters(description = "KeY or Java file.", arity = "1..*")
     private List<File> files = new LinkedList<>();
 
-    @CommandLine.Option(names = {"-s", "--symbex"},
-            description = "apply symbex", negatable = true)
+    @CommandLine.Option(names = { "-s", "--symbex" },
+        description = "apply symbex", negatable = true)
     private boolean symbex;
 
-    @CommandLine.Option(names = {"-c", "--contract"},
-            arity = "*",
-            description = "name of the contract to be loaded in the Java environment")
+    @CommandLine.Option(names = { "-c", "--contract" },
+        arity = "*",
+        description = "name of the contract to be loaded in the Java environment")
     private List<String> contractNames = new ArrayList<>();
 
-    @CommandLine.Option(names = {"--all-contracts"},
-            description = "name of the contract to be loaded in the Java environment")
+    @CommandLine.Option(names = { "--all-contracts" },
+        description = "name of the contract to be loaded in the Java environment")
     private boolean allContracts = false;
 
 
-    @CommandLine.Option(names = {"-o", "--output"}, description = "Output folder")
+    @CommandLine.Option(names = { "-o", "--output" }, description = "Output folder")
     private File outputFolder = new File("out");
 
-    @CommandLine.Option(names = {"-r", "--rfl"}, description = "Use Reflection class", negatable = true)
+    @CommandLine.Option(names = { "-r", "--rfl" }, description = "Use Reflection class",
+        negatable = true)
     private boolean useReflection = false;
 
-    @CommandLine.Option(names = {"-f", "--format"}, description = "Use Reflection class")
+    @CommandLine.Option(names = { "-f", "--format" }, description = "Use Reflection class")
     private Format format = Format.JUnit4;
 
 
-    @CommandLine.Option(names = {"--max-unwinds"}, description = "max unwinds")
+    @CommandLine.Option(names = { "--max-unwinds" }, description = "max unwinds")
     private int maxUnwinds = 10;
-    @CommandLine.Option(names = {"--dups"}, description = "remove duplicates", negatable = true)
+    @CommandLine.Option(names = { "--dups" }, description = "remove duplicates", negatable = true)
     private boolean removeDuplicates;
 
     @Override

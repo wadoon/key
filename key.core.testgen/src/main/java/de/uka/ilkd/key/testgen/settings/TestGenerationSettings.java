@@ -3,16 +3,17 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.testgen.settings;
 
+import java.io.File;
+import java.util.Properties;
+
 import de.uka.ilkd.key.settings.AbstractSettings;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.SettingsConverter;
 import de.uka.ilkd.key.testgen.Format;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-
-import java.io.File;
-import java.util.Properties;
 
 public class TestGenerationSettings extends AbstractSettings {
     // region Default Values for option fields
@@ -20,7 +21,7 @@ public class TestGenerationSettings extends AbstractSettings {
     private static final int DEFAULT_MAXUNWINDS = 3;
     private static final int DEFAULT_CONCURRENTPROCESSES = 1;
     private static final String DEFAULT_OUTPUTPATH =
-            System.getProperty("user.home") + File.separator + "testFiles";
+        System.getProperty("user.home") + File.separator + "testFiles";
     private static final boolean DEFAULT_REMOVEDUPLICATES = true;
     private static final boolean DEFAULT_USERFL = false;
     private static final Format DEFAULT_USEJUNIT = Format.Plain;
@@ -42,7 +43,7 @@ public class TestGenerationSettings extends AbstractSettings {
     private static final String PROP_OPENJML_PATH = "OpenJMLPath";
     private static final String PROP_OBJENESIS_PATH = "ObjenesisPath";
     private static final String PROP_INCLUDE_POST_CONDITION =
-            "IncludePostCondition";
+        "IncludePostCondition";
     private static final String CATEGORY = "TestGenSettings";
     // endregion
 
@@ -130,20 +131,20 @@ public class TestGenerationSettings extends AbstractSettings {
     public void readSettings(Properties props) {
         var prefix = "[" + CATEGORY + "]";
         setApplySymbolicExecution(SettingsConverter.read(props,
-                prefix + PROP_APPLY_SYMBOLIC_EXECUTION, DEFAULT_APPLYSYMBOLICEX));
+            prefix + PROP_APPLY_SYMBOLIC_EXECUTION, DEFAULT_APPLYSYMBOLICEX));
         setMaxUnwinds(SettingsConverter.read(props, prefix + PROP_MAX_UWINDS, DEFAULT_MAXUNWINDS));
         setOutputPath(SettingsConverter.read(props, prefix + PROP_OUTPUT_PATH, DEFAULT_OUTPUTPATH));
         setRemoveDuplicates(SettingsConverter.read(props,
-                prefix + PROP_REMOVE_DUPLICATES, DEFAULT_REMOVEDUPLICATES));
+            prefix + PROP_REMOVE_DUPLICATES, DEFAULT_REMOVEDUPLICATES));
         setRFL(SettingsConverter.read(props, prefix + PROP_USE_RFL, DEFAULT_USERFL));
         setFormat(Format.valueOf(
-                SettingsConverter.read(props, prefix + PROP_USE_JUNIT, DEFAULT_USEJUNIT.name())));
+            SettingsConverter.read(props, prefix + PROP_USE_JUNIT, DEFAULT_USEJUNIT.name())));
         setConcurrentProcesses(SettingsConverter.read(props,
-                prefix + PROP_CONCURRENT_PROCESSES, DEFAULT_CONCURRENTPROCESSES));
+            prefix + PROP_CONCURRENT_PROCESSES, DEFAULT_CONCURRENTPROCESSES));
         setInvariantForAll(SettingsConverter.read(props,
-                prefix + PROP_INVARIANT_FOR_ALL, DEFAULT_INVARIANTFORALL));
+            prefix + PROP_INVARIANT_FOR_ALL, DEFAULT_INVARIANTFORALL));
         setIncludePostCondition(SettingsConverter.read(props,
-                PROP_INCLUDE_POST_CONDITION, DEFAULT_INCLUDEPOSTCONDITION));
+            PROP_INCLUDE_POST_CONDITION, DEFAULT_INCLUDEPOSTCONDITION));
     }
 
     public boolean removeDuplicates() {
@@ -216,7 +217,7 @@ public class TestGenerationSettings extends AbstractSettings {
     public void writeSettings(Properties props) {
         var prefix = "[" + CATEGORY + "]";
         SettingsConverter.store(props, prefix + PROP_APPLY_SYMBOLIC_EXECUTION,
-                applySymbolicExecution);
+            applySymbolicExecution);
         SettingsConverter.store(props, prefix + PROP_CONCURRENT_PROCESSES, concurrentProcesses);
         SettingsConverter.store(props, prefix + PROP_INVARIANT_FOR_ALL, invariantForAll);
         SettingsConverter.store(props, prefix + PROP_MAX_UWINDS, maxUnwinds);
@@ -233,7 +234,7 @@ public class TestGenerationSettings extends AbstractSettings {
         if (cat == null)
             return;
         setApplySymbolicExecution(
-                cat.getBool(PROP_APPLY_SYMBOLIC_EXECUTION, DEFAULT_APPLYSYMBOLICEX));
+            cat.getBool(PROP_APPLY_SYMBOLIC_EXECUTION, DEFAULT_APPLYSYMBOLICEX));
         setMaxUnwinds(cat.getInt(PROP_MAX_UWINDS, DEFAULT_MAXUNWINDS));
         setOutputPath(cat.getString(PROP_OUTPUT_PATH, DEFAULT_OUTPUTPATH));
         setRemoveDuplicates(cat.getBool(PROP_REMOVE_DUPLICATES, DEFAULT_REMOVEDUPLICATES));
@@ -242,7 +243,7 @@ public class TestGenerationSettings extends AbstractSettings {
         setConcurrentProcesses(cat.getInt(PROP_CONCURRENT_PROCESSES, DEFAULT_CONCURRENTPROCESSES));
         setInvariantForAll(cat.getBool(PROP_INVARIANT_FOR_ALL, DEFAULT_INVARIANTFORALL));
         setIncludePostCondition(
-                cat.getBool(PROP_INCLUDE_POST_CONDITION, DEFAULT_INCLUDEPOSTCONDITION));
+            cat.getBool(PROP_INCLUDE_POST_CONDITION, DEFAULT_INCLUDEPOSTCONDITION));
     }
 
     @Override
