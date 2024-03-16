@@ -39,7 +39,6 @@ import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.collection.Pair;
 import org.key_project.util.java.CollectionUtil;
 
 /**

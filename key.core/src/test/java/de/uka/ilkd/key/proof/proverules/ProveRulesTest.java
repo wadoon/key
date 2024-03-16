@@ -19,7 +19,6 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import de.uka.ilkd.key.util.LinkedHashMap;
 
-import org.key_project.util.collection.Pair;
 import org.key_project.util.helper.FindResources;
 
 import org.junit.jupiter.api.DynamicTest;

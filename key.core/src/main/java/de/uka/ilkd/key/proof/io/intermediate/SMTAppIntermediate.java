@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io.intermediate;
 
-import de.uka.ilkd.key.logic.PosInTerm;
 
 public class SMTAppIntermediate extends BuiltInAppIntermediate {
     private final String solver;

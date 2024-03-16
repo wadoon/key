@@ -8,7 +8,6 @@ import java.util.Objects;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.Pair;
 
 /**
  * Describes a branch in a proof as a series of branch choices.

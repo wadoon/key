@@ -17,7 +17,6 @@ import de.uka.ilkd.key.proof.Proof;
 
 import org.key_project.slicing.DependencyNodeData;
 import org.key_project.slicing.analysis.AnalysisResults;
-import org.key_project.util.collection.Pair;
 
 /**
  * Exports a {@link DependencyGraph} in DOT format.

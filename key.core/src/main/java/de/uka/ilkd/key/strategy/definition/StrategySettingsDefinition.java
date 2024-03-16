@@ -81,12 +81,12 @@ public class StrategySettingsDefinition {
 
         // Java verification standard preset (tested in TimSort case study)
         STD_FURTHER_DEFAULTS.add(new StdDefault(
-                "Java verif. std.", 7000, () -> {
-            final StrategyProperties newProps =
+            "Java verif. std.", 7000, () -> {
+                final StrategyProperties newProps =
                     IDefaultStrategyPropertiesFactory.DEFAULT_FACTORY
                             .createDefaultStrategyProperties();
 
-            newProps.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY,
+                newProps.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY,
                     StrategyProperties.SPLITTING_DELAYED);
 
                 newProps.setProperty(StrategyProperties.LOOP_OPTIONS_KEY,
@@ -172,7 +172,8 @@ public class StrategySettingsDefinition {
      *        {@link StrategyProperties}.
      * @param properties Defines the controls to edit {@link StrategyProperties}.
      */
-    public StrategySettingsDefinition(String propertiesTitle, AbstractStrategyPropertyDefinition... properties) {
+    public StrategySettingsDefinition(String propertiesTitle,
+            AbstractStrategyPropertyDefinition... properties) {
         this(true, "Max. Rule Applications", 10000, propertiesTitle,
             IDefaultStrategyPropertiesFactory.DEFAULT_FACTORY, STD_FURTHER_DEFAULTS, properties);
     }
@@ -193,10 +194,10 @@ public class StrategySettingsDefinition {
      * @param properties Defines the controls to edit {@link StrategyProperties}.
      */
     public StrategySettingsDefinition(boolean showMaxRuleApplications,
-                                      String maxRuleApplicationsLabel, int defaultMaxRuleApplications, String propertiesTitle,
-                                      IDefaultStrategyPropertiesFactory defaultPropertiesFactory,
-                                      ArrayList<StdDefault> furtherDefaults,
-                                      AbstractStrategyPropertyDefinition... properties) {
+            String maxRuleApplicationsLabel, int defaultMaxRuleApplications, String propertiesTitle,
+            IDefaultStrategyPropertiesFactory defaultPropertiesFactory,
+            ArrayList<StdDefault> furtherDefaults,
+            AbstractStrategyPropertyDefinition... properties) {
         assert defaultPropertiesFactory != null;
         this.showMaxRuleApplications = showMaxRuleApplications;
         this.maxRuleApplicationsLabel = maxRuleApplicationsLabel;

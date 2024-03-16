@@ -85,8 +85,8 @@ public class RuleStatisticsDialog extends JDialog {
         setSize(w, h);
 
         final Comparator<RuleStatistics.RuleStatisticData> comp =
-                Comparator.comparing(RuleStatistics.RuleStatisticData::first)
-                        .reversed();
+            Comparator.comparing(RuleStatistics.RuleStatisticData::first)
+                    .reversed();
 
         statisticsPane.setText(genTable(statistics.sortBy(comp)));
         statisticsPane.setCaretPosition(0);
@@ -94,22 +94,30 @@ public class RuleStatisticsDialog extends JDialog {
     }
 
 
-    final Comparator<RuleStatistics.RuleStatisticData> compareName =  Comparator.comparing(RuleStatistics.RuleStatisticData::ruleName);
-    final Comparator<RuleStatistics.RuleStatisticData> compareFirst = Comparator.comparing(RuleStatistics.RuleStatisticData::first);
-    final Comparator<RuleStatistics.RuleStatisticData> compareSecond = Comparator.comparing(RuleStatistics.RuleStatisticData::second);
-    final Comparator<RuleStatistics.RuleStatisticData> compareThird = Comparator.comparing(RuleStatistics.RuleStatisticData::third);
+    final Comparator<RuleStatistics.RuleStatisticData> compareName =
+        Comparator.comparing(RuleStatistics.RuleStatisticData::ruleName);
+    final Comparator<RuleStatistics.RuleStatisticData> compareFirst =
+        Comparator.comparing(RuleStatistics.RuleStatisticData::first);
+    final Comparator<RuleStatistics.RuleStatisticData> compareSecond =
+        Comparator.comparing(RuleStatistics.RuleStatisticData::second);
+    final Comparator<RuleStatistics.RuleStatisticData> compareThird =
+        Comparator.comparing(RuleStatistics.RuleStatisticData::third);
 
     final Comparator<? super RuleStatistics.RuleStatisticData> compareEntryByName =
-            compareName.thenComparing(compareFirst).thenComparing(compareSecond).thenComparing(compareThird);
+        compareName.thenComparing(compareFirst).thenComparing(compareSecond)
+                .thenComparing(compareThird);
 
     final Comparator<RuleStatistics.RuleStatisticData> compareEntryByFirst =
-            compareFirst.thenComparing(compareName).thenComparing(compareSecond).thenComparing(compareThird);
+        compareFirst.thenComparing(compareName).thenComparing(compareSecond)
+                .thenComparing(compareThird);
 
     final Comparator<RuleStatistics.RuleStatisticData> compareEntryBySecond =
-            compareSecond.thenComparing(compareName).thenComparing(compareFirst).thenComparing(compareThird);
+        compareSecond.thenComparing(compareName).thenComparing(compareFirst)
+                .thenComparing(compareThird);
 
     final Comparator<RuleStatistics.RuleStatisticData> compareEntryByThird =
-            compareThird.thenComparing(compareName).thenComparing(compareFirst).thenComparing(compareSecond);
+        compareThird.thenComparing(compareName).thenComparing(compareFirst)
+                .thenComparing(compareSecond);
 
 
     /**
@@ -136,20 +144,20 @@ public class RuleStatisticsDialog extends JDialog {
         sortButton2.addActionListener(event -> {
             statisticsPane.setText(genTable(
                 statistics.sortBy(compareEntryByFirst)
-                            .reversed()));
+                        .reversed()));
             statisticsPane.setCaretPosition(0);
         });
         JButton sortButton3 = new JButton("Sort by useless");
         sortButton3.addActionListener(event -> {
             statisticsPane.setText(genTable(
                 statistics.sortBy(
-                        compareEntryBySecond.reversed())));
+                    compareEntryBySecond.reversed())));
             statisticsPane.setCaretPosition(0);
         });
         JButton sortButton4 = new JButton("Sort by initial useless");
         sortButton4.addActionListener(event -> {
             statisticsPane.setText(genTable(
-                    statistics.sortBy(compareEntryByThird).reversed()));
+                statistics.sortBy(compareEntryByThird).reversed()));
             statisticsPane.setCaretPosition(0);
         });
 
@@ -192,12 +200,15 @@ public class RuleStatisticsDialog extends JDialog {
             Integer.toString(uselessSteps), Integer.toString(initialUseless)));
         // next summary row
         List<RuleStatistics.RuleStatisticData> rulesBranching =
-                rules.stream().filter(it -> statistics.branches(it.ruleName()))
-                        .toList();
+            rules.stream().filter(it -> statistics.branches(it.ruleName()))
+                    .toList();
         int uniqueRules2 = rulesBranching.size();
-        totalSteps = rulesBranching.stream().mapToInt(RuleStatistics.RuleStatisticData::first).sum();
-        uselessSteps = rulesBranching.stream().mapToInt(RuleStatistics.RuleStatisticData::second).sum();
-        initialUseless = rulesBranching.stream().mapToInt(RuleStatistics.RuleStatisticData::third).sum();
+        totalSteps =
+            rulesBranching.stream().mapToInt(RuleStatistics.RuleStatisticData::first).sum();
+        uselessSteps =
+            rulesBranching.stream().mapToInt(RuleStatistics.RuleStatisticData::second).sum();
+        initialUseless =
+            rulesBranching.stream().mapToInt(RuleStatistics.RuleStatisticData::third).sum();
         rows.add(List.of(String.format("(%d branching rules)", uniqueRules2),
             Integer.toString(totalSteps), Integer.toString(uselessSteps),
             Integer.toString(initialUseless)));
@@ -206,7 +217,8 @@ public class RuleStatisticsDialog extends JDialog {
             int all = a.first();
             int useless = a.second();
             int iua = a.third();
-            rows.add(List.of(name, Integer.toString(all), Integer.toString(useless), Integer.toString(iua)));
+            rows.add(List.of(name, Integer.toString(all), Integer.toString(useless),
+                Integer.toString(iua)));
         });
 
         return HtmlFactory.generateTable(columns, new boolean[] { false, false, false, false },

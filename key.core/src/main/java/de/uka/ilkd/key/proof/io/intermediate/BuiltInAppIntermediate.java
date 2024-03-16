@@ -7,7 +7,6 @@ import de.uka.ilkd.key.logic.PosInTerm;
 
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.Pair;
 
 /**
  * Encapsulates intermediate information for constructing a built-in rule application.

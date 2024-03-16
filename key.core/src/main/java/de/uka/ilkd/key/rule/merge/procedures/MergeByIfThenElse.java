@@ -105,7 +105,7 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
 
         if (distinguishingFormula == null) {
             DistForm distFormAndRightSidesForITEUpd =
-                    createDistFormAndRightSidesForITEUpd(state1, state2, ifTerm, elseTerm, services);
+                createDistFormAndRightSidesForITEUpd(state1, state2, ifTerm, elseTerm, services);
 
             cond = distFormAndRightSidesForITEUpd.first();
             ifForm = distFormAndRightSidesForITEUpd.second();
@@ -143,7 +143,7 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
      *         second (fourth component = true) state was used as a basis for the condition (first
      *         component).
      */
-    static Quadruple<Term, Term, Term, Boolean> createDistFormAndRightSidesForITEUpd(
+    static DistForm createDistFormAndRightSidesForITEUpd(
             LocationVariable v, SymbolicExecutionState state1, SymbolicExecutionState state2,
             Services services) {
 
@@ -174,17 +174,17 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
      * the triple is the discriminating condition, the second and third elements are the respective
      * parts for the if and else branch.
      *
-     * @param state1   First state to evaluate.
-     * @param state2   Second state to evaluate.
-     * @param ifTerm   The if term.
+     * @param state1 First state to evaluate.
+     * @param state2 Second state to evaluate.
+     * @param ifTerm The if term.
      * @param elseTerm The else term.
      * @param services The services object.
      * @return Input to construct an elementary update like
-     * <code>{ v := \if (first) \then (second) \else (third) }</code>, where first, second
-     * and third are the respective components of the returned triple. The fourth component
-     * indicates whether the path condition of the first (fourth component = false) or the
-     * second (fourth component = true) state was used as a basis for the condition (first
-     * component).
+     *         <code>{ v := \if (first) \then (second) \else (third) }</code>, where first, second
+     *         and third are the respective components of the returned triple. The fourth component
+     *         indicates whether the path condition of the first (fourth component = false) or the
+     *         second (fourth component = true) state was used as a basis for the condition (first
+     *         component).
      */
     static DistForm createDistFormAndRightSidesForITEUpd(
             SymbolicExecutionState state1, SymbolicExecutionState state2, Term ifTerm,

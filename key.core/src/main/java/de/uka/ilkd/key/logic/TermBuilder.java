@@ -32,7 +32,6 @@ import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.*;
-import org.key_project.util.collection.Pair;
 
 /**
  * <p>

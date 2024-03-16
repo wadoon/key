@@ -213,8 +213,10 @@ public class Statistics {
                 "Branches (cached) [tooltip: Number of goals resolved using the proof cache]",
                 EnhancedStringBuffer.format(stat.cachedBranches).toString()));
         }
-        summaryList.add(new SummaryEntry("Interactive steps", String.valueOf(stat.interactiveSteps)));
-        summaryList.add(new SummaryEntry("Symbolic execution steps", String.valueOf(stat.symbExApps)));
+        summaryList
+                .add(new SummaryEntry("Interactive steps", String.valueOf(stat.interactiveSteps)));
+        summaryList
+                .add(new SummaryEntry("Symbolic execution steps", String.valueOf(stat.symbExApps)));
 
 
         final long time = sideProofs ? stat.autoModeTimeInMillis : proof.getAutoModeTime();
@@ -241,11 +243,14 @@ public class Statistics {
         summaryList.add(new SummaryEntry("One-step Simplifier apps", String.valueOf(stat.ossApps)));
         summaryList.add(new SummaryEntry("SMT solver apps", String.valueOf(stat.smtSolverApps)));
         summaryList.add(
-            new SummaryEntry("Dependency Contract apps", String.valueOf(stat.dependencyContractApps)));
+            new SummaryEntry("Dependency Contract apps",
+                String.valueOf(stat.dependencyContractApps)));
         summaryList.add(
-            new SummaryEntry("Operation Contract apps", String.valueOf(stat.operationContractApps)));
+            new SummaryEntry("Operation Contract apps",
+                String.valueOf(stat.operationContractApps)));
         summaryList.add(
-            new SummaryEntry("Block/Loop Contract apps", String.valueOf(stat.blockLoopContractApps)));
+            new SummaryEntry("Block/Loop Contract apps",
+                String.valueOf(stat.blockLoopContractApps)));
         summaryList.add(new SummaryEntry("Loop invariant apps", String.valueOf(stat.loopInvApps)));
         summaryList.add(new SummaryEntry("Merge Rule apps", String.valueOf(stat.mergeRuleApps)));
         summaryList.add(new SummaryEntry("Total rule apps",

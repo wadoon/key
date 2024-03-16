@@ -22,7 +22,6 @@ import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.sort.Sort;
-import org.key_project.util.collection.Pair;
 
 /**
  * Interface for predicates used for predicate abstraction. An abstraction predicate is a mapping

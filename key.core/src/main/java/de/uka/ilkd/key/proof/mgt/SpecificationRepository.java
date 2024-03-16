@@ -3,6 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.mgt;
 
+import java.net.URI;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.function.UnaryOperator;
+
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -33,13 +38,9 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.net.URI;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.function.UnaryOperator;
 
 /**
  * Central storage for all specification elements, such as contracts, class axioms, and loop
@@ -62,18 +63,18 @@ public final class SpecificationRepository {
 
 
     private final Map<TypeObserver, ImmutableSet<Contract>> contracts =
-            new LinkedHashMap<>();
+        new LinkedHashMap<>();
     private final Map<TypeFunction, ImmutableSet<FunctionalOperationContract>> operationContracts =
-            new LinkedHashMap<>();
+        new LinkedHashMap<>();
     private final Map<TypeWdCheck, ImmutableSet<WellDefinednessCheck>> wdChecks =
-            new LinkedHashMap<>();
+        new LinkedHashMap<>();
     private final Map<String, Contract> contractsByName = new LinkedHashMap<>();
     private final Map<KeYJavaType, ImmutableSet<IObserverFunction>> contractTargets =
-            new LinkedHashMap<>();
+        new LinkedHashMap<>();
     private final Map<KeYJavaType, ImmutableSet<ClassInvariant>> invs = new LinkedHashMap<>();
     private final Map<KeYJavaType, ImmutableSet<ClassAxiom>> axioms = new LinkedHashMap<>();
     private final Map<KeYJavaType, ImmutableSet<InitiallyClause>> initiallyClauses =
-            new LinkedHashMap<>();
+        new LinkedHashMap<>();
     private final Map<ProofOblInput, ImmutableSet<Proof>> proofs = new LinkedHashMap<>();
 
     private final Map<LoopI, LoopSpecification> loopInvs = new LinkedHashMap<>();
@@ -83,12 +84,16 @@ public final class SpecificationRepository {
     /**
      * A map which relates each loop statement its starting line number and set of loop contracts.
      */
-    private final Map<LoopI, ImmutableSet<LoopContract>> loopContractsOnLoops = new LinkedHashMap<>();
-    private final Map<MergePointStatement, ImmutableSet<MergeContract>> mergeContracts = new LinkedHashMap<>();
-    private final Map<IObserverFunction, IObserverFunction> unlimitedToLimited = new LinkedHashMap<>();
-    private final Map<IObserverFunction, IObserverFunction> limitedToUnlimited = new LinkedHashMap<>();
+    private final Map<LoopI, ImmutableSet<LoopContract>> loopContractsOnLoops =
+        new LinkedHashMap<>();
+    private final Map<MergePointStatement, ImmutableSet<MergeContract>> mergeContracts =
+        new LinkedHashMap<>();
+    private final Map<IObserverFunction, IObserverFunction> unlimitedToLimited =
+        new LinkedHashMap<>();
+    private final Map<IObserverFunction, IObserverFunction> limitedToUnlimited =
+        new LinkedHashMap<>();
     private final Map<IObserverFunction, ImmutableSet<Taclet>> unlimitedToLimitTaclets =
-            new LinkedHashMap<>();
+        new LinkedHashMap<>();
 
     /**
      * <p>
@@ -103,13 +108,13 @@ public final class SpecificationRepository {
      * </p>
      */
     private final Map<KeYJavaType, ImmutableSet<ClassAxiom>> allClassAxiomsCache =
-            new LinkedHashMap<>();
+        new LinkedHashMap<>();
 
     private final Services services;
     private final TermBuilder tb;
 
     private final Map<String, Integer> contractCounters =
-            new de.uka.ilkd.key.util.LinkedHashMap<>();
+        new de.uka.ilkd.key.util.LinkedHashMap<>();
 
     public SpecificationRepository(Services services) {
         this.services = services;
@@ -136,7 +141,7 @@ public final class SpecificationRepository {
     }
 
     private static Taclet getLimitedToUnlimitedTaclet(IObserverFunction limited,
-                                                      IObserverFunction unlimited, TermServices services) {
+            IObserverFunction unlimited, TermServices services) {
         final TermBuilder tb = services.getTermBuilder();
         assert limited.arity() == unlimited.arity();
 
@@ -144,7 +149,7 @@ public final class SpecificationRepository {
         final Term[] subs = new Term[limited.arity()];
         for (int i = 0; i < subs.length; i++) {
             final SchemaVariable argSV = SchemaVariableFactory.createTermSV(new Name("t" + i),
-                    limited.argSort(i), false, false);
+                limited.argSort(i), false, false);
             subs[i] = tb.var(argSV);
         }
         final Term limitedTerm = tb.func(limited, subs);
@@ -154,14 +159,14 @@ public final class SpecificationRepository {
         final RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<>();
         tacletBuilder.setFind(limitedTerm);
         tacletBuilder.addTacletGoalTemplate(new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-                ImmutableSLList.nil(), unlimitedTerm));
+            ImmutableSLList.nil(), unlimitedTerm));
         tacletBuilder.setName(
-                MiscTools.toValidTacletName("unlimit " + getUniqueNameForObserver(unlimited)));
+            MiscTools.toValidTacletName("unlimit " + getUniqueNameForObserver(unlimited)));
         return tacletBuilder.getTaclet();
     }
 
     private static Taclet getUnlimitedToLimitedTaclet(IObserverFunction limited,
-                                                      IObserverFunction unlimited, TermServices services) {
+            IObserverFunction unlimited, TermServices services) {
         assert limited.arity() == unlimited.arity();
 
         final TermBuilder tb = services.getTermBuilder();
@@ -169,7 +174,7 @@ public final class SpecificationRepository {
         final Term[] subs = new Term[limited.arity()];
         for (int i = 0; i < subs.length; i++) {
             final SchemaVariable argSV = SchemaVariableFactory.createTermSV(new Name("t" + i),
-                    limited.argSort(i), false, false);
+                limited.argSort(i), false, false);
             subs[i] = tb.var(argSV);
         }
         final Term limitedTerm = tb.func(limited, subs);
@@ -180,12 +185,12 @@ public final class SpecificationRepository {
         tacletBuilder.setFind(tb.func(unlimited, subs));
         final SequentFormula cf = new SequentFormula(tb.equals(limitedTerm, unlimitedTerm));
         final Sequent addedSeq =
-                Sequent.createAnteSequent(Semisequent.EMPTY_SEMISEQUENT.insertFirst(cf).semisequent());
+            Sequent.createAnteSequent(Semisequent.EMPTY_SEMISEQUENT.insertFirst(cf).semisequent());
         tacletBuilder.addTacletGoalTemplate(new RewriteTacletGoalTemplate(addedSeq,
-                ImmutableSLList.nil(), tb.func(unlimited, subs)));
+            ImmutableSLList.nil(), tb.func(unlimited, subs)));
         tacletBuilder.setApplicationRestriction(RewriteTaclet.IN_SEQUENT_STATE);
         tacletBuilder.setName(
-                MiscTools.toValidTacletName("limit " + getUniqueNameForObserver(unlimited)));
+            MiscTools.toValidTacletName("limit " + getUniqueNameForObserver(unlimited)));
         tacletBuilder.addRuleSet(new RuleSet(new Name("limitObserver")));
 
         return tacletBuilder.getTaclet();
@@ -216,9 +221,8 @@ public final class SpecificationRepository {
         final String name = pm.getMethodDeclaration().getName();
         final int numParams = pm.getParameterDeclarationCount();
         final ImmutableList<IProgramMethod> candidatePMs =
-                services.getJavaInfo().getAllProgramMethods(kjt);
-        outer:
-        for (IProgramMethod candidatePM : candidatePMs) {
+            services.getJavaInfo().getAllProgramMethods(kjt);
+        outer: for (IProgramMethod candidatePM : candidatePMs) {
             if (candidatePM.getMethodDeclaration().getName().equals(name)
                     && candidatePM.getParameterDeclarationCount() == numParams) {
                 for (int i = 0; i < numParams; i++) {
@@ -265,7 +269,7 @@ public final class SpecificationRepository {
     }
 
     public ImmutableSet<TypeObserver> getOverridingTargets(KeYJavaType kjt,
-                                                           IObserverFunction target) {
+            IObserverFunction target) {
         if (target instanceof IProgramMethod) {
             return getOverridingMethods(kjt, (IProgramMethod) target)
                     .stream().map(it -> new TypeObserver(it.first, it.second))
@@ -380,30 +384,30 @@ public final class SpecificationRepository {
                 : "Tried to add a contract with a non-unique name: " + name;
         assert !name.contains(CONTRACT_COMBINATION_MARKER)
                 : "Tried to add a contract with a name containing the" + " reserved character "
-                + CONTRACT_COMBINATION_MARKER + ": " + name;
+                    + CONTRACT_COMBINATION_MARKER + ": " + name;
         assert contract.id() != Contract.INVALID_ID : "Tried to add a contract with an invalid id!";
         contracts.put(targetPair, getContracts(targetKJT, targetMethod).add(contract));
 
         if (contract instanceof FunctionalOperationContract) {
             operationContracts.put(new TypeFunction(targetKJT, (ProgramMethod) targetMethod),
-                    getOperationContracts(targetKJT, (IProgramMethod) targetMethod)
-                            .add((FunctionalOperationContract) contract));
+                getOperationContracts(targetKJT, (IProgramMethod) targetMethod)
+                        .add((FunctionalOperationContract) contract));
             // Create new well-definedness check
             final MethodWellDefinedness mwd =
-                    new MethodWellDefinedness((FunctionalOperationContract) contract, services);
+                new MethodWellDefinedness((FunctionalOperationContract) contract, services);
             registerContract(mwd);
         } else if (contract instanceof DependencyContract && contract.getOrigVars().atPres.isEmpty()
                 && targetMethod.getContainerType()
-                .equals(services.getJavaInfo().getJavaLangObject())) {
+                        .equals(services.getJavaInfo().getJavaLangObject())) {
             // Create or extend a well-definedness check for a class invariant
             final Term deps =
-                    contract.getAccessible(services.getTypeConverter().getHeapLDT().getHeap());
+                contract.getAccessible(services.getTypeConverter().getHeapLDT().getHeap());
             final Term mby = contract.getMby();
             final String invName = "JML model class invariant in " + targetKJT.getName();
             final ClassInvariant inv = new ClassInvariantImpl(invName, invName, targetKJT,
-                    contract.getVisibility(), tb.tt(), contract.getOrigVars().self);
+                contract.getVisibility(), tb.tt(), contract.getOrigVars().self);
             ClassWellDefinedness cwd =
-                    new ClassWellDefinedness(inv, targetMethod, deps, mby, services);
+                new ClassWellDefinedness(inv, targetMethod, deps, mby, services);
             final ImmutableSet<ClassWellDefinedness> cwds = getWdClassChecks(targetKJT);
             if (!cwds.isEmpty()) {
                 assert cwds.size() == 1;
@@ -417,9 +421,9 @@ public final class SpecificationRepository {
                 && contract.getOrigVars().atPres.isEmpty()) {
             // Create or extend a well-definedness check for a model field
             MethodWellDefinedness mwd =
-                    new MethodWellDefinedness((DependencyContract) contract, services);
+                new MethodWellDefinedness((DependencyContract) contract, services);
             final ImmutableSet<MethodWellDefinedness> mwds =
-                    getWdMethodChecks(targetKJT, targetMethod);
+                getWdMethodChecks(targetKJT, targetMethod);
             if (!mwds.isEmpty()) {
                 assert mwds.size() == 1;
                 final MethodWellDefinedness oldMwd = mwds.iterator().next();
@@ -445,10 +449,11 @@ public final class SpecificationRepository {
         contracts.put(tp, contracts.get(tp).remove(contract));
         if (contract instanceof FunctionalOperationContract) {
             final TypeFunction tp2 = new TypeFunction(tp.first, (ProgramMethod) tp.second);
-            operationContracts.put(tp2, operationContracts.get(tp2).remove((FunctionalOperationContract) contract));
+            operationContracts.put(tp2,
+                operationContracts.get(tp2).remove((FunctionalOperationContract) contract));
             if (!getWdChecks(contract.getKJT(), contract.getTarget()).isEmpty()) {
                 ImmutableSet<WellDefinednessCheck> wdcs =
-                        getWdChecks(contract.getKJT(), contract.getTarget());
+                    getWdChecks(contract.getKJT(), contract.getTarget());
                 for (WellDefinednessCheck wdc : wdcs) {
                     if (wdc instanceof MethodWellDefinedness
                             && ((MethodWellDefinedness) wdc).getMethodContract().equals(contract)) {
@@ -480,7 +485,7 @@ public final class SpecificationRepository {
             if (!JMLInfoExtractor.isHelper(pm)) {
                 final ImmutableSet<Contract> oldContracts = getContracts(kjt, pm);
                 ImmutableSet<FunctionalOperationContract> oldFuncContracts =
-                        DefaultImmutableSet.nil();
+                    DefaultImmutableSet.nil();
                 for (Contract old : oldContracts) {
                     if (old instanceof FunctionalOperationContract) {
                         oldFuncContracts = oldFuncContracts.add((FunctionalOperationContract) old);
@@ -532,7 +537,7 @@ public final class SpecificationRepository {
      */
     private void registerWdCheck(WellDefinednessCheck check) {
         ImmutableSet<WellDefinednessCheck> checks =
-                getWdChecks(check.getKJT(), check.getTarget()).add(check);
+            getWdChecks(check.getKJT(), check.getTarget()).add(check);
         wdChecks.put(new TypeWdCheck(check.getKJT(), check.getTarget()), checks);
     }
 
@@ -544,7 +549,7 @@ public final class SpecificationRepository {
      */
     private void unregisterWdCheck(WellDefinednessCheck check) {
         wdChecks.put(new TypeWdCheck(check.getKJT(), check.getTarget()),
-                getWdChecks(check.getKJT(), check.getTarget()).remove(check));
+            getWdChecks(check.getKJT(), check.getTarget()).remove(check));
     }
 
     /**
@@ -565,7 +570,7 @@ public final class SpecificationRepository {
      * Returns all registered (atomic) well-definedness checks for the passed target and kjt.
      */
     private ImmutableSet<WellDefinednessCheck> getWdChecks(KeYJavaType kjt,
-                                                           IObserverFunction target) {
+            IObserverFunction target) {
         assert kjt != null;
         assert target != null;
         target = getCanonicalFormForKJT(target, kjt);
@@ -605,7 +610,7 @@ public final class SpecificationRepository {
      * Returns all registered (atomic) well-definedness method checks for the passed target and kjt.
      */
     private ImmutableSet<MethodWellDefinedness> getWdMethodChecks(KeYJavaType kjt,
-                                                                  IObserverFunction target) {
+            IObserverFunction target) {
         assert kjt != null;
         assert target != null;
         ImmutableSet<MethodWellDefinedness> result = DefaultImmutableSet.nil();
@@ -634,13 +639,13 @@ public final class SpecificationRepository {
     /**
      * Helper for {@link #map(UnaryOperator, Services)}.
      *
-     * @param map      a map.
-     * @param op       an operator.
+     * @param map a map.
+     * @param op an operator.
      * @param services services.
      */
     @SuppressWarnings("unchecked")
     private <K, V extends SpecificationElement> void mapValueSets(Map<K, ImmutableSet<V>> map,
-                                                                  UnaryOperator<Term> op, Services services) {
+            UnaryOperator<Term> op, Services services) {
         for (Entry<K, ImmutableSet<V>> entry : map.entrySet()) {
             final K key = entry.getKey();
             final ImmutableSet<V> oldSet = entry.getValue();
@@ -665,13 +670,13 @@ public final class SpecificationRepository {
     /**
      * Helper for {@link #map(UnaryOperator, Services)}.
      *
-     * @param map      a map.
-     * @param op       an operator.
+     * @param map a map.
+     * @param op an operator.
      * @param services services.
      */
     @SuppressWarnings("unchecked")
     private <K, V extends SpecificationElement> void mapValues(Map<K, V> map,
-                                                               UnaryOperator<Term> op, Services services) {
+            UnaryOperator<Term> op, Services services) {
         for (Entry<K, V> entry : map.entrySet()) {
             final K key = entry.getKey();
             final V oldContract = entry.getValue();
@@ -693,7 +698,7 @@ public final class SpecificationRepository {
     /**
      * Applies the specified operator to every contract in this repository.
      *
-     * @param op       an operator.
+     * @param op an operator.
      * @param services services.
      * @see SpecificationElement#map(java.util.function.UnaryOperator, Services)
      */
@@ -727,7 +732,7 @@ public final class SpecificationRepository {
      */
     public ImmutableSet<Contract> getContracts(KeYJavaType kjt, IObserverFunction target) {
         target =
-                getCanonicalFormForKJT(Objects.requireNonNull(target), Objects.requireNonNull(kjt));
+            getCanonicalFormForKJT(Objects.requireNonNull(target), Objects.requireNonNull(kjt));
         var pair = new TypeObserver(kjt, target);
         final ImmutableSet<Contract> result = WellDefinednessCheck.isOn()
                 ? contracts.get(pair)
@@ -739,7 +744,7 @@ public final class SpecificationRepository {
      * Returns all registered (atomic) operation contracts for the passed operation.
      */
     public ImmutableSet<FunctionalOperationContract> getOperationContracts(KeYJavaType kjt,
-                                                                           IProgramMethod pm) {
+            IProgramMethod pm) {
         pm = (IProgramMethod) getCanonicalFormForKJT(pm, kjt);
         var pair = new TypeFunction(kjt, (ProgramMethod) pm);
         final ImmutableSet<FunctionalOperationContract> result = operationContracts.get(pair);
@@ -785,7 +790,7 @@ public final class SpecificationRepository {
         ImmutableSet<FunctionalOperationContract> baseContracts = DefaultImmutableSet.nil();
         for (String baseName : baseNames) {
             FunctionalOperationContract baseContract =
-                    (FunctionalOperationContract) contractsByName.get(baseName);
+                (FunctionalOperationContract) contractsByName.get(baseName);
             if (baseContract == null) {
                 return null;
             }
@@ -846,7 +851,7 @@ public final class SpecificationRepository {
         registerContract(contract, impls);
         if (!contractTargets.get(contract.getKJT()).contains(contract.getTarget())) {
             throw new IllegalStateException(
-                    "target " + contract.getTarget() + " missing for contract " + contract);
+                "target " + contract.getTarget() + " missing for contract " + contract);
         }
     }
 
@@ -879,7 +884,7 @@ public final class SpecificationRepository {
 
         // sort contracts alphabetically (for determinism)
         FunctionalOperationContract[] contractsArray =
-                toCombine.toArray(new FunctionalOperationContract[toCombine.size()]);
+            toCombine.toArray(new FunctionalOperationContract[toCombine.size()]);
         Arrays.sort(contractsArray, Comparator.comparing(SpecificationElement::getName));
 
         return cf.union(contractsArray);
@@ -926,7 +931,7 @@ public final class SpecificationRepository {
             ClassWellDefinedness cwd = cwds.iterator().next();
             unregisterContract(cwd);
             cwd = cwd.combine(new ClassWellDefinedness(inv, cwd.getTarget(), null, null, services),
-                    services);
+                services);
             registerContract(cwd);
         }
 
@@ -942,13 +947,13 @@ public final class SpecificationRepository {
             for (KeYJavaType sub : subs) {
                 ClassInvariant subInv = inv.setKJT(sub);
                 final IObserverFunction subTarget =
-                        subInv.isStatic() ? services.getJavaInfo().getStaticInv(sub)
-                                : services.getJavaInfo().getInv();
+                    subInv.isStatic() ? services.getJavaInfo().getStaticInv(sub)
+                            : services.getJavaInfo().getInv();
                 invs.put(sub, getClassInvariants(sub).add(subInv));
                 final ImmutableSet<ClassWellDefinedness> subCwds = getWdClassChecks(sub);
                 if (subCwds.isEmpty()) {
                     registerContract(
-                            new ClassWellDefinedness(subInv, subTarget, null, null, services));
+                        new ClassWellDefinedness(subInv, subTarget, null, null, services));
                 } else {
                     for (ClassWellDefinedness cwd : subCwds) {
                         unregisterContract(cwd);
@@ -981,7 +986,7 @@ public final class SpecificationRepository {
                 createContractsFromInitiallyClause(inv, kjt);
                 if (VisibilityModifier.allowsInheritance(inv.getVisibility())) {
                     final ImmutableList<KeYJavaType> subs =
-                            services.getJavaInfo().getAllSubtypes(kjt);
+                        services.getJavaInfo().getAllSubtypes(kjt);
                     for (KeYJavaType sub : subs) {
                         createContractsFromInitiallyClause(inv, sub);
                     }
@@ -1063,7 +1068,7 @@ public final class SpecificationRepository {
                             staticInvDef = tb.and(staticInvDef, inv.getInv(null, services));
                         } else {
                             freeStaticInvDef =
-                                    tb.and(freeStaticInvDef, inv.getInv(selfVar, services));
+                                tb.and(freeStaticInvDef, inv.getInv(selfVar, services));
                         }
                     }
                 }
@@ -1071,9 +1076,9 @@ public final class SpecificationRepository {
                 invDef = tb.tf().createTerm(Equality.EQV, tb.inv(tb.var(selfVar)), invDef);
                 staticInvDef = tb.tf().createTerm(Equality.EQV, tb.staticInv(kjt), staticInvDef);
                 freeInvDef = tb.tf().createTerm(Equality.EQV,
-                        tb.invFree(tb.var(selfVar)), freeInvDef);
+                    tb.invFree(tb.var(selfVar)), freeInvDef);
                 freeStaticInvDef = tb.tf().createTerm(Equality.EQV,
-                        tb.staticInvFree(kjt), freeStaticInvDef);
+                    tb.staticInvFree(kjt), freeStaticInvDef);
 
                 final IObserverFunction invSymbol = services.getJavaInfo().getInv();
                 final IObserverFunction staticInvSymbol = services.getJavaInfo().getStaticInv(kjt);
@@ -1082,24 +1087,24 @@ public final class SpecificationRepository {
                         .getStaticInvFree(kjt);
 
                 final ClassAxiom invRepresentsAxiom =
-                        new RepresentsAxiom("Class invariant axiom for " + kjt.getFullName(), invSymbol,
-                                kjt, new Private(), null, invDef, selfVar, ImmutableSLList.nil(), null);
+                    new RepresentsAxiom("Class invariant axiom for " + kjt.getFullName(), invSymbol,
+                        kjt, new Private(), null, invDef, selfVar, ImmutableSLList.nil(), null);
                 result = result.add(invRepresentsAxiom);
 
                 final ClassAxiom staticInvRepresentsAxiom = new RepresentsAxiom(
-                        "Static class invariant axiom for " + kjt.getFullName(), staticInvSymbol, kjt,
-                        new Private(), null, staticInvDef, null, ImmutableSLList.nil(), null);
+                    "Static class invariant axiom for " + kjt.getFullName(), staticInvSymbol, kjt,
+                    new Private(), null, staticInvDef, null, ImmutableSLList.nil(), null);
                 result = result.add(staticInvRepresentsAxiom);
 
                 final ClassAxiom invFreeRepresentsAxiom = new RepresentsAxiom(
-                        "Free class invariant axiom for " + kjt.getFullName(), freeInvSymbol, kjt,
-                        new Private(), null, freeInvDef, selfVar, ImmutableSLList.nil(), null);
+                    "Free class invariant axiom for " + kjt.getFullName(), freeInvSymbol, kjt,
+                    new Private(), null, freeInvDef, selfVar, ImmutableSLList.nil(), null);
                 result = result.add(invFreeRepresentsAxiom);
 
                 final ClassAxiom staticFreeInvRepresentsAxiom = new RepresentsAxiom(
-                        "Free static class invariant axiom for " + kjt.getFullName(),
-                        freeStaticInvSymbol, kjt, new Private(), null, freeStaticInvDef, null,
-                        ImmutableSLList.nil(), null);
+                    "Free static class invariant axiom for " + kjt.getFullName(),
+                    freeStaticInvSymbol, kjt, new Private(), null, freeStaticInvDef, null,
+                    ImmutableSLList.nil(), null);
                 result = result.add(staticFreeInvRepresentsAxiom);
 
             }
@@ -1115,7 +1120,7 @@ public final class SpecificationRepository {
                     }
 
                     final ClassAxiom queryAxiom = new QueryAxiom("Query axiom for " + pm.getName()
-                            + "_" + sb + " in " + selfKjt.getFullName(), pm, selfKjt);
+                        + "_" + sb + " in " + selfKjt.getFullName(), pm, selfKjt);
                     result = result.add(queryAxiom);
                 }
             }
@@ -1144,7 +1149,7 @@ public final class SpecificationRepository {
                     List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
                     for (LocationVariable heap : heaps) {
                         atPreVars.put(heap,
-                                tb.atPreVar(heap.name().toString(), heap.sort(), false));
+                            tb.atPreVar(heap.name().toString(), heap.sort(), false));
                     }
                     ProgramVariable resultVar = tb.resultVar(pm, false);
 
@@ -1153,10 +1158,10 @@ public final class SpecificationRepository {
                     // We need to construct an inheritance chain of contracts
                     // starting at the bottom
                     ImmutableList<FunctionalOperationContract> lookupContracts =
-                            ImmutableSLList.nil();
+                        ImmutableSLList.nil();
                     ImmutableSet<FunctionalOperationContract> cs = getOperationContracts(kjt, pm);
                     ImmutableList<KeYJavaType> superTypes =
-                            services.getJavaInfo().getAllSupertypes(kjt);
+                        services.getJavaInfo().getAllSupertypes(kjt);
                     for (KeYJavaType superType : superTypes) {
                         for (FunctionalOperationContract fop : cs) {
                             if (fop.getSpecifiedIn().equals(superType)) {
@@ -1166,9 +1171,9 @@ public final class SpecificationRepository {
                     }
                     for (FunctionalOperationContract fop : lookupContracts) {
                         Term representsFromContract = fop.getRepresentsAxiom(heaps.get(0), selfVar,
-                                paramVars, tb.resultVar(pm, false), atPreVars, services);
+                            paramVars, tb.resultVar(pm, false), atPreVars, services);
                         Term preContract =
-                                fop.getPre(heaps, selfVar, paramVars, atPreVars, services);
+                            fop.getPre(heaps, selfVar, paramVars, atPreVars, services);
                         if (preContract == null) {
                             preContract = tb.tt();
                         }
@@ -1180,11 +1185,11 @@ public final class SpecificationRepository {
                             // (pm.isProtected() ? new Protected() :
                             // (pm.isPublic() ? new Public() : null));
                             final ClassAxiom modelMethodRepresentsAxiom =
-                                    new RepresentsAxiom(
-                                            "Definition axiom for " + pm.getName() + " in "
-                                                    + kjt.getFullName(),
-                                            pm, kjt, new Private(), preContract, representsFromContract,
-                                            selfVar, paramVars, atPreVars);
+                                new RepresentsAxiom(
+                                    "Definition axiom for " + pm.getName() + " in "
+                                        + kjt.getFullName(),
+                                    pm, kjt, new Private(), preContract, representsFromContract,
+                                    selfVar, paramVars, atPreVars);
                             result = result.add(modelMethodRepresentsAxiom);
                             break;
                         }
@@ -1194,24 +1199,24 @@ public final class SpecificationRepository {
                             continue;
                         }
                         Term preFromContract =
-                                fop.getPre(heaps, selfVar, paramVars, atPreVars, services);
+                            fop.getPre(heaps, selfVar, paramVars, atPreVars, services);
                         Term freePreFromContract =
-                                fop.getFreePre(heaps, selfVar, paramVars, atPreVars, services);
+                            fop.getFreePre(heaps, selfVar, paramVars, atPreVars, services);
                         Term postFromContract = fop.getPost(heaps, selfVar, paramVars, resultVar,
-                                null, atPreVars, services);
+                            null, atPreVars, services);
                         Term freePostFromContract = fop.getFreePost(heaps, selfVar, paramVars,
-                                resultVar, null, atPreVars, services);
+                            resultVar, null, atPreVars, services);
                         if (preFromContract != null
                                 && ((postFromContract != null && postFromContract != tb.tt())
-                                || (freePostFromContract != null
-                                && freePostFromContract != tb.tt()))) {
+                                        || (freePostFromContract != null
+                                                && freePostFromContract != tb.tt()))) {
                             Term mbyFromContract =
-                                    fop.hasMby() ? fop.getMby(selfVar, paramVars, services) : null;
+                                fop.hasMby() ? fop.getMby(selfVar, paramVars, services) : null;
                             final ClassAxiom modelMethodContractAxiom = new ContractAxiom(
-                                    "Contract axiom for " + pm.getName() + " in " + kjt.getName(), pm,
-                                    kjt, new Private(), preFromContract, freePreFromContract,
-                                    postFromContract, freePostFromContract, mbyFromContract, atPreVars,
-                                    selfVar, resultVar, paramVars);
+                                "Contract axiom for " + pm.getName() + " in " + kjt.getName(), pm,
+                                kjt, new Private(), preFromContract, freePreFromContract,
+                                postFromContract, freePostFromContract, mbyFromContract, atPreVars,
+                                selfVar, resultVar, paramVars);
                             result = result.add(modelMethodContractAxiom);
                         }
                     }
@@ -1311,14 +1316,15 @@ public final class SpecificationRepository {
      * Returns all proofs registered for the passed target and its overriding targets.
      */
     public ImmutableSet<Proof> getProofs(KeYJavaType kjt, IObserverFunction target) {
-        ImmutableSet<TypeObserver> targets = getOverridingTargets(kjt, target).add(new TypeObserver(kjt, target));
+        ImmutableSet<TypeObserver> targets =
+            getOverridingTargets(kjt, target).add(new TypeObserver(kjt, target));
         ImmutableSet<Proof> result = DefaultImmutableSet.nil();
         for (Map.Entry<ProofOblInput, ImmutableSet<Proof>> entry : proofs.entrySet()) {
             final ProofOblInput po = entry.getKey();
             final ImmutableSet<Proof> sop = entry.getValue();
             if (po instanceof ContractPO) {
                 final Contract contract = ((ContractPO) po).getContract();
-                var  pair = new TypeObserver(contract.getKJT(), contract.getTarget());
+                var pair = new TypeObserver(contract.getKJT(), contract.getTarget());
                 if (targets.contains(pair)) {
                     result = result.union(sop);
                 }
@@ -1379,7 +1385,7 @@ public final class SpecificationRepository {
      *
      * @param proof The {@link Proof}.
      * @return The {@link ProofOblInput} of the given {@link Proof} or {@code null} if not
-     * available.
+     *         available.
      */
     public ProofOblInput getProofOblInput(Proof proof) {
         for (Map.Entry<ProofOblInput, ImmutableSet<Proof>> entry : proofs.entrySet()) {
@@ -1445,7 +1451,7 @@ public final class SpecificationRepository {
      * overwritten, a registration for the original loop remains untouched.
      *
      * @param from the loop with the original contract
-     * @param to   the loop for which the contract is to be copied
+     * @param to the loop for which the contract is to be copied
      */
     public void copyLoopInvariant(LoopStatement from, LoopStatement to) {
         LoopSpecification inv = getLoopSpec(from);
@@ -1530,7 +1536,7 @@ public final class SpecificationRepository {
     /**
      * Returns block contracts for according block statement and modality.
      *
-     * @param block    the given block.
+     * @param block the given block.
      * @param modalityKind the given modality.
      * @return
      */
@@ -1563,7 +1569,7 @@ public final class SpecificationRepository {
     /**
      * Returns loop contracts for according loop statement and modality.
      *
-     * @param loop     the given loop.
+     * @param loop the given loop.
      * @param modalityKind the given modality.
      * @return the set of resulting loop statements.
      */
@@ -1592,9 +1598,9 @@ public final class SpecificationRepository {
     /**
      * Adds a new {@code BlockContract} to the repository.
      *
-     * @param contract              the {@code BlockContract} to add.
+     * @param contract the {@code BlockContract} to add.
      * @param addFunctionalContract whether or not to add a new {@link FunctionalBlockContract}
-     *                              based on {@code contract}.
+     *        based on {@code contract}.
      */
     public void addBlockContract(final BlockContract contract, boolean addFunctionalContract) {
         final StatementBlock block = contract.getBlock();
@@ -1637,9 +1643,9 @@ public final class SpecificationRepository {
     /**
      * Adds a new {@code LoopContract} to the repository.
      *
-     * @param contract              the {@code LoopContract} to add.
+     * @param contract the {@code LoopContract} to add.
      * @param addFunctionalContract whether or not to add a new {@link FunctionalLoopContract} based
-     *                              on {@code contract}.
+     *        on {@code contract}.
      */
     public void addLoopContract(final LoopContract contract, boolean addFunctionalContract) {
         if (contract.isOnBlock()) {
@@ -1747,11 +1753,11 @@ public final class SpecificationRepository {
 
         if (limited == null) {
             final String baseName =
-                    ((ProgramElementName) obs.name()).getProgramName() + LIMIT_SUFFIX;
+                ((ProgramElementName) obs.name()).getProgramName() + LIMIT_SUFFIX;
             final Sort heapSort = services.getTypeConverter().getHeapLDT().targetSort();
             limited = new ObserverFunction(baseName, obs.sort(), obs.getType(), heapSort,
-                    obs.getContainerType(), obs.isStatic(), obs.getParamTypes(),
-                    obs.getHeapCount(services), obs.getStateCount());
+                obs.getContainerType(), obs.isStatic(), obs.getParamTypes(),
+                obs.getHeapCount(services), obs.getStateCount());
             unlimitedToLimited.put(obs, limited);
             limitedToUnlimited.put(limited, obs);
 

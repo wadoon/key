@@ -3,13 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.slicing;
 
-import de.uka.ilkd.key.rule.Rule;
-
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+
+import de.uka.ilkd.key.rule.Rule;
 
 /**
  * Simple data object to store a mapping of rules to various counters.
@@ -31,21 +30,21 @@ public class RuleStatistics {
     /**
      * Register one rule application (proof step).
      *
-     * @param rule     the rule
+     * @param rule the rule
      * @param branches whether this rule application creates new proof branches
      */
     public void addApplication(Rule rule, boolean branches) {
         String name = rule.displayName();
         ruleBranched.put(name, branches);
 
-        var entry = map.computeIfAbsent(name, it -> new RuleStatisticData(it,0, 0, 0));
-        map.put(name, new RuleStatisticData(name,entry.first + 1, entry.second, entry.third));
+        var entry = map.computeIfAbsent(name, it -> new RuleStatisticData(it, 0, 0, 0));
+        map.put(name, new RuleStatisticData(name, entry.first + 1, entry.second, entry.third));
     }
 
     /**
      * Register a useless rule application (proof step).
      *
-     * @param rule     the rule
+     * @param rule the rule
      * @param branches whether this rule application creates new proof branches
      */
     public void addUselessApplication(Rule rule, boolean branches) {
@@ -59,7 +58,7 @@ public class RuleStatistics {
     /**
      * Register an "initial useless" rule application (proof step).
      *
-     * @param rule     the rule
+     * @param rule the rule
      * @param branches whether this rule application creates new proof branches
      */
     public void addInitialUselessApplication(Rule rule, boolean branches) {
@@ -67,7 +66,8 @@ public class RuleStatistics {
         ruleBranched.put(name, branches);
 
         var entry = map.computeIfAbsent(name, it -> new RuleStatisticData(it, 0, 0, 0));
-        map.put(name, new RuleStatisticData(name, entry.first + 1, entry.second + 1, entry.third + 1));
+        map.put(name,
+            new RuleStatisticData(name, entry.first + 1, entry.second + 1, entry.third + 1));
     }
 
     /**

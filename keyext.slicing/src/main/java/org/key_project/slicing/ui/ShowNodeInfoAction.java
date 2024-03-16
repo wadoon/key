@@ -20,7 +20,6 @@ import org.key_project.slicing.DependencyTracker;
 import org.key_project.slicing.analysis.AnalysisResults;
 import org.key_project.slicing.graph.DependencyGraph;
 import org.key_project.slicing.graph.GraphNode;
-import org.key_project.util.collection.Pair;
 
 /**
  * Context menu action to show information on a dependency graph node (incoming / outgoing edges).

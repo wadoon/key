@@ -12,7 +12,6 @@ import de.uka.ilkd.key.speclang.Contract;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.Pair;
 
 public abstract class AbstractContractRuleApp extends AbstractBuiltInRuleApp {
 
@@ -48,7 +47,9 @@ public abstract class AbstractContractRuleApp extends AbstractBuiltInRuleApp {
             if (!target.equals(observerFunctionAtPos)) {
 
                 if (!specRepo.getOverridingTargets(observerFunctionAtPos.getContainerType(),
-                    observerFunctionAtPos).contains(new SpecificationRepository.TypeObserver(target.getContainerType(), target))) {
+                    observerFunctionAtPos).contains(
+                        new SpecificationRepository.TypeObserver(target.getContainerType(),
+                            target))) {
                     return null;
                 }
             }

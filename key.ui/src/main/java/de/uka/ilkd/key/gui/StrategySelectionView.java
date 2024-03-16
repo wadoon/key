@@ -418,7 +418,8 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
                 newProps =
                     DEFINITION.getDefaultPropertiesFactory().createDefaultStrategyProperties();
             } else {
-                StrategySettingsDefinition.StdDefault chosenDefault = DEFINITION.getFurtherDefaults().get(selIndex - 1);
+                StrategySettingsDefinition.StdDefault chosenDefault =
+                    DEFINITION.getFurtherDefaults().get(selIndex - 1);
                 newMaxSteps = chosenDefault.second();
                 newProps = chosenDefault.third().createDefaultStrategyProperties();
             }

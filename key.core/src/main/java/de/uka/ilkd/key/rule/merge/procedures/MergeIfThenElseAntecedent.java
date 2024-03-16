@@ -103,8 +103,8 @@ public class MergeIfThenElseAntecedent extends MergeProcedure
 
         if (distinguishingFormula == null) {
             MergeByIfThenElse.DistForm distFormAndRightSidesForITEUpd =
-                    MergeByIfThenElse.createDistFormAndRightSidesForITEUpd(state1, state2, ifTerm,
-                            elseTerm, services);
+                MergeByIfThenElse.createDistFormAndRightSidesForITEUpd(state1, state2, ifTerm,
+                    elseTerm, services);
 
             final Term cond = distFormAndRightSidesForITEUpd.first();
             final Term ifForm = distFormAndRightSidesForITEUpd.second();
