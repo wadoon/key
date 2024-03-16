@@ -18,6 +18,7 @@ import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.Pair;
 
 /**
  * Completion class for {@link MergeWithPredicateAbstraction}.

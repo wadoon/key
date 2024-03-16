@@ -25,12 +25,21 @@ import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
+import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.macros.WellDefinednessMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
@@ -41,10 +50,12 @@ import de.uka.ilkd.key.speclang.LoopWellDefinedness;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NonNull;
 
@@ -83,7 +94,8 @@ public final class WhileInvariantRule implements BuiltInRule {
         // create heap_Before_LOOP
         HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         Name heapAtPreName = new Name(tb.newName(baseHeap + "_Before_LOOP"));
-        final Function heapAtPreFunc = new Function(heapAtPreName, heapLDT.targetSort(), true);
+        final JFunction heapAtPreFunc =
+            new JFunction(heapAtPreName, heapLDT.targetSort(), true);
         services.getNamespaces().functions().addSafely(heapAtPreFunc);
         final Term heapAtPre = tb.func(heapAtPreFunc);
 
@@ -210,7 +222,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         final TermBuilder tb = services.getTermBuilder();
         for (ProgramVariable pv : localOuts) {
             final Name anonFuncName = new Name(tb.newName(pv.name().toString()));
-            final Function anonFunc = new Function(anonFuncName, pv.sort(), true);
+            final JFunction anonFunc = new JFunction(anonFuncName, pv.sort(), true);
             services.getNamespaces().functions().addSafely(anonFunc);
             final Term elemUpd = tb.elementary((LocationVariable) pv, tb.func(anonFunc));
             if (anonUpdate == null) {
@@ -230,12 +242,13 @@ public final class WhileInvariantRule implements BuiltInRule {
         final TermBuilder tb = services.getTermBuilder();
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         final Name loopHeapName = new Name(tb.newName(heap + "_After_LOOP"));
-        final Function loopHeapFunc = new Function(loopHeapName, heapLDT.targetSort(), true);
+        final JFunction loopHeapFunc =
+            new JFunction(loopHeapName, heapLDT.targetSort(), true);
         services.getNamespaces().functions().addSafely(loopHeapFunc);
 
         final Term loopHeap = tb.func(loopHeapFunc);
         final Name anonHeapName = new Name(tb.newName("anon_" + heap + "_LOOP"));
-        final Function anonHeapFunc = new Function(anonHeapName, heap.sort());
+        final JFunction anonHeapFunc = new JFunction(anonHeapName, heap.sort());
         services.getNamespaces().functions().addSafely(anonHeapFunc);
         final Term anonHeapTerm =
             tb.label(tb.func(anonHeapFunc), ParameterlessTermLabel.ANON_HEAP_LABEL);
@@ -485,10 +498,11 @@ public final class WhileInvariantRule implements BuiltInRule {
             TermServices services) {
         final TermBuilder tb = services.getTermBuilder();
         final ProgramElementName variantName = new ProgramElementName(tb.newName("variant"));
-        final LocationVariable variantPV = new LocationVariable(variantName, Sort.ANY);
+        final LocationVariable variantPV = new LocationVariable(variantName, JavaDLTheory.ANY);
         services.getNamespaces().programVariables().addSafely(variantPV);
 
-        final boolean dia = ((Modality) inst.progPost.op()).terminationSensitive();
+        Modality modality = ((Modality) inst.progPost.op());
+        final boolean dia = modality.<Modality.JavaModalityKind>kind().terminationSensitive();
         final Term variantUpdate = dia ? tb.elementary(variantPV, variant) : tb.skip();
         final Term variantPO = dia ? tb.prec(variant, tb.var(variantPV)) : tb.tt();
         return new UpdateData(variantUpdate, variantPO);
@@ -531,13 +545,16 @@ public final class WhileInvariantRule implements BuiltInRule {
         final TermBuilder tb = services.getTermBuilder();
         JavaBlock useJavaBlock =
             JavaTools.removeActiveStatement(inst.progPost.javaBlock(), services);
+        var mod = (Modality) inst.progPost.op();
         final ImmutableArray<TermLabel> instantiateLabels = TermLabelManager.instantiateLabels(
             termLabelState, services, ruleApp.posInOccurrence(), this, ruleApp, useGoal,
             "UseModality", null,
-            tb.tf().createTerm(inst.progPost.op(), new ImmutableArray<>(inst.progPost.sub(0)),
-                null, useJavaBlock, inst.progPost.getLabels()));
-        Term restPsi = tb.prog((Modality) inst.progPost.op(), useJavaBlock, inst.progPost.sub(0),
-            instantiateLabels);
+            tb.tf().createTerm(Modality.getModality(mod.kind(), useJavaBlock),
+                new ImmutableArray<>(inst.progPost.sub(0)),
+                null, inst.progPost.getLabels()));
+        Term restPsi =
+            tb.prog(mod.kind(), useJavaBlock, inst.progPost.sub(0),
+                instantiateLabels);
         return tb.box(guardJb, tb.imp(guardFalseTerm, restPsi));
     }
 
@@ -942,9 +959,9 @@ public final class WhileInvariantRule implements BuiltInRule {
         public Instantiation(Term u, Term progPost, While loop, LoopSpecification inv,
                 Term selfTerm, ExecutionContext innermostExecutionContext) {
             assert u != null;
-            assert u.sort() == Sort.UPDATE;
+            assert u.sort() == JavaDLTheory.UPDATE;
             assert progPost != null;
-            assert progPost.sort() == Sort.FORMULA;
+            assert progPost.sort() == JavaDLTheory.FORMULA;
             assert loop != null;
             assert inv != null;
             this.u = u;

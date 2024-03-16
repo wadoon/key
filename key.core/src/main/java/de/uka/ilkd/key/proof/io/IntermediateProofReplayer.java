@@ -17,6 +17,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.nparser.KeyIO;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -41,10 +42,14 @@ import de.uka.ilkd.key.util.ProgressMonitor;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionStateWithProgCnt;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.Named;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
@@ -912,7 +917,7 @@ public class IntermediateProofReplayer {
      * @throws ParserException In case of an error.
      */
     public static Term parseTerm(String value, Proof proof, Namespace<QuantifiableVariable> varNS,
-            Namespace<IProgramVariable> progVarNS, Namespace<Function> functNS) {
+            Namespace<IProgramVariable> progVarNS, Namespace<JFunction> functNS) {
         var io = new KeyIO(proof.getServices(),
             new NamespaceSet(varNS, functNS, proof.getNamespaces().sorts(), new Namespace<>(),
                 new Namespace<>(), progVarNS));
@@ -978,7 +983,7 @@ public class IntermediateProofReplayer {
             Namespace<QuantifiableVariable> varNS = p.getNamespaces().variables();
             Namespace<IProgramVariable> prgVarNS =
                 targetGoal.getLocalNamespaces().programVariables();
-            Namespace<Function> funcNS = targetGoal.getLocalNamespaces().functions();
+            Namespace<JFunction> funcNS = targetGoal.getLocalNamespaces().functions();
             varNS = app.extendVarNamespaceForSV(varNS, sv);
             Term instance = parseTerm(value, p, varNS, prgVarNS, funcNS);
             result = app.addCheckedInstantiation(sv, instance, services, true);

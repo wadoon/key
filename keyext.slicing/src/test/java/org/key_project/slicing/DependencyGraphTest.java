@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.key_project.slicing.DependencyTracker.ConsumedNode;
 import org.key_project.slicing.graph.DependencyGraph;
+import org.key_project.util.collection.Pair;
 
 import org.junit.jupiter.api.Test;
 

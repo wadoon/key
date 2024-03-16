@@ -35,9 +35,11 @@ import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
 
+import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Pair;
 import org.key_project.util.java.CollectionUtil;
 
 /**
@@ -190,7 +192,7 @@ public final class SymbolicExecutionSideProofUtil {
                 Term result = null;
                 for (SequentFormula sf : sequent.antecedent()) {
                     if (newPredicateIsSequentFormula) {
-                        if (sf.formula().op() == operator) {
+                        if (Operator.opEquals(sf.formula().op(), operator)) {
                             throw new IllegalStateException(
                                 "Result predicate found in antecedent.");
                         } else {
@@ -211,7 +213,7 @@ public final class SymbolicExecutionSideProofUtil {
                 }
                 for (SequentFormula sf : sequent.succedent()) {
                     if (newPredicateIsSequentFormula) {
-                        if (sf.formula().op() == operator) {
+                        if (Operator.opEquals(sf.formula().op(), operator)) {
                             if (result != null) {
                                 throw new IllegalStateException(
                                     "Result predicate found multiple times in succedent.");
@@ -257,7 +259,7 @@ public final class SymbolicExecutionSideProofUtil {
 
     private static Term constructResultIfContained(Services services, Term term,
             Operator operator) {
-        if (term.op() == operator) {
+        if (Operator.opEquals(term.op(), operator)) {
             return term.sub(0);
         } else {
             Term result = null;
@@ -276,7 +278,7 @@ public final class SymbolicExecutionSideProofUtil {
                     }
                 }
                 result = services.getTermFactory().createTerm(term.op(),
-                    new ImmutableArray<>(newSubs), term.boundVars(), term.javaBlock(),
+                    new ImmutableArray<>(newSubs), term.boundVars(),
                     term.getLabels());
             }
             return result;
@@ -285,7 +287,7 @@ public final class SymbolicExecutionSideProofUtil {
 
     private static boolean isOperatorASequentFormula(Sequent sequent, final Operator operator) {
         return CollectionUtil.search(sequent,
-            element -> element.formula().op() == operator) != null;
+            element -> Operator.opEquals(element.formula().op(), operator)) != null;
     }
 
     /**
@@ -296,14 +298,14 @@ public final class SymbolicExecutionSideProofUtil {
      * @param term The {@link Term} to check its {@link Name}s.
      */
     public static void addNewNamesToNamespace(Services services, Term term) {
-        final Namespace<Function> functions = services.getNamespaces().functions();
+        final Namespace<JFunction> functions = services.getNamespaces().functions();
         final Namespace<IProgramVariable> progVars = services.getNamespaces().programVariables();
         // LogicVariables are always local bound
         term.execPreOrder(new DefaultVisitor() {
             @Override
             public void visit(Term visited) {
-                if (visited.op() instanceof Function) {
-                    functions.add((Function) visited.op());
+                if (visited.op() instanceof JFunction) {
+                    functions.add((JFunction) visited.op());
                 } else if (visited.op() instanceof IProgramVariable) {
                     progVars.add((IProgramVariable) visited.op());
                 }
@@ -340,7 +342,7 @@ public final class SymbolicExecutionSideProofUtil {
      *
      * @author Martin Hentschel
      */
-    protected static class ContainsModalityOrQueryVisitor extends DefaultVisitor {
+    protected static class ContainsModalityOrQueryVisitor implements DefaultVisitor {
         /**
          * The result.
          */
@@ -408,7 +410,7 @@ public final class SymbolicExecutionSideProofUtil {
     private static boolean isRelevantThing(Services services, Term term) {
         if (term.op() instanceof IProgramVariable) {
             return true;
-        } else if (term.op() instanceof Function) {
+        } else if (term.op() instanceof JFunction) {
             HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
             if (SymbolicExecutionUtil.isHeap(term.op(), heapLDT)) {
                 return true;
@@ -490,7 +492,7 @@ public final class SymbolicExecutionSideProofUtil {
      *
      * @author Martin Hentschel
      */
-    protected static class ContainsIrrelevantThingsVisitor extends DefaultVisitor {
+    protected static class ContainsIrrelevantThingsVisitor implements DefaultVisitor {
         /**
          * The {@link Services} to use.
          */

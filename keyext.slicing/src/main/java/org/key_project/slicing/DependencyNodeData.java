@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.key_project.slicing.graph.GraphNode;
+import org.key_project.util.collection.Pair;
 
 /**
  * Stores the dependency graph nodes touched by a proof step.

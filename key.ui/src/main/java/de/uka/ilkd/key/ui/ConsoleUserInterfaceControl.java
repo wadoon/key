@@ -44,6 +44,7 @@ import de.uka.ilkd.key.util.MiscTools;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Pair;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

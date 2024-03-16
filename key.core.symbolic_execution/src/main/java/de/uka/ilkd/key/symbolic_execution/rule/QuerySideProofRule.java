@@ -6,7 +6,6 @@ package de.uka.ilkd.key.symbolic_execution.rule;
 import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
@@ -14,15 +13,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Transformer;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.BuiltInRule;
@@ -33,6 +24,8 @@ import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -225,7 +218,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
             final Services sideProofServices = sideProofEnv.getServicesForEnvironment();
             Sequent sequentToProve = SymbolicExecutionSideProofUtil
                     .computeGeneralSequentToProve(goalSequent, equalitySF);
-            Function newPredicate = createResultFunction(sideProofServices, queryTerm.sort());
+            JFunction newPredicate = createResultFunction(sideProofServices, queryTerm.sort());
             Term newTerm = sideProofServices.getTermBuilder().func(newPredicate, queryTerm);
             sequentToProve =
                 sequentToProve.addFormula(new SequentFormula(newTerm), false, false).sequent();
@@ -252,7 +245,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
                     resultGoal.addFormula(new SequentFormula(resultTerm), pio.isInAntec(), false);
                 }
             } else {
-                Function resultFunction = createResultConstant(services, varTerm.sort());
+                JFunction resultFunction = createResultConstant(services, varTerm.sort());
                 Term resultFunctionTerm = tb.func(resultFunction);
                 resultGoal.addFormula(
                     replace(pio,
