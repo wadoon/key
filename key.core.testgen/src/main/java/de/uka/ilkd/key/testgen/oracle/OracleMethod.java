@@ -5,13 +5,13 @@ package de.uka.ilkd.key.testgen.oracle;
 
 import java.util.List;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.sort.Sort;
 
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeName;
+import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.testgen.template.Constants.TAB;
 
@@ -59,7 +59,7 @@ public class OracleMethod {
 
         Iterable<ParameterSpec> params = args.stream().map(
             it -> ParameterSpec.builder(ClassName.get("", it.sort().name().toString()),
-                    it.name()).build()).toList();
+                it.name()).build()).toList();
 
         var m = MethodSpec.methodBuilder(methodName)
                 .returns(retType)
@@ -70,7 +70,6 @@ public class OracleMethod {
 
     @Override
     public String toString() {
-        String tab = TAB;
         StringBuilder argString = new StringBuilder();
 
         for (OracleVariable var : args) {
@@ -84,8 +83,8 @@ public class OracleMethod {
         if (returnType != null) {
             retType = returnType.name().toString();
         }
-        return tab + "public " + retType + " " + methodName + "(" + argString + "){\n" + tab + tab
-            + body + "\n" + tab + "}";
+        return "%spublic %s %s(%s){\n%s%s%s\n%s}".formatted(TAB, retType, methodName, argString,
+            TAB, TAB, body, TAB);
 
     }
 }

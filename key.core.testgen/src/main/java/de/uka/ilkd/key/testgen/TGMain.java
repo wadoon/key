@@ -16,7 +16,7 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.testgen.settings.TestGenerationSettings;
-import de.uka.ilkd.key.testgen.smt.testgen.TestGenerationLog;
+import de.uka.ilkd.key.testgen.smt.testgen.TestGenerationLogger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,7 +75,7 @@ public class TGMain implements Callable<Integer> {
         }
 
         var settings = new TestGenerationSettings();
-        TestGenerationLog log = new SysoutTestGenerationLog();
+        TestGenerationLogger log = new SysoutTestGenerationLogger();
         settings.setOutputPath(outputFolder.getAbsolutePath());
         settings.setRFL(useReflection);
         settings.setFormat(format);
@@ -115,19 +115,19 @@ public class TGMain implements Callable<Integer> {
         return 0;
     }
 
-    private static class SysoutTestGenerationLog implements TestGenerationLog {
+    private static class SysoutTestGenerationLogger implements TestGenerationLogger {
         @Override
-        public void writeln(String string) {
-            LOGGER.info(string);
+        public void writeln(String message) {
+            LOGGER.info(message);
         }
 
         @Override
-        public void writeException(Throwable t) {
-            LOGGER.error("Error occurred!", t);
+        public void writeException(Throwable throwable) {
+            LOGGER.error("Error occurred!", throwable);
         }
 
         @Override
-        public void testGenerationCompleted() {
+        public void close() {
         }
     }
 }
