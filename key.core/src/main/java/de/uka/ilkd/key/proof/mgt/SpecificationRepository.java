@@ -7,6 +7,7 @@ import java.net.URI;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
@@ -1867,6 +1868,29 @@ public final class SpecificationRepository {
 
     public JmlStatementSpec addStatementSpec(Statement statement, JmlStatementSpec spec) {
         return statementMap.put(statement, spec);
+    }
+
+    public Map<Triple<StatementBlock, URI, Integer>, ImmutableSet<LoopContract>> getLoopContracts() {
+        return loopContracts;
+    }
+
+    public Map<String, ImmutableSet<Contract>> getContracts() {
+        return contracts.entrySet().stream()
+                .collect(Collectors.toMap(
+                        it -> it.getKey().first.getFullName(),
+                        Entry::getValue));
+    }
+
+    public Map<KeYJavaType, ImmutableSet<ClassInvariant>> getClassInvariants() {
+        return invs;
+    }
+
+    public Map<Triple<StatementBlock, URI, Integer>, ImmutableSet<BlockContract>> getBlockContracts() {
+        return blockContracts;
+    }
+
+    public Map<Pair<LoopStatement, Integer>, LoopSpecification> getLoopSpec() {
+        return loopInvs;
     }
 
     /**
