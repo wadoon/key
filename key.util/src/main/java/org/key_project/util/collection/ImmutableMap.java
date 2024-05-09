@@ -10,6 +10,7 @@ import java.util.Iterator;
 /**
  * This interface has to be implemented by a Class providing a persistent Map.
  */
+@SuppressWarnings("type.argument.type.incompatible")
 public interface ImmutableMap<S, T>
         extends Iterable<ImmutableMapEntry<S, T>> {
 

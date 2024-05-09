@@ -7,3 +7,19 @@ dependencies {
     implementation "info.picocli:picocli:4.7.5"
 }
 
+checkerFramework {
+    if(System.getProperty("ENABLE_NULLNESS")) {
+        checkers = [
+                "org.checkerframework.checker.nullness.NullnessChecker",
+        ]
+        extraJavacArgs = [
+                "-AonlyDefs=^org\\.key_project\\.util",
+                "-Xmaxerrs", "10000",
+                "-Astubs=$rootDir/key.util/src/main/checkerframework:permit-nullness-assertion-exception.astub",
+                "-AstubNoWarnIfNotFound",
+                "-Werror",
+                "-Aversion",
+        ]
+    }
+}
+
