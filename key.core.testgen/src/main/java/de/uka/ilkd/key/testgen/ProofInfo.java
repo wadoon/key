@@ -3,9 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.testgen;
 
-import java.util.Objects;
-import java.util.Set;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
@@ -22,12 +19,13 @@ import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
-
-import org.key_project.logic.sort.Sort;
-
 import org.jspecify.annotations.Nullable;
+import org.key_project.logic.sort.Sort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Objects;
+import java.util.Set;
 
 public record ProofInfo(Proof proof, Services services) {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofInfo.class);
@@ -68,8 +66,9 @@ public record ProofInfo(Proof proof, Services services) {
         }
 
         String caller;
-        if (m.isStatic()) {
-            caller = getTypeOfClassUnderTest().getName();
+        final var type = getTypeOfClassUnderTest();
+        if (m.isStatic() && type != null) {
+            caller = type.getName();
         } else {
             caller = "self";
         }
@@ -84,15 +83,16 @@ public record ProofInfo(Proof proof, Services services) {
 
     @Nullable
     public KeYJavaType getTypeOfClassUnderTest() {
-        if (getMUT() == null) {
+        final var mut = getMUT();
+        if (mut == null) {
             return null;
         }
-        return getMUT().getContainerType();
+        return mut.getContainerType();
     }
 
     @Nullable
     public KeYJavaType getReturnType() {
-        var mut =  getMUT();
+        var mut = getMUT();
         return mut != null ? mut.getType() : null;
     }
 
@@ -138,7 +138,9 @@ public record ProofInfo(Proof proof, Services services) {
         l.beginC(0);
         l.print(" ").print(getUpdate(f)).nl();
         PrettyPrinter p = new PrettyPrinter(l);
-        block.program().visit(p);
+        if (block != null) {
+            block.program().visit(p);
+        }
         l.end();
         return p.result();
     }
@@ -218,7 +220,8 @@ public record ProofInfo(Proof proof, Services services) {
         return result.toString();
     }
 
-    public JavaBlock getJavaBlock(Term t) {
+
+    public @Nullable JavaBlock getJavaBlock(Term t) {
         if (t.containsJavaBlockRecursive()) {
             if (!t.javaBlock().isEmpty()) {
                 return t.javaBlock();

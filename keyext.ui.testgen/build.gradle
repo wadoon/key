@@ -12,7 +12,7 @@ checkerFramework {
                 "org.checkerframework.checker.nullness.NullnessChecker",
         ]
         extraJavacArgs = [
-                "-AonlyDefs=^org\\.key_project\\.util",
+                //"-AonlyDefs=^org\\.key_project\\.util",
                 "-Xmaxerrs", "10000",
                 "-Astubs=$rootDir/key.util/src/main/checkerframework:permit-nullness-assertion-exception.astub",
                 "-AstubNoWarnIfNotFound",

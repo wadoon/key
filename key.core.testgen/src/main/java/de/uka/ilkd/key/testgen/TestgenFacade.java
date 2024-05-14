@@ -24,8 +24,6 @@ import de.uka.ilkd.key.testgen.macros.SemanticsBlastingMacro;
 import de.uka.ilkd.key.testgen.settings.TestGenerationSettings;
 import de.uka.ilkd.key.testgen.smt.testgen.TestGenerationLogger;
 
-import org.jspecify.annotations.Nullable;
-
 public record TestgenFacade(TestGenerationSettings settings) {
     /**
      * @param env
@@ -36,7 +34,7 @@ public record TestgenFacade(TestGenerationSettings settings) {
      */
     public static void generateTestcases(KeYEnvironment<?> env, Proof proof,
                                          TestGenerationSettings settings,
-                                         @Nullable TestGenerationLogger log) throws InterruptedException {
+                                         TestGenerationLogger log) throws InterruptedException {
         final TestCaseGenerator tg = new TestCaseGenerator(proof, settings, log);
 
         NewSMTTranslationSettings newSettings = new NewSMTTranslationSettings();

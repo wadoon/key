@@ -18,6 +18,7 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.testgen.settings.TestGenerationSettings;
 import de.uka.ilkd.key.testgen.smt.testgen.TestGenerationLogger;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
@@ -117,8 +118,8 @@ public class TGMain implements Callable<Integer> {
 
     private static class SysoutTestGenerationLogger implements TestGenerationLogger {
         @Override
-        public void writeln(String message) {
-            LOGGER.info(message);
+        public void writeln(@Nullable String message) {
+            if(message!=null){ LOGGER.info(message);}
         }
 
         @Override

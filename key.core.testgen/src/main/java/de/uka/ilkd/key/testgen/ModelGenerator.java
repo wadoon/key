@@ -160,7 +160,7 @@ public class ModelGenerator implements SolverLauncherListener {
     private void finish() {
         LOGGER.info("Finished: found {}", models.size());
         for (Model m : models) {
-            LOGGER.info("\t{}", m.toString());
+            LOGGER.info("\t{}", m);
         }
     }
 

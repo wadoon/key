@@ -90,7 +90,7 @@ class TestGenStrategy extends FilterStrategy {
     private int computeUnwindRules(Goal goal) {
         int totalUnwinds = 0;
         Node node = goal.node();
-        while (!node.root()) {
+        while (node != null && !node.root()) {
             final RuleApp app = node.getAppliedRuleApp();
             if (app != null) {
                 final Rule rule = app.rule();

@@ -85,8 +85,10 @@ public class TestCaseGenerator {
     private final ProofInfo info;
     private final OracleGenerator oracleGenerator;
     private List<MethodSpec> oracleMethods = new ArrayList<>(0);
+
     @Nullable
     private String oracleMethodCall;
+
     private final Set<Sort> sortDummyClass = new HashSet<>();
     private final List<JavaFile> dummyClasses = new ArrayList<>(8);
 
@@ -360,7 +362,8 @@ public class TestCaseGenerator {
                                 .addStatement(info.getCode());
 
                         if (isJunit()) {
-                            ms.addComment("calling the test oracle").addStatement(oracleMethodCall);
+                            ms.addComment("calling the test oracle")
+                                    .addStatement(oracleMethodCall != null ? oracleMethodCall : "n/a");
                         }
                         counter++;
                         success = true;

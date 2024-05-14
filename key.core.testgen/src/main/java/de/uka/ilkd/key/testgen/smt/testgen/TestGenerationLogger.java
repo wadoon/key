@@ -3,8 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.testgen.smt.testgen;
 
+import org.jspecify.annotations.Nullable;
+
 public interface TestGenerationLogger {
-    void writeln(String message);
+    void writeln(@Nullable String message);
 
     void writeException(Throwable throwable);
 

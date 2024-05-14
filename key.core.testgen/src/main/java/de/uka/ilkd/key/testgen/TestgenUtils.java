@@ -7,6 +7,8 @@ import de.uka.ilkd.key.smt.model.Model;
 
 import org.jspecify.annotations.Nullable;
 
+import java.util.Objects;
+
 public class TestgenUtils {
     interface AssignmentCreator {
         String assign(String type, Object left, String right);
@@ -22,11 +24,12 @@ public class TestgenUtils {
 
     public static String createAssignmentWithRfl(String type, Object left, String right) {
         if (left instanceof RefEx leftEx) {
+            final var s = Objects.requireNonNull(leftEx.rcObjType());
             return "%s.%s%s(%s.class, %s, \"%s\", %s)".formatted(
                 ReflectionClassCreator.NAME_OF_CLASS,
                 ReflectionClassCreator.SET_PREFIX,
                 ReflectionClassCreator.cleanTypeName(leftEx.fieldType()),
-                leftEx.rcObjType(), leftEx.rcObj(), leftEx.field(), right);
+                    s, leftEx.rcObj(), leftEx.field(), right);
         } else {
             return createAssignmentWithoutRfl(type, left, right);
         }

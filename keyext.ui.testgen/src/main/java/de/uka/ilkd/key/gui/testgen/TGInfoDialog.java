@@ -19,11 +19,7 @@ import org.slf4j.LoggerFactory;
 public class TGInfoDialog extends JDialog {
     private static final Logger LOGGER = LoggerFactory.getLogger(TGInfoDialog.class);
     private final JTextArea textArea;
-    private final JButton stopButton;
     private final JButton exitButton;
-    private final JButton startButton;
-
-    private transient TGWorker worker;
 
     private final KeyAction actionStop = new KeyAction() {
         {
@@ -60,7 +56,7 @@ public class TGInfoDialog extends JDialog {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            worker = new TGWorker(TGInfoDialog.this);
+            TGWorker worker = new TGWorker(TGInfoDialog.this);
             worker.start();
         }
     };
@@ -89,9 +85,9 @@ public class TGInfoDialog extends JDialog {
 
         // init members
         textArea = new JTextArea();
-        stopButton = new JButton(actionStop);
+        JButton stopButton = new JButton(actionStop);
         exitButton = new JButton(actionExit);
-        startButton = new JButton(actionStart);
+        JButton startButton = new JButton(actionStart);
 
         // configure properties
         setModal(false);
