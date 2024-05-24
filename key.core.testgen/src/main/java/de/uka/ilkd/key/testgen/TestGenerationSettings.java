@@ -1,7 +1,7 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.testgen.settings;
+package de.uka.ilkd.key.testgen;
 
 import java.io.File;
 import java.util.Properties;
@@ -10,7 +10,6 @@ import de.uka.ilkd.key.settings.AbstractSettings;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.SettingsConverter;
-import de.uka.ilkd.key.testgen.Format;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -24,7 +23,7 @@ public class TestGenerationSettings extends AbstractSettings {
         System.getProperty("user.home") + File.separator + "testFiles";
     private static final boolean DEFAULT_REMOVEDUPLICATES = true;
     private static final boolean DEFAULT_USERFL = false;
-    private static final Format DEFAULT_USEJUNIT = Format.JUnit4;
+    private static final Format DEFAULT_USEJUNIT = Format.JUNIT_4;
     private static final boolean DEFAULT_INVARIANTFORALL = true;
     private static final boolean DEFAULT_INCLUDEPOSTCONDITION = false;
     // endregion
@@ -38,8 +37,9 @@ public class TestGenerationSettings extends AbstractSettings {
     private static final String PROP_USE_JUNIT = "UseJUnit";
     private static final String PROP_CONCURRENT_PROCESSES = "ConcurrentProcesses";
     private static final String PROP_INVARIANT_FOR_ALL = "InvariantForAll";
-    private static final String PROP_INCLUDE_POST_CONDITION =
-        "IncludePostCondition";
+    private static final String PROP_INCLUDE_POST_CONDITION = "IncludePostCondition";
+    private static final String PROP_ONLY_TEST_CLASSES = "onlyTestClasses";
+
     private static final String CATEGORY = "TestGenSettings";
     // endregion
 
@@ -54,7 +54,7 @@ public class TestGenerationSettings extends AbstractSettings {
     private boolean invariantForAll;
     private boolean includePostCondition;
     private boolean useRFLAsInternalClass;
-
+    private boolean onlyTestClasses;
 
     public TestGenerationSettings() {
         applySymbolicExecution = DEFAULT_APPLYSYMBOLICEX;
@@ -62,7 +62,7 @@ public class TestGenerationSettings extends AbstractSettings {
         outputPath = DEFAULT_OUTPUTPATH;
         removeDuplicates = DEFAULT_REMOVEDUPLICATES;
         useRFL = DEFAULT_USERFL;
-        format = Format.JUnit4;
+        format = Format.JUNIT_4;
         concurrentProcesses = DEFAULT_CONCURRENTPROCESSES;
         invariantForAll = DEFAULT_INVARIANTFORALL;
         includePostCondition = DEFAULT_INCLUDEPOSTCONDITION;
@@ -132,7 +132,7 @@ public class TestGenerationSettings extends AbstractSettings {
         setOutputPath(SettingsConverter.read(props, prefix + PROP_OUTPUT_PATH, DEFAULT_OUTPUTPATH));
         setRemoveDuplicates(SettingsConverter.read(props,
             prefix + PROP_REMOVE_DUPLICATES, DEFAULT_REMOVEDUPLICATES));
-        setRFL(SettingsConverter.read(props, prefix + PROP_USE_RFL, DEFAULT_USERFL));
+        setUseRFL(SettingsConverter.read(props, prefix + PROP_USE_RFL, DEFAULT_USERFL));
         setFormat(Format.valueOf(
             SettingsConverter.read(props, prefix + PROP_USE_JUNIT, DEFAULT_USEJUNIT.name())));
         setConcurrentProcesses(SettingsConverter.read(props,
@@ -141,6 +141,7 @@ public class TestGenerationSettings extends AbstractSettings {
             prefix + PROP_INVARIANT_FOR_ALL, DEFAULT_INVARIANTFORALL));
         setIncludePostCondition(SettingsConverter.read(props,
             PROP_INCLUDE_POST_CONDITION, DEFAULT_INCLUDEPOSTCONDITION));
+        setOnlyTestClasses(SettingsConverter.read(props, PROP_ONLY_TEST_CLASSES, false));
     }
 
     public boolean removeDuplicates() {
@@ -169,24 +170,21 @@ public class TestGenerationSettings extends AbstractSettings {
         var old = this.outputPath;
         this.outputPath = outputPath;
         firePropertyChange(PROP_OUTPUT_PATH, old, this.outputPath);
-
     }
 
     public void setRemoveDuplicates(boolean removeDuplicates) {
         var old = this.removeDuplicates;
         this.removeDuplicates = removeDuplicates;
         firePropertyChange(PROP_REMOVE_DUPLICATES, old, this.removeDuplicates);
-
     }
 
     public void setIncludePostCondition(boolean includePostCondition) {
         var old = this.includePostCondition;
         this.includePostCondition = includePostCondition;
         firePropertyChange(PROP_INCLUDE_POST_CONDITION, old, this.includePostCondition);
-
     }
 
-    public void setRFL(boolean useRFL) {
+    public void setUseRFL(boolean useRFL) {
         var old = this.useRFL;
         this.useRFL = useRFL;
         firePropertyChange(PROP_USE_RFL, old, this.useRFL);
@@ -197,17 +195,15 @@ public class TestGenerationSettings extends AbstractSettings {
         var old = this.format;
         this.format = format;
         firePropertyChange(PROP_USE_JUNIT, old, this.format);
-
     }
 
-    public boolean useRFL() {
+    public boolean isUseRFL() {
         return useRFL;
     }
 
-    public Format useJunit() {
+    public Format getFormat() {
         return format;
     }
-
 
     @Override
     public void writeSettings(Properties props) {
@@ -222,6 +218,7 @@ public class TestGenerationSettings extends AbstractSettings {
         SettingsConverter.store(props, prefix + PROP_USE_RFL, useRFL);
         SettingsConverter.store(props, prefix + PROP_USE_JUNIT, format);
         SettingsConverter.store(props, prefix + PROP_INCLUDE_POST_CONDITION, includePostCondition);
+        SettingsConverter.store(props, prefix + PROP_ONLY_TEST_CLASSES, onlyTestClasses);
     }
 
     @Override
@@ -234,18 +231,19 @@ public class TestGenerationSettings extends AbstractSettings {
         setMaxUnwinds(cat.getInt(PROP_MAX_UWINDS, DEFAULT_MAXUNWINDS));
         setOutputPath(cat.getString(PROP_OUTPUT_PATH, DEFAULT_OUTPUTPATH));
         setRemoveDuplicates(cat.getBool(PROP_REMOVE_DUPLICATES, DEFAULT_REMOVEDUPLICATES));
-        setRFL(cat.getBool(PROP_USE_RFL, DEFAULT_USERFL));
-        setFormat(cat.getEnum(PROP_USE_JUNIT, Format.JUnit4));
+        setUseRFL(cat.getBool(PROP_USE_RFL, DEFAULT_USERFL));
+        setFormat(cat.getEnum(PROP_USE_JUNIT, Format.JUNIT_4));
         setConcurrentProcesses(cat.getInt(PROP_CONCURRENT_PROCESSES, DEFAULT_CONCURRENTPROCESSES));
         setInvariantForAll(cat.getBool(PROP_INVARIANT_FOR_ALL, DEFAULT_INVARIANTFORALL));
         setIncludePostCondition(
             cat.getBool(PROP_INCLUDE_POST_CONDITION, DEFAULT_INCLUDEPOSTCONDITION));
+        setOnlyTestClasses(cat.getBool(PROP_ONLY_TEST_CLASSES));
     }
 
     @Override
     public void writeSettings(Configuration props) {
         var cat = props.getOrCreateSection(CATEGORY);
-
+        cat.set(PROP_ONLY_TEST_CLASSES, onlyTestClasses);
         cat.set(PROP_APPLY_SYMBOLIC_EXECUTION, applySymbolicExecution);
         cat.set(PROP_CONCURRENT_PROCESSES, concurrentProcesses);
         cat.set(PROP_INVARIANT_FOR_ALL, invariantForAll);
@@ -263,7 +261,6 @@ public class TestGenerationSettings extends AbstractSettings {
         readSettings(p);
     }
 
-
     private static @Nullable TestGenerationSettings instance;
 
     public static @NonNull TestGenerationSettings getInstance() {
@@ -279,6 +276,19 @@ public class TestGenerationSettings extends AbstractSettings {
     }
 
     public void setRFLAsInternalClass(boolean rflAsInternalClass) {
+        var old = this.useRFLAsInternalClass;
         this.useRFLAsInternalClass = rflAsInternalClass;
+        changeSupport.firePropertyChange(PROP_ONLY_TEST_CLASSES, old, rflAsInternalClass);
+
+    }
+
+    public void setOnlyTestClasses(boolean onlyTestClasses) {
+        var old = this.onlyTestClasses;
+        this.onlyTestClasses = onlyTestClasses;
+        changeSupport.firePropertyChange(PROP_ONLY_TEST_CLASSES, old, onlyTestClasses);
+    }
+
+    public boolean isOnlyTestClasses() {
+        return onlyTestClasses;
     }
 }

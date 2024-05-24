@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.testgen.oracle;
 
+import java.util.*;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Term;
@@ -11,16 +13,16 @@ import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.smt.NumberTranslation;
 import de.uka.ilkd.key.testgen.ReflectionClassCreator;
 import de.uka.ilkd.key.testgen.oracle.OracleUnaryTerm.Op;
+
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
-
-import static de.uka.ilkd.key.testgen.template.Constants.*;
+import static de.uka.ilkd.key.testgen.Constants.*;
 
 public class OracleGenerator {
     private static final Logger LOGGER = LoggerFactory.getLogger(OracleGenerator.class);
@@ -39,7 +41,8 @@ public class OracleGenerator {
 
     private final Set<OracleMethod> oracleMethods = new HashSet<>();
     private final List<OracleVariable> quantifiedVariables = new ArrayList<>();
-    private final Set<String> truePredicates = Set.of("inByte", "inChar", "inShort", "inInt", "inLong");
+    private final Set<String> truePredicates =
+        Set.of("inByte", "inChar", "inShort", "inInt", "inLong");
     private Set<String> falsePredicates = new TreeSet<>();
     private final Set<String> prestateTerms = new TreeSet<>();
 
@@ -66,26 +69,25 @@ public class OracleGenerator {
         HashMap<Operator, String> map = new HashMap<>();
         final var ldt = Objects.requireNonNull(services).getTypeConverter().getIntegerLDT();
         map.putAll(Map.of(Equality.EQV, EQUALS,
-                Equality.EQUALS, EQUALS,
-                Junctor.AND, AND,
-                Junctor.OR, OR,
-                ldt.getLessOrEquals(), "<=",
-                ldt.getLessThan(), "<",
-                ldt.getGreaterOrEquals(), ">=",
-                ldt.getGreaterThan(), ">",
-                ldt.getAdd(), "+",
-                ldt.getArithJavaIntAddition(), "+"
-        ));
+            Equality.EQUALS, EQUALS,
+            Junctor.AND, AND,
+            Junctor.OR, OR,
+            ldt.getLessOrEquals(), "<=",
+            ldt.getLessThan(), "<",
+            ldt.getGreaterOrEquals(), ">=",
+            ldt.getGreaterThan(), ">",
+            ldt.getAdd(), "+",
+            ldt.getArithJavaIntAddition(), "+"));
 
         map.putAll(Map.of(
-                ldt.getSub(), "-",
-                ldt.getJavaSubInt(), "-",
-                ldt.getMul(), "*",
-                ldt.getJavaMulInt(), "*",
-                ldt.getDiv(), "/",
-                ldt.getJavaDivInt(), "/",
-                ldt.getMod(), "%",
-                ldt.getJavaMod(), "%"));
+            ldt.getSub(), "-",
+            ldt.getJavaSubInt(), "-",
+            ldt.getMul(), "*",
+            ldt.getJavaMulInt(), "*",
+            ldt.getDiv(), "/",
+            ldt.getJavaDivInt(), "/",
+            ldt.getMod(), "%",
+            ldt.getJavaMod(), "%"));
         return map;
     }
 
@@ -207,13 +209,13 @@ public class OracleGenerator {
             OracleTerm right = generateOracle(term.sub(1), initialSelect);
             String javaOp = ops.get(op);
             return switch (javaOp) {
-                case EQUALS -> eq(left, right);
-                case AND -> and(left, right);
-                case OR -> or(left, right);
-                default ->
-                    // Todo wiesler: What is this for? No field nor method of OracleBinTerm has any
-                    // usages
-                        new OracleBinTerm(javaOp, left, right);
+            case EQUALS -> eq(left, right);
+            case AND -> and(left, right);
+            case OR -> or(left, right);
+            default ->
+                // Todo wiesler: What is this for? No field nor method of OracleBinTerm has any
+                // usages
+                new OracleBinTerm(javaOp, left, right);
             };
 
         } // negation
@@ -281,7 +283,7 @@ public class OracleGenerator {
         } else {
             LOGGER.debug("Could not translate: {}", term);
             throw new RuntimeException(
-                    "Could not translate oracle for: " + term + " of type " + term.op());
+                "Could not translate oracle for: " + term + " of type " + term.op());
         }
 
     }
@@ -370,7 +372,7 @@ public class OracleGenerator {
         }
 
         throw new RuntimeException(
-                "Unsupported function found: " + name + " of type " + fun.getClass().getName());
+            "Unsupported function found: " + name + " of type " + fun.getClass().getName());
     }
 
     private OracleTerm translateQuery(Term term, boolean initialSelect, Operator op) {
@@ -396,7 +398,7 @@ public class OracleGenerator {
             return new OracleMethodCall(m, params);
         } else {
             OracleTerm caller =
-                    generateOracle(term.sub(1), false /* TODO: what does this parameter mean? */);
+                generateOracle(term.sub(1), false /* TODO: what does this parameter mean? */);
             LOGGER.info(" non-static caller= {}", caller);
             return new OracleMethodCall(m, params, caller);
         }
@@ -444,19 +446,19 @@ public class OracleGenerator {
         String value;
 
         value = createLocationString(heapTerm, objTerm, fieldName, object.sort(), term.sort(),
-                initialSelect);
+            initialSelect);
 
         if (!initialSelect && isPreHeap(heapTerm)
                 && term.sort().extendsTrans(services.getJavaInfo().getJavaLangObject().getSort())) {
             return new OracleConstant(OLDMap + ".get(" + value + ")",
-                    term.sort());
+                term.sort());
         }
 
         return new OracleConstant(value, term.sort());
     }
 
     private String createLocationString(OracleTerm heapTerm, OracleTerm objTerm, String fieldName,
-                                        Sort objSort, Sort fieldSort, boolean initialSelect) {
+            Sort objSort, Sort fieldSort, boolean initialSelect) {
         String value;
 
         String objString = objTerm.toString();
@@ -483,9 +485,9 @@ public class OracleGenerator {
                 rflCreator.addSort(objSort);
 
                 value =
-                        ReflectionClassCreator.NAME_OF_CLASS + "." + ReflectionClassCreator.GET_PREFIX
-                                + ReflectionClassCreator.cleanTypeName(fieldSort.toString()) + "(" + objSort
-                                + ".class, " + objString + ", " + "\"" + fieldName + "\"" + ")";
+                    ReflectionClassCreator.NAME_OF_CLASS + "." + ReflectionClassCreator.GET_PREFIX
+                        + ReflectionClassCreator.cleanTypeName(fieldSort.toString()) + "(" + objSort
+                        + ".class, " + objString + ", " + "\"" + fieldName + "\"" + ")";
 
             } else {
                 value = objString + "." + fieldName;
@@ -562,7 +564,7 @@ public class OracleGenerator {
         OracleTerm falseCase = generateOracle(term.sub(2), initialSelect);
 
         String body = "if(" + cond + "){" + "\n   return " + trueCase + ";" + "\n}else{"
-                + "\n   return " + falseCase + ";" + "\n}";
+            + "\n   return " + falseCase + ";" + "\n}";
 
         return new OracleMethod(methodName, args, body, term.sort());
     }
@@ -626,9 +628,9 @@ public class OracleGenerator {
     private String createForallBody(QuantifiableVariable qv, String setName, OracleUnaryTerm neg) {
         String tab = TAB;
         return "\n" + tab + "for(" + qv.sort().name() + " " + qv.name() + " : " + setName + "){"
-                + "\n" + tab + tab + "if(" + neg + "){" + "\n" + tab + tab + tab
-                + "return false;" + "\n" + tab + tab + "}" + "\n" + tab + "}" + "\n" + tab
-                + "return true;";
+            + "\n" + tab + tab + "if(" + neg + "){" + "\n" + tab + tab + tab
+            + "return false;" + "\n" + tab + tab + "}" + "\n" + tab + "}" + "\n" + tab
+            + "return true;";
     }
 
     private String createExistsBody(QuantifiableVariable qv, String setName, OracleTerm cond) {
@@ -640,8 +642,8 @@ public class OracleGenerator {
                 %s%s}
                 %s}
                 %sreturn false;""").formatted(
-                tab, qv.sort().name(), qv.name(), setName, tab, tab, cond.toString(),
-                tab, tab, tab, tab, tab, tab, tab);
+            tab, qv.sort().name(), qv.name(), setName, tab, tab, cond.toString(),
+            tab, tab, tab, tab, tab, tab, tab);
     }
 
     private static OracleTerm neg(OracleTerm t) {

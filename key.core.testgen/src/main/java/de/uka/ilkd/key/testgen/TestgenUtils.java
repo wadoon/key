@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.testgen;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.smt.model.Model;
 
 import org.jspecify.annotations.Nullable;
-
-import java.util.Objects;
 
 public class TestgenUtils {
     interface AssignmentCreator {
@@ -29,7 +29,7 @@ public class TestgenUtils {
                 ReflectionClassCreator.NAME_OF_CLASS,
                 ReflectionClassCreator.SET_PREFIX,
                 ReflectionClassCreator.cleanTypeName(leftEx.fieldType()),
-                    s, leftEx.rcObj(), leftEx.field(), right);
+                s, leftEx.rcObj(), leftEx.field(), right);
         } else {
             return createAssignmentWithoutRfl(type, left, right);
         }
