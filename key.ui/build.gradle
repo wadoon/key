@@ -1,6 +1,7 @@
 import java.nio.file.Files
 import java.nio.file.Paths
 
+
 plugins {
     id 'application'
 
@@ -33,6 +34,7 @@ dependencies {
     runtimeOnly project(":keyext.exploration")
     runtimeOnly project(":keyext.slicing")
     runtimeOnly project(":keyext.proofmanagement")
+    implementation("info.picocli:picocli:4.7.6")
 }
 
 task createExamplesZip(type: Zip) {
