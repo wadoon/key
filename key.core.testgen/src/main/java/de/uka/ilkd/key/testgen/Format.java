@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.testgen;
 
+/**
+ *
+ */
 public enum Format {
     JUNIT_4, JUNIT_5
 }

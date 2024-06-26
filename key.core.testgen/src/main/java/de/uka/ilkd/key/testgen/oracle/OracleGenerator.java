@@ -43,7 +43,7 @@ public class OracleGenerator {
     private final List<OracleVariable> quantifiedVariables = new ArrayList<>();
     private final Set<String> truePredicates =
         Set.of("inByte", "inChar", "inShort", "inInt", "inLong");
-    private Set<String> falsePredicates = new TreeSet<>();
+    private final Set<String> falsePredicates = new TreeSet<>();
     private final Set<String> prestateTerms = new TreeSet<>();
 
     private final Map<Sort, OracleMethod> invariants = new HashMap<>();
@@ -158,7 +158,7 @@ public class OracleGenerator {
         OracleVariable allInts = new OracleVariable(ALL_INTS, allIntSort);
         OracleVariable allBools = new OracleVariable(ALL_BOOLS, allBoolSort);
         OracleVariable allObj = new OracleVariable(ALL_OBJECTS, allObjSort);
-        OracleVariable oldMap = new OracleVariable(OLDMap, oldMapSort);
+        OracleVariable oldMap = new OracleVariable(OLD_MAP, oldMapSort);
 
         for (Term c : constants) {
             result.add(new OracleVariable(c.toString(), c.sort()));
@@ -187,7 +187,6 @@ public class OracleGenerator {
         for (Term sub : term.subs()) {
             findConstants(constants, sub);
         }
-
     }
 
     private Sort createSetSort(String inner) {
@@ -197,8 +196,6 @@ public class OracleGenerator {
 
 
     public OracleTerm generateOracle(Term term, boolean initialSelect) {
-
-
         Operator op = term.op();
 
         LOGGER.debug("Translate: {} init: {}", term, initialSelect);
@@ -278,8 +275,8 @@ public class OracleGenerator {
             return translateFunction(term, initialSelect);
         }
         // program variables
-        else if (op instanceof ProgramVariable var) {
-            return new OracleConstant(var.name().toString(), var.sort());
+        else if (op instanceof ProgramVariable pvar) {
+            return new OracleConstant(pvar.name().toString(), pvar.sort());
         } else {
             LOGGER.debug("Could not translate: {}", term);
             throw new RuntimeException(
@@ -419,8 +416,8 @@ public class OracleGenerator {
 
 
         for (int i = 2; i < pm.argSorts().size(); i++) {
-            OracleVariable var = new OracleVariable("a" + i, pm.argSorts().get(i));
-            args.add(var);
+            OracleVariable ovar = new OracleVariable("a" + i, pm.argSorts().get(i));
+            args.add(ovar);
         }
 
 
@@ -450,7 +447,7 @@ public class OracleGenerator {
 
         if (!initialSelect && isPreHeap(heapTerm)
                 && term.sort().extendsTrans(services.getJavaInfo().getJavaLangObject().getSort())) {
-            return new OracleConstant(OLDMap + ".get(" + value + ")",
+            return new OracleConstant(OLD_MAP + ".get(" + value + ")",
                 term.sort());
         }
 
@@ -647,8 +644,8 @@ public class OracleGenerator {
     }
 
     private static OracleTerm neg(OracleTerm t) {
-        if (t instanceof OracleUnaryTerm) {
-            return ((OracleUnaryTerm) t).sub();
+        if (t instanceof OracleUnaryTerm ut) {
+            return ut.sub();
         } else {
             return new OracleUnaryTerm(t, Op.Neg);
         }

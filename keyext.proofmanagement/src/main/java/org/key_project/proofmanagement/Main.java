@@ -3,21 +3,22 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.proofmanagement;
 
-import org.jspecify.annotations.Nullable;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.concurrent.Callable;
+
 import org.key_project.proofmanagement.check.*;
 import org.key_project.proofmanagement.io.HTMLReport;
 import org.key_project.proofmanagement.io.LogLevel;
 import org.key_project.proofmanagement.io.ProofBundleHandler;
 import org.key_project.proofmanagement.merge.ProofBundleMerger;
+
+import org.jspecify.annotations.Nullable;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
-
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.concurrent.Callable;
 
 /**
  * This is the starting class for ProofManagement.
@@ -48,17 +49,22 @@ import java.util.concurrent.Callable;
  *
  * @author Wolfram Pfeifer
  */
-@Command(subcommands = {Main.BundleCommand.class, Main.CheckCommand.class,
-        Main.MergeCommand.class})
+@Command(subcommands = { Main.BundleCommand.class, Main.CheckCommand.class,
+    Main.MergeCommand.class })
 public final class Main {
     private static final String check_missing_desc = "enables check for unproven contracts";
     private static final String check_settings_desc = "enables check for consistent proof settings";
-    private static final String check_replay_desc = "enables check whether all saved proofs can be replayed successfully";
+    private static final String check_replay_desc =
+        "enables check whether all saved proofs can be replayed successfully";
     private static final String check_dependency_desc = "enables check for cyclic dependencies";
-    private static final String check_report_desc = "writes the report to an HTML file at the given path";
-    private static final String usage_merge = "pm merge [--force] [--no-check] <bundle1> <bundle2> ... <output>";
-    private static final String merge_force_desc = "Tries to merge the proof bundles even if the files check fails (may rename some files). Use only if you know what you are doing!";
-    private static final String merge_check_desc = "Merges and performs a check if successful. The arguments are passed to check command.";
+    private static final String check_report_desc =
+        "writes the report to an HTML file at the given path";
+    private static final String usage_merge =
+        "pm merge [--force] [--no-check] <bundle1> <bundle2> ... <output>";
+    private static final String merge_force_desc =
+        "Tries to merge the proof bundles even if the files check fails (may rename some files). Use only if you know what you are doing!";
+    private static final String merge_check_desc =
+        "Merges and performs a check if successful. The arguments are passed to check command.";
 
 
     /**
@@ -89,8 +95,8 @@ public final class Main {
          */
         @Option(names = "--replay", description = check_replay_desc)
         public boolean replay;
-        // check.addOption("--auto",  description = check_auto_desc"));
-        // check.addOption("--explicit",  description = check_explicit_desc"));
+        // check.addOption("--auto", description = check_auto_desc"));
+        // check.addOption("--explicit", description = check_explicit_desc"));
 
         /**
          * reportPath the output path for the HTML report (if selected)
@@ -106,7 +112,8 @@ public final class Main {
 
         @Override
         public Integer call() throws Exception {
-            // check [--settings] [--dependency] [--missing] [--replay] [--report <out_path>] <bundle_path>
+            // check [--settings] [--dependency] [--missing] [--replay] [--report <out_path>]
+            // <bundle_path>
             // we accumulate results in this variable
             CheckerData globalResult = new CheckerData(LogLevel.DEBUG);
             try (ProofBundleHandler pbh = ProofBundleHandler.createBundleHandler(bundlePath)) {
@@ -165,7 +172,8 @@ public final class Main {
         @Option(names = "--check", paramLabel = "STRING", description = merge_check_desc)
         public @Nullable String checkParams;
 
-        @Option(names = {"--output", "-o"}, required = true, description = "Output file", paramLabel = "FILE")
+        @Option(names = { "--output", "-o" }, required = true, description = "Output file",
+            paramLabel = "FILE")
         public Path output;
 
         // at least three files!
@@ -202,9 +210,9 @@ public final class Main {
      * TODO: bundle subcommand, which zips a directory into a proof bundle (and may perform checks)
      * // bundle [-c|--check "check_options"] <root_dir> <bundle_path>
      */
-    @Command(name = "bundle", description = "Creates a zipped proof bundle (file extension \"zproof\") from a directory following the proof bundle path rules.")
-    static
-    class BundleCommand implements Callable<Integer> {
+    @Command(name = "bundle",
+        description = "Creates a zipped proof bundle (file extension \"zproof\") from a directory following the proof bundle path rules.")
+    static class BundleCommand implements Callable<Integer> {
         @Parameters(arity = "2..*")
         public List<Path> arguments = List.of();
 

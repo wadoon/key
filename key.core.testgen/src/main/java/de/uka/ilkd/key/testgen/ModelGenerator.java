@@ -8,19 +8,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.settings.DefaultSMTSettings;
-import de.uka.ilkd.key.settings.NewSMTTranslationSettings;
-import de.uka.ilkd.key.settings.ProofDependentSMTSettings;
-import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.*;
 import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.smt.lang.SMTSort;
 import de.uka.ilkd.key.smt.model.Model;
@@ -117,7 +109,6 @@ public class ModelGenerator implements SolverLauncherListener {
     }
 
 
-
     /**
      * Changes the term such that when evaluated again with z3 another model will be generated. If
      * we have a model (c1=v1 & c2 = v2 & ...) where c1, c2, ... are integer constants we change the
@@ -164,8 +155,8 @@ public class ModelGenerator implements SolverLauncherListener {
     }
 
     @Override
-    public void launcherStarted(Collection<SMTProblem> problems, Collection<SolverType> solverTypes,
-            SolverLauncher launcher) {
+    public void launcherStarted(Collection<SMTProblem> problems,
+            Collection<SolverType> solverTypes, SolverLauncher launcher) {
     }
 
     public Term sequentToTerm(Sequent s) {

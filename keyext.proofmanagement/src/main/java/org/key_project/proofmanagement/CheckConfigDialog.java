@@ -56,9 +56,9 @@ class CheckConfigDialog extends JDialog {
             var c = new Main.CheckCommand();
             c.missing = missingProofsCheck.isSelected();
             c.settings = settingsCheck.isSelected();
-            c.replay=replayCheck.isSelected();
-            c.dependency=dependencyCheck.isSelected();
-            c.bundlePath= Paths.get(bundleFileField.getText());
+            c.replay = replayCheck.isSelected();
+            c.dependency = dependencyCheck.isSelected();
+            c.bundlePath = Paths.get(bundleFileField.getText());
             c.reportPath = reportPath;
             c.call();
 

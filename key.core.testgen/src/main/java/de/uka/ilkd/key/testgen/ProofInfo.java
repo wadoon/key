@@ -41,8 +41,8 @@ public record ProofInfo(Proof proof, Services services) {
     public IProgramMethod getMUT() {
         SpecificationRepository spec = services.getSpecificationRepository();
         IObserverFunction f = spec.getTargetOfProof(proof);
-        if (f instanceof IProgramMethod) {
-            return (IProgramMethod) f;
+        if (f instanceof IProgramMethod pm) {
+            return pm;
         } else {
             return null;
         }
@@ -59,8 +59,8 @@ public record ProofInfo(Proof proof, Services services) {
         StringBuilder params = new StringBuilder();
         for (ParameterDeclaration p : m.getParameters()) {
             for (VariableSpecification v : p.getVariables()) {
-                IProgramVariable var = v.getProgramVariable();
-                params.append(",").append(var.name());
+                IProgramVariable pvar = v.getProgramVariable();
+                params.append(",").append(pvar.name());
             }
         }
         if (!params.isEmpty()) {
@@ -119,9 +119,8 @@ public record ProofInfo(Proof proof, Services services) {
         Contract c = getContract();
         if (c instanceof FunctionalOperationContract t) {
             OriginalVariables orig = t.getOrigVars();
-            Term post = t.getPre(services.getTypeConverter().getHeapLDT().getHeap(), orig.self,
+            return t.getPre(services.getTypeConverter().getHeapLDT().getHeap(), orig.self,
                     orig.params, orig.atPres, services);
-            return post;
         }
         // no pre <==> false
         return services.getTermBuilder().ff();

@@ -3,6 +3,15 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.core;
 
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
+import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.Callable;
+import javax.xml.parsers.ParserConfigurationException;
+
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.gui.ExampleChooser;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -23,9 +32,11 @@ import de.uka.ilkd.key.ui.Verbosity;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.rifl.RIFLTransformer;
-import org.jspecify.annotations.Nullable;
+
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.reflection.ClassLoaderUtil;
+
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -33,15 +44,6 @@ import picocli.CommandLine;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 import recoder.ParserException;
-
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.net.URL;
-import java.util.List;
-import java.util.Locale;
-import java.util.concurrent.Callable;
 
 /**
  * The main entry point for KeY
@@ -54,8 +56,8 @@ public final class Main implements Callable<Integer> {
     private static File workingDir;
 
 
-    //@Option(names = "--help", description = "display this text")
-    //private boolean showHelp = false;
+    // @Option(names = "--help", description = "display this text")
+    // private boolean showHelp = false;
 
     @Option(names = "--K-help", description = "display help for technical/debug parameters")
     private boolean showKHelp = false;
@@ -63,30 +65,32 @@ public final class Main implements Callable<Integer> {
     @Option(names = "--show-properties", description = "list all Java properties and exit")
     private boolean showProperties = false;
 
-    @Option(names = "--auto", description = "start automatic prove procedure after initialisation without GUI")
+    @Option(names = "--auto",
+        description = "start automatic prove procedure after initialisation without GUI")
     private boolean isAuto = false;
 
     /**
      * flag whether recent loaded file should be loaded on startup
      */
-    @Option(names = "--last", description = "flag whether recent loaded file should be loaded on startup")
+    @Option(names = "--last",
+        description = "flag whether recent loaded file should be loaded on startup")
     private boolean loadRecentFile = false;
 
     @Option(names = "--auto-loadonly",
-            description = "load files automatically without proving (for testing)")
+        description = "load files automatically without proving (for testing)")
     private boolean isAutoLoadOnly = false;
 
     @Option(names = "--autosave",
-            paramLabel = "number",
-            description = "save intermediate proof states each n proof steps to a temporary location (default: 0 = off)",
-            defaultValue = "0")
+        paramLabel = "number",
+        description = "save intermediate proof states each n proof steps to a temporary location (default: 0 = off)",
+        defaultValue = "0")
     private int autoSaveSteps = 0;
 
     /**
      * Lists all features currently marked as experimental. Unless invoked with
      * command line option --experimental , those will be deactivated.
      */
-    @Deprecated
+    @Deprecated(since = "2.13.0")
     @Option(names = "--experimental", description = "switch experimental features on")
     private boolean isExperimental = false;
 
@@ -95,7 +99,8 @@ public final class Main implements Callable<Integer> {
      * closed branches. It is meant as a fallback solution
      * if storing all closed goals needs too much memory.
      */
-    @Option(names = "--no-pruning-closed", description = "disables pruning and goal back in closed branches (saves memory)")
+    @Option(names = "--no-pruning-closed",
+        description = "disables pruning and goal back in closed branches (saves memory)")
 
     private boolean isNoPruningClosed = false;
     /**
@@ -104,7 +109,7 @@ public final class Main implements Callable<Integer> {
      * used for debugging).
      */
     @Option(names = "--keep-fileRepos", description = "disables the automatic deletion of temporary"
-            + "directories of file repos (for debugging)")
+        + "directories of file repos (for debugging)")
 
     private boolean isKeepFileRepos = false;
 
@@ -117,38 +122,41 @@ public final class Main implements Callable<Integer> {
     @Option(names = "--no-jmlspecs", description = "disable parsing JML specifications")
     private boolean noJmlSpecs = false;
 
-    @Option(names = "--tacletDir", description = "load base taclets from a directory, not from internal structures",
-            paramLabel = "FOLDER")
+    @Option(names = "--tacletDir",
+        description = "load base taclets from a directory, not from internal structures",
+        paramLabel = "FOLDER")
     private @Nullable File tacletDir = null;
 
     @Option(names = "--examples", paramLabel = "FOLDER",
-            description = "load the directory containing the example files on startup")
+        description = "load the directory containing the example files on startup")
     private @Nullable String examplesFolder = null;
 
     /**
      * Path to a RIFL specification file.
      */
     @Option(names = "--rifl", paramLabel = "FILE",
-            description = "load RIFL specifications from file (requires GUI and startup file)")
+        description = "load RIFL specifications from file (requires GUI and startup file)")
     public @Nullable File riflFileName = null;
 
     /**
      * Save all contracts in selected location to automate the creation of multiple
      * ".key"-files
      */
-    @Option(names = "--save-all", description = "save all selected contracts for automatic execution")
+    @Option(names = "--save-all",
+        description = "save all selected contracts for automatic execution")
     private boolean isSaveAllContracts = false;
 
-    @Option(names = "--timeout", paramLabel = "INT", description =
-            "timeout for each automatic proof of a problem in ms (default: "
-                    + LemmataAutoModeOptions.DEFAULT_TIMEOUT + ", i.e., no timeout)")
+    @Option(names = "--timeout", paramLabel = "INT",
+        description = "timeout for each automatic proof of a problem in ms (default: "
+            + LemmataAutoModeOptions.DEFAULT_TIMEOUT + ", i.e., no timeout)")
     private int timeout = -1;
 
 
-    @CommandLine.ArgGroup(heading = "Options for justify rules. autoprove taclets (options always with prefix --jr) needs the path to the rule file as argument       The JUSTIFY_RULES option has a number of additional parameters you can set. The following options only apply if --jr-enable is used.")
+    @CommandLine.ArgGroup(
+        heading = "Options for justify rules. autoprove taclets (options always with prefix --jr) needs the path to the rule file as argument       The JUSTIFY_RULES option has a number of additional parameters you can set. The following options only apply if --jr-enable is used.")
     private @Nullable LemmataAutoModeOptions justifyRulesOptions;
 
-    @Option(names = {"--verbose", "-v"}, arity = "*")
+    @Option(names = { "--verbose", "-v" }, arity = "*")
     private int verbosity = 0;
 
 
@@ -192,7 +200,8 @@ public final class Main implements Callable<Integer> {
     /**
      * <p>
      * This flag indicates if the example chooser should be shown if
-     * {@link #examplesFolder} is defined (not {@code null}). It is set in the Eclipse integration to {@code false},
+     * {@link #examplesFolder} is defined (not {@code null}). It is set in the Eclipse integration
+     * to {@code false},
      * because it is required to define the path to a different one without showing the chooser.
      * </p>
      * <p>
@@ -230,7 +239,8 @@ public final class Main implements Callable<Integer> {
         Debug.ENABLE_DEBUG = debug;
 
         if (tacletDir != null) {
-            System.setProperty(RuleSourceFactory.STD_TACLET_DIR_PROP_KEY, tacletDir.getAbsolutePath());
+            System.setProperty(RuleSourceFactory.STD_TACLET_DIR_PROP_KEY,
+                tacletDir.getAbsolutePath());
         }
 
         GeneralSettings.noPruningClosed = isNoPruningClosed;
@@ -279,10 +289,6 @@ public final class Main implements Callable<Integer> {
             AutoSaver.setDefaultValues(autoSaveSteps, uiMode == UiMode.INTERACTIVE);
         }
 
-        //if (showHelp) {
-            //printUsageAndExit(true, null, 0);
-        //}
-
         GeneralSettings.disableSpecs = noJmlSpecs;
 
         if (timeout > 0) {
@@ -310,7 +316,8 @@ public final class Main implements Callable<Integer> {
 
         if (justifyRulesOptions != null) {
             try {
-                LemmataHandler handler = new LemmataHandler(justifyRulesOptions, AbstractProfile.getDefaultProfile());
+                LemmataHandler handler =
+                    new LemmataHandler(justifyRulesOptions, AbstractProfile.getDefaultProfile());
                 handler.start();
             } catch (Exception e) {
                 LOGGER.error("Lemmata options failed", e);
@@ -346,7 +353,8 @@ public final class Main implements Callable<Integer> {
         if (inputFiles.isEmpty()) {
             if (examplesFolder != null
                     && showExampleChooserIfExamplesDirIsDefined
-                    && ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getShowLoadExamplesDialog()) {
+                    && ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
+                            .getShowLoadExamplesDialog()) {
                 ui.openExamples();
             }
         } else {
@@ -372,9 +380,9 @@ public final class Main implements Callable<Integer> {
         LOGGER.debug("Hardware: {}", System.getProperty("java.hw"));
         Runtime rt = Runtime.getRuntime();
         LOGGER.info("Memory: total {} MB, max {} MB, free {} MB",
-                rt.totalMemory() / 1048576.0,
-                rt.maxMemory() / 1048576.0,
-                rt.freeMemory() / 1048576.0);
+            rt.totalMemory() / 1048576.0,
+            rt.maxMemory() / 1048576.0,
+            rt.freeMemory() / 1048576.0);
         LOGGER.debug("Available processors: {}", rt.availableProcessors());
     }
 
@@ -403,11 +411,12 @@ public final class Main implements Callable<Integer> {
      * {@link UiMode#AUTO} and {@link WindowUserInterfaceControl} otherwise.
      *
      * @return a <code>UserInterfaceControl</code> based on the value of
-     * <code>uiMode</code>
+     *         <code>uiMode</code>
      */
     private AbstractMediatorUserInterfaceControl createUserInterface(List<File> fileArguments) {
         if (uiMode == UiMode.AUTO) {
-            // terminate immediately when an uncaught exception occurs (e.g., OutOfMemoryError), see bug #1216
+            // terminate immediately when an uncaught exception occurs (e.g., OutOfMemoryError), see
+            // bug #1216
             Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
                 LOGGER.error("Auto mode was terminated by an exception:", e);
                 final String msg = e.getMessage();
@@ -418,14 +427,15 @@ public final class Main implements Callable<Integer> {
             });
 
             if (fileArguments.isEmpty()) {
-                //printUsageAndExit(true, "Error: No file to load from.", -4);
+                // printUsageAndExit(true, "Error: No file to load from.", -4);
                 System.exit(-4);
             }
 
             return new ConsoleUserInterfaceControl(loadOnly);
         } else {
             /*
-             * explicitly enable pruning in closed branches for interactive mode (if not* manually disabled)
+             * explicitly enable pruning in closed branches for interactive mode (if not* manually
+             * disabled)
              */
             MainWindow mainWindow = MainWindow.getInstance();
 
@@ -507,7 +517,8 @@ public final class Main implements Callable<Integer> {
      * Perform necessary actions before loading any problem files. Currently only
      * performs RIFL to JML transformation.
      */
-    private void preProcessInput() throws ParserException, IOException, ParserConfigurationException, SAXException {
+    private void preProcessInput()
+            throws ParserException, IOException, ParserConfigurationException, SAXException {
         // RIFL to JML transformation
         if (riflFileName != null) {
             if (inputFiles.isEmpty()) {
@@ -518,7 +529,7 @@ public final class Main implements Callable<Integer> {
             File fileNameOnStartUp = inputFiles.get(0).getAbsoluteFile();
             RIFLTransformer transformer = new RIFLTransformer();
             transformer.doTransform(riflFileName, fileNameOnStartUp,
-                    RIFLTransformer.getDefaultSavePath(fileNameOnStartUp));
+                RIFLTransformer.getDefaultSavePath(fileNameOnStartUp));
             LOGGER.info("[RIFL] Writing transformed Java files to {}  ...", fileNameOnStartUp);
             inputFiles = transformer.getProblemFiles();
         }

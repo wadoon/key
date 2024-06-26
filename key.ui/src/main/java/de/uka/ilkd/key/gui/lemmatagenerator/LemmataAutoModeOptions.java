@@ -8,19 +8,16 @@ import java.util.Collection;
 import java.util.LinkedList;
 
 import de.uka.ilkd.key.proof.Proof;
-
 import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.util.KeYConstants;
+
 import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
 public class LemmataAutoModeOptions {
     public static final int DEFAULT_TIMEOUT = -1;
     public static final int DEFAULT_MAXRULES = 10000;
     private static final String PROOF_POSTFIX = ".key.proof";
-    private static final Logger LOGGER = LoggerFactory.getLogger(LemmataAutoModeOptions.class);
 
     /**
      * The path of the file containing the rules that should be proven.
@@ -32,22 +29,24 @@ public class LemmataAutoModeOptions {
      * The maximum number of rules that are used within a proof.
      */
     @CommandLine.Option(names = "--jr-maxRules", paramLabel = "INT",
-            description = "maximum number of rule application to perform",
-            defaultValue = LemmataAutoModeOptions.DEFAULT_MAXRULES + "")
+        description = "maximum number of rule application to perform",
+        defaultValue = LemmataAutoModeOptions.DEFAULT_MAXRULES + "")
     public int maxRules = -1;
 
-    @CommandLine.Option(names = "--jr-pathOfResult", paramLabel = "FOLDER", description = "store proofs to this folder")
+    @CommandLine.Option(names = "--jr-pathOfResult", paramLabel = "FOLDER",
+        description = "store proofs to this folder")
     public @Nullable File pathOfResult = null;
 
     /**
      * The time out for each proof. If <code>timeout<0</code> no time out is used.
      */
     @CommandLine.Option(names = "--jr-timeout", paramLabel = "INT",
-            description = "the timeout for proof of a taclet in ms",
-            defaultValue = LemmataAutoModeOptions.DEFAULT_TIMEOUT + "")
+        description = "the timeout for proof of a taclet in ms",
+        defaultValue = LemmataAutoModeOptions.DEFAULT_TIMEOUT + "")
     public long timeout = -1;
 
-    @CommandLine.Option(names = "--jr-print", description = "send output to terminal or disable output")
+    @CommandLine.Option(names = "--jr-print",
+        description = "send output to terminal or disable output")
     public boolean print = false;
 
     /**
@@ -55,13 +54,15 @@ public class LemmataAutoModeOptions {
      * <code>pathOfResult</code>.
      */
     @CommandLine.Option(names = "--jr-saveProofToFile",
-            description = "save or drop proofs (then stored to path given by '--jr-pathOfResult')")
+        description = "save or drop proofs (then stored to path given by '--jr-pathOfResult')")
     public boolean saveResultsToFile = false;
 
-    @CommandLine.Option(names = "--jr-axioms", paramLabel = "FILE", description = "read axioms from given file")
+    @CommandLine.Option(names = "--jr-axioms", paramLabel = "FILE",
+        description = "read axioms from given file")
     public @Nullable File pathOfDefinitionFile = null;
 
-    @CommandLine.Option(names = "--jr-signature", paramLabel = "FILE", description = "read definitions from given file")
+    @CommandLine.Option(names = "--jr-signature", paramLabel = "FILE",
+        description = "read definitions from given file")
     public @Nullable File signature = null;
 
 
@@ -116,15 +117,15 @@ public class LemmataAutoModeOptions {
     }
 
     private void checkForValidity() {
-        if (!pathOfRuleFile.isFile()) {
+        if (pathOfRuleFile != null && !pathOfRuleFile.isFile()) {
             throwError(String.format("Error while setting the file containing the rules:\n"
-                    + "'%s' is not a valid file in your system.", pathOfRuleFile));
+                + "'%s' is not a valid file in your system.", pathOfRuleFile));
         }
 
-        if (!pathOfResult.isDirectory()) {
+        if (pathOfResult != null && !pathOfResult.isDirectory()) {
             throwError(String.format(
-                    "Error while setting the folder of the results:\n'%s' is not a folder.",
-                    pathOfResult));
+                "Error while setting the folder of the results:\n'%s' is not a folder.",
+                pathOfResult));
         }
 
     }
@@ -135,13 +136,13 @@ public class LemmataAutoModeOptions {
 
     public String toString() {
         return String.format(
-                """
-                        path of rule file: %s
-                        path of result: %s
-                        maximum number of rules: %s
-                        timeout: %s
-                        save proof to file: %s""",
-                pathOfRuleFile, pathOfResult, maxRules, timeout, saveResultsToFile);
+            """
+                    path of rule file: %s
+                    path of result: %s
+                    maximum number of rules: %s
+                    timeout: %s
+                    save proof to file: %s""",
+            pathOfRuleFile, pathOfResult, maxRules, timeout, saveResultsToFile);
     }
 
     public Collection<String> getFilesForAxioms() {

@@ -16,11 +16,11 @@ import java.util.concurrent.atomic.AtomicReference;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.core.Log;
-import de.uka.ilkd.key.core.Watchdog;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderControl;
 import de.uka.ilkd.key.settings.GeneralSettings;
+
 import org.key_project.slicing.analysis.AnalysisResults;
 
 import org.slf4j.Logger;
@@ -39,13 +39,8 @@ import picocli.CommandLine.Parameters;
 public final class Main implements Callable<Integer> {
     private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
-    /**
-     * Help option.
-     */
-    @Option(names = "--help", description = "display this text")
-    private boolean help = false;
-
-    @Option(names = "--overwrite", description = "overwrite all files with their sliced counterpart")
+    @Option(names = "--overwrite",
+        description = "overwrite all files with their sliced counterpart")
     private boolean overwrite = false;
 
     @Parameters(arity = "*")
@@ -85,7 +80,7 @@ public final class Main implements Callable<Integer> {
         if (file.isFile()) {
             try {
                 if (!path.toString().endsWith(".proof")) {
-                    LOGGER.debug("Ignoring non proof file " + path);
+                    LOGGER.debug("Ignoring non proof file {}", path);
                     return;
                 }
                 processFile(file, overwrite);
@@ -108,10 +103,8 @@ public final class Main implements Callable<Integer> {
         GeneralSettings.noPruningClosed = false;
         AtomicReference<DependencyTracker> tracker = new AtomicReference<>();
         KeYEnvironment<?> environment =
-                KeYEnvironment.load(JavaProfile.getDefaultInstance(), proofFile, null, null, null, null,
-                        null, proof -> {
-                            tracker.set(new DependencyTracker(proof));
-                        }, true);
+            KeYEnvironment.load(JavaProfile.getDefaultInstance(), proofFile, null, null, null, null,
+                null, proof -> tracker.set(new DependencyTracker(proof)), true);
         try {
             // get loaded proof
             Proof proof = environment.getLoadedProof();
@@ -122,21 +115,21 @@ public final class Main implements Callable<Integer> {
             File saved = SlicingProofReplayer
                     .constructSlicer(control, proof, results, null).slice();
             KeYEnvironment<?> environment2 =
-                    KeYEnvironment.load(JavaProfile.getDefaultInstance(), saved, null, null,
-                            null, null, null, null, true);
+                KeYEnvironment.load(JavaProfile.getDefaultInstance(), saved, null, null,
+                    null, null, null, null, true);
             Proof slicedProof = environment2.getLoadedProof();
 
             try {
                 LOGGER.info("Original proof: {} steps, {} branch(es)",
-                        proof.countNodes() - proof.allGoals().size(), proof.countBranches());
+                    proof.countNodes() - proof.allGoals().size(), proof.countBranches());
                 LOGGER.info("Sliced proof: {} steps, {} branch(es)",
-                        slicedProof.countNodes() - slicedProof.allGoals().size(),
-                        slicedProof.countBranches());
+                    slicedProof.countNodes() - slicedProof.allGoals().size(),
+                    slicedProof.countBranches());
 
                 if (overwrite) {
                     LOGGER.info("Saving sliced proof");
                     Files.move(saved.toPath(), proofFile.toPath(),
-                            StandardCopyOption.REPLACE_EXISTING);
+                        StandardCopyOption.REPLACE_EXISTING);
                 } else {
                     Files.delete(saved.toPath());
                 }

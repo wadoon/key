@@ -15,7 +15,6 @@ import java.util.regex.Pattern;
 import de.uka.ilkd.key.api.ProofManagementApi;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.testgen.smt.testgen.TGPhase;
@@ -29,9 +28,9 @@ import picocli.CommandLine;
 @CommandLine.Command(name = "tcgen", mixinStandardHelpOptions = true,
     description = "Generator of Testcases based on Proof Attempts")
 public class TGMain implements Callable<Integer> {
-    private final static Logger LOGGER = LoggerFactory.getLogger("main");
+    private static final Logger LOGGER = LoggerFactory.getLogger("main");
 
-    public static void main(String[] args) throws ProblemLoaderException, InterruptedException {
+    public static void main(String[] args) {
         int exitCode = new CommandLine(new TGMain()).execute(args);
         System.exit(exitCode);
     }
@@ -138,7 +137,7 @@ public class TGMain implements Callable<Integer> {
                     p -> TestgenFacade.generateTestcasesTask(env, p, settings, log)).toList();
                 var futures = tasks.stream().map(exec::submit).toList();
                 for (Future<?> future : futures) {
-                    future.wait();
+                    future.get();
                 }
             } finally {
                 proofs.forEach(Proof::dispose);
@@ -151,7 +150,7 @@ public class TGMain implements Callable<Integer> {
 
 
 class SysoutTestGenerationLifecycleListener implements TestGenerationLifecycleListener {
-    private final static Logger LOGGER = LoggerFactory.getLogger("main");
+    private static final Logger LOGGER = LoggerFactory.getLogger("main");
 
     @Override
     public void writeln(Object sender, @Nullable String message) {

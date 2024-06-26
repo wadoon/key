@@ -66,7 +66,8 @@ public abstract class AbstractTestGenerator {
         this.originalProof = originalProof;
     }
 
-    public void generateTestCases(final StopRequest stopRequest, final TGReporter log) {
+    public void generateTestCases(final StopRequest stopRequest, final TGReporter log)
+            throws InterruptedException {
         TestGenerationSettings settings = TestGenerationSettings.getInstance();
 
         if (!SolverTypes.Z3_CE_SOLVER.isInstalled(true)) {
@@ -89,6 +90,8 @@ public abstract class AbstractTestGenerator {
                 TestGenMacro macro = new TestGenMacro();
                 macro.applyTo(ui, originalProof, originalProof.openEnabledGoals(), null, null);
                 log.writeln("Finished symbolic execution.");
+            } catch (InterruptedException e) {
+                throw e;
             } catch (Exception ex) {
                 log.reportException(ex);
             }
@@ -129,6 +132,7 @@ public abstract class AbstractTestGenerator {
                     LOGGER.debug("Semantics blasting interrupted");
                     log.writeln("\n Warning: semantics blasting was interrupted. "
                         + "A test case will not be generated.");
+                    throw e;
                 } catch (final Exception e) {
                     log.writeln(e.getMessage());
                     LOGGER.warn("", e);
@@ -155,8 +159,7 @@ public abstract class AbstractTestGenerator {
         final DefaultSMTSettings smtsettings =
             new DefaultSMTSettings(pdSettings, piSettings, newSettings, proof);
 
-        var launcher = new SolverLauncher(smtsettings);
-        this.launcher = launcher;
+        launcher = new SolverLauncher(smtsettings);
         launcher.addListener(new SolverLauncherListener() {
             @Override
             public void launcherStopped(SolverLauncher launcher,
