@@ -220,7 +220,9 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
     }
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    static void processHiddenTokens(List<Token> tokens, Output output) {
+    static void processHiddenTokens(@Nullable List<Token> tokens, Output output) {
+        if(tokens == null) return;
+
         for (Token t : tokens) {
             String text = t.getText();
             if (t.getType() == KeYLexer.WS) {
