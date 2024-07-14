@@ -1,16 +1,17 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
-import picocli.CommandLine.Option;
-import picocli.CommandLine.Parameters;
 
 public class KeyFormatMain {
     private static void formatSingleFile(Path input, Path output) throws IOException {
@@ -126,7 +127,7 @@ public class KeyFormatMain {
         @Override
         public Integer call() throws Exception {
             var valid = expandPath(path).stream().map(it -> formatOrCheckInPlace(f, true)).all();
-            return valid ? 0 : 1
+            return valid ? 0 : 1;
         }
     }
 

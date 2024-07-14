@@ -1,22 +1,19 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser.format;
+
+import java.util.List;
 
 import de.uka.ilkd.key.nparser.KeYLexer;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.KeYParserBaseVisitor;
+
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.jspecify.annotations.Nullable;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
     /** Maximum newlines between tokens (2 equals to 1 empty line) */
@@ -216,10 +213,11 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
 
         return null;
     }
-    
+
 
     private static void processHiddenTokens(@Nullable List<Token> tokens, Output output) {
-        if(tokens == null) return;
+        if (tokens == null)
+            return;
 
         for (Token t : tokens) {
             String text = t.getText();

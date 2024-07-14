@@ -1,16 +1,19 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser.format;
+
+import java.util.Set;
 
 import de.uka.ilkd.key.nparser.KeYLexer;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.KeYParserBaseVisitor;
+
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
-import java.util.Arrays;
-import java.util.Set;
-
 /**
- * 
+ *
  * @author Julian Wiesler
  */
 class ExpressionVisitor extends KeYParserBaseVisitor<Void> {
@@ -33,8 +36,7 @@ class ExpressionVisitor extends KeYParserBaseVisitor<Void> {
         KeYLexer.MINUS,
         KeYLexer.PLUS,
         KeYLexer.EQV,
-        KeYLexer.ASSIGN
-    );
+        KeYLexer.ASSIGN);
 
     private final CommonTokenStream ts;
     private final Output output;
