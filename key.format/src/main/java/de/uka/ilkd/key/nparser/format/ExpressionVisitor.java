@@ -7,9 +7,14 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.util.Arrays;
+import java.util.Set;
 
-public class ExpressionVisitor extends KeYParserBaseVisitor<Void> {
-    private static final int[] OPERATORS = {
+/**
+ * 
+ * @author Julian Wiesler
+ */
+class ExpressionVisitor extends KeYParserBaseVisitor<Void> {
+    private static final Set<Integer> OPERATORS = Set.of(
         KeYLexer.LESS,
         KeYLexer.LESSEQUAL,
         KeYLexer.GREATER,
@@ -28,8 +33,8 @@ public class ExpressionVisitor extends KeYParserBaseVisitor<Void> {
         KeYLexer.MINUS,
         KeYLexer.PLUS,
         KeYLexer.EQV,
-        KeYLexer.ASSIGN,
-    };
+        KeYLexer.ASSIGN
+    );
 
     private final CommonTokenStream ts;
     private final Output output;
@@ -71,7 +76,7 @@ public class ExpressionVisitor extends KeYParserBaseVisitor<Void> {
 
     @Override
     public Void visitTerminal(TerminalNode node) {
-        var token = node.getSymbol().getType();
+        int token = node.getSymbol().getType();
 
         boolean isLBrace = token == KeYLexer.LBRACE || token == KeYLexer.LPAREN
                 || token == KeYLexer.LBRACKET || token == KeYLexer.LGUILLEMETS;
@@ -81,7 +86,7 @@ public class ExpressionVisitor extends KeYParserBaseVisitor<Void> {
             output.exitIndent();
         }
 
-        var isOperator = Arrays.stream(OPERATORS).anyMatch(v -> v == token);
+        var isOperator = OPERATORS.contains(token);
         var isUnaryMinus = token == KeYLexer.MINUS &&
                 node.getParent() instanceof KeYParser.Unary_minus_termContext;
         // Unary minus has a "soft" leading space, we allow it if the token before wants it but

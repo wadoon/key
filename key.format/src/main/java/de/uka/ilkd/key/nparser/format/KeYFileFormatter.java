@@ -22,14 +22,12 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
     /** Maximum newlines between tokens (2 equals to 1 empty line) */
     private static final int MAX_NEWLINES_BETWEEN = 2;
 
-    final Output output = new Output();
-    final CommonTokenStream ts;
+    private final Output output = new Output();
+    private final CommonTokenStream ts;
 
     public KeYFileFormatter(CommonTokenStream ts) {
         this.ts = ts;
     }
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////
 
     @Override
     public Void visitFile(KeYParser.FileContext ctx) {
@@ -183,11 +181,11 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
 
     @Override
     public Void visitTaclet(KeYParser.TacletContext ctx) {
-        var n = ctx.getChildCount();
+        int n = ctx.getChildCount();
         for (int i = 0; i < n; ++i) {
             var child = ctx.getChild(i);
             if (child instanceof TerminalNode) {
-                var token = ((TerminalNode) child).getSymbol().getType();
+                int token = ((TerminalNode) child).getSymbol().getType();
                 if (token == KeYLexer.DOC_COMMENT ||
                         token == KeYLexer.LEMMA ||
                         token == KeYLexer.IDENT ||
@@ -218,9 +216,9 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
 
         return null;
     }
-    ////////////////////////////////////////////////////////////////////////////////////////////////
+    
 
-    static void processHiddenTokens(@Nullable List<Token> tokens, Output output) {
+    private static void processHiddenTokens(@Nullable List<Token> tokens, Output output) {
         if(tokens == null) return;
 
         for (Token t : tokens) {
@@ -243,14 +241,14 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
         }
     }
 
-    static void processHiddenTokensAfterCurrent(Token currentToken, CommonTokenStream ts,
+    private static void processHiddenTokensAfterCurrent(Token currentToken, CommonTokenStream ts,
             Output output) {
         // add hidden tokens after the current token (whitespace, comments etc.)
         List<Token> list = ts.getHiddenTokensToRight(currentToken.getTokenIndex());
         processHiddenTokens(list, output);
     }
 
-    static void processIndentationInMLComment(String text, Output output) {
+    private static void processIndentationInMLComment(String text, Output output) {
         // Normalize and split
         var lines = text.split("\n");
 
@@ -312,7 +310,7 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
         output.spaceBeforeNext();
     }
 
-    static void processIndentationInSLComment(String text, Output output) {
+    private static void processIndentationInSLComment(String text, Output output) {
         output.spaceBeforeNext();
         var trimmed = text.stripTrailing();
         // Normalize actual comment content
@@ -404,135 +402,5 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
         formatter.visitFile(ctx);
         var formatted = formatter.output.toString().trim() + "\n";
         return formatted.replaceAll("\n", System.lineSeparator());
-    }
-
-    ////// Test functions below //////
-
-    private static void formatSingleFile(Path input, Path output) throws IOException {
-        var content = Files.readString(input);
-        var formatted = format(content);
-
-        if (formatted == null) {
-            System.err.println("Failed to format " + input);
-            return;
-        }
-
-        if (!formatted.equals(format(formatted))) {
-            System.err.println("Formatter is not convergent on " + input);
-        }
-
-        var noWhitespaceContent = content.replaceAll("\\s+", "");
-        var noWhitespaceFormatted = formatted.replaceAll("\\s+", "");
-        if (!noWhitespaceContent.equals(noWhitespaceFormatted)) {
-            System.err.println("File changed: " + input);
-        }
-
-        Files.writeString(output, formatted);
-    }
-
-    private static void formatSingleFileInSameDir(Path input) throws IOException {
-        var fileName = input.getFileName().toString();
-        if (!fileName.endsWith(".key")) {
-            System.err.println("Ignoring non key file " + input);
-            return;
-        }
-        var stem = fileName.substring(0, fileName.length() - 4);
-        var output = input.resolveSibling(stem + ".format.key");
-        formatSingleFile(input, output);
-    }
-
-    private static void formatSingleFileTo(Path input, Path outputDir) throws IOException {
-        var output = outputDir.resolve(input.getFileName());
-        formatSingleFile(input, output);
-    }
-
-    @SuppressWarnings("unused")
-    private static void formatDirectoryTest(Path dir) throws IOException {
-        Path outDir = dir.getParent().resolve("output");
-        // noinspection ResultOfMethodCallIgnored
-        outDir.toFile().mkdirs();
-        try (Stream<Path> s = Files.list(dir)) {
-            s.forEach(p -> {
-                var file = dir.resolve(p.getFileName());
-                try {
-                    var name = file.getFileName().toString();
-                    if (name.endsWith(".format.format.key")) {
-                        // noinspection ResultOfMethodCallIgnored
-                        file.toFile().delete();
-                        return;
-                    }
-                    formatSingleFileInSameDir(file);
-                    if (!name.endsWith(".format.key")) {
-                        formatSingleFileTo(file, outDir);
-                    }
-                } catch (Exception e) {
-                    System.err.println("Exception while processing " + file);
-                    throw new RuntimeException(e);
-                }
-            });
-        }
-    }
-
-    private static boolean formatOrCheckInPlace(Path file, boolean format) {
-        try {
-            var content = Files.readString(file);
-            var formatted = format(content);
-            if (formatted == null) {
-                System.err.println("Failed to format " + file);
-                return false;
-            }
-
-            var differs = !content.equals(formatted);
-            if (differs) {
-                if (format) {
-                    Files.writeString(file, formatted);
-                } else {
-                    System.err.println(file + " is not formatted correctly");
-                    return false;
-                }
-            }
-        } catch (Exception e) {
-            System.err.println("Exception while processing " + file);
-            e.printStackTrace();
-            return false;
-        }
-        return true;
-    }
-
-    public static void main(String[] args) throws IOException {
-        if (args.length != 2 || (!args[0].equals("format") && !args[0].equals("check"))) {
-            System.err.println("Usage:");
-            System.err.println("* format a directory or a file: format <path>");
-            System.err.println("* check a directory or a file: check <path>");
-            System.exit(3);
-            return;
-        }
-
-        var format = args[0].equals("format");
-        var path = Paths.get(args[1]);
-        var file = path.toFile();
-        if (!file.exists()) {
-            System.err.println("Input path does not exist");
-            System.exit(2);
-            return;
-        }
-
-        List<Path> files;
-        if (file.isDirectory()) {
-            try (Stream<Path> s = Files.list(path)) {
-                files = s.collect(Collectors.toList());
-            }
-        } else {
-            files = Collections.singletonList(path);
-        }
-
-        var valid = true;
-        for (Path f : files) {
-            valid &= formatOrCheckInPlace(f, format);
-        }
-
-        if (!valid) {
-            System.exit(1);
-        }
     }
 }
