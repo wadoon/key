@@ -3,25 +3,48 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser.format;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 
 import de.uka.ilkd.key.nparser.KeYLexer;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.KeYParserBaseVisitor;
 
+import de.uka.ilkd.key.nparser.ParsingFacade;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.jspecify.annotations.Nullable;
 
+/**
+ * {@link KeYFileFormatter} is the entry point for reformatting operation on KeY files.
+ * <p>
+ * It works on the AST and also on the token stream
+ * to also capture hidden tokens like comments.
+ * <p>
+ * For the future, it would be nice to move this onto a stable pretty-printing engine,
+ * which also allows line breaks with indentation if necessary.
+ * We already have such an engine for Java in the background
+ * ({@link de.uka.ilkd.key.util.pp.Layouter}).
+ *
+ * @author Julian Wiesler
+ */
 public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
-    /** Maximum newlines between tokens (2 equals to 1 empty line) */
+    /**
+     * Maximum newlines between tokens (2 means one empty line)
+     */
     private static final int MAX_NEWLINES_BETWEEN = 2;
 
     private final Output output = new Output();
     private final CommonTokenStream ts;
 
+    /**
+     * Create a {@link KeYFileFormatter} with the given stream of tokens.
+     *
+     * @param ts a token stream created by {@link KeYLexer}
+     */
     public KeYFileFormatter(CommonTokenStream ts) {
         this.ts = ts;
     }
@@ -138,14 +161,14 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
 
     @Override
     public Void visitVarexplist(KeYParser.VarexplistContext ctx) {
-        var varexps = ctx.varexp();
+        var varConditions = ctx.varexp();
         var commas = ctx.COMMA();
-        boolean multiline = varexps.size() > 3;
-        for (int i = 0; i < varexps.size(); i++) {
+        boolean multiline = varConditions.size() > 3;
+        for (int i = 0; i < varConditions.size(); i++) {
             if (multiline) {
                 output.assertNewLineAndIndent();
             }
-            visit(varexps.get(i));
+            visit(varConditions.get(i));
             if (i < commas.size()) {
                 visit(commas.get(i));
                 if (!multiline && output.isNewLine()) {
@@ -239,8 +262,8 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
         }
     }
 
-    private static void processHiddenTokensAfterCurrent(Token currentToken, CommonTokenStream ts,
-            Output output) {
+    static void processHiddenTokensAfterCurrent(Token currentToken, CommonTokenStream ts,
+                                                Output output) {
         // add hidden tokens after the current token (whitespace, comments etc.)
         List<Token> list = ts.getHiddenTokensToRight(currentToken.getTokenIndex());
         processHiddenTokens(list, output);
@@ -330,7 +353,7 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
         var token = node.getSymbol().getType();
 
         boolean isLBrace =
-            token == KeYLexer.LBRACE || token == KeYLexer.LPAREN || token == KeYLexer.LBRACKET;
+                token == KeYLexer.LBRACE || token == KeYLexer.LPAREN || token == KeYLexer.LBRACKET;
         if (isLBrace) {
             output.spaceBeforeNext();
         } else if (token == KeYLexer.RBRACE || token == KeYLexer.RPAREN
@@ -344,9 +367,9 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
         }
 
         var noSpaceAround =
-            token == KeYLexer.COLON || token == KeYLexer.DOT || token == KeYLexer.DOUBLECOLON;
+                token == KeYLexer.COLON || token == KeYLexer.DOT || token == KeYLexer.DOUBLECOLON;
         var noSpaceBefore =
-            token == KeYLexer.SEMI || token == KeYLexer.COMMA || token == KeYLexer.LPAREN;
+                token == KeYLexer.SEMI || token == KeYLexer.COMMA || token == KeYLexer.LPAREN;
         if (noSpaceBefore || noSpaceAround) {
             output.noSpaceBeforeNext();
         }
@@ -376,29 +399,29 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
 
     /**
      * Entry level method to the formatter.
-     * The formatter uses System.lineSeparator as line separator and accepts any line separator as
-     * input.
      *
-     * @param text the input text
-     * @return the formatted text *or null*, if the input was not parseable
+     * @param stream char stream
+     * @return the formatted text
+     * @throws de.uka.ilkd.key.util.parsing.SyntaxErrorReporter.ParserException if the given text is not parser
      */
-    public static @Nullable String format(String text) {
-        var in = CharStreams.fromString(text.replaceAll("\\r\\n?", "\n"));
-        KeYLexer lexer = new KeYLexer(in);
-        lexer.setTokenFactory(new CommonTokenFactory(true));
+    public static String format(CharStream stream) {
+        //weigl: Not necessary is handled within the lexer
+        // var in = CharStreams.fromString(text.replaceAll("\\r\\n?", "\n"));
+
+        var lexer = ParsingFacade.createLexer(stream);
+        //weigl: Should not be necessary
+        // lexer.setTokenFactory(new CommonTokenFactory(true));
 
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         tokens.fill();
 
         KeYParser parser = new KeYParser(tokens);
-        KeYParser.FileContext ctx = parser.file();
-        if (parser.getNumberOfSyntaxErrors() > 0) {
-            return null;
-        }
+        parser.removeErrorListeners();
+        parser.addErrorListener(parser.getErrorReporter());
 
+        KeYParser.FileContext ctx = parser.file();
         KeYFileFormatter formatter = new KeYFileFormatter(tokens);
         formatter.visitFile(ctx);
-        var formatted = formatter.output.toString().trim() + "\n";
-        return formatted.replaceAll("\n", System.lineSeparator());
+        return formatter.output.toString().trim() + "\n";
     }
 }

@@ -3,40 +3,40 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser.format;
 
-import java.util.Set;
-
 import de.uka.ilkd.key.nparser.KeYLexer;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.KeYParserBaseVisitor;
-
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
+import java.util.Set;
+
 /**
- *
  * @author Julian Wiesler
  */
 class ExpressionVisitor extends KeYParserBaseVisitor<Void> {
     private static final Set<Integer> OPERATORS = Set.of(
-        KeYLexer.LESS,
-        KeYLexer.LESSEQUAL,
-        KeYLexer.GREATER,
-        KeYLexer.GREATEREQUAL,
-        KeYLexer.EQUALS,
-        KeYLexer.NOT_EQUALS,
-        KeYLexer.IMP,
-        KeYLexer.SEQARROW,
-        KeYLexer.NOT_EQUALS,
-        KeYLexer.AND,
-        KeYLexer.OR,
-        KeYLexer.PARALLEL,
-        KeYLexer.EXP,
-        KeYLexer.PERCENT,
-        KeYLexer.STAR,
-        KeYLexer.MINUS,
-        KeYLexer.PLUS,
-        KeYLexer.EQV,
-        KeYLexer.ASSIGN);
+            KeYLexer.LESS,
+            KeYLexer.LESSEQUAL,
+            KeYLexer.GREATER,
+            KeYLexer.GREATEREQUAL,
+            KeYLexer.EQUALS,
+            KeYLexer.IMP,
+            KeYLexer.SEQARROW,
+            KeYLexer.NOT_EQUALS,
+            KeYLexer.AND,
+            KeYLexer.OR,
+            KeYLexer.PARALLEL,
+            KeYLexer.EXP,
+            KeYLexer.PERCENT,
+            KeYLexer.STAR,
+            KeYLexer.MINUS,
+            KeYLexer.PLUS,
+            KeYLexer.EQV,
+            KeYLexer.ASSIGN);
+
+    private static final Set<Integer> BRACES = Set.of(
+            KeYLexer.LBRACE, KeYLexer.LPAREN, KeYLexer.LBRACKET, KeYLexer.LGUILLEMETS);
 
     private final CommonTokenStream ts;
     private final Output output;
@@ -80,8 +80,7 @@ class ExpressionVisitor extends KeYParserBaseVisitor<Void> {
     public Void visitTerminal(TerminalNode node) {
         int token = node.getSymbol().getType();
 
-        boolean isLBrace = token == KeYLexer.LBRACE || token == KeYLexer.LPAREN
-                || token == KeYLexer.LBRACKET || token == KeYLexer.LGUILLEMETS;
+        boolean isLBrace = BRACES.contains(token);
         if (token == KeYLexer.RBRACE || token == KeYLexer.RPAREN || token == KeYLexer.RBRACKET
                 || token == KeYLexer.RGUILLEMETS) {
             output.noSpaceBeforeNext();
