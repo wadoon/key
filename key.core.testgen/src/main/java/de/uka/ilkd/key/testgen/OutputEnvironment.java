@@ -10,30 +10,38 @@ import java.nio.file.StandardCopyOption;
 import java.util.Objects;
 
 /**
+ * This class manages the different paths in the output folder.
  * @author Alexander Weigl
  * @version 1 (02.02.24)
  */
 public record OutputEnvironment(Path targetFolder) {
+    /** Returns the source code folder */
     public Path getSourceDir() {
         return targetFolder.resolve("src");
     }
 
+    /** Returns the test code folder */
     public Path getTestSourceDir() {
         return targetFolder.resolve("test");
     }
 
+    /** Returns the path to the ANT build.xml file */
     public Path getAntFile() {
         return targetFolder.resolve("build.xml");
     }
 
+    /** Returns the path to the README.md file */
     public Path getReadmeFile() {
         return targetFolder.resolve("README.md");
     }
 
+    /**
+     * Initialize/create the necessary directories.
+     * @throws IOException if the output folder is not write or the folders can not be created.
+     */
     public void init() throws IOException {
         Files.createDirectories(getSourceDir());
         Files.createDirectories(getTestSourceDir());
-
         installAntFile();
     }
 

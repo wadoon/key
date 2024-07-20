@@ -42,7 +42,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static de.uka.ilkd.key.testgen.Constants.*;
-import static de.uka.ilkd.key.testgen.Format.JUNIT_4;
+import static de.uka.ilkd.key.testgen.JUnitFormat.JUNIT_4;
 import static de.uka.ilkd.key.testgen.TestgenUtils.*;
 
 /**
@@ -808,6 +808,6 @@ public class TestCaseGenerator {
     }
 
     public boolean isJunit() {
-        return settings.getFormat() == JUNIT_4 || settings.getFormat() == Format.JUNIT_5;
+        return settings.getFormat() == JUNIT_4 || settings.getFormat() == JUnitFormat.JUNIT_5;
     }
 }

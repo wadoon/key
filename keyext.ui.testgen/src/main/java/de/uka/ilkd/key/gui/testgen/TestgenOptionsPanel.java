@@ -8,7 +8,6 @@ import javax.swing.*;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.settings.SettingsPanel;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
-import de.uka.ilkd.key.testgen.Format;
 import de.uka.ilkd.key.testgen.TestGenerationSettings;
 
 public class TestgenOptionsPanel extends SettingsPanel implements SettingsProvider {
@@ -60,7 +59,7 @@ public class TestgenOptionsPanel extends SettingsPanel implements SettingsProvid
     private final JSpinner maxProcesses;
     private final JSpinner maxUnwinds;
     private final JCheckBox symbolicEx;
-    private final JComboBox<Format> useJUnit;
+    private final JComboBox<JUnitFormat> useJUnit;
     private final JCheckBox invariantForAll;
     private final JCheckBox includePostCondition;
     private final JCheckBox removeDuplicates;
@@ -116,10 +115,10 @@ public class TestgenOptionsPanel extends SettingsPanel implements SettingsProvid
         });
     }
 
-    private JComboBox<Format> getJUnitPanel() {
+    private JComboBox<JUnitFormat> getJUnitPanel() {
         return addComboBox("Set the format", INFO_USE_JUNIT, 0, val -> {
             settings.setFormat(val);
-        }, Format.values());
+        }, JUnitFormat.values());
     }
 
     private JCheckBox getRemoveDuplicatesPanel() {

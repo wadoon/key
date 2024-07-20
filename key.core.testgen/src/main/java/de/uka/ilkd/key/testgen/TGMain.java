@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
 @CommandLine.Command(name = "tcgen", mixinStandardHelpOptions = true,
-    description = "Generator of Testcases based on Proof Attempts")
+        description = "Generator of Testcases based on Proof Attempts")
 public class TGMain implements Callable<Integer> {
     private static final Logger LOGGER = LoggerFactory.getLogger("main");
 
@@ -38,41 +38,41 @@ public class TGMain implements Callable<Integer> {
     @CommandLine.Parameters(description = "KeY or Java file.", arity = "1..*")
     private List<File> files = new LinkedList<>();
 
-    @CommandLine.Parameters(description = "Number of parallel jobs", defaultValue = "4")
+    @CommandLine.Option(names = "-T", description = "Number of parallel jobs", defaultValue = "4")
     private int numberOfThreads = 4;
 
-    @CommandLine.Option(names = { "-s", "--symbex" },
-        description = "apply symbolic execution", negatable = true)
+    @CommandLine.Option(names = {"-s", "--symbex"},
+            description = "apply symbolic execution", negatable = true)
     private boolean symbex;
 
-    @CommandLine.Option(names = { "-c", "--contract" }, arity = "*",
-        description = "name of the contract to be loaded in the Java environment. Can be a regular expression")
+    @CommandLine.Option(names = {"-c", "--contract"}, arity = "*",
+            description = "name of the contract to be loaded in the Java environment. Can be a regular expression")
     private List<String> contractNames = new ArrayList<>();
 
-    @CommandLine.Option(names = { "--all-contracts" },
-        description = "test case generation for all contracts")
+    @CommandLine.Option(names = {"--all-contracts"},
+            description = "test case generation for all contracts")
     private boolean allContracts = false;
 
-    @CommandLine.Option(names = { "-o", "--output" }, description = "Output folder")
+    @CommandLine.Option(names = {"-o", "--output"}, description = "Output folder")
     private File outputFolder = new File("out");
 
-    @CommandLine.Option(names = { "-r", "--rfl" }, description = "Use Reflection class",
-        negatable = true)
+    @CommandLine.Option(names = {"-r", "--rfl"}, description = "Use Reflection class",
+            negatable = true)
     private boolean useReflection = false;
 
-    @CommandLine.Option(names = { "-f", "--format" },
-        description = "use Reflection class for instantiation")
-    private Format format = Format.JUNIT_4;
+    @CommandLine.Option(names = {"-f", "--format"},
+            description = "use Reflection class for instantiation")
+    private JUnitFormat format = JUnitFormat.JUNIT_4;
 
-    @CommandLine.Option(names = { "--max-unwinds" }, description = "max unwinds of loops")
+    @CommandLine.Option(names = {"--max-unwinds"}, description = "max unwinds of loops")
     private int maxUnwinds = 10;
 
-    @CommandLine.Option(names = { "--dups" }, description = "remove duplicates", negatable = true)
+    @CommandLine.Option(names = {"--dups"}, description = "remove duplicates", negatable = true)
     private boolean removeDuplicates;
 
-    @CommandLine.Option(names = { "--only-tests" },
-        description = "only put test classes directly in the output folder, no build file, no copy of sources",
-        negatable = true)
+    @CommandLine.Option(names = {"--only-tests"},
+            description = "only put test classes directly in the output folder, no build file, no copy of sources",
+            negatable = true)
     private boolean onlyTestClasses;
 
 
@@ -102,7 +102,7 @@ public class TGMain implements Callable<Integer> {
             LOGGER.info("I accept every contract given by `--all-contracts`");
         } else if (contractNames.isEmpty()) {
             LOGGER.info(
-                "Only printing the contracts. You need to give contracts with `-c` or use `--all-contracts`.");
+                    "Only printing the contracts. You need to give contracts with `-c` or use `--all-contracts`.");
         } else {
             LOGGER.info("Regex matching against contract names is: {}", contractNameMatcher);
         }
@@ -134,7 +134,7 @@ public class TGMain implements Callable<Integer> {
             try {
                 LOGGER.info("Start processing with {} threads", numberOfThreads);
                 var tasks = proofs.stream().map(
-                    p -> TestgenFacade.generateTestcasesTask(env, p, settings, log)).toList();
+                        p -> TestgenFacade.generateTestcasesTask(env, p, settings, log)).toList();
                 var futures = tasks.stream().map(exec::submit).toList();
                 for (Future<?> future : futures) {
                     future.get();
