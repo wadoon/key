@@ -40,7 +40,7 @@ import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
 import org.eclipse.lsp4j.jsonrpc.services.JsonSegment;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
-import org.keyproject.key.api.remoteapi.KeyApi;
+import KeyApi;
 import org.keyproject.key.api.remoteclient.ClientApi;
 import picocli.CommandLine;
 import picocli.CommandLine.Option;

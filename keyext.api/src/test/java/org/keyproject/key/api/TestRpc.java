@@ -18,7 +18,7 @@ import org.eclipse.lsp4j.jsonrpc.json.StreamMessageProducer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.keyproject.key.api.remoteapi.KeyApi;
+import KeyApi;
 import org.keyproject.key.api.remoteclient.ClientApi;
 
 public class TestRpc {

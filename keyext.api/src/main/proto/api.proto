@@ -1,0 +1,284 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+
+
+import "google/protobuf/empty.proto";
+
+option java_package = "org.keyproject.key.api";
+
+
+message EnvironmentId {
+  required string envId = 1;
+}
+
+message SortDesc {
+  required string name = 1;
+  optional string documentation = 2;
+  repeated SortDesc extendsSorts = 3;
+  required bool anAbstract = 4;
+  required string declaration = 5;
+}
+
+message SortDescs {repeated SortDesc descriptions = 1;}
+message FunctionDescs {required FunctionDesc descriptions = 1;}
+message ContractDescs {required ContractDesc descriptions = 1;}
+
+message ContractDesc {
+  required ContractId contractId = 1;
+  required string name = 2;
+  required string displayName = 3;
+  required string typeName = 4;
+  required string htmlText = 5;
+  required string plainText = 6;
+}
+
+message FunctionDesc {
+  required string name = 1;
+  required string sort = 2;
+  required SortDesc retSort = 3;
+  repeated SortDesc argSorts = 4;
+  required bool rigid = 5;
+  required bool unique = 6;
+  required bool skolemConstant = 7;
+}
+
+message ContractId{
+  required EnvironmentId envId = 1;
+  required int32 contractId = 2;
+}
+message NodeId{
+  required ProofId proofId = 1;
+  required  int32 nodeId = 2;
+}
+
+message ProofId{
+  required EnvironmentId env = 1;
+  required  string proofId = 2;
+}
+
+message NodeTextId{
+  required NodeId nodeId = 1;
+  required  int32 nodeTextId = 2;
+}
+
+message TermActionId{
+  required NodeId nodeId = 1;
+  required  string pio = 2;
+  required  string id = 3;
+}
+
+message TreeNodeId{
+  required string id = 1;
+}
+
+
+service KeY {
+  //region environment
+  rpc sorts (EnvironmentId) returns (SortDescs) {}
+  rpc functions(EnvironmentId) returns (FunctionDescs) {}
+  rpc contracts(EnvironmentId) returns (ContractDescs){}
+  rpc openContract(ContractId) returns (ProofId) {}
+  //endregion
+}
+
+message ExampleDesc {
+  required ExampleId exampleId = 1;
+  required string content = 2;
+}
+
+service Examples {
+  rpc examples(google.protobuf.Empty) returns (stream ExampleDesc);
+}
+
+message TermActionDesc{
+  /**
+   * Unique identification
+   */
+  required TermActionId commandId = 1;
+  /**
+   * A string to display to the user.
+   */
+  required string displayName = 2;
+  /**
+   * Long description of the action for the user.
+   */
+  required string description = 3;
+  /**
+   * A string identifying a category
+   */
+  required string category = 4;
+  /**
+   * Kind of the action
+   */
+  required TermActionKind kind = 5;
+}
+
+enum TermActionKind {
+  BuiltIn = 1;
+  Script = 2;
+  Macro = 3;
+  Taclet = 4;
+}
+
+message TermActionDescs {
+  required TermActionDesc descriptions = 1;
+}
+
+message PrintOptions {}
+message PrintParams{
+  required NodeId nodeId = 1;
+  optional PrintOptions options = 2;
+}
+
+message ActionParams{
+  required NodeTextId nodeTextId = 1;
+  required int32 caretPos = 2;
+}
+
+message NodeTextDesc {
+  required NodeTextId nodeTextId = 1;
+  required string result = 2;
+}
+
+service GoalApi {
+  rpc print(PrintParams) returns(NodeTextDesc);
+  rpc actions(ActionParams) returns (TermActionDescs){}
+  rpc applyAction(TermActionId) returns (TermActionDescs){}
+  rpc freePrint(NodeTextId) returns (google.protobuf.Empty){}
+}
+
+message TreeNodeDesc {}
+message TreeNodeDescs {required TreeNodeDesc desc = 1;}
+
+service ProofTreeApi {
+  rpc treeRoot(ProofId) returns (TreeNodeDesc);
+  rpc treeChildren(TreeNodeId) returns (TreeNodeDescs);
+  rpc treeSubtree(TreeNodeId) returns (TreeNodeDescs);
+}
+
+message VersionInfo {
+  required string version = 1;
+}
+
+message ProofMacroDescs {
+  required ProofMacroDesc descriptions = 1;
+}
+
+message  ProofMacroDesc {
+  required string name = 1;
+  required string category = 2;
+  required string description = 3;
+  required string scriptCommandName = 4;
+}
+
+message ProofScriptCommandDescs {
+  repeated ProofScriptCommandDesc seq = 1;
+}
+
+message ProofScriptCommandDesc {
+  required string name = 1;
+  required string description = 3;
+}
+
+service MetaApi {
+  rpc getVersion(google.protobuf.Empty) returns (VersionInfo);
+  rpc getAvailableMacros(google.protobuf.Empty) returns (ProofMacroDescs);
+  rpc getAvailableScriptCommands(google.protobuf.Empty) returns (ProofScriptCommandDescs);
+}
+
+message MacroStatistic {}
+
+message StrategyOptions {
+
+}
+
+message AutoMacroParams {
+  required ProofId proof = 1;
+  required StrategyOptions options = 2;
+}
+
+message MacroParams {
+  required ProofId proof = 1;
+  required string macroId = 2;
+  required StrategyOptions options = 3;
+}
+
+message ScriptExecutionParams {
+  required ProofId proof = 1;
+  required string scriptLine = 2;
+  required StrategyOptions options = 3;
+}
+
+message GoalsParam {
+  required ProofId proof = 1;
+  required bool onlyOpen = 2;
+  required bool onlyEnabled = 3;
+}
+
+message  NodeDesc{
+  required NodeId nodeid = 1;
+  repeated string branchLabel = 2;
+  repeated bool scriptRuleApplication = 3;
+  repeated NodeDesc children = 4;
+}
+
+message Statistics {}
+
+service ProofApi {
+  rpc script(ScriptExecutionParams) returns (MacroStatistic);
+  rpc macro(MacroParams) returns (MacroStatistic);
+  rpc auto(AutoMacroParams) returns (MacroStatistic);
+  rpc dispose(ProofId) returns (google.protobuf.Empty);
+  rpc goals(google.protobuf.Empty) returns (NodeDesc);
+  rpc tree(ProofId) returns (NodeDesc);
+  rpc root(ProofId) returns (NodeDesc);
+  rpc children(NodeId) returns (NodeDesc);
+  rpc pruneTo(NodeId) returns (NodeDesc);
+  rpc statistics(ProofId) returns (Statistics);
+}
+
+message PredicateDesc {
+  required string name = 1;
+  repeated SortDesc argSorts = 2;
+}
+
+message ProblemDefinition{
+  repeated SortDesc sorts = 1;
+  repeated FunctionDesc functions = 2;
+  repeated PredicateDesc predicates = 3;
+  repeated string antecTerms = 4;
+  repeated string succTerms = 5;
+}
+
+message ExampleId {
+  required string name = 1;
+}
+
+message LoadKeYParam {
+  required string filePath = 1;
+}
+
+message LoadKeYTermParam {
+  required string termInput = 1;
+}
+
+message LoadParams {
+  required string keyFile = 1;
+  required string javaFile = 2;
+  repeated  string classPath = 3;
+  required string bootClassPath = 4;
+  repeated  string includes = 5;
+}
+
+service ProofLoadApi {
+  rpc loadExample(ExampleId) returns (ProofId);
+  rpc loadProblem(ProblemDefinition) returns (ProofId);
+  rpc loadKey(LoadKeYParam) returns (ProofId);
+  rpc loadTerm(LoadKeYTermParam) returns (ProofId);
+  rpc load(LoadParams) returns (EnvironmentId);
+}
+
+service Server  {
+  rpc shutdown(google.protobuf.Empty)returns (google.protobuf.Empty);
+}
