@@ -3,15 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser.format;
 
-import java.io.IOException;
-import java.nio.file.Path;
 import java.util.List;
 
 import de.uka.ilkd.key.nparser.KeYLexer;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.KeYParserBaseVisitor;
-
 import de.uka.ilkd.key.nparser.ParsingFacade;
+
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.RuleNode;
@@ -263,7 +261,7 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
     }
 
     static void processHiddenTokensAfterCurrent(Token currentToken, CommonTokenStream ts,
-                                                Output output) {
+            Output output) {
         // add hidden tokens after the current token (whitespace, comments etc.)
         List<Token> list = ts.getHiddenTokensToRight(currentToken.getTokenIndex());
         processHiddenTokens(list, output);
@@ -353,7 +351,7 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
         var token = node.getSymbol().getType();
 
         boolean isLBrace =
-                token == KeYLexer.LBRACE || token == KeYLexer.LPAREN || token == KeYLexer.LBRACKET;
+            token == KeYLexer.LBRACE || token == KeYLexer.LPAREN || token == KeYLexer.LBRACKET;
         if (isLBrace) {
             output.spaceBeforeNext();
         } else if (token == KeYLexer.RBRACE || token == KeYLexer.RPAREN
@@ -367,9 +365,9 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
         }
 
         var noSpaceAround =
-                token == KeYLexer.COLON || token == KeYLexer.DOT || token == KeYLexer.DOUBLECOLON;
+            token == KeYLexer.COLON || token == KeYLexer.DOT || token == KeYLexer.DOUBLECOLON;
         var noSpaceBefore =
-                token == KeYLexer.SEMI || token == KeYLexer.COMMA || token == KeYLexer.LPAREN;
+            token == KeYLexer.SEMI || token == KeYLexer.COMMA || token == KeYLexer.LPAREN;
         if (noSpaceBefore || noSpaceAround) {
             output.noSpaceBeforeNext();
         }
@@ -402,14 +400,15 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
      *
      * @param stream char stream
      * @return the formatted text
-     * @throws de.uka.ilkd.key.util.parsing.SyntaxErrorReporter.ParserException if the given text is not parser
+     * @throws de.uka.ilkd.key.util.parsing.SyntaxErrorReporter.ParserException if the given text is
+     *         not parser
      */
     public static String format(CharStream stream) {
-        //weigl: Not necessary is handled within the lexer
+        // weigl: Not necessary is handled within the lexer
         // var in = CharStreams.fromString(text.replaceAll("\\r\\n?", "\n"));
 
         var lexer = ParsingFacade.createLexer(stream);
-        //weigl: Should not be necessary
+        // weigl: Should not be necessary
         // lexer.setTokenFactory(new CommonTokenFactory(true));
 
         CommonTokenStream tokens = new CommonTokenStream(lexer);
