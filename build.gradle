@@ -24,8 +24,7 @@ plugins {
     id "com.diffplug.spotless" version "6.25.0"
 
     // EISOP Checker Framework
-    id "org.checkerframework" version "0.6.44"
-    id "org.checkerframework" version "0.6.41"
+    id "org.checkerframework" version "0.6.45"
 
     id("org.sonarqube") version "5.0.0.4638"
 }
@@ -36,8 +35,6 @@ sonar {
     property "sonar.organization", "keyproject"
     property "sonar.host.url", "https://sonarcloud.io"
   }
-}
-
 
 // Configure this project for use inside IntelliJ:
 idea {
