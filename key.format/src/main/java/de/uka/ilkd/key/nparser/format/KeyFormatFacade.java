@@ -2,11 +2,19 @@
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser.format;/*
-                                        * This file is part of KeY - https://key-project.org
-                                        * KeY is licensed under the GNU General Public License
-                                        * Version 2
-                                        * SPDX-License-Identifier: GPL-2.0-only
-                                        */
+ * This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License
+ * Version 2
+ * SPDX-License-Identifier: GPL-2.0-only
+ */
+
+import de.uka.ilkd.key.util.parsing.SyntaxErrorReporter;
+import org.antlr.v4.runtime.CharStreams;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import picocli.CommandLine;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Parameters;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -19,15 +27,6 @@ import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import de.uka.ilkd.key.util.parsing.SyntaxErrorReporter;
-
-import org.antlr.v4.runtime.CharStreams;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import picocli.CommandLine;
-import picocli.CommandLine.Command;
-import picocli.CommandLine.Parameters;
-
 import static de.uka.ilkd.key.nparser.format.KeYFileFormatter.format;
 
 /**
@@ -38,18 +37,33 @@ import static de.uka.ilkd.key.nparser.format.KeYFileFormatter.format;
  */
 public class KeyFormatFacade {
     /**
-     *
+     * Enables or disables the check for convergence of the formatting, i.e.,
+     * {@code format(format(x)) == format(x)}.
      */
-    public static boolean CONVERGENT_CHECK = false;
+    public static boolean convergentCheck = false;
 
-    public static final Logger LOGGER = LoggerFactory.getLogger(KeyFormatFacade.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(KeyFormatFacade.class);
+
+    /**
+     * Check if the given {@code file} is properly formatted.
+     *
+     * @param file path to an existing file
+     * @return true iff the file is properly formatted
+     * @throws IOException if the file does not exist or is not readable.
+     */
+    public static boolean checkFile(Path file) throws IOException {
+        var formatted = format(CharStreams.fromPath(file));
+        var content = Files.readString(file);
+        return !content.equals(formatted);
+    }
+
 
     /**
      * Reformat the given path and store it in {@code output}.
      * <p>
      * {@code} output is not written when an error occurred.
      *
-     * @param input source file
+     * @param input  source file
      * @param output target file
      * @throws IOException file not found or not readable.
      */
@@ -58,7 +72,7 @@ public class KeyFormatFacade {
         try {
             var formatted = format(content);
 
-            if (CONVERGENT_CHECK) {
+            if (convergentCheck) {
                 var secondInput = CharStreams.fromString(formatted);
                 try {
                     if (!formatted.equals(format(secondInput))) {
@@ -78,12 +92,6 @@ public class KeyFormatFacade {
     private static void formatSingleFileTo(Path input, Path outputDir) throws IOException {
         var output = outputDir.resolve(input.getFileName());
         formatSingleFile(input, output);
-    }
-
-    public static boolean checkFile(Path file) throws IOException {
-        var formatted = format(CharStreams.fromPath(file));
-        var content = Files.readString(file);
-        return !content.equals(formatted);
     }
 
     private static List<Path> expandPath(Path path) throws IOException {

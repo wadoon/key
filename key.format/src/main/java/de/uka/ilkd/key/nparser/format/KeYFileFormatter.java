@@ -75,7 +75,7 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
                     output.assertNewLineAndIndent();
                 } else if (token == KeYParser.RBRACE) {
                     visit(child);
-                    output.assertNewLine();
+                    output.clearline();
                     continue;
                 }
             }
@@ -97,7 +97,7 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
                     output.assertNewLineAndIndent();
                 } else if (token == KeYParser.RBRACE) {
                     visit(child);
-                    output.assertNewLine();
+                    output.clearline();
                     continue;
                 }
             }
@@ -221,7 +221,7 @@ public class KeYFileFormatter extends KeYParserBaseVisitor<Void> {
                     output.spaceBeforeNext();
                     continue;
                 } else if (token == KeYLexer.RBRACE) {
-                    output.assertNewLine();
+                    output.clearline();
                 }
             } else if (child instanceof RuleContext) {
                 if (child instanceof KeYParser.Option_listContext) {
