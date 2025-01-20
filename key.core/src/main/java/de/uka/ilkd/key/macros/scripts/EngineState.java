@@ -3,13 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros.scripts;
 
-import java.io.File;
-import java.util.Deque;
-import java.util.LinkedList;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.function.Consumer;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
@@ -21,12 +14,18 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofSettings;
-
+import org.antlr.v4.runtime.CharStreams;
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 
-import org.antlr.v4.runtime.CharStreams;
-import org.jspecify.annotations.NonNull;
+import javax.script.ScriptEngine;
+import java.io.File;
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Consumer;
 
 /**
  * @author Alexander Weigl
@@ -44,6 +43,8 @@ public class EngineState {
     private Goal goal;
     private Node lastSetGoalNode;
 
+    private final ProofScriptEngine engine;
+
     /**
      * If set to true, outputs all commands to observers and console. Otherwise, only shows explicit
      * echo messages.
@@ -56,11 +57,9 @@ public class EngineState {
      */
     private boolean failOnClosedOn = true;
 
-    public EngineState(Proof proof) {
+    public EngineState(Proof proof, ProofScriptEngine engine) {
         this.proof = proof;
-        valueInjector.addConverter(Term.class, (String s) -> toTerm(s, null));
-        valueInjector.addConverter(Sequent.class, this::toSequent);
-        valueInjector.addConverter(Sort.class, this::toSort);
+        this.engine = engine;
     }
 
     protected static Goal getGoal(ImmutableList<Goal> openGoals, Node node) {
@@ -86,9 +85,8 @@ public class EngineState {
      *
      * @param checkAutomatic Set to true if the returned {@link Goal} should be automatic.
      * @return the first open goal, which has to be automatic iff checkAutomatic is true.
-     *
      * @throws ProofAlreadyClosedException If the proof is already closed when calling this method.
-     * @throws ScriptException If there is no such {@link Goal}, or something else goes wrong.
+     * @throws ScriptException             If there is no such {@link Goal}, or something else goes wrong.
      */
     @SuppressWarnings("unused")
     public @NonNull Goal getFirstOpenGoal(boolean checkAutomatic) throws ScriptException {
@@ -124,7 +122,6 @@ public class EngineState {
 
     /**
      * @return The first open and automatic {@link Goal}.
-     *
      * @throws ScriptException If there is no such {@link Goal}.
      */
     public Goal getFirstOpenAutomaticGoal() throws ScriptException {
@@ -134,7 +131,7 @@ public class EngineState {
     private static Node goUpUntilOpen(final Node start) {
         Node currNode = start;
 
-        while (currNode.isClosed()) {
+        while (currNode != null && currNode.isClosed()) {
             /*
              * There should always be a non-closed parent since we check whether the proof is closed
              * at the beginning.
@@ -151,7 +148,8 @@ public class EngineState {
         Goal result = null;
         Node node = rootNode;
 
-        loop: while (node != null) {
+        loop:
+        while (node != null) {
             if (node.isClosed()) {
                 return null;
             }
@@ -159,30 +157,30 @@ public class EngineState {
             int childCount = node.childrenCount();
 
             switch (childCount) {
-            case 0 -> {
-                result = getGoal(proof.openGoals(), node);
-                if (!checkAutomatic || Objects.requireNonNull(result).isAutomatic()) {
-                    // We found our goal
-                    break loop;
+                case 0 -> {
+                    result = getGoal(proof.openGoals(), node);
+                    if (!checkAutomatic || Objects.requireNonNull(result).isAutomatic()) {
+                        // We found our goal
+                        break loop;
+                    }
+                    node = choices.pollLast();
                 }
-                node = choices.pollLast();
-            }
-            case 1 -> node = node.child(0);
-            default -> {
-                Node next = null;
-                for (int i = 0; i < childCount; i++) {
-                    Node child = node.child(i);
-                    if (!child.isClosed()) {
-                        if (next == null) {
-                            next = child;
-                        } else {
-                            choices.add(child);
+                case 1 -> node = node.child(0);
+                default -> {
+                    Node next = null;
+                    for (int i = 0; i < childCount; i++) {
+                        Node child = node.child(i);
+                        if (!child.isClosed()) {
+                            if (next == null) {
+                                next = child;
+                            } else {
+                                choices.add(child);
+                            }
                         }
                     }
+                    assert next != null;
+                    node = next;
                 }
-                assert next != null;
-                node = next;
-            }
             }
         }
 
@@ -197,7 +195,7 @@ public class EngineState {
             return term;
         else
             throw new IllegalStateException(
-                "Unexpected sort for term: " + term + ". Expected: " + sort);
+                    "Unexpected sort for term: " + term + ". Expected: " + sort);
     }
 
     private @NonNull KeyIO getKeyIO() throws ScriptException {
@@ -273,5 +271,9 @@ public class EngineState {
 
     public void setFailOnClosedOn(boolean failOnClosedOn) {
         this.failOnClosedOn = failOnClosedOn;
+    }
+
+    public ProofScriptEngine getEngine() {
+        return engine;
     }
 }

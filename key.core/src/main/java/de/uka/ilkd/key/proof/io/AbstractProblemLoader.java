@@ -15,7 +15,7 @@ import java.util.zip.ZipFile;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.nparser.KeYLexer;
-import de.uka.ilkd.key.nparser.ProofScriptEntry;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -659,9 +659,9 @@ public abstract class AbstractProblemLoader {
     }
 
     /**
-     * Returns a {@link ProofScriptEntry} if {@code \proofscript} is given with the problem.
+     * Returns a {@link KeyAst.ProofScriptEntry} if {@code \proofscript} is given with the problem.
      */
-    public @Nullable ProofScriptEntry getProofScript() {
+    public KeyAst.@Nullable ProofScriptEntry getProofScript() {
         if (!hasProofScript()) {
             return null;
         }

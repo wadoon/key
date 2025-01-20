@@ -3,17 +3,21 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros.scripts;
 
-import java.io.File;
-import java.nio.file.NoSuchFileException;
-
 import de.uka.ilkd.key.macros.scripts.meta.Option;
-
+import de.uka.ilkd.key.nparser.ParsingFacade;
+import org.antlr.v4.runtime.CharStreams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
+
+/**
+ * Call other script files.
+ */
 public class ScriptCommand extends AbstractCommand<ScriptCommand.Parameters> {
-    private static final Logger LOGGER =
-        LoggerFactory.getLogger(ProofScriptCommand.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ScriptCommand.class);
 
     public ScriptCommand() {
         super(Parameters.class);
@@ -30,12 +34,13 @@ public class ScriptCommand extends AbstractCommand<ScriptCommand.Parameters> {
         if (!root.isDirectory()) {
             root = root.getParentFile();
         }
-        File file = new File(root, args.filename);
+        Path file = root.toPath().resolve(args.filename);
 
-        LOGGER.info("Included script " + file);
+        LOGGER.info("Included script {}", file);
 
         try {
-            ProofScriptEngine pse = new ProofScriptEngine(file);
+            var script = ParsingFacade.parseProofScript(CharStreams.fromPath(file));
+            ProofScriptEngine pse = new ProofScriptEngine(script);
             pse.setCommandMonitor(state.getObserver());
             pse.execute(uiControl, proof);
         } catch (NoSuchFileException e) {
@@ -43,7 +48,7 @@ public class ScriptCommand extends AbstractCommand<ScriptCommand.Parameters> {
             throw new ScriptException("Script file '" + file + "' not found", e);
         } catch (Exception e) {
             throw new ScriptException("Error while running script'" + file + "': " + e.getMessage(),
-                e);
+                    e);
         }
     }
 

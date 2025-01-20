@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.gui;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -23,7 +24,7 @@ import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
-import de.uka.ilkd.key.nparser.ProofScriptEntry;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -221,10 +222,9 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             } else {
                 KeYMediator mediator = mainWindow.getMediator();
                 mediator.getNotationInfo().refresh(mediator.getServices());
-                ProofScriptEntry scriptAndLoc = problemLoader.getProofScript();
+                KeyAst.ProofScriptEntry scriptAndLoc = problemLoader.getProofScript();
                 if (scriptAndLoc != null) {
-                    ProofScriptWorker psw = new ProofScriptWorker(mainWindow.getMediator(),
-                        scriptAndLoc.script(), scriptAndLoc.location());
+                    ProofScriptWorker psw = new ProofScriptWorker(mainWindow.getMediator(), scriptAndLoc);
                     psw.init();
                     psw.execute();
                 } else if (macroChosen()) {

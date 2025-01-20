@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros.scripts;
 
-import java.util.HashMap;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import java.util.Map;
 
 /**
  * @author Alexander Weigl
@@ -15,11 +15,10 @@ import org.junit.jupiter.api.Test;
 public class SMTCommandTest {
     @Test
     public void testInstantiation() throws Exception {
-        HashMap<String, String> args = new HashMap<>();
-        args.put("solver", "z3");
+        Map<String, Object> args = Map.of("solver", "z3");
 
         SMTCommand cmd = new SMTCommand();
-        SMTCommand.SMTCommandArguments o = cmd.evaluateArguments(new EngineState(null), args);
+        SMTCommand.SMTCommandArguments o = cmd.evaluateArguments(new EngineState(null, null), args);
         Assertions.assertEquals("z3", o.solver);
     }
 }

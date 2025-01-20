@@ -6,8 +6,8 @@
 
 ### script
 
-macro split-prop;
-hide "a ==> d, e";
+macro "split-prop";
+hide `a ==> d, e`;
 
 ### goals
 

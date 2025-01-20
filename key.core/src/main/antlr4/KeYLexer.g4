@@ -252,14 +252,9 @@ VOCAB
    :       '\u0003'..'\u0377'
    ;
 
-SEMI
-:	';'
-    ;
-
-SLASH
-:	'/'
-    ;
-
+BACKTICK: '`';
+SEMI:	';';
+SLASH:	'/';
 COLON:    ':';
 
 DOUBLECOLON
@@ -479,7 +474,7 @@ MODAILITYGENERIC:
       '\\box' | '\\box_transaction' | '\\throughout' | '\\throughout_transaction')
       -> more, pushMode(modGeneric);
 */
-//BACKSLASH:  '\\';
+ERROR_UKNOWN_ESCAPE: '\\' IDENT;
 ERROR_CHAR: .;
 
 mode modDiamond;

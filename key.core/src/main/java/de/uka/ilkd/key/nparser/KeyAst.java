@@ -7,7 +7,6 @@ import java.net.URI;
 import java.net.URL;
 import java.util.List;
 
-import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.nparser.builder.BuilderHelpers;
 import de.uka.ilkd.key.nparser.builder.ChoiceFinder;
 import de.uka.ilkd.key.nparser.builder.FindProblemInformation;
@@ -96,13 +95,21 @@ public abstract class KeyAst<T extends ParserRuleContext> {
          * @return a {@link ProofScriptEntry} if {@code \proofscript} is present
          */
         public @Nullable ProofScriptEntry findProofScript(URI url) {
-            if (ctx.problem() != null && ctx.problem().proofScript() != null) {
-                KeYParser.ProofScriptContext pctx = ctx.problem().proofScript();
-                Location location = new Location(url,
-                    Position.newOneBased(pctx.ps.getLine(), pctx.ps.getCharPositionInLine()));
+            if (ctx.problem() != null && ctx.problem().proofScriptEntry() != null) {
+                KeYParser.ProofScriptEntryContext pctx = ctx.problem().proofScriptEntry();
 
-                String text = pctx.ps.getText();
-                return new ProofScriptEntry(StringUtil.trim(text, '"'), location);
+                KeYParser.ProofScriptContext ps;
+                if(pctx.STRING_LITERAL()!=null) {
+                    var ctx = pctx.STRING_LITERAL().getSymbol();
+                    String text = pctx.STRING_LITERAL().getText();
+
+                    // +1 for the removal of the quote.
+                    text = StringUtil.move(StringUtil.trim(text, '"'), ctx.getLine(),
+                            ctx.getCharPositionInLine() + 1);
+                    return ParsingFacade.parseProofScript(text);
+                }else{
+                    return new KeyAst.ProofScriptEntry(pctx.proofScript());
+                }
             }
             return null;
         }
@@ -210,6 +217,24 @@ public abstract class KeyAst<T extends ParserRuleContext> {
     public static class Taclet extends KeyAst<KeYParser.TacletContext> {
         public Taclet(KeYParser.TacletContext taclet) {
             super(taclet);
+        }
+    }
+
+    /**
+     * This struct encapsulate the information of a proofscript found in key files.
+     *
+     * @param script the content of the script
+     * @param location location of the content
+     * @author Alexander Weigl
+     * @version 1 (23.04.24)
+     */
+    public static class ProofScriptEntry extends KeyAst<KeYParser.ProofScriptContext> {
+        public ProofScriptEntry(KeYParser.ProofScriptContext ctx) {
+            super(ctx);
+        }
+
+        public KeYParser.@NonNull ProofScriptContext get() {
+            return super.ctx;
         }
     }
 }

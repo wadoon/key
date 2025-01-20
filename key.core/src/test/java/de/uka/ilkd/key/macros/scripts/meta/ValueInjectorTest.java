@@ -3,16 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros.scripts.meta;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.macros.scripts.AbstractCommand;
 import de.uka.ilkd.key.macros.scripts.EngineState;
-import de.uka.ilkd.key.macros.scripts.ScriptException;
-
 import org.junit.jupiter.api.Test;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -24,9 +22,9 @@ public class ValueInjectorTest {
     @Test
     public void testInjectionSimple() throws Exception {
         PP pp = new PP();
-        Map<String, String> args = new HashMap<>();
-        args.put("b", "true");
-        args.put("i", "42");
+        Map<String, Object> args = new HashMap<>();
+        args.put("b", true);
+        args.put("i", 42);
         args.put("s", "blubb");
 
         ValueInjector.injection(null, pp, args);
@@ -40,11 +38,11 @@ public class ValueInjectorTest {
     @Test
     public void testRequired() {
         PP pp = new PP();
-        Map<String, String> args = new HashMap<>();
-        args.put("b", "true");
+        Map<String, Object> args = new HashMap<>();
+        args.put("b", true);
         args.put("s", "blubb");
         assertThrows(ArgumentRequiredException.class,
-            () -> ValueInjector.injection(new PPCommand(), pp, args));
+                () -> ValueInjector.injection(new PPCommand(), pp, args));
     }
 
     @Test
@@ -93,13 +91,12 @@ public class ValueInjectorTest {
         }
 
         @Override
-        public PP evaluateArguments(EngineState state, Map<String, String> arguments) {
+        public PP evaluateArguments(EngineState state, Map<String, Object> arguments) {
             return null;
         }
 
         @Override
-        public void execute(AbstractUserInterfaceControl uiControl, PP args, EngineState stateMap)
-                throws ScriptException, InterruptedException {
+        public void execute(AbstractUserInterfaceControl uiControl, PP args, EngineState stateMap) {
         }
 
         @Override

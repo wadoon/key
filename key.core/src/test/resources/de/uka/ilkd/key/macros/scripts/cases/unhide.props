@@ -4,10 +4,10 @@
 
 ### script
 
-rule impRight;
-hide '2=3 ==> 3=4';
-unhide '2=3 ==>';
-unhide '==> 3=4';
+rule "impRight";
+hide `2=3 ==> 3=4`;
+unhide `2=3 ==>`;
+unhide `==> 3=4`;
 
 ### goals
 

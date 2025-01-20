@@ -1,1 +1,1 @@
-rewrite find="f < x" replace="x > f";
+rewrite find=`f < x` replace=`x > f`;

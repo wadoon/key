@@ -3,10 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.ui;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-
 import de.uka.ilkd.key.control.AbstractProofControl;
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.control.UserInterfaceControl;
@@ -20,7 +16,7 @@ import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.macros.SkipMacro;
 import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
-import de.uka.ilkd.key.nparser.ProofScriptEntry;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -40,13 +36,15 @@ import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.MiscTools;
-
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 /**
  * Implementation of {@link UserInterfaceControl} used by command line interface of KeY.
@@ -114,7 +112,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
          * assigned to keyProblemFile in method loadProblem(File).
          */
         assert keyProblemFile != null : "Unexcpected null pointer. Trying to"
-            + " save a proof but no corresponding key problem file is " + "available.";
+                + " save a proof but no corresponding key problem file is " + "available.";
         allProofsSuccessful &= saveProof(result2, info.getProof(), keyProblemFile);
         /*
          * We "delete" the value of keyProblemFile at this point by assigning null to it. That way
@@ -146,7 +144,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
             if (!isAtLeastOneMacroRunning()) {
                 printResults(openGoals, info, result);
             }
-        } else if (info.getSource() instanceof ProblemLoader) {
+        } else if (info.getSource() instanceof ProblemLoader problemLoader) {
             if (result != null) {
                 LOGGER.debug("{}", result);
                 if (result instanceof Throwable thrown) {
@@ -158,15 +156,13 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
                 LOGGER.info("Number of open goals after loading: {}", openGoals);
                 System.exit(0);
             }
-            ProblemLoader problemLoader = (ProblemLoader) info.getSource();
             if (problemLoader.hasProofScript()) {
                 try {
-                    ProofScriptEntry script = problemLoader.getProofScript();
+                    KeyAst.ProofScriptEntry script = problemLoader.getProofScript();
                     if (script != null) {
-                        ProofScriptEngine pse =
-                            new ProofScriptEngine(script.script(), script.location());
+                        ProofScriptEngine pse = new ProofScriptEngine(script);
                         this.taskStarted(
-                            new DefaultTaskStartedInfo(TaskKind.Macro, "Script started", 0));
+                                new DefaultTaskStartedInfo(TaskKind.Macro, "Script started", 0));
                         pse.execute(this, proof);
                         // The start and end messages are fake to persuade the system ...
                         // All this here should refactored anyway ...
@@ -209,22 +205,22 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     /**
      * loads the problem or proof from the given file
      *
-     * @param file the File with the problem description or the proof
-     * @param classPath the class path entries to use.
+     * @param file          the File with the problem description or the proof
+     * @param classPath     the class path entries to use.
      * @param bootClassPath the boot class path to use.
-     * @param includes the included files to use
+     * @param includes      the included files to use
      */
     public void loadProblem(File file, List<File> classPath, File bootClassPath,
-            List<File> includes) {
+                            List<File> includes) {
         ProblemLoader problemLoader =
-            getProblemLoader(file, classPath, bootClassPath, includes, getMediator());
+                getProblemLoader(file, classPath, bootClassPath, includes, getMediator());
         problemLoader.runAsynchronously();
     }
 
     @Override
     public void loadProofFromBundle(File proofBundle, File proofFilename) {
         ProblemLoader problemLoader =
-            getProblemLoader(proofBundle, null, null, null, getMediator());
+                getProblemLoader(proofBundle, null, null, null, getMediator());
         problemLoader.setProofPath(proofFilename);
         problemLoader.runAsynchronously();
     }
@@ -262,7 +258,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     @Override
     public final void reportStatus(Object sender, String status, int progress) {
         LOGGER.debug("ConsoleUserInterfaceControl.reportStatus({},{},{})", sender, status,
-            progress);
+                progress);
     }
 
     @Override
@@ -363,8 +359,8 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     /**
      * Save proof.
      *
-     * @param result the result
-     * @param proof the proof
+     * @param result         the result
+     * @param proof          the proof
      * @param keyProblemFile the key problem file
      * @return true, if successful
      */
@@ -398,8 +394,8 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
             ShowProofStatistics.getCSVStatisticsMessage(proof);
             File file = new File(MiscTools.toValidFileName(proof.name().toString()) + ".csv");
             try (BufferedWriter writer =
-                new BufferedWriter(
-                    new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8))) {
+                         new BufferedWriter(
+                                 new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8))) {
                 writer.write(ShowProofStatistics.getCSVStatisticsMessage(proof));
             }
         } catch (IOException e) {

@@ -15,6 +15,7 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofScriptWorker;
 import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.parser.Location;
 
 /**
@@ -56,9 +57,8 @@ public class ProofScriptInputAction extends AbstractAction {
             JButton okButton = new JButton("OK");
 
             okButton.addActionListener(event -> {
-                ProofScriptWorker psw = new ProofScriptWorker(mediator, textArea.getText(),
-                    new Location(null, Position.newOneBased(1, 1)),
-                    mediator.getSelectedGoal());
+                var script = ParsingFacade.parseProofScript(textArea.getText());
+                ProofScriptWorker psw = new ProofScriptWorker(mediator, script, mediator.getSelectedGoal());
 
                 dispose();
 

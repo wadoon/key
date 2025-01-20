@@ -45,12 +45,7 @@ public class ProveRulesTest {
     /*
      * File object pointing to directory key/key.core.test
      */
-    private static final File PROOF_DIRECTORY;
-
-
-    static {
-        PROOF_DIRECTORY = FindResources.getTacletProofsDirectory();
-    }
+    private static final File PROOF_DIRECTORY = FindResources.getTacletProofsDirectory();
 
 
     public void loadTacletProof(String tacletName, Taclet taclet, File proofFile) throws Exception {
@@ -68,7 +63,7 @@ public class ProveRulesTest {
 
         var script = env.getProofScript();
         if (script != null) {
-            ProofScriptEngine pse = new ProofScriptEngine(script.script(), script.location());
+            ProofScriptEngine pse = new ProofScriptEngine(script);
             pse.execute(env.getUi(), proof);
         }
 

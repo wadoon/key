@@ -127,10 +127,11 @@ public class TestLocalSymbols {
 
         KeYEnvironment<?> env = loadProof("doubleSkolem.key");
         Proof proof = env.getLoadedProof();
-        String script = env.getProofScript().script();
+        var script = env.getProofScript();
 
-        ProofScriptEngine pse =
-            new ProofScriptEngine(script, new Location(null, Position.newOneBased(1, 1)));
+        assert script != null;
+
+        ProofScriptEngine pse = new ProofScriptEngine(script);
         pse.execute(null, proof);
 
         ImmutableList<Goal> openGoals = proof.openGoals();

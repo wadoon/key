@@ -48,7 +48,7 @@ public class ValueInjector {
      * @throws ConversionException an converter could not translate the given value in arguments
      */
     public static <T> T injection(ProofScriptCommand<T> command, T obj,
-            Map<String, String> arguments) throws ArgumentRequiredException,
+            Map<String, Object> arguments) throws ArgumentRequiredException,
             InjectionReflectionException, NoSpecifiedConverterException, ConversionException {
         return getInstance().inject(command, obj, arguments);
     }
@@ -73,21 +73,7 @@ public class ValueInjector {
      * @return a fresh instance
      */
     public static ValueInjector createDefault() {
-        ValueInjector vi = new ValueInjector();
-        vi.addConverter(Integer.class, Integer::parseInt);
-        vi.addConverter(Long.class, Long::parseLong);
-        vi.addConverter(Boolean.class, Boolean::parseBoolean);
-        vi.addConverter(Double.class, Double::parseDouble);
-        vi.addConverter(String.class, (String s) -> s);
-        vi.addConverter(Boolean.TYPE, Boolean::parseBoolean);
-        vi.addConverter(Byte.TYPE, Byte::parseByte);
-        vi.addConverter(Character.TYPE, s -> s.charAt(0));
-        vi.addConverter(Short.TYPE, Short::parseShort);
-        vi.addConverter(Integer.TYPE, Integer::parseInt);
-        vi.addConverter(Long.TYPE, Long::parseLong);
-        vi.addConverter(Double.TYPE, Double::parseDouble);
-        vi.addConverter(Float.TYPE, Float::parseFloat);
-        return vi;
+        return new ValueInjector();
     }
 
     /**
@@ -105,11 +91,9 @@ public class ValueInjector {
      * @see Option
      * @see Flag
      */
-    public <T> T inject(ProofScriptCommand<T> command, T obj, Map<String, String> arguments)
-            throws ConversionException, InjectionReflectionException, NoSpecifiedConverterException,
-            ArgumentRequiredException {
-        List<ProofScriptArgument<T>> meta =
-            ArgumentsLifter.inferScriptArguments(obj.getClass(), command);
+    public <T> T inject(ProofScriptCommand<T> command, T obj, Map<String, Object> arguments)
+            throws InjectionReflectionException, NoSpecifiedConverterException, ArgumentRequiredException {
+        List<ProofScriptArgument<T>> meta = ArgumentsLifter.inferScriptArguments(obj.getClass(), command);
         List<ProofScriptArgument<T>> varArgs = new ArrayList<>(meta.size());
 
         List<String> usedKeys = new ArrayList<>();
@@ -126,11 +110,11 @@ public class ValueInjector {
         for (ProofScriptArgument<T> vararg : varArgs) {
             final Map<String, Object> map = getStringMap(obj, vararg);
             final int prefixLength = vararg.getName().length();
-            for (Map.Entry<String, String> e : arguments.entrySet()) {
+            for (Map.Entry<String, Object> e : arguments.entrySet()) {
                 String k = e.getKey();
-                String v = e.getValue();
+                Object v = e.getValue();
                 if (!usedKeys.contains(k) && k.startsWith(vararg.getName())) {
-                    map.put(k.substring(prefixLength), convert(vararg, v));
+                    map.put(k.substring(prefixLength), v);
                     usedKeys.add(k);
                 }
             }
@@ -155,10 +139,9 @@ public class ValueInjector {
         }
     }
 
-    private void injectIntoField(ProofScriptArgument<?> meta, Map<String, String> args, Object obj)
-            throws InjectionReflectionException, ArgumentRequiredException, ConversionException,
-            NoSpecifiedConverterException {
-        final String val = args.get(meta.getName());
+    private void injectIntoField(ProofScriptArgument<?> meta, Map<String, Object> args, Object obj)
+            throws InjectionReflectionException, ArgumentRequiredException {
+        final Object val = args.get(meta.getName());
         if (val == null) {
             if (meta.isRequired()) {
                 throw new ArgumentRequiredException(String.format(
@@ -167,57 +150,14 @@ public class ValueInjector {
                     meta);
             }
         } else {
-            Object value = convert(meta, val);
             try {
-                // if (meta.getType() != value.getClass())
-                // throw new ConversionException("The typed returned '" + val.getClass()
-                // + "' from the converter mismatched with the
-                // type of the field " + meta.getType(), meta);
                 // FIXME: I had to add this, otherwise I would receive an illegal access exception.
                 meta.getField().setAccessible(true);
-                meta.getField().set(obj, value);
+                meta.getField().set(obj, val);
             } catch (IllegalAccessException e) {
                 throw new InjectionReflectionException("Could not inject values via reflection", e,
                     meta);
             }
         }
-    }
-
-    private Object convert(ProofScriptArgument<?> meta, String val)
-            throws NoSpecifiedConverterException, ConversionException {
-        StringConverter<?> converter = getConverter(meta.getType());
-        if (converter == null) {
-            throw new NoSpecifiedConverterException(
-                "No converter registered for class: " + meta.getField().getType(), meta);
-        }
-        try {
-            return converter.convert(val);
-        } catch (Exception e) {
-            throw new ConversionException(String.format("Could not convert value %s to type %s",
-                val, meta.getField().getType().getName()), e, meta);
-        }
-    }
-
-    /**
-     * Registers the given converter for the specified class.
-     *
-     * @param clazz a class
-     * @param conv a converter for the given class
-     * @param <T> an arbitrary type
-     */
-    public <T> void addConverter(Class<T> clazz, StringConverter<T> conv) {
-        converters.put(clazz, conv);
-    }
-
-    /**
-     * Finds a converter for the given class.
-     *
-     * @param clazz a non-null class
-     * @param <T> an arbitrary type
-     * @return null or a suitable converter (registered) converter for the requested class.
-     */
-    @SuppressWarnings("unchecked")
-    public <T> StringConverter<T> getConverter(Class<T> clazz) {
-        return (StringConverter<T>) converters.get(clazz);
     }
 }
