@@ -61,6 +61,13 @@ public class KeyIdentifications {
         c.dispose();
     }
 
+    public void dispose(EnvironmentId id) {
+        var c = getContainer(id);
+        c.mapProof.forEach(((proofId, proofContainer) -> this.dispose(proofId)));
+        mapEnv.remove(id);
+        c.dispose();
+    }
+
     public Node find(NodeId nodeId) {
         @NonNull
         Proof p = find(nodeId.proofId);
@@ -102,7 +109,7 @@ public class KeyIdentifications {
      * @author Alexander Weigl
      * @version 1 (28.10.23)
      */
-    public record ContractId(EnvironmentId envId, int contractId) {
+    public record ContractId(EnvironmentId envId, String contractId) {
     }
 
     /**

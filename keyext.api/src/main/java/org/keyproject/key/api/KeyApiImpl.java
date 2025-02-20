@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
@@ -34,7 +35,9 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskFinishedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo;
+import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.KeYConstants;
 
 import org.key_project.util.collection.ImmutableList;
@@ -54,11 +57,13 @@ import org.keyproject.key.api.remoteclient.ClientApi;
 public final class KeyApiImpl implements KeyApi {
     private final KeyIdentifications data = new KeyIdentifications();
 
+    private Function<Void, Boolean> exitHandler;
+
     private ClientApi clientApi;
     private final ProverTaskListener clientListener = new ProverTaskListener() {
         @Override
         public void taskStarted(TaskStartedInfo info) {
-            clientApi.taskStarted(info);
+            clientApi.taskStarted(org.keyproject.key.api.data.TaskStartedInfo.from(info));
         }
 
         @Override
@@ -68,7 +73,7 @@ public final class KeyApiImpl implements KeyApi {
 
         @Override
         public void taskFinished(TaskFinishedInfo info) {
-            clientApi.taskFinished(info);
+            clientApi.taskFinished(org.keyproject.key.api.data.TaskFinishedInfo.from(info));
         }
     };
     private final AtomicInteger uniqueCounter = new AtomicInteger();
@@ -91,6 +96,11 @@ public final class KeyApiImpl implements KeyApi {
 
     @Override
     public void exit() {
+        this.exitHandler.apply(null);
+    }
+
+    public void setExitHandler(Function<Void, Boolean> exitHandler) {
+        this.exitHandler = exitHandler;
     }
 
     @Override
@@ -154,14 +164,15 @@ public final class KeyApiImpl implements KeyApi {
     }
 
     @Override
-    public CompletableFuture<MacroStatistic> auto(ProofId proofId, StreategyOptions options) {
+    public CompletableFuture<ProofStatus> auto(ProofId proofId, StreategyOptions options) {
         return CompletableFuture.supplyAsync(() -> {
             var proof = data.find(proofId);
             var env = data.find(proofId.env());
+            configureProofMode(proof, options);
             try {
                 env.getProofControl().startAndWaitForAutoMode(proof);
                 // clientListener);
-                return null;// MacroStatistic.from(proofId, info);
+                return ProofStatus.from(proofId, proof);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -169,14 +180,34 @@ public final class KeyApiImpl implements KeyApi {
 
     }
 
+    private static void configureProofMode(Proof proof, StreategyOptions options) {
+        StrategyProperties sp =
+                proof.getSettings().getStrategySettings().getActiveStrategyProperties();
+        sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY,
+                StrategyProperties.METHOD_CONTRACT);
+        sp.setProperty(StrategyProperties.DEP_OPTIONS_KEY,
+                StrategyProperties.DEP_ON);
+        sp.setProperty(StrategyProperties.QUERY_OPTIONS_KEY,
+                StrategyProperties.QUERY_ON);
+        sp.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY,
+                StrategyProperties.NON_LIN_ARITH_DEF_OPS);
+        sp.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY,
+                StrategyProperties.STOPMODE_NONCLOSE);
+        proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
+        // Make sure that the new options are used
+        int maxSteps = 10000;
+        ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setMaxSteps(maxSteps);
+        ProofSettings.DEFAULT_SETTINGS.getStrategySettings()
+                .setActiveStrategyProperties(sp);
+        proof.getSettings().getStrategySettings().setMaxSteps(maxSteps);
+        proof.setActiveStrategy(proof.getServices().getProfile()
+                .getDefaultStrategyFactory().create(proof, sp));
+    }
+
     @Override
     public CompletableFuture<Boolean> dispose(ProofId id) {
-        return CompletableFuture.supplyAsync(() -> {
-            var proof = data.find(id);
-            data.dispose(id);
-            proof.dispose();
-            return true;
-        });
+        data.dispose(id);
+        return CompletableFuture.completedFuture(true);
     }
 
     @Override
@@ -245,17 +276,19 @@ public final class KeyApiImpl implements KeyApi {
         return null;
     }
 
-    @Override
+    /*@Override
     public CompletableFuture<Statistics> statistics(ProofId proofId) {
         return CompletableFuture.supplyAsync(() -> {
             var proof = data.find(proofId);
             return proof.getStatistics();
         });
-    }
+    }*/
 
     @Override
     public CompletableFuture<TreeNodeDesc> treeRoot(ProofId proof) {
-        return null;
+        return CompletableFuture.completedFuture(
+                TreeNodeDesc.from(proof, data.find(proof).root())
+        );
     }
 
     @Override
@@ -302,7 +335,7 @@ public final class KeyApiImpl implements KeyApi {
             var env = data.find(contractId.envId());
             var contracts = env.getAvailableContracts();
             var contract =
-                contracts.stream().filter(it -> it.id() == contractId.contractId()).findFirst();
+                contracts.stream().filter(it -> Objects.equals(it.getName(),contractId.contractId())).findFirst();
             if (contract.isPresent()) {
                 try {
                     var proof = env.createProof(contract.get().createProofObl(env.getInitConfig()));
@@ -314,6 +347,14 @@ public final class KeyApiImpl implements KeyApi {
                 return null;
             }
         });
+    }
+
+    @Override
+    public CompletableFuture<Boolean> dispose(EnvironmentId environmentId) {
+        data.dispose(environmentId);
+        return CompletableFuture.completedFuture(
+                true
+        );
     }
 
     @Override
@@ -459,7 +500,7 @@ public final class KeyApiImpl implements KeyApi {
             KeYEnvironment<?> env;
             try {
                 var loader = control.load(JavaProfile.getDefaultProfile(),
-                    params.keyFile(),
+                    params.problemFile(),
                     params.classPath(),
                     params.bootClassPath(),
                     params.includes(),
@@ -486,7 +527,7 @@ public final class KeyApiImpl implements KeyApi {
     private class MyDefaultUserInterfaceControl extends DefaultUserInterfaceControl {
         @Override
         public void taskStarted(TaskStartedInfo info) {
-            clientApi.taskStarted(info);
+            clientApi.taskStarted(org.keyproject.key.api.data.TaskStartedInfo.from(info));
         }
 
         @Override
@@ -496,17 +537,17 @@ public final class KeyApiImpl implements KeyApi {
 
         @Override
         public void taskFinished(TaskFinishedInfo info) {
-            clientApi.taskFinished(info);
+            clientApi.taskFinished(org.keyproject.key.api.data.TaskFinishedInfo.from(info));
         }
 
         @Override
         protected void macroStarted(TaskStartedInfo info) {
-            clientApi.taskStarted(info);
+            clientApi.taskStarted(org.keyproject.key.api.data.TaskStartedInfo.from(info));
         }
 
         @Override
         protected synchronized void macroFinished(ProofMacroFinishedInfo info) {
-            clientApi.taskFinished(info);
+            clientApi.taskFinished(org.keyproject.key.api.data.TaskFinishedInfo.from(info));
         }
 
         @Override

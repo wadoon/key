@@ -1,27 +1,39 @@
 import socket
-from keyapi import LspEndpoint, LoadParams
-from keyapi.server import KeyServer
+from keyapi import LspEndpoint, LoadParams, StreategyOptions
+from keyapi.server import NetKeY, KeYEnv, KeYProof
 from keyapi.rpc import JsonRpcEndpoint
+
+def configure_callbacks(key):
+    key.register_notification("client/taskStarted", lambda param: print("[KeY Notification] Task started"))
+    key.register_notification("client/taskFinished", lambda param: print("[KeY Notification] Task finished"))
+    key.register_notification("client/taskProgress", lambda param: print("[KeY Notification] Task progress: ", param))
 
 if __name__ == "__main__":
     target = ("localhost", 5151)
 
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.connect(target)
-        input = s.makefile("r", newline="\r\n")
-        output = s.makefile("w", newline="\r\n")
-
-        rpc_endpoint = JsonRpcEndpoint(input, output)
-        endpoint = LspEndpoint(rpc_endpoint)
-        endpoint.start()
-
-        key = KeyServer(endpoint)
+    with NetKeY(target) as key:
         print(key.meta_version())
-        ex = key.examples_list()
-        print(ex)
+        configure_callbacks(key)
 
-        proofHandle = key.loading_load(
-            LoadParams("/home/weigl/work/key/key.ui/examples/standard_key/prop_log/contraposition.key",
-                       None, None, None, None))
+        params = LoadParams("/home/samuel/Dokumente/Projects/KeY/key/key.core.example/example/IntegerUtil.java",
+       None,
+       None,
+       None)
 
-        print(proofHandle)
+        with KeYEnv(key, params) as env:
+            contracts = env.contracts()
+
+            print("Found the following contracts: ")
+            print("\n".join([("- "+str(c.contractId)) for c in contracts]))
+
+            i = 0
+            with KeYProof(key, contracts[i]) as proof:
+                print("Proof for contract: ", contracts[i].contractId)
+
+                root = proof.root()
+                print("Root Node: ", root.name)
+
+                status = proof.auto(StreategyOptions())
+                print("Open goals: ", status.openGoals)
+
+    print("Terminating")

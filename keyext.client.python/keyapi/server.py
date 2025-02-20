@@ -1,161 +1,63 @@
-from __future__ import annotations
+import socket
+from keyapi import LspEndpoint, LoadParams, StreategyOptions
+from keyapi.server_internal import KeyServer
+from keyapi.rpc import JsonRpcEndpoint
 
-import abc
-from abc import abstractmethod
+class NetKeY(object):
+    def __init__(self, target):
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.socket.connect(target)
+        self.inStream = self.socket.makefile("r", newline="\r\n")
+        self.outStream = self.socket.makefile("w", newline="\r\n")
 
-from .keydata import *
-from .rpc import ServerBase, LspEndpoint
+        self.rpc_endpoint = JsonRpcEndpoint(self.inStream, self.outStream)
+        self.endpoint = LspEndpoint(self.rpc_endpoint)
+        self.endpoint.start()
 
+        self.key = KeyServer(self.endpoint)
 
-# noinspection PyTypeChecker
-class KeyServer(ServerBase):
+    def __enter__(self):
+        return self
 
-    def __init__(self, endpoint: LspEndpoint):
-        super().__init__(endpoint)
+    def __getattr__(self, item):
+        return getattr(self.key, item)
 
-    def env_contracts(self, env: EnvironmentId) -> typing.List[ContractDesc]:
-        """"""
+    def register_notification(self, method, callback):
+        self.endpoint.notify_callbacks[method] = callback
 
-        return self._call_sync("env/contracts", [env])
+    def __exit__(self, type, value, traceback):
+        self.key.server_exit()
+        self.inStream.close()
+        self.outStream.close()
+        self.socket.close()
 
-    def env_functions(self, env: EnvironmentId) -> typing.List[FunctionDesc]:
-        """"""
+class KeYEnv(object):
+    def __init__(self, key, load_params : LoadParams):
+        self.key = key
+        self.envHandle = self.key.loading_load(load_params)
 
-        return self._call_sync("env/functions", [env])
+    def contracts(self):
+        return self.key.env_contracts(self.envHandle)
 
-    def env_openContract(self, contractId: ContractId) -> ProofId:
-        """"""
+    def __enter__(self):
+        return self
 
-        return self._call_sync("env/openContract", [contractId])
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.key.env_dispose(self.envHandle)
 
-    def env_sorts(self, env: EnvironmentId) -> typing.List[SortDesc]:
-        """"""
+class KeYProof(object):
+    def __init__(self, key, contract):
+        self.key = key
+        self.proofHandle = self.key.env_openContract(contract.contractId)
 
-        return self._call_sync("env/sorts", [env])
+    def __enter__(self):
+        return self
 
-    def examples_list(self, ) -> typing.List[ExampleDesc]:
-        """"""
+    def root(self):
+        return self.key.proofTree_root(self.proofHandle)
 
-        return self._call_sync("examples/list", [])
+    def auto(self, options = StreategyOptions()):
+        return self.key.proof_auto(self.proofHandle, options)
 
-    def goal_actions(self, id: NodeTextId, pos: int) -> typing.List[TermActionDesc]:
-        """"""
-
-        return self._call_sync("goal/actions", [id, pos])
-
-    def goal_apply_action(self, id: TermActionId) -> typing.List[TermActionDesc]:
-        """"""
-
-        return self._call_sync("goal/apply_action", [id])
-
-    def goal_free(self, id: NodeTextId):
-        """"""
-
-        return self._call_async("goal/free", [id])
-
-    def goal_print(self, id: NodeId, options: PrintOptions) -> NodeTextDesc:
-        """"""
-
-        return self._call_sync("goal/print", [id, options])
-
-    def loading_load(self, params: LoadParams) -> typing.Union[EnvironmentId, ProofId]:
-        """"""
-
-        return self._call_sync("loading/load", [params])
-
-    def loading_loadExample(self, id: str) -> ProofId:
-        """"""
-
-        return self._call_sync("loading/loadExample", [id])
-
-    def loading_loadKey(self, content: str) -> ProofId:
-        """"""
-
-        return self._call_sync("loading/loadKey", [content])
-
-    def loading_loadProblem(self, problem: ProblemDefinition) -> ProofId:
-        """"""
-
-        return self._call_sync("loading/loadProblem", [problem])
-
-    def loading_loadTerm(self, term: str) -> ProofId:
-        """"""
-
-        return self._call_sync("loading/loadTerm", [term])
-
-    def meta_available_macros(self, ) -> typing.List[ProofMacroDesc]:
-        """"""
-
-        return self._call_sync("meta/available_macros", [])
-
-    def meta_available_script_commands(self, ) -> typing.List[ProofScriptCommandDesc]:
-        """"""
-
-        return self._call_sync("meta/available_script_commands", [])
-
-    def meta_version(self, ) -> str:
-        """"""
-
-        return self._call_sync("meta/version", [])
-
-    def proofTree_children(self, proof: ProofId, nodeId: TreeNodeId) -> typing.List[TreeNodeDesc]:
-        """"""
-
-        return self._call_sync("proofTree/children", [proof, nodeId])
-
-    def proofTree_root(self, id: ProofId) -> TreeNodeDesc:
-        """"""
-
-        return self._call_sync("proofTree/root", [id])
-
-    def proofTree_subtree(self, proof: ProofId, nodeId: TreeNodeId) -> typing.List[TreeNodeDesc]:
-        """"""
-
-        return self._call_sync("proofTree/subtree", [proof, nodeId])
-
-    def server_exit(self, ):
-        """"""
-
-        return self._call_async("server/exit", [])
-
-    def server_setTrace(self, params: SetTraceParams):
-        """"""
-
-        return self._call_async("server/setTrace", [params])
-
-    def server_shutdown(self, ) -> bool:
-        """"""
-
-        return self._call_sync("server/shutdown", [])
-
-
-class Client(abc.ABCMeta):
-    @abstractmethod
-    def client_logTrace(self, params: LogTraceParams):
-        """"""
-
-        pass
-
-    @abstractmethod
-    def client_sayHello(self, e: str):
-        """"""
-
-        pass
-
-    @abstractmethod
-    def client_showDocument(self, params: ShowDocumentParams) -> ShowDocumentResult:
-        """"""
-
-        pass
-
-    @abstractmethod
-    def client_sm(self, params: ShowMessageParams):
-        """"""
-
-        pass
-
-    @abstractmethod
-    def client_userResponse(self, params: ShowMessageRequestParams) -> MessageActionItem:
-        """"""
-
-        pass
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.key.proof_dispose(self.proofHandle)
