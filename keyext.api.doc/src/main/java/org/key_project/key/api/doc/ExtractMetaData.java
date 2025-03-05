@@ -159,7 +159,8 @@ public class ExtractMetaData implements Callable<Integer> {
             return;
         }
 
-        throw new IllegalStateException("Method " + method + " is neither a request nor a notification");
+        throw new IllegalStateException(
+            "Method " + method + " is neither a request nor a notification");
     }
 
     private String findDocumentation(Method method) {

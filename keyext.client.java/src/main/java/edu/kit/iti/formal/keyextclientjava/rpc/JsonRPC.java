@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package edu.kit.iti.formal.keyextclientjava.rpc;
 
 import com.google.gson.Gson;
@@ -40,11 +43,13 @@ public class JsonRPC {
         return createResponse(id, gson.toJsonTree(result), null);
     }
 
-    public static String createErrorReponse(String id, int code, String message, @Nullable Object data) {
+    public static String createErrorReponse(String id, int code, String message,
+            @Nullable Object data) {
         return createResponse(id, null, createError(code, message, data));
     }
 
-    public static String createResponse(String id, @Nullable JsonElement result, @Nullable JsonObject error) {
+    public static String createResponse(String id, @Nullable JsonElement result,
+            @Nullable JsonObject error) {
         if (result != null && error != null) {
             throw new IllegalArgumentException("result and error at the same time is invalid");
         }
@@ -69,7 +74,8 @@ public class JsonRPC {
 
     /**
      * 5.1 Error object
-     * When a rpc call encounters an error, the Response Object MUST contain the error member with a value that is a Object with the following members:
+     * When a rpc call encounters an error, the Response Object MUST contain the error member with a
+     * value that is a Object with the following members:
      * <p>
      * code
      * A Number that indicates the error type that occurred.
@@ -80,7 +86,8 @@ public class JsonRPC {
      * data
      * A Primitive or Structured value that contains additional information about the error.
      * This may be omitted.
-     * The value of this member is defined by the Server (e.g. detailed error information, nested errors etc.).
+     * The value of this member is defined by the Server (e.g. detailed error information, nested
+     * errors etc.).
      *
      * @return
      */

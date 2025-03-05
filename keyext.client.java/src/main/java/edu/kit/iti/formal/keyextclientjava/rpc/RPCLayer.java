@@ -1,14 +1,15 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package edu.kit.iti.formal.keyextclientjava.rpc;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import org.jspecify.annotations.Nullable;
 
 import java.io.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Alexander Weigl
@@ -83,7 +84,8 @@ public final class RPCLayer {
     }
 
     public void start() {
-        threadListener = new Thread(new JsonStreamListener(incoming, incomingMessages), "JSON Message Reader");
+        threadListener =
+            new Thread(new JsonStreamListener(incoming, incomingMessages), "JSON Message Reader");
         threadMessageHandling = new Thread(this::handler, "JSON Message Handler");
         threadListener.start();
         threadMessageHandling.start();
@@ -101,7 +103,7 @@ public final class RPCLayer {
                     var syncObj = waiting.get(id);
                     syncObj.put(obj);
                 } else {
-                    //TODO handle notification
+                    // TODO handle notification
                     System.out.println("Notification received");
                     System.out.println(obj);
                 }
@@ -135,7 +137,8 @@ public final class RPCLayer {
             try {
                 while (true) {
                     final var message = readMessage();
-                    if (message == null) break;
+                    if (message == null)
+                        break;
                     final var jsonObject = JsonParser.parseString(message).getAsJsonObject();
                     incomingMessageQueue.add(jsonObject);
                 }
@@ -151,13 +154,13 @@ public final class RPCLayer {
 
         public @Nullable String readMessage() throws IOException {
             expectedContentLength();
-            final var len = readLength() + 2; //also read \r\n,
+            final var len = readLength() + 2; // also read \r\n,
 
             if (len == 2) {// EOF reached
                 return null;
             }
 
-            if (buf.length <= len) { //reallocate more if necessary
+            if (buf.length <= len) { // reallocate more if necessary
                 buf = new char[len];
             }
 
@@ -172,9 +175,11 @@ public final class RPCLayer {
             int len = 0;
             do {
                 c = incoming.read();
-                //if (Character.isWhitespace(c)) continue;
-                if (c == -1) return 0;
-                if (c == '\r' || c == '\n') break;
+                // if (Character.isWhitespace(c)) continue;
+                if (c == -1)
+                    return 0;
+                if (c == '\r' || c == '\n')
+                    break;
                 if (Character.isDigit(c)) {
                     len = len * 10 + c - '0';
                 } else {
@@ -189,7 +194,8 @@ public final class RPCLayer {
         private void expectedContentLength() throws IOException {
             for (var e : CLENGTH) {
                 int c = incoming.read();
-                if (c == -1) return;
+                if (c == -1)
+                    return;
                 if (e != c) {
                     throw new IllegalStateException("Expected: '%c', but got '%c'".formatted(e, c));
                 }
@@ -207,6 +213,7 @@ public final class RPCLayer {
         }
     }
 }
+
 
 class SimpleFuture implements Future<JsonObject> {
     private final CountDownLatch latch = new CountDownLatch(1);
@@ -234,7 +241,8 @@ class SimpleFuture implements Future<JsonObject> {
     }
 
     @Override
-    public JsonObject get(long timeout, TimeUnit unit) throws InterruptedException, TimeoutException {
+    public JsonObject get(long timeout, TimeUnit unit)
+            throws InterruptedException, TimeoutException {
         if (latch.await(timeout, unit)) {
             return value;
         } else {

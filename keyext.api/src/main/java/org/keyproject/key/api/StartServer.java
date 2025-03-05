@@ -182,7 +182,7 @@ public class StartServer implements Runnable {
                             return StartServer.this.shutdownHandler();
                         }
                     });
-                    //listener.startListening().get();
+                    // listener.startListening().get();
                     listenerFuture = listener.startListening();
                     try {
                         listenerFuture.get();
@@ -209,7 +209,7 @@ public class StartServer implements Runnable {
         var launcherBuilder = new Launcher.Builder<ClientApi>()
                 .setOutput(out)
                 .setInput(in)
-                //.traceMessages(new PrintWriter(System.err))
+                // .traceMessages(new PrintWriter(System.err))
                 .validateMessages(true);
 
         launcherBuilder.configureGson(StartServer::configureJson);

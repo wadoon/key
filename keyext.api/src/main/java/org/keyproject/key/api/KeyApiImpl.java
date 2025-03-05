@@ -182,17 +182,17 @@ public final class KeyApiImpl implements KeyApi {
 
     private static void configureProofMode(Proof proof, StreategyOptions options) {
         StrategyProperties sp =
-                proof.getSettings().getStrategySettings().getActiveStrategyProperties();
+            proof.getSettings().getStrategySettings().getActiveStrategyProperties();
         sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY,
-                StrategyProperties.METHOD_CONTRACT);
+            StrategyProperties.METHOD_CONTRACT);
         sp.setProperty(StrategyProperties.DEP_OPTIONS_KEY,
-                StrategyProperties.DEP_ON);
+            StrategyProperties.DEP_ON);
         sp.setProperty(StrategyProperties.QUERY_OPTIONS_KEY,
-                StrategyProperties.QUERY_ON);
+            StrategyProperties.QUERY_ON);
         sp.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY,
-                StrategyProperties.NON_LIN_ARITH_DEF_OPS);
+            StrategyProperties.NON_LIN_ARITH_DEF_OPS);
         sp.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY,
-                StrategyProperties.STOPMODE_NONCLOSE);
+            StrategyProperties.STOPMODE_NONCLOSE);
         proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
         // Make sure that the new options are used
         int maxSteps = 10000;
@@ -276,19 +276,20 @@ public final class KeyApiImpl implements KeyApi {
         return null;
     }
 
-    /*@Override
-    public CompletableFuture<Statistics> statistics(ProofId proofId) {
-        return CompletableFuture.supplyAsync(() -> {
-            var proof = data.find(proofId);
-            return proof.getStatistics();
-        });
-    }*/
+    /*
+     * @Override
+     * public CompletableFuture<Statistics> statistics(ProofId proofId) {
+     * return CompletableFuture.supplyAsync(() -> {
+     * var proof = data.find(proofId);
+     * return proof.getStatistics();
+     * });
+     * }
+     */
 
     @Override
     public CompletableFuture<TreeNodeDesc> treeRoot(ProofId proof) {
         return CompletableFuture.completedFuture(
-                TreeNodeDesc.from(proof, data.find(proof).root())
-        );
+            TreeNodeDesc.from(proof, data.find(proof).root()));
     }
 
     @Override
@@ -335,7 +336,9 @@ public final class KeyApiImpl implements KeyApi {
             var env = data.find(contractId.envId());
             var contracts = env.getAvailableContracts();
             var contract =
-                contracts.stream().filter(it -> Objects.equals(it.getName(),contractId.contractId())).findFirst();
+                contracts.stream()
+                        .filter(it -> Objects.equals(it.getName(), contractId.contractId()))
+                        .findFirst();
             if (contract.isPresent()) {
                 try {
                     var proof = env.createProof(contract.get().createProofObl(env.getInitConfig()));
@@ -353,8 +356,7 @@ public final class KeyApiImpl implements KeyApi {
     public CompletableFuture<Boolean> dispose(EnvironmentId environmentId) {
         data.dispose(environmentId);
         return CompletableFuture.completedFuture(
-                true
-        );
+            true);
     }
 
     @Override
@@ -387,7 +389,7 @@ public final class KeyApiImpl implements KeyApi {
             var pis = nodeText.table().getPosInSequent(pos, filter);
             return new TermActionUtil(printId, data.find(printId.nodeId().proofId().env()), pis,
                 goal)
-                        .getActions();
+                    .getActions();
         });
 
     }

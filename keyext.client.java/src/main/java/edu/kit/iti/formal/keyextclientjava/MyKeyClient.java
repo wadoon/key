@@ -1,14 +1,28 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package edu.kit.iti.formal.keyextclientjava;
 
-import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.prover.TaskFinishedInfo;
-import de.uka.ilkd.key.prover.TaskStartedInfo;
-import edu.kit.iti.formal.keyextclientjava.rpc.KeyRemote;
-import edu.kit.iti.formal.keyextclientjava.rpc.RPCLayer;
+import java.io.IOException;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.io.PrintWriter;
+import java.util.Collections;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.geometry.Orientation;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
+
+import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.prover.TaskFinishedInfo;
+import de.uka.ilkd.key.prover.TaskStartedInfo;
+
+import edu.kit.iti.formal.keyextclientjava.rpc.KeyRemote;
+import edu.kit.iti.formal.keyextclientjava.rpc.RPCLayer;
 import org.eclipse.lsp4j.jsonrpc.Launcher;
 import org.eclipse.lsp4j.jsonrpc.json.StreamMessageProducer;
 import org.keyproject.key.api.KeyApiImpl;
@@ -20,16 +34,6 @@ import org.keyproject.key.api.remoteapi.PrintOptions;
 import org.keyproject.key.api.remoteclient.*;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeRegular;
 import org.kordamp.ikonli.javafx.FontIcon;
-
-import java.io.IOException;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PrintWriter;
-import java.util.Collections;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class MyKeyClient {
     public static final String JAR_FILE = "";
@@ -44,11 +48,11 @@ public class MyKeyClient {
     private KeyIdentifications.ProofId loadedProof;
 
     public MyKeyClient() throws IOException {
-        //region toolbar
+        // region toolbar
         var btnOpen = new Button("Open", new FontIcon(FontAwesomeRegular.FOLDER_OPEN));
         btnOpen.setOnAction(actionEvent -> openFile());
         toolbar.getItems().setAll(btnOpen, new Separator(Orientation.VERTICAL));
-        //endregion
+        // endregion
 
         var splitCenter = new SplitPane(tnid, txtSequentView);
         splitCenter.setDividerPositions(.2);
@@ -56,7 +60,7 @@ public class MyKeyClient {
         root.setCenter(splitCenter);
         root.setBottom(txtStatus);
 
-        //var startKey = ForkJoinPool.commonPool().submit(this::startKey);
+        // var startKey = ForkJoinPool.commonPool().submit(this::startKey);
 
         PipedInputStream inClient = new PipedInputStream();
         PipedOutputStream outClient = new PipedOutputStream();
@@ -98,12 +102,12 @@ public class MyKeyClient {
         if (sel != null) {
             try {
                 loadedProof = keyApi.load(
-                        new LoadParams(sel, null, null, null, null))
+                    new LoadParams(sel, null, null, null, null))
                         .get().getRight();
                 var root = keyApi.root(loadedProof).get();
-                var sequent
-                        = keyApi.print(root.nodeid(), new PrintOptions(true, 80, 4, true, false))
-                        .get();
+                var sequent =
+                    keyApi.print(root.nodeid(), new PrintOptions(true, 80, 4, true, false))
+                            .get();
                 txtSequentView.setText(sequent.result());
             } catch (ProblemLoaderException e) {
                 throw new RuntimeException(e);
@@ -117,7 +121,7 @@ public class MyKeyClient {
         }
     }
 
-    private class SimpleClient implements ClientApi{
+    private class SimpleClient implements ClientApi {
         @Override
         public void sayHello(String e) {
 

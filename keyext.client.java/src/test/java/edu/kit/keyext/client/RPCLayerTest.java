@@ -1,14 +1,17 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package edu.kit.keyext.client;
-
-import edu.kit.iti.formal.keyextclientjava.rpc.JsonRPC;
-import edu.kit.iti.formal.keyextclientjava.rpc.RPCLayer;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.concurrent.ArrayBlockingQueue;
+
+import edu.kit.iti.formal.keyextclientjava.rpc.JsonRPC;
+import edu.kit.iti.formal.keyextclientjava.rpc.RPCLayer;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Alexander Weigl
@@ -33,7 +36,8 @@ public class RPCLayerTest {
         var response = JsonRPC.createResponse("1", 2);
         final var incoming = new StringReader(JsonRPC.addHeader(notification) +
                 JsonRPC.addHeader(response));
-        RPCLayer.JsonStreamListener listener = new RPCLayer.JsonStreamListener(incoming, new ArrayBlockingQueue<>(1));
+        RPCLayer.JsonStreamListener listener =
+            new RPCLayer.JsonStreamListener(incoming, new ArrayBlockingQueue<>(1));
         String first = listener.readMessage();
         Assertions.assertEquals(notification, first);
         String second = listener.readMessage();

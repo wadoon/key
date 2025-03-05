@@ -5,7 +5,6 @@ package org.keyproject.key.api.data;
 
 import de.uka.ilkd.key.proof.Node;
 
-import javax.swing.tree.TreeNode;
 
 /**
  * @author Alexander Weigl

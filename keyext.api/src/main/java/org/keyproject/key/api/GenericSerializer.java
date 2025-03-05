@@ -53,7 +53,8 @@ public class GenericSerializer implements JsonSerializer<Object> /* , JsonDeseri
             JsonSerializationContext context) {
         JsonElement retValue = gson.toJsonTree(src);
         if (retValue.isJsonObject()) {
-            retValue.getAsJsonObject().addProperty(CLASS_PROPERTY_NAME, src.getClass().getSimpleName());
+            retValue.getAsJsonObject().addProperty(CLASS_PROPERTY_NAME,
+                src.getClass().getSimpleName());
         }
         return retValue;
     }

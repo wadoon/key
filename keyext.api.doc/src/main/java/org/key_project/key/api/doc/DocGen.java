@@ -58,10 +58,10 @@ public class DocGen implements Supplier<String> {
 
     private void endpoints(Metamodel.Endpoint endpoint) {
         var direction = switch (endpoint) {
-            case Metamodel.ServerRequest sr -> "client -> server";
-            case Metamodel.ClientRequest sr -> "server -> client";
-            case Metamodel.ServerNotification sr -> "client ~~> server";
-            case Metamodel.ClientNotification sr -> "server ~~> client";
+        case Metamodel.ServerRequest sr -> "client -> server";
+        case Metamodel.ClientRequest sr -> "server -> client";
+        case Metamodel.ServerNotification sr -> "client ~~> server";
+        case Metamodel.ClientNotification sr -> "server ~~> client";
         };
 
         out.format("### %s (`%s`) %n%n", endpoint.name(), direction);
@@ -71,12 +71,16 @@ public class DocGen implements Supplier<String> {
                 .map(it -> "%s : %s".formatted(it.name(), it.type()))
                 .collect(Collectors.joining(", "));
         switch (endpoint) {
-            case Metamodel.ServerRequest sr -> out.format("Server.%s( %s ) -> %s%n", endpoint.name(), a, sr.returnType().name());
-            case Metamodel.ClientRequest sr -> out.format("Client.%s( %s ) -> %s%n", endpoint.name(), a, sr.returnType().name());
-            case Metamodel.ServerNotification ignored -> out.format("Server.%s( %s ) **async**%n", endpoint.name(), a);
-            case Metamodel.ClientNotification ignored -> out.format("Client.%s( %s ) **async**%n", endpoint.name(), a);
-            default -> {
-            }
+        case Metamodel.ServerRequest sr ->
+            out.format("Server.%s( %s ) -> %s%n", endpoint.name(), a, sr.returnType().name());
+        case Metamodel.ClientRequest sr ->
+            out.format("Client.%s( %s ) -> %s%n", endpoint.name(), a, sr.returnType().name());
+        case Metamodel.ServerNotification ignored ->
+            out.format("Server.%s( %s ) **async**%n", endpoint.name(), a);
+        case Metamodel.ClientNotification ignored ->
+            out.format("Client.%s( %s ) **async**%n", endpoint.name(), a);
+        default -> {
+        }
         }
         out.format("```%n");
 

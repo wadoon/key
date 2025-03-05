@@ -179,11 +179,11 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
             } else if (macroChosen()) {
                 applyMacro();
             } else {
-            try {
-                finish(proof);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+                try {
+                    finish(proof);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
     }
