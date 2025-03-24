@@ -11,7 +11,7 @@ import de.uka.ilkd.key.speclang.Contract;
  * @version 1 (13.10.23)
  */
 public record ContractDesc(KeyIdentifications.ContractId contractId, String name, String displayName,
-                           String typeName, String htmlText, String plainText) {
+                           String typeName, String htmlText, String plainText) implements KeYDataTransferObject {
     public static ContractDesc from(KeyIdentifications.EnvironmentId envId, Services services, Contract it) {
         return new ContractDesc(new KeyIdentifications.ContractId(envId, it.getName()),
                 it.getName(), it.getDisplayName(), it.getTypeName(),
