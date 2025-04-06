@@ -9,14 +9,12 @@ public record LogTraceParams(
         /**
          * The message to be logged.
          */
-        @NonNull
-        String messag,
+        @NonNull String messag,
 
         /**
          * Additional information that can be computed if the `trace` configuration
          * is set to `'verbose'`
          */
-        String verbose
-) {
+        String verbose) {
 
 }

@@ -12,7 +12,6 @@ record LogMessageParams(
         /**
          * The actual message
          */
-        String message
-) {
+        String message) {
 
 }

@@ -235,7 +235,8 @@ public class ExtractMetaData implements Callable<Integer> {
                 documentation);
 
 
-        var obj = new Metamodel.ObjectType(type.getSimpleName(), type.getName(), new ArrayList<>(), documentation);
+        var obj = new Metamodel.ObjectType(type.getSimpleName(), type.getName(), new ArrayList<>(),
+            documentation);
         final var list = Arrays.stream(type.getDeclaredFields())
                 .map(it -> new Metamodel.Field(it.getName(), getOrFindType(it.getType()).name()))
                 .toList();

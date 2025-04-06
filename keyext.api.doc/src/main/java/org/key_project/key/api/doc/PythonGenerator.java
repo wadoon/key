@@ -41,14 +41,14 @@ public abstract class PythonGenerator implements Supplier<String> {
 
     protected String asPython(String typeName) {
         return switch (typeName) {
-            case "INT", "LONG" -> "int";
-            case "STRING" -> "str";
-            case "BOOL" -> "bool";
-            case "DOUBLE" -> "float";
-            default -> {
-                var t = findType(typeName);
-                yield asPython(t);
-            }
+        case "INT", "LONG" -> "int";
+        case "STRING" -> "str";
+        case "BOOL" -> "bool";
+        case "DOUBLE" -> "float";
+        default -> {
+            var t = findType(typeName);
+            yield asPython(t);
+        }
         };
     }
 
@@ -200,12 +200,14 @@ public abstract class PythonGenerator implements Supplier<String> {
             metamodel.types().forEach(this::printType);
 
             var names =
-                metamodel.types().stream().map(it -> "\"%s\": %s".formatted(it.identifier(), it.name()))
+                metamodel.types().stream()
+                        .map(it -> "\"%s\": %s".formatted(it.identifier(), it.name()))
                         .collect(Collectors.joining(","));
             out.format("KEY_DATA_CLASSES = { %s }%n%n", names);
             var names_reverse =
-                    metamodel.types().stream().map(it -> "\"%s\": \"%s\"".formatted(it.name(), it.identifier()))
-                            .collect(Collectors.joining(","));
+                metamodel.types().stream()
+                        .map(it -> "\"%s\": \"%s\"".formatted(it.name(), it.identifier()))
+                        .collect(Collectors.joining(","));
             out.format("KEY_DATA_CLASSES_REV = { %s }%n%n", names_reverse);
         }
 

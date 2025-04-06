@@ -20,6 +20,5 @@ public record ShowMessageRequestParams(
          * The message action items to present.
          *
          */
-        List<MessageActionItem> actions
-) {
+        List<MessageActionItem> actions) {
 }

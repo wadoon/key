@@ -32,7 +32,6 @@ public record ShowDocumentParams(
          * external program is started or the file is not a text
          * file.
          */
-        Range selection
-) {
+        Range selection) {
 
 }

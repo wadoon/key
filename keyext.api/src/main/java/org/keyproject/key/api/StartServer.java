@@ -18,7 +18,6 @@ import com.google.gson.GsonBuilder;
 import org.eclipse.lsp4j.jsonrpc.Launcher;
 import org.eclipse.lsp4j.websocket.jakarta.WebSocketLauncherBuilder;
 import org.keyproject.key.api.adapters.KeyAdapter;
-import org.keyproject.key.api.data.KeYDataTransferObject;
 import org.keyproject.key.api.remoteclient.ClientApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -201,7 +200,8 @@ public class StartServer implements Runnable {
     public static void configureJson(GsonBuilder gsonBuilder) {
         gsonBuilder.registerTypeAdapter(File.class, new KeyAdapter.FileTypeAdapter());
         gsonBuilder.registerTypeAdapter(Throwable.class, new KeyAdapter.ThrowableAdapter());
-        gsonBuilder.registerTypeAdapterFactory(RuntimeClassNameTypeAdapterFactory.of(Object.class, "$class"));
+        gsonBuilder.registerTypeAdapterFactory(
+            RuntimeClassNameTypeAdapterFactory.of(Object.class, "$class"));
         gsonBuilder.serializeNulls();
     }
 

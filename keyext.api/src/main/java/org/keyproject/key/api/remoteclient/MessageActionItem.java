@@ -7,6 +7,5 @@ public record MessageActionItem(
         /**
          * A short title like 'Retry', 'Open Log' etc.
          */
-        String title
-) {
+        String title) {
 }

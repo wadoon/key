@@ -12,11 +12,11 @@ import org.key_project.logic.sort.Sort;
  * @version 1 (13.10.23)
  */
 public record SortDesc(String string, String documentation,
-                       List<SortDesc> extendsSorts,
-                       boolean anAbstract, String s) implements KeYDataTransferObject {
+        List<SortDesc> extendsSorts,
+        boolean anAbstract, String s) implements KeYDataTransferObject {
     public static SortDesc from(Sort sort) {
         return new SortDesc(sort.name().toString(), sort.getDocumentation(),
-                sort.extendsSorts().stream().map(SortDesc::from).toList(),
-                sort.isAbstract(), sort.declarationString());
+            sort.extendsSorts().stream().map(SortDesc::from).toList(),
+            sort.isAbstract(), sort.declarationString());
     }
 }

@@ -40,69 +40,74 @@ public class Metamodel {
     public record Argument(String name, String type) {
     }
 
-    record ServerRequest(String name, String documentation, List<Argument> args, Type returnType) implements Endpoint {
+    record ServerRequest(String name, String documentation, List<Argument> args, Type returnType)
+            implements Endpoint {
     }
 
-    record ServerNotification(String name, String documentation, List<Argument> args) implements Endpoint {
+    record ServerNotification(String name, String documentation, List<Argument> args)
+            implements Endpoint {
     }
 
-    record ClientRequest(String name, String documentation, List<Argument> args, Type returnType) implements Endpoint {
+    record ClientRequest(String name, String documentation, List<Argument> args, Type returnType)
+            implements Endpoint {
     }
 
-    record ClientNotification(String name, String documentation, List<Argument> args) implements Endpoint {
+    record ClientNotification(String name, String documentation, List<Argument> args)
+            implements Endpoint {
     }
 
-    record Field(String name, /*Type*/ String type, String documentation) {
+    record Field(String name, /* Type */ String type, String documentation) {
 
-    Field(String name, String type) {
+        Field(String name, String type) {
             this(name, type, "");
         }
-}
+    }
 
-public sealed
+    public sealed
 
 
-interface Type {
-    default String kind() {
+    interface Type {
+        default String kind() {
             return getClass().getName();
         }
 
-    String documentation();
+        String documentation();
 
-    String name();
+        String name();
 
-    String identifier();
-}
-
-
-enum BuiltinType implements Type {
-    INT, LONG, STRING, BOOL, DOUBLE;
-
-    @Override
-    public String documentation() {
-        return "built-in data type";
+        String identifier();
     }
 
-    public String identifier() {
-        return name().toLowerCase();
-    }
 
-}
+    enum BuiltinType implements Type {
+        INT, LONG, STRING, BOOL, DOUBLE;
+
+        @Override
+        public String documentation() {
+            return "built-in data type";
+        }
+
+        public String identifier() {
+            return name().toLowerCase();
+        }
+
+    }
 
     record ListType(Type type, String documentation) implements Type {
 
-    @Override
-    public String name() {
-        return type().name() + "[]";
+        @Override
+        public String name() {
+            return type().name() + "[]";
+        }
+
+        public String identifier() {
+            return type().identifier() + "[]";
+        }
+
     }
 
-    public String identifier() {
-        return type().identifier()+"[]";
-    }
-
-    }
-
-    record ObjectType(String typeName, String typeFullName, List<Field> fields, String documentation) implements Type {
+    record ObjectType(String typeName, String typeFullName, List<Field> fields,
+            String documentation) implements Type {
 
         @Override
         public String name() {
@@ -116,25 +121,27 @@ enum BuiltinType implements Type {
 
     public record EitherType(Type a, Type b, String documentation) implements Type {
 
-    @Override
-    public String name() {
-        return "either<a,b>";
+        @Override
+        public String name() {
+            return "either<a,b>";
+        }
+
+        public String identifier() {
+            return name();
+        }
+
     }
 
-    public String identifier() {
-        return name();
-    }
+    public record EnumType(String typeName, String typeFullName, List<String> values,
+            String documentation) implements Type {
 
-    }
+        @Override
+        public String name() {
+            return typeName;
+        }
 
-    public record EnumType(String typeName, String typeFullName, List<String> values, String documentation) implements Type {
-
-    @Override
-    public String name() {
-        return typeName;
+        public String identifier() {
+            return typeFullName;
+        }
     }
-
-    public String identifier(){
-        return typeFullName;
-    }
-}}
+}
