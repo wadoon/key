@@ -1136,17 +1136,12 @@ public abstract class AbstractSymbolicExecutionTestCase {
         proof.getSettings().getStrategySettings()
                 .setCustomApplyStrategyStopCondition(stopCondition);
         // Run proof
-        try {
-            ui.getProofControl().startAndWaitForAutoMode(proof);
-            // Update symbolic execution tree
-            builder.analyse();
-            // Test result
-            assertSetTreeAfterStep(builder, oraclePathInBaseDirFile, oracleIndex,
-                oracleFileExtension,
-                baseDir);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        ui.getProofControl().startAndWaitForAutoMode(proof);
+        // Update symbolic execution tree
+        builder.analyse();
+        // Test result
+        assertSetTreeAfterStep(builder, oraclePathInBaseDirFile, oracleIndex, oracleFileExtension,
+            baseDir);
     }
 
 
@@ -1179,18 +1174,13 @@ public abstract class AbstractSymbolicExecutionTestCase {
         stopCondition.addChildren(lineBreakpoints);
         proof.getSettings().getStrategySettings()
                 .setCustomApplyStrategyStopCondition(stopCondition);
-        try {
-            // Run proof
-            ui.getProofControl().startAndWaitForAutoMode(proof);
-            // Update symbolic execution tree
-            builder.analyse();
-            // Test result
-            assertSetTreeAfterStep(builder, oraclePathInBaseDirFile, oracleIndex,
-                oracleFileExtension,
-                baseDir);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        // Run proof
+        ui.getProofControl().startAndWaitForAutoMode(proof);
+        // Update symbolic execution tree
+        builder.analyse();
+        // Test result
+        assertSetTreeAfterStep(builder, oraclePathInBaseDirFile, oracleIndex, oracleFileExtension,
+            baseDir);
     }
 
     /**
@@ -1221,18 +1211,13 @@ public abstract class AbstractSymbolicExecutionTestCase {
         stopCondition.addChildren(new StepOverSymbolicExecutionTreeNodesStopCondition());
         proof.getSettings().getStrategySettings()
                 .setCustomApplyStrategyStopCondition(stopCondition);
-        try {
-            // Run proof
-            ui.getProofControl().startAndWaitForAutoMode(proof);
-            // Update symbolic execution tree
-            builder.analyse();
-            // Test result
-            assertSetTreeAfterStep(builder, oraclePathInBaseDirFile, oracleIndex,
-                oracleFileExtension,
-                baseDir);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        // Run proof
+        ui.getProofControl().startAndWaitForAutoMode(proof);
+        // Update symbolic execution tree
+        builder.analyse();
+        // Test result
+        assertSetTreeAfterStep(builder, oraclePathInBaseDirFile, oracleIndex, oracleFileExtension,
+            baseDir);
     }
 
     /**
@@ -1264,19 +1249,13 @@ public abstract class AbstractSymbolicExecutionTestCase {
         proof.getSettings().getStrategySettings()
                 .setCustomApplyStrategyStopCondition(stopCondition);
         // Run proof
-        try {
-            ui.getProofControl().startAndWaitForAutoMode(proof);
-
-            // Update symbolic execution tree
-            SymbolicExecutionCompletions completions = builder.analyse();
-            // Test result
-            assertSetTreeAfterStep(builder, oraclePathInBaseDirFile, oracleIndex,
-                oracleFileExtension,
-                baseDir);
-            return completions;
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        ui.getProofControl().startAndWaitForAutoMode(proof);
+        // Update symbolic execution tree
+        SymbolicExecutionCompletions completions = builder.analyse();
+        // Test result
+        assertSetTreeAfterStep(builder, oraclePathInBaseDirFile, oracleIndex, oracleFileExtension,
+            baseDir);
+        return completions;
     }
 
     /**
@@ -1304,16 +1283,11 @@ public abstract class AbstractSymbolicExecutionTestCase {
         proof.getSettings().getStrategySettings()
                 .setCustomApplyStrategyStopCondition(stopCondition);
         // Run proof
-        try {
-            ui.getProofControl().startAndWaitForAutoMode(proof);
-
-            // Update symbolic execution tree
-            builder.analyse();
-            // Test result
-            assertSetTreeAfterStep(builder, oraclePathInBaseDirFile, baseDir);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        ui.getProofControl().startAndWaitForAutoMode(proof);
+        // Update symbolic execution tree
+        builder.analyse();
+        // Test result
+        assertSetTreeAfterStep(builder, oraclePathInBaseDirFile, baseDir);
     }
 
     /**
@@ -2211,24 +2185,18 @@ public abstract class AbstractSymbolicExecutionTestCase {
         // Execute auto mode until no more symbolic execution tree nodes are found or no new rules
         // are applied.
         do {
-            try {
-                // Store the number of nodes before start of the auto mode
-                nodeCount = env.getProof().countNodes();
-                // Run proof
-                env.getProofControl().startAndWaitForAutoMode(env.getProof());
-
-                // Update symbolic execution tree
-                env.getBuilder().analyse();
-                // Make sure that not to many set nodes are executed
-                Map<Goal, Integer> executedSetNodesPerGoal =
-                    stopCondition.getExectuedSetNodesPerGoal();
-                for (Integer value : executedSetNodesPerGoal.values()) {
-                    assertNotNull(value);
-                    assertTrue(value <= maximalNumberOfExecutedSetNodes,
-                        value + " is not less equal to " + maximalNumberOfExecutedSetNodes);
-                }
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+            // Store the number of nodes before start of the auto mode
+            nodeCount = env.getProof().countNodes();
+            // Run proof
+            env.getProofControl().startAndWaitForAutoMode(env.getProof());
+            // Update symbolic execution tree
+            env.getBuilder().analyse();
+            // Make sure that not to many set nodes are executed
+            Map<Goal, Integer> executedSetNodesPerGoal = stopCondition.getExectuedSetNodesPerGoal();
+            for (Integer value : executedSetNodesPerGoal.values()) {
+                assertNotNull(value);
+                assertTrue(value <= maximalNumberOfExecutedSetNodes,
+                    value + " is not less equal to " + maximalNumberOfExecutedSetNodes);
             }
         } while (stopCondition.wasSetNodeExecuted() && nodeCount != env.getProof().countNodes());
         // Create new oracle file if required in a temporary directory
