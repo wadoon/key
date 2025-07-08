@@ -1,12 +1,7 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package org.key_project.key.api.doc;/*
-                                     * This file is part of KeY - https://key-project.org
-                                     * KeY is licensed under the GNU General Public License Version
-                                     * 2
-                                     * SPDX-License-Identifier: GPL-2.0-only
-                                     */
+package org.key_project.key.api.doc;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -21,8 +16,8 @@ import java.util.stream.Stream;
  */
 public abstract class PythonGenerator implements Supplier<String> {
     protected final Metamodel.KeyApi metamodel;
-    protected PrintWriter out;
     protected final StringWriter target = new StringWriter();
+    protected final PrintWriter out = new PrintWriter(target);
 
     public PythonGenerator(Metamodel.KeyApi metamodel) {
         this.metamodel = metamodel;
@@ -30,10 +25,7 @@ public abstract class PythonGenerator implements Supplier<String> {
 
     @Override
     public String get() {
-        try (var out = new PrintWriter(target)) {
-            this.out = out;
-            run();
-        }
+        run();
         return target.toString();
     }
 
@@ -53,23 +45,19 @@ public abstract class PythonGenerator implements Supplier<String> {
     }
 
     protected String asPython(Metamodel.Type t) {
-        if (t instanceof Metamodel.ListType lt) {
-            return "typing.List[" + asPython(lt.type()) + "]";
-        }
+        return switch (t) {
+        case Metamodel.ListType lt -> "typing.List[" + asPython(lt.type()) + "]";
+        case Metamodel.EitherType lt ->
+            "typing.Union[" + asPython(lt.a()) + ", " + asPython(lt.b()) + "]";
+        case Metamodel.BuiltinType bt -> switch (bt) {
+        case INT, LONG -> "int";
+        case STRING -> "str";
+        case BOOL -> "bool";
+        case DOUBLE -> "float";
+        };
+        default -> t.name();
+        };
 
-        if (t instanceof Metamodel.EitherType lt) {
-            return "typing.Union[" + asPython(lt.a()) + ", " + asPython(lt.b()) + "]";
-        }
-
-        if (t instanceof Metamodel.BuiltinType bt) {
-            return switch (bt) {
-            case INT, LONG -> "int";
-            case STRING -> "str";
-            case BOOL -> "bool";
-            case DOUBLE -> "float";
-            };
-        }
-        return t.name();
     }
 
     protected Metamodel.Type findType(String typeName) {
@@ -177,15 +165,6 @@ public abstract class PythonGenerator implements Supplier<String> {
     public static class PyDataGen extends PythonGenerator {
         public PyDataGen(Metamodel.KeyApi metamodel) {
             super(metamodel);
-        }
-
-        @Override
-        public String get() {
-            try (var out = new PrintWriter(target)) {
-                this.out = out;
-                run();
-            }
-            return target.toString();
         }
 
         protected void run() {
