@@ -33,29 +33,29 @@ public abstract class PythonGenerator implements Supplier<String> {
 
     protected String asPython(String typeName) {
         return switch (typeName) {
-        case "INT", "LONG" -> "int";
-        case "STRING" -> "str";
-        case "BOOL" -> "bool";
-        case "DOUBLE" -> "float";
-        default -> {
-            var t = findType(typeName);
-            yield asPython(t);
-        }
+            case "INT", "LONG" -> "int";
+            case "STRING" -> "str";
+            case "BOOL" -> "bool";
+            case "DOUBLE" -> "float";
+            default -> {
+                var t = findType(typeName);
+                yield asPython(t);
+            }
         };
     }
 
     protected String asPython(Metamodel.Type t) {
         return switch (t) {
-        case Metamodel.ListType lt -> "typing.List[" + asPython(lt.type()) + "]";
-        case Metamodel.EitherType lt ->
-            "typing.Union[" + asPython(lt.a()) + ", " + asPython(lt.b()) + "]";
-        case Metamodel.BuiltinType bt -> switch (bt) {
-        case INT, LONG -> "int";
-        case STRING -> "str";
-        case BOOL -> "bool";
-        case DOUBLE -> "float";
-        };
-        default -> t.name();
+            case Metamodel.ListType lt -> "typing.List[" + asPython(lt.type()) + "]";
+            case Metamodel.EitherType lt ->
+                "typing.Union[" + asPython(lt.a()) + ", " + asPython(lt.b()) + "]";
+            case Metamodel.BuiltinType bt -> switch (bt) {
+                case INT, LONG -> "int";
+                case STRING -> "str";
+                case BOOL -> "bool";
+                case DOUBLE -> "float";
+            };
+            default -> t.name();
         };
 
     }

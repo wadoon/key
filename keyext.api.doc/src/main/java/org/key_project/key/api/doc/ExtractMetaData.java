@@ -129,7 +129,7 @@ public class ExtractMetaData implements Runnable {
             return getOrFindType(type.getTypeParameters()[0].getClass());
         }
 
-        if(type == List.class) {
+        if (type == List.class) {
             // TODO try to get the type below.
             var subType = getOrFindType(type.getTypeParameters()[0].getClass());
             return new Metamodel.ListType(subType, "");
