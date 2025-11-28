@@ -2,11 +2,11 @@
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.key.api.doc;/*
-                                     * This file is part of KeY - https://key-project.org
-                                     * KeY is licensed under the GNU General Public License Version
-                                     * 2
-                                     * SPDX-License-Identifier: GPL-2.0-only
-                                     */
+ * This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version
+ * 2
+ * SPDX-License-Identifier: GPL-2.0-only
+ */
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -34,7 +34,7 @@ public class DocGen implements Supplier<String> {
             printHeader();
 
             out.format("## Types%n");
-            metamodel.types()
+            metamodel.types().values()
                     .stream().sorted(Comparator.comparing(Metamodel.Type::name))
                     .forEach(this::printType);
 
@@ -72,13 +72,11 @@ public class DocGen implements Supplier<String> {
                 .collect(Collectors.joining(", "));
         switch (endpoint) {
             case Metamodel.ServerRequest sr ->
-                out.format("Server.%s( %s ) -> %s%n", endpoint.name(), a, sr.returnType().name());
+                    out.format("Server.%s( %s ) -> %s%n", endpoint.name(), a, sr.returnType().name());
             case Metamodel.ClientRequest sr ->
-                out.format("Client.%s( %s ) -> %s%n", endpoint.name(), a, sr.returnType().name());
-            case Metamodel.ServerNotification ignored ->
-                out.format("Server.%s( %s ) **async**%n", endpoint.name(), a);
-            case Metamodel.ClientNotification ignored ->
-                out.format("Client.%s( %s ) **async**%n", endpoint.name(), a);
+                    out.format("Client.%s( %s ) -> %s%n", endpoint.name(), a, sr.returnType().name());
+            case Metamodel.ServerNotification ignored -> out.format("Server.%s( %s ) **async**%n", endpoint.name(), a);
+            case Metamodel.ClientNotification ignored -> out.format("Client.%s( %s ) **async**%n", endpoint.name(), a);
             default -> {
             }
         }
@@ -92,24 +90,31 @@ public class DocGen implements Supplier<String> {
         out.format("### Type: %s%n", type.name());
         if (type instanceof Metamodel.ObjectType ot) {
             out.format("""
-                    ```
+                    %s 
+                    ```                    
                     type %s {
                      %s
                     }
                     ```
-                    """.formatted(type.name(),
-                ot.fields().stream().sorted(Comparator.comparing(Metamodel.Field::name))
-                        .map(it -> "\t%s : %s".formatted(it.name(), it.type()))
-                        .collect(Collectors.joining("\n"))));
+                    """.formatted(
+                    type.documentation(),
+                    type.name(),
+                    ot.fields().stream().sorted(Comparator.comparing(Metamodel.Field::name))
+                            .map(it -> "  /* %s */\n  %s : %s".formatted(it.documentation(), it.name(), it.type()))
+                            .collect(Collectors.joining("\n"))));
         }
 
         if (type instanceof Metamodel.EnumType et) {
             out.format("""
                     ```
+                    %s
                     enum %s { %s }
                     ```
-                    """.formatted(type.name(), String.join(", ", et.values())));
-            out.format(type.documentation());
+                    """.formatted(
+                    type.documentation(),
+                    type.name(),
+                    et.values().stream().map(it -> "  /* %s */\n  %s".formatted(it.documentation(), it.value())).collect(Collectors.joining("\n"))));
+                    out.format(type.documentation());
         }
         out.format(type.documentation());
         out.println();

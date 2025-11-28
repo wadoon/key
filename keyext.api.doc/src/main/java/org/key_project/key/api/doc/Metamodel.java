@@ -6,6 +6,7 @@ package org.key_project.key.api.doc;
 import java.util.List;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /// Metamodel of the API. This class contains classes which represents the functionality and
 /// interfaces of the API.
@@ -18,10 +19,10 @@ public class Metamodel {
     /// Root class of the metamodel.
     ///
     /// @param endpoints a list of provided services
-    /// @param types a list of known types
+    /// @param types     a list of known types
     public record KeyApi(
             List<Endpoint> endpoints,
-            List<Type> types) {
+            java.util.Map<Class<?>, Type> types) {
     }
 
     /// An {@link Endpoint} is a provided service/method.
@@ -54,7 +55,7 @@ public class Metamodel {
     /// @param documentation
     /// @param returnType
     public record ServerRequest(String name, String documentation, List<Argument> args,
-            Type returnType)
+                                Type returnType)
             implements Endpoint {
     }
 
@@ -65,7 +66,7 @@ public class Metamodel {
 
     ///
     public record ClientRequest(String name, String documentation, List<Argument> args,
-            Type returnType)
+                                Type returnType)
             implements Endpoint {
     }
 
@@ -115,7 +116,7 @@ public class Metamodel {
 
     /// List of `type`.
     ///
-    /// @param type the type of list elements
+    /// @param type          the type of list elements
     /// @param documentation documentation of this data type
     record ListType(Type type, String documentation) implements Type {
         @Override
@@ -131,12 +132,12 @@ public class Metamodel {
 
     /// Data type of objects or struct or record.
     ///
-    /// @param typeName short type name
-    /// @param typeFullName fully-qualified type name
-    /// @param fields list of fields
+    /// @param typeName      short type name
+    /// @param typeFullName  fully-qualified type name
+    /// @param fields        list of fields
     /// @param documentation documentation of data type
     record ObjectType(String typeName, String typeFullName, List<Field> fields,
-            String documentation) implements Type {
+                      String documentation) implements Type {
 
         @Override
         public String name() {
@@ -168,12 +169,12 @@ public class Metamodel {
 
     /// Enumeration data type
     ///
-    /// @param typeName short name of the data type
-    /// @param typeFullName fully-qualified name
-    /// @param values possible values of the enum
+    /// @param typeName      short name of the data type
+    /// @param typeFullName  fully-qualified name
+    /// @param values        possible values of the enum
     /// @param documentation documentation of the data type
-    public record EnumType(String typeName, String typeFullName, List<String> values,
-            String documentation) implements Type {
+    public record EnumType(String typeName, String typeFullName, List<EnumConstant> values,
+                           String documentation) implements Type {
 
         @Override
         public String name() {
@@ -183,5 +184,10 @@ public class Metamodel {
         public String identifier() {
             return typeFullName;
         }
+
     }
+
+    record EnumConstant(String value, @Nullable String documentation) {
+    }
+
 }

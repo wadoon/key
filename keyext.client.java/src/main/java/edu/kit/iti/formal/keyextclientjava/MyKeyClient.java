@@ -30,7 +30,7 @@ import org.keyproject.key.api.data.LoadParams;
 import org.keyproject.key.api.data.TaskFinishedInfo;
 import org.keyproject.key.api.data.TaskStartedInfo;
 import org.keyproject.key.api.remoteapi.KeyApi;
-import org.keyproject.key.api.remoteapi.PrintOptions;
+import org.keyproject.key.api.data.PrintOptions;
 import org.keyproject.key.api.remoteclient.*;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeRegular;
 import org.kordamp.ikonli.javafx.FontIcon;
