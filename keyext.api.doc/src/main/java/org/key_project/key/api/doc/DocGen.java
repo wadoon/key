@@ -3,17 +3,19 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.key.api.doc;
 
-import freemarker.ext.beans.ZeroArgumentNonVoidMethodPolicy;
-import freemarker.template.Configuration;
-import freemarker.template.DefaultObjectWrapper;
-import freemarker.template.TemplateException;
-
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.Supplier;
+
+import freemarker.core.HTMLOutputFormat;
+import freemarker.ext.beans.ZeroArgumentNonVoidMethodPolicy;
+import freemarker.template.Configuration;
+import freemarker.template.DefaultObjectWrapper;
+import freemarker.template.TemplateException;
+import freemarker.template.TemplateExceptionHandler;
 
 /**
  * Generation of Markdown documentation.
@@ -31,22 +33,23 @@ public class DocGen implements Supplier<String> {
     @Override
     public String get() {
         final StringWriter target = new StringWriter();
-        try  {
+        try {
             // 1) Configure FreeMarker
             var cfg = new Configuration(Configuration.VERSION_2_3_32);
             cfg.setClassForTemplateLoading(DocGen.class, "/templates"); // classpath
             cfg.setDefaultEncoding("UTF-8");
-            //cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
+            cfg.setTemplateExceptionHandler(TemplateExceptionHandler.HTML_DEBUG_HANDLER);
             cfg.setLogTemplateExceptions(false);
             cfg.setWrapUncheckedExceptions(true);
             cfg.setFallbackOnNullLoopVariable(false);
-            //cfg.setOutputFormat(HTMLOutputFormat.INSTANCE);
+            cfg.setOutputFormat(HTMLOutputFormat.INSTANCE);
 
             // Use DefaultObjectWrapper to expose fields of objects in the data model
             DefaultObjectWrapper wrapper = new DefaultObjectWrapper(Configuration.VERSION_2_3_32);
             wrapper.setExposeFields(true);
             wrapper.setMethodsShadowItems(true);
-            wrapper.setRecordZeroArgumentNonVoidMethodPolicy(ZeroArgumentNonVoidMethodPolicy.BOTH_METHOD_AND_PROPERTY_UNLESS_BEAN_PROPERTY_READ_METHOD);
+            wrapper.setRecordZeroArgumentNonVoidMethodPolicy(
+                ZeroArgumentNonVoidMethodPolicy.BOTH_METHOD_AND_PROPERTY_UNLESS_BEAN_PROPERTY_READ_METHOD);
             wrapper.setForceLegacyNonListCollections(false);
             wrapper.setDefaultDateType(freemarker.template.TemplateDateModel.DATETIME);
             cfg.setObjectWrapper(wrapper);
@@ -57,14 +60,14 @@ public class DocGen implements Supplier<String> {
             model.put("segmentDocumentation", metamodel.segmentDocumentation());
 
             model.put("endpoints",
-                    metamodel.endpoints()
-                            .stream().sorted(Comparator.comparing(Metamodel.Endpoint::name))
-                            .toList());
+                metamodel.endpoints()
+                        .stream().sorted(Comparator.comparing(Metamodel.Endpoint::name))
+                        .toList());
 
             model.put("types",
-                    metamodel.types().values()
-                            .stream().sorted(Comparator.comparing(Metamodel.Type::name))
-                            .toList());
+                metamodel.types().values()
+                        .stream().sorted(Comparator.comparing(Metamodel.Type::name))
+                        .toList());
 
 
             // 3) Get template

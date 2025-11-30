@@ -26,7 +26,8 @@ class SimpleClient implements ClientApi {
 
     @Nullable
     @Override
-    public CompletableFuture<MessageActionItem> showMessageWithActions(ShowMessageRequestParams params) {
+    public CompletableFuture<MessageActionItem> showMessageWithActions(
+            ShowMessageRequestParams params) {
         return null;
     }
 

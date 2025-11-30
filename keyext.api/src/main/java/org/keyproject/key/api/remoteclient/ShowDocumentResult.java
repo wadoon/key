@@ -6,4 +6,5 @@ package org.keyproject.key.api.remoteclient;
 /**
  * @param success A boolean indicating if the show was successful.
  */
-public record ShowDocumentResult(boolean success) {}
+public record ShowDocumentResult(boolean success) {
+}

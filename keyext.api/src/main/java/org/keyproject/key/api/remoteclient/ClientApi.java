@@ -17,7 +17,8 @@ import org.keyproject.key.api.data.TaskStartedInfo;
  * This segment contains the functionalities that a client needs to implement.
  * Mainly, it is logging and displaying of information.
  */
-@JsonSegment("client") @NullMarked
+@JsonSegment("client")
+@NullMarked
 public interface ClientApi {
     /**
      * A notification to log the trace of the server’s execution.
@@ -71,8 +72,8 @@ public interface ClientApi {
      *
      * @param position some integer
      * @TODO weigl: This call is stupid w/o information of the task assigned.
-     * we also should send max value for showing a progress indicator,
-     * and a message.
+     *       we also should send max value for showing a progress indicator,
+     *       and a message.
      */
     @JsonNotification
     void taskProgress(int position);

@@ -70,7 +70,7 @@ public abstract class PythonGenerator implements Supplier<String> {
                 })
                 .findFirst()
                 .orElse(new Metamodel.ObjectType("...", "...", List.of(), null));
-                        //new RuntimeException("Could not find type: " + typeName));
+        // new RuntimeException("Could not find type: " + typeName));
     }
 
 

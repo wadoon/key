@@ -6,7 +6,7 @@ package org.keyproject.key.api.remoteclient;
 import java.util.List;
 
 /**
- * @param type    The message type. See {@link MessageType}.
+ * @param type The message type. See {@link MessageType}.
  * @param message the actual message
  */
 public record ShowMessageRequestParams(

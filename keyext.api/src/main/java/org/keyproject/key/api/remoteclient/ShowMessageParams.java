@@ -4,7 +4,7 @@
 package org.keyproject.key.api.remoteclient;
 
 /**
- * @param type    The message type. See {@link MessageType}.
+ * @param type The message type. See {@link MessageType}.
  * @param message the actual message
  */
 public record ShowMessageParams(MessageType type, String message) {

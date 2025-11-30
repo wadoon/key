@@ -7,6 +7,8 @@ import org.eclipse.lsp4j.jsonrpc.validation.NonNull;
 
 /**
  * @param message The message to be logged.
- * @param level   Additional information that can be computed if the `trace` configuration is set to `'verbose'`
+ * @param level Additional information that can be computed if the `trace` configuration is set to
+ *        `'verbose'`
  */
-public record LogTraceParams(@NonNull String message, String level) {}
+public record LogTraceParams(@NonNull String message, String level) {
+}
