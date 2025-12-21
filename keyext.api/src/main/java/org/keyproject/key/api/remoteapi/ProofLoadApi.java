@@ -25,7 +25,7 @@ import org.keyproject.key.api.data.ProblemDefinition;
 public interface ProofLoadApi {
 
     /**
-     *
+     * Do not use. Not implemented
      * @param problem
      * @return
      */
@@ -49,10 +49,8 @@ public interface ProofLoadApi {
     CompletableFuture<ProofId> loadTerm(String term);
 
     /**
-     * Test!
-     *
      * @param params parameters for loading
-     * @return
+     * @return either an {@link EnvironmentId or a ProofId depending on the given params.}
      * @throws ProblemLoaderException if something went wrong
      */
     @JsonRequest
