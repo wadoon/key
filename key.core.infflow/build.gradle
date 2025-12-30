@@ -1,5 +1,9 @@
+description = "Java Information Flow support for the KeY Theorem Prover"
+
 dependencies {
     api(project(":key.core"))
+
+    // This is not the way it should be done, but other ways (aka test fixtures) requires more relocation.
     testImplementation(project(":key.core").sourceSets.test.output)
 }
 
