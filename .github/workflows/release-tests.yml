@@ -12,7 +12,7 @@ env:
 jobs:
   unit-tests:
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         os: [ macos-latest, ubuntu-latest, windows-latest ]
         java: [ 21, 25 ]
@@ -68,7 +68,7 @@ jobs:
       GH_TOKEN: ${{ github.token }}
     continue-on-error: false
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         test: [ testProveRules, testRunAllFunProofs, testRunAllInfProofs, testProveSMTLemmas ]
         os: [ macos-latest, ubuntu-latest, windows-latest ]
@@ -115,7 +115,7 @@ jobs:
       GH_TOKEN: ${{ github.token }}
     continue-on-error: false
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         test: [ testProveSMTLemmas, testStrictSMT ]
         os: [ macos-latest, ubuntu-latest, windows-latest ]
