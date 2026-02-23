@@ -46,6 +46,9 @@ jobs:
         uses:
           gradle/actions/setup-gradle@v5
 
+      - name: Assemble
+        run: ./gradlew --parallel assemble
+
       - name: Test mandatory modules with Gradle
         run: ./gradlew test --continue -x :key.core.symbolic_execution:test -x :key.core.proof_references:test
 
@@ -70,7 +73,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test: [ testProveRules, testRunAllFunProofs, testRunAllInfProofs, testProveSMTLemmas ]
+        test: [ testProveRules, testRunAllFunProofs, testRunAllInfProofs, testRunAllWdProofs, testProveSMTLemmas ]
         os: [ macos-latest, ubuntu-latest, windows-latest ]
         java: [ 21, 25 ]
         z3: [ '4.15.4' ]
